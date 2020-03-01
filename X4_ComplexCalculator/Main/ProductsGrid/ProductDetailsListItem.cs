@@ -52,7 +52,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// <param name="moduleCount">モジュール数</param>
         /// <param name="efficiency">効率</param>
         /// <param name="amount">製品数</param>
-        public ProductDetailsListItem(string moduleID, int moduleCount, double efficiency, long amount)
+        public ProductDetailsListItem(string moduleID, long moduleCount, double efficiency, long amount)
         {
             ModuleID = moduleID;
             ModuleCount = moduleCount;

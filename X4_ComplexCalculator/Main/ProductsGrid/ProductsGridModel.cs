@@ -40,11 +40,6 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// <param name="e"></param>
         private void UpdateProducts(object sender, NotifyCollectionChangedEventArgs e)
         {
-            // 前回値保存
-            var backup = Products.ToDictionary(x => x.Ware.WareID, x => new { x.UnitPrice, x.IsExpanded });
-
-            Products.Clear();
-
             // モジュール一覧(製造モジュールか居住モジュールのみ抽出)
             var modules = ((IEnumerable<ModulesGridItem>)sender).Where(x => x.Module.ModuleType.ModuleTypeID == "production" || x.Module.ModuleType.ModuleTypeID == "habitation");
 
@@ -57,60 +52,62 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
             // ウェア関連モジュール集計用ディクショナリ
             var moduleDict = new Dictionary<string, List<ProductDetailsListItem>>();    // <ウェアID, 詳細情報>
 
-
+            // パラメータ設定
+            var prodParam = new SQLiteCommandParameters(3);     // 製造モジュール用パラメーター
+            var habParam  = new SQLiteCommandParameters(2);     // 居住モジュール用パラメーター
             foreach (var module in modules)
             {
-                switch(module.Module.ModuleType.ModuleTypeID)
+                switch (module.Module.ModuleType.ModuleTypeID)
                 {
-                    // 製造モジュールの場合
                     case "production":
-                        AggregateProductionModule(module, efficiency, wareDict, moduleDict);
+                        prodParam.Add("efficiency", DbType.Double, efficiency);
+                        prodParam.Add("count", DbType.Int32, module.ModuleCount);
+                        prodParam.Add("moduleID", DbType.String, module.Module.ModuleID);
                         break;
 
-                    // 居住モジュールの場合
                     case "habitation":
-                        AggregateHabitationModule(module, wareDict, moduleDict);
+                        habParam.Add("count", DbType.Int32, module.ModuleCount);
+                        habParam.Add("moduleID", DbType.String, module.Module.ModuleID);
                         break;
 
-                    // それ以外の場合(ありえない)
                     default:
-                        System.Diagnostics.Debug.Assert(false, "モジュール種別が不正です。");
                         break;
                 }
             }
 
+            // 製造モジュール集計
+            AggregateProductionModule(prodParam, wareDict, moduleDict);
 
+            // 居住モジュール集計
+            AggregateHabitationModule(habParam, wareDict, moduleDict);
 
-            Products.AddRange(wareDict.Select((System.Func<KeyValuePair<string, long>, ProductsGridItem>)(x => 
+            // 前回値保存
+            var backup = Products.ToDictionary(x => x.Ware.WareID, x => new { x.UnitPrice, x.IsExpanded });
+
+            Products.Reset(wareDict.Select(x =>
             {
                 var details = moduleDict[x.Key];
-                var bak = new { UnitPrice = (long)0, IsExpanded = false};
+                var bak = new { UnitPrice = (long)0, IsExpanded = false };
                 return backup.TryGetValue(x.Key, out bak)
                     ? new ProductsGridItem(x.Key, x.Value, details, bak.IsExpanded, bak.UnitPrice)
                     : new ProductsGridItem(x.Key, x.Value, details);
-            })));
+            }));
         }
 
 
-        /// <summary>
-        /// 製造モジュール用集計処理
-        /// </summary>
-        /// <param name="module">モジュール情報</param>
-        /// <param name="efficiency">生産性</param>
-        /// <param name="wareDict">ウェア情報辞書</param>
-        /// <param name="moduleDict">ウェア情報辞書の関連モジュール辞書</param>
-        private void AggregateProductionModule(ModulesGridItem module, double efficiency, Dictionary<string, long> wareDict, Dictionary<string, List<ProductDetailsListItem>> moduleDict)
+        private void AggregateProductionModule(SQLiteCommandParameters param, Dictionary<string, long> wareDict, Dictionary<string, List<ProductDetailsListItem>> moduleDict)
         {
             //------------//
             // 製品を集計 //
             //------------//
-            {
-                var query = $@"
+            var query = $@"
 SELECT
     WareProduction.WareID,
-    (1 + WareEffect.Product * {efficiency}) AS Efficiency,
-	CAST(Amount * {module.ModuleCount} * (3600 / WareProduction.Time) * (1 + WareEffect.Product * {efficiency}) AS INTEGER) AS Amount
-
+    (1 + WareEffect.Product * :efficiency) AS Efficiency,
+	CAST(Amount * :count * (3600 / WareProduction.Time) * (1 + WareEffect.Product * :efficiency) AS INTEGER) AS Amount,
+    :count AS Count,
+    :moduleID AS ModuleID
+    
 FROM
     WareProduction,
 	WareEffect,
@@ -119,7 +116,7 @@ FROM
 WHERE
 	WareProduction.WareID  = WareEffect.WareID AND
 	WareProduction.WareID  = ModuleProduct.WareID AND 
-	ModuleProduct.ModuleID = '{module.Module.ModuleID}' AND
+	ModuleProduct.ModuleID = :moduleID AND
 	WareProduction.Method  = WareEffect.Method AND
 	WareProduction.Method  = 
 		CASE
@@ -130,25 +127,20 @@ WHERE
 					ModuleProduct,
 					WareProduction
 				WHERE
-					ModuleProduct.ModuleID = '{module.Module.ModuleID}' AND
+					ModuleProduct.ModuleID = :moduleID AND
 					ModuleProduct.WareID   = WareProduction.WareID AND
 					ModuleProduct.Method   = WareProduction.Method
 			) THEN ModuleProduct.Method
 			ELSE 'default'
-		END";
-
-
-                DBConnection.X4DB.ExecQuery(query, SumProduct, wareDict, moduleDict, module.Module.ModuleID, module.ModuleCount);
-            }
-
-            //--------------------------//
-            // 生産に必要なウェアを集計 //
-            //--------------------------//
-            {
-                var query = $@"
+		END
+-- ■ 生産に必要なウェアを連結
+UNION ALL
 SELECT
 	NeedWareID AS 'WareID',
-	{module.ModuleCount} * CAST(-3600 / Time * WareResource.Amount AS INTEGER) AS 'Amount'
+    -1.0 AS Efficiency,
+	:count * CAST(-3600 / Time * WareResource.Amount AS INTEGER) AS Amount,
+    :count AS Count,
+    :moduleID AS ModuleID
 FROM
 	WareProduction,
 	WareResource,
@@ -157,12 +149,14 @@ WHERE
 	WareProduction.WareID  = WareResource.WareID   AND
 	WareProduction.WareID  = ModuleProduct.WareID  AND
 	WareResource.WareID    = WareProduction.WareID AND
-	ModuleProduct.ModuleID = '{module.Module.ModuleID}' AND
-    WareResource.Method    = WareProduction.Method";
+	ModuleProduct.ModuleID = :moduleID AND
+    WareResource.Method    = WareProduction.Method
+";
 
-                DBConnection.X4DB.ExecQuery(query, SumResource, wareDict, moduleDict, module.Module.ModuleID, module.ModuleCount);
-            }
+            DBConnection.X4DB.ExecQuery(query, param, SumProduct, wareDict, moduleDict);
         }
+
+
 
         /// <summary>
         /// 居住モジュール用集計処理
@@ -170,13 +164,14 @@ WHERE
         /// <param name="module">モジュール情報</param>
         /// <param name="wareDict">ウェア情報辞書</param>
         /// <param name="moduleDict">ウェア情報辞書の関連モジュール辞書</param>
-        private void AggregateHabitationModule(ModulesGridItem module, Dictionary<string, long> wareDict, Dictionary<string, List<ProductDetailsListItem>> moduleDict)
+        private void AggregateHabitationModule(SQLiteCommandParameters param, Dictionary<string, long> wareDict, Dictionary<string, List<ProductDetailsListItem>> moduleDict)
         {
             var query = $@"
 SELECT
 	WorkUnitResource.WareID,
-	CAST((CAST(WorkUnitResource.Amount AS REAL)	/ WorkUnitProduction.Amount) * -Module.WorkersCapacity AS INTEGER) * {module.ModuleCount} As Amount
-	
+	CAST((CAST(WorkUnitResource.Amount AS REAL)	/ WorkUnitProduction.Amount) * -Module.WorkersCapacity AS INTEGER) * :count As Amount,
+	:count AS Count,
+    :moduleID AS ModuleID
 FROM
 	WorkUnitProduction,
 	WorkUnitResource,
@@ -185,7 +180,7 @@ FROM
 WHERE
 	WorkUnitResource.WorkUnitID = WorkUnitProduction.WorkUnitID AND
 	WorkUnitResource.WorkUnitID = 'workunit_busy' AND
-    Module.ModuleID             = '{module.Module.ModuleID}' AND
+    Module.ModuleID             = :moduleID AND
     WorkUnitResource.Method     = WorkUnitProduction.Method AND
     WorkUnitResource.Method     =
 	(
@@ -204,14 +199,14 @@ WHERE
 				ModuleOwner.FactionID = Faction.FactionID AND
 				Faction.RaceID = Race.RaceID AND
 				WorkUnitResource.Method = Race.RaceID AND
-				ModuleOwner.ModuleID = '{module.Module.ModuleID}'
+				ModuleOwner.ModuleID = :moduleID
 			UNION ALL
 			SELECT 'default'
 			)
 		LIMIT 1
 	)
 ";
-            DBConnection.X4DB.ExecQuery(query, SumResource, wareDict, moduleDict, module.Module.ModuleID, module.ModuleCount);
+            DBConnection.X4DB.ExecQuery(query, param, SumResource, wareDict, moduleDict);
         }
 
         /// <summary>
@@ -271,10 +266,10 @@ WHERE
             }
 
             // 関連モジュール集計
-            var moduleDict = (Dictionary<string, List<ProductDetailsListItem>>)args[1];
-            var moduleID = (string)args[2];
-            var moduleCount = (int)args[3];
-            var efficiency = (double)dr["Efficiency"];
+            var moduleDict  = (Dictionary<string, List<ProductDetailsListItem>>)args[1];
+            var moduleID    = (string)dr["ModuleID"];
+            var moduleCount = (long)dr["Count"];
+            var efficiency  = (double)dr["Efficiency"];
 
             // このウェアに対して初回か？
             if (!moduleDict.ContainsKey(wareID))
@@ -330,8 +325,8 @@ WHERE
 
             // 関連モジュール集計
             var modulesDict = (Dictionary<string, List<ProductDetailsListItem>>)args[1];
-            var moduleID = (string)args[2];
-            var moduleCount = (int)args[3];
+            var moduleID = dr["ModuleID"].ToString();
+            var moduleCount = (long)dr["Count"];
 
             // このウェアに対して関連モジュール追加が初回か？
             if (!modulesDict.ContainsKey(wareID))
