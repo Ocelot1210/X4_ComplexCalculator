@@ -1,0 +1,70 @@
+﻿<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:modGrid="clr-namespace:X4_ComplexCalculator.Main.ModulesGrid"
+    xmlns:prodGrid="clr-namespace:X4_ComplexCalculator.Main.ProductsGrid"
+    xmlns:resGrid="clr-namespace:X4_ComplexCalculator.Main.ResourcesGrid"
+    xmlns:storGrid="clr-namespace:X4_ComplexCalculator.Main.StorageGrid"
+    xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
+    x:Class="X4_ComplexCalculator.MainWindow"
+    mc:Ignorable="d"
+    Title="X4: ステーション計算機"
+    Height="600" Width="1000" Style="{StaticResource DefaultWindowBackgroundStyle}">
+
+
+    <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Menu>
+            <MenuItem Header="ファイル">
+                <MenuItem Header="上書き保存"/>
+                <MenuItem Header="名前を付けて保存"/>
+            </MenuItem>
+        </Menu>
+
+        <xcad:DockingManager Grid.Row="1">
+            <xcad:LayoutRoot>
+                <xcad:LayoutPanel Orientation="Horizontal">
+
+                    <xcad:LayoutDocumentPaneGroup>
+                        <xcad:LayoutDocumentPane>
+                            <!-- モジュール一覧 -->
+                            <xcad:LayoutDocument Title="モジュール一覧" CanClose="False">
+                                <modGrid:ModulesGrid x:Name="modulesGrid" Grid.Column="0"/>
+                            </xcad:LayoutDocument>
+                        </xcad:LayoutDocumentPane>
+
+                        <xcad:LayoutDocumentPane>
+                            <!-- 概要 -->
+                            <xcad:LayoutDocument Title="概要" CanClose="False">
+
+                            </xcad:LayoutDocument>
+
+                            <!-- 製品 -->
+                            <xcad:LayoutDocument Title="製品" CanClose="False">
+                                <prodGrid:ProductsGrid x:Name="productsGrid"/>
+                            </xcad:LayoutDocument>
+
+                            <!-- 建造 -->
+                            <xcad:LayoutDocument Title="建造" CanClose="False">
+                                <resGrid:ResourcesGrid x:Name="resourcesGrid"/>
+                            </xcad:LayoutDocument>
+
+                            <!-- 保管庫 -->
+                            <xcad:LayoutDocument Title="保管庫" CanClose="False">
+                                <storGrid:StoragesGrid x:Name="storagesGrid"/>
+                            </xcad:LayoutDocument>
+                        </xcad:LayoutDocumentPane>
+                    </xcad:LayoutDocumentPaneGroup>
+
+                </xcad:LayoutPanel>
+            </xcad:LayoutRoot>
+        </xcad:DockingManager>
+    </Grid>
+</Window>

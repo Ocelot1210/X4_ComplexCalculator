@@ -1,0 +1,148 @@
+﻿using System.Collections.Generic;
+using System.Data.SQLite;
+using System.Linq;
+
+namespace X4_ComplexCalculator.DB.X4DB
+{
+    /// <summary>
+    /// モジュールの装備品管理用クラス
+    /// </summary>
+    public class ModuleEquipmentManager
+    {
+        #region メンバ
+        /// <summary>
+        /// 装備品
+        /// </summary>
+        private readonly Dictionary<Size, List<Equipment>> _Equipments = new Dictionary<Size, List<Equipment>>();
+
+
+        /// <summary>
+        /// 装備可能な数
+        /// </summary>
+        private readonly Dictionary<Size, int> _MaxAmount = new Dictionary<Size, int>();
+
+
+        /// <summary>
+        /// サイズ一覧
+        /// </summary>
+        private readonly List<Size> _Sizes = new List<Size>();
+        #endregion
+
+
+        #region プロパティ
+        /// <summary>
+        /// 装備可能な数
+        /// </summary>
+        public IReadOnlyDictionary<Size, int> MaxAmount => _MaxAmount;
+
+
+        /// <summary>
+        /// サイズ一覧
+        /// </summary>
+        public IReadOnlyList<Size> Sizes => _Sizes;
+
+
+        /// <summary>
+        /// 装備を持てるか
+        /// </summary>
+        public bool CanEquipped { private set; get; }
+
+
+        /// <summary>
+        /// 全装備を取得
+        /// </summary>
+        public List<Equipment> AllEquipments
+        {
+            get
+            {
+                var ret = new List<Equipment>();
+
+                foreach(var itm in _Equipments.Values)
+                {
+                    ret.AddRange(itm);
+                }
+
+                return ret;
+            }
+        }
+
+
+        /// <summary>
+        /// 全装備の個数
+        /// </summary>
+        public int AllEquipmentsCount => (CanEquipped) ? _Equipments.Sum(x => x.Value.Count) : 0;
+        #endregion
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="moduleID">モジュールID</param>
+        /// <param name="type">"Turret"か"Shield"のどちらか"</param>
+        public ModuleEquipmentManager(string moduleID, string type)
+        {
+            CanEquipped = false;
+
+            var query = $@"SELECT SizeID, Amount FROM Module{type} WHERE ModuleID = '{moduleID}'";
+
+            DBConnection.X4DB.ExecQuery(query,
+                (SQLiteDataReader dr, object[] args) =>
+                {
+                    var size = new Size(dr["SizeID"].ToString());
+                    _Sizes.Add(size);
+                    _MaxAmount.Add(size, (int)(long)dr["Amount"]);
+                    _Equipments.Add(size, new List<Equipment>());
+                    CanEquipped = true;
+                });
+        }
+
+        /// <summary>
+        /// 装備一覧を取得
+        /// </summary>
+        /// <param name="size">サイズ</param>
+        /// <returns>装備一覧</returns>
+        public IReadOnlyList<Equipment> GetEquipment(Size size)
+        {
+            return _Equipments[size];
+        }
+
+
+        /// <summary>
+        /// 装備一覧に追加
+        /// </summary>
+        /// <param name="size">サイズ</param>
+        /// <param name="equipments">装備一覧</param>
+        public void ResetEquipment(Size size, ICollection<Equipment> equipments)
+        {
+            if(MaxAmount[size] < equipments.Count)
+            {
+                throw new System.IndexOutOfRangeException("モジュール数がオーバーしています。");
+            }
+
+            _Equipments[size].Clear();
+            _Equipments[size].AddRange(equipments);
+        }
+
+
+        /// <summary>
+        /// 比較
+        /// </summary>
+        /// <param name="obj">比較対象</param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+        {
+            if (!(obj is ModuleEquipmentManager tgt)) return false;
+
+            return _Equipments.Equals(tgt._Equipments);
+        }
+
+
+        /// <summary>
+        /// ハッシュ値を取得
+        /// </summary>
+        /// <returns>ハッシュ値</returns>
+        public override int GetHashCode()
+        {
+            return _Equipments.GetHashCode();
+        }
+    }
+}
