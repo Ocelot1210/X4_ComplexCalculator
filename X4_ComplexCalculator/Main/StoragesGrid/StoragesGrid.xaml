@@ -10,7 +10,7 @@
     <Grid>
         <DataGrid
             AutoGenerateColumns="False"
-            ItemsSource="{Binding Path=Storages, UpdateSourceTrigger=PropertyChanged}"
+            ItemsSource="{Binding Path=Storages, UpdateSourceTrigger=PropertyChanged, IsAsync=True}"
             SelectionUnit="Cell"
             Style="{StaticResource DefaultDataGridStyle}"
             IsReadOnly="True"
@@ -33,18 +33,10 @@
                                 <!-- 保管庫詳細 -->
                                 <DataGridInline:InlineListView
                                     ItemsSource="{Binding Details, Mode=OneTime}"
-                                    VirtualizingPanel.IsVirtualizing="True"
-                                    VirtualizingPanel.VirtualizationMode="Recycling"
+                                    Style="{StaticResource DefaultListView}"
                                     >
-                                    
-                                    <!-- ListViewの文字寄せに必要な設定 -->
-                                    <DataGridInline:InlineListView.ItemContainerStyle>
-                                        <Style TargetType="ListViewItem">
-                                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                                        </Style>
-                                    </DataGridInline:InlineListView.ItemContainerStyle>
 
-                                    <DataGridInline:InlineListView.View>
+                                    <ListView.View>
                                         <GridView>
                                             
                                             <!-- モジュール数 -->
@@ -91,7 +83,7 @@
                                             </DataGridInline:InlineGridViewColumn>
 
                                         </GridView>
-                                    </DataGridInline:InlineListView.View>
+                                    </ListView.View>
                                     
                                 </DataGridInline:InlineListView>
                             </Expander>

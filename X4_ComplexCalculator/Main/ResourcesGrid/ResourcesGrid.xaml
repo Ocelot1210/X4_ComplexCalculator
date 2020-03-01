@@ -16,7 +16,7 @@
     <Grid>
         <DataGrid
             AutoGenerateColumns="False"
-            ItemsSource="{Binding Path=BuildResource, UpdateSourceTrigger=PropertyChanged}"
+            ItemsSource="{Binding Path=BuildResource, UpdateSourceTrigger=PropertyChanged, IsAsync=True}"
             SelectionUnit="Cell"
             IsReadOnly="True"
             Style="{StaticResource DefaultDataGridStyle}"

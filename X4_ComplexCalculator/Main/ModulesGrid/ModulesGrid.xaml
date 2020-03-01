@@ -14,7 +14,7 @@
         <CollectionViewSource x:Key="ModulesViewSource" Source="{Binding Modules}"/>
 
         <ContextMenu x:Key="DataGridContextMenu">
-            <MenuItem Header="削除"/>
+            <MenuItem Header="削除" Command="{Binding DeleteModules}"/>
         </ContextMenu>
 
         <Style TargetType="{x:Type DataGridCell}" x:Key="ModulesGridDefaultCellStyle">
@@ -71,7 +71,7 @@
             <DataGrid 
                 Name="moduleGrid"
                 AutoGenerateColumns="False"
-                ItemsSource="{Binding Source={StaticResource ModulesViewSource}, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                ItemsSource="{Binding Source={StaticResource ModulesViewSource}, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, IsAsync=True}"
                 SelectionUnit="FullRow"
                 PresentationOptions:Freeze="true"
                 IsReadOnly="True"
@@ -81,6 +81,12 @@
                 CellStyle="{StaticResource ModulesGridDefaultCellStyle}"
                 >
 
+                <DataGrid.Resources>
+                    <Style TargetType="DataGridRow">
+                        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=OneWayToSource}"/>
+                    </Style>
+                </DataGrid.Resources>
+                
                 <DataGrid.Columns>
                     
                     <!-- モジュール名 -->
@@ -91,7 +97,7 @@
                         >
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Module.Name, Mode=OneWay}">
+                                <TextBlock Text="{Binding Module.Name, Mode=OneTime}">
                                     <TextBlock.InputBindings>
                                         <MouseBinding
                                             MouseAction="LeftDoubleClick"

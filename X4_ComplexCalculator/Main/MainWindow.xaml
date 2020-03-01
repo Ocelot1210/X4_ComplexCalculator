@@ -3,6 +3,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:stsmry="clr-namespace:X4_ComplexCalculator.Main.StationSummary"
     xmlns:modGrid="clr-namespace:X4_ComplexCalculator.Main.ModulesGrid"
     xmlns:prodGrid="clr-namespace:X4_ComplexCalculator.Main.ProductsGrid"
     xmlns:resGrid="clr-namespace:X4_ComplexCalculator.Main.ResourcesGrid"
@@ -22,9 +23,16 @@
         </Grid.RowDefinitions>
 
         <Menu>
-            <MenuItem Header="ファイル">
-                <MenuItem Header="上書き保存"/>
+            <MenuItem Header="ファイル(_F)">
+                <MenuItem Header="上書き保存" InputGestureText="Ctrl+S"/>
                 <MenuItem Header="名前を付けて保存"/>
+            </MenuItem>
+            <MenuItem Header="表示(_V)">
+                <MenuItem IsCheckable="True" Header="{Binding Title, Mode=OneTime, ElementName=_Module}"   IsChecked="{Binding IsVisible, ElementName=_Module}"/>
+                <MenuItem IsCheckable="True" Header="{Binding Title, Mode=OneTime, ElementName=_Summary}"  IsChecked="{Binding IsVisible, ElementName=_Summary}"/>
+                <MenuItem IsCheckable="True" Header="{Binding Title, Mode=OneTime, ElementName=_Products}" IsChecked="{Binding IsVisible, ElementName=_Products}"/>
+                <MenuItem IsCheckable="True" Header="{Binding Title, Mode=OneTime, ElementName=_Build}"    IsChecked="{Binding IsVisible, ElementName=_Build}"/>
+                <MenuItem IsCheckable="True" Header="{Binding Title, Mode=OneTime, ElementName=_Storage}"  IsChecked="{Binding IsVisible, ElementName=_Storage}"/>
             </MenuItem>
         </Menu>
 
@@ -32,36 +40,36 @@
             <xcad:LayoutRoot>
                 <xcad:LayoutPanel Orientation="Horizontal">
 
-                    <xcad:LayoutDocumentPaneGroup>
-                        <xcad:LayoutDocumentPane>
+                    <xcad:LayoutAnchorablePaneGroup>
+                        <xcad:LayoutAnchorablePane>
                             <!-- モジュール一覧 -->
-                            <xcad:LayoutDocument Title="モジュール一覧" CanClose="False">
-                                <modGrid:ModulesGrid x:Name="modulesGrid" Grid.Column="0"/>
-                            </xcad:LayoutDocument>
-                        </xcad:LayoutDocumentPane>
+                            <xcad:LayoutAnchorable x:Name="_Module" Title="モジュール一覧">
+                                <modGrid:ModulesGrid x:Name="Modules" Grid.Column="0"/>
+                            </xcad:LayoutAnchorable>
+                        </xcad:LayoutAnchorablePane>
 
-                        <xcad:LayoutDocumentPane>
+                        <xcad:LayoutAnchorablePane>
                             <!-- 概要 -->
-                            <xcad:LayoutDocument Title="概要" CanClose="False">
-
-                            </xcad:LayoutDocument>
+                            <xcad:LayoutAnchorable x:Name="_Summary" Title="概要">
+                                <stsmry:StationSummary x:Name="Summary"/>
+                            </xcad:LayoutAnchorable>
 
                             <!-- 製品 -->
-                            <xcad:LayoutDocument Title="製品" CanClose="False">
-                                <prodGrid:ProductsGrid x:Name="productsGrid"/>
-                            </xcad:LayoutDocument>
+                            <xcad:LayoutAnchorable x:Name="_Products" Title="製品">
+                                <prodGrid:ProductsGrid x:Name="Products"/>
+                            </xcad:LayoutAnchorable>
 
                             <!-- 建造 -->
-                            <xcad:LayoutDocument Title="建造" CanClose="False">
-                                <resGrid:ResourcesGrid x:Name="resourcesGrid"/>
-                            </xcad:LayoutDocument>
+                            <xcad:LayoutAnchorable x:Name="_Build" Title="建造">
+                                <resGrid:ResourcesGrid x:Name="Build"/>
+                            </xcad:LayoutAnchorable>
 
                             <!-- 保管庫 -->
-                            <xcad:LayoutDocument Title="保管庫" CanClose="False">
-                                <storGrid:StoragesGrid x:Name="storagesGrid"/>
-                            </xcad:LayoutDocument>
-                        </xcad:LayoutDocumentPane>
-                    </xcad:LayoutDocumentPaneGroup>
+                            <xcad:LayoutAnchorable x:Name="_Storage" Title="保管庫">
+                                <storGrid:StoragesGrid x:Name="Storages"/>
+                            </xcad:LayoutAnchorable>
+                        </xcad:LayoutAnchorablePane>
+                    </xcad:LayoutAnchorablePaneGroup>
 
                 </xcad:LayoutPanel>
             </xcad:LayoutRoot>

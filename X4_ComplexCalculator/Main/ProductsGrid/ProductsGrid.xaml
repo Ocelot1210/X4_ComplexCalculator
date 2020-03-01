@@ -37,7 +37,7 @@
     <Grid>
         <DataGrid 
             Name="productsGrid"
-            ItemsSource="{Binding Path=Products, UpdateSourceTrigger=PropertyChanged}"
+            ItemsSource="{Binding Path=Products, UpdateSourceTrigger=PropertyChanged, IsAsync=True}"
             SelectionUnit="Cell"
             VirtualizingPanel.ScrollUnit="Pixel"
             PresentationOptions:Freeze="true"
@@ -71,23 +71,22 @@
                                 <!-- 子要素のListView -->
                                 <DataGridInline:InlineListView
                                     ItemsSource="{Binding Details, Mode=OneTime}"
-                                    VirtualizingStackPanel.IsVirtualizing ="True"
-                                    VirtualizingStackPanel.VirtualizationMode="Recycling"
+                                    Style="{StaticResource DefaultListView}"
                                     >
 
-                                    <!-- ListViewの文字寄せに必要な設定 -->
-                                    <DataGridInline:InlineListView.ItemContainerStyle>
-                                        <Style TargetType="ListViewItem">
-                                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                                        </Style>
-                                    </DataGridInline:InlineListView.ItemContainerStyle>
-
-                                    <DataGridInline:InlineListView.View>
+                                    <ListView.View>
                                         <GridView>
 
+                                            <!-- モジュール名 -->
+                                            <DataGridInline:InlineGridViewColumn
+                                                Header="モジュール名"
+                                                SortTargetPropertyName="ModuleName"
+                                                DisplayMemberBinding="{Binding ModuleName, Mode=OneTime}"
+                                                />
+                                            
                                             <!-- モジュール数 -->
                                             <DataGridInline:InlineGridViewColumn
-                                                Header="数"
+                                                Header="モジュール数"
                                                 SortTargetPropertyName="ModuleCount"
                                                 >
                                                 <GridViewColumn.CellTemplate>
@@ -96,15 +95,7 @@
                                                     </DataTemplate>
                                                 </GridViewColumn.CellTemplate>
                                             </DataGridInline:InlineGridViewColumn>
-
-
-                                            <!-- モジュール名 -->
-                                            <DataGridInline:InlineGridViewColumn
-                                                Header="モジュール名"
-                                                SortTargetPropertyName="ModuleName"
-                                                DisplayMemberBinding="{Binding ModuleName, Mode=OneTime}"
-                                                />
-
+                                            
 
                                             <!-- 生産性 -->
                                             <DataGridInline:InlineGridViewColumn
@@ -118,9 +109,9 @@
                                                 </GridViewColumn.CellTemplate>
                                             </DataGridInline:InlineGridViewColumn>
 
-                                            <!-- 生産数 -->
+                                            <!-- 生産量 -->
                                             <DataGridInline:InlineGridViewColumn
-                                                Header="個数"
+                                                Header="生産量"
                                                 SortTargetPropertyName="Amount"
                                                 >
                                                 <GridViewColumn.CellTemplate>
@@ -130,7 +121,7 @@
                                                 </GridViewColumn.CellTemplate>
                                             </DataGridInline:InlineGridViewColumn>
                                         </GridView>
-                                    </DataGridInline:InlineListView.View>
+                                    </ListView.View>
                                 </DataGridInline:InlineListView>
 
                                 

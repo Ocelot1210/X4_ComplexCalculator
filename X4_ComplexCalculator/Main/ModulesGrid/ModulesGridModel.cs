@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.Windows;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Main.ModulesGrid.SelectModule;
+using System.Linq;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid
 {
@@ -61,6 +62,13 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             Modules.Remove(item);
         }
 
+        /// <summary>
+        /// モジュール一括削除
+        /// </summary>
+        public void DeleteModules()
+        {
+            Modules.RemoveItems(Modules.Where(x => x.IsSelected));
+        }
 
         /// <summary>
         /// モジュール追加画面を表示

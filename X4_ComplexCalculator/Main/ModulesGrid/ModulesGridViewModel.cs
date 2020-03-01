@@ -1,5 +1,6 @@
 ﻿using Prism.Commands;
 using System;
+using System.Collections;
 using System.Collections.ObjectModel;
 using System.Windows.Data;
 using X4_ComplexCalculator.Common;
@@ -44,7 +45,10 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// </summary>
         public string SearchModuleName
         {
-            get { return _SearchModuleName; }
+            get
+            {
+                return _SearchModuleName;
+            }
             set
             {
                 if (_SearchModuleName == value) return;
@@ -71,6 +75,11 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// モジュール変更
         /// </summary>
         public DelegateCommand<ModulesGridItem> ReplaceModule { get; }
+
+        /// <summary>
+        /// モジュールたちを削除
+        /// </summary>
+        public DelegateCommand DeleteModules { get; }
         #endregion
 
 
@@ -86,6 +95,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             AddButtonClicked = new DelegateCommand(Model.ShowAddModuleWindow);
             DeleteModule = new DelegateCommand<ModulesGridItem>(Model.DeleteModule);
             ReplaceModule = new DelegateCommand<ModulesGridItem>(Model.ReplaceModule);
+            DeleteModules = new DelegateCommand(Model.DeleteModules);
         }
 
         /// <summary>

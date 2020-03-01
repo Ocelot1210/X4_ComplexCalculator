@@ -20,7 +20,6 @@
             <Setter Property="CanUserReorderColumns" Value="False"/>
             <Setter Property="CanUserSortColumns" Value="True"/>
             <Setter Property="EnableColumnVirtualization" Value="True"/>
-            <Setter Property="EnableRowVirtualization" Value="True"/>
             <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True"/>
             <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling"/>
         </Style>
@@ -37,6 +36,18 @@
 
         <!-- 3ケタ区切り数値表示用フォーマット -->
         <sys:String x:Key="DefaultNumericFormat">{0:N0}</sys:String>
+
+        <!-- ListViewのセルを右寄せ可能にする設定 -->
+        <Style TargetType="ListViewItem" x:Key="ListViewItemStretchedStyle">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        </Style>
         
+        <!-- ListViewの初期設定 -->
+        <Style TargetType="ListView" x:Key="DefaultListView">
+            <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True"/>
+            <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling"/>
+            <Setter Property="ItemContainerStyle" Value="{StaticResource ListViewItemStretchedStyle}"/>
+        </Style>
+
     </Application.Resources>
 </Application>

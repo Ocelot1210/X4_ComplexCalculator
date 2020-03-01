@@ -34,6 +34,11 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
 
 
         /// <summary>
+        /// 選択されているか
+        /// </summary>
+        public bool IsSelected { get; set; }
+
+        /// <summary>
         /// モジュール数
         /// </summary>
         public int ModuleCount
