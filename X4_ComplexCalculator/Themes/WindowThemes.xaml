@@ -1,0 +1,10 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:X4_ComplexCalculator.Themes">
+
+    <!-- Windowの背景 -->
+    <Style TargetType="Window" x:Key="DefaultWindowBackgroundStyle">
+        <Setter Property="Background" Value="LightGray"/>
+    </Style>
+    
+</ResourceDictionary>

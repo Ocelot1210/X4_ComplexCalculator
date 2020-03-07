@@ -21,15 +21,5 @@ namespace X4_ComplexCalculator.Common
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        /// <summary>
-        /// プロパティ変更通知
-        /// </summary>
-        /// <param name="propertyName">プロパティ名</param>
-        protected virtual void RaisePropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            
-        }
     }
 }

@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
+             xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
              xmlns:local="clr-namespace:X4_ComplexCalculator.Main.ModulesGrid"
              mc:Ignorable="d PresentationOptions" 
              x:Name="root"
@@ -13,166 +14,130 @@
     <UserControl.Resources>
         <CollectionViewSource x:Key="ModulesViewSource" Source="{Binding Modules}"/>
 
-        <ContextMenu x:Key="DataGridContextMenu">
-            <MenuItem Header="削除" Command="{Binding DeleteModules}"/>
+        <ContextMenu x:Key="ModulesGridContextMenu">
+            <MenuItem Header="コピー" Command="{Binding DeleteModules}"/>
+            <MenuItem Header="貼り付け" Command="{Binding DeleteModules}"/>
+            <MenuItem Header="削除" Command="{Binding DeleteModules}" CommandParameter="{x:Reference Name=moduleGrid}"/>
         </ContextMenu>
 
-        <Style TargetType="{x:Type DataGridCell}" x:Key="ModulesGridDefaultCellStyle">
-            <Style.Triggers>
-                <!-- 選択中のセルの色 -->
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
-                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
-                    <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
-                </Trigger>
-
-                <MultiDataTrigger>
-                    <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="True"/>
-                        <Condition Binding="{Binding IsKeyboardFocusWithin, RelativeSource={RelativeSource AncestorType=DataGrid}}" Value="False"/>
-                    </MultiDataTrigger.Conditions>
-                    <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
-                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
-                    <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
-                </MultiDataTrigger>
-
-                <MultiDataTrigger>
-                    <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="True"/>
-                        <Condition Binding="{Binding ContextMenu.IsOpen, RelativeSource={RelativeSource AncestorType=DataGrid}}" Value="True"/>
-                    </MultiDataTrigger.Conditions>
-                    <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
-                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
-                    <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
-                </MultiDataTrigger>
-            </Style.Triggers>
-        </Style>
-
-        <Style TargetType="DataGridCell" x:Key="ModulesGridRightDirectionCell" BasedOn="{StaticResource ModulesGridDefaultCellStyle}">
-            <Setter Property="TextBlock.TextAlignment" Value="Right"/>
-        </Style>
-        
     </UserControl.Resources>
-    
-    <Grid>
-        <DockPanel Grid.ColumnSpan="2">
-            <DockPanel DockPanel.Dock="Top">
-                <Button Content="追加" Width="75" DockPanel.Dock="Right">
-                    <Button.InputBindings>
-                        <MouseBinding Command="{Binding AddButtonClicked}" MouseAction="LeftClick"/>
-                    </Button.InputBindings>
-                </Button>
 
-                <xctk:WatermarkTextBox Watermark="モジュール名を入力して検索" Text="{Binding SearchModuleName, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"/>
-                
-            </DockPanel>
+    <DockPanel>
+        <DockPanel DockPanel.Dock="Top">
+            <Button Content="追加" Width="75" DockPanel.Dock="Right">
+                <Button.InputBindings>
+                    <MouseBinding Command="{Binding AddButtonClicked}" MouseAction="LeftClick"/>
+                </Button.InputBindings>
+            </Button>
 
-            <!-- モジュール表示用DataGrid -->
-            <DataGrid 
-                Name="moduleGrid"
-                AutoGenerateColumns="False"
-                ItemsSource="{Binding Source={StaticResource ModulesViewSource}, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, IsAsync=True}"
-                SelectionUnit="FullRow"
-                PresentationOptions:Freeze="true"
-                IsReadOnly="True"
-                Style="{StaticResource DefaultDataGridStyle}"
-                ContextMenu="{StaticResource DataGridContextMenu}"
-                ColumnHeaderStyle="{StaticResource DefaultDataGridColumnHeaderStyle}"
-                CellStyle="{StaticResource ModulesGridDefaultCellStyle}"
-                >
+            <xctk:WatermarkTextBox Watermark="モジュール名を入力して検索" Text="{Binding SearchModuleName, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"/>
 
-                <DataGrid.Resources>
-                    <Style TargetType="DataGridRow">
-                        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=OneWayToSource}"/>
-                    </Style>
-                </DataGrid.Resources>
-                
-                <DataGrid.Columns>
-                    
-                    <!-- モジュール名 -->
-                    <DataGridTemplateColumn
-                        Header="モジュール名"
-                        SortMemberPath="Module.Name"
-                        ClipboardContentBinding="{Binding Module.Name}"
-                        >
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Module.Name, Mode=OneTime}">
-                                    <TextBlock.InputBindings>
-                                        <MouseBinding
-                                            MouseAction="LeftDoubleClick"
-                                            Command="{Binding DataContext.ReplaceModule, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
-                                            CommandParameter="{Binding .}"
-                                            />
-                                    </TextBlock.InputBindings>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-
-
-                    <!-- 個数変更ボタン -->
-                    <DataGridTemplateColumn
-                        Header="数"
-                        IsReadOnly="True"
-                        CanUserSort="True"
-                        SortMemberPath="Count"
-                        ClipboardContentBinding="{Binding ModuleCount}">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <xctk:IntegerUpDown Value="{Binding ModuleCount, UpdateSourceTrigger=PropertyChanged}" FormatString="N0" Minimum="0" Maximum="99999"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-
-
-                    <!-- 装備編集ボタン -->
-                    <DataGridTemplateColumn
-                        Header="装備"
-                        IsReadOnly="True"
-                        CanUserSort="True"
-                        SortMemberPath="ShouldVisibleButton">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button Content="編集" Visibility="{Binding EditEquipmentButtonVisiblity, Mode=OneTime}">
-                                    <Button.InputBindings>
-                                        <MouseBinding Command="{Binding EditEquipmentCommand, Mode=OneTime}" MouseAction="LeftClick"/>
-                                    </Button.InputBindings>
-                                </Button>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-
-
-                    <!-- タレット数 -->
-                    <DataGridTextColumn
-                        Header="タレット"
-                        Binding="{Binding TurretsCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-                        CellStyle="{StaticResource ModulesGridRightDirectionCell}"
-                        />
-
-
-                    <!-- シールド数 -->
-                    <DataGridTextColumn
-                        Header="シールド"
-                        Binding="{Binding ShieldsCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-                        CellStyle="{StaticResource ModulesGridRightDirectionCell}"
-                        />
-
-
-                    <!-- 削除ボタン -->
-                    <DataGridTemplateColumn Header="削除">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button
-                                    Content="×"
-                                    Command="{Binding Path=DataContext.DeleteModule, Mode=OneTime, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"
-                                    CommandParameter="{Binding}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                </DataGrid.Columns>
-            </DataGrid>
         </DockPanel>
-    </Grid>
+
+        <!-- モジュール表示用DataGrid -->
+        <DataGrid 
+            Name="moduleGrid"
+            ItemsSource="{Binding Source={StaticResource ModulesViewSource}, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, IsAsync=True}"
+            SelectionUnit="FullRow"
+            PresentationOptions:Freeze="true"
+            Style="{StaticResource DefaultDataGridStyle}"
+            ContextMenu="{StaticResource ModulesGridContextMenu}"
+            x4cmn:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
+            >
+            
+            <DataGrid.Columns>
+
+                <!-- モジュール名 -->
+                <DataGridTemplateColumn
+                    Header="モジュール名"
+                    SortMemberPath="Module.Name"
+                    ClipboardContentBinding="{Binding Module.Name}"
+                    IsReadOnly="True"
+                    >
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Module.Name, Mode=OneTime}">
+                                <TextBlock.InputBindings>
+                                    <MouseBinding
+                                        MouseAction="LeftDoubleClick"
+                                        Command="{Binding DataContext.ReplaceModule, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+                                        CommandParameter="{Binding .}"
+                                        />
+                                </TextBlock.InputBindings>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+
+                <!-- モジュール数 -->
+                <DataGridTemplateColumn
+                    Header="モジュール数"
+                    CanUserSort="True"
+                    SortMemberPath="Count"
+                    ClipboardContentBinding="{Binding ModuleCount}">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding ModuleCount, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Right"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <xctk:IntegerUpDown ClipValueToMinMax="True" Value="{Binding ModuleCount, UpdateSourceTrigger=PropertyChanged}" FormatString="N0" Minimum="0" Maximum="99999"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+
+
+                <!-- 装備編集ボタン -->
+                <DataGridTemplateColumn
+                    Header="装備"
+                    IsReadOnly="True"
+                    CanUserSort="True"
+                    SortMemberPath="ShouldVisibleButton">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="編集" Visibility="{Binding EditEquipmentButtonVisiblity, Mode=OneTime}">
+                                <Button.InputBindings>
+                                    <MouseBinding Command="{Binding EditEquipmentCommand, Mode=OneTime}" MouseAction="LeftClick"/>
+                                </Button.InputBindings>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+
+                <!-- タレット数 -->
+                <DataGridTextColumn
+                    Header="タレット"
+                    IsReadOnly="True"
+                    Binding="{Binding TurretsCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                    CellStyle="{StaticResource RightAlignedDataGridReadOnlyCell}"
+                    />
+
+
+                <!-- シールド数 -->
+                <DataGridTextColumn
+                    Header="シールド"
+                    IsReadOnly="True"
+                    Binding="{Binding ShieldsCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                    CellStyle="{StaticResource RightAlignedDataGridReadOnlyCell}"
+                    />
+
+
+                <!-- 削除ボタン -->
+                <DataGridTemplateColumn Header="削除" IsReadOnly="True">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button
+                                Content="×"
+                                Command="{Binding Path=DataContext.DeleteModule, Mode=OneTime, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"
+                                CommandParameter="{Binding}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
 </UserControl>

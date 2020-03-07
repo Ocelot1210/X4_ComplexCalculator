@@ -94,6 +94,12 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
 
 
         /// <summary>
+        /// 選択されているか
+        /// </summary>
+        public bool IsSelected { get; set; }
+
+
+        /// <summary>
         /// Expanderが展開されているか
         /// </summary>
         public bool IsExpanded

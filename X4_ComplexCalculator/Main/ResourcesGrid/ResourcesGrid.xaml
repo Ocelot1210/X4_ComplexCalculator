@@ -13,90 +13,94 @@
         <!-- データ中継用 -->
         <x4cmn:BindingProxy x:Key="ProxyUnitPricePercent" Data="{Binding UnitPricePercent, Mode=TwoWay}"/>
     </UserControl.Resources>
-    <Grid>
-        <DataGrid
-            AutoGenerateColumns="False"
-            ItemsSource="{Binding Path=BuildResource, UpdateSourceTrigger=PropertyChanged, IsAsync=True}"
-            SelectionUnit="Cell"
-            IsReadOnly="True"
-            Style="{StaticResource DefaultDataGridStyle}"
-            ColumnHeaderStyle="{StaticResource DefaultDataGridColumnHeaderStyle}"
-            >
-            <DataGrid.Columns>
+    <DataGrid
+        ItemsSource="{Binding Path=BuildResource, UpdateSourceTrigger=PropertyChanged, IsAsync=True}"
+        Style="{StaticResource DefaultDataGridStyle}"
+        IsReadOnly="False"
+        >
+        <DataGrid.Columns>
 
-                <!-- 建造に必要なウェア -->
-                <DataGridTextColumn
-                    Header="建造に必要なウェア"
-                    Binding="{Binding Ware.Name, Mode=OneTime}"/>
+            <!-- 建造に必要なウェア -->
+            <DataGridTextColumn
+                Header="建造に必要なウェア"
+                IsReadOnly="True"
+                Binding="{Binding Ware.Name, Mode=OneTime}"
+                CellStyle="{StaticResource DataGridReadOnlyCell}"
+                />
 
-                <!-- 個数 -->
-                <DataGridTextColumn
-                    Header="個数"
-                    Binding="{Binding Count, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}"
-                    CellStyle="{StaticResource RightAlignedDataGridCell}"/>
+            <!-- 個数 -->
+            <DataGridTextColumn
+                Header="個数"
+                IsReadOnly="True"
+                Binding="{Binding Count, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}"
+                CellStyle="{StaticResource RightAlignedDataGridReadOnlyCell}"
+                />
 
-                <!-- 金額 -->
-                <DataGridTextColumn
-                    Header="金額"
-                    Binding="{Binding Price, StringFormat='{}{0:N0} cr', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                    IsReadOnly="True"
-                    CellStyle="{StaticResource RightAlignedDataGridCell}"
-                    />
-                
-                <!-- 単価 -->
-                <DataGridTemplateColumn Header="単価" SortMemberPath="UnitPrice" ClipboardContentBinding="{Binding UnitPrice, Mode=OneTime}">
-                    <!-- 通常表示時のスタイル -->
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding UnitPrice, StringFormat='{}{0:N0} cr', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Right"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
+            <!-- 金額 -->
+            <DataGridTextColumn
+                Header="金額"
+                Binding="{Binding Price, StringFormat='{}{0:N0} cr', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                IsReadOnly="True"
+                CellStyle="{StaticResource RightAlignedDataGridReadOnlyCell}"
+                />
 
-                    <!-- 編集時のスタイル -->
-                    <DataGridTemplateColumn.CellEditingTemplate>
-                        <DataTemplate>
-                            <xctk:ValueRangeTextBox Text="{Binding UnitPrice, Mode=TwoWay}" TextAlignment="Right" ValueDataType="{x:Type sys:Int64}" MinValue="{Binding Ware.MinPrice}" MaxValue="{Binding Ware.MaxPrice}"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellEditingTemplate>
-                </DataGridTemplateColumn>
+            <!-- 単価 -->
+            <DataGridTemplateColumn
+                Header="単価"
+                SortMemberPath="UnitPrice"
+                ClipboardContentBinding="{Binding UnitPrice, Mode=OneTime}"
+                >
+                <!-- 通常表示時のスタイル -->
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding UnitPrice, StringFormat='{}{0:N0} cr', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Right"/>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
 
-                
-                <!-- 単価(スライダー) -->
-                <DataGridTemplateColumn IsReadOnly="True" MinWidth="100" SortMemberPath="UnitPrice">
-                    <!-- ヘッダのスタイル定義 -->
-                    <DataGridTemplateColumn.HeaderStyle>
-                        <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                            <Setter Property="Padding" Value="0"/>
-                        </Style>
-                    </DataGridTemplateColumn.HeaderStyle>
+                <!-- 編集時のスタイル -->
+                <DataGridTemplateColumn.CellEditingTemplate>
+                    <DataTemplate>
+                        <xctk:IntegerUpDown ClipValueToMinMax="True" Value="{Binding UnitPrice, Mode=TwoWay}" Minimum="{Binding Ware.MinPrice}" Maximum="{Binding Ware.MaxPrice}"/>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellEditingTemplate>
+            </DataGridTemplateColumn>
 
-                    <!-- ヘッダの内容定義 -->
-                    <DataGridTemplateColumn.Header>
-                        <DockPanel>
-                            <Slider
-                                DockPanel.Dock="Left"
-                                Minimum="1"
-                                Maximum="100"
-                                TickFrequency="1"
-                                Value="{Binding Data, Source={StaticResource ProxyUnitPricePercent}}"/>
-                        </DockPanel>
-                    </DataGridTemplateColumn.Header>
 
-                    <!-- セルの内容定義 -->
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Slider
-                                Value="{Binding UnitPrice, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
-                                Minimum="{Binding Ware.MinPrice}"
-                                Maximum="{Binding Ware.MaxPrice}"
-                                />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                
-            </DataGrid.Columns>
-        </DataGrid>
-    </Grid>
+            <!-- 単価(スライダー) -->
+            <DataGridTemplateColumn IsReadOnly="True" MinWidth="100" SortMemberPath="UnitPrice">
+                <!-- ヘッダのスタイル定義 -->
+                <DataGridTemplateColumn.HeaderStyle>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        <Setter Property="Padding" Value="0"/>
+                    </Style>
+                </DataGridTemplateColumn.HeaderStyle>
+
+                <!-- ヘッダの内容定義 -->
+                <DataGridTemplateColumn.Header>
+                    <DockPanel>
+                        <Slider
+                            DockPanel.Dock="Left"
+                            Minimum="1"
+                            Maximum="100"
+                            TickFrequency="1"
+                            Value="{Binding Data, Source={StaticResource ProxyUnitPricePercent}}"/>
+                    </DockPanel>
+                </DataGridTemplateColumn.Header>
+
+                <!-- セルの内容定義 -->
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <Slider
+                            Value="{Binding UnitPrice, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                            Minimum="{Binding Ware.MinPrice}"
+                            Maximum="{Binding Ware.MaxPrice}"
+                            />
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+
+        </DataGrid.Columns>
+    </DataGrid>
 </UserControl>

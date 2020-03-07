@@ -7,99 +7,103 @@
              xmlns:DataGridInline="clr-namespace:CustomControlLibrary.DataGridInline;assembly=X4_ComplexCalculator_CustomControlLibrary"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <DataGrid
-            AutoGenerateColumns="False"
-            ItemsSource="{Binding Path=Storages, UpdateSourceTrigger=PropertyChanged, IsAsync=True}"
-            SelectionUnit="Cell"
-            Style="{StaticResource DefaultDataGridStyle}"
-            IsReadOnly="True"
-            ColumnHeaderStyle="{StaticResource DefaultDataGridColumnHeaderStyle}"
+
+    <UserControl.Resources>
+        <!-- 保管庫詳細 -->
+        <DataGridInline:InlineListView
+            x:Key="DetailsListView"
+            x:Shared="false"
+            ItemsSource="{Binding}"
+            Style="{StaticResource DefaultListView}"
             >
-            <DataGrid.Columns>
-                
-                <!-- 保管庫種別 -->
-                <DataGridTemplateColumn
-                    Header="保管庫種別"
-                    ClipboardContentBinding="{Binding TransportType.Name, Mode=OneTime}"
-                    SortMemberPath="TransportType.Name"
-                    >
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Expander
-                                Header="{Binding TransportType.Name, Mode=OneTime}"
-                                IsExpanded="{Binding IsExpanded, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                >
-                                <!-- 保管庫詳細 -->
-                                <DataGridInline:InlineListView
-                                    ItemsSource="{Binding Details, Mode=OneTime}"
-                                    Style="{StaticResource DefaultListView}"
-                                    >
 
-                                    <ListView.View>
-                                        <GridView>
-                                            
-                                            <!-- モジュール数 -->
-                                            <DataGridInline:InlineGridViewColumn
-                                                Header="数"
-                                                SortTargetPropertyName="ModuleCount"
-                                                >
-                                                <GridViewColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <TextBlock Text="{Binding ModuleCount, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right"/>
-                                                    </DataTemplate>
-                                                </GridViewColumn.CellTemplate>
-                                            </DataGridInline:InlineGridViewColumn>
-                                            
-                                            <!-- モジュール名 -->
-                                            <DataGridInline:InlineGridViewColumn
-                                                Header="モジュール名"
-                                                SortTargetPropertyName="ModuleName"
-                                                DisplayMemberBinding="{Binding ModuleName, Mode=OneTime}"
-                                                />
+            <ListView.View>
+                <GridView>
 
-                                            <!-- 容量 -->
-                                            <DataGridInline:InlineGridViewColumn
-                                                Header="容量"
-                                                SortTargetPropertyName="Capacity"
-                                                >
-                                                <GridViewColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <TextBlock Text="{Binding Capacity, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right"/>
-                                                    </DataTemplate>
-                                                </GridViewColumn.CellTemplate>
-                                            </DataGridInline:InlineGridViewColumn>
+                    <!-- モジュール数 -->
+                    <DataGridInline:InlineGridViewColumn
+                        Header="数"
+                        SortTargetPropertyName="ModuleCount"
+                        >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding ModuleCount, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </DataGridInline:InlineGridViewColumn>
 
-                                            <!-- 容量(合計) -->
-                                            <DataGridInline:InlineGridViewColumn
-                                                Header="容量(合計)"
-                                                SortTargetPropertyName="TotalCapacity"
-                                                >
-                                                <GridViewColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <TextBlock Text="{Binding TotalCapacity, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right"/>
-                                                    </DataTemplate>
-                                                </GridViewColumn.CellTemplate>
-                                            </DataGridInline:InlineGridViewColumn>
+                    <!-- モジュール名 -->
+                    <DataGridInline:InlineGridViewColumn
+                            Header="モジュール名"
+                            SortTargetPropertyName="ModuleName"
+                            DisplayMemberBinding="{Binding ModuleName, Mode=OneTime}"
+                            />
 
-                                        </GridView>
-                                    </ListView.View>
-                                    
-                                </DataGridInline:InlineListView>
-                            </Expander>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                    
-                </DataGridTemplateColumn>
-                
-                
-                <!-- 容量 -->
-                <DataGridTextColumn
-                    Header="容量" Binding="{Binding Capacity, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}"
-                    CellStyle="{StaticResource RightAlignedDataGridCell}"
-                    />
+                    <!-- 容量 -->
+                    <DataGridInline:InlineGridViewColumn
+                        Header="容量"
+                        SortTargetPropertyName="Capacity"
+                        >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Capacity, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </DataGridInline:InlineGridViewColumn>
 
-            </DataGrid.Columns>
-        </DataGrid>
-    </Grid>
+                    <!-- 容量(合計) -->
+                    <DataGridInline:InlineGridViewColumn
+                        Header="容量(合計)"
+                        SortTargetPropertyName="TotalCapacity"
+                        >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding TotalCapacity, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </DataGridInline:InlineGridViewColumn>
+
+                </GridView>
+            </ListView.View>
+        </DataGridInline:InlineListView>
+        
+    </UserControl.Resources>
+    
+    <DataGrid
+            ItemsSource="{Binding Path=Storages, UpdateSourceTrigger=PropertyChanged, IsAsync=True}"
+            Style="{StaticResource DefaultDataGridStyle}"
+            >
+        <DataGrid.Columns>
+
+            <!-- 保管庫種別 -->
+            <DataGridTemplateColumn
+                Header="保管庫種別"
+                ClipboardContentBinding="{Binding TransportType.Name, Mode=OneTime}"
+                SortMemberPath="TransportType.Name"
+                >
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <Expander
+                            Header="{Binding TransportType.Name, Mode=OneTime}"
+                            IsExpanded="{Binding IsExpanded, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            >
+                            <ContentControl
+                                Content="{StaticResource DetailsListView}"
+                                DataContext="{Binding Details, Mode=OneWay}"/>
+                        </Expander>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+
+            </DataGridTemplateColumn>
+
+
+            <!-- 容量 -->
+            <DataGridTextColumn
+                Header="容量" Binding="{Binding Capacity, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}"
+                CellStyle="{StaticResource RightAlignedDataGridReadOnlyCell}"
+                />
+
+        </DataGrid.Columns>
+    </DataGrid>
+
 </UserControl>

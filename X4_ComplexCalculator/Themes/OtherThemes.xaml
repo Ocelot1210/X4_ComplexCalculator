@@ -1,0 +1,10 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:X4_ComplexCalculator.Themes"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                    >
+
+    <!-- 3ケタ区切り数値表示用フォーマット -->
+    <sys:String x:Key="DefaultNumericFormat">{0:N0}</sys:String>
+
+</ResourceDictionary>

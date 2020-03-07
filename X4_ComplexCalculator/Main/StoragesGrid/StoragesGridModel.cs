@@ -4,6 +4,7 @@ using System.Linq;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.ModulesGrid;
+using System.Collections.Specialized;
 
 namespace X4_ComplexCalculator.Main.StorageGrid
 {
@@ -27,27 +28,42 @@ namespace X4_ComplexCalculator.Main.StorageGrid
         public StoragesGridModel(ModulesGridModel moduleGridModel)
         {
             Storages = new SmartCollection<StoragesGridItem>();
-            moduleGridModel.OnModulesChanged += ModuleGridModel_OnCollectionChanged;
+            moduleGridModel.OnModulesChanged += UpdateProducts;
         }
 
 
         /// <summary>
-        /// モジュール数に変更があった場合
+        /// 保管庫更新
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ModuleGridModel_OnCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void UpdateProducts(object sender, NotifyCollectionChangedEventArgs e)
         {
-            var modules = (IEnumerable<ModulesGridItem>)sender;
+            var task = System.Threading.Tasks.Task.Run(() =>
+            {
+                UpdateStoragesMain(sender, e);
+            });
+        }
 
-            // カーゴ種別ごとの容量
-            var transportDict = new Dictionary<string, long>();  // transportTypeID, Capacity
 
-            // カーゴ種別ごとのモジュール集計用
-            var modulesDict = new Dictionary<string, List<StorageDetailsListItem>>();
+        /// <summary>
+        /// 保管庫更新メイン
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void UpdateStoragesMain(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            var modules = ((IEnumerable<ModulesGridItem>)sender)
+                                .Where(x => x.Module.ModuleType.ModuleTypeID == "storage")
+                                .GroupBy(x => x.Module.ModuleID)
+                                .Select(x => new { x.First().Module.ModuleID, Count = x.Sum(y => y.ModuleCount) });
 
-            // 前回値保存
-            var backup = Storages.ToDictionary(x => x.TransportType.TransportTypeID, x => x.IsExpanded);
+            // 処理対象が無ければクリアして終わる
+            if (!modules.Any())
+            {
+                Storages.Clear();
+                return;
+            }
 
             var sqlParam = new SQLiteCommandParameters(2);
 
@@ -65,14 +81,24 @@ WHERE
     ModuleID = :moduleID";
 
             // 保管モジュールのみ列挙)
-            foreach (var module in modules.Where(x => x.Module.ModuleType.ModuleTypeID == "storage"))
+            foreach (var module in modules)
             {
-                sqlParam.Add("moduleID", System.Data.DbType.String, module.Module.ModuleID);
-                sqlParam.Add("count", System.Data.DbType.Int32, module.ModuleCount);
+                sqlParam.Add("moduleID", System.Data.DbType.String, module.ModuleID);
+                sqlParam.Add("count", System.Data.DbType.Int32, module.Count);
             }
+
+
+            // カーゴ種別ごとの容量
+            var transportDict = new Dictionary<string, long>();  // transportTypeID, Capacity
+
+            // カーゴ種別ごとのモジュール集計用
+            var modulesDict = new Dictionary<string, List<StorageDetailsListItem>>();
 
             // 容量をタイプ別に集計
             DBConnection.X4DB.ExecQuery(query, sqlParam, SumStorage, transportDict, modulesDict);
+
+            // 前回値保
+            var backup = Storages.ToDictionary(x => x.TransportType.TransportTypeID, x => x.IsExpanded);
 
             // コレクションに設定
             Storages.Reset(transportDict.Select(x =>

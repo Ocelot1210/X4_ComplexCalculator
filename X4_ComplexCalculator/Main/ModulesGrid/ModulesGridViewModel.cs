@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.Windows.Controls;
 using System.Windows.Data;
 using X4_ComplexCalculator.Common;
 
@@ -77,9 +78,9 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         public DelegateCommand<ModulesGridItem> ReplaceModule { get; }
 
         /// <summary>
-        /// モジュールたちを削除
+        /// 選択されたモジュールたちを削除
         /// </summary>
-        public DelegateCommand DeleteModules { get; }
+        public DelegateCommand<DataGrid> DeleteModules { get; }
         #endregion
 
 
@@ -95,7 +96,17 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             AddButtonClicked = new DelegateCommand(Model.ShowAddModuleWindow);
             DeleteModule = new DelegateCommand<ModulesGridItem>(Model.DeleteModule);
             ReplaceModule = new DelegateCommand<ModulesGridItem>(Model.ReplaceModule);
-            DeleteModules = new DelegateCommand(Model.DeleteModules);
+            DeleteModules = new DelegateCommand<DataGrid>(DeleteModulesCommand);
+        }
+
+        /// <summary>
+        /// 選択されたモジュールたちを削除
+        /// </summary>
+        /// <param name="dg"></param>
+        private void DeleteModulesCommand(DataGrid dg)
+        {
+            Model.DeleteModules();
+            dg.SelectedItems.Clear();
         }
 
         /// <summary>

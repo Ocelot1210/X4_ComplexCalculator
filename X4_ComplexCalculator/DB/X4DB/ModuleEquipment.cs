@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
@@ -35,6 +36,22 @@ namespace X4_ComplexCalculator.DB.X4DB
         {
             Turret = new ModuleEquipmentManager(moduleID, "Turret");
             Shield = new ModuleEquipmentManager(moduleID, "Shield");
+        }
+
+        /// <summary>
+        /// 全装備を列挙する
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<Equipment> GetAllEquipment()
+        {
+            foreach(var turret in Turret.AllEquipments)
+            {
+                yield return turret;
+            }
+            foreach(var shiled in Shield.AllEquipments)
+            {
+                yield return shiled;
+            }
         }
 
 

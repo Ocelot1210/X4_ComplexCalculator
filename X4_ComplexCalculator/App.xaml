@@ -2,52 +2,27 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:X4_ComplexCalculator"
-             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              StartupUri="Main\MainWindow.xaml">
+
+
     <Application.Resources>
-        
-        <!-- Windowの背景 -->
-        <Style TargetType="Window" x:Key="DefaultWindowBackgroundStyle">
-            <Setter Property="Background" Value="LightGray"/>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                
+                <!-- DataGrid用の定義読み込み -->
+                <ResourceDictionary Source="/Themes/DataGridThemes.xaml"/>
 
-        <!-- DataGridの初期設定 -->
-        <Style TargetType="DataGrid" x:Key="DefaultDataGridStyle">
-            <Setter Property="AutoGenerateColumns" Value="False"/>
-            <Setter Property="CanUserSortColumns" Value="True"/>
-            <Setter Property="CanUserAddRows" Value="False"/>
-            <Setter Property="CanUserDeleteRows" Value="False"/>
-            <Setter Property="CanUserReorderColumns" Value="False"/>
-            <Setter Property="CanUserSortColumns" Value="True"/>
-            <Setter Property="EnableColumnVirtualization" Value="True"/>
-            <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True"/>
-            <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling"/>
-        </Style>
+                <!-- Window用の定義読み込み -->
+                <ResourceDictionary Source="/Themes/WindowThemes.xaml"/>
 
-        <!-- DataGridColumnHeaderの初期設定 -->
-        <Style TargetType="DataGridColumnHeader" x:Key="DefaultDataGridColumnHeaderStyle">
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        </Style>
-
-        <!-- 右寄せセル用 -->
-        <Style TargetType="DataGridCell" x:Key="RightAlignedDataGridCell">
-            <Setter Property="TextBlock.TextAlignment" Value="Right"/>
-        </Style>
-
-        <!-- 3ケタ区切り数値表示用フォーマット -->
-        <sys:String x:Key="DefaultNumericFormat">{0:N0}</sys:String>
-
-        <!-- ListViewのセルを右寄せ可能にする設定 -->
-        <Style TargetType="ListViewItem" x:Key="ListViewItemStretchedStyle">
-            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-        </Style>
-        
-        <!-- ListViewの初期設定 -->
-        <Style TargetType="ListView" x:Key="DefaultListView">
-            <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True"/>
-            <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling"/>
-            <Setter Property="ItemContainerStyle" Value="{StaticResource ListViewItemStretchedStyle}"/>
-        </Style>
-
+                <!-- ListView用の定義読み込み -->
+                <ResourceDictionary Source="/Themes/ListViewThemes.xaml"/>
+                
+                <!-- その他用の定義読み込み -->
+                <ResourceDictionary Source="/Themes/OtherThemes.xaml"/>
+                
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
+    
 </Application>

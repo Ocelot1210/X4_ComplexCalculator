@@ -6,6 +6,7 @@ using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.ModulesGrid;
+using System.Collections.Specialized;
 
 namespace X4_ComplexCalculator.Main.ResourcesGrid
 {
@@ -29,19 +30,29 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         public ResourcesGridModel(ModulesGridModel moduleGridModel)
         {
             Resources = new SmartCollection<ResourcesGridItem>();
-            moduleGridModel.OnModulesChanged += ModuleGridModel_OnCollectionChanged;
+            moduleGridModel.OnModulesChanged += UpdateResources;
         }
 
-
         /// <summary>
-        /// モジュール一覧変更時
+        /// 必要リソース更新
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ModuleGridModel_OnCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void UpdateResources(object sender, NotifyCollectionChangedEventArgs e)
         {
-            Resources.Clear();
+            var task = System.Threading.Tasks.Task.Run(() =>
+            {
+                UpdateResourcesMain(sender, e);
+            });
+        }
 
+        /// <summary>
+        /// 必要リソース更新メイン
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void UpdateResourcesMain(object sender, NotifyCollectionChangedEventArgs e)
+        {
             // モジュール一覧
             var modules = (IEnumerable<ModulesGridItem>)sender;
 
@@ -72,32 +83,17 @@ WHERE
             }
 
 
-            // TODO: モジュールの装備の分も集計
             {
-                var equipmentsDict = new Dictionary<string, int>();     // 装備ID, 個数
-
                 // 装備IDごとに集計
-                foreach (var moduleGridItem in modules.Where(x => x.Module.Equipment.CanEquipped))
+                var equipments = modules.Where(x => x.Module.Equipment.CanEquipped)
+                                        .Select(x => x.Module.Equipment.GetAllEquipment().Select(y => new { ID = y.EquipmentID, Count = x.ModuleCount }))
+                                        .Where(x => x.Any())
+                                        .GroupBy(x => x.First().ID)
+                                        .Select(x => new { ID = x.Key, Count = x.Sum(y => y.Sum(z => z.Count)) });
+
+                if (equipments.Any())
                 {
-                    ModuleEquipmentManager[] mng = { moduleGridItem.Module.Equipment.Turret, moduleGridItem.Module.Equipment.Shield };
-
-                    foreach (var equipments in mng.Select(x => x.AllEquipments.GroupBy(y => y.EquipmentID).Select(y => new { ID = y.Key, Count = y.Count() })))
-                    {
-                        foreach (var equipment in equipments)
-                        {
-                            if (equipmentsDict.ContainsKey(equipment.ID))
-                            {
-                                equipmentsDict[equipment.ID] += equipment.Count * moduleGridItem.ModuleCount;
-                            }
-                            else
-                            {
-                                equipmentsDict[equipment.ID] = equipment.Count * moduleGridItem.ModuleCount;
-                            }
-                        }
-                    }
-                }
-
-                var query = $@"
+                    var query = $@"
 SELECT
     WareID,
     Amount * :count AS Amount
@@ -106,20 +102,20 @@ FROM
     EquipmentResource
 
 WHERE
-    EquipmentID = :moduleID AND
+    EquipmentID = :equipmentID AND
 	Method = 'default'";
 
-                var sqlParam = new SQLiteCommandParameters(2);
-                foreach (var equipment in equipmentsDict)
-                {
-                    sqlParam.Add("count", DbType.Int32, equipment.Value);
-                    sqlParam.Add("moduleID", DbType.String, equipment.Key);
+                    var sqlParam = new SQLiteCommandParameters(2);
+                    foreach (var equipment in equipments)
+                    {
+                        sqlParam.Add("equipmentID", DbType.String, equipment.ID);
+                        sqlParam.Add("count", DbType.Int32, equipment.Count);
+                    }
+                    DBConnection.X4DB.ExecQuery(query, sqlParam, SumResource, resourcesDict);
                 }
-
-                DBConnection.X4DB.ExecQuery(query, sqlParam, SumResource, resourcesDict);
             }
 
-            Resources.AddRange(resourcesDict.Select(x => new ResourcesGridItem(x.Key, x.Value)));
+            Resources.Reset(resourcesDict.Select(x => new ResourcesGridItem(x.Key, x.Value)));
         }
 
 

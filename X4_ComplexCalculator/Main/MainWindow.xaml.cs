@@ -26,8 +26,8 @@ namespace X4_ComplexCalculator
             Summary.DataContext     = new StationSummaryViewModel(moduleModel);
             Modules.DataContext     = new ModulesGridViewModel(moduleModel, (CollectionViewSource)Modules.Resources["ModulesViewSource"]);
             Products.DataContext    = new ProductsGridViewModel(moduleModel);
-            Build.DataContext       = new ResourcesGridViewModel(moduleModel);
-            Storages.DataContext    = new StoragesGridViewModel(moduleModel);
+            Build.DataContext = new ResourcesGridViewModel(moduleModel);
+            Storages.DataContext = new StoragesGridViewModel(moduleModel);
         }
     }
 }

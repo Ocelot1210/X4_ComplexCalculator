@@ -3,6 +3,7 @@ using System.Windows;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.ModulesGrid.EditEquipment;
+using System.Linq;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid
 {
@@ -95,11 +96,35 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         {
             var window = new EditEquipmentWindow(Module);
 
+            // 変更前
+            var turretsOld = Module.Equipment.Turret.AllEquipments.Select(x => x.EquipmentID).OrderBy(x => x).ToArray();
+            var shieldsOld = Module.Equipment.Shield.AllEquipments.Select(x => x.EquipmentID).OrderBy(x => x).ToArray();
+
             window.ShowDialog();
 
-            OnPropertyChanged("Module");
-            OnPropertyChanged("TurretsCount");
-            OnPropertyChanged("ShieldsCount");
+            // 変更後
+            var turretsNew = Module.Equipment.Turret.AllEquipments.Select(x => x.EquipmentID).OrderBy(x => x).ToArray();
+            var shieldsNew = Module.Equipment.Shield.AllEquipments.Select(x => x.EquipmentID).OrderBy(x => x).ToArray();
+
+            bool moduleChanged = false;
+
+            // 変更があった場合のみ通知
+            if (!turretsOld.SequenceEqual(turretsNew))
+            {
+                OnPropertyChanged("TurretsCount");
+                moduleChanged = true;
+            }
+
+            if (!shieldsOld.SequenceEqual(shieldsNew))
+            {
+                OnPropertyChanged("ShieldsCount");
+                moduleChanged = true;
+            }
+
+            if (moduleChanged)
+            {
+                OnPropertyChanged("Module");
+            }
         }
     }
 }

@@ -107,13 +107,11 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             if (0 < newModules.Count)
             {
                 // 個数をコピーする
-                var newItem = newModules[0];
+                var newItem = newModules.First();
                 newItem.ModuleCount = oldItem.ModuleCount;
 
                 // 要素を入れ替える
-                var idx = Modules.IndexOf(oldItem);
-                Modules.RemoveAt(idx);
-                Modules.Insert(idx, newItem);
+                Modules.Replace(oldItem, newItem);
             }
         }
     }

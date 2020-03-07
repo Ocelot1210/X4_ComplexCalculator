@@ -1,0 +1,21 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:X4_ComplexCalculator.Themes">
+    
+    <!-- ListViewのセルを右寄せ可能にする設定 -->
+    <Style TargetType="ListViewItem" x:Key="ListViewItemStretchedStyle">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+    </Style>
+
+    <!-- ListViewの初期設定 -->
+    <Style TargetType="ListView" x:Key="DefaultListView">
+        <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True"/>
+        <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling"/>
+        <Setter Property="ItemContainerStyle" Value="{StaticResource ListViewItemStretchedStyle}"/>
+    </Style>
+
+    <DataTemplate x:Key="RightAlignedGridViewColumn">
+        <TextBlock Text="{Binding RelativeSource={RelativeSource AncestorType={x:Type GridViewColumn}}}" TextAlignment="Right"/>
+    </DataTemplate>
+    
+</ResourceDictionary>

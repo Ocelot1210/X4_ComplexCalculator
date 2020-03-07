@@ -79,11 +79,25 @@ namespace X4_ComplexCalculator.Main.StationSummary
 
 
         /// <summary>
-        /// 労働力情報を更新
+        /// 製品更新
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void UpdateWorkForce(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            var task = System.Threading.Tasks.Task.Run(() =>
+            {
+                UpdateWorkForceMain(sender, e);
+            });
+        }
+
+
+        /// <summary>
+        /// 労働力情報を更新
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void UpdateWorkForceMain(object sender, NotifyCollectionChangedEventArgs e)
         {
             var modules = ((IEnumerable<ModulesGridItem>)sender).Where(x => x.Module.ModuleType.ModuleTypeID == "production" || x.Module.ModuleType.ModuleTypeID == "habitation");
 
@@ -92,8 +106,8 @@ namespace X4_ComplexCalculator.Main.StationSummary
                                  .ToArray();
 
             // 値を更新
-            NeedWorkforce = details.Sum(x => x.MaxWorkers);
-            WorkForce = details.Sum(x => x.WorkersCapacity);
+            NeedWorkforce = details.Sum(x => x.MaxWorkers * x.ModuleCount);
+            WorkForce = details.Sum(x => x.WorkersCapacity * x.ModuleCount);
             WorkForceDetails.Reset(details);
         }
     }
