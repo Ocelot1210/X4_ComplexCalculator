@@ -39,6 +39,17 @@ namespace X4_ComplexCalculator.DB.X4DB
         }
 
         /// <summary>
+        /// コピーコンストラクタ
+        /// </summary>
+        /// <param name="moduleEquipment"></param>
+        public ModuleEquipment(ModuleEquipment moduleEquipment)
+        {
+            Turret = new ModuleEquipmentManager(moduleEquipment.Turret);
+            Shield = new ModuleEquipmentManager(moduleEquipment.Shield);
+        }
+
+
+        /// <summary>
         /// 全装備を列挙する
         /// </summary>
         /// <returns></returns>
@@ -55,27 +66,16 @@ namespace X4_ComplexCalculator.DB.X4DB
         }
 
 
-        /// <summary>
-        /// 比較
-        /// </summary>
-        /// <param name="obj">比較対象</param>
-        /// <returns></returns>
         public override bool Equals(object obj)
         {
-            var tgt = obj as ModuleEquipment;
-            if (tgt == null) return false;
-
-            return Turret.Equals(tgt.Turret) && Shield.Equals(tgt.Shield);
+            return obj is ModuleEquipment equipment &&
+                   EqualityComparer<ModuleEquipmentManager>.Default.Equals(Turret, equipment.Turret) &&
+                   EqualityComparer<ModuleEquipmentManager>.Default.Equals(Shield, equipment.Shield);
         }
 
-
-        /// <summary>
-        /// ハッシュ値を取得
-        /// </summary>
-        /// <returns>ハッシュ値</returns>
         public override int GetHashCode()
         {
-            return Turret.GetHashCode() ^ Shield.GetHashCode();
+            return HashCode.Combine(Turret, Shield);
         }
     }
 }

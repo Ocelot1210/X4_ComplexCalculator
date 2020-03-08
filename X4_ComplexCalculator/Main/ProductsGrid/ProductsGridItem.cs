@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB.X4DB;
+using System.Linq;  
 
 namespace X4_ComplexCalculator.Main.ProductsGrid
 {
@@ -11,6 +12,11 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
     public class ProductsGridItem : INotifyPropertyChangedBace
     {
         #region メンバ
+        /// <summary>
+        /// 金額
+        /// </summary>
+        private long _Price;
+
         /// <summary>
         /// 単価
         /// </summary>
@@ -45,7 +51,24 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// <summary>
         /// 金額
         /// </summary>
-        public long Price => Count * UnitPrice;
+        public long Price
+        {
+            get
+            {
+                return _Price;
+            }
+            set
+            {
+                UnitPrice = (long)Math.Round((double)value / Count);
+
+                var price = UnitPrice * Count;
+                if (_Price != price)
+                {
+                    _Price = price;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
 
         /// <summary>
@@ -60,9 +83,10 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
             set
             {
                 // 最低価格≦ 入力価格 ≦ 最高価格かつ価格が変更された場合のみ更新
+
+                // 変更無しの場合は何もしない
                 if (_UnitPrice == value)
                 {
-                    // 変更無しの場合は何もしない
                     return;
                 }
 
@@ -83,7 +107,8 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
                     _UnitPrice = value;
                 }
                 OnPropertyChanged();
-                OnPropertyChanged("Price");
+
+                Price = _UnitPrice * Count;
             }
         }
 
@@ -135,13 +160,14 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// <param name="datails">ウェア詳細(関連モジュール等)</param>
         /// <param name="isExpanded">関連モジュールが展開されているか</param>
         /// <param name="price">価格</param>
-        public ProductsGridItem(string id, long count, IReadOnlyCollection<ProductDetailsListItem> datails, bool isExpanded = false, long price = 0)
+        public ProductsGridItem(string id, long count, IEnumerable<ProductDetailsListItem> datails, bool isExpanded = false, long price = 0)
         {
             Ware = new Ware(id);
             Count = count;
             _IsExpanded = isExpanded;
             UnitPrice = (price != 0)? price : (Ware.MinPrice + Ware.MaxPrice) / 2;
-            Details = datails;
+            Price = Count * UnitPrice;
+            Details = datails.ToArray();
         }
     }
 }

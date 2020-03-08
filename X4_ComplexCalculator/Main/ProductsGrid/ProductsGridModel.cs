@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.Data;
 using System.Data.SQLite;
 using System.Linq;
+using System.Threading.Tasks;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.ModulesGrid;
@@ -32,31 +33,19 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
             moduleGridModel.OnModulesChanged += UpdateProducts;
         }
 
+
         /// <summary>
         /// 製品更新
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void UpdateProducts(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            var task = System.Threading.Tasks.Task.Run(() =>
-            {
-                UpdateProductsMain(sender, e);
-            });
-        }
-
-
-        /// <summary>
-        /// 製品更新メイン
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void UpdateProductsMain(object sender, NotifyCollectionChangedEventArgs e)
+        private async Task UpdateProducts(object sender, NotifyCollectionChangedEventArgs e)
         {
             // モジュール一覧
             // → 製造モジュールか居住モジュールのみ抽出し、
             // モジュールIDごとにモジュール数を集計
             var modules = ((IEnumerable<ModulesGridItem>)sender)
+                                .AsParallel()
                                 .Where(x => x.Module.ModuleType.ModuleTypeID == "production" ||
                                             x.Module.ModuleType.ModuleTypeID == "habitation")
                                 .GroupBy(x => x.Module.ModuleID)
@@ -84,7 +73,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
             // 生産性(倍率)
             var efficiency = 0.0;
             {
-                var maxWorkers = modules.Sum(x => x.MaxWorkers * x.Count);
+                var maxWorkers      = modules.Sum(x => x.MaxWorkers * x.Count);
                 var workersCapacity = modules.Sum(x => x.WorkersCapacity * x.Count);
 
                 // 生産性を0.0以上、1.0以下にする
@@ -109,12 +98,12 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
                 {
                     case "production":
                         prodParam.Add("efficiency", DbType.Double, efficiency);
-                        prodParam.Add("count", DbType.Int32, module.Count);
-                        prodParam.Add("moduleID", DbType.String, module.ModuleID);
+                        prodParam.Add("count",      DbType.Int32,  module.Count);
+                        prodParam.Add("moduleID",   DbType.String, module.ModuleID);
                         break;
 
                     case "habitation":
-                        habParam.Add("count", DbType.Int32, module.Count);
+                        habParam.Add("count",    DbType.Int32,  module.Count);
                         habParam.Add("moduleID", DbType.String, module.ModuleID);
                         break;
 
@@ -123,25 +112,32 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
                 }
             }
 
-            // 製造モジュール集計
-            AggregateProductionModule(prodParam, wareDict, moduleDict);
+            // 集計
+            Task.WaitAll(
+                // 製造モジュール集計
+                AggregateProductionModule(prodParam, wareDict, moduleDict),
 
-            // 居住モジュール集計
-            AggregateHabitationModule(habParam, wareDict, moduleDict);
+                // 居住モジュール集計
+                AggregateHabitationModule(habParam, wareDict, moduleDict)
+            );
 
             // 前回値保存
-            var backup = Products.ToDictionary(x => x.Ware.WareID, x => new { x.UnitPrice, x.IsExpanded });
+            var backup = Products.AsParallel().ToDictionary(x => x.Ware.WareID, x => new { x.UnitPrice, x.IsExpanded });
 
-            var items = wareDict.Select(x =>
-            {
-                var details = moduleDict[x.Key];
-                var bak = new { UnitPrice = (long)0, IsExpanded = false };
-                return backup.TryGetValue(x.Key, out bak)
-                    ? new ProductsGridItem(x.Key, x.Value, details, bak.IsExpanded, bak.UnitPrice)
-                    : new ProductsGridItem(x.Key, x.Value, details);
-            }).ToArray();
+            var items = wareDict.AsParallel()
+                                .Select(x =>
+                                {
+                                    var details = moduleDict[x.Key].OrderBy(x => x.ModuleName);
+                                    var bak = new { UnitPrice = (long)0, IsExpanded = false };
+                                    return backup.TryGetValue(x.Key, out bak)
+                                        ? new ProductsGridItem(x.Key, x.Value, details, bak.IsExpanded, bak.UnitPrice)
+                                        : new ProductsGridItem(x.Key, x.Value, details);
+                                }
+            );
 
-            Products.Reset(items);
+
+            Products.Reset(items.OrderBy(x => x.Ware.WareGroup.Tier).ThenBy(x => x.Ware.Name));
+            await Task.CompletedTask;
         }
 
         /// <summary>
@@ -150,7 +146,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// <param name="param">製造モジュール情報のパラメータ</param>
         /// <param name="wareDict">ウェア情報辞書</param>
         /// <param name="moduleDict">関連モジュール情報辞書</param>
-        private void AggregateProductionModule(SQLiteCommandParameters param, Dictionary<string, long> wareDict, Dictionary<string, List<ProductDetailsListItem>> moduleDict)
+        private async Task AggregateProductionModule(SQLiteCommandParameters param, Dictionary<string, long> wareDict, Dictionary<string, List<ProductDetailsListItem>> moduleDict)
         {
             //------------//
             // 製品を集計 //
@@ -209,6 +205,8 @@ WHERE
 ";
 
             DBConnection.X4DB.ExecQuery(query, param, SumProduct, wareDict, moduleDict);
+
+            await Task.CompletedTask;
         }
 
 
@@ -219,7 +217,7 @@ WHERE
         /// <param name="param">居住モジュール情報のパラメータ</param>
         /// <param name="wareDict">ウェア情報辞書</param>
         /// <param name="moduleDict">関連モジュール情報辞書</param>
-        private void AggregateHabitationModule(SQLiteCommandParameters param, Dictionary<string, long> wareDict, Dictionary<string, List<ProductDetailsListItem>> moduleDict)
+        private async Task AggregateHabitationModule(SQLiteCommandParameters param, Dictionary<string, long> wareDict, Dictionary<string, List<ProductDetailsListItem>> moduleDict)
         {
             var query = $@"
 SELECT
@@ -262,6 +260,8 @@ WHERE
 	)
 ";
             DBConnection.X4DB.ExecQuery(query, param, SumResource, wareDict, moduleDict);
+
+            await Task.CompletedTask;
         }
 
         /// <summary>

@@ -7,6 +7,7 @@ using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.ModulesGrid;
 using System.Collections.Specialized;
+using System.Threading.Tasks;
 
 namespace X4_ComplexCalculator.Main.ResourcesGrid
 {
@@ -33,25 +34,13 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
             moduleGridModel.OnModulesChanged += UpdateResources;
         }
 
+
         /// <summary>
         /// 必要リソース更新
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void UpdateResources(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            var task = System.Threading.Tasks.Task.Run(() =>
-            {
-                UpdateResourcesMain(sender, e);
-            });
-        }
-
-        /// <summary>
-        /// 必要リソース更新メイン
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void UpdateResourcesMain(object sender, NotifyCollectionChangedEventArgs e)
+        private async Task UpdateResources(object sender, NotifyCollectionChangedEventArgs e)
         {
             // モジュール一覧
             var modules = (IEnumerable<ModulesGridItem>)sender;
@@ -59,9 +48,28 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
             // 建造に必要なリソース集計用
             var resourcesDict = new Dictionary<string, long>();
 
-            // 建造に必要なリソースを集計
-            {
-                var query = $@"
+            Task.WaitAll(
+                // モジュールの建造に必要なリソースを集計
+                AggregateModuleResources(modules, resourcesDict),
+
+                // モジュールの装備の建造に必要なリソースを集計
+                AggregateEquipmentResources(modules, resourcesDict)
+            );
+
+            Resources.Reset(resourcesDict.Select(x => new ResourcesGridItem(x.Key, x.Value)));
+            await Task.CompletedTask;
+        }
+
+
+        /// <summary>
+        /// モジュールの建造に必要なリソースを集計
+        /// </summary>
+        /// <param name="modules">モジュール一覧</param>
+        /// <param name="resourcesDict">集計用辞書</param>
+        /// <returns></returns>
+        private async Task AggregateModuleResources(IEnumerable<ModulesGridItem> modules, Dictionary<string, long> resourcesDict)
+        {
+            var query = $@"
 SELECT
     WareID,
     Amount * :count AS Amount
@@ -72,28 +80,34 @@ FROM
 WHERE
     ModuleID = :moduleID";
 
-                var sqlParam = new SQLiteCommandParameters(2);
-                foreach (ModulesGridItem mgi in modules)
-                {
-                    sqlParam.Add("count", DbType.Int32, mgi.ModuleCount);
-                    sqlParam.Add("moduleID", DbType.String, mgi.Module.ModuleID);
-                }
-
-                DBConnection.X4DB.ExecQuery(query, sqlParam, SumResource, resourcesDict);
+            var sqlParam = new SQLiteCommandParameters(2);
+            foreach (ModulesGridItem mgi in modules)
+            {
+                sqlParam.Add("count", DbType.Int32, mgi.ModuleCount);
+                sqlParam.Add("moduleID", DbType.String, mgi.Module.ModuleID);
             }
 
+            DBConnection.X4DB.ExecQuery(query, sqlParam, SumResource, resourcesDict);
 
-            {
-                // 装備IDごとに集計
-                var equipments = modules.Where(x => x.Module.Equipment.CanEquipped)
-                                        .Select(x => x.Module.Equipment.GetAllEquipment().Select(y => new { ID = y.EquipmentID, Count = x.ModuleCount }))
-                                        .Where(x => x.Any())
-                                        .GroupBy(x => x.First().ID)
-                                        .Select(x => new { ID = x.Key, Count = x.Sum(y => y.Sum(z => z.Count)) });
+            await Task.CompletedTask;
+        }
 
-                if (equipments.Any())
-                {
-                    var query = $@"
+
+        /// <summary>
+        /// モジュールの装備の建造に必要なリソースを集計
+        /// </summary>
+        /// <returns></returns>
+        private async Task AggregateEquipmentResources(IEnumerable<ModulesGridItem> modules, Dictionary<string, long> resourcesDict)
+        {
+            // 装備IDごとに集計
+            var equipments = modules.AsParallel()
+                                    .Where(x => x.Module.Equipment.CanEquipped)
+                                    .Select(x => x.Module.Equipment.GetAllEquipment().Select(y => new { ID = y.EquipmentID, Count = x.ModuleCount }))
+                                    .Where(x => x.Any())
+                                    .GroupBy(x => x.First().ID)
+                                    .Select(x => new { ID = x.Key, Count = x.Sum(y => y.Sum(z => z.Count)) });
+
+            var query = $@"
 SELECT
     WareID,
     Amount * :count AS Amount
@@ -105,22 +119,20 @@ WHERE
     EquipmentID = :equipmentID AND
 	Method = 'default'";
 
-                    var sqlParam = new SQLiteCommandParameters(2);
-                    foreach (var equipment in equipments)
-                    {
-                        sqlParam.Add("equipmentID", DbType.String, equipment.ID);
-                        sqlParam.Add("count", DbType.Int32, equipment.Count);
-                    }
-                    DBConnection.X4DB.ExecQuery(query, sqlParam, SumResource, resourcesDict);
-                }
+            var sqlParam = new SQLiteCommandParameters(2);
+            foreach (var equipment in equipments)
+            {
+                sqlParam.Add("equipmentID", DbType.String, equipment.ID);
+                sqlParam.Add("count", DbType.Int32, equipment.Count);
             }
+            DBConnection.X4DB.ExecQuery(query, sqlParam, SumResource, resourcesDict);
 
-            Resources.Reset(resourcesDict.Select(x => new ResourcesGridItem(x.Key, x.Value)));
+            await Task.CompletedTask;
         }
 
 
         /// <summary>
-        /// ステーション建造に必要なリソースを集計
+        /// ウェアID別にリソースを集計
         /// </summary>
         /// <param name="dr"></param>
         /// <param name="args"></param>

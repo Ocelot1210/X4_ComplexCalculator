@@ -1,10 +1,12 @@
 ﻿using Prism.Commands;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Controls;
 using System.Windows.Data;
 using X4_ComplexCalculator.Common;
+using System.Linq;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid
 {
@@ -25,6 +27,11 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// 検索用フィルタを削除できるか
         /// </summary>
         private bool CanRemoveFilter = false;
+
+        /// <summary>
+        /// コピーされたモジュール
+        /// </summary>
+        private ModulesGridItem[] CopiedModules = new ModulesGridItem[0];
         #endregion
 
 
@@ -67,18 +74,31 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
 
 
         /// <summary>
-        /// モジュール削除ボタンクリック
-        /// </summary>
-        public DelegateCommand<ModulesGridItem> DeleteModule { get; }
-
-
-        /// <summary>
         /// モジュール変更
         /// </summary>
         public DelegateCommand<ModulesGridItem> ReplaceModule { get; }
 
+
         /// <summary>
-        /// 選択されたモジュールたちを削除
+        /// ソート順をクリア
+        /// </summary>
+        public DelegateCommand<DataGrid> ClearSortOrder { get; }
+
+
+        /// <summary>
+        /// モジュールをコピー
+        /// </summary>
+        public DelegateCommand<DataGrid> CopyModules { get; }
+
+
+        /// <summary>
+        /// モジュールを貼り付け
+        /// </summary>
+        public DelegateCommand<DataGrid> PasteModules { get; }
+
+
+        /// <summary>
+        /// モジュールを削除
         /// </summary>
         public DelegateCommand<DataGrid> DeleteModules { get; }
         #endregion
@@ -93,20 +113,81 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         {
             Model = model;
             ModulesViewSource = modulesViewSource;
-            AddButtonClicked = new DelegateCommand(Model.ShowAddModuleWindow);
-            DeleteModule = new DelegateCommand<ModulesGridItem>(Model.DeleteModule);
-            ReplaceModule = new DelegateCommand<ModulesGridItem>(Model.ReplaceModule);
-            DeleteModules = new DelegateCommand<DataGrid>(DeleteModulesCommand);
+            AddButtonClicked  = new DelegateCommand(Model.ShowAddModuleWindow);
+            ReplaceModule     = new DelegateCommand<ModulesGridItem>(Model.ReplaceModule);
+            ClearSortOrder    = new DelegateCommand<DataGrid>(ClearSortOrderCommand);
+            CopyModules       = new DelegateCommand<DataGrid>(CopyModulesCommand);
+            PasteModules      = new DelegateCommand<DataGrid>(PasteModulesCommand);
+            DeleteModules     = new DelegateCommand<DataGrid>(DeleteModulesCommand);
         }
 
         /// <summary>
-        /// 選択されたモジュールたちを削除
+        /// ソート順をクリア
         /// </summary>
-        /// <param name="dg"></param>
-        private void DeleteModulesCommand(DataGrid dg)
+        /// <param name="dataGrid"></param>
+        private void ClearSortOrderCommand(DataGrid dataGrid)
         {
-            Model.DeleteModules();
-            dg.SelectedItems.Clear();
+            var cvs = CollectionViewSource.GetDefaultView(dataGrid.ItemsSource);
+            if (cvs != null)
+            {
+                cvs.SortDescriptions.Clear();
+                foreach(var clm in dataGrid.Columns)
+                {
+                    clm.SortDirection = null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 選択中のモジュールをコピー
+        /// </summary>
+        /// <param name="dataGrid"></param>
+        private void CopyModulesCommand(DataGrid dataGrid)
+        {
+            // 選択中のモジュールをコピー
+            CopiedModules = dataGrid.SelectedItems.Cast<ModulesGridItem>().Select(x => new ModulesGridItem(x)).ToArray();
+        }
+
+        /// <summary>
+        /// コピーしたモジュールを貼り付け
+        /// </summary>
+        /// <param name="dataGrid"></param>
+        private void PasteModulesCommand(DataGrid dataGrid)
+        {
+            // 選択状態保存
+            var cvs = CollectionViewSource.GetDefaultView(dataGrid.ItemsSource);
+            var selectedIndexes = cvs.Cast<ModulesGridItem>()
+                                     .Select((itm, idx) => new { itm.IsSelected, Idx = idx })
+                                     .Where(x => x.IsSelected)
+                                     .Select(x => x.Idx)
+                                     .ToArray();
+
+            Model.Modules.AddRange(CopiedModules.Select(x => new ModulesGridItem(x)).ToArray());
+            dataGrid.UpdateLayout();
+            dataGrid.Focus();
+        }
+
+        /// <summary>
+        /// 選択中のモジュールを削除
+        /// </summary>
+        /// <param name="dataGrid"></param>
+        private void DeleteModulesCommand(DataGrid dataGrid)
+        {
+            var cvs = (ListCollectionView)ModulesViewSource.View;
+            var currPos = cvs.CurrentPosition;
+
+            Model.DeleteModules(dataGrid.SelectedItems.Cast<ModulesGridItem>());
+
+            if (cvs.Count <= currPos)
+            {
+                cvs.MoveCurrentToLast();
+            }
+            else
+            {
+                cvs.MoveCurrentToPosition(currPos);
+            }
+
+            dataGrid.Focus();
         }
 
         /// <summary>

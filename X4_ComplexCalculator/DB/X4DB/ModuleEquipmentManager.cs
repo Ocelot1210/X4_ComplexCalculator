@@ -96,6 +96,27 @@ namespace X4_ComplexCalculator.DB.X4DB
         }
 
         /// <summary>
+        /// コピーコンストラクタ
+        /// </summary>
+        /// <param name="manager"></param>
+        public ModuleEquipmentManager(ModuleEquipmentManager manager)
+        {
+            CanEquipped = manager.CanEquipped;
+            _Sizes      = manager._Sizes.ToList();
+            _MaxAmount  = new Dictionary<Size, int>();
+            foreach(var amount in manager._MaxAmount)
+            {
+                _MaxAmount.Add(amount.Key, amount.Value);
+            }
+            
+            _Equipments = new Dictionary<Size, List<Equipment>>();
+            foreach(var equipment in manager._Equipments)
+            {
+                _Equipments.Add(equipment.Key, equipment.Value.ToList());
+            }
+        }
+
+        /// <summary>
         /// 装備一覧を取得
         /// </summary>
         /// <param name="size">サイズ</param>

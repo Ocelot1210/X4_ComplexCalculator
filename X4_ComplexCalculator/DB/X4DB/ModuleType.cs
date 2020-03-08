@@ -30,6 +30,17 @@ namespace X4_ComplexCalculator.DB.X4DB
         }
 
         /// <summary>
+        /// コピーコンストラクタ
+        /// </summary>
+        /// <param name="moduleType"></param>
+        public ModuleType(ModuleType moduleType)
+        {
+            ModuleTypeID = moduleType.ModuleTypeID;
+            Name = moduleType.Name;
+        }
+
+
+        /// <summary>
         /// 比較
         /// </summary>
         /// <param name="obj">比較対象</param>

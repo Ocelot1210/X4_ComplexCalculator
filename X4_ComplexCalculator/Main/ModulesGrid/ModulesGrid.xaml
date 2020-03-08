@@ -15,9 +15,10 @@
         <CollectionViewSource x:Key="ModulesViewSource" Source="{Binding Modules}"/>
 
         <ContextMenu x:Key="ModulesGridContextMenu">
-            <MenuItem Header="コピー" Command="{Binding DeleteModules}"/>
-            <MenuItem Header="貼り付け" Command="{Binding DeleteModules}"/>
-            <MenuItem Header="削除" Command="{Binding DeleteModules}" CommandParameter="{x:Reference Name=moduleGrid}"/>
+            <MenuItem Header="ソート順初期化" Command="{Binding ClearSortOrder}" CommandParameter="{x:Reference Name=moduleGrid}"/>
+            <MenuItem Header="コピー"   InputGestureText="Ctrl+C" Command="{Binding CopyModules}"   CommandParameter="{x:Reference Name=moduleGrid}"/>
+            <MenuItem Header="貼り付け" InputGestureText="Ctrl+V" Command="{Binding PasteModules}"  CommandParameter="{x:Reference Name=moduleGrid}"/>
+            <MenuItem Header="削除"     InputGestureText="Delete" Command="{Binding DeleteModules}" CommandParameter="{x:Reference Name=moduleGrid}"/>
         </ContextMenu>
 
     </UserControl.Resources>
@@ -42,8 +43,16 @@
             PresentationOptions:Freeze="true"
             Style="{StaticResource DefaultDataGridStyle}"
             ContextMenu="{StaticResource ModulesGridContextMenu}"
-            x4cmn:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
+            CellStyle="{StaticResource DataGridCellDefaultStyle}"
             >
+
+            <!-- キーボードショートカット -->
+            <DataGrid.InputBindings>
+                <KeyBinding Gesture="Ctrl+C" Command="{Binding CopyModules}"   CommandParameter="{x:Reference Name=moduleGrid}"/>
+                <KeyBinding Gesture="Ctrl+V" Command="{Binding PasteModules}"  CommandParameter="{x:Reference Name=moduleGrid}"/>
+                <KeyBinding Gesture="Delete" Command="{Binding DeleteModules}" CommandParameter="{x:Reference Name=moduleGrid}"/>
+            </DataGrid.InputBindings>
+
             
             <DataGrid.Columns>
 
@@ -74,19 +83,13 @@
                 <DataGridTemplateColumn
                     Header="モジュール数"
                     CanUserSort="True"
-                    SortMemberPath="Count"
+                    SortMemberPath="ModuleCount"
                     ClipboardContentBinding="{Binding ModuleCount}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding ModuleCount, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Right"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-
-                    <DataGridTemplateColumn.CellEditingTemplate>
-                        <DataTemplate>
                             <xctk:IntegerUpDown ClipValueToMinMax="True" Value="{Binding ModuleCount, UpdateSourceTrigger=PropertyChanged}" FormatString="N0" Minimum="0" Maximum="99999"/>
                         </DataTemplate>
-                    </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
 
@@ -124,19 +127,6 @@
                     Binding="{Binding ShieldsCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                     CellStyle="{StaticResource RightAlignedDataGridReadOnlyCell}"
                     />
-
-
-                <!-- 削除ボタン -->
-                <DataGridTemplateColumn Header="削除" IsReadOnly="True">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button
-                                Content="×"
-                                Command="{Binding Path=DataContext.DeleteModule, Mode=OneTime, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}"
-                                CommandParameter="{Binding}"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
     </DockPanel>

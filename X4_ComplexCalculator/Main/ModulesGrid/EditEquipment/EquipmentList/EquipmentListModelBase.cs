@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB.X4DB;
 
@@ -75,7 +76,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
             set
             {
                 _SelectedSize = value;
-                UpdateEquipments();
+                UpdateEquipments(null, null).Wait();
             }
         }
 
@@ -83,7 +84,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// <summary>
         /// 選択中の種族
         /// </summary>
-        protected IReadOnlyList<FactionsListItem> SelectedFactions => Factions.Where(x => x.Checked).ToList();
+        protected IReadOnlyList<FactionsListItem> SelectedFactions => Factions.Where(x => x.Checked).ToArray();
         #endregion
 
 
@@ -96,13 +97,13 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         {
             Module = module;
             Factions = factions;
-            Factions.OnCollectionChangedMain += (object sender, NotifyCollectionChangedEventArgs e) => { if (SelectedSize != null) { UpdateEquipments(); } };
+            Factions.OnCollectionOrPropertyChanged += UpdateEquipments;
         }
 
         /// <summary>
         /// 装備一覧を更新
         /// </summary>
-        protected abstract void UpdateEquipments();
+        protected abstract Task UpdateEquipments(object sender, NotifyCollectionChangedEventArgs e);
 
 
         /// <summary>
@@ -130,7 +131,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         {
             if (0 < Equipped[SelectedSize].Count)
             {
-                var tgt = targets.Cast<Equipment>().ToList();
+                var tgt = targets.Cast<Equipment>().ToArray();
                 foreach (var equipment in tgt)
                 {
                     Equipped[SelectedSize].Remove(equipment);

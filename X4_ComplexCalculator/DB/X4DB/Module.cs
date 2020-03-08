@@ -64,6 +64,21 @@ namespace X4_ComplexCalculator.DB.X4DB
             Equipment = new ModuleEquipment(moduleID);
         }
 
+        /// <summary>
+        /// コピーコンストラクタ
+        /// </summary>
+        /// <param name="module"></param>
+        public Module(Module module)
+        {
+            ModuleID        = module.ModuleID;
+            Name            = module.Name;
+            ModuleType      = new ModuleType(module.ModuleType);
+            MaxWorkers      = module.MaxWorkers;
+            WorkersCapacity = module.WorkersCapacity;
+            Equipment       = new ModuleEquipment(module.Equipment);
+        }
+
+
 
         /// <summary>
         /// 文字列化

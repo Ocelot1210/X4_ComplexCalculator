@@ -106,6 +106,7 @@
         x4cmn:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
         ContextMenu="{StaticResource ProductsGridContextMenu}"
         IsReadOnly="False"
+        CellStyle="{StaticResource DataGridCellDefaultStyle}"
         >
 
         <DataGrid.Columns>
@@ -150,28 +151,33 @@
 
 
             <!-- 金額 -->
+            <DataGridTemplateColumn
+                Header="金額"
+                SortMemberPath="Price"
+                >
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <xctk:IntegerUpDown ClipValueToMinMax="True" FormatString="{}{0:N0} cr" Value="{Binding Price, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Increment="{Binding Count, Mode=OneTime}"/>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            
+            <!--
             <DataGridTextColumn
                 Header="金額"
                 Binding="{Binding Price, StringFormat='{}{0:N0} cr', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                 IsReadOnly="True"
                 CellStyle="{StaticResource LossEmphasisStyle}"
                 />
+            -->
 
             <!--単価-->
             <DataGridTemplateColumn Header="単価" SortMemberPath="UnitPrice">
-                <!--通常表示時のスタイル-->
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding UnitPrice, StringFormat='{}{0:N0} cr', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Right"/>
+                        <xctk:IntegerUpDown ClipValueToMinMax="True" FormatString="{}{0:N0} cr" Value="{Binding UnitPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Minimum="{Binding Ware.MinPrice}" Maximum="{Binding Ware.MaxPrice}"/>
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
-
-                <!--編集時のスタイル-->
-                <DataGridTemplateColumn.CellEditingTemplate>
-                    <DataTemplate>
-                        <xctk:IntegerUpDown ClipValueToMinMax="True" Value="{Binding UnitPrice, Mode=TwoWay}" Minimum="{Binding Ware.MinPrice}" Maximum="{Binding Ware.MaxPrice}"/>
-                    </DataTemplate>
-                </DataGridTemplateColumn.CellEditingTemplate>
             </DataGridTemplateColumn>
 
             <!--単価(スライダー)-->
@@ -201,7 +207,7 @@
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
                         <Slider
-                            Value="{Binding UnitPrice, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                            Value="{Binding UnitPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             Minimum="{Binding Ware.MinPrice}"
                             Maximum="{Binding Ware.MaxPrice}"
                             />

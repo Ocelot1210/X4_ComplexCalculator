@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.ModulesGrid;
@@ -79,36 +80,25 @@ namespace X4_ComplexCalculator.Main.StationSummary
 
 
         /// <summary>
-        /// 製品更新
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void UpdateWorkForce(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            var task = System.Threading.Tasks.Task.Run(() =>
-            {
-                UpdateWorkForceMain(sender, e);
-            });
-        }
-
-
-        /// <summary>
         /// 労働力情報を更新
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void UpdateWorkForceMain(object sender, NotifyCollectionChangedEventArgs e)
+        private async Task UpdateWorkForce(object sender, NotifyCollectionChangedEventArgs e)
         {
-            var modules = ((IEnumerable<ModulesGridItem>)sender).Where(x => x.Module.ModuleType.ModuleTypeID == "production" || x.Module.ModuleType.ModuleTypeID == "habitation");
-
-            var details = modules.GroupBy(x => x.Module.ModuleID)
-                                 .Select(x => new WorkForceDetailsItem(x.First().Module, x.Sum(y => y.ModuleCount)))
-                                 .ToArray();
+            var details = ((IEnumerable<ModulesGridItem>)sender).AsParallel()
+                                                                .Where(x => x.Module.ModuleType.ModuleTypeID == "production" || x.Module.ModuleType.ModuleTypeID == "habitation")
+                                                                .GroupBy(x => x.Module.ModuleID)
+                                                                .Select(x => new WorkForceDetailsItem(x.First().Module, x.Sum(y => y.ModuleCount)))
+                                                                .OrderBy(x => x.ModuleName)
+                                                                .ToArray();
 
             // 値を更新
             NeedWorkforce = details.Sum(x => x.MaxWorkers * x.ModuleCount);
             WorkForce = details.Sum(x => x.WorkersCapacity * x.ModuleCount);
             WorkForceDetails.Reset(details);
+
+            await Task.CompletedTask;
         }
     }
 }

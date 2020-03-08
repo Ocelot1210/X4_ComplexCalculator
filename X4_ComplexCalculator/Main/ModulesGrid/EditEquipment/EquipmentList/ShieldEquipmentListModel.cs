@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Data.SQLite;
 using System.Linq;
+using System.Threading.Tasks;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
@@ -31,8 +33,13 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// <summary>
         /// 装備一覧を更新
         /// </summary>
-        protected override void UpdateEquipments()
+        protected override async Task UpdateEquipments(object sender, NotifyCollectionChangedEventArgs e)
         {
+            if (SelectedSize != null)
+            {
+                return;
+            }
+
             var items = new List<Equipment>();
 
             var selectedFactions = string.Join(", ", SelectedFactions.Select(x => $"'{x.Faction.FactionID}'"));
@@ -51,7 +58,7 @@ WHERE
 
             DBConnection.X4DB.ExecQuery(query, (SQLiteDataReader dr, object[] args) => { items.Add(new Equipment(dr["EquipmentID"].ToString())); });
 
-            Equipments[SelectedSize].Reset(items);
+            await Task.Run(() => Equipments[SelectedSize].Reset(items));
         }
 
 

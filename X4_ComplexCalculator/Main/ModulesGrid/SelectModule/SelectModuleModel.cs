@@ -2,6 +2,7 @@
 using System.Collections.Specialized;
 using System.Data.SQLite;
 using System.Linq;
+using System.Threading.Tasks;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB;
 
@@ -44,26 +45,17 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         {
             ItemCollection = itemCollection;
 
-            // モジュール種別一覧初期化
-            InitModuleTypes();
+            Task.WaitAll(InitModuleTypes(), InitModuleOwners(), UpdateModules(null, null));
 
-
-            // 所有派閥一覧初期化
-            InitModuleOwners();
-
-            // モジュール一覧更新
-            UpdateModules(null, null);
-
-            ModuleOwners.OnCollectionChangedMain += UpdateModules;
-            ModuleTypes.OnCollectionChangedMain += UpdateModules;
-
+            ModuleOwners.OnCollectionOrPropertyChanged += UpdateModules;
+            ModuleTypes.OnCollectionOrPropertyChanged += UpdateModules;
         }
 
 
         /// <summary>
         /// モジュール種別一覧を初期化する
         /// </summary>
-        private void InitModuleTypes()
+        private async Task InitModuleTypes()
         {
             var items = new List<ModulesListItem>();
 
@@ -85,13 +77,15 @@ WHERE
 ORDER BY Name", init, "SelectModuleCheckStateTypes");
 
             ModuleTypes.AddRange(items);
+
+            await Task.CompletedTask;
         }
 
 
         /// <summary>
         /// 派閥一覧を初期化する
         /// </summary>
-        private void InitModuleOwners()
+        private async Task InitModuleOwners()
         {
             var items = new List<ModulesListItem>();
 
@@ -113,6 +107,8 @@ WHERE
 ORDER BY Name ASC", init, "SelectModuleCheckStateTypes");
 
             ModuleOwners.AddRange(items);
+
+            await Task.CompletedTask;
         }
 
 
@@ -120,7 +116,7 @@ ORDER BY Name ASC", init, "SelectModuleCheckStateTypes");
         /// <summary>
         /// モジュール一覧を更新する
         /// </summary>
-        public void UpdateModules(object sender, NotifyCollectionChangedEventArgs e)
+        public async Task UpdateModules(object sender, NotifyCollectionChangedEventArgs e)
         {
             var query = $@"
 SELECT
@@ -137,6 +133,8 @@ WHERE
             var list = new List<ModulesListItem>();
             DBConnection.X4DB.ExecQuery(query, SetModules, list);
             Modules.Reset(list);
+
+            await Task.CompletedTask;
         }
 
 

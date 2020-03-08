@@ -4,6 +4,8 @@ using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.ModulesGrid.EditEquipment;
 using System.Linq;
+using System.Collections.Generic;
+using System;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid
 {
@@ -84,7 +86,18 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         public ModulesGridItem(string id)
         {
             Module = new Module(id);
+            EditEquipmentCommand = new DelegateCommand(EditEquipment);
+        }
 
+
+        /// <summary>
+        /// コピーコンストラクタ
+        /// </summary>
+        /// <param name="modulesGridItem">コピー対象</param>
+        public ModulesGridItem(ModulesGridItem modulesGridItem)
+        {
+            Module = new Module(modulesGridItem.Module);
+            ModuleCount = modulesGridItem.ModuleCount;
             EditEquipmentCommand = new DelegateCommand(EditEquipment);
         }
 
@@ -125,6 +138,23 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             {
                 OnPropertyChanged("Module");
             }
+        }
+
+
+        public override bool Equals(object obj)
+        {
+            return obj is ModulesGridItem item &&
+                   EqualityComparer<Module>.Default.Equals(Module, item.Module) &&
+                   IsSelected == item.IsSelected &&
+                   ModuleCount == item.ModuleCount &&
+                   TurretsCount == item.TurretsCount &&
+                   ShieldsCount == item.ShieldsCount;
+                    
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Module, IsSelected, ModuleCount, TurretsCount, ShieldsCount);
         }
     }
 }

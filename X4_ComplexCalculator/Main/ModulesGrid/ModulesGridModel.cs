@@ -4,6 +4,7 @@ using System.Windows;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Main.ModulesGrid.SelectModule;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid
 {
@@ -30,15 +31,15 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// <summary>
         /// プロパティ変更時のイベント
         /// </summary>
-        public event NotifyCollectionChangedEventHandler OnModulesChanged
+        public event NotifyCollectionChangedEventAsync OnModulesChanged
         {
             add
             {
-                Modules.OnCollectionChangedMain += value;
+                Modules.OnCollectionOrPropertyChanged += value;
             }
             remove
             {
-                Modules.OnCollectionChangedMain -= value;
+                Modules.OnCollectionOrPropertyChanged -= value;
             }
         }
         #endregion
@@ -52,22 +53,13 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             OwnerWindow = ownerWindow;
         }
 
-
-        /// <summary>
-        /// モジュールを削除
-        /// </summary>
-        /// <param name="item">削除したいモジュール</param>
-        public void DeleteModule(ModulesGridItem item)
-        {
-            Modules.Remove(item);
-        }
-
         /// <summary>
         /// モジュール一括削除
         /// </summary>
-        public void DeleteModules()
+        /// <param name="items">削除対象</param>
+        public void DeleteModules(IEnumerable<ModulesGridItem> items)
         {
-            Modules.RemoveItems(Modules.Where(x => x.IsSelected));
+            Modules.RemoveItems(items);
         }
 
         /// <summary>

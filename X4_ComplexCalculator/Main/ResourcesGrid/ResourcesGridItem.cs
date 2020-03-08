@@ -72,6 +72,10 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
             }
         }
 
+        /// <summary>
+        /// 選択されたか
+        /// </summary>
+        public bool IsSelected { get; set; }
 
         /// <summary>
         /// 百分率ベースで価格を設定する

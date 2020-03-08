@@ -46,7 +46,11 @@ namespace X4_ComplexCalculator.Common
         public virtual void AddRange(IEnumerable<T> range)
         {
             CheckReentrancy();
-            ((List<T>)Items).AddRange(range);
+
+            foreach(var itm in range)
+            {
+                Items.Add(itm);
+            }
 
             OnPropertyChanged(new PropertyChangedEventArgs("Count"));
             OnPropertyChanged(new PropertyChangedEventArgs("Item[]"));
@@ -65,6 +69,13 @@ namespace X4_ComplexCalculator.Common
             if (!(range is T[] removeTargets))
             {
                 removeTargets = range.ToArray();
+            }
+
+            // 削除対象が1つだけならRemoveを使用
+            if (removeTargets.Length == 1)
+            {
+                Remove(removeTargets[0]);
+                return;
             }
 
             foreach(var removeTarget in removeTargets)

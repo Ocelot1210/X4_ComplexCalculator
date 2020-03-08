@@ -177,7 +177,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         {
             if (selectedEquipments != null)
             {
-                Model.RemoveEquipments(selectedEquipments.Cast<Equipment>().ToList());
+                Model.RemoveEquipments(selectedEquipments.Cast<Equipment>().ToArray());
                 OnPropertyChanged("CanAddEquipment");
                 OnPropertyChanged("CanRemoveEquipment");
                 OnPropertyChanged("MaxAmount");

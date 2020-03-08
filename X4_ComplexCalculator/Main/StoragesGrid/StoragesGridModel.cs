@@ -5,6 +5,7 @@ using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.ModulesGrid;
 using System.Collections.Specialized;
+using System.Threading.Tasks;
 
 namespace X4_ComplexCalculator.Main.StorageGrid
 {
@@ -28,7 +29,7 @@ namespace X4_ComplexCalculator.Main.StorageGrid
         public StoragesGridModel(ModulesGridModel moduleGridModel)
         {
             Storages = new SmartCollection<StoragesGridItem>();
-            moduleGridModel.OnModulesChanged += UpdateProducts;
+            moduleGridModel.OnModulesChanged += UpdateStorages;
         }
 
 
@@ -37,23 +38,10 @@ namespace X4_ComplexCalculator.Main.StorageGrid
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void UpdateProducts(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            var task = System.Threading.Tasks.Task.Run(() =>
-            {
-                UpdateStoragesMain(sender, e);
-            });
-        }
-
-
-        /// <summary>
-        /// 保管庫更新メイン
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void UpdateStoragesMain(object sender, NotifyCollectionChangedEventArgs e)
+        private async Task UpdateStorages(object sender, NotifyCollectionChangedEventArgs e)
         {
             var modules = ((IEnumerable<ModulesGridItem>)sender)
+                                .AsParallel()
                                 .Where(x => x.Module.ModuleType.ModuleTypeID == "storage")
                                 .GroupBy(x => x.Module.ModuleID)
                                 .Select(x => new { x.First().Module.ModuleID, Count = x.Sum(y => y.ModuleCount) });
@@ -107,6 +95,8 @@ WHERE
                     ? new StoragesGridItem(x.Key, x.Value, modulesDict[x.Key], expanded)
                     : new StoragesGridItem(x.Key, x.Value, modulesDict[x.Key]);
             }));
+
+            await Task.CompletedTask;
         }
 
 
