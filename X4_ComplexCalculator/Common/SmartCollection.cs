@@ -62,7 +62,7 @@ namespace X4_ComplexCalculator.Common
         /// 一括削除
         /// </summary>
         /// <param name="range">削除対象</param>
-        public void RemoveItems(IEnumerable<T> range)
+        public virtual void RemoveItems(IEnumerable<T> range)
         {
             CheckReentrancy();
 

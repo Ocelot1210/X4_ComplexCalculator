@@ -1,17 +1,57 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Windows;
 
 namespace X4_ComplexCalculator.Common
 {
     /// <summary>
     /// INotifyPropertyChangedを簡単に実装するためのクラス
     /// </summary>
-    public class INotifyPropertyChangedBace : INotifyPropertyChanged
+    public class INotifyPropertyChangedBace : INotifyPropertyChanged, IDisposable
     {
         /// <summary>
         /// プロパティ変更時のイベントハンドラ
         /// </summary>
-        public event PropertyChangedEventHandler PropertyChanged;
+        private PropertyChangedEventHandler _PropertyChanged;
+
+        private List<PropertyChangedEventHandler> _EventHandlers = new List<PropertyChangedEventHandler>();
+
+        /// <summary>
+        /// プロパティ変更時のイベントハンドラ
+        /// </summary>
+        public event PropertyChangedEventHandler PropertyChanged
+        {
+            add
+            {
+                PropertyChangedEventHandler ev2;
+                var ev1 = _PropertyChanged;
+                do
+                {
+                    ev2 = ev1;
+                    var ev3 = (PropertyChangedEventHandler)Delegate.Combine(ev2, value);
+                    _EventHandlers.Add(value);
+                    ev1 = Interlocked.CompareExchange(ref _PropertyChanged, ev3, ev2);
+                }
+                while (ev1 != ev2);
+            }
+            remove
+            {
+                PropertyChangedEventHandler ev2;
+                var ev1 = _PropertyChanged;
+                do
+                {
+                    ev2 = ev1;
+                    var ev3 = (PropertyChangedEventHandler)Delegate.Remove(ev2, value);
+                    _EventHandlers.Remove(value);
+                    ev1 = Interlocked.CompareExchange(ref _PropertyChanged, ev3, ev2);
+                }
+                while (ev1 != ev2);
+            }
+        }
+
 
         /// <summary>
         /// プロパティ変更時
@@ -19,7 +59,16 @@ namespace X4_ComplexCalculator.Common
         /// <param name="propertyName">プロパティ名</param>
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            _PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+
+        public void Dispose()
+        {
+            foreach(var ev in _EventHandlers.ToArray())
+            {
+                PropertyChanged -= ev;
+            }
         }
     }
 }

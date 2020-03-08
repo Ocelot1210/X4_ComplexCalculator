@@ -101,10 +101,11 @@ namespace X4_ComplexCalculator.DB.X4DB
             switch (equipment.EquipmentType.EquipmentTypeID)
             {
                 case "turrets":
-                    
+                    Equipment.Turret.AddEquipment(equipment);
                     break;
 
                 case "shields":
+                    Equipment.Shield.AddEquipment(equipment);
                     break;
 
                 default:

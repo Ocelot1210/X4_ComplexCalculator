@@ -177,6 +177,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             var currPos = cvs.CurrentPosition;
 
             Model.DeleteModules(dataGrid.SelectedItems.Cast<ModulesGridItem>());
+            GC.Collect();
 
             if (cvs.Count <= currPos)
             {

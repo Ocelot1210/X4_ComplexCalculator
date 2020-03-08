@@ -103,7 +103,6 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             EditEquipmentCommand = new DelegateCommand(EditEquipment);
         }
 
-
         /// <summary>
         /// 装備を編集
         /// </summary>

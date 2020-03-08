@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
@@ -14,17 +15,20 @@ namespace X4_ComplexCalculator.Common
     /// <typeparam name="T">INotifyPropertyChangedを実装したクラス</typeparam>
     public class MemberChangeDetectCollection<T> : SmartCollection<T> where T : INotifyPropertyChanged
     {
-        
+        #region メンバ
+        /// <summary>
+        /// 範囲追加時の追加開始位置
+        /// </summary>
+        private int AddRangeStart;
+        #endregion
+
 
         /// <summary>
         /// コレクションとプロパティ変更時のイベント
         /// </summary>
         public event NotifyCollectionChangedEventAsync OnCollectionOrPropertyChanged;
 
-        /// <summary>
-        /// 範囲追加時の追加開始位置
-        /// </summary>
-        private int AddRangeStart;
+
 
         #region コンストラクタ
         public MemberChangeDetectCollection() : base()
@@ -62,7 +66,7 @@ namespace X4_ComplexCalculator.Common
                 await Task.WhenAll(
                     handler.GetInvocationList()
                            .OfType<NotifyCollectionChangedEventAsync>()
-                           .Select(async (x) => await x.Invoke(this, e)));
+                           .Select(async (x) => await x.Invoke(this, null)));
             }
 
             switch (e.Action)
@@ -92,6 +96,10 @@ namespace X4_ComplexCalculator.Common
                     foreach (T item in e.OldItems)
                     {
                         item.PropertyChanged -= OnPropertyChanged;
+                        if (item is IDisposable disposable)
+                        {
+                            disposable.Dispose();
+                        }
                     }
                     break;
 
@@ -144,6 +152,40 @@ namespace X4_ComplexCalculator.Common
             OnPropertyChanged(new PropertyChangedEventArgs("Item[]"));
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             AddRangeStart = -1;
+        }
+
+        /// <summary>
+        /// 一括削除
+        /// </summary>
+        /// <param name="range">削除対象</param>
+        public override void RemoveItems(IEnumerable<T> range)
+        {
+            CheckReentrancy();
+
+            if (!(range is T[] removeTargets))
+            {
+                removeTargets = range.ToArray();
+            }
+
+            // 削除対象が1つだけならRemoveを使用
+            if (removeTargets.Length == 1)
+            {
+                Remove(removeTargets[0]);
+                return;
+            }
+
+            foreach (var removeTarget in removeTargets)
+            {
+                Items.Remove(removeTarget);
+                if (removeTarget is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
+            }
+
+            OnPropertyChanged(new PropertyChangedEventArgs("Count"));
+            OnPropertyChanged(new PropertyChangedEventArgs("Item[]"));
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
     }
 }

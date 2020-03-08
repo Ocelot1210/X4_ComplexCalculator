@@ -190,7 +190,7 @@ namespace X4_ComplexCalculator.Main
                 modules.Add(module);
             });
 
-            _Modules.AddRange(modules);
+            _Modules.Reset(modules);
         }
 
 
