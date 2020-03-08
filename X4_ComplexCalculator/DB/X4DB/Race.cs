@@ -26,11 +26,9 @@ namespace X4_ComplexCalculator.DB.X4DB
         public Race(string raceID)
         {
             RaceID = raceID;
-            {
-                string name = "";
-                DBConnection.X4DB.ExecQuery($"SELECT Name FROM Race WHERE RaceID = '{RaceID}'", (SQLiteDataReader dr, object[] args) => { name = dr["Name"].ToString(); });
-                Name = name;
-            }
+            string name = "";
+            DBConnection.X4DB.ExecQuery($"SELECT Name FROM Race WHERE RaceID = '{RaceID}'", (SQLiteDataReader dr, object[] args) => { name = dr["Name"].ToString(); });
+            Name = name;
         }
 
         /// <summary>

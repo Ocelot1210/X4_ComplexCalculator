@@ -6,7 +6,7 @@ using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Main.ModulesGrid;
 using X4_ComplexCalculator.Main.ProductsGrid;
 using X4_ComplexCalculator.Main.ResourcesGrid;
-using X4_ComplexCalculator.Main.StorageGrid;
+using X4_ComplexCalculator.Main.StoragesGrid;
 
 namespace X4_ComplexCalculator.Main.StationSummary
 {

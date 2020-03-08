@@ -11,13 +11,13 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// カーゴ種別ID
         /// </summary>
-        public string TransportTypeID { private set; get; }
+        public string TransportTypeID { get; }
 
 
         /// <summary>
         /// ウェアグループ名
         /// </summary>
-        public string Name { private set; get; }
+        public string Name { get; }
         #endregion
 
 
@@ -28,12 +28,14 @@ namespace X4_ComplexCalculator.DB.X4DB
         public TransportType(string transportTypeID)
         {
             TransportTypeID = transportTypeID;
+            string name = "";
             DBConnection.X4DB.ExecQuery(
                 $"SELECT Name FROM TransportType WHERE TransportTypeID = '{TransportTypeID}'",
                 (SQLiteDataReader dr, object[] args) =>
                 {
-                    Name = dr["Name"].ToString();
+                    name = dr["Name"].ToString();
                 });
+            Name = name;
         }
 
 

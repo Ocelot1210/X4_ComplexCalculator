@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using X4_ComplexCalculator.Common;
-using X4_ComplexCalculator.Main.ModulesGrid;
 
 namespace X4_ComplexCalculator.Main.ResourcesGrid
 {
@@ -55,10 +54,10 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="moduleGridModel">建造に必要なリソースを表示するDataGridView用用Model</param>
-        public ResourcesGridViewModel(ModulesGridModel moduleGridModel)
+        /// <param name="moduleGridModel">建造リソース用Model</param>
+        public ResourcesGridViewModel(ResourcesGridModel resourcesGridModel)
         {
-            Model = new ResourcesGridModel(moduleGridModel);
+            Model = resourcesGridModel;
         }
     }
 }

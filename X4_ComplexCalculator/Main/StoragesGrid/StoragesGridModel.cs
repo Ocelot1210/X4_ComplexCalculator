@@ -7,7 +7,7 @@ using X4_ComplexCalculator.Main.ModulesGrid;
 using System.Collections.Specialized;
 using System.Threading.Tasks;
 
-namespace X4_ComplexCalculator.Main.StorageGrid
+namespace X4_ComplexCalculator.Main.StoragesGrid
 {
     /// <summary>
     /// 保管庫一覧表示用DataGridViewのModel

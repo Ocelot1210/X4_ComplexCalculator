@@ -8,25 +8,27 @@ namespace X4_ComplexCalculator.DB.X4DB
     /// </summary>
     public class Equipment : IComparable
     {
+        #region プロパティ
         /// <summary>
         /// 装備品ID
         /// </summary>
-        public string EquipmentID { private set; get; }
+        public string EquipmentID { get; }
 
         /// <summary>
         /// 装備種別
         /// </summary>
-        public EquipmentType EquipmentType { private set; get; }
+        public EquipmentType EquipmentType { get; }
 
         /// <summary>
         /// 装備の大きさ
         /// </summary>
-        public Size Size { private set; get; }
+        public Size Size { get; }
 
         /// <summary>
         /// 装備名称
         /// </summary>
-        public string Name { private set; get; }
+        public string Name { get; }
+        #endregion
 
         /// <summary>
         /// コンストラクタ
@@ -35,15 +37,21 @@ namespace X4_ComplexCalculator.DB.X4DB
         public Equipment(string equipmentID)
         {
             EquipmentID = equipmentID;
+            string name = "";
+            EquipmentType equipmentType = null;
+            Size          size          = null;
 
             DBConnection.X4DB.ExecQuery(
                 $"SELECT * FROM Equipment WHERE EquipmentID = '{EquipmentID}'",
                 (SQLiteDataReader dr, object[] args) =>
                     {
-                        EquipmentType = new EquipmentType(dr["EquipmentTypeID"].ToString());
-                        Size = new Size(dr["SizeID"].ToString());
-                        Name = dr["Name"].ToString();
+                        equipmentType = new EquipmentType(dr["EquipmentTypeID"].ToString());
+                        size = new Size(dr["SizeID"].ToString());
+                        name = dr["Name"].ToString();
                     });
+            Name = name;
+            Size = size;
+            EquipmentType = equipmentType;
         }
 
         /// <summary>

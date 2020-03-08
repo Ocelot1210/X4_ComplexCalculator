@@ -7,13 +7,18 @@
     xmlns:modGrid="clr-namespace:X4_ComplexCalculator.Main.ModulesGrid"
     xmlns:prodGrid="clr-namespace:X4_ComplexCalculator.Main.ProductsGrid"
     xmlns:resGrid="clr-namespace:X4_ComplexCalculator.Main.ResourcesGrid"
-    xmlns:storGrid="clr-namespace:X4_ComplexCalculator.Main.StorageGrid"
+    xmlns:storGrid="clr-namespace:X4_ComplexCalculator.Main.StoragesGrid"
     xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
     x:Class="X4_ComplexCalculator.MainWindow"
     mc:Ignorable="d"
     Title="X4: ステーション計算機"
     Height="600" Width="1000" Style="{StaticResource DefaultWindowBackgroundStyle}">
 
+    <Window.InputBindings>
+        <KeyBinding Gesture="Ctrl+S"       Command="{Binding Save}"/>
+        <KeyBinding Gesture="Shift+Ctrl+S" Command="{Binding SaveAs}"/>
+        <KeyBinding Gesture="Ctrl+O"       Command="{Binding Open}"/>
+    </Window.InputBindings>
 
     <Grid>
 
@@ -21,11 +26,12 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
+        
         <Menu>
             <MenuItem Header="ファイル(_F)">
-                <MenuItem Header="上書き保存" InputGestureText="Ctrl+S"/>
-                <MenuItem Header="名前を付けて保存"/>
+                <MenuItem Header="上書き保存"       InputGestureText="Ctrl+S"       Command="{Binding Save}"/>
+                <MenuItem Header="名前を付けて保存" InputGestureText="Shift+Ctrl+S" Command="{Binding SaveAs}"/>
+                <MenuItem Header="開く"             InputGestureText="Ctrl+O" Command="{Binding Open}"/>
             </MenuItem>
             <MenuItem Header="表示(_V)">
                 <MenuItem IsCheckable="True" Header="{Binding Title, Mode=OneTime, ElementName=_Module}"   IsChecked="{Binding IsVisible, ElementName=_Module}"/>

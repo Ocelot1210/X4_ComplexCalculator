@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.SQLite;
 
 namespace X4_ComplexCalculator.DB.X4DB
@@ -8,15 +9,18 @@ namespace X4_ComplexCalculator.DB.X4DB
     /// </summary>
     public class EquipmentType : IComparable
     {
+        #region プロパティ
         /// <summary>
         /// 装備種別ID
         /// </summary>
-        public string EquipmentTypeID { private set; get; }
+        public string EquipmentTypeID { get; }
 
         /// <summary>
         /// 装備種別名
         /// </summary>
-        public string Name { private set; get; }
+        public string Name { get; }
+        #endregion
+
 
         /// <summary>
         /// コンストラクタ
@@ -25,7 +29,9 @@ namespace X4_ComplexCalculator.DB.X4DB
         public EquipmentType(string id)
         {
             EquipmentTypeID = id;
-            DBConnection.X4DB.ExecQuery($"SELECT * FROM EquipmentType WHERE EquipmentTypeID = '{EquipmentTypeID}'", (SQLiteDataReader dr, object[] args) => { Name = dr["Name"].ToString(); });
+            string name = "";
+            DBConnection.X4DB.ExecQuery($"SELECT * FROM EquipmentType WHERE EquipmentTypeID = '{EquipmentTypeID}'", (SQLiteDataReader dr, object[] args) => { name = dr["Name"].ToString(); });
+            Name = name;
         }
 
 

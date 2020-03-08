@@ -1,4 +1,5 @@
-﻿using X4_ComplexCalculator.Common;
+﻿using System.Threading.Tasks;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.ResourcesGrid
@@ -77,6 +78,7 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         /// </summary>
         public bool IsSelected { get; set; }
 
+
         /// <summary>
         /// 百分率ベースで価格を設定する
         /// </summary>
@@ -84,13 +86,14 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         public void SetUnitPricePercent(long percent)
         {
             UnitPrice = (long)(Ware.MinPrice + (Ware.MaxPrice - Ware.MinPrice) * 0.01 * percent);
+            //await Task.CompletedTask;
         }
         #endregion
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="ware">建造に必要なウェアID</param>
+        /// <param name="wareID">建造に必要なウェアID</param>
         /// <param name="count">建造に必要なウェアの個数</param>
         public ResourcesGridItem(string wareID, long count)
         {

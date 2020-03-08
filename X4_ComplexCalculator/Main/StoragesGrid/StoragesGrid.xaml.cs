@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace X4_ComplexCalculator.Main.StorageGrid
+namespace X4_ComplexCalculator.Main.StoragesGrid
 {
     /// <summary>
     /// StoragesGrid.xaml の相互作用ロジック

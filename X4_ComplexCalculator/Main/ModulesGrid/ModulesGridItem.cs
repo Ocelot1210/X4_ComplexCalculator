@@ -18,7 +18,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// <summary>
         /// モジュール数
         /// </summary>
-        private int _ModuleCount = 1;
+        private long _ModuleCount = 1;
         #endregion
 
 
@@ -44,7 +44,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// <summary>
         /// モジュール数
         /// </summary>
-        public int ModuleCount
+        public long ModuleCount
         {
             get
             {
@@ -83,9 +83,11 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// コンストラクタ
         /// </summary>
         /// <param name="id">モジュールID</param>
-        public ModulesGridItem(string id)
+        /// <param name="moduleCount">モジュール数</param>
+        public ModulesGridItem(string id, long moduleCount = 1)
         {
             Module = new Module(id);
+            ModuleCount = moduleCount;
             EditEquipmentCommand = new DelegateCommand(EditEquipment);
         }
 

@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SQLite;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Data.SQLite;
 using X4_ComplexCalculator.DB;
 
-namespace X4_ComplexCalculator.Main.StorageGrid
+namespace X4_ComplexCalculator.Main.StoragesGrid
 {
     /// <summary>
     /// ドロップダウンで表示するListViewのアイテム(保管庫用)

@@ -76,7 +76,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
             set
             {
                 _SelectedSize = value;
-                UpdateEquipments(null, null).Wait();
+                _ = UpdateEquipments(null, null);
             }
         }
 

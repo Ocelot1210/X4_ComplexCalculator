@@ -11,31 +11,31 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// ID
         /// </summary>
-        public string ModuleID { get; private set; }
+        public string ModuleID { get; }
 
 
         /// <summary>
         /// モジュール種別
         /// </summary>
-        public ModuleType ModuleType { get; private set; }
+        public ModuleType ModuleType { get; }
 
 
         /// <summary>
         /// モジュール名称
         /// </summary>
-        public string Name { get; private set; }
+        public string Name { get; }
 
 
         /// <summary>
         /// 従業員
         /// </summary>
-        public long MaxWorkers { get; private set; }
+        public long MaxWorkers { get; }
 
 
         /// <summary>
         /// 最大収容人数
         /// </summary>
-        public long WorkersCapacity { get; private set; }
+        public long WorkersCapacity { get; }
 
 
         /// <summary>
@@ -51,16 +51,24 @@ namespace X4_ComplexCalculator.DB.X4DB
         public Module(string moduleID)
         {
             ModuleID = moduleID;
+            string name = "";
+            long maxWorkers = 0;
+            long workersCapacity = 0;
+            ModuleType moduleType = null;
 
             DBConnection.X4DB.ExecQuery($"SELECT ModuleTypeID, Name, MaxWorkers, WorkersCapacity FROM Module WHERE Module.ModuleID = '{moduleID}'",
                 (SQLiteDataReader dr, object[] args) =>
                 {
-                    Name = dr["Name"].ToString();
-                    ModuleType = new ModuleType(dr["ModuleTypeID"].ToString());
-                    MaxWorkers = (long)dr["MaxWorkers"];
-                    WorkersCapacity = (long)dr["WorkersCapacity"];
+                    name            = dr["Name"].ToString();
+                    moduleType      = new ModuleType(dr["ModuleTypeID"].ToString());
+                    maxWorkers      = (long)dr["MaxWorkers"];
+                    workersCapacity = (long)dr["WorkersCapacity"];
                 });
 
+            Name = name;
+            ModuleType = moduleType;
+            MaxWorkers = maxWorkers;
+            WorkersCapacity = workersCapacity;
             Equipment = new ModuleEquipment(moduleID);
         }
 
@@ -78,17 +86,31 @@ namespace X4_ComplexCalculator.DB.X4DB
             Equipment       = new ModuleEquipment(module.Equipment);
         }
 
-
-
         /// <summary>
-        /// 文字列化
+        /// 装備を追加
         /// </summary>
-        /// <returns></returns>
-        public override string ToString()
+        /// <param name="equipment">追加したい装備</param>
+        public void AddEquipment(Equipment equipment)
         {
-            return Name;
-        }
+            // 装備できないモジュールの場合、何もしない
+            if (!Equipment.CanEquipped)
+            {
+                return;
+            }
 
+            switch (equipment.EquipmentType.EquipmentTypeID)
+            {
+                case "turrets":
+                    
+                    break;
+
+                case "shields":
+                    break;
+
+                default:
+                    throw new InvalidOperationException("追加できるのはタレットかシールドのみです。");
+            }
+        }
 
         /// <summary>
         /// オブジェクト比較

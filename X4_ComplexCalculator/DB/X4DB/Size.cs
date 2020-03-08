@@ -11,12 +11,12 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// サイズID
         /// </summary>
-        public string SizeID { private set; get; }
+        public string SizeID { get; }
 
         /// <summary>
         /// サイズ名
         /// </summary>
-        public string Name { private set; get; }
+        public string Name { get; }
 
 
         /// <summary>
@@ -26,7 +26,9 @@ namespace X4_ComplexCalculator.DB.X4DB
         public Size(string sizeID)
         {
             SizeID = sizeID;
-            DBConnection.X4DB.ExecQuery($"SELECT * FROM Size WHERE SizeID = '{sizeID}'", (SQLiteDataReader dr, object[] args) => { Name = dr["Name"].ToString(); });
+            string name = "";
+            DBConnection.X4DB.ExecQuery($"SELECT * FROM Size WHERE SizeID = '{sizeID}'", (SQLiteDataReader dr, object[] args) => { name = dr["Name"].ToString(); });
+            Name = name;
         }
 
 

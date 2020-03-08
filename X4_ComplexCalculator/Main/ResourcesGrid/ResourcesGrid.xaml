@@ -6,6 +6,7 @@
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
+             xmlns:x4mupsld="clr-namespace:X4_ComplexCalculator_CustomControlLibrary.MouseUpSlider;assembly=X4_ComplexCalculator_CustomControlLibrary"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -82,10 +83,11 @@
                     <DockPanel>
                         <Slider
                             DockPanel.Dock="Left"
-                            Minimum="1"
+                            Minimum="0"
                             Maximum="100"
                             TickFrequency="1"
-                            Value="{Binding Data, Source={StaticResource ProxyUnitPricePercent}}"/>
+                            Value="{Binding Data, Source={StaticResource ProxyUnitPricePercent}}"
+                            />
                     </DockPanel>
                 </DataGridTemplateColumn.Header>
 

@@ -4,8 +4,9 @@ using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.ModulesGrid;
 using X4_ComplexCalculator.Main.ProductsGrid;
 using X4_ComplexCalculator.Main.ResourcesGrid;
-using X4_ComplexCalculator.Main.StorageGrid;
+using X4_ComplexCalculator.Main.StoragesGrid;
 using X4_ComplexCalculator.Main.StationSummary;
+using X4_ComplexCalculator.Main;
 
 namespace X4_ComplexCalculator
 {
@@ -22,12 +23,16 @@ namespace X4_ComplexCalculator
             DBConnection.Open();
 
             var moduleModel = new ModulesGridModel(this);
+            var productsModel = new ProductsGridModel(moduleModel);
+            var resourcesModel = new ResourcesGridModel(moduleModel);
 
-            Summary.DataContext     = new StationSummaryViewModel(moduleModel);
-            Modules.DataContext     = new ModulesGridViewModel(moduleModel, (CollectionViewSource)Modules.Resources["ModulesViewSource"]);
-            Products.DataContext    = new ProductsGridViewModel(moduleModel);
-            Build.DataContext = new ResourcesGridViewModel(moduleModel);
+            Summary.DataContext  = new StationSummaryViewModel(moduleModel);
+            Modules.DataContext  = new ModulesGridViewModel(moduleModel, (CollectionViewSource)Modules.Resources["ModulesViewSource"]);
+            Products.DataContext = new ProductsGridViewModel(productsModel);
+            Build.DataContext    = new ResourcesGridViewModel(resourcesModel);
             Storages.DataContext = new StoragesGridViewModel(moduleModel);
+
+            DataContext = new MainWindowViewModel(moduleModel, productsModel, resourcesModel);
         }
     }
 }

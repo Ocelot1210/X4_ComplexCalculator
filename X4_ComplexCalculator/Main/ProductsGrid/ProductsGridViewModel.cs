@@ -1,4 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using Prism.Commands;
+using System.Collections.ObjectModel;
+using System.Windows.Controls;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Main.ModulesGrid;
 
@@ -49,16 +51,52 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
                 OnPropertyChanged();
             }
         }
+
+        /// <summary>
+        /// 選択されたアイテムを展開する
+        /// </summary>
+        public DelegateCommand<DataGrid> SelectedExpand { get; }
+
+        /// <summary>
+        /// 選択されたアイテムを折りたたむ
+        /// </summary>
+        public DelegateCommand<DataGrid> SelectedCollapse { get; }
         #endregion
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="moduleGridModel">モジュール一覧用Model</param>
-        public ProductsGridViewModel(ModulesGridModel moduleGridModel)
+        /// <param name="productsGridModel">製品一覧用Model</param>
+        public ProductsGridViewModel(ProductsGridModel productsGridModel)
         {
-            Model = new ProductsGridModel(moduleGridModel);
+            Model = productsGridModel;
+            SelectedExpand = new DelegateCommand<DataGrid>(SelectedExpandCommand);
+            SelectedCollapse = new DelegateCommand<DataGrid>(SelectedCollapseCommand);
+        }
+
+        /// <summary>
+        /// 選択されたアイテムを展開する
+        /// </summary>
+        /// <param name="dataGrid"></param>
+        private void SelectedExpandCommand(DataGrid dataGrid)
+        {
+            foreach(ProductsGridItem item in dataGrid.SelectedItems)
+            {
+                item.IsExpanded = true;
+            }
+        }
+
+        /// <summary>
+        /// 選択されたアイテムを折りたたむ
+        /// </summary>
+        /// <param name="dataGrid"></param>
+        private void SelectedCollapseCommand(DataGrid dataGrid)
+        {
+            foreach (ProductsGridItem item in dataGrid.SelectedItems)
+            {
+                item.IsExpanded = false;
+            }
         }
     }
 }

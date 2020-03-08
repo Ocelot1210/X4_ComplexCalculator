@@ -12,19 +12,19 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// 派閥ID
         /// </summary>
-        public string FactionID { get; private set; }
+        public string FactionID { get; }
 
 
         /// <summary>
         /// 派閥名
         /// </summary>
-        public string Name { get; private set; }
+        public string Name { get; }
 
 
         /// <summary>
         /// 種族
         /// </summary>
-        public Race Race { get; private set; }
+        public Race Race { get; }
         #endregion
 
 
@@ -35,13 +35,18 @@ namespace X4_ComplexCalculator.DB.X4DB
         public Faction(string factionID)
         {
             FactionID = factionID;
+            string name = "";
+            Race race = null;
+
             DBConnection.X4DB.ExecQuery(
                 $"SELECT Name, RaceID FROM Faction WHERE FactionID = '{FactionID}'", 
                 (SQLiteDataReader dr, object[] args) => 
-                { 
-                    Name = dr["Name"].ToString();
-                    Race = new Race(dr["RaceID"].ToString());
+                {
+                    name = dr["Name"].ToString();
+                    race = new Race(dr["RaceID"].ToString());
                 });
+            Name = name;
+            Race = race;
         }
 
 

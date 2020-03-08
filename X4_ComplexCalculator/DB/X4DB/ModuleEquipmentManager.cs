@@ -128,7 +128,7 @@ namespace X4_ComplexCalculator.DB.X4DB
 
 
         /// <summary>
-        /// 装備一覧に追加
+        /// 装備一覧をリセット
         /// </summary>
         /// <param name="size">サイズ</param>
         /// <param name="equipments">装備一覧</param>
@@ -136,11 +136,23 @@ namespace X4_ComplexCalculator.DB.X4DB
         {
             if(MaxAmount[size] < equipments.Count)
             {
-                throw new System.IndexOutOfRangeException("モジュール数がオーバーしています。");
+                throw new System.IndexOutOfRangeException("これ以上装備できません。");
             }
 
             _Equipments[size].Clear();
             _Equipments[size].AddRange(equipments);
+        }
+
+        /// <summary>
+        /// 装備を追加
+        /// </summary>
+        /// <param name="equipment">追加対象</param>
+        public void AddEquipment(Equipment equipment)
+        {
+            if (_Equipments[equipment.Size].Count <= MaxAmount[equipment.Size])
+            {
+                _Equipments[equipment.Size].Add(equipment);
+            }
         }
 
 

@@ -42,6 +42,7 @@ namespace X4_ComplexCalculator.DB
         public DBConnection(string dbPath)
         {
             var consb = new SQLiteConnectionStringBuilder { DataSource = dbPath };
+            
             conn = new SQLiteConnection(consb.ToString());
             conn.Open();
         }
@@ -101,7 +102,7 @@ namespace X4_ComplexCalculator.DB
         /// <param name="callback">実行結果に対する処理</param>
         /// <param name="args">可変長引数</param>
         /// <returns>結果の行数</returns>
-        public int ExecQuery(string query, Action<SQLiteDataReader, object[]> callback, params object[] args)
+        public int ExecQuery(string query, Action<SQLiteDataReader, object[]> callback = null, params object[] args)
         {
             int ret = 0;
 
@@ -227,10 +228,10 @@ namespace X4_ComplexCalculator.DB
             ret = new DBConnection(path);
 
             // テーブルがなければ作る
-            ret.ExecQuery("CREATE TABLE IF NOT EXISTS SelectModuleCheckStateModuleTypes(ID TEXT NOT NULL)", null);
-            ret.ExecQuery("CREATE TABLE IF NOT EXISTS SelectModuleCheckStateModuleOwners(ID TEXT NOT NULL)", null);
-            ret.ExecQuery("CREATE TABLE IF NOT EXISTS SelectModuleEquipmentCheckStateFactions(ID TEXT NOT NULL)", null);
-            ret.ExecQuery("CREATE TABLE IF NOT EXISTS ModulePresets(ID TEXT NOT NULL, Name TEXT NOT NULL, EquipmentID TEXT NOT NULL)", null);
+            ret.ExecQuery("CREATE TABLE IF NOT EXISTS SelectModuleCheckStateModuleTypes(ID TEXT NOT NULL)");
+            ret.ExecQuery("CREATE TABLE IF NOT EXISTS SelectModuleCheckStateModuleOwners(ID TEXT NOT NULL)");
+            ret.ExecQuery("CREATE TABLE IF NOT EXISTS SelectModuleEquipmentCheckStateFactions(ID TEXT NOT NULL)");
+            ret.ExecQuery("CREATE TABLE IF NOT EXISTS ModulePresets(ID TEXT NOT NULL, Name TEXT NOT NULL, EquipmentID TEXT NOT NULL)");
 
             return ret;
         }

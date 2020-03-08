@@ -155,14 +155,14 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="id">ウェアID</param>
+        /// <param name="wareID">ウェアID</param>
         /// <param name="count">ウェア個数</param>
         /// <param name="datails">ウェア詳細(関連モジュール等)</param>
         /// <param name="isExpanded">関連モジュールが展開されているか</param>
         /// <param name="price">価格</param>
-        public ProductsGridItem(string id, long count, IEnumerable<ProductDetailsListItem> datails, bool isExpanded = false, long price = 0)
+        public ProductsGridItem(string wareID, long count, IEnumerable<ProductDetailsListItem> datails, bool isExpanded = false, long price = 0)
         {
-            Ware = new Ware(id);
+            Ware = new Ware(wareID);
             Count = count;
             _IsExpanded = isExpanded;
             UnitPrice = (price != 0)? price : (Ware.MinPrice + Ware.MaxPrice) / 2;

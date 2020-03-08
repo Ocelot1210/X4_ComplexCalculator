@@ -2,7 +2,7 @@
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB.X4DB;
 
-namespace X4_ComplexCalculator.Main.StorageGrid
+namespace X4_ComplexCalculator.Main.StoragesGrid
 {
     /// <summary>
     /// 保管庫一覧表示用DataGridViewの1レコード分

@@ -18,18 +18,6 @@
                 <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
             </Trigger>
 
-            <!-- 選択行 -->
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="True"/>
-                    <Condition Binding="{Binding IsKeyboardFocusWithin, RelativeSource={RelativeSource AncestorType=DataGrid}}" Value="False"/>
-                </MultiDataTrigger.Conditions>
-                <Setter Property="Background"  Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
-                <Setter Property="Foreground"  Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
-            </MultiDataTrigger>
-            
-
             <!-- コンテキストメニューを表示している場合の背景色 -->
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
@@ -40,37 +28,9 @@
                 <Setter Property="Foreground"  Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
             </MultiDataTrigger>
-            <!--
-            <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
-            </Trigger>
-
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="True"/>
-                    <Condition Binding="{Binding IsKeyboardFocusWithin, RelativeSource={RelativeSource AncestorType=DataGrid}}" Value="False"/>
-                </MultiDataTrigger.Conditions>
-                <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
-            </MultiDataTrigger>
-
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="True"/>
-                    <Condition Binding="{Binding ContextMenu.IsOpen, RelativeSource={RelativeSource AncestorType=DataGrid}}" Value="True"/>
-                </MultiDataTrigger.Conditions>
-                <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
-            </MultiDataTrigger>
-            -->
         </Style.Triggers>
     </Style>
 
-    
     <!-- DataGridの初期設定 -->
     <Style TargetType="DataGrid" x:Key="DefaultDataGridStyle">
         <Setter Property="AutoGenerateColumns" Value="False"/>

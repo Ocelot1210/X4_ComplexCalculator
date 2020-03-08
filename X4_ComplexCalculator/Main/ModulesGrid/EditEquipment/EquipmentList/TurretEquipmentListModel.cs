@@ -37,7 +37,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// </summary>
         protected override async Task UpdateEquipments(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (SelectedSize != null)
+            if (SelectedSize == null)
             {
                 return;
             }

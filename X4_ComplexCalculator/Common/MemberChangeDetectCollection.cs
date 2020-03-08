@@ -63,7 +63,6 @@ namespace X4_ComplexCalculator.Common
                     handler.GetInvocationList()
                            .OfType<NotifyCollectionChangedEventAsync>()
                            .Select(async (x) => await x.Invoke(this, e)));
-                //await OnCollectionOrPropertyChanged(obj, e);
             }
 
             switch (e.Action)

@@ -35,8 +35,8 @@
 
         <!-- DataGridのコンテキストメニュー -->
         <ContextMenu x:Key="ProductsGridContextMenu">
-            <MenuItem Header="展開"/>
-            <MenuItem Header="折りたたむ"/>
+            <MenuItem Header="展開"       Command="{Binding SelectedExpand, Mode=OneTime}"   CommandParameter="{x:Reference productGrid}"/>
+            <MenuItem Header="折りたたむ" Command="{Binding SelectedCollapse, Mode=OneTime}" CommandParameter="{x:Reference productGrid}"/>
         </ContextMenu>
         
         <!-- 子要素のListView -->
@@ -99,6 +99,7 @@
     </UserControl.Resources>
 
     <DataGrid 
+        x:Name="productGrid"
         ItemsSource="{Binding Path=Products, UpdateSourceTrigger=PropertyChanged, IsAsync=True}"
         VirtualizingPanel.ScrollUnit="Pixel"
         PresentationOptions:Freeze="true"
@@ -161,15 +162,6 @@
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
-            
-            <!--
-            <DataGridTextColumn
-                Header="金額"
-                Binding="{Binding Price, StringFormat='{}{0:N0} cr', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                IsReadOnly="True"
-                CellStyle="{StaticResource LossEmphasisStyle}"
-                />
-            -->
 
             <!--単価-->
             <DataGridTemplateColumn Header="単価" SortMemberPath="UnitPrice">
@@ -181,7 +173,7 @@
             </DataGridTemplateColumn>
 
             <!--単価(スライダー)-->
-            <DataGridTemplateColumn IsReadOnly="True" MinWidth="100" SortMemberPath="UnitPrice">
+            <DataGridTemplateColumn IsReadOnly="True" MinWidth="100">
                 <!--ヘッダのスタイル定義-->
                 <DataGridTemplateColumn.HeaderStyle>
                     <Style TargetType="DataGridColumnHeader">

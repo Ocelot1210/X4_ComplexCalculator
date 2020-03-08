@@ -10,13 +10,13 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// モジュール種別ID
         /// </summary>
-        public string ModuleTypeID { private set; get; }
+        public string ModuleTypeID { get; }
 
 
         /// <summary>
         /// モジュール種別名
         /// </summary>
-        public string Name { private set; get; }
+        public string Name { get; }
 
 
         /// <summary>
@@ -26,7 +26,9 @@ namespace X4_ComplexCalculator.DB.X4DB
         public ModuleType(string id)
         {
             ModuleTypeID = id;
-            DBConnection.X4DB.ExecQuery($"SELECT Name FROM ModuleType WHERE ModuleTypeID = '{id}'", (SQLiteDataReader dr, object[] args) => { Name = dr["Name"].ToString(); });
+            string name = "";
+            DBConnection.X4DB.ExecQuery($"SELECT Name FROM ModuleType WHERE ModuleTypeID = '{id}'", (SQLiteDataReader dr, object[] args) => { name = dr["Name"].ToString(); });
+            Name = name;
         }
 
         /// <summary>
