@@ -16,8 +16,8 @@
 
         <ContextMenu x:Key="ModulesGridContextMenu">
             <MenuItem Header="ソート順初期化" Command="{Binding ClearSortOrder}" CommandParameter="{x:Reference Name=moduleGrid}"/>
-            <MenuItem Header="コピー"   InputGestureText="Ctrl+C" Command="{Binding CopyModules}"   CommandParameter="{x:Reference Name=moduleGrid}"/>
-            <MenuItem Header="貼り付け" InputGestureText="Ctrl+V" Command="{Binding PasteModules}"  CommandParameter="{x:Reference Name=moduleGrid}"/>
+            <MenuItem Header="コピー"   InputGestureText="Alt+C"  Command="{Binding CopyModules}"/>
+            <MenuItem Header="貼り付け" InputGestureText="Alt+V"  Command="{Binding PasteModules}"  CommandParameter="{x:Reference Name=moduleGrid}"/>
             <MenuItem Header="削除"     InputGestureText="Delete" Command="{Binding DeleteModules}" CommandParameter="{x:Reference Name=moduleGrid}"/>
         </ContextMenu>
 
@@ -44,12 +44,13 @@
             Style="{StaticResource DefaultDataGridStyle}"
             ContextMenu="{StaticResource ModulesGridContextMenu}"
             CellStyle="{StaticResource DataGridCellDefaultStyle}"
+            x4cmn:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
             >
 
             <!-- キーボードショートカット -->
             <DataGrid.InputBindings>
-                <KeyBinding Gesture="Ctrl+C" Command="{Binding CopyModules}"   CommandParameter="{x:Reference Name=moduleGrid}"/>
-                <KeyBinding Gesture="Ctrl+V" Command="{Binding PasteModules}"  CommandParameter="{x:Reference Name=moduleGrid}"/>
+                <KeyBinding Gesture="Alt+C"  Command="{Binding CopyModules}"/>
+                <KeyBinding Gesture="Alt+V"  Command="{Binding PasteModules}"  CommandParameter="{x:Reference Name=moduleGrid}"/>
                 <KeyBinding Gesture="Delete" Command="{Binding DeleteModules}" CommandParameter="{x:Reference Name=moduleGrid}"/>
             </DataGrid.InputBindings>
 
@@ -98,7 +99,9 @@
                     Header="装備"
                     IsReadOnly="True"
                     CanUserSort="True"
-                    SortMemberPath="ShouldVisibleButton">
+                    SortMemberPath="ShouldVisibleButton"
+                    CanUserResize="False"
+                    >
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Content="編集" Visibility="{Binding EditEquipmentButtonVisiblity, Mode=OneTime}">
@@ -117,6 +120,7 @@
                     IsReadOnly="True"
                     Binding="{Binding TurretsCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                     CellStyle="{StaticResource RightAlignedDataGridReadOnlyCell}"
+                    CanUserResize="False"
                     />
 
 
@@ -126,6 +130,7 @@
                     IsReadOnly="True"
                     Binding="{Binding ShieldsCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                     CellStyle="{StaticResource RightAlignedDataGridReadOnlyCell}"
+                    CanUserResize="False"
                     />
             </DataGrid.Columns>
         </DataGrid>

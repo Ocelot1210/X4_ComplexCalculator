@@ -2,13 +2,16 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Collections.Generic;
+using System.Windows.Input;
+using System;
+using System.Collections;
 
 namespace X4_ComplexCalculator.Common
 {
     /// <summary>
     /// 仮想化を行ったDataGridも正しく選択できるようにするビヘイビア
     /// </summary>
-    class VirtualizedDataGridSelectBehavior
+    public class VirtualizedDataGridSelectBehavior
     {
         /// <summary>
         /// 選択状態を設定するメンバ名
@@ -46,39 +49,33 @@ namespace X4_ComplexCalculator.Common
             // 選択状態変更時のイベントハンドラの登録/解除
             if (e.NewValue != null)
             {
-                dg.SelectedCellsChanged += SelectedCellsChanged;
+                dg.SelectionChanged += SelectedItemsChanged;
             }
             else
             {
-                dg.SelectedCellsChanged -= SelectedCellsChanged;
+                dg.SelectionChanged -= SelectedItemsChanged;
             }
         }
 
         /// <summary>
-        /// セル選択状態変更時の処理
+        /// 選択状態変更時のイベント
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private static void SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
+        private static void SelectedItemsChanged(object sender, SelectionChangedEventArgs e)
         {
-            static void setvalue(IEnumerable<object> items, string memberName, object value)
+            static void setvalue(IList items, string memberName, object value)
             {
-                object oldItm = null;
-
                 foreach (var itm in items)
                 {
-                    if (itm != oldItm)
-                    {
-                        itm.GetType().GetProperty(memberName)?.SetValue(itm, value);
-                        oldItm = itm;
-                    }
+                    itm.GetType().GetProperty(memberName)?.SetValue(itm, value);
                 }
             }
 
             var memberName = GetMemberName((DependencyObject)sender);
 
-            setvalue(e.AddedCells.Select(x => x.Item),   memberName, true);
-            setvalue(e.RemovedCells.Select(x => x.Item), memberName, false);
+            setvalue(e.AddedItems, memberName, true);
+            setvalue(e.RemovedItems, memberName, false);
         }
     }
 }

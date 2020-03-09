@@ -31,7 +31,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// <summary>
         /// コピーされたモジュール
         /// </summary>
-        private ModulesGridItem[] CopiedModules = new ModulesGridItem[0];
+        private IEnumerable<ModulesGridItem> CopiedModules;
         #endregion
 
 
@@ -88,7 +88,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// <summary>
         /// モジュールをコピー
         /// </summary>
-        public DelegateCommand<DataGrid> CopyModules { get; }
+        public DelegateCommand CopyModules { get; }
 
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             AddButtonClicked  = new DelegateCommand(Model.ShowAddModuleWindow);
             ReplaceModule     = new DelegateCommand<ModulesGridItem>(Model.ReplaceModule);
             ClearSortOrder    = new DelegateCommand<DataGrid>(ClearSortOrderCommand);
-            CopyModules       = new DelegateCommand<DataGrid>(CopyModulesCommand);
+            CopyModules       = new DelegateCommand(CopyModulesCommand);
             PasteModules      = new DelegateCommand<DataGrid>(PasteModulesCommand);
             DeleteModules     = new DelegateCommand<DataGrid>(DeleteModulesCommand);
         }
@@ -142,10 +142,13 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// 選択中のモジュールをコピー
         /// </summary>
         /// <param name="dataGrid"></param>
-        private void CopyModulesCommand(DataGrid dataGrid)
+        private void CopyModulesCommand()
         {
             // 選択中のモジュールをコピー
-            CopiedModules = dataGrid.SelectedItems.Cast<ModulesGridItem>().Select(x => new ModulesGridItem(x)).ToArray();
+            CopiedModules = CollectionViewSource.GetDefaultView(ModulesViewSource.View)
+                                                .Cast<ModulesGridItem>()
+                                                .Where(x => x.IsSelected)
+                                                .Select(x => new ModulesGridItem(x));
         }
 
         /// <summary>
@@ -154,16 +157,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// <param name="dataGrid"></param>
         private void PasteModulesCommand(DataGrid dataGrid)
         {
-            // 選択状態保存
-            var cvs = CollectionViewSource.GetDefaultView(dataGrid.ItemsSource);
-            var selectedIndexes = cvs.Cast<ModulesGridItem>()
-                                     .Select((itm, idx) => new { itm.IsSelected, Idx = idx })
-                                     .Where(x => x.IsSelected)
-                                     .Select(x => x.Idx)
-                                     .ToArray();
-
             Model.Modules.AddRange(CopiedModules.Select(x => new ModulesGridItem(x)).ToArray());
-            dataGrid.UpdateLayout();
             dataGrid.Focus();
         }
 
@@ -176,16 +170,28 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             var cvs = (ListCollectionView)ModulesViewSource.View;
             var currPos = cvs.CurrentPosition;
 
-            Model.DeleteModules(dataGrid.SelectedItems.Cast<ModulesGridItem>());
-            GC.Collect();
+            var items = CollectionViewSource.GetDefaultView(ModulesViewSource.View)
+                                            .Cast<ModulesGridItem>()
+                                            .Where(x => x.IsSelected)
+                                            .ToArray();
+            Model.DeleteModules(items);
 
+            // 削除後に全部の選択状態を外さないと余計なものまで選択される
+            foreach (var module in Model.Modules)
+            {
+                module.IsSelected = false;
+            }
+
+            // 最後の行を消した場合、選択行を最後にする
             if (cvs.Count <= currPos)
             {
                 cvs.MoveCurrentToLast();
             }
-            else
+
+            // 本当に選択したいものだけ選択
+            if (cvs.CurrentItem is ModulesGridItem item)
             {
-                cvs.MoveCurrentToPosition(currPos);
+                item.IsSelected = true;
             }
 
             dataGrid.Focus();

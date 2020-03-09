@@ -104,7 +104,6 @@
         VirtualizingPanel.ScrollUnit="Pixel"
         PresentationOptions:Freeze="true"
         Style="{StaticResource DefaultDataGridStyle}"
-        x4cmn:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
         ContextMenu="{StaticResource ProductsGridContextMenu}"
         IsReadOnly="False"
         CellStyle="{StaticResource DataGridCellDefaultStyle}"

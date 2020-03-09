@@ -13,7 +13,7 @@ namespace X4_ComplexCalculator.Common
     /// メンバの変更もCollectionChangedとして検知するObservableCollection
     /// </summary>
     /// <typeparam name="T">INotifyPropertyChangedを実装したクラス</typeparam>
-    public class MemberChangeDetectCollection<T> : SmartCollection<T> where T : INotifyPropertyChanged
+    public class MemberChangeDetectCollection<T> : SmartCollection<T> where T : INotifyPropertyChanged, IDisposable
     {
         #region メンバ
         /// <summary>
@@ -96,10 +96,7 @@ namespace X4_ComplexCalculator.Common
                     foreach (T item in e.OldItems)
                     {
                         item.PropertyChanged -= OnPropertyChanged;
-                        if (item is IDisposable disposable)
-                        {
-                            disposable.Dispose();
-                        }
+                        item.Dispose();
                     }
                     break;
 
@@ -121,7 +118,6 @@ namespace X4_ComplexCalculator.Common
                     break;
             }
 
-            //OnCollectionAndPropertyChanged?.Invoke(this, e);
             OnPropertyChanged(sender, new PropertyChangedEventArgs(""));
         }
 
@@ -177,10 +173,7 @@ namespace X4_ComplexCalculator.Common
             foreach (var removeTarget in removeTargets)
             {
                 Items.Remove(removeTarget);
-                if (removeTarget is IDisposable disposable)
-                {
-                    disposable.Dispose();
-                }
+                removeTarget.Dispose();
             }
 
             OnPropertyChanged(new PropertyChangedEventArgs("Count"));
