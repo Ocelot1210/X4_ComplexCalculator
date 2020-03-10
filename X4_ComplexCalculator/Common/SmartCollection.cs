@@ -10,7 +10,7 @@ using System.Windows.Threading;
 namespace X4_ComplexCalculator.Common
 {
     /// <summary>
-    /// ObservableCollectionの拡張(範囲追加メソッドをサポート)
+    /// ObservableCollectionの拡張(範囲操作とマルチスレッドをサポート)
     /// </summary>
     /// <typeparam name="T">任意のデータ型</typeparam>
     public class SmartCollection<T> : ObservableCollection<T>
@@ -47,10 +47,11 @@ namespace X4_ComplexCalculator.Common
         {
             CheckReentrancy();
 
-            foreach(var itm in range)
-            {
-                Items.Add(itm);
-            }
+            ((List<T>)Items).AddRange(range);
+            //foreach(var itm in range)
+            //{
+            //    Items.Add(itm);
+            //}
 
             OnPropertyChanged(new PropertyChangedEventArgs("Count"));
             OnPropertyChanged(new PropertyChangedEventArgs("Item[]"));
@@ -78,7 +79,7 @@ namespace X4_ComplexCalculator.Common
                 return;
             }
 
-            foreach(var removeTarget in removeTargets)
+            foreach (var removeTarget in removeTargets)
             {
                 Items.Remove(removeTarget);
             }
@@ -96,8 +97,6 @@ namespace X4_ComplexCalculator.Common
         public void Reset(IEnumerable<T> range)
         {
             Items.Clear();
-
-            // 内容がある場合のみ処理
             AddRange(range);
         }
 

@@ -1,10 +1,7 @@
-﻿using System.Linq;
+﻿using System.Collections;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Collections.Generic;
-using System.Windows.Input;
-using System;
-using System.Collections;
 
 namespace X4_ComplexCalculator.Common
 {
@@ -57,6 +54,7 @@ namespace X4_ComplexCalculator.Common
             }
         }
 
+
         /// <summary>
         /// 選択状態変更時のイベント
         /// </summary>
@@ -64,18 +62,35 @@ namespace X4_ComplexCalculator.Common
         /// <param name="e"></param>
         private static void SelectedItemsChanged(object sender, SelectionChangedEventArgs e)
         {
-            static void setvalue(IList items, string memberName, object value)
+            static void setvalue(IList items, MethodInfo method, object value)
             {
+                var setValue = new object[] { value };
+
                 foreach (var itm in items)
                 {
-                    itm.GetType().GetProperty(memberName)?.SetValue(itm, value);
+                    method.Invoke(itm, setValue);
                 }
             }
 
-            var memberName = GetMemberName((DependencyObject)sender);
+            // 高速化のためここでプロパティのdelegateを取得して使い回す
+            MethodInfo methodInfo;
+            {
+                var memberName = GetMemberName((DependencyObject)sender);
 
-            setvalue(e.AddedItems, memberName, true);
-            setvalue(e.RemovedItems, memberName, false);
+                var obj = (0 < e.AddedItems.Count) ? e.AddedItems[0] : e.RemovedItems[0];
+
+                methodInfo = obj?.GetType()
+                                ?.GetProperty(memberName)
+                                ?.GetSetMethod();
+            }
+
+            if (methodInfo == null)
+            {
+                return;
+            }
+
+            setvalue(e.AddedItems, methodInfo, true);
+            setvalue(e.RemovedItems, methodInfo, false);
         }
     }
 }
