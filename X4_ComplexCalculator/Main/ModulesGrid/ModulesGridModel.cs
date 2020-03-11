@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.Windows;
-using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Main.ModulesGrid.SelectModule;
 using System.Linq;
 using System.Collections.Generic;
+using X4_ComplexCalculator.Common.Collection;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid
 {
@@ -69,7 +69,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         {
             if (selectModuleWindow == null)
             {
-                selectModuleWindow = new SelectModuleWindow(Modules, false);
+                selectModuleWindow = new SelectModuleWindow(Modules);
                 selectModuleWindow.Closed += (object s, EventArgs ev) => { selectModuleWindow.Close(); GC.Collect(); selectModuleWindow = null; };
                 selectModuleWindow.Owner = OwnerWindow;
                 selectModuleWindow.Show();
@@ -92,7 +92,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             var newModules = new SmartCollection<ModulesGridItem>();
 
             // 変更の場合はモーダル表示にする
-            var wnd = new SelectModuleWindow(newModules, true);
+            var wnd = new SelectModuleWindow(newModules, oldItem.Module.Name);
             wnd.ShowDialog();
 
             // 追加された場合

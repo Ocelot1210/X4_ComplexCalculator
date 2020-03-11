@@ -5,11 +5,11 @@
              xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
              mc:Ignorable="d PresentationOptions"
              xmlns:local="clr-namespace:X4_ComplexCalculator.Main.ProductsGrid"
              xmlns:DataGridInline="clr-namespace:CustomControlLibrary.DataGridInline;assembly=X4_ComplexCalculator_CustomControlLibrary"
+             xmlns:x4conv="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
              x:Name="Control"
              d:DesignHeight="450" d:DesignWidth="800">
 
@@ -45,6 +45,8 @@
             x:Shared="false"
             ItemsSource="{Binding}"
             Style="{StaticResource DefaultListView}"
+            ItemContainerStyle="{StaticResource NoHighlightListViewItem}"
+            Margin="0 0 0 20"
             >
 
             <ListView.View>
@@ -95,66 +97,44 @@
                 </GridView>
             </ListView.View>
         </DataGridInline:InlineListView>
-
     </UserControl.Resources>
 
     <DataGrid 
         x:Name="productGrid"
         ItemsSource="{Binding Path=Products, UpdateSourceTrigger=PropertyChanged, IsAsync=True}"
-        VirtualizingPanel.ScrollUnit="Pixel"
         PresentationOptions:Freeze="true"
-        Style="{StaticResource DefaultDataGridStyle}"
+        Style="{StaticResource DetailsDataGridStyle}"
         ContextMenu="{StaticResource ProductsGridContextMenu}"
-        IsReadOnly="False"
-        CellStyle="{StaticResource DataGridCellDefaultStyle}"
+        IsReadOnly="True"
         >
-
+        
         <DataGrid.Columns>
 
             <!-- 階級 -->
             <DataGridTextColumn
                 Header="階級"
                 Binding="{Binding Ware.WareGroup.Tier, Mode=OneTime}"
-                IsReadOnly="True"
                 CellStyle="{StaticResource RightAlignedDataGridReadOnlyCell}"
                 />
 
 
             <!-- 製品名 -->
-            <DataGridTemplateColumn
+            <DataGridTextColumn
                 Header="製品"
-                ClipboardContentBinding="{Binding Ware.Name, Mode=OneTime}"
-                SortMemberPath="Ware.Name">
-                <DataGridTemplateColumn.CellTemplate>
-                    <DataTemplate>
-                        <Expander
-                            Header="{Binding Ware.Name, Mode=OneTime}"
-                            IsExpanded="{Binding IsExpanded, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                            >
-                            <ContentControl
-                                Content="{StaticResource DetailsListView}"
-                                DataContext="{Binding Details, Mode=OneTime}"
-                                />
-                        </Expander>
-                    </DataTemplate>
-                </DataGridTemplateColumn.CellTemplate>
-            </DataGridTemplateColumn>
+                Binding="{Binding Ware.Name, Mode=OneTime}"
+                />
 
-
+            
             <!-- 1時間あたりの個数 -->
             <DataGridTextColumn
                 Header="個数/h"
                 Binding="{Binding Count, Mode=OneTime, StringFormat='{}{0:N0}'}"
-                IsReadOnly="True"
                 CellStyle="{StaticResource LossEmphasisStyle}"
                 />
 
 
             <!-- 金額 -->
-            <DataGridTemplateColumn
-                Header="金額"
-                SortMemberPath="Price"
-                >
+            <DataGridTemplateColumn Header="金額" SortMemberPath="Price" ClipboardContentBinding="{Binding Price, Mode=OneTime}">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
                         <xctk:IntegerUpDown ClipValueToMinMax="True" FormatString="{}{0:N0} cr" Value="{Binding Price, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Increment="{Binding Count, Mode=OneTime}"/>
@@ -162,8 +142,9 @@
                 </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
 
+            
             <!--単価-->
-            <DataGridTemplateColumn Header="単価" SortMemberPath="UnitPrice">
+            <DataGridTemplateColumn Header="単価" SortMemberPath="UnitPrice" ClipboardContentBinding="{Binding UnitPrice, Mode=OneTime}">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
                         <xctk:IntegerUpDown ClipValueToMinMax="True" FormatString="{}{0:N0} cr" Value="{Binding UnitPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Minimum="{Binding Ware.MinPrice}" Maximum="{Binding Ware.MaxPrice}"/>
@@ -171,8 +152,9 @@
                 </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
 
+            
             <!--単価(スライダー)-->
-            <DataGridTemplateColumn IsReadOnly="True" MinWidth="100">
+            <DataGridTemplateColumn MinWidth="100">
                 <!--ヘッダのスタイル定義-->
                 <DataGridTemplateColumn.HeaderStyle>
                     <Style TargetType="DataGridColumnHeader">
@@ -205,7 +187,13 @@
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
-
         </DataGrid.Columns>
+
+        <!-- 行の詳細表示用 -->
+        <DataGrid.RowDetailsTemplate>
+            <DataTemplate>
+                <ContentControl Content="{StaticResource DetailsListView}" DataContext="{Binding Details, Mode=OneTime}"/>
+            </DataTemplate>
+        </DataGrid.RowDetailsTemplate>
     </DataGrid>
 </UserControl>

@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using X4_ComplexCalculator.Common;
 using System;
+using X4_ComplexCalculator.Common.Collection;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
 {
@@ -32,16 +33,25 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         /// 置換モードか
         /// </summary>
         private readonly bool IsReplaceMode;
-        #endregion
 
-
-        #region プロパティ
 
         /// <summary>
         /// モジュール一覧を表示するコレクション
         /// </summary>
-        private CollectionViewSource ModulesViewSource { get; set; }
+        private CollectionViewSource ModulesViewSource;
+        #endregion
 
+
+        #region プロパティ
+        /// <summary>
+        /// 変更前のモジュール名
+        /// </summary>
+        public string PrevModuleName { get; }
+
+        /// <summary>
+        /// 変更前モジュールを表示するか
+        /// </summary>
+        public Visibility PrevModuleVisiblity => (IsReplaceMode) ? Visibility.Visible : Visibility.Collapsed;
 
         /// <summary>
         /// モジュール種別
@@ -101,16 +111,18 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         /// <param name="modules">選択結果格納先</param>
         /// <param name="isReplaceMode">置換モードか(falseで複数選択許可)</param>
         /// <param name="viewSource">modulesViewSource</param>
-        public SelectModuleViewModel(SmartCollection<ModulesGridItem> modules, bool isReplaceMode, CollectionViewSource modulesViewSource)
+        public SelectModuleViewModel(SmartCollection<ModulesGridItem> modules, CollectionViewSource modulesViewSource, string prevModuleName = "")
         {
             Model = new SelectModuleModel(modules);
 
-            IsReplaceMode = isReplaceMode;
+            PrevModuleName = prevModuleName;
+            IsReplaceMode = prevModuleName != "";
 
             ModulesViewSource = modulesViewSource;
             OKButtonClickedCommand = new DelegateCommand<Window>(OKButtonClicked);
             CloseButtonClickedCommand = new DelegateCommand<Window>(CloseWindow);
         }
+
 
         /// <summary>
         /// ウィンドウが閉じられる時のイベント

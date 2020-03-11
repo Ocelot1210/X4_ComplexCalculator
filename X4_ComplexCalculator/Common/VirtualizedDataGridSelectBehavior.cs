@@ -34,11 +34,11 @@ namespace X4_ComplexCalculator.Common
         /// <summary>
         /// 選択状態を設定するメンバ名変更時
         /// </summary>
-        /// <param name="d"></param>
+        /// <param name="obj"></param>
         /// <param name="e"></param>
-        public static void MemberNameProppertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void MemberNameProppertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
-            if (!(d is DataGrid dg))
+            if (!(obj is DataGrid dg))
             {
                 return;
             }

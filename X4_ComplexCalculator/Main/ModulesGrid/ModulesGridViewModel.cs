@@ -148,7 +148,8 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             CopiedModules = CollectionViewSource.GetDefaultView(ModulesViewSource.View)
                                                 .Cast<ModulesGridItem>()
                                                 .Where(x => x.IsSelected)
-                                                .Select(x => new ModulesGridItem(x));
+                                                .Select(x => new ModulesGridItem(x))
+                                                .ToArray();
         }
 
         /// <summary>

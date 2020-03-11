@@ -3,7 +3,7 @@ using System.Collections.Specialized;
 using System.Data.SQLite;
 using System.Linq;
 using System.Threading.Tasks;
-using X4_ComplexCalculator.Common;
+using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule

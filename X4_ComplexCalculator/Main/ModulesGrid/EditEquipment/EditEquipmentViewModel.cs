@@ -2,7 +2,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Windows;
-using X4_ComplexCalculator.Common;
+using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment

@@ -1,15 +1,16 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="clr-namespace:X4_ComplexCalculator.Themes">
+                    xmlns:local="clr-namespace:X4_ComplexCalculator.Themes"
+                    xmlns:x4conv="clr-namespace:X4_ComplexCalculator.Common.ValueConverter">
 
 
     <!-- DataGridColumnHeaderの初期設定 -->
-    <Style TargetType="DataGridColumnHeader" x:Key="DefaultDataGridColumnHeaderStyle">
+    <Style TargetType="{x:Type DataGridColumnHeader}" x:Key="DefaultDataGridColumnHeaderStyle">
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
     </Style>
 
     <!-- コンテキストメニューを表示しても選択行が灰色にならないようにするスタイル -->
-    <Style TargetType="DataGridCell" x:Key="DataGridCellDefaultStyle">
+    <Style TargetType="{x:Type DataGridCell}" x:Key="DataGridCellDefaultStyle">
         <Style.Triggers>
             <!-- 選択中のセルの色 -->
             <Trigger Property="IsSelected" Value="True">
@@ -31,36 +32,86 @@
         </Style.Triggers>
     </Style>
 
+
     <!-- DataGridの初期設定 -->
-    <Style TargetType="DataGrid" x:Key="DefaultDataGridStyle">
+    <Style TargetType="{x:Type DataGrid}" x:Key="DefaultDataGridStyle">
         <Setter Property="AutoGenerateColumns" Value="False"/>
         <Setter Property="CanUserAddRows" Value="False"/>
         <Setter Property="CanUserDeleteRows" Value="False"/>
-        <Setter Property="CanUserReorderColumns" Value="False"/>
         <Setter Property="CanUserResizeRows" Value="False"/>
-        <Setter Property="CanUserSortColumns" Value="True"/>
         <Setter Property="EnableColumnVirtualization" Value="True"/>
+        <Setter Property="EnableRowVirtualization" Value="True"/>
         <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True"/>
         <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling"/>
         <Setter Property="ColumnHeaderStyle" Value="{StaticResource DefaultDataGridColumnHeaderStyle}"/>
         <Setter Property="CellStyle" Value="{StaticResource DataGridCellDefaultStyle}"/>
         <Setter Property="SelectionUnit" Value="FullRow"/>
+        <Setter Property="VerticalGridLinesBrush" Value="LightGray"/>
+        <Setter Property="HorizontalGridLinesBrush" Value="LightGray"/>
+        <Setter Property="AlternatingRowBackground" Value="LightCyan"/>
     </Style>
 
 
     <!-- 右寄せセル用 -->
-    <Style TargetType="DataGridCell" x:Key="RightAlignedDataGridCell" BasedOn="{StaticResource DataGridCellDefaultStyle}">
+    <Style TargetType="{x:Type DataGridCell}" x:Key="RightAlignedDataGridCell" BasedOn="{StaticResource DataGridCellDefaultStyle}">
         <Setter Property="TextBlock.TextAlignment" Value="Right"/>
     </Style>
 
     <!-- 読み取り専用セル -->
-    <Style TargetType="DataGridCell" x:Key="DataGridReadOnlyCell" BasedOn="{StaticResource DataGridCellDefaultStyle}">
+    <Style TargetType="{x:Type DataGridCell}" x:Key="DataGridReadOnlyCell" BasedOn="{StaticResource DataGridCellDefaultStyle}">
         <Setter Property="FontStyle" Value="Italic"/>
     </Style>
     
     <!-- 右寄せセル用(読み取り専用) -->
-    <Style TargetType="DataGridCell" x:Key="RightAlignedDataGridReadOnlyCell" BasedOn="{StaticResource RightAlignedDataGridCell}">
+    <Style TargetType="{x:Type DataGridCell}" x:Key="RightAlignedDataGridReadOnlyCell" BasedOn="{StaticResource RightAlignedDataGridCell}">
         <Setter Property="FontStyle" Value="Italic"/>
     </Style>
 
+    <!-- ValueConverter -->
+    <x4conv:Visiblity2NullableBooleanConverter x:Key="Visiblity2NullableConverter"/>
+    <x4conv:Bool2VisiblityConverter x:Key="Bool2VisiblityConverter"/>
+    
+    <!-- RowDetailsを使用するDataGridのRowHeaderStyle -->
+    <Style TargetType="{x:Type DataGridRowHeader}" x:Key="RowDetailsRowHeaderStyle" >
+        <Setter Property="VerticalAlignment" Value="Top"/>
+    </Style>
+
+    <!-- RowDetailsを使用する-->
+    <Style TargetType="{x:Type DataGridRow}" x:Key="DataGridDetailsRowStyle">
+        <Setter Property="DetailsVisibility" Value="{Binding IsExpanded, Mode=TwoWay, Converter={StaticResource Bool2VisiblityConverter}}"/>
+    </Style>
+
+    <!-- RowDetailsを使用するDataGridのRowHeaderのDataTemplate -->
+    <DataTemplate x:Key="DataGridDetailsRowHeaderTemplate">
+        <ToggleButton
+            Margin="0"
+            Padding="0"
+            HorizontalContentAlignment="Center"
+            VerticalContentAlignment="Center"
+            IsChecked="{Binding Path=DetailsVisibility, RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}}, Converter={StaticResource Visiblity2NullableConverter}}"
+            >
+            <ToggleButton.Style>
+                <Style TargetType="{x:Type ToggleButton}">
+                    <Style.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="Content" Value="－"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="False">
+                            <Setter Property="Content" Value="＋"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ToggleButton.Style>
+        </ToggleButton>
+    </DataTemplate>
+
+    <!-- RowDetailsがあるDataGridのスタイル -->
+    <Style TargetType="{x:Type DataGrid}" x:Key="DetailsDataGridStyle" BasedOn="{StaticResource DefaultDataGridStyle}">
+        <Setter Property="CellStyle" Value="{StaticResource DataGridCellDefaultStyle}"/>
+        <Setter Property="RowHeaderStyle" Value="{StaticResource RowDetailsRowHeaderStyle}"/>
+        <Setter Property="RowStyle" Value="{StaticResource DataGridDetailsRowStyle}"/>
+        <Setter Property="RowHeaderTemplate" Value="{StaticResource DataGridDetailsRowHeaderTemplate}"/>
+        <Setter Property="VirtualizingPanel.ScrollUnit" Value="Pixel"/>
+    </Style>
+    
 </ResourceDictionary>

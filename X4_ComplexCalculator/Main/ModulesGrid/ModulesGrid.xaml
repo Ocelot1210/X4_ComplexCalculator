@@ -99,7 +99,7 @@
                     Header="装備"
                     IsReadOnly="True"
                     CanUserSort="True"
-                    SortMemberPath="ShouldVisibleButton"
+                    SortMemberPath="EditEquipmentButtonVisiblity"
                     CanUserResize="False"
                     >
                     <DataGridTemplateColumn.CellTemplate>

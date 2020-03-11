@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace X4_ComplexCalculator.Common
+namespace X4_ComplexCalculator.Common.Collection
 {
     public delegate Task NotifyCollectionChangedEventAsync(object sender, NotifyCollectionChangedEventArgs e);
 

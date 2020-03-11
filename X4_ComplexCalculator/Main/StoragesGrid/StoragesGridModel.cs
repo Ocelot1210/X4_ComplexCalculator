@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
-using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.ModulesGrid;
 using System.Collections.Specialized;
 using System.Threading.Tasks;
+using X4_ComplexCalculator.Common.Collection;
 
 namespace X4_ComplexCalculator.Main.StoragesGrid
 {
@@ -90,11 +90,14 @@ WHERE
 
             // コレクションに設定
             Storages.Reset(transportDict.Select(x =>
-            {
-                return backup.TryGetValue(x.Key, out bool expanded)
-                    ? new StoragesGridItem(x.Key, x.Value, modulesDict[x.Key], expanded)
-                    : new StoragesGridItem(x.Key, x.Value, modulesDict[x.Key]);
-            }));
+                {
+                    var details = modulesDict[x.Key].OrderBy(x => x.ModuleName).ToArray();
+                    return backup.TryGetValue(x.Key, out bool expanded)
+                        ? new StoragesGridItem(x.Key, x.Value, details, expanded)
+                        : new StoragesGridItem(x.Key, x.Value, details);
+                })
+                .OrderBy(x => x.TransportType.Name)
+            );
 
             await Task.CompletedTask;
         }

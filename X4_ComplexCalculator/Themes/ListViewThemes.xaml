@@ -14,6 +14,27 @@
         <Setter Property="ItemContainerStyle" Value="{StaticResource ListViewItemStretchedStyle}"/>
     </Style>
 
+    <!-- 選択項目をハイライトしないListViewItem -->
+    <Style TargetType="{x:Type ListViewItem}" x:Key="NoHighlightListViewItem" BasedOn="{StaticResource ListViewItemStretchedStyle}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ListViewItem}">
+                    <Grid Background="{TemplateBinding Background}">
+                        <Border Name="Selection" Visibility="Collapsed"/>
+                        <GridViewRowPresenter
+                            Grid.RowSpan="2"
+                            Margin="{TemplateBinding Padding}"
+                            HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                            />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <!-- 右寄せセル -->
     <DataTemplate x:Key="RightAlignedGridViewColumn">
         <TextBlock Text="{Binding RelativeSource={RelativeSource AncestorType={x:Type GridViewColumn}}}" TextAlignment="Right"/>
     </DataTemplate>

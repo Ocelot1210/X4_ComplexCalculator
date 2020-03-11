@@ -1,7 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Data;
-using X4_ComplexCalculator.Common;
-
+using X4_ComplexCalculator.Common.Collection;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
 {
@@ -14,16 +13,15 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         /// コンストラクタ
         /// </summary>
         /// <param name="modules">モジュール追加対象</param>
-        /// <param name="isReplaceMode">置換モードか(falseで複数選択許可)</param>
-        public SelectModuleWindow(SmartCollection<ModulesGridItem> modules, bool isReplaceMode)
+        /// <param name="prevModuleName">変更前のモジュール</param>
+        public SelectModuleWindow(SmartCollection<ModulesGridItem> modules, string prevModuleName = "")
         {
             InitializeComponent();
 
-            var viewModel = new SelectModuleViewModel(modules, isReplaceMode, (CollectionViewSource)Resources["ModulesViewSource"]);
+            var viewModel = new SelectModuleViewModel(modules, (CollectionViewSource)Resources["ModulesViewSource"], prevModuleName);
             Closing += viewModel.OnWindowClosing;
 
             DataContext = viewModel;
-            
         }
     }
 }

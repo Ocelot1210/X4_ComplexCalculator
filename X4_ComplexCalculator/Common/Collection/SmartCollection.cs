@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows.Threading;
 
-namespace X4_ComplexCalculator.Common
+namespace X4_ComplexCalculator.Common.Collection
 {
     /// <summary>
     /// ObservableCollectionの拡張(範囲操作とマルチスレッドをサポート)

@@ -2,12 +2,12 @@
 using System.Data;
 using System.Data.SQLite;
 using System.Linq;
-using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.ModulesGrid;
 using System.Collections.Specialized;
 using System.Threading.Tasks;
+using X4_ComplexCalculator.Common.Collection;
 
 namespace X4_ComplexCalculator.Main.ResourcesGrid
 {
