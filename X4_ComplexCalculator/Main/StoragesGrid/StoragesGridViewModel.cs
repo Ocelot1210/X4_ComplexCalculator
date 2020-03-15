@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.ModulesGrid;
 
 namespace X4_ComplexCalculator.Main.StoragesGrid
@@ -27,10 +28,10 @@ namespace X4_ComplexCalculator.Main.StoragesGrid
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="moduleGridModel">モジュール一覧用Model</param>
-        public StoragesGridViewModel(ModulesGridModel moduleGridModel)
+        /// <param name="moduleGridModel">モジュール一覧</param>
+        public StoragesGridViewModel(MemberChangeDetectCollection<ModulesGridItem> modules)
         {
-            Model = new StoragesGridModel(moduleGridModel);
+            Model = new StoragesGridModel(modules);
         }
     }
 }

@@ -20,7 +20,7 @@
                 
                 <!-- その他用の定義読み込み -->
                 <ResourceDictionary Source="/Themes/OtherThemes.xaml"/>
-                
+
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

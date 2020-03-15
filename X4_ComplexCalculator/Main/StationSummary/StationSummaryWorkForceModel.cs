@@ -21,6 +21,11 @@ namespace X4_ComplexCalculator.Main.StationSummary
         /// 現在の労働者数
         /// </summary>
         private long _WorkForce = 0;
+
+        /// <summary>
+        /// モジュール一覧
+        /// </summary>
+        readonly IReadOnlyCollection<ModulesGridItem> Modules;
         #endregion
 
         #region プロパティ
@@ -74,9 +79,10 @@ namespace X4_ComplexCalculator.Main.StationSummary
         /// コンストラクタ
         /// </summary>
         /// <param name="moduleGridModel">モジュール一覧のModel</param>
-        public StationSummaryWorkForceModel(ModulesGridModel moduleGridModel)
+        public StationSummaryWorkForceModel(MemberChangeDetectCollection<ModulesGridItem> modules)
         {
-            moduleGridModel.OnModulesChanged += UpdateWorkForce;
+            Modules = modules;
+            modules.OnCollectionChangedAsync += UpdateWorkForce;
         }
 
 
@@ -87,12 +93,12 @@ namespace X4_ComplexCalculator.Main.StationSummary
         /// <param name="e"></param>
         private async Task UpdateWorkForce(object sender, NotifyCollectionChangedEventArgs e)
         {
-            var details = ((IEnumerable<ModulesGridItem>)sender).AsParallel()
-                                                                .Where(x => x.Module.ModuleType.ModuleTypeID == "production" || x.Module.ModuleType.ModuleTypeID == "habitation")
-                                                                .GroupBy(x => x.Module.ModuleID)
-                                                                .Select(x => new WorkForceDetailsItem(x.First().Module, x.Sum(y => y.ModuleCount)))
-                                                                .OrderBy(x => x.ModuleName)
-                                                                .ToArray();
+            var details = Modules.AsParallel()
+                                 .Where(x => x.Module.ModuleType.ModuleTypeID == "production" || x.Module.ModuleType.ModuleTypeID == "habitation")
+                                 .GroupBy(x => x.Module.ModuleID)
+                                 .Select(x => new WorkForceDetailsItem(x.First().Module, x.Sum(y => y.ModuleCount)))
+                                 .OrderBy(x => x.ModuleName)
+                                 .ToArray();
 
             // 値を更新
             NeedWorkforce = details.Sum(x => x.MaxWorkers * x.ModuleCount);

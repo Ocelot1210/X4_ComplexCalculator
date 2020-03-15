@@ -27,21 +27,6 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// モジュール一覧
         /// </summary>
         public MemberChangeDetectCollection<ModulesGridItem> Modules { get; private set; } = new MemberChangeDetectCollection<ModulesGridItem>();
-
-        /// <summary>
-        /// プロパティ変更時のイベント
-        /// </summary>
-        public event NotifyCollectionChangedEventAsync OnModulesChanged
-        {
-            add
-            {
-                Modules.OnCollectionOrPropertyChanged += value;
-            }
-            remove
-            {
-                Modules.OnCollectionOrPropertyChanged -= value;
-            }
-        }
         #endregion
 
         /// <summary>

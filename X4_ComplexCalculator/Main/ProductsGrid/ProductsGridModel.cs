@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Data;
 using System.Data.SQLite;
 using System.Linq;
@@ -16,6 +17,13 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
     /// </summary>
     class ProductsGridModel : INotifyPropertyChangedBace
     {
+        #region メンバ
+        /// <summary>
+        /// モジュール一覧
+        /// </summary>
+        readonly IReadOnlyCollection<ModulesGridItem> Modules;
+        #endregion
+
         #region プロパティ
         /// <summary>
         /// 製品一覧
@@ -26,43 +34,138 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="moduleGridModel">モジュール一覧のModel</param>
-        public ProductsGridModel(ModulesGridModel moduleGridModel)
+        /// <param name="moduleGridModel">モジュール一覧</param>
+        public ProductsGridModel(MemberChangeDetectCollection<ModulesGridItem> modules)
         {
             Products = new SmartCollection<ProductsGridItem>();
 
-            moduleGridModel.OnModulesChanged += UpdateProducts;
+            modules.OnCollectionChangedAsync += OnModulesChanged;
+            modules.OnPropertyChangedAsync += OnModulePropertyChanged;
+
+            Modules = modules;
         }
 
+
+        /// <summary>
+        /// モジュールのプロパティが変更された場合
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        private async Task OnModulePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            // モジュール数変更時のみ処理
+            if (e.PropertyName != "ModuleCount")
+            {
+                await Task.CompletedTask;
+                return;
+            }
+
+            if(sender is ModulesGridItem module)
+            {
+                switch (module.Module.ModuleType.ModuleTypeID)
+                {
+                    case "production":
+                        OnProductionModuleCountChanged(module);
+                        break;
+
+                    case "habitation":
+                        OnHabitationModuleCountChanged(module);
+                        break;
+
+                    default:
+                        break;
+                }
+
+            }
+
+            await Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// 製造モジュール数変更時
+        /// </summary>
+        /// <param name="module"></param>
+        private void OnProductionModuleCountChanged(ModulesGridItem module)
+        {
+            // 処理対象モジュール一覧
+            ProductionModuleInfo[] modules = GetProductionModules();
+
+            double efficiency = CalcEfficiency(modules);
+        }
+
+
+        /// <summary>
+        /// 居住モジュール数変更時
+        /// </summary>
+        /// <param name="module"></param>
+        private void OnHabitationModuleCountChanged(ModulesGridItem module)
+        {
+            // 処理対象モジュール一覧
+            ProductionModuleInfo[] modules = GetProductionModules();
+
+            double efficiency = CalcEfficiency(modules);
+        }
+
+        /// <summary>
+        /// 処理対象モジュール一覧取得
+        /// </summary>
+        /// <returns>処理対象モジュール一覧</returns>
+        /// <remarks>
+        /// 製造モジュールか居住モジュールのみ抽出し、モジュールIDごとにモジュール数を集計
+        /// </remarks>
+        private ProductionModuleInfo[] GetProductionModules()
+        {
+            return Modules.AsParallel()
+                          .Where(x => x.Module.ModuleType.ModuleTypeID == "production" || x.Module.ModuleType.ModuleTypeID == "habitation")
+                          .GroupBy(x => x.Module.ModuleID)
+                          .Select(x =>
+                          {
+                              var module = x.First().Module;
+                              return new ProductionModuleInfo(module.ModuleID, module.MaxWorkers, module.WorkersCapacity, module.ModuleType.ModuleTypeID, x.Sum(y => y.ModuleCount));
+                          })
+                          .ToArray();
+        }
+
+        /// <summary>
+        /// 生産性を計算
+        /// </summary>
+        /// <returns>生産性</returns>
+        private double CalcEfficiency(ProductionModuleInfo[] modules)
+        {
+            var ret = 0.0;
+
+            var maxWorkers = modules.Sum(x => x.MaxWorkers * x.Count);
+            var workersCapacity = modules.Sum(x => x.WorkersCapacity * x.Count);
+
+            // 生産性を0.0以上、1.0以下にする
+            if (0 < workersCapacity)
+            {
+                ret = (maxWorkers < workersCapacity) ? 1.0 : (double)maxWorkers / workersCapacity;
+            }
+
+            return ret;
+        }
 
         /// <summary>
         /// 製品更新
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async Task UpdateProducts(object sender, NotifyCollectionChangedEventArgs e)
+        private async Task OnModulesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            // モジュール一覧
-            // → 製造モジュールか居住モジュールのみ抽出し、
-            // モジュールIDごとにモジュール数を集計
-            var modules = ((IEnumerable<ModulesGridItem>)sender)
-                                .AsParallel()
-                                .Where(x => x.Module.ModuleType.ModuleTypeID == "production" ||
-                                            x.Module.ModuleType.ModuleTypeID == "habitation")
-                                .GroupBy(x => x.Module.ModuleID)
-                                .Select(x =>
-                                {
-                                    var module = x.First().Module;
-                                    return new
-                                    {
-                                        module.ModuleID,
-                                        module.MaxWorkers,
-                                        module.WorkersCapacity,
-                                        module.ModuleType.ModuleTypeID,
-                                        Count = x.Sum(y => y.ModuleCount)
-                                    };
-                                })
-                                .ToArray();
+            UpdateProducts();
+            await Task.CompletedTask;
+        }
+
+
+        /// <summary>
+        /// 製品を更新
+        /// </summary>
+        private void UpdateProducts()
+        {
+            // 処理対象モジュール一覧
+            ProductionModuleInfo[] modules = GetProductionModules();
 
             // 処理対象が無ければクリアして終わる
             if (!modules.Any())
@@ -72,17 +175,8 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
             }
 
             // 生産性(倍率)
-            var efficiency = 0.0;
-            {
-                var maxWorkers      = modules.Sum(x => x.MaxWorkers * x.Count);
-                var workersCapacity = modules.Sum(x => x.WorkersCapacity * x.Count);
+            double efficiency = CalcEfficiency(modules);
 
-                // 生産性を0.0以上、1.0以下にする
-                efficiency = (workersCapacity == 0)?          0.0 :
-                             (maxWorkers < workersCapacity) ? 1.0 : (double)maxWorkers / workersCapacity;
-
-            }
-            
 
             // ウェア集計用ディクショナリ
             var wareDict = new Dictionary<string, long>();      // <ウェアID, 生産数>
@@ -92,19 +186,19 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
 
             // パラメータ設定
             var prodParam = new SQLiteCommandParameters(3);     // 製造モジュール用パラメーター
-            var habParam  = new SQLiteCommandParameters(2);     // 居住モジュール用パラメーター
+            var habParam = new SQLiteCommandParameters(2);     // 居住モジュール用パラメーター
             foreach (var module in modules)
             {
                 switch (module.ModuleTypeID)
                 {
                     case "production":
                         prodParam.Add("efficiency", DbType.Double, efficiency);
-                        prodParam.Add("count",      DbType.Int32,  module.Count);
-                        prodParam.Add("moduleID",   DbType.String, module.ModuleID);
+                        prodParam.Add("count", DbType.Int32, module.Count);
+                        prodParam.Add("moduleID", DbType.String, module.ModuleID);
                         break;
 
                     case "habitation":
-                        habParam.Add("count",    DbType.Int32,  module.Count);
+                        habParam.Add("count", DbType.Int32, module.Count);
                         habParam.Add("moduleID", DbType.String, module.ModuleID);
                         break;
 
@@ -138,8 +232,8 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
 
 
             Products.Reset(items.OrderBy(x => x.Ware.WareGroup.Tier).ThenBy(x => x.Ware.Name));
-            await Task.CompletedTask;
         }
+
 
         /// <summary>
         /// 製造モジュールを更新

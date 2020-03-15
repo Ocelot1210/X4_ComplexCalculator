@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using X4_ComplexCalculator.Common;
 using System.Linq;
+using System.Windows;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid
 {
@@ -80,12 +81,6 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
 
 
         /// <summary>
-        /// ソート順をクリア
-        /// </summary>
-        public DelegateCommand<DataGrid> ClearSortOrder { get; }
-
-
-        /// <summary>
         /// モジュールをコピー
         /// </summary>
         public DelegateCommand CopyModules { get; }
@@ -115,28 +110,11 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             ModulesViewSource = modulesViewSource;
             AddButtonClicked  = new DelegateCommand(Model.ShowAddModuleWindow);
             ReplaceModule     = new DelegateCommand<ModulesGridItem>(Model.ReplaceModule);
-            ClearSortOrder    = new DelegateCommand<DataGrid>(ClearSortOrderCommand);
             CopyModules       = new DelegateCommand(CopyModulesCommand);
             PasteModules      = new DelegateCommand<DataGrid>(PasteModulesCommand);
             DeleteModules     = new DelegateCommand<DataGrid>(DeleteModulesCommand);
         }
 
-        /// <summary>
-        /// ソート順をクリア
-        /// </summary>
-        /// <param name="dataGrid"></param>
-        private void ClearSortOrderCommand(DataGrid dataGrid)
-        {
-            var cvs = CollectionViewSource.GetDefaultView(dataGrid.ItemsSource);
-            if (cvs != null)
-            {
-                cvs.SortDescriptions.Clear();
-                foreach(var clm in dataGrid.Columns)
-                {
-                    clm.SortDirection = null;
-                }
-            }
-        }
 
         /// <summary>
         /// 選択中のモジュールをコピー

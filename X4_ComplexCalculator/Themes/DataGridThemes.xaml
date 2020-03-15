@@ -49,23 +49,17 @@
         <Setter Property="VerticalGridLinesBrush" Value="LightGray"/>
         <Setter Property="HorizontalGridLinesBrush" Value="LightGray"/>
         <Setter Property="AlternatingRowBackground" Value="LightCyan"/>
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Visible"/>
+        <Setter Property="VerticalScrollBarVisibility" Value="Visible"/>
     </Style>
 
 
+    
     <!-- 右寄せセル用 -->
     <Style TargetType="{x:Type DataGridCell}" x:Key="RightAlignedDataGridCell" BasedOn="{StaticResource DataGridCellDefaultStyle}">
         <Setter Property="TextBlock.TextAlignment" Value="Right"/>
     </Style>
 
-    <!-- 読み取り専用セル -->
-    <Style TargetType="{x:Type DataGridCell}" x:Key="DataGridReadOnlyCell" BasedOn="{StaticResource DataGridCellDefaultStyle}">
-        <Setter Property="FontStyle" Value="Italic"/>
-    </Style>
-    
-    <!-- 右寄せセル用(読み取り専用) -->
-    <Style TargetType="{x:Type DataGridCell}" x:Key="RightAlignedDataGridReadOnlyCell" BasedOn="{StaticResource RightAlignedDataGridCell}">
-        <Setter Property="FontStyle" Value="Italic"/>
-    </Style>
 
     <!-- ValueConverter -->
     <x4conv:Visiblity2NullableBooleanConverter x:Key="Visiblity2NullableConverter"/>

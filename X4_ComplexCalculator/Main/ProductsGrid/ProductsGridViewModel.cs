@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Windows.Controls;
 using X4_ComplexCalculator.Common;
-using X4_ComplexCalculator.Main.ModulesGrid;
+using System.Linq;
 
 namespace X4_ComplexCalculator.Main.ProductsGrid
 {
@@ -81,7 +81,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// <param name="dataGrid"></param>
         private void SelectedExpandCommand(DataGrid dataGrid)
         {
-            foreach(ProductsGridItem item in dataGrid.SelectedItems)
+            foreach(ProductsGridItem item in dataGrid.SelectedCells.Select(x => x.Item))
             {
                 item.IsExpanded = true;
             }
@@ -93,7 +93,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// <param name="dataGrid"></param>
         private void SelectedCollapseCommand(DataGrid dataGrid)
         {
-            foreach (ProductsGridItem item in dataGrid.SelectedItems)
+            foreach (ProductsGridItem item in dataGrid.SelectedCells.Select(x => x.Item))
             {
                 item.IsExpanded = false;
             }

@@ -14,22 +14,30 @@ namespace X4_ComplexCalculator.Main.StoragesGrid
     /// </summary>
     class StoragesGridModel
     {
+        #region メンバ
+        /// <summary>
+        /// モジュール一覧
+        /// </summary>
+        readonly IReadOnlyCollection<ModulesGridItem> Modules;
+        #endregion
+
+
         #region プロパティ
         /// <summary>
         /// ストレージ一覧
         /// </summary>
-        public SmartCollection<StoragesGridItem> Storages { get; private set; }
+        public SmartCollection<StoragesGridItem> Storages { get; private set; } = new SmartCollection<StoragesGridItem>();
         #endregion
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="moduleGridModel">モジュール一覧用Model</param>
-        public StoragesGridModel(ModulesGridModel moduleGridModel)
+        /// <param name="moduleGridModel">モジュール一覧</param>
+        public StoragesGridModel(MemberChangeDetectCollection<ModulesGridItem> modules)
         {
-            Storages = new SmartCollection<StoragesGridItem>();
-            moduleGridModel.OnModulesChanged += UpdateStorages;
+            Modules = modules;
+            modules.OnCollectionChangedAsync += OnModulesChanged;
         }
 
 
@@ -38,13 +46,12 @@ namespace X4_ComplexCalculator.Main.StoragesGrid
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async Task UpdateStorages(object sender, NotifyCollectionChangedEventArgs e)
+        private async Task OnModulesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            var modules = ((IEnumerable<ModulesGridItem>)sender)
-                                .AsParallel()
-                                .Where(x => x.Module.ModuleType.ModuleTypeID == "storage")
-                                .GroupBy(x => x.Module.ModuleID)
-                                .Select(x => new { x.First().Module.ModuleID, Count = x.Sum(y => y.ModuleCount) });
+            var modules = Modules.AsParallel()
+                                 .Where(x => x.Module.ModuleType.ModuleTypeID == "storage")
+                                 .GroupBy(x => x.Module.ModuleID)
+                                 .Select(x => new { x.First().Module.ModuleID, Count = x.Sum(y => y.ModuleCount) });
 
             // 処理対象が無ければクリアして終わる
             if (!modules.Any())

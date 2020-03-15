@@ -29,9 +29,10 @@
         
         <Menu>
             <MenuItem Header="ファイル(_F)">
-                <MenuItem Header="上書き保存"       InputGestureText="Ctrl+S"       Command="{Binding Save}"/>
-                <MenuItem Header="名前を付けて保存" InputGestureText="Shift+Ctrl+S" Command="{Binding SaveAs}"/>
-                <MenuItem Header="開く"             InputGestureText="Ctrl+O" Command="{Binding Open}"/>
+                <MenuItem Header="上書き保存"       InputGestureText="Ctrl+S"       Command="{Binding Save,     Mode=OneTime}"/>
+                <MenuItem Header="名前を付けて保存" InputGestureText="Shift+Ctrl+S" Command="{Binding SaveAs,   Mode=OneTime}"/>
+                <MenuItem Header="開く"             InputGestureText="Ctrl+O"       Command="{Binding Open,     Mode=OneTime}"/>
+                <MenuItem Header="DB更新"           InputGestureText="Ctrl+U"       Command="{Binding UpdateDB, Mode=OneTime}"/>
             </MenuItem>
             <MenuItem Header="表示(_V)">
                 <MenuItem IsCheckable="True" Header="{Binding Title, Mode=OneTime, ElementName=_Module}"   IsChecked="{Binding IsVisible, ElementName=_Module}"/>

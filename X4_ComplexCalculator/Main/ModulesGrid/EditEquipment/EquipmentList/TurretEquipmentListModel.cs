@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Data.SQLite;
 using System.Linq;
 using System.Threading.Tasks;
@@ -35,7 +35,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// <summary>
         /// 装備一覧を更新
         /// </summary>
-        protected override async Task UpdateEquipments(object sender, NotifyCollectionChangedEventArgs e)
+        protected override async Task UpdateEquipments(object sender, PropertyChangedEventArgs e)
         {
             if (SelectedSize == null)
             {

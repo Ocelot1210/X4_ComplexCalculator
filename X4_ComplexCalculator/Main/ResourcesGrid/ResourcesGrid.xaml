@@ -26,7 +26,6 @@
                 Header="建造に必要なウェア"
                 IsReadOnly="True"
                 Binding="{Binding Ware.Name, Mode=OneTime}"
-                CellStyle="{StaticResource DataGridReadOnlyCell}"
                 />
 
             <!-- 個数 -->
@@ -34,7 +33,7 @@
                 Header="個数"
                 IsReadOnly="True"
                 Binding="{Binding Count, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}"
-                CellStyle="{StaticResource RightAlignedDataGridReadOnlyCell}"
+                CellStyle="{StaticResource RightAlignedDataGridCell}"
                 />
 
             <!-- 金額 -->
@@ -42,11 +41,11 @@
                 Header="金額"
                 Binding="{Binding Price, StringFormat='{}{0:N0} cr', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                 IsReadOnly="True"
-                CellStyle="{StaticResource RightAlignedDataGridReadOnlyCell}"
+                CellStyle="{StaticResource RightAlignedDataGridCell}"
                 />
 
             <!-- 単価 -->
-            <DataGridTemplateColumn
+            <x4cmn:MouseHoverEditCellColumn
                 Header="単価"
                 SortMemberPath="UnitPrice"
                 ClipboardContentBinding="{Binding UnitPrice, Mode=OneTime}"
@@ -54,7 +53,7 @@
                 <!-- 通常表示時のスタイル -->
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding UnitPrice, StringFormat='{}{0:N0} cr', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Right"/>
+                        <TextBlock Text="{Binding UnitPrice, StringFormat='{}{0:N0} cr', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Right" TextDecorations="Underline"/>
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
 
@@ -64,11 +63,15 @@
                         <xctk:IntegerUpDown ClipValueToMinMax="True" Value="{Binding UnitPrice, Mode=TwoWay}" Minimum="{Binding Ware.MinPrice}" Maximum="{Binding Ware.MaxPrice}"/>
                     </DataTemplate>
                 </DataGridTemplateColumn.CellEditingTemplate>
-            </DataGridTemplateColumn>
+            </x4cmn:MouseHoverEditCellColumn>
 
 
             <!-- 単価(スライダー) -->
-            <DataGridTemplateColumn IsReadOnly="True" MinWidth="100" SortMemberPath="UnitPrice">
+            <DataGridTemplateColumn
+                IsReadOnly="True"
+                MinWidth="100"
+                SortMemberPath="UnitPrice"
+                >
                 <!-- ヘッダのスタイル定義 -->
                 <DataGridTemplateColumn.HeaderStyle>
                     <Style TargetType="DataGridColumnHeader">

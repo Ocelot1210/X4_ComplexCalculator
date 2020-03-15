@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB.X4DB;
 
@@ -97,13 +98,13 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         {
             Module = module;
             Factions = factions;
-            Factions.OnCollectionOrPropertyChanged += UpdateEquipments;
+            Factions.OnPropertyChangedAsync += UpdateEquipments;
         }
 
         /// <summary>
         /// 装備一覧を更新
         /// </summary>
-        protected abstract Task UpdateEquipments(object sender, NotifyCollectionChangedEventArgs e);
+        protected abstract Task UpdateEquipments(object sender, PropertyChangedEventArgs e);
 
 
         /// <summary>
@@ -114,11 +115,31 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         {
             int addRange = MaxAmount[SelectedSize] - Equipped[SelectedSize].Count;  // 追加可能な個数
 
-            // 1つ以上空きスロットがあるか？(追加可能か？)
-            if (0 < addRange)
+            // 追加対象が無ければ何もしない
+            if (!targets.Any())
             {
-                // 追加可能な分だけ追加する
-                Equipped[SelectedSize].AddRange(targets.Take(addRange));
+                return;
+            }
+
+            // Altキー押下時なら選択アイテムを全追加
+            if (Keyboard.IsKeyDown(Key.LeftAlt))
+            {
+                while (0 < addRange)
+                {
+                    // 追加可能な分だけ追加する
+                    Equipped[SelectedSize].AddRange(targets.Take(addRange));
+
+                    // 再計算
+                    addRange = MaxAmount[SelectedSize] - Equipped[SelectedSize].Count;
+                }
+            }
+            else
+            {
+                if (0 < addRange)
+                {
+                    // 追加可能な分だけ追加する
+                    Equipped[SelectedSize].AddRange(targets.Take(addRange));
+                }
             }
         }
 
@@ -129,6 +150,12 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// <param name="targets">削除対象</param>
         public void RemoveEquipments(IEnumerable<Equipment> targets)
         {
+            // 削除対象が無ければ何もしない
+            if (!targets.Any())
+            {
+                return;
+            }
+
             if (0 < Equipped[SelectedSize].Count)
             {
                 var tgt = targets.Cast<Equipment>().ToArray();

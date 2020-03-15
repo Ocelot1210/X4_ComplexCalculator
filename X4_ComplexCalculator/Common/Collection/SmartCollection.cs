@@ -48,10 +48,6 @@ namespace X4_ComplexCalculator.Common.Collection
             CheckReentrancy();
 
             ((List<T>)Items).AddRange(range);
-            //foreach(var itm in range)
-            //{
-            //    Items.Add(itm);
-            //}
 
             OnPropertyChanged(new PropertyChangedEventArgs("Count"));
             OnPropertyChanged(new PropertyChangedEventArgs("Item[]"));

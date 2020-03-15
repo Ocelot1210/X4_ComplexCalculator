@@ -4,10 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-             xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
              xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
              xmlns:local="clr-namespace:X4_ComplexCalculator.Main.ModulesGrid"
-             mc:Ignorable="d PresentationOptions" 
+             mc:Ignorable="d" 
              x:Name="root"
              d:DesignHeight="450" d:DesignWidth="800"
              >
@@ -15,7 +14,6 @@
         <CollectionViewSource x:Key="ModulesViewSource" Source="{Binding Modules}"/>
 
         <ContextMenu x:Key="ModulesGridContextMenu">
-            <MenuItem Header="ソート順初期化" Command="{Binding ClearSortOrder}" CommandParameter="{x:Reference Name=moduleGrid}"/>
             <MenuItem Header="コピー"   InputGestureText="Alt+C"  Command="{Binding CopyModules}"/>
             <MenuItem Header="貼り付け" InputGestureText="Alt+V"  Command="{Binding PasteModules}"  CommandParameter="{x:Reference Name=moduleGrid}"/>
             <MenuItem Header="削除"     InputGestureText="Delete" Command="{Binding DeleteModules}" CommandParameter="{x:Reference Name=moduleGrid}"/>
@@ -40,11 +38,11 @@
             Name="moduleGrid"
             ItemsSource="{Binding Source={StaticResource ModulesViewSource}, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, IsAsync=True}"
             SelectionUnit="FullRow"
-            PresentationOptions:Freeze="true"
             Style="{StaticResource DefaultDataGridStyle}"
             ContextMenu="{StaticResource ModulesGridContextMenu}"
-            CellStyle="{StaticResource DataGridCellDefaultStyle}"
             x4cmn:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
+            CellStyle="{StaticResource DataGridCellDefaultStyle}"
+            RowHeight="25"
             >
 
             <!-- キーボードショートカット -->
@@ -66,11 +64,11 @@
                     >
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Module.Name, Mode=OneTime}">
+                            <TextBlock Text="{Binding Module.Name, Mode=OneTime}" TextDecorations="Underline" VerticalAlignment="Center">
                                 <TextBlock.InputBindings>
                                     <MouseBinding
                                         MouseAction="LeftDoubleClick"
-                                        Command="{Binding DataContext.ReplaceModule, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+                                        Command="{Binding DataContext.ReplaceModule, Mode=OneTime, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
                                         CommandParameter="{Binding .}"
                                         />
                                 </TextBlock.InputBindings>
@@ -81,17 +79,23 @@
 
 
                 <!-- モジュール数 -->
-                <DataGridTemplateColumn
+                <x4cmn:MouseHoverEditCellColumn
                     Header="モジュール数"
                     CanUserSort="True"
                     SortMemberPath="ModuleCount"
-                    ClipboardContentBinding="{Binding ModuleCount}">
+                    ClipboardContentBinding="{Binding ModuleCount}"
+                    >
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <xctk:IntegerUpDown ClipValueToMinMax="True" Value="{Binding ModuleCount, UpdateSourceTrigger=PropertyChanged}" FormatString="N0" Minimum="0" Maximum="99999"/>
+                            <TextBlock Text="{Binding ModuleCount, StringFormat='{}{0:N0}'}" TextAlignment="Right" TextDecorations="Underline" VerticalAlignment="Center"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <xctk:IntegerUpDown Background="LightYellow" ClipValueToMinMax="True" Value="{Binding ModuleCount, UpdateSourceTrigger=PropertyChanged}" FormatString="N0" Minimum="0" Maximum="99999"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </x4cmn:MouseHoverEditCellColumn>
 
 
                 <!-- 装備編集ボタン -->
@@ -104,34 +108,42 @@
                     >
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Content="編集" Visibility="{Binding EditEquipmentButtonVisiblity, Mode=OneTime}">
-                                <Button.InputBindings>
-                                    <MouseBinding Command="{Binding EditEquipmentCommand, Mode=OneTime}" MouseAction="LeftClick"/>
-                                </Button.InputBindings>
-                            </Button>
+                            <TextBlock Text="編集" Visibility="{Binding EditEquipmentButtonVisiblity, Mode=OneTime}" TextDecorations="Underline" TextAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock.InputBindings>
+                                    <MouseBinding Command="{Binding EditEquipmentCommand, Mode=OneTime}" MouseAction="LeftDoubleClick"/>
+                                </TextBlock.InputBindings>
+                            </TextBlock>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
 
                 <!-- タレット数 -->
-                <DataGridTextColumn
+                <DataGridTemplateColumn
                     Header="タレット"
-                    IsReadOnly="True"
-                    Binding="{Binding TurretsCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-                    CellStyle="{StaticResource RightAlignedDataGridReadOnlyCell}"
                     CanUserResize="False"
-                    />
+                    ClipboardContentBinding="{Binding TurretsCount, Mode=OneTime}"
+                    >
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding TurretsCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat='{}{0:N0}'}" TextAlignment="Right" VerticalAlignment="Center"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
 
 
                 <!-- シールド数 -->
-                <DataGridTextColumn
+                <DataGridTemplateColumn
                     Header="シールド"
-                    IsReadOnly="True"
-                    Binding="{Binding ShieldsCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-                    CellStyle="{StaticResource RightAlignedDataGridReadOnlyCell}"
                     CanUserResize="False"
-                    />
+                    ClipboardContentBinding="{Binding ShieldsCount, Mode=OneTime}"
+                    >
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding ShieldsCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat='{}{0:N0}'}" TextAlignment="Right" VerticalAlignment="Center"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
     </DockPanel>

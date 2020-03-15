@@ -7,7 +7,22 @@ using System.Threading.Tasks;
 
 namespace X4_ComplexCalculator.Common.Collection
 {
+    /// <summary>
+    /// コレクションの内容変更時のイベント(非同期)
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    /// <returns></returns>
     public delegate Task NotifyCollectionChangedEventAsync(object sender, NotifyCollectionChangedEventArgs e);
+
+    /// <summary>
+    /// プロパティ変更時のイベント(非同期)
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    /// <returns></returns>
+    public delegate Task NotifyPropertyChangedEventAsync(object sender, PropertyChangedEventArgs e);
+
 
     /// <summary>
     /// メンバの変更もCollectionChangedとして検知するObservableCollection
@@ -24,10 +39,15 @@ namespace X4_ComplexCalculator.Common.Collection
 
 
         /// <summary>
-        /// コレクションとプロパティ変更時のイベント
+        /// コレクション変更時のイベント
         /// </summary>
-        public event NotifyCollectionChangedEventAsync OnCollectionOrPropertyChanged;
+        public event NotifyCollectionChangedEventAsync OnCollectionChangedAsync;
 
+
+        /// <summary>
+        /// コレクションのプロパティ変更時のイベント
+        /// </summary>
+        public event NotifyPropertyChangedEventAsync OnPropertyChangedAsync;
 
 
         #region コンストラクタ
@@ -55,20 +75,47 @@ namespace X4_ComplexCalculator.Common.Collection
         /// <param name="e"></param>
         private void CollectionChangedEvent(object sender, NotifyCollectionChangedEventArgs e)
         {
-            async void OnPropertyChanged(object obj, PropertyChangedEventArgs ev)
-            {
-                var handler = OnCollectionOrPropertyChanged;
-                if (handler == null)
-                {
-                    return;
-                }
+            // イベントハンドラーの設定/解除
+            SetOrRemoveEventHandler(e);
 
-                await Task.WhenAll(
-                    handler.GetInvocationList()
-                           .OfType<NotifyCollectionChangedEventAsync>()
-                           .Select(async (x) => await x.Invoke(this, null)));
+            if (OnCollectionChangedAsync == null)
+            {
+                return;
             }
 
+            Task.WhenAll(
+                OnCollectionChangedAsync.GetInvocationList()
+                                        .OfType<NotifyCollectionChangedEventAsync>()
+                                        .Select(x => x.Invoke(sender, e))
+            );
+        }
+
+        /// <summary>
+        /// プロパティ変更時のイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            var handler = OnPropertyChangedAsync;
+            if (handler == null)
+            {
+                return;
+            }
+
+            await Task.WhenAll(
+                handler.GetInvocationList()
+                       .OfType<NotifyPropertyChangedEventAsync>()
+                       .Select(async (x) => await x.Invoke(sender, e)));
+        }
+
+
+        /// <summary>
+        /// イベントハンドラーの設定/解除
+        /// </summary>
+        /// <param name="e"></param>
+        private void SetOrRemoveEventHandler(NotifyCollectionChangedEventArgs e)
+        {
             switch (e.Action)
             {
                 // 置換の場合
@@ -85,7 +132,7 @@ namespace X4_ComplexCalculator.Common.Collection
 
                 // 新規追加の場合
                 case NotifyCollectionChangedAction.Add:
-                    foreach (T item in e.NewItems)
+                    foreach (T item in Items.Skip(e.NewStartingIndex).Take(e.NewItems.Count))
                     {
                         item.PropertyChanged += OnPropertyChanged;
                     }
@@ -102,7 +149,6 @@ namespace X4_ComplexCalculator.Common.Collection
 
                 // リセットの場合
                 case NotifyCollectionChangedAction.Reset:
-                    // AddRangeされたか?
                     if (AddRangeStart != -1)
                     {
                         foreach (T item in Items.Skip(AddRangeStart))
@@ -110,15 +156,13 @@ namespace X4_ComplexCalculator.Common.Collection
                             item.PropertyChanged += OnPropertyChanged;
                         }
                     }
-
+                    
                     break;
 
                 // それ以外の場合
                 default:
                     break;
             }
-
-            OnPropertyChanged(sender, new PropertyChangedEventArgs(""));
         }
 
 
@@ -134,12 +178,6 @@ namespace X4_ComplexCalculator.Common.Collection
                 return;
             }
 
-            // 追加対象が1つだけならAddを使う
-            if (!range.Skip(1).Any())
-            {
-                Add(range.First());
-                return;
-            }
 
             AddRangeStart = Items.Count;
             (Items as List<T>).AddRange(range);
@@ -156,6 +194,12 @@ namespace X4_ComplexCalculator.Common.Collection
         /// <param name="range">削除対象</param>
         public override void RemoveItems(IEnumerable<T> range)
         {
+            // 削除対象がなければ何もしない
+            if (!range.Any())
+            {
+                return;
+            }
+
             CheckReentrancy();
 
             if (!(range is T[] removeTargets))

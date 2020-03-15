@@ -87,7 +87,7 @@
             <!-- 容量 -->
             <DataGridTextColumn
                 Header="容量" Binding="{Binding Capacity, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}"
-                CellStyle="{StaticResource RightAlignedDataGridReadOnlyCell}"
+                CellStyle="{StaticResource RightAlignedDataGridCell}"
                 />
 
         </DataGrid.Columns>

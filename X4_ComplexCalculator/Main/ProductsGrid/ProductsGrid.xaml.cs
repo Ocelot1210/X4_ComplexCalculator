@@ -13,5 +13,20 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         {
             InitializeComponent();
         }
+
+        private void DataGridCell_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            var cell = sender as DataGridCell;
+            if (!cell.IsReadOnly)
+            {
+                cell.IsEditing = true;
+            }
+        }
+
+        private void DataGridCell_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            var cell = sender as DataGridCell;
+            cell.IsEditing = false;
+        }
     }
 }

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Data.SQLite;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,7 +12,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
 {
     class SelectModuleModel
     {
-        #region メンバ変数
+        #region メンバ
         /// <summary>
         /// モジュール追加先
         /// </summary>
@@ -45,10 +47,15 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         {
             ItemCollection = itemCollection;
 
-            Task.WaitAll(InitModuleTypes(), InitModuleOwners(), UpdateModules(null, null));
+            //ModuleOwners.OnCollectionChangedAsync += UpdateModules;
+            ModuleOwners.OnPropertyChangedAsync += OnCheckChanged;
 
-            ModuleOwners.OnCollectionOrPropertyChanged += UpdateModules;
-            ModuleTypes.OnCollectionOrPropertyChanged += UpdateModules;
+            //ModuleTypes.OnCollectionChangedAsync += UpdateModules;
+            ModuleTypes.OnPropertyChangedAsync += OnCheckChanged;
+
+            Task.WaitAll(InitModuleTypes());
+            Task.WaitAll(InitModuleOwners());
+            Task.WaitAll(UpdateModules(null, null));
         }
 
 
@@ -111,12 +118,15 @@ ORDER BY Name ASC", init, "SelectModuleCheckStateTypes");
             await Task.CompletedTask;
         }
 
-
+        private async Task OnCheckChanged(object sender, PropertyChangedEventArgs e)
+        {
+            await UpdateModules(null, null);
+        }
 
         /// <summary>
         /// モジュール一覧を更新する
         /// </summary>
-        public async Task UpdateModules(object sender, NotifyCollectionChangedEventArgs e)
+        private async Task UpdateModules(object sender, EventArgs e)
         {
             var query = $@"
 SELECT
@@ -133,7 +143,6 @@ WHERE
             var list = new List<ModulesListItem>();
             DBConnection.X4DB.ExecQuery(query, SetModules, list);
             Modules.Reset(list);
-
             await Task.CompletedTask;
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 using X4_ComplexCalculator.Common;
+using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.ModulesGrid;
 using X4_ComplexCalculator.Main.ProductsGrid;
 using X4_ComplexCalculator.Main.ResourcesGrid;
@@ -47,10 +48,10 @@ namespace X4_ComplexCalculator.Main.StationSummary
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="moduleGridModel">モジュール一覧のModel</param>
-        public StationSummaryViewModel(ModulesGridModel moduleGridModel)
+        /// <param name="moduleGridModel">モジュール一覧</param>
+        public StationSummaryViewModel(MemberChangeDetectCollection<ModulesGridItem> modules)
         {
-            WorkForceModel = new StationSummaryWorkForceModel(moduleGridModel);
+            WorkForceModel = new StationSummaryWorkForceModel(modules);
             WorkForceModel.PropertyChanged += WorkForceModel_PropertyChanged;
         }
 

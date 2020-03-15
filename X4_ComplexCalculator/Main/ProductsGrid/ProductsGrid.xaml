@@ -16,7 +16,7 @@
     <UserControl.Resources>
 
         <!-- 赤字強調用スタイル(セルが非選択中のみ発動) -->
-        <Style x:Key="LossEmphasisStyle" TargetType="DataGridCell" BasedOn="{StaticResource RightAlignedDataGridReadOnlyCell}">
+        <Style x:Key="LossEmphasisStyle" TargetType="DataGridCell" BasedOn="{StaticResource RightAlignedDataGridCell}">
             <Style.Triggers>
                 <MultiDataTrigger>
                     <MultiDataTrigger.Conditions>
@@ -105,52 +105,92 @@
         PresentationOptions:Freeze="true"
         Style="{StaticResource DetailsDataGridStyle}"
         ContextMenu="{StaticResource ProductsGridContextMenu}"
-        IsReadOnly="True"
+        SelectionUnit="Cell"
+        CellStyle="{StaticResource DataGridCellDefaultStyle}"
         >
+
         
         <DataGrid.Columns>
 
             <!-- 階級 -->
-            <DataGridTextColumn
+            <DataGridTemplateColumn
                 Header="階級"
-                Binding="{Binding Ware.WareGroup.Tier, Mode=OneTime}"
-                CellStyle="{StaticResource RightAlignedDataGridReadOnlyCell}"
-                />
+                CellStyle="{StaticResource RightAlignedDataGridCell}"
+                SortMemberPath="Ware.WareGroup.Tier"
+                ClipboardContentBinding="{Binding Ware.WareGroup.Tier, Mode=OneTime}"
+                >
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Ware.WareGroup.Tier, Mode=OneTime}" VerticalAlignment="Center"/>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
 
 
             <!-- 製品名 -->
-            <DataGridTextColumn
-                Header="製品"
-                Binding="{Binding Ware.Name, Mode=OneTime}"
-                />
-
+            <DataGridTemplateColumn
+                Header="階級"
+                SortMemberPath="Ware.Name"
+                ClipboardContentBinding="{Binding Ware.Name, Mode=OneTime}"
+                >
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Ware.Name, Mode=OneTime}" VerticalAlignment="Center"/>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            
             
             <!-- 1時間あたりの個数 -->
-            <DataGridTextColumn
+            <DataGridTemplateColumn
                 Header="個数/h"
-                Binding="{Binding Count, Mode=OneTime, StringFormat='{}{0:N0}'}"
                 CellStyle="{StaticResource LossEmphasisStyle}"
-                />
+                SortMemberPath="Count"
+                ClipboardContentBinding="{Binding Count, Mode=OneTime}">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Count, Mode=OneTime}" VerticalAlignment="Center"/>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
 
 
             <!-- 金額 -->
-            <DataGridTemplateColumn Header="金額" SortMemberPath="Price" ClipboardContentBinding="{Binding Price, Mode=OneTime}">
+            <x4cmn:MouseHoverEditCellColumn
+                Header="金額"
+                SortMemberPath="Price"
+                ClipboardContentBinding="{Binding Price, Mode=OneTime}"
+                >
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
-                        <xctk:IntegerUpDown ClipValueToMinMax="True" FormatString="{}{0:N0} cr" Value="{Binding Price, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Increment="{Binding Count, Mode=OneTime}"/>
+                        <TextBlock Text="{Binding Price, StringFormat='{}{0:N0} cr', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Right" TextDecorations="Underline"/>
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
-            </DataGridTemplateColumn>
+                <DataGridTemplateColumn.CellEditingTemplate>
+                    <DataTemplate>
+                        <xctk:IntegerUpDown ClipValueToMinMax="True" Value="{Binding Price, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Increment="{Binding Count, Mode=OneTime}"/>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellEditingTemplate>
+            </x4cmn:MouseHoverEditCellColumn>
 
             
             <!--単価-->
-            <DataGridTemplateColumn Header="単価" SortMemberPath="UnitPrice" ClipboardContentBinding="{Binding UnitPrice, Mode=OneTime}">
+            <x4cmn:MouseHoverEditCellColumn
+                Header="単価"
+                SortMemberPath="UnitPrice"
+                ClipboardContentBinding="{Binding UnitPrice, Mode=OneTime}"
+                >
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
-                        <xctk:IntegerUpDown ClipValueToMinMax="True" FormatString="{}{0:N0} cr" Value="{Binding UnitPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Minimum="{Binding Ware.MinPrice}" Maximum="{Binding Ware.MaxPrice}"/>
+                        <TextBlock Text="{Binding UnitPrice, StringFormat='{}{0:N0} cr', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Right" TextDecorations="Underline"/>
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
-            </DataGridTemplateColumn>
+                <DataGridTemplateColumn.CellEditingTemplate>
+                    <DataTemplate>
+                        <xctk:IntegerUpDown ClipValueToMinMax="True" Value="{Binding UnitPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Minimum="{Binding Ware.MinPrice}" Maximum="{Binding Ware.MaxPrice}"/>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellEditingTemplate>
+            </x4cmn:MouseHoverEditCellColumn>
 
             
             <!--単価(スライダー)-->

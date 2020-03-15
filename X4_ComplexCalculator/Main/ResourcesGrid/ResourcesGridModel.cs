@@ -16,6 +16,14 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
     /// </summary>
     class ResourcesGridModel
     {
+        #region メンバ
+        /// <summary>
+        /// モジュール一覧
+        /// </summary>
+        readonly IReadOnlyCollection<ModulesGridItem> Modules;
+        #endregion
+
+
         #region プロパティ
         /// <summary>
         /// 建造に必要なリソース
@@ -27,11 +35,12 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="moduleGridModel">モジュール一覧用Model</param>
-        public ResourcesGridModel(ModulesGridModel moduleGridModel)
+        /// <param name="moduleGridModel">モジュール一覧</param>
+        public ResourcesGridModel(MemberChangeDetectCollection<ModulesGridItem> modules)
         {
             Resources = new SmartCollection<ResourcesGridItem>();
-            moduleGridModel.OnModulesChanged += UpdateResources;
+            Modules = modules;
+            modules.OnCollectionChangedAsync += OnModulesChanged;
         }
 
 
@@ -40,20 +49,17 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async Task UpdateResources(object sender, NotifyCollectionChangedEventArgs e)
+        private async Task OnModulesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            // モジュール一覧
-            var modules = (IEnumerable<ModulesGridItem>)sender;
-
             // 建造に必要なリソース集計用
             var resourcesDict = new Dictionary<string, long>();
 
             Task.WaitAll(
                 // モジュールの建造に必要なリソースを集計
-                AggregateModuleResources(modules, resourcesDict),
+                AggregateModuleResources(Modules, resourcesDict),
 
                 // モジュールの装備の建造に必要なリソースを集計
-                AggregateEquipmentResources(modules, resourcesDict)
+                AggregateEquipmentResources(Modules, resourcesDict)
             );
 
             Resources.Reset(resourcesDict.Select(x => new ResourcesGridItem(x.Key, x.Value)));

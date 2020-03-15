@@ -251,10 +251,7 @@ namespace X4_ComplexCalculator.DB
                 }
                 else
                 {
-                    MessageBox.Show(@"
-DBが存在しません。
-ゲームファイルよりDBを抽出する必要があります。
-データ抽出画面が立ち上がるまでしばらくお待ち下さい。", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("DBが存在しません。\r\nゲームファイルよりDBを抽出する必要があります。\r\nデータ抽出画面が立ち上がるまでしばらくお待ち下さい。", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
 
                     if (!UpdateDB())
                     {
@@ -265,10 +262,7 @@ DBが存在しません。
             }
             catch
             {
-                if (MessageBox.Show(@"
-DBのオープンに失敗しました。
-ゲームファイルよりDBを抽出する事で起動可能になるかもしれません。
-DBを更新しますか？", "Error", MessageBoxButton.YesNo, MessageBoxImage.Error) == MessageBoxResult.Yes)
+                if (MessageBox.Show("DBのオープンに失敗しました。\r\nゲームファイルよりDBを抽出する事で起動可能になるかもしれません。\r\nDBを更新しますか？", "Error", MessageBoxButton.YesNo, MessageBoxImage.Error) == MessageBoxResult.Yes)
                 {
                     if (!UpdateDB())
                     {

@@ -3,7 +3,7 @@
                     xmlns:local="clr-namespace:X4_ComplexCalculator.Themes">
 
     <!-- Windowの背景 -->
-    <Style TargetType="Window" x:Key="DefaultWindowBackgroundStyle">
+    <Style TargetType="{x:Type Window}" x:Key="DefaultWindowBackgroundStyle">
         <Setter Property="Background" Value="LightGray"/>
     </Style>
     
