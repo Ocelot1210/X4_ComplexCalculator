@@ -6,6 +6,7 @@ using X4_ComplexCalculator.Main.ModulesGrid.EditEquipment;
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using System.Text;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid
 {
@@ -70,11 +71,33 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// </summary>
         public int TurretsCount => Module.Equipment.Turret.AllEquipmentsCount;
 
+        /// <summary>
+        /// タレットのツールチップ文字列
+        /// </summary>
+        public string TurretsToolTip
+        {
+            get
+            {
+                return MakeEquipmentToolTipString(Module.Equipment.Turret);
+            }
+        }
+
 
         /// <summary>
         /// 装備中のシールドの個数
         /// </summary>
         public int ShieldsCount => Module.Equipment.Shield.AllEquipmentsCount;
+
+        /// <summary>
+        /// シールドのツールチップ文字列
+        /// </summary>
+        public string ShieldsToolTip
+        {
+            get
+            {
+                return MakeEquipmentToolTipString(Module.Equipment.Shield);
+            }
+        }
 
 
         /// <summary>
@@ -161,12 +184,14 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             if (!turretsOld.SequenceEqual(turretsNew))
             {
                 OnPropertyChanged("TurretsCount");
+                OnPropertyChanged("TurretsToolTip");
                 moduleChanged = true;
             }
 
             if (!shieldsOld.SequenceEqual(shieldsNew))
             {
                 OnPropertyChanged("ShieldsCount");
+                OnPropertyChanged("ShieldsToolTip");
                 moduleChanged = true;
             }
 
@@ -174,6 +199,40 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             {
                 OnPropertyChanged("Module");
             }
+        }
+
+        /// <summary>
+        /// 装備のツールチップ文字列を作成
+        /// </summary>
+        /// <returns></returns>
+        private string MakeEquipmentToolTipString(ModuleEquipmentManager equipmentManager)
+        {
+            var sb = new StringBuilder();
+
+            foreach (var size in equipmentManager.Sizes)
+            {
+                var cnt = 1;
+
+                foreach (var eq in equipmentManager.GetEquipment(size))
+                {
+                    if (cnt == 1)
+                    {
+                        if (sb.Length != 0)
+                        {
+                            sb.AppendLine();
+                        }
+                        sb.AppendLine($"【{size.Name}】");
+                    }
+                    sb.AppendLine($"{cnt++:D2} ： {eq.Name}");
+                }
+            }
+
+            if (sb.Length == 0)
+            {
+                sb.Append("何も装備していません");
+            }
+
+            return sb.ToString();
         }
     }
 }

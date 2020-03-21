@@ -122,7 +122,6 @@
 
                 <!--  モジュール数  -->
                 <DataGridTemplateColumn
-                    CanUserSort="True"
                     ClipboardContentBinding="{Binding ModuleCount}"
                     Header="モジュール数"
                     SortMemberPath="ModuleCount">
@@ -155,7 +154,6 @@
                 <!--  装備編集  -->
                 <DataGridTemplateColumn
                     CanUserResize="False"
-                    CanUserSort="True"
                     Header="装備"
                     IsReadOnly="True"
                     SortMemberPath="EditEquipmentButtonVisiblity">
@@ -180,13 +178,31 @@
                 <DataGridTemplateColumn
                     CanUserResize="False"
                     ClipboardContentBinding="{Binding TurretsCount, Mode=OneTime}"
-                    Header="タレット">
+                    Header="タレット"
+                    SortMemberPath="TurretsCount">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock
                                 VerticalAlignment="Center"
                                 Text="{Binding TurretsCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat='{}{0:N0}'}"
-                                TextAlignment="Right" />
+                                TextAlignment="Right"
+                                ToolTipService.ShowDuration="1000000"
+                                Visibility="{Binding EditEquipmentButtonVisiblity, Mode=OneTime}">
+                                <TextBlock.Style>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Setter Property="ToolTip">
+                                            <Setter.Value>
+                                                <ToolTip HorizontalContentAlignment="Left">
+                                                    <TextBlock
+                                                        HorizontalAlignment="Left"
+                                                        Text="{Binding TurretsToolTip, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                                        TextAlignment="Left" />
+                                                </ToolTip>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -196,13 +212,31 @@
                 <DataGridTemplateColumn
                     CanUserResize="False"
                     ClipboardContentBinding="{Binding ShieldsCount, Mode=OneTime}"
-                    Header="シールド">
+                    Header="シールド"
+                    SortMemberPath="ShieldsCount">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock
                                 VerticalAlignment="Center"
                                 Text="{Binding ShieldsCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat='{}{0:N0}'}"
-                                TextAlignment="Right" />
+                                TextAlignment="Right"
+                                ToolTipService.ShowDuration="1000000"
+                                Visibility="{Binding EditEquipmentButtonVisiblity, Mode=OneTime}">
+                                <TextBlock.Style>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Setter Property="ToolTip">
+                                            <Setter.Value>
+                                                <ToolTip HorizontalContentAlignment="Left">
+                                                    <TextBlock
+                                                        HorizontalAlignment="Left"
+                                                        Text="{Binding ShieldsToolTip, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                                        TextAlignment="Left" />
+                                                </ToolTip>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -211,7 +245,7 @@
                 <x4cmn:MouseHoverEditCellColumn
                     ClipboardContentBinding="{Binding SelectedMethod.Method, Mode=OneTime}"
                     Header="建造方式"
-                    SortMemberPath="{Binding SelectedMethod.Method}">
+                    SortMemberPath="SelectedMethod.Method">
 
                     <!--  表示モード  -->
                     <DataGridTemplateColumn.CellTemplate>
