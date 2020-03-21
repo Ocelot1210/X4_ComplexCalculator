@@ -5,7 +5,7 @@ namespace X4_ComplexCalculator.DB.X4DB
     /// <summary>
     /// 種族管理用クラス
     /// </summary>
-    class Race
+    public class Race
     {
         /// <summary>
         /// 種族ID

@@ -19,6 +19,11 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// モジュール数
         /// </summary>
         private long _ModuleCount = 1;
+
+        /// <summary>
+        /// 選択された建造方式
+        /// </summary>
+        private ModuleProduction _SelectedMethod;
         #endregion
 
 
@@ -76,21 +81,50 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// 編集ボタンを表示すべきか
         /// </summary>
         public Visibility EditEquipmentButtonVisiblity => (Module.Equipment.CanEquipped) ? Visibility.Visible : Visibility.Hidden;
+
+
+        /// <summary>
+        /// 建造方式を表示すべきか
+        /// </summary>
+        public Visibility SelectedMethodVisiblity => (2 <= Module.ModuleProductions.Count()) ? Visibility.Visible : Visibility.Hidden;
+
+
+        /// <summary>
+        /// 選択中の建造方式
+        /// </summary>
+        public ModuleProduction SelectedMethod
+        {
+            get
+            {
+                return _SelectedMethod;
+            }
+            set
+            {
+                _SelectedMethod = value;
+                OnPropertyChanged();
+                OnPropertyChanged("SelectedMethod.Method");
+            }
+        }
         #endregion
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="id">モジュールID</param>
+        /// <param name="moduleID">モジュールID</param>
         /// <param name="moduleCount">モジュール数</param>
-        public ModulesGridItem(string id, long moduleCount = 1)
+        public ModulesGridItem(string moduleID, long moduleCount = 1)
         {
-            Module = new Module(id);
+            Module = new Module(moduleID);
             ModuleCount = moduleCount;
             EditEquipmentCommand = new DelegateCommand(EditEquipment);
+            _SelectedMethod = Module.ModuleProductions[0];
         }
 
+        ~ModulesGridItem()
+        {
+
+        }
 
         /// <summary>
         /// コピーコンストラクタ
@@ -101,6 +135,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             Module = new Module(modulesGridItem.Module);
             ModuleCount = modulesGridItem.ModuleCount;
             EditEquipmentCommand = new DelegateCommand(EditEquipment);
+            _SelectedMethod = modulesGridItem.SelectedMethod;
         }
 
         /// <summary>
@@ -139,23 +174,6 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             {
                 OnPropertyChanged("Module");
             }
-        }
-
-
-        public override bool Equals(object obj)
-        {
-            return obj is ModulesGridItem item &&
-                   EqualityComparer<Module>.Default.Equals(Module, item.Module) &&
-                   IsSelected == item.IsSelected &&
-                   ModuleCount == item.ModuleCount &&
-                   TurretsCount == item.TurretsCount &&
-                   ShieldsCount == item.ShieldsCount;
-                    
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Module, IsSelected, ModuleCount, TurretsCount, ShieldsCount);
         }
     }
 }

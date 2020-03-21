@@ -13,6 +13,11 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// 製品数(モジュール追加用)
         /// </summary>
         private readonly long _Amount;
+
+        /// <summary>
+        /// 生産性
+        /// </summary>
+        private double _Efficiency;
         #endregion
 
         /// <summary>
@@ -24,7 +29,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// <summary>
         /// モジュール名
         /// </summary>
-        public string ModuleName { get; private set; }
+        public string ModuleName { get; }
 
 
         /// <summary>
@@ -57,9 +62,14 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
             ModuleID = moduleID;
             ModuleCount = moduleCount;
             _Amount = amount;
+            _Efficiency = efficiency;
+
             Efficiency = (efficiency < 0) ? "-" : $"{(int)(efficiency * 100)}%";
 
-            DBConnection.X4DB.ExecQuery($"SELECT Name FROM Module WHERE ModuleID = '{moduleID}'", (SQLiteDataReader dr, object[] args) => { ModuleName = dr["Name"].ToString(); });
+
+            var moduleName = "";
+            DBConnection.X4DB.ExecQuery($"SELECT Name FROM Module WHERE ModuleID = '{moduleID}'", (SQLiteDataReader dr, object[] args) => { moduleName = dr["Name"].ToString(); });
+            ModuleName = moduleName;
         }
 
         /// <summary>

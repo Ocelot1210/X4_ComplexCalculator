@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.SQLite;
 
 namespace X4_ComplexCalculator.DB.X4DB
@@ -45,6 +46,12 @@ namespace X4_ComplexCalculator.DB.X4DB
 
 
         /// <summary>
+        /// 建造方式
+        /// </summary>
+        public IReadOnlyList<ModuleProduction> ModuleProductions { get; }
+
+
+        /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="moduleID">モジュールID</param>
@@ -56,7 +63,7 @@ namespace X4_ComplexCalculator.DB.X4DB
             long workersCapacity = 0;
             ModuleType moduleType = null;
 
-            DBConnection.X4DB.ExecQuery($"SELECT ModuleTypeID, Name, MaxWorkers, WorkersCapacity FROM Module WHERE Module.ModuleID = '{moduleID}'",
+            DBConnection.X4DB.ExecQuery($"SELECT ModuleTypeID, Name, MaxWorkers, WorkersCapacity FROM Module WHERE ModuleID = '{moduleID}'",
                 (SQLiteDataReader dr, object[] args) =>
                 {
                     name            = dr["Name"].ToString();
@@ -70,6 +77,14 @@ namespace X4_ComplexCalculator.DB.X4DB
             MaxWorkers = maxWorkers;
             WorkersCapacity = workersCapacity;
             Equipment = new ModuleEquipment(moduleID);
+
+            var mProd = new List<ModuleProduction>();
+            DBConnection.X4DB.ExecQuery($"SELECT Method, Time FROM ModuleProduction WHERE ModuleID = '{moduleID}'",
+                (SQLiteDataReader dr, object[] args) =>
+                {
+                    mProd.Add(new ModuleProduction(dr["Method"].ToString(), (long)dr["Time"]));
+                });
+            ModuleProductions = mProd;
         }
 
         /// <summary>
@@ -78,12 +93,13 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <param name="module"></param>
         public Module(Module module)
         {
-            ModuleID        = module.ModuleID;
-            Name            = module.Name;
-            ModuleType      = new ModuleType(module.ModuleType);
-            MaxWorkers      = module.MaxWorkers;
-            WorkersCapacity = module.WorkersCapacity;
-            Equipment       = new ModuleEquipment(module.Equipment);
+            ModuleID          = module.ModuleID;
+            Name              = module.Name;
+            ModuleType        = new ModuleType(module.ModuleType);
+            MaxWorkers        = module.MaxWorkers;
+            WorkersCapacity   = module.WorkersCapacity;
+            Equipment         = new ModuleEquipment(module.Equipment);
+            ModuleProductions = module.ModuleProductions;
         }
 
         /// <summary>

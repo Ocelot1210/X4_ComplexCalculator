@@ -15,11 +15,17 @@ namespace X4_ComplexCalculator.Common.Collection
     /// <typeparam name="T">任意のデータ型</typeparam>
     public class SmartCollection<T> : ObservableCollection<T>
     {
+        #region メンバ
         /// <summary>
         /// CollectionChangedイベント時に使用
         /// </summary>
-        public Dispatcher Dispatcher { get; set; }
+        private Dispatcher Dispatcher { get; }
 
+        /// <summary>
+        /// イベントが無効化されているか
+        /// </summary>
+        protected bool EventDisabled = false;
+        #endregion
 
         #region コンストラクタ
         public SmartCollection() : base()
@@ -47,7 +53,12 @@ namespace X4_ComplexCalculator.Common.Collection
         {
             CheckReentrancy();
 
-            ((List<T>)Items).AddRange(range);
+            EventDisabled = true;
+            foreach(var itm in range)
+            {
+                Add(itm);
+            }
+            EventDisabled = false;
 
             OnPropertyChanged(new PropertyChangedEventArgs("Count"));
             OnPropertyChanged(new PropertyChangedEventArgs("Item[]"));
@@ -63,22 +74,17 @@ namespace X4_ComplexCalculator.Common.Collection
         {
             CheckReentrancy();
 
-            if (!(range is T[] removeTargets))
-            {
-                removeTargets = range.ToArray();
-            }
+            // 削除対象要素番号(順番を維持するため要素番号の降順にする)
+            var indexies = range.Select(x => Items.IndexOf(x))
+                                .Where(x => -1 < x)
+                                .OrderByDescending(x => x);
 
-            // 削除対象が1つだけならRemoveを使用
-            if (removeTargets.Length == 1)
+            EventDisabled = true;
+            foreach (var idx in indexies)
             {
-                Remove(removeTargets[0]);
-                return;
+                RemoveAt(idx);
             }
-
-            foreach (var removeTarget in removeTargets)
-            {
-                Items.Remove(removeTarget);
-            }
+            EventDisabled = false;
 
             OnPropertyChanged(new PropertyChangedEventArgs("Count"));
             OnPropertyChanged(new PropertyChangedEventArgs("Item[]"));
@@ -90,31 +96,12 @@ namespace X4_ComplexCalculator.Common.Collection
         /// クリアしてコレクションを追加
         /// </summary>
         /// <param name="range">追加するコレクション</param>
-        public void Reset(IEnumerable<T> range)
+        public virtual void Reset(IEnumerable<T> range)
         {
             Items.Clear();
             AddRange(range);
         }
 
-        /// <summary>
-        /// コレクション変更時
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
-        {
-            // UIスレッドか？
-            if (Dispatcher == null || Dispatcher.Thread == Thread.CurrentThread)
-            {
-                // UIスレッドの場合、通常処理
-                base.OnCollectionChanged(e);
-            }
-            else
-            {
-                // UIスレッドでない場合、Dispatcherで処理する
-                Action<NotifyCollectionChangedEventArgs> action = OnCollectionChanged;
-                Dispatcher.Invoke(action, e);
-            }
-        }
 
         /// <summary>
         /// 要素を置換する
@@ -128,6 +115,50 @@ namespace X4_ComplexCalculator.Common.Collection
             Items.Insert(idx, newItem);
 
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, newItem, oldItem));
+        }
+
+
+
+        /// <summary>
+        /// プロパティ変更時
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            // イベントが無効化されていれば何もしない
+            if (EventDisabled)
+            {
+                return;
+            }
+
+            base.OnPropertyChanged(e);
+        }
+
+
+        /// <summary>
+        /// コレクション変更時
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            // イベントが無効化されていれば何もしない
+            if (EventDisabled)
+            {
+                return;
+            }
+
+            // UIスレッドか？
+            if (Dispatcher == null || Dispatcher.Thread == Thread.CurrentThread)
+            {
+                // UIスレッドの場合、通常処理
+                base.OnCollectionChanged(e);
+            }
+            else
+            {
+                // UIスレッドでない場合、Dispatcherで処理する
+                Action<NotifyCollectionChangedEventArgs> action = OnCollectionChanged;
+                Dispatcher.Invoke(action, e);
+            }
         }
     }
 }

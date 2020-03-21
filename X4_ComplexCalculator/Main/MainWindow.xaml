@@ -1,45 +1,95 @@
 ﻿<Window
+    x:Class="X4_ComplexCalculator.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:stsmry="clr-namespace:X4_ComplexCalculator.Main.StationSummary"
     xmlns:modGrid="clr-namespace:X4_ComplexCalculator.Main.ModulesGrid"
     xmlns:prodGrid="clr-namespace:X4_ComplexCalculator.Main.ProductsGrid"
     xmlns:resGrid="clr-namespace:X4_ComplexCalculator.Main.ResourcesGrid"
     xmlns:storGrid="clr-namespace:X4_ComplexCalculator.Main.StoragesGrid"
+    xmlns:stsmry="clr-namespace:X4_ComplexCalculator.Main.StationSummary"
     xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
-    x:Class="X4_ComplexCalculator.MainWindow"
-    mc:Ignorable="d"
     Title="X4: ステーション計算機"
-    Height="600" Width="1000" Style="{StaticResource DefaultWindowBackgroundStyle}">
+    Width="1000"
+    Height="600"
+    Style="{StaticResource DefaultWindowBackgroundStyle}"
+    mc:Ignorable="d">
 
     <Window.InputBindings>
-        <KeyBinding Gesture="Ctrl+S"       Command="{Binding Save}"/>
-        <KeyBinding Gesture="Shift+Ctrl+S" Command="{Binding SaveAs}"/>
-        <KeyBinding Gesture="Ctrl+O"       Command="{Binding Open}"/>
+        <KeyBinding Command="{Binding Save}" Gesture="Ctrl+S" />
+        <KeyBinding Command="{Binding SaveAs}" Gesture="Shift+Ctrl+S" />
+        <KeyBinding Command="{Binding Open}" Gesture="Ctrl+O" />
     </Window.InputBindings>
 
     <Grid>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        
-        <Menu>
+
+        <!--  ウィンドウ上部メニュー  -->
+        <Menu Grid.Row="0">
+
+            <!--  ファイル(F)  -->
             <MenuItem Header="ファイル(_F)">
-                <MenuItem Header="上書き保存"       InputGestureText="Ctrl+S"       Command="{Binding Save,     Mode=OneTime}"/>
-                <MenuItem Header="名前を付けて保存" InputGestureText="Shift+Ctrl+S" Command="{Binding SaveAs,   Mode=OneTime}"/>
-                <MenuItem Header="開く"             InputGestureText="Ctrl+O"       Command="{Binding Open,     Mode=OneTime}"/>
-                <MenuItem Header="DB更新"           InputGestureText="Ctrl+U"       Command="{Binding UpdateDB, Mode=OneTime}"/>
+                <!--  上書き保存  -->
+                <MenuItem
+                    Command="{Binding Save, Mode=OneTime}"
+                    Header="上書き保存"
+                    InputGestureText="Ctrl+S" />
+
+                <!--  名前を付けて保存  -->
+                <MenuItem
+                    Command="{Binding SaveAs, Mode=OneTime}"
+                    Header="名前を付けて保存"
+                    InputGestureText="Shift+Ctrl+S" />
+
+                <!--  開く  -->
+                <MenuItem
+                    Command="{Binding Open, Mode=OneTime}"
+                    Header="開く"
+                    InputGestureText="Ctrl+O" />
+
+                <!--  DB更新  -->
+                <MenuItem
+                    Command="{Binding UpdateDB, Mode=OneTime}"
+                    Header="DB更新"
+                    InputGestureText="Ctrl+U" />
             </MenuItem>
+
+            <!--  表示(V)  -->
             <MenuItem Header="表示(_V)">
-                <MenuItem IsCheckable="True" Header="{Binding Title, Mode=OneTime, ElementName=_Module}"   IsChecked="{Binding IsVisible, ElementName=_Module}"/>
-                <MenuItem IsCheckable="True" Header="{Binding Title, Mode=OneTime, ElementName=_Summary}"  IsChecked="{Binding IsVisible, ElementName=_Summary}"/>
-                <MenuItem IsCheckable="True" Header="{Binding Title, Mode=OneTime, ElementName=_Products}" IsChecked="{Binding IsVisible, ElementName=_Products}"/>
-                <MenuItem IsCheckable="True" Header="{Binding Title, Mode=OneTime, ElementName=_Build}"    IsChecked="{Binding IsVisible, ElementName=_Build}"/>
-                <MenuItem IsCheckable="True" Header="{Binding Title, Mode=OneTime, ElementName=_Storage}"  IsChecked="{Binding IsVisible, ElementName=_Storage}"/>
+                <!--  モジュール一覧  -->
+                <MenuItem
+                    Header="{Binding Title, Mode=OneTime, ElementName=_Module}"
+                    IsCheckable="True"
+                    IsChecked="{Binding IsVisible, ElementName=_Module}" />
+
+                <!--  概要  -->
+                <MenuItem
+                    Header="{Binding Title, Mode=OneTime, ElementName=_Summary}"
+                    IsCheckable="True"
+                    IsChecked="{Binding IsVisible, ElementName=_Summary}" />
+
+                <!--  製品  -->
+                <MenuItem
+                    Header="{Binding Title, Mode=OneTime, ElementName=_Products}"
+                    IsCheckable="True"
+                    IsChecked="{Binding IsVisible, ElementName=_Products}" />
+
+                <!--  建造リソース  -->
+                <MenuItem
+                    Header="{Binding Title, Mode=OneTime, ElementName=_Build}"
+                    IsCheckable="True"
+                    IsChecked="{Binding IsVisible, ElementName=_Build}" />
+
+                <!--  保管庫  -->
+                <MenuItem
+                    Header="{Binding Title, Mode=OneTime, ElementName=_Storage}"
+                    IsCheckable="True"
+                    IsChecked="{Binding IsVisible, ElementName=_Storage}" />
             </MenuItem>
         </Menu>
 
@@ -49,31 +99,31 @@
 
                     <xcad:LayoutAnchorablePaneGroup>
                         <xcad:LayoutAnchorablePane>
-                            <!-- モジュール一覧 -->
+                            <!--  モジュール一覧  -->
                             <xcad:LayoutAnchorable x:Name="_Module" Title="モジュール一覧">
-                                <modGrid:ModulesGrid x:Name="Modules" Grid.Column="0"/>
+                                <modGrid:ModulesGrid x:Name="Modules" Grid.Column="0" />
                             </xcad:LayoutAnchorable>
                         </xcad:LayoutAnchorablePane>
 
                         <xcad:LayoutAnchorablePane>
-                            <!-- 概要 -->
+                            <!--  概要  -->
                             <xcad:LayoutAnchorable x:Name="_Summary" Title="概要">
-                                <stsmry:StationSummary x:Name="Summary"/>
+                                <stsmry:StationSummary x:Name="Summary" />
                             </xcad:LayoutAnchorable>
 
-                            <!-- 製品 -->
+                            <!--  製品  -->
                             <xcad:LayoutAnchorable x:Name="_Products" Title="製品">
-                                <prodGrid:ProductsGrid x:Name="Products"/>
+                                <prodGrid:ProductsGrid x:Name="Products" />
                             </xcad:LayoutAnchorable>
 
-                            <!-- 建造 -->
+                            <!--  建造  -->
                             <xcad:LayoutAnchorable x:Name="_Build" Title="建造">
-                                <resGrid:ResourcesGrid x:Name="Build"/>
+                                <resGrid:ResourcesGrid x:Name="Build" />
                             </xcad:LayoutAnchorable>
 
-                            <!-- 保管庫 -->
+                            <!--  保管庫  -->
                             <xcad:LayoutAnchorable x:Name="_Storage" Title="保管庫">
-                                <storGrid:StoragesGrid x:Name="Storages"/>
+                                <storGrid:StoragesGrid x:Name="Storages" />
                             </xcad:LayoutAnchorable>
                         </xcad:LayoutAnchorablePane>
                     </xcad:LayoutAnchorablePaneGroup>

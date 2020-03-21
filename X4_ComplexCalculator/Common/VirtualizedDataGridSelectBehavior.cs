@@ -1,7 +1,11 @@
 ﻿using System.Collections;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Linq;
+using X4_ComplexCalculator.Common.Reflection;
+using System.Windows.Threading;
 
 namespace X4_ComplexCalculator.Common
 {
@@ -47,10 +51,34 @@ namespace X4_ComplexCalculator.Common
             if (e.NewValue != null)
             {
                 dg.SelectionChanged += SelectedItemsChanged;
+                dg.SelectedCellsChanged += SelectedCellsChanged;
             }
             else
             {
                 dg.SelectionChanged -= SelectedItemsChanged;
+                dg.SelectedCellsChanged  -= SelectedCellsChanged;
+            }
+        }
+
+        private static void SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
+        {
+            if (!(sender is DataGrid dataGrid))
+            {
+                return;
+            }
+
+            // 行選択モードでなければ何もしない
+            if (dataGrid.SelectionUnit != DataGridSelectionUnit.Cell)
+            {
+                return;
+            }
+
+            using (Dispatcher.CurrentDispatcher.DisableProcessing())
+            {
+                var accessor = ((0 < e.AddedCells.Count) ? e.AddedCells[0].Item : e.RemovedCells[0].Item).GetType().GetProperty(GetMemberName((DependencyObject)sender)).ToAccessor();
+
+                SetSelectedStatus(e.AddedCells.Select(x => x.Item),   accessor, true);
+                SetSelectedStatus(e.RemovedCells.Select(x => x.Item), accessor, false);
             }
         }
 
@@ -62,35 +90,41 @@ namespace X4_ComplexCalculator.Common
         /// <param name="e"></param>
         private static void SelectedItemsChanged(object sender, SelectionChangedEventArgs e)
         {
-            static void setvalue(IList items, MethodInfo method, object value)
-            {
-                var setValue = new object[] { value };
-
-                foreach (var itm in items)
-                {
-                    method.Invoke(itm, setValue);
-                }
-            }
-
-            // 高速化のためここでプロパティのdelegateを取得して使い回す
-            MethodInfo methodInfo;
-            {
-                var memberName = GetMemberName((DependencyObject)sender);
-
-                var obj = (0 < e.AddedItems.Count) ? e.AddedItems[0] : e.RemovedItems[0];
-
-                methodInfo = obj?.GetType()
-                                ?.GetProperty(memberName)
-                                ?.GetSetMethod();
-            }
-
-            if (methodInfo == null)
+            if (!(sender is DataGrid dataGrid))
             {
                 return;
             }
 
-            setvalue(e.AddedItems, methodInfo, true);
-            setvalue(e.RemovedItems, methodInfo, false);
+            // 行選択モードでなければ何もしない
+            if (dataGrid.SelectionUnit != DataGridSelectionUnit.FullRow)
+            {
+                return;
+            }
+
+            using (Dispatcher.CurrentDispatcher.DisableProcessing())
+            {
+                var accessor = ((0 < e.AddedItems.Count) ? e.AddedItems[0] : e.RemovedItems[0]).GetType().GetProperty(GetMemberName((DependencyObject)sender))?.ToAccessor();
+                if (accessor != null)
+                {
+                    SetSelectedStatus(e.AddedItems, accessor, true);
+                    SetSelectedStatus(e.RemovedItems, accessor, false);
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// 選択状態を設定
+        /// </summary>
+        /// <param name="items">設定対象</param>
+        /// <param name="accessor">プロパティへのアクセサー</param>
+        /// <param name="value">設定値</param>
+        static void SetSelectedStatus(IEnumerable items, IAccessor accessor, object value)
+        {
+            Parallel.ForEach(items.Cast<object>(), item =>
+            {
+                accessor.SetValue(item, value);
+            });
         }
     }
 }

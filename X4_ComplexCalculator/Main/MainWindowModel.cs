@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Windows;
+using System.Windows.Threading;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
@@ -140,7 +141,11 @@ namespace X4_ComplexCalculator.Main
             if (dlg.ShowDialog() == true)
             {
                 _SaveFilePath = dlg.FileName;
-                OpenMain();
+
+                using (Dispatcher.CurrentDispatcher.DisableProcessing())
+                {
+                    OpenMain();
+                }
             }
         }
 
@@ -164,7 +169,10 @@ namespace X4_ComplexCalculator.Main
             }
             catch(Exception e)
             {
-                MessageBox.Show(@$"ファイルの読み込みに失敗しました。\r\n\r\n■理由：\r\n{e.Message}", "読み込み失敗", MessageBoxButton.OK, MessageBoxImage.Error);
+                Dispatcher.CurrentDispatcher.BeginInvoke(() => 
+                {
+                    MessageBox.Show($"ファイルの読み込みに失敗しました。\r\n\r\n■理由：\r\n{e.Message}", "読み込み失敗", MessageBoxButton.OK, MessageBoxImage.Error);
+                });
             }
         }
 

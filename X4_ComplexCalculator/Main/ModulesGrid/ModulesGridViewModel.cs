@@ -8,6 +8,7 @@ using System.Windows.Data;
 using X4_ComplexCalculator.Common;
 using System.Linq;
 using System.Windows;
+using System.Threading.Tasks;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid
 {
@@ -151,15 +152,27 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
 
             var items = CollectionViewSource.GetDefaultView(ModulesViewSource.View)
                                             .Cast<ModulesGridItem>()
-                                            .Where(x => x.IsSelected)
-                                            .ToArray();
+                                            .Where(x => x.IsSelected);
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
             Model.DeleteModules(items);
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
 
             // 削除後に全部の選択状態を外さないと余計なものまで選択される
-            foreach (var module in Model.Modules)
+            Parallel.ForEach(Model.Modules, module => 
             {
                 module.IsSelected = false;
+            });
+
+            // 先頭行を削除した場合
+            if (currPos < 0)
+            {
+                cvs.MoveCurrentToFirst();
             }
+
 
             // 最後の行を消した場合、選択行を最後にする
             if (cvs.Count <= currPos)

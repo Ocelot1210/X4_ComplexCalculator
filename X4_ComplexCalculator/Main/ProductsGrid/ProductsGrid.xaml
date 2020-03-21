@@ -1,96 +1,96 @@
-﻿<UserControl x:Class="X4_ComplexCalculator.Main.ProductsGrid.ProductsGrid"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
-             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
-             mc:Ignorable="d PresentationOptions"
-             xmlns:local="clr-namespace:X4_ComplexCalculator.Main.ProductsGrid"
-             xmlns:DataGridInline="clr-namespace:CustomControlLibrary.DataGridInline;assembly=X4_ComplexCalculator_CustomControlLibrary"
-             xmlns:x4conv="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
-             x:Name="Control"
-             d:DesignHeight="450" d:DesignWidth="800">
+﻿<UserControl
+    x:Class="X4_ComplexCalculator.Main.ProductsGrid.ProductsGrid"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:DataGridInline="clr-namespace:CustomControlLibrary.DataGridInline;assembly=X4_ComplexCalculator_CustomControlLibrary"
+    xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:X4_ComplexCalculator.Main.ProductsGrid"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
+    xmlns:x4conv="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
+    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+    x:Name="Control"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d PresentationOptions">
 
     <UserControl.Resources>
 
-        <!-- 赤字強調用スタイル(セルが非選択中のみ発動) -->
-        <Style x:Key="LossEmphasisStyle" TargetType="DataGridCell" BasedOn="{StaticResource RightAlignedDataGridCell}">
+        <!--  赤字強調用スタイル(セルが非選択中のみ発動)  -->
+        <Style
+            x:Key="LossEmphasisStyle"
+            BasedOn="{StaticResource RightAlignedDataGridCell}"
+            TargetType="DataGridCell">
             <Style.Triggers>
                 <MultiDataTrigger>
                     <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="False"/>
-                        <Condition Binding="{Binding IsLosing}" Value="True"/>
+                        <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="False" />
+                        <Condition Binding="{Binding IsLosing}" Value="True" />
                     </MultiDataTrigger.Conditions>
-                    <Setter Property="Background" Value="LightPink"/>
-                    <Setter Property="FontWeight" Value="Bold"/>
+                    <Setter Property="Background" Value="LightPink" />
+                    <Setter Property="FontWeight" Value="Bold" />
                 </MultiDataTrigger>
             </Style.Triggers>
         </Style>
 
 
-        <!-- データ中継用 -->
-        <x4cmn:BindingProxy x:Key="ProxyUnitPricePercent" Data="{Binding UnitPricePercent, Mode=TwoWay}"/>
+        <!--  データ中継用  -->
+        <x4cmn:BindingProxy x:Key="ProxyUnitPricePercent" Data="{Binding UnitPricePercent, Mode=TwoWay}" />
 
-        <!-- DataGridのコンテキストメニュー -->
+        <!--  DataGridのコンテキストメニュー  -->
         <ContextMenu x:Key="ProductsGridContextMenu">
-            <MenuItem Header="展開"       Command="{Binding SelectedExpand, Mode=OneTime}"   CommandParameter="{x:Reference productGrid}"/>
-            <MenuItem Header="折りたたむ" Command="{Binding SelectedCollapse, Mode=OneTime}" CommandParameter="{x:Reference productGrid}"/>
+            <MenuItem
+                Command="{Binding SelectedExpand, Mode=OneTime}"
+                CommandParameter="{x:Reference productGrid}"
+                Header="展開" />
+            <MenuItem
+                Command="{Binding SelectedCollapse, Mode=OneTime}"
+                CommandParameter="{x:Reference productGrid}"
+                Header="折りたたむ" />
         </ContextMenu>
-        
-        <!-- 子要素のListView -->
+
+        <!--  子要素のListView  -->
         <DataGridInline:InlineListView
             x:Key="DetailsListView"
+            Margin="0,0,0,20"
             x:Shared="false"
-            ItemsSource="{Binding}"
-            Style="{StaticResource DefaultListView}"
             ItemContainerStyle="{StaticResource NoHighlightListViewItem}"
-            Margin="0 0 0 20"
-            >
+            ItemsSource="{Binding}"
+            Style="{StaticResource DefaultListView}">
 
             <ListView.View>
                 <GridView>
 
-                    <!-- モジュール名 -->
+                    <!--  モジュール名  -->
                     <DataGridInline:InlineGridViewColumn
-                        Header="モジュール名"
-                        SortTargetPropertyName="ModuleName"
                         DisplayMemberBinding="{Binding ModuleName, Mode=OneTime}"
-                        />
+                        Header="モジュール名"
+                        SortTargetPropertyName="ModuleName" />
 
-                    <!-- モジュール数 -->
-                    <DataGridInline:InlineGridViewColumn
-                        Header="モジュール数"
-                        SortTargetPropertyName="ModuleCount"
-                        >
+                    <!--  モジュール数  -->
+                    <DataGridInline:InlineGridViewColumn Header="モジュール数" SortTargetPropertyName="ModuleCount">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding ModuleCount, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right"/>
+                                <TextBlock Text="{Binding ModuleCount, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </DataGridInline:InlineGridViewColumn>
 
-                    <!-- 生産性 -->
-                    <DataGridInline:InlineGridViewColumn
-                        Header="生産性"
-                        SortTargetPropertyName="Efficiency"
-                        >
+                    <!--  生産性  -->
+                    <DataGridInline:InlineGridViewColumn Header="生産性" SortTargetPropertyName="Efficiency">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Efficiency, Mode=OneTime}" TextAlignment="Right"/>
+                                <TextBlock Text="{Binding Efficiency, Mode=OneTime}" TextAlignment="Right" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </DataGridInline:InlineGridViewColumn>
 
-                    <!-- 生産量 -->
-                    <DataGridInline:InlineGridViewColumn
-                        Header="生産量"
-                        SortTargetPropertyName="Amount"
-                        >
+                    <!--  生産量  -->
+                    <DataGridInline:InlineGridViewColumn Header="生産量" SortTargetPropertyName="Amount">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Amount, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right"/>
+                                <TextBlock Text="{Binding Amount, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </DataGridInline:InlineGridViewColumn>
@@ -99,140 +99,151 @@
         </DataGridInline:InlineListView>
     </UserControl.Resources>
 
-    <DataGrid 
+    <DataGrid
         x:Name="productGrid"
-        ItemsSource="{Binding Path=Products, UpdateSourceTrigger=PropertyChanged, IsAsync=True}"
         PresentationOptions:Freeze="true"
-        Style="{StaticResource DetailsDataGridStyle}"
-        ContextMenu="{StaticResource ProductsGridContextMenu}"
-        SelectionUnit="Cell"
+        x4cmn:DataGridCurrentCellEditModeBehavior.Enabled="True"
+        x4cmn:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
         CellStyle="{StaticResource DataGridCellDefaultStyle}"
-        >
+        ContextMenu="{StaticResource ProductsGridContextMenu}"
+        ItemsSource="{Binding Path=Products, UpdateSourceTrigger=PropertyChanged, IsAsync=True}"
+        SelectionUnit="Cell"
+        Style="{StaticResource DetailsDataGridStyle}">
 
-        
+
         <DataGrid.Columns>
 
-            <!-- 階級 -->
+            <!--  階級  -->
             <DataGridTemplateColumn
-                Header="階級"
                 CellStyle="{StaticResource RightAlignedDataGridCell}"
-                SortMemberPath="Ware.WareGroup.Tier"
                 ClipboardContentBinding="{Binding Ware.WareGroup.Tier, Mode=OneTime}"
-                >
-                <DataGridTemplateColumn.CellTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Ware.WareGroup.Tier, Mode=OneTime}" VerticalAlignment="Center"/>
-                    </DataTemplate>
-                </DataGridTemplateColumn.CellTemplate>
-            </DataGridTemplateColumn>
-
-
-            <!-- 製品名 -->
-            <DataGridTemplateColumn
                 Header="階級"
-                SortMemberPath="Ware.Name"
-                ClipboardContentBinding="{Binding Ware.Name, Mode=OneTime}"
-                >
+                SortMemberPath="Ware.WareGroup.Tier">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding Ware.Name, Mode=OneTime}" VerticalAlignment="Center"/>
+                        <TextBlock VerticalAlignment="Center" Text="{Binding Ware.WareGroup.Tier, Mode=OneTime}" />
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
-            
-            
-            <!-- 1時間あたりの個数 -->
+
+
+            <!--  製品名  -->
             <DataGridTemplateColumn
-                Header="個数/h"
-                CellStyle="{StaticResource LossEmphasisStyle}"
-                SortMemberPath="Count"
-                ClipboardContentBinding="{Binding Count, Mode=OneTime}">
+                ClipboardContentBinding="{Binding Ware.Name, Mode=OneTime}"
+                Header="階級"
+                SortMemberPath="Ware.Name">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding Count, Mode=OneTime}" VerticalAlignment="Center"/>
+                        <TextBlock VerticalAlignment="Center" Text="{Binding Ware.Name, Mode=OneTime}" />
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
 
 
-            <!-- 金額 -->
-            <x4cmn:MouseHoverEditCellColumn
-                Header="金額"
-                SortMemberPath="Price"
+            <!--  1時間あたりの個数  -->
+            <DataGridTemplateColumn
+                CellStyle="{StaticResource LossEmphasisStyle}"
+                ClipboardContentBinding="{Binding Count, Mode=OneTime}"
+                Header="個数/h"
+                SortMemberPath="Count">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <TextBlock VerticalAlignment="Center" Text="{Binding Count, Mode=OneTime}" />
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+
+
+            <!--  金額  -->
+            <DataGridTemplateColumn
                 ClipboardContentBinding="{Binding Price, Mode=OneTime}"
-                >
+                Header="金額"
+                SortMemberPath="Price">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding Price, StringFormat='{}{0:N0} cr', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Right" TextDecorations="Underline"/>
+                        <TextBlock
+                            Text="{Binding Price, StringFormat='{}{0:N0} cr', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                            TextAlignment="Right"
+                            TextDecorations="Underline" />
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
                 <DataGridTemplateColumn.CellEditingTemplate>
                     <DataTemplate>
-                        <xctk:IntegerUpDown ClipValueToMinMax="True" Value="{Binding Price, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Increment="{Binding Count, Mode=OneTime}"/>
+                        <xctk:IntegerUpDown
+                            ClipValueToMinMax="True"
+                            FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
+                            Increment="{Binding Count, Mode=OneTime}"
+                            Value="{Binding Price, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </DataTemplate>
                 </DataGridTemplateColumn.CellEditingTemplate>
-            </x4cmn:MouseHoverEditCellColumn>
+            </DataGridTemplateColumn>
 
-            
-            <!--単価-->
-            <x4cmn:MouseHoverEditCellColumn
-                Header="単価"
-                SortMemberPath="UnitPrice"
+
+            <!--  単価  -->
+            <DataGridTemplateColumn
                 ClipboardContentBinding="{Binding UnitPrice, Mode=OneTime}"
-                >
+                Header="単価"
+                SortMemberPath="UnitPrice">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding UnitPrice, StringFormat='{}{0:N0} cr', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Right" TextDecorations="Underline"/>
+                        <TextBlock
+                            Text="{Binding UnitPrice, StringFormat='{}{0:N0} cr', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                            TextAlignment="Right"
+                            TextDecorations="Underline" />
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
                 <DataGridTemplateColumn.CellEditingTemplate>
                     <DataTemplate>
-                        <xctk:IntegerUpDown ClipValueToMinMax="True" Value="{Binding UnitPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Minimum="{Binding Ware.MinPrice}" Maximum="{Binding Ware.MaxPrice}"/>
+                        <xctk:IntegerUpDown
+                            ClipValueToMinMax="True"
+                            FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
+                            Maximum="{Binding Ware.MaxPrice}"
+                            Minimum="{Binding Ware.MinPrice}"
+                            Value="{Binding UnitPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </DataTemplate>
                 </DataGridTemplateColumn.CellEditingTemplate>
-            </x4cmn:MouseHoverEditCellColumn>
+            </DataGridTemplateColumn>
 
-            
-            <!--単価(スライダー)-->
+
+            <!--  単価(スライダー)  -->
             <DataGridTemplateColumn MinWidth="100">
-                <!--ヘッダのスタイル定義-->
+                <!--  ヘッダのスタイル定義  -->
                 <DataGridTemplateColumn.HeaderStyle>
                     <Style TargetType="DataGridColumnHeader">
-                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                        <Setter Property="Padding" Value="0"/>
+                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="Padding" Value="0" />
                     </Style>
                 </DataGridTemplateColumn.HeaderStyle>
 
-                <!--ヘッダの内容定義-->
+                <!--  ヘッダの内容定義  -->
                 <DataGridTemplateColumn.Header>
                     <DockPanel>
                         <Slider
                             DockPanel.Dock="Left"
-                            Minimum="1"
                             Maximum="100"
+                            Minimum="1"
                             TickFrequency="1"
-                            Value="{Binding Data, Source={StaticResource ProxyUnitPricePercent}}"/>
+                            Value="{Binding Data, Source={StaticResource ProxyUnitPricePercent}}" />
                     </DockPanel>
                 </DataGridTemplateColumn.Header>
 
-                <!--セルの内容定義-->
+                <!--  セルの内容定義  -->
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
                         <Slider
-                            Value="{Binding UnitPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                            Minimum="{Binding Ware.MinPrice}"
                             Maximum="{Binding Ware.MaxPrice}"
-                            />
+                            Minimum="{Binding Ware.MinPrice}"
+                            Value="{Binding UnitPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
         </DataGrid.Columns>
 
-        <!-- 行の詳細表示用 -->
+        <!--  行の詳細表示用  -->
         <DataGrid.RowDetailsTemplate>
             <DataTemplate>
-                <ContentControl Content="{StaticResource DetailsListView}" DataContext="{Binding Details, Mode=OneTime}"/>
+                <ContentControl Content="{StaticResource DetailsListView}" DataContext="{Binding Details, Mode=OneTime}" />
             </DataTemplate>
         </DataGrid.RowDetailsTemplate>
     </DataGrid>

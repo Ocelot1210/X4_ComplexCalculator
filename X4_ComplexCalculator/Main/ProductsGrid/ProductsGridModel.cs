@@ -54,58 +54,30 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// <returns></returns>
         private async Task OnModulePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            // モジュール数変更時のみ処理
+            // モジュール数変更時以外は処理しない
             if (e.PropertyName != "ModuleCount")
             {
                 await Task.CompletedTask;
                 return;
             }
 
-            if(sender is ModulesGridItem module)
+            if(!(sender is ModulesGridItem module))
             {
-                switch (module.Module.ModuleType.ModuleTypeID)
-                {
-                    case "production":
-                        OnProductionModuleCountChanged(module);
-                        break;
+                await Task.CompletedTask;
+                return;
+            }
 
-                    case "habitation":
-                        OnHabitationModuleCountChanged(module);
-                        break;
-
-                    default:
-                        break;
-                }
-
+            // 製造モジュールか居住モジュールの場合のみ更新
+            if (module.Module.ModuleType.ModuleTypeID == "production" ||
+                module.Module.ModuleType.ModuleTypeID == "habitation"
+                )
+            {
+                UpdateProducts();
             }
 
             await Task.CompletedTask;
         }
 
-        /// <summary>
-        /// 製造モジュール数変更時
-        /// </summary>
-        /// <param name="module"></param>
-        private void OnProductionModuleCountChanged(ModulesGridItem module)
-        {
-            // 処理対象モジュール一覧
-            ProductionModuleInfo[] modules = GetProductionModules();
-
-            double efficiency = CalcEfficiency(modules);
-        }
-
-
-        /// <summary>
-        /// 居住モジュール数変更時
-        /// </summary>
-        /// <param name="module"></param>
-        private void OnHabitationModuleCountChanged(ModulesGridItem module)
-        {
-            // 処理対象モジュール一覧
-            ProductionModuleInfo[] modules = GetProductionModules();
-
-            double efficiency = CalcEfficiency(modules);
-        }
 
         /// <summary>
         /// 処理対象モジュール一覧取得
@@ -258,7 +230,6 @@ FROM
     WareProduction,
 	WareEffect,
 	ModuleProduct
-
 WHERE
 	WareProduction.WareID  = WareEffect.WareID AND
 	WareProduction.WareID  = ModuleProduct.WareID AND 
@@ -369,7 +340,7 @@ WHERE
             long workers = 0;
             long needWorkers = 0;
 
-            foreach(var module in modules.Select(x => x.Module))
+            foreach (var module in modules.Select(x => x.Module))
             {
                 needWorkers += module.MaxWorkers;
                 workers += module.WorkersCapacity;
@@ -398,7 +369,7 @@ WHERE
         private void SumProduct(SQLiteDataReader dr, object[] args)
         {
             var wareDict = (Dictionary<string, long>)args[0];
-            
+
 
             var wareID = dr["WareID"].ToString();
             var amount = (long)dr["Amount"];
@@ -416,10 +387,10 @@ WHERE
             }
 
             // 関連モジュール集計
-            var moduleDict  = (Dictionary<string, List<ProductDetailsListItem>>)args[1];
-            var moduleID    = (string)dr["ModuleID"];
+            var moduleDict = (Dictionary<string, List<ProductDetailsListItem>>)args[1];
+            var moduleID = (string)dr["ModuleID"];
             var moduleCount = (long)dr["Count"];
-            var efficiency  = (double)dr["Efficiency"];
+            var efficiency = (double)dr["Efficiency"];
 
             // このウェアに対して初回か？
             if (!moduleDict.ContainsKey(wareID))
@@ -483,7 +454,7 @@ WHERE
             {
                 modulesDict.Add(wareID, new List<ProductDetailsListItem>());
             }
-            
+
 
             // このウェアに対し、既にモジュールが追加されているか？
             var itm = modulesDict[wareID].Where(x => x.ModuleID == moduleID);

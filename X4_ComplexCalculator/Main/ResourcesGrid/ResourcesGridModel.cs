@@ -8,6 +8,7 @@ using X4_ComplexCalculator.Main.ModulesGrid;
 using System.Collections.Specialized;
 using System.Threading.Tasks;
 using X4_ComplexCalculator.Common.Collection;
+using System.ComponentModel;
 
 namespace X4_ComplexCalculator.Main.ResourcesGrid
 {
@@ -41,11 +42,34 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
             Resources = new SmartCollection<ResourcesGridItem>();
             Modules = modules;
             modules.OnCollectionChangedAsync += OnModulesChanged;
+            modules.OnPropertyChangedAsync += OnModulesPropertyChanged;
         }
 
+        /// <summary>
+        /// モジュールのプロパティ変更時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        private async Task OnModulesPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            // 建造に必要なリソース集計用
+            var resourcesDict = new Dictionary<string, long>();
+
+            Task.WaitAll(
+                // モジュールの建造に必要なリソースを集計
+                AggregateModuleResources(Modules, resourcesDict),
+
+                // モジュールの装備の建造に必要なリソースを集計
+                AggregateEquipmentResources(Modules, resourcesDict)
+            );
+
+            Resources.Reset(resourcesDict.Select(x => new ResourcesGridItem(x.Key, x.Value)).OrderBy(x => x.Ware.Name));
+            await Task.CompletedTask;
+        }
 
         /// <summary>
-        /// 必要リソース更新
+        /// モジュール一覧変更時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -84,13 +108,15 @@ FROM
     ModuleResource
 
 WHERE
-    ModuleID = :moduleID";
+    ModuleID = :moduleID AND
+    Method   = :method";
 
-            var sqlParam = new SQLiteCommandParameters(2);
+            var sqlParam = new SQLiteCommandParameters(3);
             foreach (ModulesGridItem mgi in modules)
             {
                 sqlParam.Add("count", DbType.Int32, mgi.ModuleCount);
                 sqlParam.Add("moduleID", DbType.String, mgi.Module.ModuleID);
+                sqlParam.Add("method", DbType.String, mgi.SelectedMethod.Method);
             }
 
             DBConnection.X4DB.ExecQuery(query, sqlParam, SumResource, resourcesDict);

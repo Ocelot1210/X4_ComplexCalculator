@@ -165,7 +165,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
             Ware = new Ware(wareID);
             Count = count;
             _IsExpanded = isExpanded;
-            UnitPrice = (price != 0)? price : (Ware.MinPrice + Ware.MaxPrice) / 2;
+            UnitPrice = (price != 0) ? price : (Ware.MinPrice + Ware.MaxPrice) / 2;
             Price = Count * UnitPrice;
             Details = datails.ToArray();
         }

@@ -38,15 +38,52 @@ namespace X4_ComplexCalculator.Main.StoragesGrid
         {
             Modules = modules;
             modules.OnCollectionChangedAsync += OnModulesChanged;
+            modules.OnPropertyChangedAsync += OnModulePropertyChanged;
+        }
+
+
+        private async Task OnModulePropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            // モジュール数変更時のみ処理
+            if (e.PropertyName != "ModuleCount")
+            {
+                await Task.CompletedTask;
+                return;
+            }
+
+
+            if (!(sender is ModulesGridItem module))
+            {
+                await Task.CompletedTask;
+                return;
+            }
+
+            // 保管モジュールの場合のみ更新
+            if (module.Module.ModuleType.ModuleTypeID == "storage")
+            {
+                UpdateStorages();
+            }
+
+            await Task.CompletedTask;
         }
 
 
         /// <summary>
-        /// 保管庫更新
+        /// モジュール一覧変更時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private async Task OnModulesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            UpdateStorages();
+            await Task.CompletedTask;
+        }
+
+
+        /// <summary>
+        /// 保管庫情報更新
+        /// </summary>
+        private void UpdateStorages()
         {
             var modules = Modules.AsParallel()
                                  .Where(x => x.Module.ModuleType.ModuleTypeID == "storage")
@@ -92,23 +129,20 @@ WHERE
             // 容量をタイプ別に集計
             DBConnection.X4DB.ExecQuery(query, sqlParam, SumStorage, transportDict, modulesDict);
 
-            // 前回値保
+            // 前回値保存
             var backup = Storages.ToDictionary(x => x.TransportType.TransportTypeID, x => x.IsExpanded);
 
             // コレクションに設定
             Storages.Reset(transportDict.Select(x =>
-                {
-                    var details = modulesDict[x.Key].OrderBy(x => x.ModuleName).ToArray();
-                    return backup.TryGetValue(x.Key, out bool expanded)
-                        ? new StoragesGridItem(x.Key, x.Value, details, expanded)
-                        : new StoragesGridItem(x.Key, x.Value, details);
-                })
+            {
+                var details = modulesDict[x.Key].OrderBy(x => x.ModuleName).ToArray();
+                return backup.TryGetValue(x.Key, out bool expanded)
+                    ? new StoragesGridItem(x.Key, x.Value, details, expanded)
+                    : new StoragesGridItem(x.Key, x.Value, details);
+            })
                 .OrderBy(x => x.TransportType.Name)
             );
-
-            await Task.CompletedTask;
         }
-
 
         /// <summary>
         /// 保管庫の容量を集計
