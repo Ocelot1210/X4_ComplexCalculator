@@ -23,11 +23,11 @@ namespace X4_ComplexCalculator
             ContentRendered += (object sender, EventArgs e) => { DBConnection.Open(); };
             
 
-            var moduleModel = new ModulesGridModel(this);
-            var productsModel = new ProductsGridModel(moduleModel.Modules);
+            var moduleModel    = new ModulesGridModel(this);
+            var productsModel  = new ProductsGridModel(moduleModel.Modules);
             var resourcesModel = new ResourcesGridModel(moduleModel.Modules);
 
-            Summary.DataContext  = new StationSummaryViewModel(moduleModel.Modules);
+            Summary.DataContext  = new StationSummaryViewModel(moduleModel.Modules, productsModel.Products, resourcesModel.Resources);
             Modules.DataContext  = new ModulesGridViewModel(moduleModel, (CollectionViewSource)Modules.Resources["ModulesViewSource"]);
             Products.DataContext = new ProductsGridViewModel(productsModel);
             Build.DataContext    = new ResourcesGridViewModel(resourcesModel);

@@ -28,7 +28,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// <summary>
         /// 製品一覧
         /// </summary>
-        public SmartCollection<ProductsGridItem> Products { get; private set; }
+        public MemberChangeDetectCollection<ProductsGridItem> Products { get; private set; }
         #endregion
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// <param name="moduleGridModel">モジュール一覧</param>
         public ProductsGridModel(MemberChangeDetectCollection<ModulesGridItem> modules)
         {
-            Products = new SmartCollection<ProductsGridItem>();
+            Products = new MemberChangeDetectCollection<ProductsGridItem>();
 
             modules.OnCollectionChangedAsync += OnModulesChanged;
             modules.OnPropertyChangedAsync += OnModulePropertyChanged;
@@ -199,8 +199,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
                                     return backup.TryGetValue(x.Key, out bak)
                                         ? new ProductsGridItem(x.Key, x.Value, details, bak.IsExpanded, bak.UnitPrice)
                                         : new ProductsGridItem(x.Key, x.Value, details);
-                                }
-            );
+                                });
 
 
             Products.Reset(items.OrderBy(x => x.Ware.WareGroup.Tier).ThenBy(x => x.Ware.Name));
@@ -328,30 +327,6 @@ WHERE
             DBConnection.X4DB.ExecQuery(query, param, SumResource, wareDict, moduleDict);
 
             await Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// 生産性を計算
-        /// </summary>
-        /// <param name="modules">モジュール一覧</param>
-        /// <returns>倍率</returns>
-        private double CalcEffeciency(IEnumerable<ModulesGridItem> modules)
-        {
-            long workers = 0;
-            long needWorkers = 0;
-
-            foreach (var module in modules.Select(x => x.Module))
-            {
-                needWorkers += module.MaxWorkers;
-                workers += module.WorkersCapacity;
-            }
-
-            if (needWorkers == 0)
-            {
-                return 0.0;
-            }
-
-            return (needWorkers < workers) ? 1.0 : (double)workers / needWorkers;
         }
 
 

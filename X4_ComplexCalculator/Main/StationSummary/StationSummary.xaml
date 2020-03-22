@@ -14,8 +14,20 @@
     <ScrollViewer HorizontalScrollBarVisibility="Auto">
         <StackPanel Orientation="Vertical">
             <!--  労働力  -->
-            <Expander Header="{Binding WorkforceTitle}">
-                <DataGridInline:InlineListView ItemsSource="{Binding WorkforceDetails, IsAsync=True}" Style="{StaticResource DefaultListView}">
+            <Expander>
+                <Expander.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="労働力 = [" />
+                        <TextBlock Text="{Binding WorkForce, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat={StaticResource DefaultNumericFormat}}" />
+                        <TextBlock Text="/" />
+                        <TextBlock Text="{Binding NeedWorkforce, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat={StaticResource DefaultNumericFormat}}" />
+                        <TextBlock Text="]" />
+                    </StackPanel>
+                </Expander.Header>
+                <DataGridInline:InlineListView
+                    ItemContainerStyle="{StaticResource NoHighlightListViewItem}"
+                    ItemsSource="{Binding WorkforceDetails, IsAsync=True}"
+                    Style="{StaticResource DefaultListView}">
                     <ListView.View>
                         <GridView>
 
@@ -26,10 +38,10 @@
                                 SortTargetPropertyName="ModuleName" />
 
                             <!--  モジュール数  -->
-                            <DataGridInline:InlineGridViewColumn Header="数" SortTargetPropertyName="ModuleCount">
+                            <DataGridInline:InlineGridViewColumn Header="モジュール数" SortTargetPropertyName="ModuleCount">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding ModuleCount, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
+                                        <TextBlock Text="{Binding ModuleCount, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </DataGridInline:InlineGridViewColumn>
@@ -38,7 +50,7 @@
                             <DataGridInline:InlineGridViewColumn Header="労働者数" SortTargetPropertyName="WorkForce">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding WorkForce, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
+                                        <TextBlock Text="{Binding WorkForce, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </DataGridInline:InlineGridViewColumn>
@@ -47,7 +59,7 @@
                             <DataGridInline:InlineGridViewColumn Header="総働者数" SortTargetPropertyName="TotalWorkforce">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding TotalWorkforce, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
+                                        <TextBlock Text="{Binding TotalWorkforce, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </DataGridInline:InlineGridViewColumn>
@@ -56,17 +68,107 @@
                 </DataGridInline:InlineListView>
             </Expander>
 
-            <!--  1hあたりの利益  -->
-            <Expander Header="{Binding ProfitPerHourTitle}">
-                <DataGridInline:InlineListView ItemsSource="{Binding ProfitDetails}" Style="{StaticResource DefaultListView}">
+            <!--  1hあたりの損益  -->
+            <Expander>
+                <Expander.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="1時間あたりの損益 = " />
+                        <TextBlock Text="{Binding Profit, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat={StaticResource DefaultNumericFormat}}" />
+                    </StackPanel>
+                </Expander.Header>
+                <DataGridInline:InlineListView
+                    ItemContainerStyle="{StaticResource NoHighlightListViewItem}"
+                    ItemsSource="{Binding ProfitDetails}"
+                    Style="{StaticResource DefaultListView}">
                     <ListView.View>
-                        <GridView />
+                        <GridView>
+                            <!--  ウェア名  -->
+                            <DataGridInline:InlineGridViewColumn
+                                DisplayMemberBinding="{Binding WareName, Mode=OneTime}"
+                                Header="ウェア名"
+                                SortTargetPropertyName="WareName" />
+
+                            <!--  数量  -->
+                            <DataGridInline:InlineGridViewColumn Header="数量" SortTargetPropertyName="Count">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Count, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </DataGridInline:InlineGridViewColumn>
+
+                            <!--  単価  -->
+                            <DataGridInline:InlineGridViewColumn Header="単価" SortTargetPropertyName="UnitPrice">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding UnitPrice, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:N0} cr'}" TextAlignment="Right" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </DataGridInline:InlineGridViewColumn>
+
+                            <!--  価格  -->
+                            <DataGridInline:InlineGridViewColumn Header="金額" SortTargetPropertyName="TotalPrice">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding TotalPrice, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:N0} cr'}" TextAlignment="Right" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </DataGridInline:InlineGridViewColumn>
+                        </GridView>
                     </ListView.View>
                 </DataGridInline:InlineListView>
             </Expander>
 
             <!--  建造コスト  -->
-            <Expander Header="{Binding ConstructionCostsTitle}" />
+            <Expander>
+                <Expander.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="建造コスト = " />
+                        <TextBlock Text="{Binding BuildingCost, StringFormat='{}{0:N0} cr'}" />
+                    </StackPanel>
+                </Expander.Header>
+                <DataGridInline:InlineListView
+                    ItemContainerStyle="{StaticResource NoHighlightListViewItem}"
+                    ItemsSource="{Binding BuildingCostDetails}"
+                    Style="{StaticResource DefaultListView}">
+                    <ListView.View>
+                        <GridView>
+                            <!--  ウェア名  -->
+                            <DataGridInline:InlineGridViewColumn
+                                DisplayMemberBinding="{Binding WareName, Mode=OneTime}"
+                                Header="ウェア名"
+                                SortTargetPropertyName="WareName" />
+
+                            <!--  数量  -->
+                            <DataGridInline:InlineGridViewColumn Header="数量" SortTargetPropertyName="Count">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Count, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </DataGridInline:InlineGridViewColumn>
+
+                            <!--  単価  -->
+                            <DataGridInline:InlineGridViewColumn Header="単価" SortTargetPropertyName="UnitPrice">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding UnitPrice, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:N0} cr'}" TextAlignment="Right" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </DataGridInline:InlineGridViewColumn>
+
+                            <!--  価格  -->
+                            <DataGridInline:InlineGridViewColumn Header="金額" SortTargetPropertyName="TotalPrice">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding TotalPrice, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:N0} cr'}" TextAlignment="Right" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </DataGridInline:InlineGridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </DataGridInline:InlineListView>
+            </Expander>
         </StackPanel>
     </ScrollViewer>
 

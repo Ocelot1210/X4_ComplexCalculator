@@ -158,24 +158,13 @@
             <DataGridTemplateColumn
                 ClipboardContentBinding="{Binding Price, Mode=OneTime}"
                 Header="金額"
+                IsReadOnly="True"
                 SortMemberPath="Price">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
-                        <TextBlock
-                            Text="{Binding Price, StringFormat='{}{0:N0} cr', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                            TextAlignment="Right"
-                            TextDecorations="Underline" />
+                        <TextBlock Text="{Binding Price, StringFormat='{}{0:N0} cr', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Right" />
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
-                <DataGridTemplateColumn.CellEditingTemplate>
-                    <DataTemplate>
-                        <xctk:IntegerUpDown
-                            ClipValueToMinMax="True"
-                            FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
-                            Increment="{Binding Count, Mode=OneTime}"
-                            Value="{Binding Price, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    </DataTemplate>
-                </DataGridTemplateColumn.CellEditingTemplate>
             </DataGridTemplateColumn>
 
 

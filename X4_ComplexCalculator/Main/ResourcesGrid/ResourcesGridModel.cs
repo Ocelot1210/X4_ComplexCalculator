@@ -29,7 +29,7 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         /// <summary>
         /// 建造に必要なリソース
         /// </summary>
-        public SmartCollection<ResourcesGridItem> Resources { get; private set; }
+        public MemberChangeDetectCollection<ResourcesGridItem> Resources { get; private set; }
         #endregion
 
 
@@ -39,7 +39,7 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         /// <param name="moduleGridModel">モジュール一覧</param>
         public ResourcesGridModel(MemberChangeDetectCollection<ModulesGridItem> modules)
         {
-            Resources = new SmartCollection<ResourcesGridItem>();
+            Resources = new MemberChangeDetectCollection<ResourcesGridItem>();
             Modules = modules;
             modules.OnCollectionChangedAsync += OnModulesChanged;
             modules.OnPropertyChangedAsync += OnModulesPropertyChanged;

@@ -242,7 +242,7 @@
                 </DataGridTemplateColumn>
 
                 <!--  建造方式  -->
-                <x4cmn:MouseHoverEditCellColumn
+                <DataGridTemplateColumn
                     ClipboardContentBinding="{Binding SelectedMethod.Method, Mode=OneTime}"
                     Header="建造方式"
                     SortMemberPath="SelectedMethod.Method">
@@ -269,7 +269,7 @@
                                 Visibility="{Binding SelectedMethodVisiblity, Mode=OneTime}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
-                </x4cmn:MouseHoverEditCellColumn>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
     </DockPanel>

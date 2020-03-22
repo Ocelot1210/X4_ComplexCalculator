@@ -1,39 +1,64 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SQLite;
-using System.Text;
-using X4_ComplexCalculator.DB;
+﻿using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB.X4DB;
 
-namespace X4_ComplexCalculator.Main.StationSummary
+namespace X4_ComplexCalculator.Main.StationSummary.WorkForce
 {
     /// <summary>
     /// 労働力用ListVierのアイテム
     /// </summary>
-    class WorkForceDetailsItem
+    class WorkForceDetailsItem : INotifyPropertyChangedBace
     {
+        #region メンバ
+        /// <summary>
+        /// モジュール数
+        /// </summary>
+        private long _ModuleCount;
+        #endregion
+
+
+        #region プロパティ
+        /// <summary>
+        /// モジュールID
+        /// </summary>
+        public string ModuleID { get; }
+
         /// <summary>
         /// モジュール名
         /// </summary>
-        public string ModuleName { get; private set; }
+        public string ModuleName { get; }
 
 
         /// <summary>
         /// モジュール数
         /// </summary>
-        public long ModuleCount { get; private set; }
+        public long ModuleCount
+        {
+            get
+            {
+                return _ModuleCount;
+            }
+            set
+            {
+                if (_ModuleCount != value)
+                {
+                    _ModuleCount = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged("TotalWorkforce");
+                }
+            }
+        }
 
 
         /// <summary>
         /// 必要労働力
         /// </summary>
-        public long MaxWorkers { get; private set; } = 0;
+        public long MaxWorkers { get; }
 
 
         /// <summary>
         /// 収容人数
         /// </summary>
-        public long WorkersCapacity { get; private set; } = 0;
+        public long WorkersCapacity { get; }
 
 
         /// <summary>
@@ -46,6 +71,7 @@ namespace X4_ComplexCalculator.Main.StationSummary
         /// 総労働者数
         /// </summary>
         public long TotalWorkforce => ModuleCount * WorkForce;
+        #endregion
 
 
         /// <summary>
@@ -55,8 +81,9 @@ namespace X4_ComplexCalculator.Main.StationSummary
         /// <param name="moduleCount">モジュール数</param>
         public WorkForceDetailsItem(Module module, long moduleCount)
         {
+            ModuleID = module.ModuleID;
             ModuleName = module.Name;
-            ModuleCount = moduleCount;
+            _ModuleCount = moduleCount;
             MaxWorkers = module.MaxWorkers;
             WorkersCapacity = module.WorkersCapacity;
         }

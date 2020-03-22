@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
+﻿using System.Collections.ObjectModel;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.ModulesGrid;
+using X4_ComplexCalculator.Main.StationSummary.WorkForce;
+using X4_ComplexCalculator.Main.StationSummary.Profit;
 using X4_ComplexCalculator.Main.ProductsGrid;
 using X4_ComplexCalculator.Main.ResourcesGrid;
-using X4_ComplexCalculator.Main.StoragesGrid;
+using System.ComponentModel;
+using X4_ComplexCalculator.Main.StationSummary.BuildingCost;
 
 namespace X4_ComplexCalculator.Main.StationSummary
 {
@@ -17,14 +17,30 @@ namespace X4_ComplexCalculator.Main.StationSummary
         /// <summary>
         /// 労働力用Model
         /// </summary>
-        private readonly StationSummaryWorkForceModel WorkForceModel;
+        private readonly WorkForceModel WorkForceModel;
+
+        /// <summary>
+        /// 利益用Model
+        /// </summary>
+        private readonly ProfitModel ProfitModel;
+
+        /// <summary>
+        /// 建造コスト用Model
+        /// </summary>
+        private readonly BuildingCostModel BuildingCostModel;
         #endregion
 
-        #region 労働力関連
+
+        #region 労働力関連プロパティ
         /// <summary>
-        /// 労働力のタイトル
+        /// 現在の労働力
         /// </summary>
-        public string WorkforceTitle => $"労働力[{WorkForceModel.WorkForce}/{WorkForceModel.NeedWorkforce}]";
+        public long WorkForce => WorkForceModel.WorkForce;
+
+        /// <summary>
+        /// 必要労働力
+        /// </summary>
+        public long NeedWorkforce => WorkForceModel.NeedWorkforce;
 
         /// <summary>
         /// 労働力情報詳細
@@ -33,31 +49,58 @@ namespace X4_ComplexCalculator.Main.StationSummary
         #endregion
 
 
+        #region 損益関連プロパティ
         /// <summary>
-        /// 1時間あたりの利益
+        /// 1時間あたりの損益
         /// </summary>
-        public string ProfitPerHourTitle => "1時間あたりの利益[1000cr]";
+        public long Profit => ProfitModel.Profit;
+
+        /// <summary>
+        /// 損益詳細
+        /// </summary>
+        public ObservableCollection<ProfitDetailsItem> ProfitDetails => ProfitModel.ProfitDetails;
+        #endregion
 
 
+        #region 建造コスト関連プロパティ
         /// <summary>
         /// 建造費用
         /// </summary>
-        public string ConstructionCostsTitle => "建造費用[1000 cr]";
+        public long BuildingCost => BuildingCostModel.BuildingCost;
 
+
+        /// <summary>
+        /// 建造コスト詳細
+        /// </summary>
+        public ObservableCollection<BuildingCostDetailsItem> BuildingCostDetails => BuildingCostModel.BuildingCostDetails;
+        #endregion
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="moduleGridModel">モジュール一覧</param>
-        public StationSummaryViewModel(MemberChangeDetectCollection<ModulesGridItem> modules)
+        /// <param name="modules">モジュール一覧</param>
+        /// <param name="products">製品一覧</param>
+        /// <param name="resources">建造に必要なリソース一覧</param>
+        public StationSummaryViewModel(MemberChangeDetectCollection<ModulesGridItem> modules, MemberChangeDetectCollection<ProductsGridItem> products, MemberChangeDetectCollection<ResourcesGridItem> resources)
         {
-            WorkForceModel = new StationSummaryWorkForceModel(modules);
-            WorkForceModel.PropertyChanged += WorkForceModel_PropertyChanged;
+            WorkForceModel = new WorkForceModel(modules);
+            WorkForceModel.PropertyChanged += ModelPropertyChanged;
+
+            ProfitModel = new ProfitModel(products);
+            ProfitModel.PropertyChanged += ModelPropertyChanged;
+
+            BuildingCostModel = new BuildingCostModel(resources);
+            BuildingCostModel.PropertyChanged += ModelPropertyChanged;
         }
 
-        private void WorkForceModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        /// <summary>
+        /// Modelのプロパティ変更時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ModelPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            OnPropertyChanged("WorkforceTitle");
+            OnPropertyChanged(e.PropertyName);
         }
     }
 }

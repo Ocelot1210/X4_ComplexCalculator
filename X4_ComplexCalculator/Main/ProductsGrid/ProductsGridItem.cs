@@ -13,11 +13,6 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
     {
         #region メンバ
         /// <summary>
-        /// 金額
-        /// </summary>
-        private long _Price;
-
-        /// <summary>
         /// 単価
         /// </summary>
         private long _UnitPrice;
@@ -51,24 +46,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// <summary>
         /// 金額
         /// </summary>
-        public long Price
-        {
-            get
-            {
-                return _Price;
-            }
-            set
-            {
-                UnitPrice = (long)Math.Round((double)value / Count);
-
-                var price = UnitPrice * Count;
-                if (_Price != price)
-                {
-                    _Price = price;
-                    OnPropertyChanged();
-                }
-            }
-        }
+        public long Price => UnitPrice * Count;
 
 
         /// <summary>
@@ -107,8 +85,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
                     _UnitPrice = value;
                 }
                 OnPropertyChanged();
-
-                Price = _UnitPrice * Count;
+                OnPropertyChanged("Price");
             }
         }
 
@@ -166,7 +143,6 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
             Count = count;
             _IsExpanded = isExpanded;
             UnitPrice = (price != 0) ? price : (Ware.MinPrice + Ware.MaxPrice) / 2;
-            Price = Count * UnitPrice;
             Details = datails.ToArray();
         }
     }
