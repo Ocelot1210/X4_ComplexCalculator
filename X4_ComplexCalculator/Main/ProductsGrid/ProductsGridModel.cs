@@ -249,7 +249,9 @@ WHERE
 			) THEN ModuleProduct.Method
 			ELSE 'default'
 		END
--- ■ 生産に必要なウェアを連結
+
+-- 生産に必要なウェアを連結
+
 UNION ALL
 SELECT
 	NeedWareID AS 'WareID',
@@ -266,7 +268,8 @@ WHERE
 	WareProduction.WareID  = ModuleProduct.WareID  AND
 	WareResource.WareID    = WareProduction.WareID AND
 	ModuleProduct.ModuleID = :moduleID AND
-    WareResource.Method    = WareProduction.Method
+    WareResource.Method    = WareProduction.Method AND
+    WareResource.Method    = ModuleProduct.Method
 ";
 
             DBConnection.X4DB.ExecQuery(query, param, SumProduct, wareDict, moduleDict);

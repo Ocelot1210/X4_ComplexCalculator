@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using X4_ComplexCalculator.Common;
+using System.Linq;
 
 namespace X4_ComplexCalculator.Main.ResourcesGrid
 {
@@ -40,7 +41,7 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
             {
                 _UnitPricePercent = (long)value;
 
-                foreach (var resource in BuildResource)
+                foreach (var resource in BuildResource.Where(x => x.IsSelected))
                 {
                     resource.SetUnitPricePercent(_UnitPricePercent);
                 }

@@ -1,103 +1,160 @@
-﻿<Window x:Class="X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EditEquipmentWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:X4_ComplexCalculator.Main.ModulesGrid.EditEquipment"
-        xmlns:eqlst="clr-namespace:X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList"
-        xmlns:xctk="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
-        mc:Ignorable="d"
-        x:Name="window"
-        Title="兵装編集画面" Height="450" Width="800" ResizeMode="NoResize" WindowStyle="ToolWindow"
-        Style="{StaticResource DefaultWindowBackgroundStyle}">
+﻿<Window
+    x:Class="X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EditEquipmentWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:eqlst="clr-namespace:X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList"
+    xmlns:local="clr-namespace:X4_ComplexCalculator.Main.ModulesGrid.EditEquipment"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:xctk="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+    x:Name="window"
+    Title="兵装編集画面"
+    Width="800"
+    Height="450"
+    ResizeMode="NoResize"
+    Style="{StaticResource DefaultWindowBackgroundStyle}"
+    WindowStyle="ToolWindow"
+    mc:Ignorable="d">
 
     <Window.Resources>
         <Style x:Key="DefaultTextStyle" TargetType="{x:Type Label}">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Height" Value="18"/>
-            <Setter Property="Padding" Value="0"/>
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Height" Value="18" />
+            <Setter Property="Padding" Value="0" />
         </Style>
     </Window.Resources>
 
     <Grid>
 
-        <!-- 行列定義 -->
+        <!--  行列定義  -->
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="1*" />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="50" />
+            <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
 
-        <!-- モジュール名 -->
-        <StackPanel Grid.Column="0" Grid.Row="0" Margin="5">
-            <Label Content="モジュール名" Name="moduleNameLabel" Style="{StaticResource DefaultTextStyle}"/>
-            <TextBox Text="{Binding ModuleName, Mode=OneWay}" TextAlignment="Left" IsReadOnly="True"/>
+        <!--  モジュール名  -->
+        <StackPanel
+            Grid.Row="0"
+            Grid.Column="0"
+            Margin="5">
+            <Label
+                Name="moduleNameLabel"
+                Content="モジュール名"
+                Style="{StaticResource DefaultTextStyle}" />
+            <TextBox
+                IsReadOnly="True"
+                Text="{Binding ModuleName, Mode=OneWay}"
+                TextAlignment="Left" />
         </StackPanel>
 
-        <!-- 装備サイズ -->
-        <StackPanel Grid.Column="1" Grid.Row="0" Margin="5">
-            <Label Content="装備サイズ" Style="{StaticResource DefaultTextStyle}"/>
-            <ComboBox Name="SizeComboBox" Height="20" ItemsSource="{Binding EquipmentSizes}" DisplayMemberPath="Name" SelectedIndex="0"/>
+        <!--  装備サイズ  -->
+        <StackPanel
+            Grid.Row="0"
+            Grid.Column="1"
+            Margin="5">
+            <Label Content="装備サイズ" Style="{StaticResource DefaultTextStyle}" />
+            <ComboBox
+                Name="SizeComboBox"
+                DisplayMemberPath="Name"
+                ItemsSource="{Binding EquipmentSizes}"
+                SelectedIndex="0" />
         </StackPanel>
 
-        <!-- プリセット -->
-        <StackPanel Grid.Column="2" Grid.Row="0" Margin="5">
-            <Label Content="プリセット" Style="{StaticResource DefaultTextStyle}"/>
-            <ComboBox Grid.Row="0" Grid.Column="2" Height="20"/>
+        <!--  プリセット  -->
+        <StackPanel
+            Grid.Row="0"
+            Grid.Column="2"
+            Margin="5">
+            <Label Content="プリセット" Style="{StaticResource DefaultTextStyle}" />
+            <DockPanel>
+                <Button
+                    Width="20"
+                    Content="＋"
+                    DockPanel.Dock="Right" />
+
+                <Button
+                    Width="20"
+                    Content="💾"
+                    DockPanel.Dock="Right" />
+
+                <ComboBox
+                    x:Name="presetCombobox"
+                    Grid.Row="0"
+                    Grid.Column="2"
+                    Width="Auto"
+                    DisplayMemberPath="Name"
+                    DockPanel.Dock="Left"
+                    IsEditable="True"
+                    ItemsSource="{Binding Presets}"
+                    SelectedItem="{Binding SelectedPreset}" />
+
+            </DockPanel>
         </StackPanel>
 
-        <!-- 保存/キャンセル -->
-        <Grid Grid.Column="3" Grid.Row="0" Margin="5">
+        <!--  保存/キャンセル  -->
+        <Grid
+            Grid.Row="0"
+            Grid.Column="3"
+            Margin="5">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
 
             <Button
                 x:Name="SaveButton"
-                Content="保存"
+                Grid.Column="0"
                 Width="75"
                 Height="20"
-                Grid.Column="0"
                 Command="{Binding SaveButtonClickedCommand}"
                 CommandParameter="{Binding ElementName=window}"
-                />
+                Content="保存" />
             <Button
                 Grid.Column="1"
-                Content="キャンセル"
                 Width="{Binding ElementName=SaveButton, Path=Width}"
                 Height="{Binding ElementName=SaveButton, Path=Height}"
                 Command="{Binding CloseButtonClickedCommand}"
                 CommandParameter="{Binding ElementName=window}"
-                />
+                Content="キャンセル" />
         </Grid>
 
-        <!-- 絞り込み用チェックリストボックス -->
-        <DockPanel Grid.Column="0" Grid.Row="2" Margin="5, 0, 5, 5">
-            <Label Content="所有派閥" DockPanel.Dock="Top" VerticalAlignment="Bottom" Height="28"/>
+        <!--  絞り込み用チェックリストボックス  -->
+        <DockPanel
+            Grid.Row="2"
+            Grid.Column="0"
+            Margin="5,0,5,5">
+            <Label
+                Height="28"
+                VerticalAlignment="Bottom"
+                Content="所有派閥"
+                DockPanel.Dock="Top" />
             <xctk:CheckListBox
                 DisplayMemberPath="Faction.Name"
                 IsSelectAllActive="True"
-                SelectAllContent="全選択"
-                SelectedMemberPath="Checked"
                 ItemsSource="{Binding Factions}"
-                />
+                SelectAllContent="全選択"
+                SelectedMemberPath="Checked" />
         </DockPanel>
 
-        
-        <!-- 装備編集領域 -->
-        <TabControl Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="3" Margin="5 5 5 5">
+
+        <!--  装備編集領域  -->
+        <TabControl
+            Grid.Row="2"
+            Grid.Column="1"
+            Grid.ColumnSpan="3"
+            Margin="5,5,5,5">
             <TabItem Header="タレット">
-                <eqlst:EquipmentList x:Name="TurretsList" SelectedSize="{Binding SelectedValue, ElementName=SizeComboBox, UpdateSourceTrigger=PropertyChanged}"/>
+                <eqlst:EquipmentList x:Name="TurretsList" SelectedSize="{Binding SelectedValue, ElementName=SizeComboBox, UpdateSourceTrigger=PropertyChanged}" />
             </TabItem>
             <TabItem Header="シールド">
-                <eqlst:EquipmentList x:Name="ShieldsList" SelectedSize="{Binding SelectedValue, ElementName=SizeComboBox, UpdateSourceTrigger=PropertyChanged}"/>
+                <eqlst:EquipmentList x:Name="ShieldsList" SelectedSize="{Binding SelectedValue, ElementName=SizeComboBox, UpdateSourceTrigger=PropertyChanged}" />
             </TabItem>
         </TabControl>
 

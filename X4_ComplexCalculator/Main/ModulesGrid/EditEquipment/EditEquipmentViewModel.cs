@@ -46,6 +46,15 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
 
 
         /// <summary>
+        /// プリセット
+        /// </summary>
+        public ObservableCollection<PresetComboboxItem> Presets => Model.Presets;
+
+
+        public PresetComboboxItem SelectedPresets => Model.SelectedPreset;
+
+
+        /// <summary>
         /// 保存ボタンクリック
         /// </summary>
         public DelegateCommand<Window> SaveButtonClickedCommand { get; }
@@ -55,6 +64,18 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
         /// 閉じるボタンクリック時のコマンド
         /// </summary>
         public DelegateCommand<Window> CloseButtonClickedCommand { get; }
+
+
+        /// <summary>
+        /// プリセット保存
+        /// </summary>
+        public DelegateCommand SavePresetCommand { get; }
+
+
+        /// <summary>
+        /// プリセット追加
+        /// </summary>
+        public DelegateCommand AddPresetCommand { get; }
         #endregion
 
 
@@ -69,6 +90,8 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
             Model = new EditEquipmentModel(module);
             SaveButtonClickedCommand = new DelegateCommand<Window>(SavebuttonClicked);
             CloseButtonClickedCommand = new DelegateCommand<Window>(CloseButtonClicked);
+            SavePresetCommand = new DelegateCommand(Model.SavePreset);
+            AddPresetCommand = new DelegateCommand(Model.AddPreset);
         }
 
         /// <summary>

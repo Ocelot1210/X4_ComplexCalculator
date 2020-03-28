@@ -21,6 +21,7 @@
         x4cmn:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
         IsReadOnly="False"
         ItemsSource="{Binding Path=BuildResource, UpdateSourceTrigger=PropertyChanged, IsAsync=True}"
+        SelectionUnit="Cell"
         Style="{StaticResource DefaultDataGridStyle}">
         <DataGrid.Columns>
 

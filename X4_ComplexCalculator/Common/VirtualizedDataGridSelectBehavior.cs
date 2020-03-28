@@ -67,7 +67,7 @@ namespace X4_ComplexCalculator.Common
                 return;
             }
 
-            // 行選択モードでなければ何もしない
+            // セル選択モードでなければ何もしない
             if (dataGrid.SelectionUnit != DataGridSelectionUnit.Cell)
             {
                 return;

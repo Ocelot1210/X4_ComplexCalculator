@@ -30,6 +30,11 @@ namespace X4_ComplexCalculator.Main
         /// 開く
         /// </summary>
         public DelegateCommand Open { get; }
+
+        /// <summary>
+        /// DB更新
+        /// </summary>
+        public DelegateCommand UpdateDB { get; }
         #endregion
 
 
@@ -41,10 +46,11 @@ namespace X4_ComplexCalculator.Main
         /// <param name="storagesGridModel">建造リソース用Model</param>
         public MainWindowViewModel(ModulesGridModel modulesGridModel, ProductsGridModel productsGridModel, ResourcesGridModel resources)
         {
-            Model  = new MainWindowModel(modulesGridModel.Modules, productsGridModel.Products, resources.Resources);
-            Save   = new DelegateCommand(Model.Save);
-            SaveAs = new DelegateCommand(Model.SaveAs);
-            Open   = new DelegateCommand(Model.Open);
+            Model    = new MainWindowModel(modulesGridModel.Modules, productsGridModel.Products, resources.Resources);
+            Save     = new DelegateCommand(Model.Save);
+            SaveAs   = new DelegateCommand(Model.SaveAs);
+            Open     = new DelegateCommand(Model.Open);
+            UpdateDB = new DelegateCommand(Model.UpdateDB);
         }
     }
 }

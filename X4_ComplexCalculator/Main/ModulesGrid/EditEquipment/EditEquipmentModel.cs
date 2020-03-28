@@ -4,6 +4,7 @@ using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
 using System.Linq;
 using X4_ComplexCalculator.Common.Collection;
+using System.Collections.ObjectModel;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
 {
@@ -12,6 +13,15 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
     /// </summary>
     class EditEquipmentModel
     {
+        #region メンバ
+        /// <summary>
+        /// 編集対象モジュール
+        /// </summary>
+        private Module _Module;
+
+        private PresetComboboxItem _SelectedPreset;
+        #endregion
+
         #region プロパティ
         /// <summary>
         /// 装備サイズ一覧
@@ -23,6 +33,28 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
         /// 種族一覧
         /// </summary>
         public MemberChangeDetectCollection<FactionsListItem> Factions { get; } = new MemberChangeDetectCollection<FactionsListItem>();
+
+
+        /// <summary>
+        /// プリセット名
+        /// </summary>
+        public SmartCollection<PresetComboboxItem> Presets { get; } = new SmartCollection<PresetComboboxItem>();
+
+
+        /// <summary>
+        /// 選択中のプリセット
+        /// </summary>
+        public PresetComboboxItem SelectedPreset
+        {
+            get
+            {
+                return _SelectedPreset;
+            }
+            set
+            {
+                _SelectedPreset = value;
+            }
+        }
         #endregion
 
 
@@ -33,8 +65,10 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
         public EditEquipmentModel(Module module)
         {
             // 初期化
+            _Module = module;
             InitEquipmentSizes(module.ModuleID);
             UpdateFactions();
+            InitPreset(module.ModuleID);
         }
 
 
@@ -44,7 +78,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
         /// <param name="moduleID"></param>
         private void InitEquipmentSizes(string moduleID)
         {
-            void AddItem(SQLiteDataReader dr, object[] args)
+            static void AddItem(SQLiteDataReader dr, object[] args)
             {
                 ((ICollection<Size>)args[0]).Add(new Size(dr["SizeID"].ToString()));
             }
@@ -60,7 +94,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
         /// </summary>
         private void UpdateFactions()
         {
-            void AddItem(SQLiteDataReader dr, object[] args)
+            static void AddItem(SQLiteDataReader dr, object[] args)
             {
                 bool chkState = 0 < DBConnection.CommonDB.ExecQuery($"SELECT ID FROM SelectModuleEquipmentCheckStateFactions WHERE ID = '{dr["FactionID"]}'", (SQLiteDataReader drDummy, object[] argsDummy) => { });
 
@@ -80,6 +114,21 @@ WHERE
             Factions.AddRange(items);
         }
 
+        /// <summary>
+        /// プリセットを初期化
+        /// </summary>
+        private void InitPreset(string moduleID)
+        {
+            DBConnection.CommonDB.ExecQuery($"SELECT DISTINCT PresetID, PresetName FROM ModulePresets WHERE ModuleID = '{moduleID}'", (SQLiteDataReader dr, object[] args) =>
+            {
+                Presets.Add(new PresetComboboxItem((long)dr["PresetID"], dr["Name"].ToString()));
+            });
+        }
+
+
+        /// <summary>
+        /// チェック状態を保存
+        /// </summary>
         public void SaveCheckState()
         {
             // 前回値クリア
@@ -96,6 +145,40 @@ WHERE
 
             // コミット
             DBConnection.CommonDB.Commit();
+        }
+
+        /// <summary>
+        /// プリセット保存
+        /// </summary>
+        public void SavePreset()
+        {
+            if (SelectedPreset == null)
+            {
+                return;
+            }
+        }
+
+
+        /// <summary>
+        /// プリセット追加
+        /// </summary>
+        public void AddPreset()
+        {
+            var id = 0L;
+
+            var query = @$"
+SELECT
+    MIN( PresetID + 1 ) AS PresetID
+FROM
+    ModulePresets
+WHERE
+	ModuleID = '{_Module.ModuleID}' AND
+    ( PresetID + 1 ) NOT IN ( SELECT PresetID FROM ModulePresets WHERE ModuleID = '{_Module.ModuleID}')";
+
+            DBConnection.CommonDB.ExecQuery(query, (SQLiteDataReader dr, object[] args) =>
+            {
+                id = (long)dr["PresetID"];
+            });
         }
     }
 }

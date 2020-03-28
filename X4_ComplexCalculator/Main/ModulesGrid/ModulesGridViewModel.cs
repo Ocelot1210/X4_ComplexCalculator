@@ -153,13 +153,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             var items = CollectionViewSource.GetDefaultView(ModulesViewSource.View)
                                             .Cast<ModulesGridItem>()
                                             .Where(x => x.IsSelected);
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
             Model.DeleteModules(items);
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
 
             // 削除後に全部の選択状態を外さないと余計なものまで選択される
             Parallel.ForEach(Model.Modules, module => 

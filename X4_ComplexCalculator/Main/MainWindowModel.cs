@@ -235,5 +235,21 @@ namespace X4_ComplexCalculator.Main
                 });
             }
         }
+
+        /// <summary>
+        /// DB更新
+        /// </summary>
+        public void UpdateDB()
+        {
+            var result = MessageBox.Show("DB更新画面を表示しますか？\r\n※ 画面が起動するまでしばらくお待ち下さい。", "確認", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                if (!DBConnection.UpdateDB())
+                {
+                    MessageBox.Show("DBの更新に失敗しました。\r\nDBファイルにアクセス可能か確認後、再度実行してください。", "確認", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
     }
 }
