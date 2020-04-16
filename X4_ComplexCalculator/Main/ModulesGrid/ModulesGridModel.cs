@@ -35,10 +35,6 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         public ModulesGridModel(Window ownerWindow)
         {
             OwnerWindow = ownerWindow;
-
-#if DEBUG
-            Modules.Add(new ModulesGridItem("module_arg_prod_foodrations_01"));
-#endif
         }
 
         /// <summary>

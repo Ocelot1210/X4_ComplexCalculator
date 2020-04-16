@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
@@ -94,12 +96,36 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// </summary>
         /// <param name="module">編集対象モジュール</param>
         /// <param name="factions">種族一覧</param>
-        public EquipmentListModelBase(Module module, MemberChangeDetectCollection<FactionsListItem> factions)
+        public EquipmentListModelBase(Module module, EditEquipmentViewModel viewModel)
         {
             Module = module;
-            Factions = factions;
+            Factions = viewModel.Factions;
             Factions.OnPropertyChangedAsync += UpdateEquipments;
+            viewModel.Presets.CollectionChanged += OnPresetsCollectionChanged;
         }
+
+
+        /// <summary>
+        /// プリセット一覧変更時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected virtual void OnPresetsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Replace ||
+                e.Action == NotifyCollectionChangedAction.Add)
+            {
+
+                foreach (PresetComboboxItem item in e.NewItems)
+                {
+                    foreach (var equipment in Equipments.Values.SelectMany((x) => x))
+                    {
+                        var query = $"INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES('{Module.ModuleID}', {item.ID}, '{equipment.EquipmentID}', '{equipment.EquipmentType}')";
+                    }
+                }
+            }
+        }
+
 
         /// <summary>
         /// 装備一覧を更新

@@ -25,7 +25,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
 
             // タレット用タブの内容を作成
             {
-                var tem = new TurretEquipmentListModel(module, viewModel.Factions);
+                var tem = new TurretEquipmentListModel(module, viewModel);
                 var cvs = (CollectionViewSource)TurretsList.Resources["EquipmentsViewSource"];
                 var evm = new EquipmentListViewModel(tem, cvs);
                 viewModel.OnSaveEquipment += evm.SaveEquipment;
@@ -35,7 +35,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
 
             // シールド用タブの内容を作成
             {
-                var sem = new ShieldEquipmentListModel(module, viewModel.Factions);
+                var sem = new ShieldEquipmentListModel(module, viewModel);
                 var cvs = (CollectionViewSource)ShieldsList.Resources["EquipmentsViewSource"];
                 var evm = new EquipmentListViewModel(sem, cvs);
                 viewModel.OnSaveEquipment += evm.SaveEquipment;

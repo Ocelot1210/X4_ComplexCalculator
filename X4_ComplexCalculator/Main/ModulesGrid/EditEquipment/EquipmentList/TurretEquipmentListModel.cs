@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data.SQLite;
 using System.Linq;
@@ -19,8 +20,10 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// </summary>
         /// <param name="module"></param>
         /// <param name="factions"></param>
-        public TurretEquipmentListModel(Module module, MemberChangeDetectCollection<FactionsListItem> factions) : base(module, factions)
+        public TurretEquipmentListModel(Module module, EditEquipmentViewModel viewModel) : base(module, viewModel)
         {
+            viewModel.Presets.CollectionChanged += OnPresetsCollectionChanged;
+
             foreach (Size size in Module.Equipment.Turret.Sizes)
             {
                 _Equipments.Add(size, new SmartCollection<Equipment>());
@@ -31,6 +34,34 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
                 _Equipped[size].AddRange(Module.Equipment.Turret.GetEquipment(size).Take(_MaxAmount[size]));
             }
         }
+
+        /// <summary>
+        /// プリセット一覧変更時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected override void OnPresetsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Replace ||
+                e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (PresetComboboxItem item in e.OldItems)
+                {
+                    var query = @$"
+DELETE FROM
+    ModulePresetsEquipment
+
+WHERE
+    ModuleID = '{Module.ModuleID}' AND
+    PresetID = {item.ID} AND
+    EquipmentType = 'turrets'";
+                    DBConnection.CommonDB.ExecQuery(query);
+                }
+            }
+
+            base.OnPresetsCollectionChanged(sender, e);
+        }
+
 
         /// <summary>
         /// 装備一覧を更新
@@ -61,7 +92,8 @@ WHERE
 
             DBConnection.X4DB.ExecQuery(query, (SQLiteDataReader dr, object[] args) => { items.Add(new Equipment(dr["EquipmentID"].ToString())); });
 
-            await Task.Run(() => Equipments[SelectedSize].Reset(items));
+            Equipments[SelectedSize].Reset(items);
+            await Task.CompletedTask;
         }
 
 

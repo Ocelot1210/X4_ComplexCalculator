@@ -19,12 +19,8 @@ namespace X4_ComplexCalculator
         {
             InitializeComponent();
 
-            // DB接続
-#if DEBUG
-            DBConnection.Open();
-#else
+            // DB接続  
             ContentRendered += (object sender, EventArgs e) => { DBConnection.Open(); };
-#endif       
 
             var moduleModel    = new ModulesGridModel(this);
             var productsModel  = new ProductsGridModel(moduleModel.Modules);

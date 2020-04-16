@@ -86,7 +86,7 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
                 AggregateEquipmentResources(Modules, resourcesDict)
             );
 
-            Resources.Reset(resourcesDict.Select(x => new ResourcesGridItem(x.Key, x.Value)));
+            Resources.Reset(resourcesDict.Select(x => new ResourcesGridItem(x.Key, x.Value)).OrderBy((x) => x.Ware.Name));
             await Task.CompletedTask;
         }
 

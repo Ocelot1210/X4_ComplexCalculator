@@ -1,14 +1,14 @@
 ﻿using Prism.Commands;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Data;
 using X4_ComplexCalculator.Common;
-using System.Linq;
+using System.Xml.Linq;
 using System.Windows;
-using System.Threading.Tasks;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid
 {
@@ -29,11 +29,6 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// 検索用フィルタを削除できるか
         /// </summary>
         private bool CanRemoveFilter = false;
-
-        /// <summary>
-        /// コピーされたモジュール
-        /// </summary>
-        private IEnumerable<ModulesGridItem> CopiedModules;
         #endregion
 
 
@@ -123,13 +118,19 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// <param name="dataGrid"></param>
         private void CopyModulesCommand()
         {
-            // 選択中のモジュールをコピー
-            CopiedModules = CollectionViewSource.GetDefaultView(ModulesViewSource.View)
-                                                .Cast<ModulesGridItem>()
-                                                .Where(x => x.IsSelected)
-                                                .Select(x => new ModulesGridItem(x))
-                                                .ToArray();
+            var xml = new XElement("modules");
+            var selectedModules = CollectionViewSource.GetDefaultView(ModulesViewSource.View)
+                                                      .Cast<ModulesGridItem>()
+                                                      .Where(x => x.IsSelected);
+            
+            foreach (var module in selectedModules)
+            {
+                xml.Add(module.ToXml());
+            }
+
+            Clipboard.SetText(xml.ToString());
         }
+
 
         /// <summary>
         /// コピーしたモジュールを貼り付け
@@ -137,8 +138,20 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// <param name="dataGrid"></param>
         private void PasteModulesCommand(DataGrid dataGrid)
         {
-            Model.Modules.AddRange(CopiedModules.Select(x => new ModulesGridItem(x)).ToArray());
-            dataGrid.Focus();
+            try
+            {
+                var xml = XDocument.Parse(Clipboard.GetText());
+
+                // xmlの内容に問題がないか確認するため、ここでToArray()する
+                var modules = xml.Root.Elements().Select(x => new ModulesGridItem(x)).ToArray();
+
+                Model.Modules.AddRange(modules);
+                dataGrid.Focus();
+            }
+            catch
+            {
+                
+            }
         }
 
         /// <summary>

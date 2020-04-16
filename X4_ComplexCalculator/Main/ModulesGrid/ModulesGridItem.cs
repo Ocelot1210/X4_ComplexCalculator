@@ -7,6 +7,8 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using System.Text;
+using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid
 {
@@ -144,22 +146,79 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             _SelectedMethod = Module.ModuleProductions[0];
         }
 
-        ~ModulesGridItem()
-        {
-
-        }
 
         /// <summary>
-        /// コピーコンストラクタ
+        /// コンストラクタ(xmlより作成)
         /// </summary>
-        /// <param name="modulesGridItem">コピー対象</param>
-        public ModulesGridItem(ModulesGridItem modulesGridItem)
+        /// <param name="element">モジュール情報が記載されたxml</param>
+        public ModulesGridItem(XElement element)
         {
-            Module = new Module(modulesGridItem.Module);
-            ModuleCount = modulesGridItem.ModuleCount;
+            Module = new Module(element.Attribute("id").Value);
+            ModuleCount = long.Parse(element.Attribute("count").Value);
+            SelectedMethod = Module.ModuleProductions.Where(x => x.Method == element.Attribute("method").Value).First();
             EditEquipmentCommand = new DelegateCommand(EditEquipment);
-            _SelectedMethod = modulesGridItem.SelectedMethod;
+
+            // タレット追加
+            foreach (var turret in element.XPathSelectElement("turrets").Elements())
+            {
+                Module.AddEquipment(new Equipment(turret.Attribute("id").Value));
+            }
+
+            // シールド追加
+            foreach (var shield in element.XPathSelectElement("shields").Elements())
+            {
+                Module.AddEquipment(new Equipment(shield.Attribute("id").Value));
+            }
         }
+
+
+        /// <summary>
+        /// xml化する
+        /// </summary>
+        /// <returns>xml化した情報</returns>
+        public XElement ToXml()
+        {
+            // それぞれのモジュールの情報を設定
+            var ret = new XElement("module");
+            ret.Add(new XAttribute("id", Module.ModuleID));
+            ret.Add(new XAttribute("count", ModuleCount));
+            ret.Add(new XAttribute("method", SelectedMethod.Method));
+
+            // タレット追加
+            {
+                var turretsXml = new XElement("turrets");
+
+                foreach (var turret in Module.Equipment.Turret.AllEquipments)
+                {
+                    var turXml = new XElement("turret");
+                    turXml.Add(new XAttribute("id", turret.EquipmentID));
+
+                    turretsXml.Add(turXml);
+                }
+
+                ret.Add(turretsXml);
+            }
+
+
+            // シールド追加
+            {
+                var shieldsXml = new XElement("shields");
+
+                foreach (var shield in Module.Equipment.Shield.AllEquipments)
+                {
+                    var sldXml = new XElement("shield");
+                    sldXml.Add(new XAttribute("id", shield.EquipmentID));
+
+                    shieldsXml.Add(sldXml);
+                }
+
+                ret.Add(shieldsXml);
+            }
+
+            return ret;
+        }
+
+
 
         /// <summary>
         /// 装備を編集

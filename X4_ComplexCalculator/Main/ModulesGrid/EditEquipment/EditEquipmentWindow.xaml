@@ -28,10 +28,10 @@
 
         <!--  行列定義  -->
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1.5*" />
             <ColumnDefinition Width="1*" />
-            <ColumnDefinition Width="1*" />
-            <ColumnDefinition Width="1*" />
-            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="1.5*" />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
@@ -76,11 +76,19 @@
             <DockPanel>
                 <Button
                     Width="20"
-                    Content="＋"
+                    Command="{Binding RemovePresetCommand, Mode=OneTime}"
+                    Content="🗑"
                     DockPanel.Dock="Right" />
 
                 <Button
                     Width="20"
+                    Command="{Binding AddPresetCommand, Mode=OneTime}"
+                    Content="➕"
+                    DockPanel.Dock="Right" />
+
+                <Button
+                    Width="20"
+                    Command="{Binding SavePresetCommand, Mode=OneTime}"
                     Content="💾"
                     DockPanel.Dock="Right" />
 
@@ -92,6 +100,8 @@
                     DisplayMemberPath="Name"
                     DockPanel.Dock="Left"
                     IsEditable="True"
+                    IsSynchronizedWithCurrentItem="True"
+                    IsTextSearchEnabled="True"
                     ItemsSource="{Binding Presets}"
                     SelectedItem="{Binding SelectedPreset}" />
 

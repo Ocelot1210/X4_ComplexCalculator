@@ -1,17 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Data.SQLite;
+using System.Linq;
+using X4_ComplexCalculator.Common;
+using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
-using System.Linq;
-using X4_ComplexCalculator.Common.Collection;
-using System.Collections.ObjectModel;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
 {
     /// <summary>
     /// 装備編集画面のModel
     /// </summary>
-    class EditEquipmentModel
+    class EditEquipmentModel : INotifyPropertyChangedBace
     {
         #region メンバ
         /// <summary>
@@ -19,6 +19,10 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
         /// </summary>
         private Module _Module;
 
+
+        /// <summary>
+        /// 選択中のプリセット
+        /// </summary>
         private PresetComboboxItem _SelectedPreset;
         #endregion
 
@@ -53,6 +57,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
             set
             {
                 _SelectedPreset = value;
+                OnPropertyChanged();
             }
         }
         #endregion
@@ -121,7 +126,7 @@ WHERE
         {
             DBConnection.CommonDB.ExecQuery($"SELECT DISTINCT PresetID, PresetName FROM ModulePresets WHERE ModuleID = '{moduleID}'", (SQLiteDataReader dr, object[] args) =>
             {
-                Presets.Add(new PresetComboboxItem((long)dr["PresetID"], dr["Name"].ToString()));
+                Presets.Add(new PresetComboboxItem((long)dr["PresetID"], dr["PresetName"].ToString()));
             });
         }
 
@@ -147,6 +152,7 @@ WHERE
             DBConnection.CommonDB.Commit();
         }
 
+
         /// <summary>
         /// プリセット保存
         /// </summary>
@@ -156,6 +162,11 @@ WHERE
             {
                 return;
             }
+
+            DBConnection.CommonDB.BeginTransaction();
+            var newPreset = new PresetComboboxItem(SelectedPreset.ID, SelectedPreset.Name);
+            Presets.Replace(SelectedPreset, newPreset);
+            DBConnection.CommonDB.Commit();
         }
 
 
@@ -168,7 +179,7 @@ WHERE
 
             var query = @$"
 SELECT
-    MIN( PresetID + 1 ) AS PresetID
+    ifnull(MIN( PresetID + 1 ), 0) AS PresetID
 FROM
     ModulePresets
 WHERE
@@ -179,6 +190,35 @@ WHERE
             {
                 id = (long)dr["PresetID"];
             });
+
+            var item = new PresetComboboxItem(id, "新規プリセット");
+
+            DBConnection.CommonDB.BeginTransaction();
+            DBConnection.CommonDB.ExecQuery($"INSERT INTO ModulePresets(ModuleID, PresetID, PresetName) VALUES('{_Module.ModuleID}', {item.ID}, '{item.Name}')");
+            Presets.Add(item);
+            DBConnection.CommonDB.Commit();
+
+            SelectedPreset = item;
+        }
+
+        /// <summary>
+        /// プリセットを削除
+        /// </summary>
+        public void RemovePreset()
+        {
+            if (SelectedPreset == null)
+            {
+                return;
+            }
+
+            var query = $"";
+
+            DBConnection.CommonDB.BeginTransaction();
+            DBConnection.CommonDB.ExecQuery($"DELETE FROM ModulePresets WHERE ModuleID = '{_Module.ModuleID}' AND PresetID = {SelectedPreset.ID}");
+            Presets.Remove(SelectedPreset);
+            DBConnection.CommonDB.Commit();
+
+            SelectedPreset = Presets.FirstOrDefault();
         }
     }
 }

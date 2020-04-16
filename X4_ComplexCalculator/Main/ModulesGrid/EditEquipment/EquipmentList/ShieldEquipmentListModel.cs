@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
+using System.Collections.Specialized;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
 {
@@ -16,8 +17,11 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// </summary>
         /// <param name="module">編集対象モジュール</param>
         /// <param name="factions">種族一覧</param>
-        public ShieldEquipmentListModel(Module module, MemberChangeDetectCollection<FactionsListItem> factions) : base(module, factions)
+        public ShieldEquipmentListModel(Module module, EditEquipmentViewModel viewModel) : base(module, viewModel)
         {
+            viewModel.Presets.CollectionChanged += OnPresetsCollectionChanged;
+
+
             foreach (Size size in Module.Equipment.Shield.Sizes)
             {
                 _Equipments.Add(size, new SmartCollection<Equipment>());
@@ -27,6 +31,33 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
                 // 前回値復元
                 _Equipped[size].AddRange(Module.Equipment.Shield.GetEquipment(size).Take(_MaxAmount[size]));
             }
+        }
+
+        /// <summary>
+        /// プリセット一覧変更時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected override void OnPresetsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Replace ||
+                e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (PresetComboboxItem item in e.OldItems)
+                {
+                    var query = @$"
+DELETE FROM
+    ModulePresetsEquipment
+
+WHERE
+    ModuleID = '{Module.ModuleID}' AND
+    PresetID = {item.ID} AND
+    EquipmentType = 'shields'";
+                    DBConnection.CommonDB.ExecQuery(query);
+                }
+            }
+
+            base.OnPresetsCollectionChanged(sender, e);
         }
 
 
@@ -58,7 +89,8 @@ WHERE
 
             DBConnection.X4DB.ExecQuery(query, (SQLiteDataReader dr, object[] args) => { items.Add(new Equipment(dr["EquipmentID"].ToString())); });
 
-            await Task.Run(() => Equipments[SelectedSize].Reset(items));
+            Equipments[SelectedSize].Reset(items);
+            await Task.CompletedTask;
         }
 
 

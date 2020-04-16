@@ -131,7 +131,7 @@ namespace X4_ComplexCalculator.DB
         /// <param name="callback">実行結果に対する処理</param>
         /// <param name="args">可変長引数</param>
         /// <returns>結果の行数</returns>
-        public int ExecQuery(string query, SQLiteCommandParameters parameters, Action<SQLiteDataReader, object[]> callback, params object[] args)
+        public int ExecQuery(string query, SQLiteCommandParameters parameters, Action<SQLiteDataReader, object[]> callback = null, params object[] args)
         {
             int ret = 0;
 
@@ -177,15 +177,13 @@ namespace X4_ComplexCalculator.DB
                 }
                 else
                 {
-                    using (var dr = cmd.ExecuteReader())
+                    using var dr = cmd.ExecuteReader();
+                    if (dr.HasRows)
                     {
-                        if (dr.HasRows)
+                        while (dr.Read())
                         {
-                            while (dr.Read())
-                            {
-                                callback.Invoke(dr, args);
-                                ret++;
-                            }
+                            callback.Invoke(dr, args);
+                            ret++;
                         }
                     }
                 }

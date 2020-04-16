@@ -1,7 +1,9 @@
 ﻿using Prism.Commands;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB.X4DB;
 
@@ -10,7 +12,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
     /// <summary>
     /// 装備編集画面のViewModel
     /// </summary>
-    class EditEquipmentViewModel
+    class EditEquipmentViewModel : INotifyPropertyChangedBace
     {
         #region メンバ
         /// <summary>
@@ -51,7 +53,20 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
         public ObservableCollection<PresetComboboxItem> Presets => Model.Presets;
 
 
-        public PresetComboboxItem SelectedPresets => Model.SelectedPreset;
+        /// <summary>
+        /// 選択中のプリセット
+        /// </summary>
+        public PresetComboboxItem SelectedPreset
+        {
+            get
+            {
+                return Model.SelectedPreset;
+            }
+            set
+            {
+                Model.SelectedPreset = value;
+            }
+        }
 
 
         /// <summary>
@@ -76,6 +91,12 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
         /// プリセット追加
         /// </summary>
         public DelegateCommand AddPresetCommand { get; }
+
+
+        /// <summary>
+        /// プリセット削除
+        /// </summary>
+        public DelegateCommand RemovePresetCommand { get; }
         #endregion
 
 
@@ -88,11 +109,34 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
             ModuleName = module.Name;
 
             Model = new EditEquipmentModel(module);
+            Model.PropertyChanged += Model_PropertyChanged;
             SaveButtonClickedCommand = new DelegateCommand<Window>(SavebuttonClicked);
             CloseButtonClickedCommand = new DelegateCommand<Window>(CloseButtonClicked);
             SavePresetCommand = new DelegateCommand(Model.SavePreset);
             AddPresetCommand = new DelegateCommand(Model.AddPreset);
+            RemovePresetCommand = new DelegateCommand(Model.RemovePreset);
         }
+
+
+        /// <summary>
+        /// Modelのプロパティ変更時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(SelectedPreset):
+                    OnPropertyChanged(nameof(SelectedPreset));
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+
 
         /// <summary>
         /// ウィンドウが閉じられる時のイベント

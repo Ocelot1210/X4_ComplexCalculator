@@ -264,12 +264,10 @@ FROM
 	WareResource,
 	ModuleProduct
 WHERE
-	WareProduction.WareID  = WareResource.WareID   AND
-	WareProduction.WareID  = ModuleProduct.WareID  AND
-	WareResource.WareID    = WareProduction.WareID AND
-	ModuleProduct.ModuleID = :moduleID AND
-    WareResource.Method    = WareProduction.Method AND
-    WareResource.Method    = ModuleProduct.Method
+	ModuleProduct.ModuleID  = :moduleID AND
+	ModuleProduct.WareID    = WareResource.WareID AN
+	WareResource.Method     = WareProduction.Method AND
+	WareResource.NeedWareID = WareProduction.WareID
 ";
 
             DBConnection.X4DB.ExecQuery(query, param, SumProduct, wareDict, moduleDict);
