@@ -28,6 +28,12 @@ namespace X4_ComplexCalculator.DB.X4DB
             SizeID = sizeID;
             string name = "";
             DBConnection.X4DB.ExecQuery($"SELECT * FROM Size WHERE SizeID = '{sizeID}'", (SQLiteDataReader dr, object[] args) => { name = dr["Name"].ToString(); });
+
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentException("Invalid size id.", nameof(sizeID));
+            }
+
             Name = name;
         }
 

@@ -25,12 +25,18 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="id">装備種別ID</param>
-        public EquipmentType(string id)
+        /// <param name="equipmentTypeID">装備種別ID</param>
+        public EquipmentType(string equipmentTypeID)
         {
-            EquipmentTypeID = id;
+            EquipmentTypeID = equipmentTypeID;
             string name = "";
             DBConnection.X4DB.ExecQuery($"SELECT * FROM EquipmentType WHERE EquipmentTypeID = '{EquipmentTypeID}'", (SQLiteDataReader dr, object[] args) => { name = dr["Name"].ToString(); });
+
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentException("Invalid equipment type id.", nameof(equipmentTypeID));
+            }
+
             Name = name;
         }
 

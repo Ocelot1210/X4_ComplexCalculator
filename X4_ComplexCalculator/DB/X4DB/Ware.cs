@@ -54,10 +54,10 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="id">ウェアID</param>
-        public Ware(string id)
+        /// <param name="wareID">ウェアID</param>
+        public Ware(string wareID)
         {
-            WareID = id;
+            WareID = wareID;
             var name     = "";
             var volume   = 0L;
             var minPrice = 0L;
@@ -76,6 +76,12 @@ namespace X4_ComplexCalculator.DB.X4DB
                     wareGroup     = new WareGroup(dr["WareGroupID"].ToString());
                     transportType = new TransportType(dr["TransportTypeID"].ToString());
                 });
+
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentException("Invalid ware id.", nameof(wareID));
+            }
+
             Name          = name;
             Volume        = volume;
             MinPrice      = minPrice;

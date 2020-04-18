@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
 
@@ -77,20 +78,26 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// コンストラクタ
         /// </summary>
         /// <param name="moduleID">モジュールID</param>
-        /// <param name="type">"Turret"か"Shield"のどちらか"</param>
-        public ModuleEquipmentManager(string moduleID, string type)
+        /// <param name="equipmentType">装備種別("Turret"か"Shield"のどちらか")</param>
+        public ModuleEquipmentManager(string moduleID, string equipmentType)
         {
             CanEquipped = false;
 
-            var query = $@"SELECT SizeID, Amount FROM Module{type} WHERE ModuleID = '{moduleID}'";
+            if (string.IsNullOrEmpty(equipmentType))
+            {
+                throw new ArgumentException("Invalid equipment type.", nameof(equipmentType));
+            }
+
+            var query = $@"SELECT SizeID, Amount FROM Module{equipmentType} WHERE ModuleID = '{moduleID}'";
 
             DBConnection.X4DB.ExecQuery(query,
                 (SQLiteDataReader dr, object[] args) =>
                 {
                     var size = new Size(dr["SizeID"].ToString());
                     _Sizes.Add(size);
-                    _MaxAmount.Add(size, (int)(long)dr["Amount"]);
-                    _Equipments.Add(size, new List<Equipment>());
+                    var maxAmount = (int)(long)dr["Amount"];
+                    _MaxAmount.Add(size, maxAmount);
+                    _Equipments.Add(size, new List<Equipment>(maxAmount));
                     CanEquipped = true;
                 });
         }
@@ -149,7 +156,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <param name="equipment">追加対象</param>
         public void AddEquipment(Equipment equipment)
         {
-            if (_Equipments[equipment.Size].Count <= MaxAmount[equipment.Size])
+            if (_Equipments[equipment.Size].Count < MaxAmount[equipment.Size])
             {
                 _Equipments[equipment.Size].Add(equipment);
             }

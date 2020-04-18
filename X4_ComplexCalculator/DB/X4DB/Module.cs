@@ -72,6 +72,11 @@ namespace X4_ComplexCalculator.DB.X4DB
                     workersCapacity = (long)dr["WorkersCapacity"];
                 });
 
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentException("Invalid module id.", nameof(moduleID));
+            }
+
             Name = name;
             ModuleType = moduleType;
             MaxWorkers = maxWorkers;
@@ -86,6 +91,7 @@ namespace X4_ComplexCalculator.DB.X4DB
                 });
             ModuleProductions = mProd;
         }
+
 
         /// <summary>
         /// コピーコンストラクタ

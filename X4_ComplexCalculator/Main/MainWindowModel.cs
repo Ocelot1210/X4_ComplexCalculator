@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Threading;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
@@ -156,7 +157,9 @@ namespace X4_ComplexCalculator.Main
         {
             try
             {
+                Mouse.OverrideCursor = Cursors.Wait;
                 using var conn = new DBConnection(_SaveFilePath);
+                conn.BeginTransaction();
 
                 // モジュール復元
                 RestoreModules(conn);
@@ -166,6 +169,9 @@ namespace X4_ComplexCalculator.Main
 
                 // 建造リソースを復元
                 RestoreBuildResource(conn);
+
+                conn.Rollback();
+                Mouse.OverrideCursor = null;
             }
             catch(Exception e)
             {
@@ -183,22 +189,25 @@ namespace X4_ComplexCalculator.Main
         /// <param name="args"></param>
         private void RestoreModules(DBConnection conn)
         {
-            var modules = new List<ModulesGridItem>();
+            var moduleCnt = 0;
+
+            conn.ExecQuery("SELECT count(*) AS Count from Modules", (dr, _) =>
+            {
+                moduleCnt = (int)(long)dr[0];
+            });
+
+            var modules = new List<ModulesGridItem>(moduleCnt);
 
             // モジュールを復元
-            conn.ExecQuery("SELECT * FROM Modules", (SQLiteDataReader modDr, object[] _) =>
+            conn.ExecQuery("SELECT ModuleID, Count FROM Modules ORDER BY Row ASC", (dr, _) =>
             {
-                var module = new ModulesGridItem(modDr["ModuleID"].ToString(), (long)modDr["Count"]);
+                modules.Add(new ModulesGridItem(dr["ModuleID"].ToString(), (long)dr["Count"]));
+            });
 
-                // モジュールの装備を復元
-                conn.ExecQuery($"SELECT EquipmentID FROM Equipments WHERE Row = {(long)modDr["Row"]}", (SQLiteDataReader eqDr, object[] _) =>
-                {
-                    var eqipment = new Equipment(eqDr["EquipmentID"].ToString());
-
-                    module.Module.AddEquipment(eqipment);
-                });
-
-                modules.Add(module);
+            // モジュールの装備を復元
+            conn.ExecQuery($"SELECT * FROM Equipments", (dr, _) =>
+            {
+                modules[(int)(long)dr["row"]].Module.AddEquipment(new Equipment(dr["EquipmentID"].ToString()));
             });
 
             _Modules.Reset(modules);

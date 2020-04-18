@@ -49,6 +49,12 @@ namespace X4_ComplexCalculator.DB.X4DB
                         size = new Size(dr["SizeID"].ToString());
                         name = dr["Name"].ToString();
                     });
+
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentException("Invalid equipment id.", nameof(equipmentID));
+            }
+
             Name = name;
             Size = size;
             EquipmentType = equipmentType;

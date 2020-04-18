@@ -1,4 +1,5 @@
-﻿using System.Data.SQLite;
+﻿using System;
+using System.Data.SQLite;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
@@ -35,6 +36,12 @@ namespace X4_ComplexCalculator.DB.X4DB
                 {
                     name = dr["Name"].ToString();
                 });
+
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentException("Invalid transport type id.", nameof(transportTypeID));
+            }
+
             Name = name;
         }
 

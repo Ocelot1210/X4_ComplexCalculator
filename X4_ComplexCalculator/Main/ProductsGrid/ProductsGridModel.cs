@@ -158,7 +158,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
 
             // パラメータ設定
             var prodParam = new SQLiteCommandParameters(3);     // 製造モジュール用パラメーター
-            var habParam = new SQLiteCommandParameters(2);     // 居住モジュール用パラメーター
+            var habParam = new SQLiteCommandParameters(2);      // 居住モジュール用パラメーター
             foreach (var module in modules)
             {
                 switch (module.ModuleTypeID)
@@ -265,7 +265,7 @@ FROM
 	ModuleProduct
 WHERE
 	ModuleProduct.ModuleID  = :moduleID AND
-	ModuleProduct.WareID    = WareResource.WareID AN
+	ModuleProduct.WareID    = WareResource.WareID AND
 	WareResource.Method     = WareProduction.Method AND
 	WareResource.NeedWareID = WareProduction.WareID
 ";

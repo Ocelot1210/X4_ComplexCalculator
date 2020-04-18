@@ -45,6 +45,12 @@ namespace X4_ComplexCalculator.DB.X4DB
                     name = dr["Name"].ToString();
                     race = new Race(dr["RaceID"].ToString());
                 });
+
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentException("Invalid faction id.", nameof(factionID));
+            }
+
             Name = name;
             Race = race;
         }

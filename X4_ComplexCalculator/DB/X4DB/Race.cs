@@ -1,4 +1,5 @@
-﻿using System.Data.SQLite;
+﻿using System;
+using System.Data.SQLite;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
@@ -28,6 +29,12 @@ namespace X4_ComplexCalculator.DB.X4DB
             RaceID = raceID;
             string name = "";
             DBConnection.X4DB.ExecQuery($"SELECT Name FROM Race WHERE RaceID = '{RaceID}'", (SQLiteDataReader dr, object[] args) => { name = dr["Name"].ToString(); });
+
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentException("Invalid race id.", nameof(raceID));
+            }
+
             Name = name;
         }
 

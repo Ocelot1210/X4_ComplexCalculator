@@ -60,9 +60,12 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             }
             set
             {
-                if (0 <= value)
+                var setValue = (value < 0) ? 0L :
+                               (99999 < value) ? 99999L : value;
+
+                if (setValue != ModuleCount)
                 {
-                    _ModuleCount = value;
+                    _ModuleCount = setValue;
                     OnPropertyChanged();
                 }
             }
@@ -155,19 +158,37 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         {
             Module = new Module(element.Attribute("id").Value);
             ModuleCount = long.Parse(element.Attribute("count").Value);
-            SelectedMethod = Module.ModuleProductions.Where(x => x.Method == element.Attribute("method").Value).First();
+            SelectedMethod = Module.ModuleProductions.Where(x => x.Method == element.Attribute("method").Value).FirstOrDefault();
+            if (SelectedMethod == null)
+            {
+                SelectedMethod = Module.ModuleProductions.First();
+            }
             EditEquipmentCommand = new DelegateCommand(EditEquipment);
 
             // タレット追加
             foreach (var turret in element.XPathSelectElement("turrets").Elements())
             {
-                Module.AddEquipment(new Equipment(turret.Attribute("id").Value));
+                try
+                {
+                    Module.AddEquipment(new Equipment(turret.Attribute("id").Value));
+                }
+                catch
+                {
+
+                }
             }
 
             // シールド追加
             foreach (var shield in element.XPathSelectElement("shields").Elements())
             {
-                Module.AddEquipment(new Equipment(shield.Attribute("id").Value));
+                try
+                {
+                    Module.AddEquipment(new Equipment(shield.Attribute("id").Value));
+                }
+                catch
+                {
+
+                }
             }
         }
 

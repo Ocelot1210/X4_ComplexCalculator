@@ -1,4 +1,5 @@
-﻿using System.Data.SQLite;
+﻿using System;
+using System.Data.SQLite;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
@@ -22,12 +23,18 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="id">モジュール種別ID</param>
-        public ModuleType(string id)
+        /// <param name="moduleTypeID">モジュール種別ID</param>
+        public ModuleType(string moduleTypeID)
         {
-            ModuleTypeID = id;
+            ModuleTypeID = moduleTypeID;
             string name = "";
-            DBConnection.X4DB.ExecQuery($"SELECT Name FROM ModuleType WHERE ModuleTypeID = '{id}'", (SQLiteDataReader dr, object[] args) => { name = dr["Name"].ToString(); });
+            DBConnection.X4DB.ExecQuery($"SELECT Name FROM ModuleType WHERE ModuleTypeID = '{moduleTypeID}'", (SQLiteDataReader dr, object[] args) => { name = dr["Name"].ToString(); });
+
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentException("Invalid module type id.", nameof(moduleTypeID));
+            }
+
             Name = name;
         }
 

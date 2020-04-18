@@ -1,4 +1,5 @@
-﻿using System.Data.SQLite;
+﻿using System;
+using System.Data.SQLite;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
@@ -30,10 +31,10 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="id">ウェアグループID</param>
-        public WareGroup(string id)
+        /// <param name="wareGroupID">ウェアグループID</param>
+        public WareGroup(string wareGroupID)
         {
-            WareGroupID = id;
+            WareGroupID = wareGroupID;
             string name = "";
             long tier = 0;
             DBConnection.X4DB.ExecQuery($"SELECT Name, Tier FROM WareGroup WHERE WareGroupID = '{WareGroupID}'",(SQLiteDataReader dr, object[] args) =>
@@ -41,6 +42,12 @@ namespace X4_ComplexCalculator.DB.X4DB
                 name = dr["Name"].ToString();
                 tier = (long)dr["Tier"];
             });
+
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentException("Invalid ware group id.", nameof(wareGroupID));
+            }
+
             Name = name;
             Tier = tier;
         }
