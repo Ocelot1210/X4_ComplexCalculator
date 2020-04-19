@@ -132,8 +132,7 @@ WHERE
         private async Task AggregateEquipmentResources(IEnumerable<ModulesGridItem> modules, Dictionary<string, long> resourcesDict)
         {
             // 装備IDごとに集計
-            var equipments = modules.AsParallel()
-                                    .Where(x => x.Module.Equipment.CanEquipped)
+            var equipments = modules.Where(x => x.Module.Equipment.CanEquipped)
                                     .Select(x => x.Module.Equipment.GetAllEquipment().Select(y => new { ID = y.EquipmentID, Count = x.ModuleCount }))
                                     .Where(x => x.Any())
                                     .GroupBy(x => x.First().ID)

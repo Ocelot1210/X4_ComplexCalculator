@@ -18,8 +18,14 @@ namespace X4_ComplexCalculator.Common
         /// </summary>
         public object Data
         {
-            get { return (object)GetValue(DataProperty); }
-            set { SetValue(DataProperty, value); }
+            get
+            {
+                return GetValue(DataProperty);
+            }
+            set
+            {
+                SetValue(DataProperty, value);
+            }
         }
 
 

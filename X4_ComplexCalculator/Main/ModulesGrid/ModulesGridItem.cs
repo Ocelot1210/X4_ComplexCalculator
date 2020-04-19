@@ -27,6 +27,11 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// 選択された建造方式
         /// </summary>
         private ModuleProduction _SelectedMethod;
+
+        /// <summary>
+        /// 選択されているか
+        /// </summary>
+        private bool _IsSelected;
         #endregion
 
 
@@ -47,7 +52,21 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// <summary>
         /// 選択されているか
         /// </summary>
-        public bool IsSelected { get; set; }
+        public bool IsSelected
+        {
+            get
+            {
+                return _IsSelected;
+            }
+            set
+            {
+                if (_IsSelected != value)
+                {
+                    _IsSelected = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         /// <summary>
         /// モジュール数

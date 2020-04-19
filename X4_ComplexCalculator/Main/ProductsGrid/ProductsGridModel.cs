@@ -88,8 +88,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// </remarks>
         private ProductionModuleInfo[] GetProductionModules()
         {
-            return Modules.AsParallel()
-                          .Where(x => x.Module.ModuleType.ModuleTypeID == "production" || x.Module.ModuleType.ModuleTypeID == "habitation")
+            return Modules.Where(x => x.Module.ModuleType.ModuleTypeID == "production" || x.Module.ModuleType.ModuleTypeID == "habitation")
                           .GroupBy(x => x.Module.ModuleID)
                           .Select(x =>
                           {
@@ -189,10 +188,9 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
             );
 
             // 前回値保存
-            var backup = Products.AsParallel().ToDictionary(x => x.Ware.WareID, x => new { x.UnitPrice, x.IsExpanded });
+            var backup = Products.ToDictionary(x => x.Ware.WareID, x => new { x.UnitPrice, x.IsExpanded });
 
-            var items = wareDict.AsParallel()
-                                .Select(x =>
+            var items = wareDict.Select(x =>
                                 {
                                     var details = moduleDict[x.Key].OrderBy(x => x.ModuleName);
                                     var bak = new { UnitPrice = (long)0, IsExpanded = false };

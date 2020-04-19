@@ -43,7 +43,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
             {
                 _UnitPricePercent = (long)value;
 
-                foreach (var product in Products.Where(x => x.IsSelected))
+                foreach (var product in Products)
                 {
                     product.SetUnitPricePercent(_UnitPricePercent);
                 }

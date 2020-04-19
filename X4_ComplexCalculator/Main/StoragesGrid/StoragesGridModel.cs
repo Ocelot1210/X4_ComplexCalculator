@@ -85,8 +85,7 @@ namespace X4_ComplexCalculator.Main.StoragesGrid
         /// </summary>
         private void UpdateStorages()
         {
-            var modules = Modules.AsParallel()
-                                 .Where(x => x.Module.ModuleType.ModuleTypeID == "storage")
+            var modules = Modules.Where(x => x.Module.ModuleType.ModuleTypeID == "storage")
                                  .GroupBy(x => x.Module.ModuleID)
                                  .Select(x => new { x.First().Module.ModuleID, Count = x.Sum(y => y.ModuleCount) });
 

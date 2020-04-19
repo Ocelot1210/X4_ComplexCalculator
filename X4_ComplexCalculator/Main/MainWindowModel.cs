@@ -9,6 +9,9 @@ using X4_ComplexCalculator.Main.WorkArea;
 
 namespace X4_ComplexCalculator.Main
 {
+    /// <summary>
+    /// メイン画面のModel
+    /// </summary>
     class MainWindowModel
     {
         #region プロパティ
@@ -19,9 +22,9 @@ namespace X4_ComplexCalculator.Main
 
 
         /// <summary>
-        /// 選択中のコンテンツ
+        /// アクティブなワークスペース
         /// </summary>
-        public WorkAreaViewModel ActiveContent { set; private get; }
+        public WorkAreaViewModel ActiveContent { set; get; }
         #endregion
 
 
@@ -33,25 +36,25 @@ namespace X4_ComplexCalculator.Main
 
         }
 
-
+        /// <summary>
+        /// 上書き保存
+        /// </summary>
         public void Save()
         {
-            if (ActiveContent != null)
-            {
-                ActiveContent.Save();
-            }
+            ActiveContent?.Save();
         }
 
-
+        /// <summary>
+        /// 名前を付けて保存
+        /// </summary>
         public void SaveAs()
         {
-            if (ActiveContent != null)
-            {
-                ActiveContent.SaveAs();
-            }
+            ActiveContent?.SaveAs();
         }
 
-
+        /// <summary>
+        /// 開く
+        /// </summary>
         public void Open()
         {
             var dlg = new OpenFileDialog();
@@ -63,7 +66,7 @@ namespace X4_ComplexCalculator.Main
                 try
                 {
                     var vm = new WorkAreaViewModel();
-                    vm.Load(dlg.FileName);
+                    vm.LoadFile(dlg.FileName);
                     Documents.Add(vm);
                 }
                 catch (Exception e)
@@ -80,9 +83,14 @@ namespace X4_ComplexCalculator.Main
             }
         }
 
+        /// <summary>
+        /// 新規作成
+        /// </summary>
         public void CreateNew()
         {
-            Documents.Add(new WorkAreaViewModel());
+            var vm = new WorkAreaViewModel();
+            Documents.Add(vm);
+            ActiveContent = vm;
         }
 
 

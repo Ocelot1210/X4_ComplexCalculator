@@ -121,10 +121,10 @@ namespace X4_ComplexCalculator.Common
         /// <param name="value">設定値</param>
         static void SetSelectedStatus(IEnumerable items, IAccessor accessor, object value)
         {
-            Parallel.ForEach(items.Cast<object>(), item =>
+            foreach(var item in items)
             {
                 accessor.SetValue(item, value);
-            });
+            }
         }
     }
 }

@@ -1,4 +1,7 @@
-﻿using System.Windows.Controls;
+﻿using System.IO;
+using System.Windows.Controls;
+using System.Xml;
+using Xceed.Wpf.AvalonDock.Layout.Serialization;
 
 namespace X4_ComplexCalculator.Main.WorkArea
 {
@@ -7,6 +10,9 @@ namespace X4_ComplexCalculator.Main.WorkArea
     /// </summary>
     public partial class WorkArea : UserControl
     {
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
         public WorkArea()
         {
             InitializeComponent();

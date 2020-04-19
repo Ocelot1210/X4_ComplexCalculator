@@ -154,8 +154,7 @@ namespace X4_ComplexCalculator.Main.StationSummary.WorkForce
             var needWorkforce = 0L;
             var workforce = 0L;
 
-            var details = Modules.AsParallel()
-                                 .Where(x => x.Module.ModuleType.ModuleTypeID == "production" || x.Module.ModuleType.ModuleTypeID == "habitation")
+            var details = Modules.Where(x => x.Module.ModuleType.ModuleTypeID == "production" || x.Module.ModuleType.ModuleTypeID == "habitation")
                                  .GroupBy(x => x.Module.ModuleID)
                                  .Select(x =>
                                  {

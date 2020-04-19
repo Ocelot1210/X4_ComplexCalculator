@@ -1,12 +1,6 @@
 ﻿using Microsoft.Win32;
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Data.SQLite;
-using System.Windows;
-using System.Windows.Input;
-using System.Windows.Threading;
-using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.ModulesGrid;
@@ -16,7 +10,7 @@ using X4_ComplexCalculator.Main.ResourcesGrid;
 namespace X4_ComplexCalculator.Main.WorkArea
 {
     /// <summary>
-    /// 作業用エリアModel
+    /// 作業エリア用Model
     /// </summary>
     class WorkAreaModel
     {

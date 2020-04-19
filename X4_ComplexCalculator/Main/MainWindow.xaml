@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:wkarea="clr-namespace:X4_ComplexCalculator.Main.WorkArea"
+    xmlns:x4vcvt="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
     xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
     Title="X4: ステーション計算機"
     Width="1000"
@@ -12,10 +13,15 @@
     Style="{StaticResource DefaultWindowBackgroundStyle}"
     mc:Ignorable="d">
 
+    <Window.Resources>
+        <x4vcvt:ActiveDocumentConverter x:Key="ActiveDocumentConverter" />
+    </Window.Resources>
+
     <Window.InputBindings>
-        <KeyBinding Command="{Binding Save}" Gesture="Ctrl+S" />
-        <KeyBinding Command="{Binding SaveAs}" Gesture="Shift+Ctrl+S" />
-        <KeyBinding Command="{Binding Open}" Gesture="Ctrl+O" />
+        <KeyBinding Command="{Binding CreateNewCommand}" Gesture="Ctrl+N" />
+        <KeyBinding Command="{Binding SaveCommand}" Gesture="Ctrl+S" />
+        <KeyBinding Command="{Binding SaveAsCommand}" Gesture="Shift+Ctrl+S" />
+        <KeyBinding Command="{Binding OpenCommand}" Gesture="Ctrl+O" />
     </Window.InputBindings>
 
     <Grid>
@@ -33,31 +39,31 @@
 
                 <!--  新規  -->
                 <MenuItem
-                    Command="{Binding CreateNew, Mode=OneTime}"
+                    Command="{Binding CreateNewCommand, Mode=OneTime}"
                     Header="新規作成"
                     InputGestureText="Ctrl+N" />
 
                 <!--  上書き保存  -->
                 <MenuItem
-                    Command="{Binding Save, Mode=OneTime}"
+                    Command="{Binding SaveCommand, Mode=OneTime}"
                     Header="上書き保存"
                     InputGestureText="Ctrl+S" />
 
                 <!--  名前を付けて保存  -->
                 <MenuItem
-                    Command="{Binding SaveAs, Mode=OneTime}"
+                    Command="{Binding SaveAsCommand, Mode=OneTime}"
                     Header="名前を付けて保存"
                     InputGestureText="Shift+Ctrl+S" />
 
                 <!--  開く  -->
                 <MenuItem
-                    Command="{Binding Open, Mode=OneTime}"
+                    Command="{Binding OpenCommand, Mode=OneTime}"
                     Header="開く"
                     InputGestureText="Ctrl+O" />
 
                 <!--  DB更新  -->
                 <MenuItem
-                    Command="{Binding UpdateDB, Mode=OneTime}"
+                    Command="{Binding UpdateDBCommand, Mode=OneTime}"
                     Header="DB更新"
                     InputGestureText="Ctrl+U" />
             </MenuItem>
@@ -65,7 +71,7 @@
 
         <xcad:DockingManager
             Grid.Row="1"
-            ActiveContent="{Binding ActiveContent, Mode=OneWayToSource}"
+            ActiveContent="{Binding ActiveContent, Mode=TwoWay, Converter={StaticResource ActiveDocumentConverter}}"
             DocumentsSource="{Binding Documents}">
 
             <xcad:DockingManager.DocumentHeaderTemplate>
