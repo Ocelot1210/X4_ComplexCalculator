@@ -1,48 +1,43 @@
 ﻿using Prism.Commands;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using X4_ComplexCalculator.Common;
 using System.Xml.Linq;
-using System.Windows;
+using X4_ComplexCalculator.Common;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid
 {
     class ModulesGridViewModel : INotifyPropertyChangedBace
     {
-        #region メンバ変数
+        #region メンバ
         /// <summary>
         /// Model
         /// </summary>
-        private readonly ModulesGridModel Model;
+        private readonly ModulesGridModel _Model;
+
 
         /// <summary>
         /// 検索モジュール名
         /// </summary>
         private string _SearchModuleName = "";
-
-        /// <summary>
-        /// 検索用フィルタを削除できるか
-        /// </summary>
-        private bool CanRemoveFilter = false;
         #endregion
 
 
         #region プロパティ
         /// <summary>
-        /// 表示するコレクション
+        /// モジュール一覧表示用
         /// </summary>
-        private CollectionViewSource ModulesViewSource { get; set; }
+        public ListCollectionView ModulesView { get; }
 
 
         /// <summary>
         /// モジュール一覧
         /// </summary>
-        public ObservableCollection<ModulesGridItem> Modules => Model.Modules;
+        public ObservableCollection<ModulesGridItem> Modules => _Model.Modules;
 
 
         /// <summary>
@@ -56,10 +51,12 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             }
             set
             {
-                if (_SearchModuleName == value) return;
-                _SearchModuleName = value;
-                OnPropertyChanged();
-                ApplyFilter();
+                if (_SearchModuleName != value)
+                {
+                    _SearchModuleName = value;
+                    OnPropertyChanged();
+                    ModulesView.Refresh();
+                }
             }
         }
 
@@ -99,16 +96,16 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// コンストラクタ
         /// </summary>
         /// <param name="model">モデル</param>
-        /// <param name="modulesViewSource">モジュール一覧</param>
-        public ModulesGridViewModel(ModulesGridModel model, CollectionViewSource modulesViewSource)
+        public ModulesGridViewModel(ModulesGridModel model)
         {
-            Model = model;
-            ModulesViewSource = modulesViewSource;
-            AddButtonClicked  = new DelegateCommand(Model.ShowAddModuleWindow);
-            ReplaceModule     = new DelegateCommand<ModulesGridItem>(Model.ReplaceModule);
-            CopyModules       = new DelegateCommand(CopyModulesCommand);
-            PasteModules      = new DelegateCommand<DataGrid>(PasteModulesCommand);
-            DeleteModules     = new DelegateCommand<DataGrid>(DeleteModulesCommand);
+            _Model = model;
+            ModulesView        = (ListCollectionView)CollectionViewSource.GetDefaultView(Modules);
+            ModulesView.Filter = Filter;
+            AddButtonClicked   = new DelegateCommand(_Model.ShowAddModuleWindow);
+            ReplaceModule      = new DelegateCommand<ModulesGridItem>(_Model.ReplaceModule);
+            CopyModules        = new DelegateCommand(CopyModulesCommand);
+            PasteModules       = new DelegateCommand<DataGrid>(PasteModulesCommand);
+            DeleteModules      = new DelegateCommand<DataGrid>(DeleteModulesCommand);
         }
 
 
@@ -119,7 +116,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         private void CopyModulesCommand()
         {
             var xml = new XElement("modules");
-            var selectedModules = CollectionViewSource.GetDefaultView(ModulesViewSource.View)
+            var selectedModules = CollectionViewSource.GetDefaultView(ModulesView)
                                                       .Cast<ModulesGridItem>()
                                                       .Where(x => x.IsSelected);
             
@@ -145,7 +142,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
                 // xmlの内容に問題がないか確認するため、ここでToArray()する
                 var modules = xml.Root.Elements().Select(x => new ModulesGridItem(x)).ToArray();
 
-                Model.Modules.AddRange(modules);
+                _Model.Modules.AddRange(modules);
                 dataGrid.Focus();
             }
             catch
@@ -160,16 +157,15 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// <param name="dataGrid"></param>
         private void DeleteModulesCommand(DataGrid dataGrid)
         {
-            var cvs = (ListCollectionView)ModulesViewSource.View;
-            var currPos = cvs.CurrentPosition;
+            var currPos = ModulesView.CurrentPosition;
 
-            var items = CollectionViewSource.GetDefaultView(ModulesViewSource.View)
+            var items = CollectionViewSource.GetDefaultView(ModulesView)
                                             .Cast<ModulesGridItem>()
                                             .Where(x => x.IsSelected);
-            Model.DeleteModules(items);
+            _Model.DeleteModules(items);
 
             // 削除後に全部の選択状態を外さないと余計なものまで選択される
-            Parallel.ForEach(Model.Modules, module => 
+            Parallel.ForEach(_Model.Modules, module => 
             {
                 module.IsSelected = false;
             });
@@ -177,18 +173,19 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             // 先頭行を削除した場合
             if (currPos < 0)
             {
-                cvs.MoveCurrentToFirst();
+                ModulesView.MoveCurrentToFirst();
             }
 
 
             // 最後の行を消した場合、選択行を最後にする
-            if (cvs.Count <= currPos)
+            if (ModulesView.Count <= currPos)
             {
-                cvs.MoveCurrentToLast();
+                ModulesView.MoveCurrentToLast();
             }
 
+
             // 本当に選択したいものだけ選択
-            if (cvs.CurrentItem is ModulesGridItem item)
+            if (ModulesView.CurrentItem is ModulesGridItem item)
             {
                 item.IsSelected = true;
             }
@@ -196,34 +193,15 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             dataGrid.Focus();
         }
 
-        /// <summary>
-        /// フィルタを適用
-        /// </summary>
-        private void ApplyFilter()
-        {
-            // 2回目以降か？
-            if (CanRemoveFilter)
-            {
-                ModulesViewSource.Filter -= new FilterEventHandler(FilterEvent);
-                ModulesViewSource.Filter += new FilterEventHandler(FilterEvent);
-            }
-            else
-            {
-                // 初回はこっち
-                CanRemoveFilter = true;
-                ModulesViewSource.Filter += new FilterEventHandler(FilterEvent);
-            }
-        }
-
 
         /// <summary>
         /// フィルタイベント
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="ev"></param>
-        private void FilterEvent(object sender, FilterEventArgs e)
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        private bool Filter(object obj)
         {
-            e.Accepted = (e.Item is ModulesGridItem src && (SearchModuleName == "" || 0 <= src.Module.Name.IndexOf(SearchModuleName, StringComparison.InvariantCultureIgnoreCase)));
+            return obj is ModulesGridItem src && (SearchModuleName == "" || 0 <= src.Module.Name.IndexOf(SearchModuleName, StringComparison.InvariantCultureIgnoreCase));
         }
     }
 }

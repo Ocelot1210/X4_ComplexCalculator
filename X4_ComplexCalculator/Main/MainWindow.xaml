@@ -4,11 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:modGrid="clr-namespace:X4_ComplexCalculator.Main.ModulesGrid"
-    xmlns:prodGrid="clr-namespace:X4_ComplexCalculator.Main.ProductsGrid"
-    xmlns:resGrid="clr-namespace:X4_ComplexCalculator.Main.ResourcesGrid"
-    xmlns:storGrid="clr-namespace:X4_ComplexCalculator.Main.StoragesGrid"
-    xmlns:stsmry="clr-namespace:X4_ComplexCalculator.Main.StationSummary"
+    xmlns:wkarea="clr-namespace:X4_ComplexCalculator.Main.WorkArea"
     xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
     Title="X4: ステーション計算機"
     Width="1000"
@@ -34,6 +30,13 @@
 
             <!--  ファイル(F)  -->
             <MenuItem Header="ファイル(_F)">
+
+                <!--  新規  -->
+                <MenuItem
+                    Command="{Binding CreateNew, Mode=OneTime}"
+                    Header="新規作成"
+                    InputGestureText="Ctrl+N" />
+
                 <!--  上書き保存  -->
                 <MenuItem
                     Command="{Binding Save, Mode=OneTime}"
@@ -58,78 +61,26 @@
                     Header="DB更新"
                     InputGestureText="Ctrl+U" />
             </MenuItem>
-
-            <!--  表示(V)  -->
-            <MenuItem Header="表示(_V)">
-                <!--  モジュール一覧  -->
-                <MenuItem
-                    Header="{Binding Title, Mode=OneTime, ElementName=_Module}"
-                    IsCheckable="True"
-                    IsChecked="{Binding IsVisible, ElementName=_Module}" />
-
-                <!--  概要  -->
-                <MenuItem
-                    Header="{Binding Title, Mode=OneTime, ElementName=_Summary}"
-                    IsCheckable="True"
-                    IsChecked="{Binding IsVisible, ElementName=_Summary}" />
-
-                <!--  製品  -->
-                <MenuItem
-                    Header="{Binding Title, Mode=OneTime, ElementName=_Products}"
-                    IsCheckable="True"
-                    IsChecked="{Binding IsVisible, ElementName=_Products}" />
-
-                <!--  建造リソース  -->
-                <MenuItem
-                    Header="{Binding Title, Mode=OneTime, ElementName=_Build}"
-                    IsCheckable="True"
-                    IsChecked="{Binding IsVisible, ElementName=_Build}" />
-
-                <!--  保管庫  -->
-                <MenuItem
-                    Header="{Binding Title, Mode=OneTime, ElementName=_Storage}"
-                    IsCheckable="True"
-                    IsChecked="{Binding IsVisible, ElementName=_Storage}" />
-            </MenuItem>
         </Menu>
 
-        <xcad:DockingManager Grid.Row="1">
-            <xcad:LayoutRoot>
-                <xcad:LayoutPanel Orientation="Horizontal">
+        <xcad:DockingManager
+            Grid.Row="1"
+            ActiveContent="{Binding ActiveContent, Mode=OneWayToSource}"
+            DocumentsSource="{Binding Documents}">
 
-                    <xcad:LayoutAnchorablePaneGroup>
-                        <xcad:LayoutAnchorablePane>
-                            <!--  モジュール一覧  -->
-                            <xcad:LayoutAnchorable x:Name="_Module" Title="モジュール一覧">
-                                <modGrid:ModulesGrid x:Name="Modules" Grid.Column="0" />
-                            </xcad:LayoutAnchorable>
-                        </xcad:LayoutAnchorablePane>
+            <xcad:DockingManager.DocumentHeaderTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Content.Title}" />
+                </DataTemplate>
+            </xcad:DockingManager.DocumentHeaderTemplate>
 
-                        <xcad:LayoutAnchorablePane>
-                            <!--  概要  -->
-                            <xcad:LayoutAnchorable x:Name="_Summary" Title="概要">
-                                <stsmry:StationSummary x:Name="Summary" />
-                            </xcad:LayoutAnchorable>
+            <xcad:DockingManager.Resources>
+                <DataTemplate DataType="{x:Type wkarea:WorkAreaViewModel}">
+                    <wkarea:WorkArea DataContext="{Binding}" />
+                </DataTemplate>
+            </xcad:DockingManager.Resources>
 
-                            <!--  製品  -->
-                            <xcad:LayoutAnchorable x:Name="_Products" Title="製品">
-                                <prodGrid:ProductsGrid x:Name="Products" />
-                            </xcad:LayoutAnchorable>
-
-                            <!--  建造  -->
-                            <xcad:LayoutAnchorable x:Name="_Build" Title="建造">
-                                <resGrid:ResourcesGrid x:Name="Build" />
-                            </xcad:LayoutAnchorable>
-
-                            <!--  保管庫  -->
-                            <xcad:LayoutAnchorable x:Name="_Storage" Title="保管庫">
-                                <storGrid:StoragesGrid x:Name="Storages" />
-                            </xcad:LayoutAnchorable>
-                        </xcad:LayoutAnchorablePane>
-                    </xcad:LayoutAnchorablePaneGroup>
-
-                </xcad:LayoutPanel>
-            </xcad:LayoutRoot>
+            <xcad:LayoutRoot />
         </xcad:DockingManager>
     </Grid>
 </Window>

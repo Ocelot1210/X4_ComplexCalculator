@@ -11,11 +11,6 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
     {
         #region メンバ
         /// <summary>
-        /// 親ウィンドウ
-        /// </summary>
-        private readonly Window OwnerWindow;
-
-        /// <summary>
         /// モジュール選択ウィンドウ
         /// </summary>
         private SelectModuleWindow selectModuleWindow;
@@ -31,10 +26,9 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="ownerWindow">親ウィンドウ</param>
-        public ModulesGridModel(Window ownerWindow)
+        public ModulesGridModel()
         {
-            OwnerWindow = ownerWindow;
+
         }
 
         /// <summary>
@@ -55,7 +49,6 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             {
                 selectModuleWindow = new SelectModuleWindow(Modules);
                 selectModuleWindow.Closed += (object s, EventArgs ev) => { selectModuleWindow.Close(); GC.Collect(); selectModuleWindow = null; };
-                selectModuleWindow.Owner = OwnerWindow;
                 selectModuleWindow.Show();
             }
 

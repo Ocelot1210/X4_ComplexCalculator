@@ -1,21 +1,22 @@
 ﻿using Prism.Commands;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using X4_ComplexCalculator.Main.ModulesGrid;
-using X4_ComplexCalculator.Main.ProductsGrid;
-using X4_ComplexCalculator.Main.ResourcesGrid;
-using X4_ComplexCalculator.Main.StoragesGrid;
+using System.Collections.ObjectModel;
+using X4_ComplexCalculator.Main.WorkArea;
 
 namespace X4_ComplexCalculator.Main
 {
     class MainWindowViewModel
     {
         #region メンバ
-        private MainWindowModel Model;
+        private readonly MainWindowModel _Model;
         #endregion
 
         #region プロパティ
+
+        /// <summary>
+        /// 新規作成
+        /// </summary>
+        public DelegateCommand CreateNew { get; }
+
         /// <summary>
         /// 上書き保存
         /// </summary>
@@ -31,26 +32,40 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         public DelegateCommand Open { get; }
 
+
         /// <summary>
         /// DB更新
         /// </summary>
         public DelegateCommand UpdateDB { get; }
+
+
+        /// <summary>
+        /// ワークエリア一覧
+        /// </summary>
+        public ObservableCollection<WorkAreaViewModel> Documents => _Model.Documents;
+
+
+        public WorkAreaViewModel ActiveContent
+        {
+            set
+            {
+                _Model.ActiveContent = value;
+            }
+        }
         #endregion
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="modulesGridModel">モジュール一覧用Model</param>
-        /// <param name="productsGridModel">製品一覧用Model</param>
-        /// <param name="storagesGridModel">建造リソース用Model</param>
-        public MainWindowViewModel(ModulesGridModel modulesGridModel, ProductsGridModel productsGridModel, ResourcesGridModel resources)
+        public MainWindowViewModel()
         {
-            Model    = new MainWindowModel(modulesGridModel.Modules, productsGridModel.Products, resources.Resources);
-            Save     = new DelegateCommand(Model.Save);
-            SaveAs   = new DelegateCommand(Model.SaveAs);
-            Open     = new DelegateCommand(Model.Open);
-            UpdateDB = new DelegateCommand(Model.UpdateDB);
+            _Model    = new MainWindowModel();
+            CreateNew = new DelegateCommand(_Model.CreateNew);
+            Save      = new DelegateCommand(_Model.Save);
+            SaveAs    = new DelegateCommand(_Model.SaveAs);
+            Open      = new DelegateCommand(_Model.Open);
+            UpdateDB  = new DelegateCommand(_Model.UpdateDB);
         }
     }
 }
