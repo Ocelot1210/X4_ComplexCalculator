@@ -5,6 +5,7 @@ using System.Windows.Data;
 using X4_ComplexCalculator.Common;
 using System;
 using X4_ComplexCalculator.Common.Collection;
+using System.ComponentModel;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
 {
@@ -24,34 +25,59 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
 
 
         /// <summary>
-        /// 検索用フィルタを削除できるか
-        /// </summary>
-        private bool CanRemoveFilter = false;
-
-
-        /// <summary>
         /// 置換モードか
         /// </summary>
         private readonly bool IsReplaceMode;
 
 
         /// <summary>
-        /// モジュール一覧を表示するコレクション
+        /// ウィンドウの表示状態
         /// </summary>
-        private CollectionViewSource ModulesViewSource;
+        private bool _CloseWindow = false;
         #endregion
 
 
         #region プロパティ
         /// <summary>
+        /// ウィンドウの表示状態
+        /// </summary>
+        public bool CloseWindowProperty
+        {
+            get
+            {
+                return _CloseWindow;
+            }
+            set
+            {
+                _CloseWindow = value;
+                OnPropertyChanged();
+            }
+        }
+
+
+        /// <summary>
+        /// ウィンドウが閉じられる時のコマンド
+        /// </summary>
+        public DelegateCommand<CancelEventArgs> WindowClosingCommand { get; }
+
+
+        /// <summary>
         /// 変更前のモジュール名
         /// </summary>
         public string PrevModuleName { get; }
 
+
+        /// <summary>
+        /// モジュール一覧表示用
+        /// </summary>
+        public ListCollectionView ModulesView { get; }
+
+
         /// <summary>
         /// 変更前モジュールを表示するか
         /// </summary>
-        public Visibility PrevModuleVisiblity => (IsReplaceMode) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility PrevModuleVisiblity => IsReplaceMode ? Visibility.Visible : Visibility.Collapsed;
+
 
         /// <summary>
         /// モジュール種別
@@ -78,10 +104,12 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
             private get { return _SearchModuleName; }
             set
             {
-                if (_SearchModuleName == value) return;
-                _SearchModuleName = value;
-                OnPropertyChanged();
-                ApplyFilter();
+                if (_SearchModuleName != value)
+                {
+                    _SearchModuleName = value;
+                    OnPropertyChanged();
+                    ModulesView.Refresh();
+                }
             }
         }
 
@@ -89,13 +117,13 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         /// <summary>
         /// 選択ボタンクリック時
         /// </summary>
-        public DelegateCommand<Window> OKButtonClickedCommand { get; }
+        public DelegateCommand OKButtonClickedCommand { get; }
 
 
         /// <summary>
         /// 閉じるボタンクリック時
         /// </summary>
-        public DelegateCommand<Window> CloseButtonClickedCommand { get; }
+        public DelegateCommand CloseButtonClickedCommand { get; }
 
 
         /// <summary>
@@ -110,26 +138,27 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         /// </summary>
         /// <param name="modules">選択結果格納先</param>
         /// <param name="isReplaceMode">置換モードか(falseで複数選択許可)</param>
-        /// <param name="viewSource">modulesViewSource</param>
-        public SelectModuleViewModel(SmartCollection<ModulesGridItem> modules, CollectionViewSource modulesViewSource, string prevModuleName = "")
+        public SelectModuleViewModel(SmartCollection<ModulesGridItem> modules, string prevModuleName = "")
         {
             Model = new SelectModuleModel(modules);
 
             PrevModuleName = prevModuleName;
-            IsReplaceMode = prevModuleName != "";
+            IsReplaceMode  = prevModuleName != "";
 
-            ModulesViewSource = modulesViewSource;
-            OKButtonClickedCommand = new DelegateCommand<Window>(OKButtonClicked);
-            CloseButtonClickedCommand = new DelegateCommand<Window>(CloseWindow);
+            ModulesView = (ListCollectionView)CollectionViewSource.GetDefaultView(Modules);
+            ModulesView.Filter = Filter;
+
+            OKButtonClickedCommand    = new DelegateCommand(OKButtonClicked);
+            CloseButtonClickedCommand = new DelegateCommand(CloseWindow);
+            WindowClosingCommand      = new DelegateCommand<CancelEventArgs>(WindowClosing);
         }
 
 
         /// <summary>
         /// ウィンドウが閉じられる時のイベント
         /// </summary>
-        /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void OnWindowClosing(object sender, EventArgs e)
+        public void WindowClosing(CancelEventArgs _)
         {
             Model.SaveCheckState();
         }
@@ -138,15 +167,14 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         /// <summary>
         /// OKボタンクリック時
         /// </summary>
-        /// <param name="window">親ウィンドウ</param>
-        private void OKButtonClicked(Window window)
+        private void OKButtonClicked()
         {
             Model.AddSelectedModuleToItemCollection();
 
             // 置換モードならウィンドウを閉じる
             if (IsReplaceMode)
             {
-                window.Close();
+                CloseWindowProperty = true;
             }
         }
 
@@ -154,46 +182,20 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         /// <summary>
         /// ウィンドウを閉じる
         /// </summary>
-        /// <param name="window">親ウィンドウ</param>
-        private void CloseWindow(Window window)
+        private void CloseWindow()
         {
-            window.Close();
-        }
-
-
-        /// <summary>
-        /// フィルタを適用
-        /// </summary>
-        private void ApplyFilter()
-        {
-            // 2回目以降か？
-            if (CanRemoveFilter)
-            {
-                ModulesViewSource.Filter -= new FilterEventHandler(FilterEvent);
-                ModulesViewSource.Filter += new FilterEventHandler(FilterEvent);
-            }
-            else
-            {
-                // 初回はこっち
-                CanRemoveFilter = true;
-                ModulesViewSource.Filter += new FilterEventHandler(FilterEvent);
-            }
+            CloseWindowProperty = true;
         }
 
 
         /// <summary>
         /// フィルタイベント
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="ev"></param>
-        private void FilterEvent(object sender, FilterEventArgs e)
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        private bool Filter(object obj)
         {
-            if (e.Item is ModulesListItem src)
-            {
-                // 選択解除する
-                src.Checked = false;
-                e.Accepted = src != null && (SearchModuleName == "" || 0 <= src.Name.IndexOf(SearchModuleName, StringComparison.InvariantCultureIgnoreCase));
-            }
+            return obj is ModulesListItem src && (SearchModuleName == "" || 0 <= src.Name.IndexOf(SearchModuleName, StringComparison.InvariantCultureIgnoreCase));
         }
     }
 }

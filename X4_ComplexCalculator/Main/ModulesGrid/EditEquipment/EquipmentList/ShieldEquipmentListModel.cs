@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data.SQLite;
 using System.Linq;
@@ -6,7 +7,6 @@ using System.Threading.Tasks;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
-using System.Collections.Specialized;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
 {
@@ -17,11 +17,8 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// </summary>
         /// <param name="module">編集対象モジュール</param>
         /// <param name="factions">種族一覧</param>
-        public ShieldEquipmentListModel(Module module, EditEquipmentViewModel viewModel) : base(module, viewModel)
+        public ShieldEquipmentListModel(Module module, MemberChangeDetectCollection<FactionsListItem> factions) : base(module, factions)
         {
-            viewModel.Presets.CollectionChanged += OnPresetsCollectionChanged;
-
-
             foreach (Size size in Module.Equipment.Shield.Sizes)
             {
                 _Equipments.Add(size, new SmartCollection<Equipment>());
@@ -33,12 +30,13 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
             }
         }
 
+
         /// <summary>
         /// プリセット一覧変更時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        protected override void OnPresetsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        public override void OnPresetsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Replace ||
                 e.Action == NotifyCollectionChangedAction.Remove)
@@ -57,7 +55,19 @@ WHERE
                 }
             }
 
-            base.OnPresetsCollectionChanged(sender, e);
+
+            if (e.Action == NotifyCollectionChangedAction.Replace ||
+                e.Action == NotifyCollectionChangedAction.Add)
+            {
+
+                foreach (PresetComboboxItem item in e.NewItems)
+                {
+                    foreach (var equipment in Equipments.Values.SelectMany((x) => x))
+                    {
+                        var query = $"INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES('{Module.ModuleID}', {item.ID}, '{equipment.EquipmentID}', '{equipment.EquipmentType}')";
+                    }
+                }
+            }
         }
 
 

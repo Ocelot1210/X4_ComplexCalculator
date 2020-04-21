@@ -2,10 +2,12 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
 {
@@ -20,11 +22,16 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
         /// </summary>
         private readonly EditEquipmentModel Model;
 
+        /// <summary>
+        /// ウィンドウの表示状態
+        /// </summary>
+        private bool _CloseWindow = false;
+
 
         /// <summary>
-        /// 装備保存イベント
+        /// 選択中の装備サイズ
         /// </summary>
-        public event EventHandler OnSaveEquipment;
+        private DB.X4DB.Size _SelectedSize;
         #endregion
 
 
@@ -36,10 +43,54 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
 
 
         /// <summary>
+        /// ウィンドウの表示状態
+        /// </summary>
+        public bool CloseWindowProperty
+        {
+            get
+            {
+                return _CloseWindow;
+            }
+            set
+            {
+                _CloseWindow = value;
+                OnPropertyChanged();
+            }
+        }
+
+
+        /// <summary>
+        /// ウィンドウが閉じられる時のイベント
+        /// </summary>
+        public DelegateCommand<CancelEventArgs> WindowClosingCommand { get; }
+
+
+        /// <summary>
         /// 装備サイズ一覧
         /// </summary>
         public ObservableCollection<DB.X4DB.Size> EquipmentSizes => Model.EquipmentSizes;
 
+
+        /// <summary>
+        /// 選択中の装備サイズ
+        /// </summary>
+        public DB.X4DB.Size SelectedSize
+        {
+            get
+            {
+                return _SelectedSize;
+            }
+            set
+            {
+                if (value.SizeID != (_SelectedSize?.SizeID ?? ""))
+                {
+                    _SelectedSize = value;
+                    TurretsViewModel.SelectedSize = value;
+                    ShieldsViewModel.SelectedSize = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         /// <summary>
         /// 種族一覧
@@ -72,13 +123,25 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
         /// <summary>
         /// 保存ボタンクリック
         /// </summary>
-        public DelegateCommand<Window> SaveButtonClickedCommand { get; }
+        public DelegateCommand SaveButtonClickedCommand { get; }
 
 
         /// <summary>
         /// 閉じるボタンクリック時のコマンド
         /// </summary>
-        public DelegateCommand<Window> CloseButtonClickedCommand { get; }
+        public DelegateCommand CloseWindowCommand { get; }
+
+
+        /// <summary>
+        /// タレット用ViewModel
+        /// </summary>
+        public EquipmentListViewModel TurretsViewModel { get; }
+
+
+        /// <summary>
+        /// シールド用ViewModel
+        /// </summary>
+        public EquipmentListViewModel ShieldsViewModel { get; }
 
 
         /// <summary>
@@ -108,13 +171,27 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
         {
             ModuleName = module.Name;
 
+            // Model類
             Model = new EditEquipmentModel(module);
             Model.PropertyChanged += Model_PropertyChanged;
-            SaveButtonClickedCommand = new DelegateCommand<Window>(SavebuttonClicked);
-            CloseButtonClickedCommand = new DelegateCommand<Window>(CloseButtonClicked);
-            SavePresetCommand = new DelegateCommand(Model.SavePreset);
-            AddPresetCommand = new DelegateCommand(Model.AddPreset);
-            RemovePresetCommand = new DelegateCommand(Model.RemovePreset);
+            
+            // サブViewModel類
+            TurretsViewModel = new EquipmentListViewModel(new TurretEquipmentListModel(module, Factions));
+            Presets.CollectionChanged += TurretsViewModel.OnPresetsCollectionChanged;
+
+            ShieldsViewModel = new EquipmentListViewModel(new ShieldEquipmentListModel(module, Factions));
+            Presets.CollectionChanged += ShieldsViewModel.OnPresetsCollectionChanged;
+
+            // コマンド類
+            SaveButtonClickedCommand = new DelegateCommand(SavebuttonClicked);
+            CloseWindowCommand       = new DelegateCommand(CloseWindow);
+            SavePresetCommand        = new DelegateCommand(Model.SavePreset);
+            AddPresetCommand         = new DelegateCommand(Model.AddPreset);
+            RemovePresetCommand      = new DelegateCommand(Model.RemovePreset);
+            WindowClosingCommand     = new DelegateCommand<CancelEventArgs>(WindowClosing);
+
+            // その他初期化
+            SelectedSize = EquipmentSizes.FirstOrDefault();
         }
 
 
@@ -137,36 +214,58 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
         }
 
 
-
         /// <summary>
-        /// ウィンドウが閉じられる時のイベント
+        /// ウィンドウが閉じられる時
         /// </summary>
-        /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void OnWindowClosing(object sender, EventArgs e)
+        public void WindowClosing(CancelEventArgs e)
         {
-            Model.SaveCheckState();
+            // 装備が未保存の場合
+            if (TurretsViewModel.Unsaved || ShieldsViewModel.Unsaved)
+            {
+                var result = MessageBox.Show("変更内容を保存しますか？", "確認", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+
+                switch (result)
+                {
+                    // 保存する場合
+                    case MessageBoxResult.Yes:
+                        TurretsViewModel.SaveEquipment();
+                        ShieldsViewModel.SaveEquipment();
+                        Model.SaveCheckState();
+                        break;
+
+                    // 保存せずに閉じる場合
+                    case MessageBoxResult.No:
+                        Model.SaveCheckState();
+                        break;
+
+                    // キャンセルする場合
+                    case MessageBoxResult.Cancel:
+                        CloseWindowProperty = false;
+                        e.Cancel = true;
+                        break;
+                }
+            }
         }
 
 
         /// <summary>
         /// 保存ボタンクリック時
         /// </summary>
-        /// <param name="window"></param>
-        private void SavebuttonClicked(Window window)
+        private void SavebuttonClicked()
         {
-            OnSaveEquipment?.Invoke(this, null);
-            window.Close();
+            TurretsViewModel.SaveEquipment();
+            ShieldsViewModel.SaveEquipment();
+            CloseWindowProperty = true;
         }
 
 
         /// <summary>
         /// 閉じるボタンクリック時
         /// </summary>
-        /// <param name="window">親ウィンドウ</param>
-        private void CloseButtonClicked(Window window)
+        private void CloseWindow()
         {
-            window.Close();
+            CloseWindowProperty = true;
         }
     }
 }

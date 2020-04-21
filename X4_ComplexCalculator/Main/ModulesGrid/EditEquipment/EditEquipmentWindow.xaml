@@ -4,17 +4,28 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:eqlst="clr-namespace:X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:local="clr-namespace:X4_ComplexCalculator.Main.ModulesGrid.EditEquipment"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
     xmlns:xctk="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
     x:Name="window"
     Title="兵装編集画面"
     Width="800"
     Height="450"
+    x4cmn:CloseWindowBehavior.Close="{Binding CloseWindowProperty, Mode=OneWay}"
     ResizeMode="NoResize"
     Style="{StaticResource DefaultWindowBackgroundStyle}"
     WindowStyle="ToolWindow"
     mc:Ignorable="d">
+
+
+    <i:Interaction.Triggers>
+        <!--  ウィンドウが閉じられる時のイベント  -->
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding WindowClosingCommand, Mode=OneTime}" PassEventArgsToCommand="True" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
 
     <Window.Resources>
         <Style x:Key="DefaultTextStyle" TargetType="{x:Type Label}">
@@ -64,7 +75,8 @@
                 Name="SizeComboBox"
                 DisplayMemberPath="Name"
                 ItemsSource="{Binding EquipmentSizes}"
-                SelectedIndex="0" />
+                SelectedIndex="0"
+                SelectedItem="{Binding SelectedSize, Mode=TwoWay}" />
         </StackPanel>
 
         <!--  プリセット  -->
@@ -126,11 +138,12 @@
                 Command="{Binding SaveButtonClickedCommand}"
                 CommandParameter="{Binding ElementName=window}"
                 Content="保存" />
+
             <Button
                 Grid.Column="1"
                 Width="{Binding ElementName=SaveButton, Path=Width}"
                 Height="{Binding ElementName=SaveButton, Path=Height}"
-                Command="{Binding CloseButtonClickedCommand}"
+                Command="{Binding CloseWindowCommand}"
                 CommandParameter="{Binding ElementName=window}"
                 Content="キャンセル" />
         </Grid>
@@ -161,10 +174,10 @@
             Grid.ColumnSpan="3"
             Margin="5,5,5,5">
             <TabItem Header="タレット">
-                <eqlst:EquipmentList x:Name="TurretsList" SelectedSize="{Binding SelectedValue, ElementName=SizeComboBox, UpdateSourceTrigger=PropertyChanged}" />
+                <eqlst:EquipmentList x:Name="TurretsList" />
             </TabItem>
             <TabItem Header="シールド">
-                <eqlst:EquipmentList x:Name="ShieldsList" SelectedSize="{Binding SelectedValue, ElementName=SizeComboBox, UpdateSourceTrigger=PropertyChanged}" />
+                <eqlst:EquipmentList x:Name="ShieldsList" />
             </TabItem>
         </TabControl>
 

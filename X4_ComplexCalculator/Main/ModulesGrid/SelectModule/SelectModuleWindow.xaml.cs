@@ -1,5 +1,4 @@
 ﻿using System.Windows;
-using System.Windows.Data;
 using X4_ComplexCalculator.Common.Collection;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
@@ -18,10 +17,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         {
             InitializeComponent();
 
-            var viewModel = new SelectModuleViewModel(modules, (CollectionViewSource)Resources["ModulesViewSource"], prevModuleName);
-            Closing += viewModel.OnWindowClosing;
-
-            DataContext = viewModel;
+            DataContext = new SelectModuleViewModel(modules, prevModuleName);
         }
     }
 }

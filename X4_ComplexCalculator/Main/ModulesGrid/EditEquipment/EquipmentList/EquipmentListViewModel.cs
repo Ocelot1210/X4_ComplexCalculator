@@ -1,7 +1,9 @@
 ﻿using Prism.Commands;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Windows.Data;
 using X4_ComplexCalculator.Common;
@@ -18,7 +20,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// <summary>
         /// 装備一覧用Model
         /// </summary>
-        readonly EquipmentListModelBase Model;
+        readonly EquipmentListModelBase _Model;
 
 
         /// <summary>
@@ -28,41 +30,35 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
 
 
         /// <summary>
-        /// 検索用フィルタを削除できるか
+        /// 装備一覧表示用
         /// </summary>
-        private bool CanRemoveFilter = false;
+        private readonly Dictionary<Size, ListCollectionView> _EquipmentsViews = new Dictionary<Size, ListCollectionView>();
         #endregion
 
 
         #region プロパティ
         /// <summary>
-        /// 表示するコレクション
+        /// 装備一覧表示用
         /// </summary>
-        private CollectionViewSource EquipmentsViewSource { get; set; }
-
-
-        /// <summary>
-        /// 装備一覧
-        /// </summary>
-        public ObservableCollection<Equipment> Equipments => (Model.SelectedSize != null)? Model.Equipments[Model.SelectedSize] : null;
+        public ListCollectionView EquipmentsView => (_Model.SelectedSize != null) ? _EquipmentsViews[_Model.SelectedSize] : null;
 
 
         /// <summary>
         /// 装備中の装備
         /// </summary>
-        public ObservableCollection<Equipment> Equipped => (Model.SelectedSize != null)? Model.Equipped[Model.SelectedSize] : null;
+        public ObservableCollection<Equipment> Equipped => (_Model.SelectedSize != null)? _Model.Equipped[_Model.SelectedSize] : null;
 
 
         /// <summary>
         /// 装備可能な個数
         /// </summary>
-        public int MaxAmount => Model.MaxAmount[Model.SelectedSize];
+        public int MaxAmount => (_Model.SelectedSize != null)? _Model.MaxAmount[_Model.SelectedSize] : 0;
 
 
         /// <summary>
         /// 現在装備中の個数
         /// </summary>
-        public int EquippedCount => Model.Equipped[Model.SelectedSize].Count;
+        public int EquippedCount => (_Model.SelectedSize != null) ? _Model.Equipped[_Model.SelectedSize].Count : 0;
 
 
         /// <summary>
@@ -88,10 +84,12 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
             }
             set
             {
-                if (_SearchEquipmentName == value) return;
-                _SearchEquipmentName = value;
-                OnPropertyChanged();
-                ApplyFilter();
+                if (_SearchEquipmentName != value)
+                {
+                    _SearchEquipmentName = value;
+                    OnPropertyChanged();
+                    EquipmentsView.Refresh();
+                }
             }
         }
 
@@ -115,15 +113,21 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         {
             set
             {
-                Model.SelectedSize = value;
-                OnPropertyChanged("MaxAmount");
-                OnPropertyChanged("EquippedCount");
-                OnPropertyChanged("Equipments");
-                OnPropertyChanged("Equipped");
-                OnPropertyChanged("CanAddEquipment");
-                OnPropertyChanged("CanRemoveEquipment");
+                _Model.SelectedSize = value;
+                OnPropertyChanged(nameof(MaxAmount));
+                OnPropertyChanged(nameof(EquippedCount));
+                OnPropertyChanged(nameof(Equipped));
+                OnPropertyChanged(nameof(CanAddEquipment));
+                OnPropertyChanged(nameof(CanRemoveEquipment));
+                OnPropertyChanged(nameof(EquipmentsView));
             }
         }
+
+
+        /// <summary>
+        /// 未保存か
+        /// </summary>
+        public bool Unsaved { get; set; } = false;
         #endregion
 
 
@@ -131,10 +135,16 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// コンストラクタ
         /// </summary>
         /// <param name="model"></param>
-        public EquipmentListViewModel(EquipmentListModelBase model, CollectionViewSource viewSource)
+        public EquipmentListViewModel(EquipmentListModelBase model)
         {
-            Model = model;
-            EquipmentsViewSource = viewSource;
+            _Model = model;
+
+            foreach (var pair in _Model.Equipments)
+            {
+                var item = (ListCollectionView)CollectionViewSource.GetDefaultView(pair.Value);
+                item.Filter = Filter;
+                _EquipmentsViews.Add(pair.Key, item);
+            }
 
             AddButtonClickedCommand = new DelegateCommand<ICollection>(AddButtonClicked);
             RemoveButtonClickedCommand = new DelegateCommand<ICollection>(DeleteButtonClicked);
@@ -146,9 +156,10 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void SaveEquipment(object sender, EventArgs e)
+        public void SaveEquipment()
         {
-            Model.SaveEquipment();
+            _Model.SaveEquipment();
+            Unsaved = false;
         }
 
 
@@ -160,11 +171,11 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         {
             if (selectedEquipments != null)
             {
-                Model.AddEquipments(selectedEquipments.Cast<Equipment>());
-                OnPropertyChanged("CanAddEquipment");
-                OnPropertyChanged("CanRemoveEquipment");
-                OnPropertyChanged("MaxAmount");
-                OnPropertyChanged("EquippedCount");
+                _Model.AddEquipments(selectedEquipments.Cast<Equipment>());
+                Unsaved = true;
+                OnPropertyChanged(nameof(CanAddEquipment));
+                OnPropertyChanged(nameof(CanRemoveEquipment));
+                OnPropertyChanged(nameof(EquippedCount));
             }
         }
 
@@ -177,31 +188,11 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         {
             if (selectedEquipments != null)
             {
-                Model.RemoveEquipments(selectedEquipments.Cast<Equipment>().ToArray());
-                OnPropertyChanged("CanAddEquipment");
-                OnPropertyChanged("CanRemoveEquipment");
-                OnPropertyChanged("MaxAmount");
-                OnPropertyChanged("EquippedCount");
-            }
-        }
-
-
-        /// <summary>
-        /// フィルタを適用
-        /// </summary>
-        private void ApplyFilter()
-        {
-            // 2回目以降か？
-            if (CanRemoveFilter)
-            {
-                EquipmentsViewSource.Filter -= new FilterEventHandler(FilterEvent);
-                EquipmentsViewSource.Filter += new FilterEventHandler(FilterEvent);
-            }
-            else
-            {
-                // 初回はこっち
-                CanRemoveFilter = true;
-                EquipmentsViewSource.Filter += new FilterEventHandler(FilterEvent);
+                _Model.RemoveEquipments(selectedEquipments.Cast<Equipment>().ToArray());
+                Unsaved = true;
+                OnPropertyChanged(nameof(CanAddEquipment));
+                OnPropertyChanged(nameof(CanRemoveEquipment));
+                OnPropertyChanged(nameof(EquippedCount));
             }
         }
 
@@ -209,11 +200,23 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// <summary>
         /// フィルタイベント
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="ev"></param>
-        private void FilterEvent(object sender, FilterEventArgs e)
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        private bool Filter(object obj)
         {
-            e.Accepted = e.Item is Equipment src && (SearchEquipmentName == "" || 0 <= src.Name.IndexOf(SearchEquipmentName, StringComparison.InvariantCultureIgnoreCase));
+            return obj is Equipment src && (SearchEquipmentName == "" || 0 <= src.Name.IndexOf(SearchEquipmentName, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+
+        /// <summary>
+        /// プリセット一覧変更時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void OnPresetsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            _Model.OnPresetsCollectionChanged(sender, e);
+            Unsaved = true;
         }
     }
 }

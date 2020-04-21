@@ -35,12 +35,6 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
 
 
         /// <summary>
-        /// モジュール一覧
-        /// </summary>
-        public ObservableCollection<ModulesGridItem> Modules => _Model.Modules;
-
-
-        /// <summary>
         /// 検索するモジュール名
         /// </summary>
         public string SearchModuleName
@@ -99,7 +93,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         public ModulesGridViewModel(ModulesGridModel model)
         {
             _Model = model;
-            ModulesView        = (ListCollectionView)CollectionViewSource.GetDefaultView(Modules);
+            ModulesView        = (ListCollectionView)CollectionViewSource.GetDefaultView(_Model.Modules);
             ModulesView.Filter = Filter;
             AddButtonClicked   = new DelegateCommand(_Model.ShowAddModuleWindow);
             ReplaceModule      = new DelegateCommand<ModulesGridItem>(_Model.ReplaceModule);

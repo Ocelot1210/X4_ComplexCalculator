@@ -20,10 +20,8 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// </summary>
         /// <param name="module"></param>
         /// <param name="factions"></param>
-        public TurretEquipmentListModel(Module module, EditEquipmentViewModel viewModel) : base(module, viewModel)
+        public TurretEquipmentListModel(Module module, MemberChangeDetectCollection<FactionsListItem> factions) : base(module, factions)
         {
-            viewModel.Presets.CollectionChanged += OnPresetsCollectionChanged;
-
             foreach (Size size in Module.Equipment.Turret.Sizes)
             {
                 _Equipments.Add(size, new SmartCollection<Equipment>());
@@ -40,7 +38,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        protected override void OnPresetsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        public override void OnPresetsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Replace ||
                 e.Action == NotifyCollectionChangedAction.Remove)
@@ -59,7 +57,18 @@ WHERE
                 }
             }
 
-            base.OnPresetsCollectionChanged(sender, e);
+            if (e.Action == NotifyCollectionChangedAction.Replace ||
+                e.Action == NotifyCollectionChangedAction.Add)
+            {
+
+                foreach (PresetComboboxItem item in e.NewItems)
+                {
+                    foreach (var equipment in Equipments.Values.SelectMany((x) => x))
+                    {
+                        var query = $"INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES('{Module.ModuleID}', {item.ID}, '{equipment.EquipmentID}', '{equipment.EquipmentType}')";
+                    }
+                }
+            }
         }
 
 

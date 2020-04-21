@@ -96,34 +96,12 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// </summary>
         /// <param name="module">編集対象モジュール</param>
         /// <param name="factions">種族一覧</param>
-        public EquipmentListModelBase(Module module, EditEquipmentViewModel viewModel)
+        /// <param name="presetsCollectionChanged">プリセット変更時のイベントハンドラー</param>
+        public EquipmentListModelBase(Module module, MemberChangeDetectCollection<FactionsListItem> factions)
         {
             Module = module;
-            Factions = viewModel.Factions;
+            Factions = factions;
             Factions.OnPropertyChangedAsync += UpdateEquipments;
-            viewModel.Presets.CollectionChanged += OnPresetsCollectionChanged;
-        }
-
-
-        /// <summary>
-        /// プリセット一覧変更時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        protected virtual void OnPresetsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action == NotifyCollectionChangedAction.Replace ||
-                e.Action == NotifyCollectionChangedAction.Add)
-            {
-
-                foreach (PresetComboboxItem item in e.NewItems)
-                {
-                    foreach (var equipment in Equipments.Values.SelectMany((x) => x))
-                    {
-                        var query = $"INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES('{Module.ModuleID}', {item.ID}, '{equipment.EquipmentID}', '{equipment.EquipmentType}')";
-                    }
-                }
-            }
         }
 
 
@@ -132,6 +110,13 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// </summary>
         protected abstract Task UpdateEquipments(object sender, PropertyChangedEventArgs e);
 
+
+        /// <summary>
+        /// プリセット変更時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public abstract void OnPresetsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e);
 
         /// <summary>
         /// 装備を追加
@@ -147,8 +132,8 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
                 return;
             }
 
-            // Altキー押下時なら選択アイテムを全追加
-            if (Keyboard.IsKeyDown(Key.LeftAlt))
+            // 左Shiftキー押下時なら選択アイテムを全追加
+            if (Keyboard.IsKeyDown(Key.LeftShift))
             {
                 while (0 < addRange)
                 {

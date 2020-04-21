@@ -9,10 +9,7 @@
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
-    <UserControl.Resources>
-        <CollectionViewSource x:Key="EquipmentsViewSource" Source="{Binding Equipments}" />
 
-    </UserControl.Resources>
 
     <Grid Background="LightGray">
         <!--  行列定義  -->
@@ -60,7 +57,7 @@
                 Content="➡"
                 FontSize="18"
                 IsEnabled="{Binding CanAddEquipment, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-                ToolTip="Altキーを押しながらクリックで選択項目を一気に追加できます" />
+                ToolTip="左Shiftキーを押しながらクリックで選択項目を一気に追加できます" />
 
             <!--  削除ボタン  -->
             <Button
@@ -80,7 +77,7 @@
             Grid.Row="1"
             Grid.Column="0"
             DisplayMemberPath="Name"
-            ItemsSource="{Binding Source={StaticResource EquipmentsViewSource}}"
+            ItemsSource="{Binding EquipmentsView}"
             SelectionMode="Extended" />
 
         <!--  装備中  -->
