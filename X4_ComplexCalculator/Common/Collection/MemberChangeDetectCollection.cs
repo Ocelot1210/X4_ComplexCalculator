@@ -165,10 +165,10 @@ namespace X4_ComplexCalculator.Common.Collection
         /// <param name="range">追加するコレクション</param>
         public override void Reset(IEnumerable<T> range)
         {
-            Parallel.ForEach(Items, item =>
+            foreach (var item in Items)
             {
                 item.Dispose();
-            });
+            }
 
             base.Reset(range);
         }

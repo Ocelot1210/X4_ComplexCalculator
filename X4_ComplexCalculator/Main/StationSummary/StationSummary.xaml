@@ -26,7 +26,7 @@
                 </Expander.Header>
                 <DataGridInline:InlineListView
                     ItemContainerStyle="{StaticResource NoHighlightListViewItem}"
-                    ItemsSource="{Binding WorkforceDetails, IsAsync=True}"
+                    ItemsSource="{Binding WorkforceDetails, Mode=OneTime}"
                     Style="{StaticResource DefaultListView}">
                     <ListView.View>
                         <GridView>
@@ -129,7 +129,7 @@
                 </Expander.Header>
                 <DataGridInline:InlineListView
                     ItemContainerStyle="{StaticResource NoHighlightListViewItem}"
-                    ItemsSource="{Binding BuildingCostDetails}"
+                    ItemsSource="{Binding BuildingCostDetails, Mode=OneTime}"
                     Style="{StaticResource DefaultListView}">
                     <ListView.View>
                         <GridView>

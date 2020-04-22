@@ -1,11 +1,11 @@
 ﻿using Prism.Commands;
 using System;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+using System.Windows.Media;
 using System.Xml.Linq;
 using X4_ComplexCalculator.Common;
 
@@ -145,6 +145,48 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             }
         }
 
+        private static T FindVisualChild<T>(DependencyObject obj) where T : DependencyObject
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
+            {
+                DependencyObject child = VisualTreeHelper.GetChild(obj, i);
+                if (child != null && child is T)
+                    return (T)child;
+                else
+                {
+                    T childOfChild = FindVisualChild<T>(child);
+                    if (childOfChild != null)
+                        return childOfChild;
+                }
+            }
+            return null;
+        }
+
+        private DataGridCell GetCell(DataGrid grid, DataGridRow row, int column)
+        {
+            if (row != null)
+            {
+                var presenter = FindVisualChild<DataGridCellsPresenter>(row);
+                if (presenter == null)
+                {
+                    row.ApplyTemplate();
+                    presenter = FindVisualChild<DataGridCellsPresenter>(row);
+                }
+                if (presenter != null)
+                {
+                    var cell = presenter.ItemContainerGenerator.ContainerFromIndex(column) as DataGridCell;
+                    if (cell != null)
+                    {
+                        grid.ScrollIntoView(row, grid.Columns[column]);
+                        cell = presenter.ItemContainerGenerator.ContainerFromIndex(column) as DataGridCell;
+                    }
+                    return cell;
+                }
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// 選択中のモジュールを削除
         /// </summary>
@@ -159,32 +201,52 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             _Model.DeleteModules(items);
 
             // 削除後に全部の選択状態を外さないと余計なものまで選択される
-            Parallel.ForEach(_Model.Modules, module => 
+            foreach (var module in _Model.Modules)
             {
                 module.IsSelected = false;
-            });
+            }
 
-            // 先頭行を削除した場合
+            // 選択行を設定
             if (currPos < 0)
             {
+                // 先頭行を削除した場合
                 ModulesView.MoveCurrentToFirst();
             }
-
-
-            // 最後の行を消した場合、選択行を最後にする
-            if (ModulesView.Count <= currPos)
+            else if (ModulesView.Count <= currPos)
             {
+                // 最後の行を消した場合、選択行を最後にする
                 ModulesView.MoveCurrentToLast();
             }
+            else
+            {
+                // 中間行の場合
+                ModulesView.MoveCurrentToPosition(currPos);
+            }
 
-
-            // 本当に選択したいものだけ選択
+            // 再度選択
             if (ModulesView.CurrentItem is ModulesGridItem item)
             {
                 item.IsSelected = true;
             }
 
-            dataGrid.Focus();
+            // 選択項目があるか？
+            if (0 <= ModulesView.CurrentPosition)
+            {
+                // UpdateLayout()とScrollIntoView()しないとrowが取れない！
+                dataGrid.UpdateLayout();
+                dataGrid.ScrollIntoView(dataGrid.Items[ModulesView.CurrentPosition]);
+
+                // 参考：https://blog.magnusmontin.net/2013/11/08/how-to-programmatically-select-and-focus-a-row-or-cell-in-a-datagrid-in-wpf/
+                var row = dataGrid.ItemContainerGenerator.ContainerFromIndex(ModulesView.CurrentPosition) as DataGridRow;
+                if (row != null)
+                {
+                    var cell = GetCell(dataGrid, row, 0);
+                    if (cell != null)
+                    {
+                        cell.Focus();
+                    }
+                }
+            }
         }
 
 

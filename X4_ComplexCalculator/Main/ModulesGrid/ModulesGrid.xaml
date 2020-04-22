@@ -66,7 +66,8 @@
             x4cmn:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
             CellStyle="{StaticResource DataGridCellDefaultStyle}"
             ContextMenu="{StaticResource ModulesGridContextMenu}"
-            ItemsSource="{Binding ModulesView, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, IsAsync=True}"
+            IsSynchronizedWithCurrentItem="True"
+            ItemsSource="{Binding ModulesView, Mode=OneTime}"
             RowHeight="25"
             SelectionUnit="FullRow"
             Style="{StaticResource DefaultDataGridStyle}">

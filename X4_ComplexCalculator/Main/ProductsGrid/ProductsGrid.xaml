@@ -106,7 +106,7 @@
         x4cmn:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
         CellStyle="{StaticResource DataGridCellDefaultStyle}"
         ContextMenu="{StaticResource ProductsGridContextMenu}"
-        ItemsSource="{Binding Path=Products, UpdateSourceTrigger=PropertyChanged, IsAsync=True}"
+        ItemsSource="{Binding Products, Mode=OneTime}"
         SelectionUnit="Cell"
         Style="{StaticResource DetailsDataGridStyle}">
 

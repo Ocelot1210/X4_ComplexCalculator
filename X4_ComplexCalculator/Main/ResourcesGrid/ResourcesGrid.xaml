@@ -11,16 +11,18 @@
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
+
     <UserControl.Resources>
 
         <!--  データ中継用  -->
         <x4cmn:BindingProxy x:Key="ProxyUnitPricePercent" Data="{Binding UnitPricePercent, Mode=TwoWay}" />
     </UserControl.Resources>
+
     <DataGrid
         x4cmn:DataGridCurrentCellEditModeBehavior.Enabled="True"
         x4cmn:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
         IsReadOnly="False"
-        ItemsSource="{Binding Path=BuildResource, UpdateSourceTrigger=PropertyChanged, IsAsync=True}"
+        ItemsSource="{Binding BuildResource, Mode=OneTime}"
         SelectionUnit="Cell"
         Style="{StaticResource DefaultDataGridStyle}">
         <DataGrid.Columns>

@@ -53,6 +53,13 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         /// <returns></returns>
         private async Task OnModulesPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            // モジュール数変更時のみ処理
+            if (e.PropertyName != "ModuleCount")
+            {
+                await Task.CompletedTask;
+                return;
+            }
+
             // 建造に必要なリソース集計用
             var resourcesDict = new Dictionary<string, long>();
 
@@ -65,6 +72,7 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
             );
 
             Resources.Reset(resourcesDict.Select(x => new ResourcesGridItem(x.Key, x.Value)).OrderBy(x => x.Ware.Name));
+
             await Task.CompletedTask;
         }
 
