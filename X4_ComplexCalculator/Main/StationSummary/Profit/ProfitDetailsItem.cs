@@ -44,7 +44,7 @@ namespace X4_ComplexCalculator.Main.StationSummary.Profit
                 {
                     _UnitPrice = value;
                     OnPropertyChanged();
-                    OnPropertyChanged(nameof(TotalPrice));
+                    OnPropertyChanged("TotalPrice");
                 }
             }
         }

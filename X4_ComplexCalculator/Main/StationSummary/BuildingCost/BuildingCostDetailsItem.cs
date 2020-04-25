@@ -51,7 +51,7 @@ namespace X4_ComplexCalculator.Main.StationSummary.BuildingCost
                 {
                     _Count = value;
                     OnPropertyChanged();
-                    OnPropertyChanged(nameof(TotalPrice));
+                    OnPropertyChanged("TotalPrice");
                 }
             }
         }
@@ -72,7 +72,7 @@ namespace X4_ComplexCalculator.Main.StationSummary.BuildingCost
                 {
                     _UnitPrice = value;
                     OnPropertyChanged();
-                    OnPropertyChanged(nameof(TotalPrice));
+                    OnPropertyChanged("TotalPrice");
                 }
             }
         }

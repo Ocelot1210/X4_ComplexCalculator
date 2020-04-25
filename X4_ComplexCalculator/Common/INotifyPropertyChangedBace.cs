@@ -56,7 +56,7 @@ namespace X4_ComplexCalculator.Common
         /// プロパティ変更時
         /// </summary>
         /// <param name="propertyName">プロパティ名</param>
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             _PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

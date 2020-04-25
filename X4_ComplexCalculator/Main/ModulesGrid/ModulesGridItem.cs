@@ -149,7 +149,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             {
                 _SelectedMethod = value;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(SelectedMethod.Method));
+                OnPropertyChanged("SelectedMethod.Method");
             }
         }
         #endregion
@@ -282,21 +282,21 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             // 変更があった場合のみ通知
             if (!turretsOld.SequenceEqual(turretsNew))
             {
-                OnPropertyChanged(nameof(TurretsCount));
-                OnPropertyChanged(nameof(TurretsToolTip));
+                OnPropertyChanged("TurretsCount");
+                OnPropertyChanged("TurretsToolTip");
                 moduleChanged = true;
             }
 
             if (!shieldsOld.SequenceEqual(shieldsNew))
             {
-                OnPropertyChanged(nameof(ShieldsCount));
-                OnPropertyChanged(nameof(ShieldsToolTip));
+                OnPropertyChanged("ShieldsCount");
+                OnPropertyChanged("ShieldsToolTip");
                 moduleChanged = true;
             }
 
             if (moduleChanged)
             {
-                OnPropertyChanged(nameof(Module));
+                OnPropertyChanged("Module");
             }
         }
 

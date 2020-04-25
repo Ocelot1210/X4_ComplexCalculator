@@ -85,7 +85,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
                     _UnitPrice = value;
                 }
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(Price));
+                OnPropertyChanged("Price");
             }
         }
 

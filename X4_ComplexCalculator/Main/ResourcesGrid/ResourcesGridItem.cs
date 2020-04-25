@@ -69,7 +69,7 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
                     _UnitPrice = value;
                 }
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(Price));
+                OnPropertyChanged("Price");
             }
         }
 
