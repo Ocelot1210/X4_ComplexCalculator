@@ -43,7 +43,7 @@ namespace X4_ComplexCalculator.Main.StationSummary.WorkForce
                 {
                     _ModuleCount = value;
                     OnPropertyChanged();
-                    OnPropertyChanged("TotalWorkforce");
+                    OnPropertyChanged(nameof(TotalWorkforce));
                 }
             }
         }
