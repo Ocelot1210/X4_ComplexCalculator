@@ -57,7 +57,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             if (selectModuleWindow == null)
             {
                 selectModuleWindow = new SelectModuleWindow(Modules);
-                selectModuleWindow.Closed += (object s, EventArgs ev) => { selectModuleWindow.Close(); GC.Collect(); selectModuleWindow = null; };
+                selectModuleWindow.Closed += (object s, EventArgs ev) => { selectModuleWindow.Close(); selectModuleWindow = null; };
                 selectModuleWindow.Show();
             }
 

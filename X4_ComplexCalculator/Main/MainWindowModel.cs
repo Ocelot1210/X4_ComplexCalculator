@@ -26,15 +26,6 @@ namespace X4_ComplexCalculator.Main
         /// アクティブなワークスペース
         /// </summary>
         public WorkAreaViewModel ActiveContent { set; get; }
-
-
-        public bool UnsavedExists
-        {
-            get
-            {
-                return Documents.Where(x => x.HasChanged).Any();
-            }
-        }
         #endregion
 
 

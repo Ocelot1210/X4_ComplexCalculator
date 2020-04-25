@@ -118,7 +118,6 @@ namespace X4_ComplexCalculator.Main.WorkArea
             _Products.Products.OnCollectionPropertyChanged -= OnPropertyChanged;
             _Resources.Resources.OnCollectionPropertyChanged -= OnPropertyChanged;
 
-
             _Modules.Dispose();
         }
 

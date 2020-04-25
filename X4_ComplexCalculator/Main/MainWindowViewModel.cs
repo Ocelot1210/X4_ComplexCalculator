@@ -1,9 +1,11 @@
 ﻿using Prism.Commands;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Main.WorkArea;
 using Xceed.Wpf.AvalonDock;
@@ -129,7 +131,7 @@ namespace X4_ComplexCalculator.Main
         private void WindowClosing(CancelEventArgs e)
         {
             // 未保存の内容が存在するか？
-            if (Documents.Any() && Documents.Where(x => x.HasChanged).Any())
+            if (Documents.Where(x => x.HasChanged).Any())
             {
                 var result = MessageBox.Show("未保存の項目があります。保存しますか？", "確認", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 
@@ -186,9 +188,11 @@ namespace X4_ComplexCalculator.Main
                     }
                 }
 
+                
                 if (!e.Cancel)
                 {
                     workArea.Dispose();
+                    Dispatcher.CurrentDispatcher.BeginInvoke(new Action(() => Documents.Remove(workArea)), DispatcherPriority.Background);
                 }
             }
         }
