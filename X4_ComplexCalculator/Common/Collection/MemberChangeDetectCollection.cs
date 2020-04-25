@@ -25,11 +25,20 @@ namespace X4_ComplexCalculator.Common.Collection
 
 
     /// <summary>
+    /// プロパティ変更時のイベント
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    public delegate void NotifyPropertyChangedEvent(object sender, PropertyChangedEventArgs e);
+
+
+    /// <summary>
     /// メンバの変更もCollectionChangedとして検知するObservableCollection
     /// </summary>
     /// <typeparam name="T">INotifyPropertyChangedを実装したクラス</typeparam>
     public class MemberChangeDetectCollection<T> : SmartCollection<T> where T : INotifyPropertyChanged, IDisposable
     {
+        #region イベント
         /// <summary>
         /// コレクション変更時のイベント
         /// </summary>
@@ -37,10 +46,16 @@ namespace X4_ComplexCalculator.Common.Collection
 
 
         /// <summary>
+        /// コレクションのプロパティ変更時のイベント(非同期)
+        /// </summary>
+        public event NotifyPropertyChangedEventAsync OnCollectionPropertyChangedAsync;
+
+
+        /// <summary>
         /// コレクションのプロパティ変更時のイベント
         /// </summary>
-        public event NotifyPropertyChangedEventAsync OnPropertyChangedAsync;
-
+        public event NotifyPropertyChangedEvent OnCollectionPropertyChanged;
+        #endregion
 
         #region コンストラクタ
         public MemberChangeDetectCollection() : base()
@@ -81,6 +96,7 @@ namespace X4_ComplexCalculator.Common.Collection
                 return;
             }
 
+            
             Task.WhenAll(
                 OnCollectionChangedAsync.GetInvocationList()
                                         .OfType<NotifyCollectionChangedEventAsync>()
@@ -101,11 +117,13 @@ namespace X4_ComplexCalculator.Common.Collection
                 return;
             }
 
-            var handler = OnPropertyChangedAsync;
+            var handler = OnCollectionPropertyChangedAsync;
             if (handler == null)
             {
                 return;
             }
+
+            OnCollectionPropertyChanged?.Invoke(sender, e);
 
             await Task.WhenAll(
                 handler.GetInvocationList()

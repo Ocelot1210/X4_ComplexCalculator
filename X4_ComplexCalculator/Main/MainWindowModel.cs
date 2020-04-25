@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -25,6 +26,15 @@ namespace X4_ComplexCalculator.Main
         /// アクティブなワークスペース
         /// </summary>
         public WorkAreaViewModel ActiveContent { set; get; }
+
+
+        public bool UnsavedExists
+        {
+            get
+            {
+                return Documents.Where(x => x.HasChanged).Any();
+            }
+        }
         #endregion
 
 

@@ -92,6 +92,7 @@
     <!--  ValueConverter  -->
     <x4conv:Visiblity2NullableBooleanConverter x:Key="Visiblity2NullableConverter" />
     <x4conv:Bool2VisiblityConverter x:Key="Bool2VisiblityConverter" />
+    <x4conv:SliderValueConverter x:Key="SliderValueConverter" />
 
     <!--  RowDetailsを使用するDataGridのRowHeaderStyle  -->
     <Style x:Key="RowDetailsRowHeaderStyle" TargetType="{x:Type DataGridRowHeader}">

@@ -6,6 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
+    xmlns:x4cvt="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
     xmlns:x4mupsld="clr-namespace:X4_ComplexCalculator_CustomControlLibrary.MouseUpSlider;assembly=X4_ComplexCalculator_CustomControlLibrary"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     d:DesignHeight="450"
@@ -98,7 +99,7 @@
                             Maximum="100"
                             Minimum="0"
                             TickFrequency="1"
-                            Value="{Binding Data, Source={StaticResource ProxyUnitPricePercent}}" />
+                            Value="{Binding Data, Source={StaticResource ProxyUnitPricePercent}, Converter={StaticResource SliderValueConverter}, ConverterParameter=50.0}" />
                     </DockPanel>
                 </DataGridTemplateColumn.Header>
 

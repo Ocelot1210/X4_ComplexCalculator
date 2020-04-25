@@ -48,10 +48,10 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
             ItemCollection = itemCollection;
 
             //ModuleOwners.OnCollectionChangedAsync += UpdateModules;
-            ModuleOwners.OnPropertyChangedAsync += OnCheckChanged;
+            ModuleOwners.OnCollectionPropertyChangedAsync += OnCheckChanged;
 
             //ModuleTypes.OnCollectionChangedAsync += UpdateModules;
-            ModuleTypes.OnPropertyChangedAsync += OnCheckChanged;
+            ModuleTypes.OnCollectionPropertyChangedAsync += OnCheckChanged;
 
             Task.WaitAll(InitModuleTypes());
             Task.WaitAll(InitModuleOwners());

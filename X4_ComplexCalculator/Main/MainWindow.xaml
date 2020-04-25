@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:wkarea="clr-namespace:X4_ComplexCalculator.Main.WorkArea"
     xmlns:x4vcvt="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
@@ -23,6 +24,12 @@
         <KeyBinding Command="{Binding SaveAsCommand}" Gesture="Shift+Ctrl+S" />
         <KeyBinding Command="{Binding OpenCommand}" Gesture="Ctrl+O" />
     </Window.InputBindings>
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding WindowClosingCommand, Mode=OneTime}" PassEventArgsToCommand="True" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
 
     <Grid>
 
@@ -69,22 +76,29 @@
             </MenuItem>
         </Menu>
 
+        <!--  作業エリア  -->
         <xcad:DockingManager
             Grid.Row="1"
             ActiveContent="{Binding ActiveContent, Mode=TwoWay, Converter={StaticResource ActiveDocumentConverter}}"
             DocumentsSource="{Binding Documents}">
 
-            <xcad:DockingManager.DocumentHeaderTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Content.Title}" />
-                </DataTemplate>
-            </xcad:DockingManager.DocumentHeaderTemplate>
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="DocumentClosing">
+                    <i:InvokeCommandAction Command="{Binding DocumentClosingCommand, Mode=OneTime}" PassEventArgsToCommand="True" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
 
             <xcad:DockingManager.Resources>
                 <DataTemplate DataType="{x:Type wkarea:WorkAreaViewModel}">
                     <wkarea:WorkArea DataContext="{Binding}" />
                 </DataTemplate>
             </xcad:DockingManager.Resources>
+
+            <xcad:DockingManager.DocumentHeaderTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Content.Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                </DataTemplate>
+            </xcad:DockingManager.DocumentHeaderTemplate>
 
             <xcad:LayoutRoot />
         </xcad:DockingManager>

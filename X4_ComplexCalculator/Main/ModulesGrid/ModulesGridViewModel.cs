@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Linq;
 using X4_ComplexCalculator.Common;
@@ -58,31 +59,31 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// <summary>
         /// モジュール追加ボタンクリック
         /// </summary>
-        public DelegateCommand AddButtonClicked { get; }
+        public ICommand AddButtonClicked { get; }
 
 
         /// <summary>
         /// モジュール変更
         /// </summary>
-        public DelegateCommand<ModulesGridItem> ReplaceModule { get; }
+        public ICommand ReplaceModule { get; }
 
 
         /// <summary>
         /// モジュールをコピー
         /// </summary>
-        public DelegateCommand CopyModules { get; }
+        public ICommand CopyModules { get; }
 
 
         /// <summary>
         /// モジュールを貼り付け
         /// </summary>
-        public DelegateCommand<DataGrid> PasteModules { get; }
+        public ICommand PasteModules { get; }
 
 
         /// <summary>
         /// モジュールを削除
         /// </summary>
-        public DelegateCommand<DataGrid> DeleteModules { get; }
+        public ICommand DeleteModules { get; }
         #endregion
 
 

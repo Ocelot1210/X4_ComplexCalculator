@@ -62,7 +62,7 @@ namespace X4_ComplexCalculator.Main.StationSummary.BuildingCost
         {
             Resources = resources;
             resources.OnCollectionChangedAsync += Resources_OnCollectionChangedAsync;
-            resources.OnPropertyChangedAsync += Resources_OnPropertyChangedAsync;
+            resources.OnCollectionPropertyChangedAsync += Resources_OnPropertyChangedAsync;
         }
 
         /// <summary>

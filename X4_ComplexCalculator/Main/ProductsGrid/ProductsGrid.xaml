@@ -217,7 +217,7 @@
                             Maximum="100"
                             Minimum="1"
                             TickFrequency="1"
-                            Value="{Binding Data, Source={StaticResource ProxyUnitPricePercent}}" />
+                            Value="{Binding Data, Source={StaticResource ProxyUnitPricePercent}, Converter={StaticResource SliderValueConverter}, ConverterParameter=50.0}" />
                     </DockPanel>
                 </DataGridTemplateColumn.Header>
 

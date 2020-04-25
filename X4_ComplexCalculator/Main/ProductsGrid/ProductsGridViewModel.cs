@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Controls;
 using X4_ComplexCalculator.Common;
 using System.Linq;
+using System.Windows.Input;
 
 namespace X4_ComplexCalculator.Main.ProductsGrid
 {
@@ -55,12 +56,12 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// <summary>
         /// 選択されたアイテムを展開する
         /// </summary>
-        public DelegateCommand<DataGrid> SelectedExpand { get; }
+        public ICommand SelectedExpand { get; }
 
         /// <summary>
         /// 選択されたアイテムを折りたたむ
         /// </summary>
-        public DelegateCommand<DataGrid> SelectedCollapse { get; }
+        public ICommand SelectedCollapse { get; }
         #endregion
 
 

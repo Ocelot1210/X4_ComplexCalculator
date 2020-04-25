@@ -42,7 +42,7 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
             Resources = new MemberChangeDetectCollection<ResourcesGridItem>();
             Modules = modules;
             modules.OnCollectionChangedAsync += OnModulesChanged;
-            modules.OnPropertyChangedAsync += OnModulesPropertyChanged;
+            modules.OnCollectionPropertyChangedAsync += OnModulesPropertyChanged;
         }
 
         /// <summary>

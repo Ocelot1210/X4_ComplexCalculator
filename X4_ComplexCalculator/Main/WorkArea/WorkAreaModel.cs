@@ -1,6 +1,10 @@
 ﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Data.SQLite;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.ModulesGrid;
@@ -12,7 +16,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
     /// <summary>
     /// 作業エリア用Model
     /// </summary>
-    class WorkAreaModel
+    class WorkAreaModel : INotifyPropertyChangedBace, IDisposable
     {
         #region メンバ
         /// <summary>
@@ -31,6 +35,12 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// 建造リソース一覧
         /// </summary>
         private readonly ResourcesGridModel _Resources;
+
+
+        /// <summary>
+        /// 変更されたか
+        /// </summary>
+        private bool _HasChanged;
         #endregion
 
 
@@ -39,6 +49,43 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// 保存先ファイルパス
         /// </summary>
         public string SaveFilePath { get; private set; }
+
+
+        /// <summary>
+        /// 変更されたか
+        /// </summary>
+        public bool HasChanged
+        {
+            get
+            {
+                return _HasChanged;
+            }
+            set
+            {
+                if (value != _HasChanged)
+                {
+                    _HasChanged = value;
+                    OnPropertyChanged();
+
+                    if (value)
+                    {
+                        // 変更検知イベントを購読解除
+                        _Modules.Modules.CollectionChanged -= OnModulesChanged;
+                        _Modules.Modules.OnCollectionPropertyChanged -= OnPropertyChanged;
+                        _Products.Products.OnCollectionPropertyChanged -= OnPropertyChanged;
+                        _Resources.Resources.OnCollectionPropertyChanged -= OnPropertyChanged;
+                    }
+                    else
+                    {
+                        // 変更検知イベントを購読
+                        _Modules.Modules.CollectionChanged += OnModulesChanged;
+                        _Modules.Modules.OnCollectionPropertyChanged += OnPropertyChanged;
+                        _Products.Products.OnCollectionPropertyChanged += OnPropertyChanged;
+                        _Resources.Resources.OnCollectionPropertyChanged += OnPropertyChanged;
+                    }
+                }
+            }
+        }
         #endregion
 
 
@@ -53,7 +100,59 @@ namespace X4_ComplexCalculator.Main.WorkArea
             _Modules = modules;
             _Products = products;
             _Resources = resources;
+
+            HasChanged = true;
         }
+
+
+        /// <summary>
+        /// リソースを開放
+        /// </summary>
+        public override void Dispose()
+        {
+            base.Dispose();
+
+            // 変更検知イベントを購読解除
+            _Modules.Modules.CollectionChanged -= OnModulesChanged;
+            _Modules.Modules.OnCollectionPropertyChanged -= OnPropertyChanged;
+            _Products.Products.OnCollectionPropertyChanged -= OnPropertyChanged;
+            _Resources.Resources.OnCollectionPropertyChanged -= OnPropertyChanged;
+
+
+            _Modules.Dispose();
+        }
+
+
+        /// <summary>
+        /// モジュール数に変更があった場合
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnModulesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            HasChanged = true;
+        }
+
+        /// <summary>
+        /// コレクションのプロパティに変更があった場合
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            string[] names =
+            {
+                nameof(ModulesGridItem.ModuleCount),
+                nameof(ProductsGridItem.Price),
+                nameof(ResourcesGridItem.Price),
+            };
+
+            if (0 < Array.IndexOf(names, e.PropertyName))
+            {
+                HasChanged = true;
+            }
+        }
+
 
         /// <summary>
         /// 上書き保存
@@ -130,6 +229,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
             }
 
             conn.Commit();
+            HasChanged = false;
         }
 
 
@@ -155,6 +255,8 @@ namespace X4_ComplexCalculator.Main.WorkArea
             conn.Rollback();
 
             SaveFilePath = path;
+
+            HasChanged = false;
         }
 
 

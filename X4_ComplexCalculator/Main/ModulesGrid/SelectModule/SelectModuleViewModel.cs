@@ -6,6 +6,7 @@ using X4_ComplexCalculator.Common;
 using System;
 using X4_ComplexCalculator.Common.Collection;
 using System.ComponentModel;
+using System.Windows.Input;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
 {
@@ -58,7 +59,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         /// <summary>
         /// ウィンドウが閉じられる時のコマンド
         /// </summary>
-        public DelegateCommand<CancelEventArgs> WindowClosingCommand { get; }
+        public ICommand WindowClosingCommand { get; }
 
 
         /// <summary>
@@ -117,13 +118,13 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         /// <summary>
         /// 選択ボタンクリック時
         /// </summary>
-        public DelegateCommand OKButtonClickedCommand { get; }
+        public ICommand OKButtonClickedCommand { get; }
 
 
         /// <summary>
         /// 閉じるボタンクリック時
         /// </summary>
-        public DelegateCommand CloseButtonClickedCommand { get; }
+        public ICommand CloseButtonClickedCommand { get; }
 
 
         /// <summary>

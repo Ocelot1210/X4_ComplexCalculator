@@ -74,7 +74,7 @@ WHERE
         /// <summary>
         /// 装備一覧を更新
         /// </summary>
-        protected override async Task UpdateEquipments(object sender, PropertyChangedEventArgs e)
+        protected override void UpdateEquipments(object sender, PropertyChangedEventArgs e)
         {
             if (SelectedSize == null)
             {
@@ -100,7 +100,6 @@ WHERE
             DBConnection.X4DB.ExecQuery(query, (SQLiteDataReader dr, object[] args) => { items.Add(new Equipment(dr["EquipmentID"].ToString())); });
 
             Equipments[SelectedSize].Reset(items);
-            await Task.CompletedTask;
         }
 
 

@@ -38,7 +38,7 @@ namespace X4_ComplexCalculator.Main.StoragesGrid
         {
             Modules = modules;
             modules.OnCollectionChangedAsync += OnModulesChanged;
-            modules.OnPropertyChangedAsync += OnModulePropertyChanged;
+            modules.OnCollectionPropertyChangedAsync += OnModulePropertyChanged;
         }
 
 

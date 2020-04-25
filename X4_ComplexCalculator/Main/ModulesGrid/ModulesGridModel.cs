@@ -7,7 +7,7 @@ using X4_ComplexCalculator.Main.ModulesGrid.SelectModule;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid
 {
-    class ModulesGridModel
+    class ModulesGridModel : IDisposable
     {
         #region メンバ
         /// <summary>
@@ -30,6 +30,15 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         {
 
         }
+
+        /// <summary>
+        /// リソースを開放
+        /// </summary>
+        public void Dispose()
+        {
+            Modules.Clear();
+        }
+
 
         /// <summary>
         /// モジュール一括削除

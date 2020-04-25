@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB.X4DB;
@@ -60,9 +61,9 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
 
 
         /// <summary>
-        /// ウィンドウが閉じられる時のイベント
+        /// ウィンドウが閉じられる時
         /// </summary>
-        public DelegateCommand<CancelEventArgs> WindowClosingCommand { get; }
+        public ICommand WindowClosingCommand { get; }
 
 
         /// <summary>
@@ -123,13 +124,13 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
         /// <summary>
         /// 保存ボタンクリック
         /// </summary>
-        public DelegateCommand SaveButtonClickedCommand { get; }
+        public ICommand SaveButtonClickedCommand { get; }
 
 
         /// <summary>
         /// 閉じるボタンクリック時のコマンド
         /// </summary>
-        public DelegateCommand CloseWindowCommand { get; }
+        public ICommand CloseWindowCommand { get; }
 
 
         /// <summary>
@@ -147,19 +148,19 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
         /// <summary>
         /// プリセット保存
         /// </summary>
-        public DelegateCommand SavePresetCommand { get; }
+        public ICommand SavePresetCommand { get; }
 
 
         /// <summary>
         /// プリセット追加
         /// </summary>
-        public DelegateCommand AddPresetCommand { get; }
+        public ICommand AddPresetCommand { get; }
 
 
         /// <summary>
         /// プリセット削除
         /// </summary>
-        public DelegateCommand RemovePresetCommand { get; }
+        public ICommand RemovePresetCommand { get; }
         #endregion
 
 
@@ -204,7 +205,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
         {
             switch (e.PropertyName)
             {
-                case nameof(SelectedPreset):
+                case nameof(Model.SelectedPreset):
                     OnPropertyChanged(nameof(SelectedPreset));
                     break;
 

@@ -62,7 +62,7 @@ namespace X4_ComplexCalculator.Common
         }
 
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             foreach(var ev in _EventHandlers.ToArray())
             {

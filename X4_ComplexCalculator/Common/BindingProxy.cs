@@ -16,11 +16,18 @@ namespace X4_ComplexCalculator.Common
         /// <summary>
         /// 中継するデータ
         /// </summary>
+        public static readonly DependencyProperty DataProperty =
+            DependencyProperty.Register("Data", typeof(object), typeof(BindingProxy), new UIPropertyMetadata(null));
+
+
+        /// <summary>
+        /// 中継するデータ
+        /// </summary>
         public object Data
         {
             get
             {
-                return GetValue(DataProperty);
+                return GetValue(DataProperty) ?? DefaultData;
             }
             set
             {
@@ -30,9 +37,25 @@ namespace X4_ComplexCalculator.Common
 
 
         /// <summary>
+        /// 中継するデータ(初期値)
+        /// </summary>
+        public static readonly DependencyProperty DefaultDataProperty =
+            DependencyProperty.Register("DefaultData", typeof(object), typeof(BindingProxy), new UIPropertyMetadata(null));
+
+
+        /// <summary>
         /// 中継するデータ
         /// </summary>
-        public static readonly DependencyProperty DataProperty =
-            DependencyProperty.Register("Data", typeof(object), typeof(BindingProxy), new UIPropertyMetadata(null));
+        public object DefaultData
+        {
+            get
+            {
+                return GetValue(DefaultDataProperty);
+            }
+            set
+            {
+                SetValue(DefaultDataProperty, value);
+            }
+        }
     }
 }

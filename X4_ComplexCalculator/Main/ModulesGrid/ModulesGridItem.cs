@@ -1,14 +1,14 @@
 ﻿using Prism.Commands;
+using System;
+using System.Linq;
+using System.Text;
 using System.Windows;
+using System.Windows.Input;
+using System.Xml.Linq;
+using System.Xml.XPath;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.ModulesGrid.EditEquipment;
-using System.Linq;
-using System.Collections.Generic;
-using System;
-using System.Text;
-using System.Xml.Linq;
-using System.Xml.XPath;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid
 {
@@ -46,7 +46,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// <summary>
         /// モジュールの装備編集
         /// </summary>
-        public DelegateCommand EditEquipmentCommand { get; }
+        public ICommand EditEquipmentCommand { get; }
 
 
         /// <summary>

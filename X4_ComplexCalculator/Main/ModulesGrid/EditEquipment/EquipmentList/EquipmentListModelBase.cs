@@ -79,7 +79,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
             set
             {
                 _SelectedSize = value;
-                _ = UpdateEquipments(null, null);
+                UpdateEquipments(null, null);
             }
         }
 
@@ -101,14 +101,14 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         {
             Module = module;
             Factions = factions;
-            Factions.OnPropertyChangedAsync += UpdateEquipments;
+            Factions.OnCollectionPropertyChanged += UpdateEquipments;
         }
 
 
         /// <summary>
         /// 装備一覧を更新
         /// </summary>
-        protected abstract Task UpdateEquipments(object sender, PropertyChangedEventArgs e);
+        protected abstract void UpdateEquipments(object sender, PropertyChangedEventArgs e);
 
 
         /// <summary>

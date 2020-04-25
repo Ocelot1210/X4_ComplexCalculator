@@ -40,7 +40,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
             Products = new MemberChangeDetectCollection<ProductsGridItem>();
 
             modules.OnCollectionChangedAsync += OnModulesChanged;
-            modules.OnPropertyChangedAsync += OnModulePropertyChanged;
+            modules.OnCollectionPropertyChangedAsync += OnModulePropertyChanged;
 
             Modules = modules;
         }

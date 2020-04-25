@@ -60,7 +60,7 @@ namespace X4_ComplexCalculator.Main.StationSummary.Profit
         {
             Products = products;
             products.OnCollectionChangedAsync += OnProductsCollectionChanged;
-            products.OnPropertyChangedAsync += OnProductsPropertyChanged;
+            products.OnCollectionPropertyChangedAsync += OnProductsPropertyChanged;
         }
 
 

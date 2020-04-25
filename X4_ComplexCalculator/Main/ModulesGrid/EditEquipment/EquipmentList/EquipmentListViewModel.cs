@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Windows.Data;
+using System.Windows.Input;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB.X4DB;
 
@@ -97,13 +98,13 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// <summary>
         /// 追加ボタンクリック時のコマンド
         /// </summary>
-        public DelegateCommand<ICollection> AddButtonClickedCommand { get; }
+        public ICommand AddButtonClickedCommand { get; }
 
 
         /// <summary>
         /// 削除ボタンクリック時のコマンド
         /// </summary>
-        public DelegateCommand<ICollection> RemoveButtonClickedCommand { get; }
+        public ICommand RemoveButtonClickedCommand { get; }
 
 
         /// <summary>
