@@ -193,6 +193,10 @@ namespace X4_ComplexCalculator.Main
                 {
                     workArea.Dispose();
                     Dispatcher.CurrentDispatcher.BeginInvoke(new Action(() => Documents.Remove(workArea)), DispatcherPriority.Background);
+
+                    System.GC.Collect();
+                    System.GC.WaitForPendingFinalizers();
+                    System.GC.Collect();
                 }
             }
         }

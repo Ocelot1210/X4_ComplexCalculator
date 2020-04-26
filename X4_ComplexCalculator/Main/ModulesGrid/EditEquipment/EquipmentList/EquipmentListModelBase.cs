@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
@@ -23,7 +24,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// <summary>
         /// 選択中のサイズ
         /// </summary>
-        protected Size _SelectedSize;
+        protected DB.X4DB.Size _SelectedSize;
 
 
         /// <summary>
@@ -35,19 +36,19 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// <summary>
         /// 装備一覧
         /// </summary>
-        protected Dictionary<Size, SmartCollection<Equipment>> _Equipments = new Dictionary<Size, SmartCollection<Equipment>>();
+        protected Dictionary<DB.X4DB.Size, SmartCollection<Equipment>> _Equipments = new Dictionary<DB.X4DB.Size, SmartCollection<Equipment>>();
 
 
         /// <summary>
         /// 装備中の装備
         /// </summary>
-        protected Dictionary<Size, SmartCollection<Equipment>> _Equipped = new Dictionary<Size, SmartCollection<Equipment>>();
+        protected Dictionary<DB.X4DB.Size, SmartCollection<Equipment>> _Equipped = new Dictionary<DB.X4DB.Size, SmartCollection<Equipment>>();
 
 
         /// <summary>
         /// 装備可能な個数
         /// </summary>
-        protected Dictionary<Size, int> _MaxAmount = new Dictionary<Size, int>();
+        protected Dictionary<DB.X4DB.Size, int> _MaxAmount = new Dictionary<DB.X4DB.Size, int>();
         #endregion
 
 
@@ -55,25 +56,25 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// <summary>
         /// 装備一覧
         /// </summary>
-        public IReadOnlyDictionary<Size, SmartCollection<Equipment>> Equipments => _Equipments;
+        public IReadOnlyDictionary<DB.X4DB.Size, SmartCollection<Equipment>> Equipments => _Equipments;
 
 
         /// <summary>
         /// 装備中
         /// </summary>
-        public IReadOnlyDictionary<Size, SmartCollection<Equipment>> Equipped => _Equipped;
+        public IReadOnlyDictionary<DB.X4DB.Size, SmartCollection<Equipment>> Equipped => _Equipped;
 
 
         /// <summary>
         /// 装備可能な個数
         /// </summary>
-        public IReadOnlyDictionary<Size, int> MaxAmount => _MaxAmount;
+        public IReadOnlyDictionary<DB.X4DB.Size, int> MaxAmount => _MaxAmount;
 
 
         /// <summary>
         /// 現在のサイズ
         /// </summary>
-        public Size SelectedSize
+        public DB.X4DB.Size SelectedSize
         {
             get { return _SelectedSize; }
             set
@@ -101,7 +102,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         {
             Module = module;
             Factions = factions;
-            Factions.OnCollectionPropertyChanged += UpdateEquipments;
+            WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.AddHandler(Factions, "PropertyChanged", UpdateEquipments);
         }
 
 

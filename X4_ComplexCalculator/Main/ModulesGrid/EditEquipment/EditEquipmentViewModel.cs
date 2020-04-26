@@ -174,7 +174,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
 
             // Model類
             Model = new EditEquipmentModel(module);
-            Model.PropertyChanged += Model_PropertyChanged;
+            WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.AddHandler(Model, "PropertyChanged", Model_PropertyChanged);
             
             // サブViewModel類
             TurretsViewModel = new EquipmentListViewModel(new TurretEquipmentListModel(module, Factions));

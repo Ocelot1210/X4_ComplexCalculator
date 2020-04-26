@@ -1,6 +1,8 @@
 ﻿using Prism.Commands;
 using System;
+using System.ComponentModel;
 using System.IO;
+using System.Windows;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Main.ModulesGrid;
@@ -120,7 +122,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
             OnLoadedCommand = new DelegateCommand<DockingManager>(OnLoaded);
             OnUnloadedCommand = new DelegateCommand<DockingManager>(OnUnloaded);
 
-            _Model.PropertyChanged += Model_PropertyChanged;
+            WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.AddHandler(_Model, "PropertyChanged", Model_PropertyChanged);
         }
 
 

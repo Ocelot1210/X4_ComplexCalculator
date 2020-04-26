@@ -8,6 +8,7 @@ using X4_ComplexCalculator.Main.ProductsGrid;
 using X4_ComplexCalculator.Main.ResourcesGrid;
 using System.ComponentModel;
 using X4_ComplexCalculator.Main.StationSummary.BuildingCost;
+using System.Windows;
 
 namespace X4_ComplexCalculator.Main.StationSummary
 {
@@ -84,13 +85,13 @@ namespace X4_ComplexCalculator.Main.StationSummary
         public StationSummaryViewModel(MemberChangeDetectCollection<ModulesGridItem> modules, MemberChangeDetectCollection<ProductsGridItem> products, MemberChangeDetectCollection<ResourcesGridItem> resources)
         {
             WorkForceModel = new WorkForceModel(modules);
-            WorkForceModel.PropertyChanged += ModelPropertyChanged;
+            WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.AddHandler(WorkForceModel, "PropertyChanged", ModelPropertyChanged);
 
             ProfitModel = new ProfitModel(products);
-            ProfitModel.PropertyChanged += ModelPropertyChanged;
+            WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.AddHandler(ProfitModel, "PropertyChanged", ModelPropertyChanged);
 
             BuildingCostModel = new BuildingCostModel(resources);
-            BuildingCostModel.PropertyChanged += ModelPropertyChanged;
+            WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.AddHandler(BuildingCostModel, "PropertyChanged", ModelPropertyChanged);
         }
 
         /// <summary>
