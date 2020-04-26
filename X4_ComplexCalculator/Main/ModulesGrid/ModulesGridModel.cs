@@ -13,7 +13,12 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// <summary>
         /// モジュール選択ウィンドウ
         /// </summary>
-        private SelectModuleWindow selectModuleWindow;
+        private SelectModuleWindow _SelectModuleWindow;
+
+        /// <summary>
+        /// モジュール選択ウィンドウがクローズ済みか
+        /// </summary>
+        private bool _SelectModuleWindowClosed = true;
         #endregion
 
         #region プロパティ
@@ -37,7 +42,12 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         public void Dispose()
         {
             Modules.Clear();
-            selectModuleWindow?.Close();
+
+            // モジュール選択ウィンドウが開いていたら閉じる
+            if (!_SelectModuleWindowClosed)
+            {
+                _SelectModuleWindow?.Close();
+            }
         }
 
 
@@ -55,17 +65,24 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// </summary>
         public void ShowAddModuleWindow()
         {
-            if (selectModuleWindow == null)
+            if (_SelectModuleWindowClosed)
             {
-                selectModuleWindow = new SelectModuleWindow(Modules);
-                //selectModuleWindow.Closed += (object s, EventArgs ev) => { selectModuleWindow.Close(); selectModuleWindow = null; };
-                selectModuleWindow.Show();
-            }
+                void OnWindowClosed(object s, EventArgs ev)
+                {
+                    ((Window)s).Closed -= OnWindowClosed;
+                    _SelectModuleWindowClosed = true;
+                }
 
-            selectModuleWindow.Activate();
+                _SelectModuleWindow = new SelectModuleWindow(Modules);
+                _SelectModuleWindow.Closed += OnWindowClosed;
+                _SelectModuleWindow.Show();
+            }
+            _SelectModuleWindowClosed = false;
+
+            _SelectModuleWindow.Activate();
 
             // 最小化されていたら通常状態にする
-            selectModuleWindow.WindowState = (selectModuleWindow.WindowState == WindowState.Minimized)? WindowState.Normal : selectModuleWindow.WindowState;
+            _SelectModuleWindow.WindowState = (_SelectModuleWindow.WindowState == WindowState.Minimized)? WindowState.Normal : _SelectModuleWindow.WindowState;
         }
 
 
