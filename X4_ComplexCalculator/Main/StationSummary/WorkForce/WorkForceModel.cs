@@ -34,7 +34,7 @@ namespace X4_ComplexCalculator.Main.StationSummary.WorkForce
         /// <summary>
         /// 労働力の詳細情報
         /// </summary>
-        public SmartCollection<WorkForceDetailsItem> WorkForceDetails { get; private set; } = new SmartCollection<WorkForceDetailsItem>();
+        public ObservableRangeCollection<WorkForceDetailsItem> WorkForceDetails { get; private set; } = new ObservableRangeCollection<WorkForceDetailsItem>();
 
         /// <summary>
         /// 必要な労働者数
@@ -81,7 +81,7 @@ namespace X4_ComplexCalculator.Main.StationSummary.WorkForce
         /// コンストラクタ
         /// </summary>
         /// <param name="moduleGridModel">モジュール一覧のModel</param>
-        public WorkForceModel(MemberChangeDetectCollection<ModulesGridItem> modules)
+        public WorkForceModel(ObservablePropertyChangedCollection<ModulesGridItem> modules)
         {
             Modules = modules;
             modules.OnCollectionChangedAsync += OnModulesChanged;

@@ -18,7 +18,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// <summary>
         /// 種族一覧
         /// </summary>
-        private readonly MemberChangeDetectCollection<FactionsListItem> Factions;
+        private readonly ObservablePropertyChangedCollection<FactionsListItem> Factions;
 
 
         /// <summary>
@@ -36,13 +36,13 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// <summary>
         /// 装備一覧
         /// </summary>
-        protected Dictionary<DB.X4DB.Size, SmartCollection<Equipment>> _Equipments = new Dictionary<DB.X4DB.Size, SmartCollection<Equipment>>();
+        protected Dictionary<DB.X4DB.Size, ObservableRangeCollection<Equipment>> _Equipments = new Dictionary<DB.X4DB.Size, ObservableRangeCollection<Equipment>>();
 
 
         /// <summary>
         /// 装備中の装備
         /// </summary>
-        protected Dictionary<DB.X4DB.Size, SmartCollection<Equipment>> _Equipped = new Dictionary<DB.X4DB.Size, SmartCollection<Equipment>>();
+        protected Dictionary<DB.X4DB.Size, ObservableRangeCollection<Equipment>> _Equipped = new Dictionary<DB.X4DB.Size, ObservableRangeCollection<Equipment>>();
 
 
         /// <summary>
@@ -56,13 +56,13 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// <summary>
         /// 装備一覧
         /// </summary>
-        public IReadOnlyDictionary<DB.X4DB.Size, SmartCollection<Equipment>> Equipments => _Equipments;
+        public IReadOnlyDictionary<DB.X4DB.Size, ObservableRangeCollection<Equipment>> Equipments => _Equipments;
 
 
         /// <summary>
         /// 装備中
         /// </summary>
-        public IReadOnlyDictionary<DB.X4DB.Size, SmartCollection<Equipment>> Equipped => _Equipped;
+        public IReadOnlyDictionary<DB.X4DB.Size, ObservableRangeCollection<Equipment>> Equipped => _Equipped;
 
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// <param name="module">編集対象モジュール</param>
         /// <param name="factions">種族一覧</param>
         /// <param name="presetsCollectionChanged">プリセット変更時のイベントハンドラー</param>
-        public EquipmentListModelBase(Module module, MemberChangeDetectCollection<FactionsListItem> factions)
+        public EquipmentListModelBase(Module module, ObservablePropertyChangedCollection<FactionsListItem> factions)
         {
             Module = module;
             Factions = factions;

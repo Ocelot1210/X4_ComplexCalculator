@@ -13,7 +13,7 @@ namespace X4_ComplexCalculator.Common.Collection
     /// ObservableCollectionの拡張(範囲操作とマルチスレッドをサポート)
     /// </summary>
     /// <typeparam name="T">任意のデータ型</typeparam>
-    public class SmartCollection<T> : ObservableCollection<T>
+    public class ObservableRangeCollection<T> : ObservableCollection<T>
     {
         #region メンバ
         /// <summary>
@@ -28,17 +28,17 @@ namespace X4_ComplexCalculator.Common.Collection
         #endregion
 
         #region コンストラクタ
-        public SmartCollection() : base()
+        public ObservableRangeCollection() : base()
         {
             Dispatcher = Dispatcher.CurrentDispatcher;
         }
 
-        public SmartCollection(IEnumerable<T> collection) : base(collection)
+        public ObservableRangeCollection(IEnumerable<T> collection) : base(collection)
         {
             Dispatcher = Dispatcher.CurrentDispatcher;
         }
 
-        public SmartCollection(List<T> list) : base(list)
+        public ObservableRangeCollection(List<T> list) : base(list)
         {
             Dispatcher = Dispatcher.CurrentDispatcher;
         }

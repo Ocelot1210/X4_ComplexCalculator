@@ -96,7 +96,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
         /// <summary>
         /// 種族一覧
         /// </summary>
-        public MemberChangeDetectCollection<FactionsListItem> Factions => Model.Factions;
+        public ObservablePropertyChangedCollection<FactionsListItem> Factions => Model.Factions;
 
 
         /// <summary>

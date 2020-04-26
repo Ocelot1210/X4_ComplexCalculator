@@ -20,12 +20,12 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// </summary>
         /// <param name="module"></param>
         /// <param name="factions"></param>
-        public TurretEquipmentListModel(Module module, MemberChangeDetectCollection<FactionsListItem> factions) : base(module, factions)
+        public TurretEquipmentListModel(Module module, ObservablePropertyChangedCollection<FactionsListItem> factions) : base(module, factions)
         {
             foreach (Size size in Module.Equipment.Turret.Sizes)
             {
-                _Equipments.Add(size, new SmartCollection<Equipment>());
-                _Equipped.Add(size, new SmartCollection<Equipment>());
+                _Equipments.Add(size, new ObservableRangeCollection<Equipment>());
+                _Equipped.Add(size, new ObservableRangeCollection<Equipment>());
                 _MaxAmount.Add(size, Module.Equipment.Turret.MaxAmount[size]);
 
                 // 前回値復元

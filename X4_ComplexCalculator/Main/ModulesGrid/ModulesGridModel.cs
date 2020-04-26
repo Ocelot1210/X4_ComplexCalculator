@@ -20,7 +20,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// <summary>
         /// モジュール一覧
         /// </summary>
-        public MemberChangeDetectCollection<ModulesGridItem> Modules { get; private set; } = new MemberChangeDetectCollection<ModulesGridItem>();
+        public ObservablePropertyChangedCollection<ModulesGridItem> Modules { get; private set; } = new ObservablePropertyChangedCollection<ModulesGridItem>();
         #endregion
 
         /// <summary>
@@ -37,6 +37,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         public void Dispose()
         {
             Modules.Clear();
+            selectModuleWindow?.Close();
         }
 
 
@@ -57,7 +58,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             if (selectModuleWindow == null)
             {
                 selectModuleWindow = new SelectModuleWindow(Modules);
-                selectModuleWindow.Closed += (object s, EventArgs ev) => { selectModuleWindow.Close(); selectModuleWindow = null; };
+                //selectModuleWindow.Closed += (object s, EventArgs ev) => { selectModuleWindow.Close(); selectModuleWindow = null; };
                 selectModuleWindow.Show();
             }
 
@@ -75,7 +76,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         public void ReplaceModule(ModulesGridItem oldItem)
         {
             // 置換後のモジュール
-            var newModules = new SmartCollection<ModulesGridItem>();
+            var newModules = new ObservableRangeCollection<ModulesGridItem>();
 
             // 変更の場合はモーダル表示にする
             var wnd = new SelectModuleWindow(newModules, oldItem.Module.Name);

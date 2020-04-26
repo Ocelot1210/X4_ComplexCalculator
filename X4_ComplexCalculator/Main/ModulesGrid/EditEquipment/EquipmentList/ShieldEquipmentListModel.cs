@@ -17,12 +17,12 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// </summary>
         /// <param name="module">編集対象モジュール</param>
         /// <param name="factions">種族一覧</param>
-        public ShieldEquipmentListModel(Module module, MemberChangeDetectCollection<FactionsListItem> factions) : base(module, factions)
+        public ShieldEquipmentListModel(Module module, ObservablePropertyChangedCollection<FactionsListItem> factions) : base(module, factions)
         {
             foreach (Size size in Module.Equipment.Shield.Sizes)
             {
-                _Equipments.Add(size, new SmartCollection<Equipment>());
-                _Equipped.Add(size, new SmartCollection<Equipment>());
+                _Equipments.Add(size, new ObservableRangeCollection<Equipment>());
+                _Equipped.Add(size, new ObservableRangeCollection<Equipment>());
                 _MaxAmount.Add(size, Module.Equipment.Shield.MaxAmount[size]);
 
                 // 前回値復元

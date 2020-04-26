@@ -29,7 +29,7 @@ namespace X4_ComplexCalculator.Main.StoragesGrid
         /// コンストラクタ
         /// </summary>
         /// <param name="moduleGridModel">モジュール一覧</param>
-        public StoragesGridViewModel(MemberChangeDetectCollection<ModulesGridItem> modules)
+        public StoragesGridViewModel(ObservablePropertyChangedCollection<ModulesGridItem> modules)
         {
             Model = new StoragesGridModel(modules);
         }

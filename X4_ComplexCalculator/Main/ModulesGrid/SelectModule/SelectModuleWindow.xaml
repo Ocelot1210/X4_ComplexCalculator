@@ -59,14 +59,14 @@
             <Button
                 Width="75"
                 Margin="10"
-                Command="{Binding OKButtonClickedCommand}"
+                Command="{Binding OKButtonClickedCommand, Mode=OneTime}"
                 CommandParameter="{Binding ElementName=window}"
                 Content="選択" />
 
             <Button
                 Width="75"
                 Margin="10"
-                Command="{Binding CloseButtonClickedCommand}"
+                Command="{Binding CloseButtonClickedCommand, Mode=OneTime}"
                 CommandParameter="{Binding ElementName=window}"
                 Content="閉じる" />
         </StackPanel>

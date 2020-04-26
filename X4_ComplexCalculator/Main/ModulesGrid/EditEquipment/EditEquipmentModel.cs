@@ -30,19 +30,19 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
         /// <summary>
         /// 装備サイズ一覧
         /// </summary>
-        public SmartCollection<Size> EquipmentSizes { get; private set; } = new SmartCollection<Size>();
+        public ObservableRangeCollection<Size> EquipmentSizes { get; private set; } = new ObservableRangeCollection<Size>();
 
 
         /// <summary>
         /// 種族一覧
         /// </summary>
-        public MemberChangeDetectCollection<FactionsListItem> Factions { get; } = new MemberChangeDetectCollection<FactionsListItem>();
+        public ObservablePropertyChangedCollection<FactionsListItem> Factions { get; } = new ObservablePropertyChangedCollection<FactionsListItem>();
 
 
         /// <summary>
         /// プリセット名
         /// </summary>
-        public SmartCollection<PresetComboboxItem> Presets { get; } = new SmartCollection<PresetComboboxItem>();
+        public ObservableRangeCollection<PresetComboboxItem> Presets { get; } = new ObservableRangeCollection<PresetComboboxItem>();
 
 
         /// <summary>

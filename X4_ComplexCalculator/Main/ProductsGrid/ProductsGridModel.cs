@@ -28,16 +28,16 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// <summary>
         /// 製品一覧
         /// </summary>
-        public MemberChangeDetectCollection<ProductsGridItem> Products { get; private set; }
+        public ObservablePropertyChangedCollection<ProductsGridItem> Products { get; private set; }
         #endregion
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="moduleGridModel">モジュール一覧</param>
-        public ProductsGridModel(MemberChangeDetectCollection<ModulesGridItem> modules)
+        public ProductsGridModel(ObservablePropertyChangedCollection<ModulesGridItem> modules)
         {
-            Products = new MemberChangeDetectCollection<ProductsGridItem>();
+            Products = new ObservablePropertyChangedCollection<ProductsGridItem>();
 
             modules.OnCollectionChangedAsync += OnModulesChanged;
             modules.OnCollectionPropertyChangedAsync += OnModulePropertyChanged;

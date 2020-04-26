@@ -130,31 +130,7 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         private void WindowClosing(CancelEventArgs e)
         {
-            // 未保存の内容が存在するか？
-            if (Documents.Where(x => x.HasChanged).Any())
-            {
-                var result = MessageBox.Show("未保存の項目があります。保存しますか？", "確認", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
-
-                switch (result)
-                {
-                    // 保存する場合
-                    case MessageBoxResult.Yes:
-                        foreach (var doc in Documents)
-                        {
-                            doc.Save();
-                        }
-                        break;
-
-                    // 保存せずに閉じる場合
-                    case MessageBoxResult.No:
-                        break;
-
-                    // キャンセルする場合
-                    case MessageBoxResult.Cancel:
-                        e.Cancel = true;
-                        break;
-                }
-            }
+            e.Cancel = _Model.WindowClosing();
         }
 
         /// <summary>
@@ -165,39 +141,7 @@ namespace X4_ComplexCalculator.Main
         {
             if (e.Document.Content is WorkAreaViewModel workArea)
             {
-                // 変更があったか？
-                if (workArea.HasChanged)
-                {
-                    var result = MessageBox.Show("変更内容を保存しますか？", "確認", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
-
-                    switch (result)
-                    {
-                        // 保存する場合
-                        case MessageBoxResult.Yes:
-                            workArea.Save();
-                            break;
-
-                        // 保存せずに閉じる場合
-                        case MessageBoxResult.No:
-                            break;
-
-                        // キャンセルする場合
-                        case MessageBoxResult.Cancel:
-                            e.Cancel = true;
-                            break;
-                    }
-                }
-
-                
-                if (!e.Cancel)
-                {
-                    workArea.Dispose();
-                    Dispatcher.CurrentDispatcher.BeginInvoke(new Action(() => Documents.Remove(workArea)), DispatcherPriority.Background);
-
-                    System.GC.Collect();
-                    System.GC.WaitForPendingFinalizers();
-                    System.GC.Collect();
-                }
+                e.Cancel = _Model.DocumentClosing(workArea);
             }
         }
     }

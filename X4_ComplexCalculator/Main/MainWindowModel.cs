@@ -110,5 +110,94 @@ namespace X4_ComplexCalculator.Main
                 }
             }
         }
+
+        /// <summary>
+        /// ウィンドウが閉じられる時
+        /// </summary>
+        /// <returns>キャンセルされたか</returns>
+        public bool WindowClosing()
+        {
+            var canceled = false;
+
+            // 未保存の内容が存在するか？
+            if (Documents.Where(x => x.HasChanged).Any())
+            {
+                var result = MessageBox.Show("未保存の項目があります。保存しますか？", "確認", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+
+                switch (result)
+                {
+                    // 保存する場合
+                    case MessageBoxResult.Yes:
+                        foreach (var doc in Documents)
+                        {
+                            doc.Save();
+                        }
+                        break;
+
+                    // 保存せずに閉じる場合
+                    case MessageBoxResult.No:
+                        break;
+
+                    // キャンセルする場合
+                    case MessageBoxResult.Cancel:
+                        canceled = true;
+                        break;
+                }
+            }
+
+            // 閉じる場合、リソースを開放
+            if (!canceled)
+            {
+                foreach (var doc in Documents)
+                {
+                    doc.Dispose();
+                }
+            }
+
+            return canceled;
+        }
+
+
+        /// <summary>
+        /// 作業エリアが閉じられる時
+        /// </summary>
+        /// <param name="vm">閉じようとしている作業エリア</param>
+        /// <returns></returns>
+        public bool DocumentClosing(WorkAreaViewModel vm)
+        {
+            var canceled = false;
+
+            // 変更があったか？
+            if (vm.HasChanged)
+            {
+                var result = MessageBox.Show("変更内容を保存しますか？", "確認", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+
+                switch (result)
+                {
+                    // 保存する場合
+                    case MessageBoxResult.Yes:
+                        vm.Save();
+                        break;
+
+                    // 保存せずに閉じる場合
+                    case MessageBoxResult.No:
+                        break;
+
+                    // キャンセルする場合
+                    case MessageBoxResult.Cancel:
+                        canceled = true;
+                        break;
+                }
+            }
+
+            // 閉じる場合、リソースを開放
+            if (!canceled)
+            {
+                vm.Dispose();
+                Dispatcher.CurrentDispatcher.BeginInvoke(new Action(() => Documents.Remove(vm)), DispatcherPriority.Background);
+            }
+
+            return canceled;
+        }
     }
 }

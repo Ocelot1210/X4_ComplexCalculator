@@ -7,6 +7,7 @@ using System;
 using X4_ComplexCalculator.Common.Collection;
 using System.ComponentModel;
 using System.Windows.Input;
+using System.Collections.ObjectModel;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
 {
@@ -83,19 +84,20 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         /// <summary>
         /// モジュール種別
         /// </summary>
-        public SmartCollection<ModulesListItem> ModuleTypes { get { return Model.ModuleTypes; } }
+        public ObservableCollection<ModulesListItem> ModuleTypes => Model.ModuleTypes;
 
 
         /// <summary>
         /// モジュール所有派閥
         /// </summary>
-        public SmartCollection<ModulesListItem> ModuleOwners { get { return Model.ModuleOwners; } }
+        public ObservableCollection<ModulesListItem> ModuleOwners => Model.ModuleOwners;
 
 
         /// <summary>
         /// モジュール一覧
         /// </summary>
-        public SmartCollection<ModulesListItem> Modules { get { return Model.Modules; } }
+        public ObservableCollection<ModulesListItem> Modules => Model.Modules;
+
 
         /// <summary>
         /// モジュール名検索用
@@ -139,7 +141,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         /// </summary>
         /// <param name="modules">選択結果格納先</param>
         /// <param name="isReplaceMode">置換モードか(falseで複数選択許可)</param>
-        public SelectModuleViewModel(SmartCollection<ModulesGridItem> modules, string prevModuleName = "")
+        public SelectModuleViewModel(ObservableRangeCollection<ModulesGridItem> modules, string prevModuleName = "")
         {
             Model = new SelectModuleModel(modules);
 

@@ -28,7 +28,7 @@ namespace X4_ComplexCalculator.Main.StationSummary.Profit
         /// <summary>
         /// 利益詳細
         /// </summary>
-        public SmartCollection<ProfitDetailsItem> ProfitDetails { get; } = new SmartCollection<ProfitDetailsItem>();
+        public ObservableRangeCollection<ProfitDetailsItem> ProfitDetails { get; } = new ObservableRangeCollection<ProfitDetailsItem>();
 
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace X4_ComplexCalculator.Main.StationSummary.Profit
         /// コンストラクタ
         /// </summary>
         /// <param name="products">製品一覧</param>
-        public ProfitModel(MemberChangeDetectCollection<ProductsGridItem> products)
+        public ProfitModel(ObservablePropertyChangedCollection<ProductsGridItem> products)
         {
             Products = products;
             products.OnCollectionChangedAsync += OnProductsCollectionChanged;

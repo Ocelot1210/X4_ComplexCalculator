@@ -36,7 +36,7 @@ namespace X4_ComplexCalculator.Common.Collection
     /// メンバの変更もCollectionChangedとして検知するObservableCollection
     /// </summary>
     /// <typeparam name="T">INotifyPropertyChangedを実装したクラス</typeparam>
-    public class MemberChangeDetectCollection<INotifyPropertyChanged> : SmartCollection<INotifyPropertyChanged>
+    public class ObservablePropertyChangedCollection<INotifyPropertyChanged> : ObservableRangeCollection<INotifyPropertyChanged>
     {
         #region イベント
         /// <summary>
@@ -58,17 +58,17 @@ namespace X4_ComplexCalculator.Common.Collection
         #endregion
 
         #region コンストラクタ
-        public MemberChangeDetectCollection() : base()
+        public ObservablePropertyChangedCollection() : base()
         {
             CollectionChanged += CollectionChangedEvent;
         }
 
-        public MemberChangeDetectCollection(IEnumerable<INotifyPropertyChanged> collection) : base(collection)
+        public ObservablePropertyChangedCollection(IEnumerable<INotifyPropertyChanged> collection) : base(collection)
         {
             CollectionChanged += CollectionChangedEvent;
         }
 
-        public MemberChangeDetectCollection(List<INotifyPropertyChanged> list) : base(list)
+        public ObservablePropertyChangedCollection(List<INotifyPropertyChanged> list) : base(list)
         {
             CollectionChanged += CollectionChangedEvent;
         }

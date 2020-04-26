@@ -31,7 +31,7 @@ namespace X4_ComplexCalculator.Main.StationSummary.BuildingCost
         /// <summary>
         /// 建造コスト詳細
         /// </summary>
-        public SmartCollection<BuildingCostDetailsItem> BuildingCostDetails = new SmartCollection<BuildingCostDetailsItem>();
+        public ObservableRangeCollection<BuildingCostDetailsItem> BuildingCostDetails = new ObservableRangeCollection<BuildingCostDetailsItem>();
 
         /// <summary>
         /// 建造コスト
@@ -58,7 +58,7 @@ namespace X4_ComplexCalculator.Main.StationSummary.BuildingCost
         /// コンストラクタ
         /// </summary>
         /// <param name="resources"></param>
-        public BuildingCostModel(MemberChangeDetectCollection<ResourcesGridItem> resources)
+        public BuildingCostModel(ObservablePropertyChangedCollection<ResourcesGridItem> resources)
         {
             Resources = resources;
             resources.OnCollectionChangedAsync += Resources_OnCollectionChangedAsync;

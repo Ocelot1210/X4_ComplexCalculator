@@ -145,7 +145,7 @@
                 Height="{Binding ElementName=SaveButton, Path=Height}"
                 Command="{Binding CloseWindowCommand}"
                 CommandParameter="{Binding ElementName=window}"
-                Content="キャンセル" />
+                Content="閉じる" />
         </Grid>
 
         <!--  絞り込み用チェックリストボックス  -->

@@ -82,7 +82,7 @@ namespace X4_ComplexCalculator.Main.StationSummary
         /// <param name="modules">モジュール一覧</param>
         /// <param name="products">製品一覧</param>
         /// <param name="resources">建造に必要なリソース一覧</param>
-        public StationSummaryViewModel(MemberChangeDetectCollection<ModulesGridItem> modules, MemberChangeDetectCollection<ProductsGridItem> products, MemberChangeDetectCollection<ResourcesGridItem> resources)
+        public StationSummaryViewModel(ObservablePropertyChangedCollection<ModulesGridItem> modules, ObservablePropertyChangedCollection<ProductsGridItem> products, ObservablePropertyChangedCollection<ResourcesGridItem> resources)
         {
             WorkForceModel = new WorkForceModel(modules);
             WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.AddHandler(WorkForceModel, "PropertyChanged", ModelPropertyChanged);

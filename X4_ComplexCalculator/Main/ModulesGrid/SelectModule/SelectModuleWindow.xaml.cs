@@ -13,7 +13,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         /// </summary>
         /// <param name="modules">モジュール追加対象</param>
         /// <param name="prevModuleName">変更前のモジュール</param>
-        public SelectModuleWindow(SmartCollection<ModulesGridItem> modules, string prevModuleName = "")
+        public SelectModuleWindow(ObservableRangeCollection<ModulesGridItem> modules, string prevModuleName = "")
         {
             InitializeComponent();
 

@@ -16,26 +16,26 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         /// <summary>
         /// モジュール追加先
         /// </summary>
-        private SmartCollection<ModulesGridItem> ItemCollection;
+        private ObservableRangeCollection<ModulesGridItem> ItemCollection;
         #endregion
 
         #region プロパティ
         /// <summary>
         /// モジュール種別
         /// </summary>
-        public MemberChangeDetectCollection<ModulesListItem> ModuleTypes { get; private set; } = new MemberChangeDetectCollection<ModulesListItem>();
+        public ObservablePropertyChangedCollection<ModulesListItem> ModuleTypes { get; private set; } = new ObservablePropertyChangedCollection<ModulesListItem>();
 
 
         /// <summary>
         /// モジュール所有派閥
         /// </summary>
-        public MemberChangeDetectCollection<ModulesListItem> ModuleOwners { get; private set; } = new MemberChangeDetectCollection<ModulesListItem>();
+        public ObservablePropertyChangedCollection<ModulesListItem> ModuleOwners { get; private set; } = new ObservablePropertyChangedCollection<ModulesListItem>();
 
 
         /// <summary>
         /// モジュール一覧
         /// </summary>
-        public MemberChangeDetectCollection<ModulesListItem> Modules { get; private set; } = new MemberChangeDetectCollection<ModulesListItem>();
+        public ObservablePropertyChangedCollection<ModulesListItem> Modules { get; private set; } = new ObservablePropertyChangedCollection<ModulesListItem>();
         #endregion
 
 
@@ -43,7 +43,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         /// コンストラクタ
         /// </summary>
         /// <param name="itemCollection">選択結果格納先</param>
-        public SelectModuleModel(SmartCollection<ModulesGridItem> itemCollection)
+        public SelectModuleModel(ObservableRangeCollection<ModulesGridItem> itemCollection)
         {
             ItemCollection = itemCollection;
 

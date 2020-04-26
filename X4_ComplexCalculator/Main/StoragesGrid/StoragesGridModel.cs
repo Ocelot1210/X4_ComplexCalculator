@@ -26,7 +26,7 @@ namespace X4_ComplexCalculator.Main.StoragesGrid
         /// <summary>
         /// ストレージ一覧
         /// </summary>
-        public SmartCollection<StoragesGridItem> Storages { get; private set; } = new SmartCollection<StoragesGridItem>();
+        public ObservableRangeCollection<StoragesGridItem> Storages { get; private set; } = new ObservableRangeCollection<StoragesGridItem>();
         #endregion
 
 
@@ -34,7 +34,7 @@ namespace X4_ComplexCalculator.Main.StoragesGrid
         /// コンストラクタ
         /// </summary>
         /// <param name="moduleGridModel">モジュール一覧</param>
-        public StoragesGridModel(MemberChangeDetectCollection<ModulesGridItem> modules)
+        public StoragesGridModel(ObservablePropertyChangedCollection<ModulesGridItem> modules)
         {
             Modules = modules;
             modules.OnCollectionChangedAsync += OnModulesChanged;
