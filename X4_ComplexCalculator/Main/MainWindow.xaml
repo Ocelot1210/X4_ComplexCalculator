@@ -79,7 +79,7 @@
         <!--  作業エリア  -->
         <xcad:DockingManager
             Grid.Row="1"
-            ActiveContent="{Binding ActiveContent, Mode=TwoWay, Converter={StaticResource ActiveDocumentConverter}}"
+            ActiveContent="{Binding ActiveContent, Mode=TwoWay, Converter={StaticResource ActiveDocumentConverter}, UpdateSourceTrigger=PropertyChanged}"
             DocumentsSource="{Binding Documents}">
 
             <i:Interaction.Triggers>

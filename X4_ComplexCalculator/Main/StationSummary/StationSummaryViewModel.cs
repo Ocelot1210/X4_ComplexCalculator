@@ -18,17 +18,17 @@ namespace X4_ComplexCalculator.Main.StationSummary
         /// <summary>
         /// 労働力用Model
         /// </summary>
-        private readonly WorkForceModel WorkForceModel;
+        private readonly WorkForceModel _WorkForceModel;
 
         /// <summary>
         /// 利益用Model
         /// </summary>
-        private readonly ProfitModel ProfitModel;
+        private readonly ProfitModel _ProfitModel;
 
         /// <summary>
         /// 建造コスト用Model
         /// </summary>
-        private readonly BuildingCostModel BuildingCostModel;
+        private readonly BuildingCostModel _BuildingCostModel;
         #endregion
 
 
@@ -36,17 +36,17 @@ namespace X4_ComplexCalculator.Main.StationSummary
         /// <summary>
         /// 現在の労働力
         /// </summary>
-        public long WorkForce => WorkForceModel.WorkForce;
+        public long WorkForce => _WorkForceModel.WorkForce;
 
         /// <summary>
         /// 必要労働力
         /// </summary>
-        public long NeedWorkforce => WorkForceModel.NeedWorkforce;
+        public long NeedWorkforce => _WorkForceModel.NeedWorkforce;
 
         /// <summary>
         /// 労働力情報詳細
         /// </summary>
-        public ObservableCollection<WorkForceDetailsItem> WorkforceDetails => WorkForceModel.WorkForceDetails;
+        public ObservableCollection<WorkForceDetailsItem> WorkforceDetails => _WorkForceModel.WorkForceDetails;
         #endregion
 
 
@@ -54,12 +54,12 @@ namespace X4_ComplexCalculator.Main.StationSummary
         /// <summary>
         /// 1時間あたりの損益
         /// </summary>
-        public long Profit => ProfitModel.Profit;
+        public long Profit => _ProfitModel.Profit;
 
         /// <summary>
         /// 損益詳細
         /// </summary>
-        public ObservableCollection<ProfitDetailsItem> ProfitDetails => ProfitModel.ProfitDetails;
+        public ObservableCollection<ProfitDetailsItem> ProfitDetails => _ProfitModel.ProfitDetails;
         #endregion
 
 
@@ -67,13 +67,13 @@ namespace X4_ComplexCalculator.Main.StationSummary
         /// <summary>
         /// 建造費用
         /// </summary>
-        public long BuildingCost => BuildingCostModel.BuildingCost;
+        public long BuildingCost => _BuildingCostModel.BuildingCost;
 
 
         /// <summary>
         /// 建造コスト詳細
         /// </summary>
-        public ObservableCollection<BuildingCostDetailsItem> BuildingCostDetails => BuildingCostModel.BuildingCostDetails;
+        public ObservableCollection<BuildingCostDetailsItem> BuildingCostDetails => _BuildingCostModel.BuildingCostDetails;
         #endregion
 
         /// <summary>
@@ -84,14 +84,14 @@ namespace X4_ComplexCalculator.Main.StationSummary
         /// <param name="resources">建造に必要なリソース一覧</param>
         public StationSummaryViewModel(ObservablePropertyChangedCollection<ModulesGridItem> modules, ObservablePropertyChangedCollection<ProductsGridItem> products, ObservablePropertyChangedCollection<ResourcesGridItem> resources)
         {
-            WorkForceModel = new WorkForceModel(modules);
-            WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.AddHandler(WorkForceModel, "PropertyChanged", ModelPropertyChanged);
+            _WorkForceModel = new WorkForceModel(modules);
+            WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.AddHandler(_WorkForceModel, "PropertyChanged", ModelPropertyChanged);
 
-            ProfitModel = new ProfitModel(products);
-            WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.AddHandler(ProfitModel, "PropertyChanged", ModelPropertyChanged);
+            _ProfitModel = new ProfitModel(products);
+            WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.AddHandler(_ProfitModel, "PropertyChanged", ModelPropertyChanged);
 
-            BuildingCostModel = new BuildingCostModel(resources);
-            WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.AddHandler(BuildingCostModel, "PropertyChanged", ModelPropertyChanged);
+            _BuildingCostModel = new BuildingCostModel(resources);
+            WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.AddHandler(_BuildingCostModel, "PropertyChanged", ModelPropertyChanged);
         }
 
         /// <summary>
@@ -102,6 +102,17 @@ namespace X4_ComplexCalculator.Main.StationSummary
         private void ModelPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             OnPropertyChanged(e.PropertyName);
+        }
+
+
+        /// <summary>
+        /// リソースを開放
+        /// </summary>
+        public void Dispose()
+        {
+            _WorkForceModel.Dispose();
+            _ProfitModel.Dispose();
+            _BuildingCostModel.Dispose();
         }
     }
 }

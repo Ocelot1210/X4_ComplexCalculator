@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
@@ -15,13 +16,13 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
     /// <summary>
     /// 製品一覧用DataGridViewのModel
     /// </summary>
-    class ProductsGridModel : INotifyPropertyChangedBace
+    class ProductsGridModel : INotifyPropertyChangedBace, IDisposable
     {
         #region メンバ
         /// <summary>
         /// モジュール一覧
         /// </summary>
-        readonly IReadOnlyCollection<ModulesGridItem> Modules;
+        readonly ObservablePropertyChangedCollection<ModulesGridItem> Modules;
         #endregion
 
         #region プロパティ
@@ -43,6 +44,17 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
             modules.OnCollectionPropertyChangedAsync += OnModulePropertyChanged;
 
             Modules = modules;
+        }
+
+
+        /// <summary>
+        /// リソースを開放
+        /// </summary>
+        public void Dispose()
+        {
+            Products.Clear();
+            Modules.OnCollectionChangedAsync -= OnModulesChanged;
+            Modules.OnCollectionPropertyChangedAsync -= OnModulePropertyChanged;
         }
 
 

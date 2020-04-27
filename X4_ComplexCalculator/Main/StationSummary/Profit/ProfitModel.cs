@@ -15,7 +15,7 @@ namespace X4_ComplexCalculator.Main.StationSummary.Profit
         /// <summary>
         /// 製品一覧
         /// </summary>
-        private readonly IReadOnlyCollection<ProductsGridItem> Products;
+        private readonly ObservablePropertyChangedCollection<ProductsGridItem> Products;
 
         /// <summary>
         /// 利益
@@ -59,10 +59,19 @@ namespace X4_ComplexCalculator.Main.StationSummary.Profit
         public ProfitModel(ObservablePropertyChangedCollection<ProductsGridItem> products)
         {
             Products = products;
-            products.OnCollectionChangedAsync += OnProductsCollectionChanged;
-            products.OnCollectionPropertyChangedAsync += OnProductsPropertyChanged;
+            Products.OnCollectionChangedAsync += OnProductsCollectionChanged;
+            Products.OnCollectionPropertyChangedAsync += OnProductsPropertyChanged;
         }
 
+        /// <summary>
+        /// リソースを開放
+        /// </summary>
+        public void Dispose()
+        {
+            Products.OnCollectionChangedAsync -= OnProductsCollectionChanged;
+            Products.OnCollectionPropertyChangedAsync -= OnProductsPropertyChanged;
+            ProfitDetails.Clear();
+        }
 
         /// <summary>
         /// 製品のプロパティが変更された時

@@ -9,19 +9,20 @@ using System.Collections.Specialized;
 using System.Threading.Tasks;
 using X4_ComplexCalculator.Common.Collection;
 using System.ComponentModel;
+using System;
 
 namespace X4_ComplexCalculator.Main.ResourcesGrid
 {
     /// <summary>
     /// 建造に必要なリソースを表示するDataGridView用Model
     /// </summary>
-    class ResourcesGridModel
+    class ResourcesGridModel : IDisposable
     {
         #region メンバ
         /// <summary>
         /// モジュール一覧
         /// </summary>
-        readonly IReadOnlyCollection<ModulesGridItem> Modules;
+        readonly ObservablePropertyChangedCollection<ModulesGridItem> Modules;
         #endregion
 
 
@@ -41,8 +42,18 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         {
             Resources = new ObservablePropertyChangedCollection<ResourcesGridItem>();
             Modules = modules;
-            modules.OnCollectionChangedAsync += OnModulesChanged;
-            modules.OnCollectionPropertyChangedAsync += OnModulesPropertyChanged;
+            Modules.OnCollectionChangedAsync += OnModulesChanged;
+            Modules.OnCollectionPropertyChangedAsync += OnModulesPropertyChanged;
+        }
+
+        /// <summary>
+        /// リソースを開放
+        /// </summary>
+        public void Dispose()
+        {
+            Resources.Clear();
+            Modules.OnCollectionChangedAsync -= OnModulesChanged;
+            Modules.OnCollectionPropertyChangedAsync -= OnModulesPropertyChanged;
         }
 
         /// <summary>

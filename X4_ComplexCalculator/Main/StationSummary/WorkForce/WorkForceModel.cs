@@ -26,7 +26,7 @@ namespace X4_ComplexCalculator.Main.StationSummary.WorkForce
         /// <summary>
         /// モジュール一覧
         /// </summary>
-        readonly IReadOnlyCollection<ModulesGridItem> Modules;
+        readonly ObservablePropertyChangedCollection<ModulesGridItem> Modules;
         #endregion
 
 
@@ -84,9 +84,21 @@ namespace X4_ComplexCalculator.Main.StationSummary.WorkForce
         public WorkForceModel(ObservablePropertyChangedCollection<ModulesGridItem> modules)
         {
             Modules = modules;
-            modules.OnCollectionChangedAsync += OnModulesChanged;
-            modules.OnCollectionPropertyChangedAsync += OnModulesPropertyChanged;
+            Modules.OnCollectionChangedAsync += OnModulesChanged;
+            Modules.OnCollectionPropertyChangedAsync += OnModulesPropertyChanged;
         }
+
+
+        /// <summary>
+        /// リソースを開放
+        /// </summary>
+        public void Dispose()
+        {
+            Modules.OnCollectionChangedAsync -= OnModulesChanged;
+            Modules.OnCollectionPropertyChangedAsync -= OnModulesPropertyChanged;
+            WorkForceDetails.Clear();
+        }
+
 
         /// <summary>
         /// モジュールのプロパティ変更時

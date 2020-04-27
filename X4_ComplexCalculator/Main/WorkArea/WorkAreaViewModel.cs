@@ -211,11 +211,14 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <summary>
         /// リソースを開放
         /// </summary>
-        public override void Dispose()
+        public void Dispose()
         {
-            base.Dispose();
-
             _Model.Dispose();
+            Summary.Dispose();
+            Modules.Dispose();
+            Products.Dispose();
+            Resources.Dispose();
+            Storages.Dispose();
         }
     }
 }

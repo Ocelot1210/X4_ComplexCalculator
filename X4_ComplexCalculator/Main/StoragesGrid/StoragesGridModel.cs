@@ -6,19 +6,20 @@ using X4_ComplexCalculator.Main.ModulesGrid;
 using System.Collections.Specialized;
 using System.Threading.Tasks;
 using X4_ComplexCalculator.Common.Collection;
+using System;
 
 namespace X4_ComplexCalculator.Main.StoragesGrid
 {
     /// <summary>
     /// 保管庫一覧表示用DataGridViewのModel
     /// </summary>
-    class StoragesGridModel
+    class StoragesGridModel : IDisposable
     {
         #region メンバ
         /// <summary>
         /// モジュール一覧
         /// </summary>
-        readonly IReadOnlyCollection<ModulesGridItem> Modules;
+        readonly ObservablePropertyChangedCollection<ModulesGridItem> Modules;
         #endregion
 
 
@@ -37,11 +38,26 @@ namespace X4_ComplexCalculator.Main.StoragesGrid
         public StoragesGridModel(ObservablePropertyChangedCollection<ModulesGridItem> modules)
         {
             Modules = modules;
-            modules.OnCollectionChangedAsync += OnModulesChanged;
-            modules.OnCollectionPropertyChangedAsync += OnModulePropertyChanged;
+            Modules.OnCollectionChangedAsync += OnModulesChanged;
+            Modules.OnCollectionPropertyChangedAsync += OnModulePropertyChanged;
         }
 
 
+        /// <summary>
+        /// リソースを開放
+        /// </summary>
+        public void Dispose()
+        {
+            Modules.OnCollectionChangedAsync -= OnModulesChanged;
+            Modules.OnCollectionPropertyChangedAsync -= OnModulePropertyChanged;
+        }
+
+        /// <summary>
+        /// モジュールのプロパティ変更時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <returns></returns>
         private async Task OnModulePropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             // モジュール数変更時のみ処理

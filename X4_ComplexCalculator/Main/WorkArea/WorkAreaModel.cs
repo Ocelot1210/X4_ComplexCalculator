@@ -108,17 +108,13 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <summary>
         /// リソースを開放
         /// </summary>
-        public override void Dispose()
+        public void Dispose()
         {
-            base.Dispose();
-
             // 変更検知イベントを購読解除
             _Modules.Modules.CollectionChanged -= OnModulesChanged;
             _Modules.Modules.OnCollectionPropertyChanged -= OnPropertyChanged;
             _Products.Products.OnCollectionPropertyChanged -= OnPropertyChanged;
             _Resources.Resources.OnCollectionPropertyChanged -= OnPropertyChanged;
-
-            _Modules.Dispose();
         }
 
 

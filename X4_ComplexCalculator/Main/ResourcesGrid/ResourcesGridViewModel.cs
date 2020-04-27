@@ -1,19 +1,19 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using X4_ComplexCalculator.Common;
-using System.Linq;
 
 namespace X4_ComplexCalculator.Main.ResourcesGrid
 {
     /// <summary>
     /// 建造に必要なリソースを表示するDataGridView用ViewModel
     /// </summary>
-    class ResourcesGridViewModel : INotifyPropertyChangedBace
+    class ResourcesGridViewModel : INotifyPropertyChangedBace, IDisposable
     {
         #region メンバ
         /// <summary>
         /// 建造に必要なリソースを表示するDataGridView用Model
         /// </summary>
-        readonly ResourcesGridModel Model;
+        readonly ResourcesGridModel _Model;
 
         /// <summary>
         /// 価格割合
@@ -25,7 +25,7 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         /// <summary>
         /// 建造に必要なリソース一覧
         /// </summary>
-        public ObservableCollection<ResourcesGridItem> BuildResource => Model.Resources;
+        public ObservableCollection<ResourcesGridItem> BuildResource => _Model.Resources;
 
 
         /// <summary>
@@ -58,7 +58,12 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         /// <param name="moduleGridModel">建造リソース用Model</param>
         public ResourcesGridViewModel(ResourcesGridModel resourcesGridModel)
         {
-            Model = resourcesGridModel;
+            _Model = resourcesGridModel;
+        }
+
+        public void Dispose()
+        {
+            _Model.Dispose();
         }
     }
 }

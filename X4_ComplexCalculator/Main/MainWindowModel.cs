@@ -195,6 +195,17 @@ namespace X4_ComplexCalculator.Main
             {
                 vm.Dispose();
                 Dispatcher.CurrentDispatcher.BeginInvoke(new Action(() => Documents.Remove(vm)), DispatcherPriority.Background);
+
+                // 最後のタブを閉じた時にAvalonDockのActiveContentが更新されないためここでnullにする
+                // → nullにしないと閉じたはずのタブを保存できてしまう
+                if (Documents.Count == 1)
+                {
+                    ActiveContent = null;
+                }
+
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
             }
 
             return canceled;

@@ -103,6 +103,13 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             DeleteModules      = new DelegateCommand<DataGrid>(DeleteModulesCommand);
         }
 
+        /// <summary>
+        /// リソースを開放
+        /// </summary>
+        public void Dispose()
+        {
+            _Model.Dispose();
+        }
 
         /// <summary>
         /// 選択中のモジュールをコピー

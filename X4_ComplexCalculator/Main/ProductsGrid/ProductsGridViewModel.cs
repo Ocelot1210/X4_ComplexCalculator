@@ -16,7 +16,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// <summary>
         /// 製品一覧用DataGridViewのModel
         /// </summary>
-        readonly ProductsGridModel Model;
+        readonly ProductsGridModel _Model;
 
         /// <summary>
         /// 製品価格割合
@@ -29,7 +29,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// <summary>
         /// 製品一覧
         /// </summary>
-        public ObservableCollection<ProductsGridItem> Products => Model.Products;
+        public ObservableCollection<ProductsGridItem> Products => _Model.Products;
 
         /// <summary>
         /// 単価(百分率)
@@ -71,9 +71,17 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// <param name="productsGridModel">製品一覧用Model</param>
         public ProductsGridViewModel(ProductsGridModel productsGridModel)
         {
-            Model = productsGridModel;
+            _Model = productsGridModel;
             SelectedExpand = new DelegateCommand<DataGrid>(SelectedExpandCommand);
             SelectedCollapse = new DelegateCommand<DataGrid>(SelectedCollapseCommand);
+        }
+
+        /// <summary>
+        /// リソースを開放
+        /// </summary>
+        public void Dispose()
+        {
+            _Model.Dispose();
         }
 
         /// <summary>

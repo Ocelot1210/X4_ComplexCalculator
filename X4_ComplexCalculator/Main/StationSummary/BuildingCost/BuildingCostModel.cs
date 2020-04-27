@@ -18,7 +18,7 @@ namespace X4_ComplexCalculator.Main.StationSummary.BuildingCost
         /// <summary>
         /// 建造に必要なウェア一覧
         /// </summary>
-        private readonly IReadOnlyCollection<ResourcesGridItem> Resources;
+        private readonly ObservablePropertyChangedCollection<ResourcesGridItem> Resources;
 
         /// <summary>
         /// 建造コスト
@@ -61,8 +61,18 @@ namespace X4_ComplexCalculator.Main.StationSummary.BuildingCost
         public BuildingCostModel(ObservablePropertyChangedCollection<ResourcesGridItem> resources)
         {
             Resources = resources;
-            resources.OnCollectionChangedAsync += Resources_OnCollectionChangedAsync;
-            resources.OnCollectionPropertyChangedAsync += Resources_OnPropertyChangedAsync;
+            Resources.OnCollectionChangedAsync += Resources_OnCollectionChangedAsync;
+            Resources.OnCollectionPropertyChangedAsync += Resources_OnPropertyChangedAsync;
+        }
+
+        /// <summary>
+        /// リソースを開放
+        /// </summary>
+        public void Dispose()
+        {
+            Resources.OnCollectionChangedAsync -= Resources_OnCollectionChangedAsync;
+            Resources.OnCollectionPropertyChangedAsync -= Resources_OnPropertyChangedAsync;
+            BuildingCostDetails.Clear();
         }
 
         /// <summary>

@@ -1,11 +1,7 @@
 ﻿using Prism.Commands;
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Windows;
 using System.Windows.Input;
-using System.Windows.Threading;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Main.WorkArea;
 using Xceed.Wpf.AvalonDock;
