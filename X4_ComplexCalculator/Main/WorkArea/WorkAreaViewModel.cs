@@ -122,7 +122,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
             OnLoadedCommand = new DelegateCommand<DockingManager>(OnLoaded);
             OnUnloadedCommand = new DelegateCommand<DockingManager>(OnUnloaded);
 
-            WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.AddHandler(_Model, "PropertyChanged", Model_PropertyChanged);
+            _Model.PropertyChanged += Model_PropertyChanged;
         }
 
 
@@ -213,6 +213,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// </summary>
         public void Dispose()
         {
+            _Model.PropertyChanged -= Model_PropertyChanged;
             _Model.Dispose();
             Summary.Dispose();
             Modules.Dispose();

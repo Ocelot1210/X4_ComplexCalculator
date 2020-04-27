@@ -65,7 +65,7 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         private async Task OnModulesPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             // モジュール数変更時のみ処理
-            if (e.PropertyName != "ModuleCount")
+            if (e.PropertyName != "Module")
             {
                 await Task.CompletedTask;
                 return;
@@ -159,7 +159,7 @@ WHERE
 
             var query = $@"
 SELECT
-    WareID,
+    NeedWareID AS 'WareID',
     Amount * :count AS Amount
 
 FROM

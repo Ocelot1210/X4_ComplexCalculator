@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace X4_ComplexCalculator.Common
+namespace X4_ComplexCalculator.Common.Behavior
 {
     /// <summary>
     /// マウスカーソルがセルに乗った時に編集モードにするビヘイビア

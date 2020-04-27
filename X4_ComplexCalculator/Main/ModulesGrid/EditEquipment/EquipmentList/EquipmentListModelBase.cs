@@ -102,14 +102,14 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         {
             Module = module;
             Factions = factions;
-            WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.AddHandler(Factions, "PropertyChanged", UpdateEquipments);
+            Factions.OnCollectionPropertyChanged += UpdateEquipments;
         }
 
 
         /// <summary>
         /// 装備一覧を更新
         /// </summary>
-        protected abstract void UpdateEquipments(object sender, PropertyChangedEventArgs e);
+        public abstract void UpdateEquipments(object sender, PropertyChangedEventArgs e);
 
 
         /// <summary>

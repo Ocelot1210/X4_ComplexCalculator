@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xaml.Behaviors;
 using System.Windows;
 using System.Windows.Controls;
+using X4_ComplexCalculator.Common.Behavior;
 
 namespace X4_ComplexCalculator.Common
 {

@@ -3,12 +3,12 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace X4_ComplexCalculator.Common
+namespace X4_ComplexCalculator.Common.Behavior
 {
     /// <summary>
     /// カレントセルを自動的に編集モードにするBehavior
     /// </summary>
-    class DataGridCurrentCellEditModeBehavior : Behavior<DataGrid>
+    public class DataGridCurrentCellEditModeBehavior : Behavior<DataGrid>
     {
         /// <summary>
         /// カレントセルを編集モードにするかのプロパティ

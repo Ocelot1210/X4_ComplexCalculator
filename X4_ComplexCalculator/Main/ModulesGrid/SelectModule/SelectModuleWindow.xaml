@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
     xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
     xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
     xmlns:xctk="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
@@ -12,7 +13,7 @@
     Title="モジュール選択画面"
     Width="800"
     Height="500"
-    x4cmn:CloseWindowBehavior.Close="{Binding CloseWindowProperty}"
+    x4bhv:CloseWindowBehavior.Close="{Binding CloseWindowProperty}"
     Style="{StaticResource DefaultWindowBackgroundStyle}"
     mc:Ignorable="d">
 

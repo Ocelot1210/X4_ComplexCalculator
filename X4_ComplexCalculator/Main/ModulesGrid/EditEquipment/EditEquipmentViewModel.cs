@@ -174,12 +174,12 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
 
             // Model類
             Model = new EditEquipmentModel(module);
-            WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.AddHandler(Model, "PropertyChanged", Model_PropertyChanged);
+            Model.PropertyChanged += Model_PropertyChanged;
             
             // サブViewModel類
             TurretsViewModel = new EquipmentListViewModel(new TurretEquipmentListModel(module, Factions));
             Presets.CollectionChanged += TurretsViewModel.OnPresetsCollectionChanged;
-
+            
             ShieldsViewModel = new EquipmentListViewModel(new ShieldEquipmentListModel(module, Factions));
             Presets.CollectionChanged += ShieldsViewModel.OnPresetsCollectionChanged;
 
@@ -232,12 +232,10 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
                     case MessageBoxResult.Yes:
                         TurretsViewModel.SaveEquipment();
                         ShieldsViewModel.SaveEquipment();
-                        Model.SaveCheckState();
                         break;
 
                     // 保存せずに閉じる場合
                     case MessageBoxResult.No:
-                        Model.SaveCheckState();
                         break;
 
                     // キャンセルする場合
@@ -246,6 +244,12 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
                         e.Cancel = true;
                         break;
                 }
+            }
+
+            // ウィンドウを閉じない場合、チェック状態を保存
+            if (!e.Cancel)
+            {
+                Model.SaveCheckState();
             }
         }
 

@@ -7,7 +7,7 @@ using System.Linq;
 using X4_ComplexCalculator.Common.Reflection;
 using System.Windows.Threading;
 
-namespace X4_ComplexCalculator.Common
+namespace X4_ComplexCalculator.Common.Behavior
 {
     /// <summary>
     /// 仮想化を行ったDataGridも正しく選択できるようにするビヘイビア

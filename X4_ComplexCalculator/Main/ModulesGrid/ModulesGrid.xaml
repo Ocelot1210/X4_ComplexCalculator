@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:X4_ComplexCalculator.Main.ModulesGrid"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
     xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     x:Name="root"
@@ -62,8 +63,9 @@
         <!--  モジュール表示用DataGrid  -->
         <DataGrid
             Name="moduleGrid"
-            x4cmn:DataGridCurrentCellEditModeBehavior.Enabled="True"
-            x4cmn:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
+            x4bhv:DataGridCurrentCellEditModeBehavior.Enabled="True"
+            x4bhv:DataGridFocusCellBehavior.FocusCommand="{Binding CellFocusCommand, Mode=OneWayToSource}"
+            x4bhv:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
             CellStyle="{StaticResource DataGridCellDefaultStyle}"
             ContextMenu="{StaticResource ModulesGridContextMenu}"
             IsSynchronizedWithCurrentItem="True"

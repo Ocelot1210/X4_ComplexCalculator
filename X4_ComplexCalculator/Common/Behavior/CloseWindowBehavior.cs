@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace X4_ComplexCalculator.Common
+namespace X4_ComplexCalculator.Common.Behavior
 {
     /// <summary>
     /// Windowクローズ用添付ビヘイビア

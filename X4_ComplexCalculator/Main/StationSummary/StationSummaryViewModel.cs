@@ -85,13 +85,13 @@ namespace X4_ComplexCalculator.Main.StationSummary
         public StationSummaryViewModel(ObservablePropertyChangedCollection<ModulesGridItem> modules, ObservablePropertyChangedCollection<ProductsGridItem> products, ObservablePropertyChangedCollection<ResourcesGridItem> resources)
         {
             _WorkForceModel = new WorkForceModel(modules);
-            WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.AddHandler(_WorkForceModel, "PropertyChanged", ModelPropertyChanged);
+            _WorkForceModel.PropertyChanged += ModelPropertyChanged;
 
             _ProfitModel = new ProfitModel(products);
-            WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.AddHandler(_ProfitModel, "PropertyChanged", ModelPropertyChanged);
+            _ProfitModel.PropertyChanged += ModelPropertyChanged;
 
             _BuildingCostModel = new BuildingCostModel(resources);
-            WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.AddHandler(_BuildingCostModel, "PropertyChanged", ModelPropertyChanged);
+            _BuildingCostModel.PropertyChanged += ModelPropertyChanged;
         }
 
         /// <summary>
@@ -110,6 +110,10 @@ namespace X4_ComplexCalculator.Main.StationSummary
         /// </summary>
         public void Dispose()
         {
+            _WorkForceModel.PropertyChanged -= ModelPropertyChanged;
+            _ProfitModel.PropertyChanged -= ModelPropertyChanged;
+            _BuildingCostModel.PropertyChanged -= ModelPropertyChanged;
+
             _WorkForceModel.Dispose();
             _ProfitModel.Dispose();
             _BuildingCostModel.Dispose();

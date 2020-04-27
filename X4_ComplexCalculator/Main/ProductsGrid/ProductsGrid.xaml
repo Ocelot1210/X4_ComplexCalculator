@@ -7,6 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:X4_ComplexCalculator.Main.ProductsGrid"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
     xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
     xmlns:x4conv="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
@@ -102,8 +103,8 @@
     <DataGrid
         x:Name="productGrid"
         PresentationOptions:Freeze="true"
-        x4cmn:DataGridCurrentCellEditModeBehavior.Enabled="True"
-        x4cmn:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
+        x4bhv:DataGridCurrentCellEditModeBehavior.Enabled="True"
+        x4bhv:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
         CellStyle="{StaticResource DataGridCellDefaultStyle}"
         ContextMenu="{StaticResource ProductsGridContextMenu}"
         ItemsSource="{Binding Products, Mode=OneTime}"

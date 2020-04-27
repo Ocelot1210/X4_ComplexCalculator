@@ -84,6 +84,12 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// モジュールを削除
         /// </summary>
         public ICommand DeleteModules { get; }
+
+
+        /// <summary>
+        /// セルフォーカス用のコマンド
+        /// </summary>
+        public ICommand CellFocusCommand { private get; set; }
         #endregion
 
 
@@ -153,47 +159,6 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             }
         }
 
-        private static T FindVisualChild<T>(DependencyObject obj) where T : DependencyObject
-        {
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
-            {
-                DependencyObject child = VisualTreeHelper.GetChild(obj, i);
-                if (child != null && child is T)
-                    return (T)child;
-                else
-                {
-                    T childOfChild = FindVisualChild<T>(child);
-                    if (childOfChild != null)
-                        return childOfChild;
-                }
-            }
-            return null;
-        }
-
-        private DataGridCell GetCell(DataGrid grid, DataGridRow row, int column)
-        {
-            if (row != null)
-            {
-                var presenter = FindVisualChild<DataGridCellsPresenter>(row);
-                if (presenter == null)
-                {
-                    row.ApplyTemplate();
-                    presenter = FindVisualChild<DataGridCellsPresenter>(row);
-                }
-                if (presenter != null)
-                {
-                    var cell = presenter.ItemContainerGenerator.ContainerFromIndex(column) as DataGridCell;
-                    if (cell != null)
-                    {
-                        grid.ScrollIntoView(row, grid.Columns[column]);
-                        cell = presenter.ItemContainerGenerator.ContainerFromIndex(column) as DataGridCell;
-                    }
-                    return cell;
-                }
-            }
-
-            return null;
-        }
 
         /// <summary>
         /// 選択中のモジュールを削除
@@ -237,24 +202,8 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
                 item.IsSelected = true;
             }
 
-            // 選択項目があるか？
-            if (0 <= ModulesView.CurrentPosition)
-            {
-                // UpdateLayout()とScrollIntoView()しないとrowが取れない！
-                dataGrid.UpdateLayout();
-                dataGrid.ScrollIntoView(dataGrid.Items[ModulesView.CurrentPosition]);
-
-                // 参考：https://blog.magnusmontin.net/2013/11/08/how-to-programmatically-select-and-focus-a-row-or-cell-in-a-datagrid-in-wpf/
-                var row = dataGrid.ItemContainerGenerator.ContainerFromIndex(ModulesView.CurrentPosition) as DataGridRow;
-                if (row != null)
-                {
-                    var cell = GetCell(dataGrid, row, 0);
-                    if (cell != null)
-                    {
-                        cell.Focus();
-                    }
-                }
-            }
+            // セルフォーカス
+            CellFocusCommand?.Execute(new Tuple<DataGrid, int, int>(dataGrid, ModulesView.CurrentPosition, dataGrid.CurrentCell.Column.DisplayIndex));
         }
 
 

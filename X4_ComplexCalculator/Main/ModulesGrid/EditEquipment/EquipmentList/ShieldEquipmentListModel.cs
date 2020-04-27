@@ -74,7 +74,7 @@ WHERE
         /// <summary>
         /// 装備一覧を更新
         /// </summary>
-        protected override void UpdateEquipments(object sender, PropertyChangedEventArgs e)
+        public override void UpdateEquipments(object sender, PropertyChangedEventArgs e)
         {
             if (SelectedSize == null)
             {

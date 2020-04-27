@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
     xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
     xmlns:x4cvt="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
     xmlns:x4mupsld="clr-namespace:X4_ComplexCalculator_CustomControlLibrary.MouseUpSlider;assembly=X4_ComplexCalculator_CustomControlLibrary"
@@ -20,8 +21,8 @@
     </UserControl.Resources>
 
     <DataGrid
-        x4cmn:DataGridCurrentCellEditModeBehavior.Enabled="True"
-        x4cmn:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
+        x4bhv:DataGridCurrentCellEditModeBehavior.Enabled="True"
+        x4bhv:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
         IsReadOnly="False"
         ItemsSource="{Binding BuildResource, Mode=OneTime}"
         SelectionUnit="Cell"
