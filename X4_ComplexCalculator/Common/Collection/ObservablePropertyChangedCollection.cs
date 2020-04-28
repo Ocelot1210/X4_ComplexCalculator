@@ -127,14 +127,10 @@ namespace X4_ComplexCalculator.Common.Collection
                 return;
             }
 
-            //await Task.WhenAll(
-            //    handler.GetInvocationList()
-            //           .OfType<NotifyPropertyChangedEventAsync>()
-            //           .Select(async (x) => await x.Invoke(sender, e)));
-
-            await OnCollectionPropertyChangedAsync(sender, e);
-
-            await Task.CompletedTask;
+            await Task.WhenAll(
+                handler.GetInvocationList()
+                       .OfType<NotifyPropertyChangedEventAsync>()
+                       .Select(async (x) => await x.Invoke(sender, e)));
         }
 
 

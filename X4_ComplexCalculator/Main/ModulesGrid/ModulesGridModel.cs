@@ -69,7 +69,6 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
             {
                 void OnWindowClosed(object s, EventArgs ev)
                 {
-                    ((Window)s).Closed -= OnWindowClosed;
                     _SelectModuleWindowClosed = true;
                 }
 

@@ -17,7 +17,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         /// <summary>
         /// モデル
         /// </summary>
-        readonly SelectModuleModel Model;
+        readonly SelectModuleModel _Model;
 
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         /// <summary>
         /// 置換モードか
         /// </summary>
-        private readonly bool IsReplaceMode;
+        private readonly bool _IsReplaceMode;
 
 
         /// <summary>
@@ -78,25 +78,25 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         /// <summary>
         /// 変更前モジュールを表示するか
         /// </summary>
-        public Visibility PrevModuleVisiblity => IsReplaceMode ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility PrevModuleVisiblity => _IsReplaceMode ? Visibility.Visible : Visibility.Collapsed;
 
 
         /// <summary>
         /// モジュール種別
         /// </summary>
-        public ObservableCollection<ModulesListItem> ModuleTypes => Model.ModuleTypes;
+        public ObservableCollection<ModulesListItem> ModuleTypes => _Model.ModuleTypes;
 
 
         /// <summary>
         /// モジュール所有派閥
         /// </summary>
-        public ObservableCollection<ModulesListItem> ModuleOwners => Model.ModuleOwners;
+        public ObservableCollection<ModulesListItem> ModuleOwners => _Model.ModuleOwners;
 
 
         /// <summary>
         /// モジュール一覧
         /// </summary>
-        public ObservableCollection<ModulesListItem> Modules => Model.Modules;
+        public ObservableCollection<ModulesListItem> Modules => _Model.Modules;
 
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         /// <summary>
         /// モジュール一覧ListBoxの選択モード
         /// </summary>
-        public SelectionMode ModuleListSelectionMode => IsReplaceMode ? SelectionMode.Single : SelectionMode.Extended;
+        public SelectionMode ModuleListSelectionMode => _IsReplaceMode ? SelectionMode.Single : SelectionMode.Extended;
         #endregion
 
 
@@ -143,10 +143,10 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         /// <param name="isReplaceMode">置換モードか(falseで複数選択許可)</param>
         public SelectModuleViewModel(ObservableRangeCollection<ModulesGridItem> modules, string prevModuleName = "")
         {
-            Model = new SelectModuleModel(modules);
+            _Model = new SelectModuleModel(modules);
 
             PrevModuleName = prevModuleName;
-            IsReplaceMode  = prevModuleName != "";
+            _IsReplaceMode  = prevModuleName != "";
 
             ModulesView = (ListCollectionView)CollectionViewSource.GetDefaultView(Modules);
             ModulesView.Filter = Filter;
@@ -163,7 +163,8 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         /// <param name="e"></param>
         public void WindowClosing(CancelEventArgs _)
         {
-            Model.SaveCheckState();
+            _Model.SaveCheckState();
+            _Model.Dispose();
         }
 
 
@@ -172,10 +173,10 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         /// </summary>
         private void OKButtonClicked()
         {
-            Model.AddSelectedModuleToItemCollection();
+            _Model.AddSelectedModuleToItemCollection();
 
             // 置換モードならウィンドウを閉じる
-            if (IsReplaceMode)
+            if (_IsReplaceMode)
             {
                 CloseWindowProperty = true;
             }

@@ -4,7 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -16,7 +15,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
     /// <summary>
     /// 装備一覧用ViewModel
     /// </summary>
-    class EquipmentListViewModel : INotifyPropertyChangedBace
+    class EquipmentListViewModel : INotifyPropertyChangedBace, IDisposable
     {
         #region メンバ
         /// <summary>
@@ -150,6 +149,15 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
 
             AddButtonClickedCommand = new DelegateCommand<ICollection>(AddButtonClicked);
             RemoveButtonClickedCommand = new DelegateCommand<ICollection>(DeleteButtonClicked);
+        }
+
+
+        /// <summary>
+        /// リソースを開放
+        /// </summary>
+        public void Dispose()
+        {
+            _Model.Dispose();
         }
 
 

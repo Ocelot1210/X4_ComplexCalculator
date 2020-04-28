@@ -101,6 +101,7 @@
             </xcad:DockingManager.DocumentHeaderTemplate>
 
             <xcad:LayoutRoot />
+
         </xcad:DockingManager>
     </Grid>
 </Window>

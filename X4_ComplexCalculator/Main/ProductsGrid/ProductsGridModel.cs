@@ -92,34 +92,15 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
 
 
         /// <summary>
-        /// 処理対象モジュール一覧取得
-        /// </summary>
-        /// <returns>処理対象モジュール一覧</returns>
-        /// <remarks>
-        /// 製造モジュールか居住モジュールのみ抽出し、モジュールIDごとにモジュール数を集計
-        /// </remarks>
-        private ProductionModuleInfo[] GetProductionModules()
-        {
-            return Modules.Where(x => x.Module.ModuleType.ModuleTypeID == "production" || x.Module.ModuleType.ModuleTypeID == "habitation")
-                          .GroupBy(x => x.Module.ModuleID)
-                          .Select(x =>
-                          {
-                              var module = x.First().Module;
-                              return new ProductionModuleInfo(module.ModuleID, module.MaxWorkers, module.WorkersCapacity, module.ModuleType.ModuleTypeID, x.Sum(y => y.ModuleCount));
-                          })
-                          .ToArray();
-        }
-
-        /// <summary>
         /// 生産性を計算
         /// </summary>
         /// <returns>生産性</returns>
-        private double CalcEfficiency(ProductionModuleInfo[] modules)
+        private double CalcEfficiency()
         {
             var ret = 0.0;
 
-            var maxWorkers = modules.Sum(x => x.MaxWorkers * x.Count);
-            var workersCapacity = modules.Sum(x => x.WorkersCapacity * x.Count);
+            var maxWorkers = Modules.Sum(x => x.Module.MaxWorkers * x.ModuleCount);
+            var workersCapacity = Modules.Sum(x => x.Module.WorkersCapacity * x.ModuleCount);
 
             // 生産性を0.0以上、1.0以下にする
             if (0 < workersCapacity)
@@ -148,7 +129,13 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         private void UpdateProducts()
         {
             // 処理対象モジュール一覧
-            ProductionModuleInfo[] modules = GetProductionModules();
+            var modules = Modules.Where(x => x.Module.ModuleType.ModuleTypeID == "production" || x.Module.ModuleType.ModuleTypeID == "habitation")
+                          .GroupBy(x => x.Module.ModuleID)
+                          .Select(x =>
+                          {
+                              var module = x.First().Module;
+                              return (module.ModuleID, module.MaxWorkers, module.WorkersCapacity, module.ModuleType.ModuleTypeID, Count : x.Sum(y => y.ModuleCount));
+                          });
 
             // 処理対象が無ければクリアして終わる
             if (!modules.Any())
@@ -158,7 +145,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
             }
 
             // 生産性(倍率)
-            double efficiency = CalcEfficiency(modules);
+            double efficiency = CalcEfficiency();
 
 
             // ウェア集計用ディクショナリ
@@ -200,12 +187,14 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
             );
 
             // 前回値保存
-            var backup = Products.ToDictionary(x => x.Ware.WareID, x => new { x.UnitPrice, x.IsExpanded });
+            var backup = Products.ToDictionary(x => x.Ware.WareID, x => (x.UnitPrice, x.IsExpanded ));
 
             var items = wareDict.Select(x =>
                                 {
                                     var details = moduleDict[x.Key].OrderBy(x => x.ModuleName);
-                                    var bak = new { UnitPrice = (long)0, IsExpanded = false };
+
+                                    var bak = (UnitPrice : 0L, IsExpanded : false );
+
                                     return backup.TryGetValue(x.Key, out bak)
                                         ? new ProductsGridItem(x.Key, x.Value, details, bak.IsExpanded, bak.UnitPrice)
                                         : new ProductsGridItem(x.Key, x.Value, details);

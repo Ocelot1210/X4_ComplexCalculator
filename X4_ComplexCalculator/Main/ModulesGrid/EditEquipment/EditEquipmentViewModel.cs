@@ -15,7 +15,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
     /// <summary>
     /// 装備編集画面のViewModel
     /// </summary>
-    class EditEquipmentViewModel : INotifyPropertyChangedBace
+    class EditEquipmentViewModel : INotifyPropertyChangedBace, IDisposable
     {
         #region メンバ
         /// <summary>
@@ -197,6 +197,19 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
 
 
         /// <summary>
+        /// リソースを開放
+        /// </summary>
+        public void Dispose()
+        {
+            Presets.CollectionChanged -= TurretsViewModel.OnPresetsCollectionChanged;
+            Presets.CollectionChanged -= ShieldsViewModel.OnPresetsCollectionChanged;
+
+            TurretsViewModel.Dispose();
+            ShieldsViewModel.Dispose();
+        }
+
+
+        /// <summary>
         /// Modelのプロパティ変更時
         /// </summary>
         /// <param name="sender"></param>
@@ -246,10 +259,11 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
                 }
             }
 
-            // ウィンドウを閉じない場合、チェック状態を保存
+            // ウィンドウを閉じる場合、チェック状態を保存
             if (!e.Cancel)
             {
                 Model.SaveCheckState();
+                Dispose();
             }
         }
 

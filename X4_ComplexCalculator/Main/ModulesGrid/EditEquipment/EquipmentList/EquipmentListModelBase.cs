@@ -107,6 +107,15 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
 
 
         /// <summary>
+        /// リソースを開放
+        /// </summary>
+        public virtual void Dispose()
+        {
+            Factions.OnCollectionPropertyChanged -= UpdateEquipments;
+        }
+
+
+        /// <summary>
         /// 装備一覧を更新
         /// </summary>
         public abstract void UpdateEquipments(object sender, PropertyChangedEventArgs e);

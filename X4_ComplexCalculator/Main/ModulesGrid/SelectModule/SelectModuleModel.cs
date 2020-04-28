@@ -10,7 +10,7 @@ using X4_ComplexCalculator.DB;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
 {
-    class SelectModuleModel
+    class SelectModuleModel : IDisposable
     {
         #region メンバ
         /// <summary>
@@ -47,22 +47,30 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         {
             ItemCollection = itemCollection;
 
-            //ModuleOwners.OnCollectionChangedAsync += UpdateModules;
-            ModuleOwners.OnCollectionPropertyChangedAsync += OnCheckChanged;
+            ModuleOwners.OnCollectionPropertyChanged += UpdateModules;
 
-            //ModuleTypes.OnCollectionChangedAsync += UpdateModules;
-            ModuleTypes.OnCollectionPropertyChangedAsync += OnCheckChanged;
+            ModuleTypes.OnCollectionPropertyChanged += UpdateModules;
 
-            Task.WaitAll(InitModuleTypes());
-            Task.WaitAll(InitModuleOwners());
-            Task.WaitAll(UpdateModules(null, null));
+            InitModuleTypes();
+            InitModuleOwners();
+            UpdateModules(null, null);
+        }
+
+
+        /// <summary>
+        /// リソースを開放
+        /// </summary>
+        public void Dispose()
+        {
+            ModuleTypes.OnCollectionPropertyChanged -= UpdateModules;
+            ModuleOwners.OnCollectionPropertyChanged -= UpdateModules;
         }
 
 
         /// <summary>
         /// モジュール種別一覧を初期化する
         /// </summary>
-        private async Task InitModuleTypes()
+        private void InitModuleTypes()
         {
             var items = new List<ModulesListItem>();
 
@@ -84,15 +92,13 @@ WHERE
 ORDER BY Name", init, "SelectModuleCheckStateTypes");
 
             ModuleTypes.AddRange(items);
-
-            await Task.CompletedTask;
         }
 
 
         /// <summary>
         /// 派閥一覧を初期化する
         /// </summary>
-        private async Task InitModuleOwners()
+        private void InitModuleOwners()
         {
             var items = new List<ModulesListItem>();
 
@@ -114,19 +120,13 @@ WHERE
 ORDER BY Name ASC", init, "SelectModuleCheckStateTypes");
 
             ModuleOwners.AddRange(items);
-
-            await Task.CompletedTask;
         }
 
-        private async Task OnCheckChanged(object sender, PropertyChangedEventArgs e)
-        {
-            await UpdateModules(null, null);
-        }
 
         /// <summary>
         /// モジュール一覧を更新する
         /// </summary>
-        private async Task UpdateModules(object sender, EventArgs e)
+        private void UpdateModules(object sender, EventArgs e)
         {
             var query = $@"
 SELECT
@@ -143,7 +143,6 @@ WHERE
             var list = new List<ModulesListItem>();
             DBConnection.X4DB.ExecQuery(query, SetModules, list);
             Modules.Reset(list);
-            await Task.CompletedTask;
         }
 
 
