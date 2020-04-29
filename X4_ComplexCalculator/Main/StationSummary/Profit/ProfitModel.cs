@@ -36,18 +36,8 @@ namespace X4_ComplexCalculator.Main.StationSummary.Profit
         /// </summary>
         public long Profit
         {
-            get
-            {
-                return _Profit;
-            }
-            set
-            {
-                if (value != _Profit)
-                {
-                    _Profit = value;
-                    OnPropertyChanged();
-                }
-            }
+            get => _Profit;
+            set => SetProperty(ref _Profit, value);
         }
         #endregion
 
@@ -59,8 +49,8 @@ namespace X4_ComplexCalculator.Main.StationSummary.Profit
         public ProfitModel(ObservablePropertyChangedCollection<ProductsGridItem> products)
         {
             Products = products;
-            Products.OnCollectionChangedAsync += OnProductsCollectionChanged;
-            Products.OnCollectionPropertyChangedAsync += OnProductsPropertyChanged;
+            Products.CollectionChangedAsync += OnProductsCollectionChanged;
+            Products.CollectionPropertyChangedAsync += OnProductsPropertyChanged;
         }
 
         /// <summary>
@@ -68,8 +58,8 @@ namespace X4_ComplexCalculator.Main.StationSummary.Profit
         /// </summary>
         public void Dispose()
         {
-            Products.OnCollectionChangedAsync -= OnProductsCollectionChanged;
-            Products.OnCollectionPropertyChangedAsync -= OnProductsPropertyChanged;
+            Products.CollectionChangedAsync -= OnProductsCollectionChanged;
+            Products.CollectionPropertyChangedAsync -= OnProductsPropertyChanged;
             ProfitDetails.Clear();
         }
 

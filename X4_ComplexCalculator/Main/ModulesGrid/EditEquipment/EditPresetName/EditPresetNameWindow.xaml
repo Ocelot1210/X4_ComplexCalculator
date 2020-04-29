@@ -1,0 +1,56 @@
+﻿<Window
+    x:Class="X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EditPresetName.EditPresetNameWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
+    Title="プリセット名編集"
+    Width="400"
+    Height="150"
+    x4bhv:CloseWindowBehavior.Close="{Binding CloseDialogProperty, Mode=OneWay}"
+    x4bhv:CloseWindowBehavior.Result="{Binding DialogResult, Mode=OneWay}"
+    ResizeMode="NoResize"
+    Style="{StaticResource DefaultWindowBackgroundStyle}"
+    WindowStyle="ToolWindow"
+    mc:Ignorable="d">
+
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+
+        <!--  変更前プリセット名  -->
+        <StackPanel Grid.Row="0">
+            <TextBlock Text="変更前プリセット名" />
+            <TextBox IsReadOnly="True" Text="{Binding OriginalPresetName, Mode=OneTime}" />
+        </StackPanel>
+
+        <!--  変更後プリセット名  -->
+        <StackPanel Grid.Row="1">
+            <TextBlock Text="変更後プリセット名" />
+            <TextBox x:Name="NewPresetNameTextBox" Text="{Binding NewPresetName, Mode=OneWayToSource}" />
+        </StackPanel>
+
+        <!--  OK/Cancelボタン  -->
+        <DockPanel Grid.Row="2" HorizontalAlignment="Right">
+            <Button
+                Width="75"
+                Height="20"
+                Margin="5"
+                Command="{Binding OkButtonClickedCommand, Mode=OneTime}"
+                Content="OK" />
+
+            <Button
+                Width="75"
+                Height="20"
+                Margin="5"
+                Command="{Binding CancelButtonClickedCommand, Mode=OneTime}"
+                Content="Cancel" />
+        </DockPanel>
+
+    </Grid>
+</Window>

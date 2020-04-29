@@ -5,6 +5,7 @@ using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EditPresetName;
 
 namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
 {
@@ -101,7 +102,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
         {
             static void AddItem(SQLiteDataReader dr, object[] args)
             {
-                bool chkState = 0 < DBConnection.CommonDB.ExecQuery($"SELECT ID FROM SelectModuleEquipmentCheckStateFactions WHERE ID = '{dr["FactionID"]}'", (SQLiteDataReader drDummy, object[] argsDummy) => { });
+                bool chkState = 0 < DBConnection.CommonDB.ExecQuery($"SELECT ID FROM SelectModuleEquipmentCheckStateFactions WHERE ID = '{dr["FactionID"]}'");
 
                 ((ICollection<FactionsListItem>)args[0]).Add(new FactionsListItem(dr["FactionID"].ToString(), chkState));
             }
@@ -154,19 +155,31 @@ WHERE
 
 
         /// <summary>
-        /// プリセット保存
+        /// プリセット編集
         /// </summary>
-        public void SavePreset()
+        public void EditPreset()
         {
             if (SelectedPreset == null)
             {
                 return;
             }
 
-            DBConnection.CommonDB.BeginTransaction();
-            var newPreset = new PresetComboboxItem(SelectedPreset.ID, SelectedPreset.Name);
-            Presets.Replace(SelectedPreset, newPreset);
-            DBConnection.CommonDB.Commit();
+            // 新プリセット名
+            var newPresetName = EditPresetNameWindow.ShowDialog(SelectedPreset.Name);
+            if (!string.IsNullOrEmpty(newPresetName))
+            {
+                // 新プリセット名が設定された場合
+
+                var param = new SQLiteCommandParameters(3);
+                param.Add("presetName", System.Data.DbType.String,  newPresetName);
+                param.Add("moduleID",   System.Data.DbType.String,  _Module.ModuleID);
+                param.Add("presetID",   System.Data.DbType.Int64,   SelectedPreset.ID);
+                DBConnection.CommonDB.ExecQuery($"UPDATE ModulePresets Set PresetName = :presetName WHERE ModuleID = :moduleID AND presetID = :presetID", param);
+
+                var newPreset = new PresetComboboxItem(SelectedPreset.ID, newPresetName);
+                Presets.Replace(SelectedPreset, newPreset);
+                SelectedPreset = newPreset;
+            }
         }
 
 

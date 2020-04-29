@@ -1,4 +1,5 @@
 ﻿using System.Data.SQLite;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB;
 
 namespace X4_ComplexCalculator.Main.StoragesGrid
@@ -6,7 +7,7 @@ namespace X4_ComplexCalculator.Main.StoragesGrid
     /// <summary>
     /// ドロップダウンで表示するListViewのアイテム(保管庫用)
     /// </summary>
-    class StorageDetailsListItem
+    class StorageDetailsListItem : INotifyPropertyChangedBace
     {
         #region プロパティ
         /// <summary>

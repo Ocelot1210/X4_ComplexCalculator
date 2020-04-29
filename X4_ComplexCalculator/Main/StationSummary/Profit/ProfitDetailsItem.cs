@@ -34,16 +34,11 @@ namespace X4_ComplexCalculator.Main.StationSummary.Profit
         /// </summary>
         public long UnitPrice
         {
-            get
-            {
-                return _UnitPrice;
-            }
+            get => _UnitPrice;
             set
             {
-                if (value != _UnitPrice)
+                if (SetProperty(ref _UnitPrice, value))
                 {
-                    _UnitPrice = value;
-                    OnPropertyChanged();
                     OnPropertyChanged(nameof(TotalPrice));
                 }
             }

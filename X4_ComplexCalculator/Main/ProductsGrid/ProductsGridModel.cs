@@ -6,6 +6,7 @@ using System.Data;
 using System.Data.SQLite;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
@@ -40,8 +41,8 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         {
             Products = new ObservablePropertyChangedCollection<ProductsGridItem>();
 
-            modules.OnCollectionChangedAsync += OnModulesChanged;
-            modules.OnCollectionPropertyChangedAsync += OnModulePropertyChanged;
+            modules.CollectionChangedAsync += OnModulesChanged;
+            modules.CollectionPropertyChangedAsync += OnModulePropertyChanged;
 
             Modules = modules;
         }
@@ -53,8 +54,8 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         public void Dispose()
         {
             Products.Clear();
-            Modules.OnCollectionChangedAsync -= OnModulesChanged;
-            Modules.OnCollectionPropertyChangedAsync -= OnModulePropertyChanged;
+            Modules.CollectionChangedAsync -= OnModulesChanged;
+            Modules.CollectionPropertyChangedAsync -= OnModulePropertyChanged;
         }
 
 
@@ -177,14 +178,12 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
                 }
             }
 
-            // 集計
-            Task.WaitAll(
-                // 製造モジュール集計
-                AggregateProductionModule(prodParam, wareDict, moduleDict),
+            // 製造モジュール集計
+            AggregateProductionModule(prodParam, wareDict, moduleDict);
 
-                // 居住モジュール集計
-                AggregateHabitationModule(habParam, wareDict, moduleDict)
-            );
+            // 居住モジュール集計
+            AggregateHabitationModule(habParam, wareDict, moduleDict);
+
 
             // 前回値保存
             var backup = Products.ToDictionary(x => x.Ware.WareID, x => (x.UnitPrice, x.IsExpanded ));
@@ -211,7 +210,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// <param name="param">製造モジュール情報のパラメータ</param>
         /// <param name="wareDict">ウェア情報辞書</param>
         /// <param name="moduleDict">関連モジュール情報辞書</param>
-        private async Task AggregateProductionModule(SQLiteCommandParameters param, Dictionary<string, long> wareDict, Dictionary<string, List<ProductDetailsListItem>> moduleDict)
+        private void AggregateProductionModule(SQLiteCommandParameters param, Dictionary<string, long> wareDict, Dictionary<string, List<ProductDetailsListItem>> moduleDict)
         {
             //------------//
             // 製品を集計 //
@@ -270,8 +269,6 @@ WHERE
 ";
 
             DBConnection.X4DB.ExecQuery(query, param, SumProduct, wareDict, moduleDict);
-
-            await Task.CompletedTask;
         }
 
 
@@ -282,7 +279,7 @@ WHERE
         /// <param name="param">居住モジュール情報のパラメータ</param>
         /// <param name="wareDict">ウェア情報辞書</param>
         /// <param name="moduleDict">関連モジュール情報辞書</param>
-        private async Task AggregateHabitationModule(SQLiteCommandParameters param, Dictionary<string, long> wareDict, Dictionary<string, List<ProductDetailsListItem>> moduleDict)
+        private void AggregateHabitationModule(SQLiteCommandParameters param, Dictionary<string, long> wareDict, Dictionary<string, List<ProductDetailsListItem>> moduleDict)
         {
             var query = $@"
 SELECT
@@ -325,8 +322,6 @@ WHERE
 	)
 ";
             DBConnection.X4DB.ExecQuery(query, param, SumResource, wareDict, moduleDict);
-
-            await Task.CompletedTask;
         }
 
 

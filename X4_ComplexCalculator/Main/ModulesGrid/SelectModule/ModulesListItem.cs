@@ -8,7 +8,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         /// <summary>
         /// チェックされたか
         /// </summary>
-        private bool _checked;
+        private bool _Checked;
         #endregion
 
 
@@ -30,18 +30,8 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         /// </summary>
         public bool Checked
         {
-            get
-            {
-                return _checked;
-            }
-            set
-            {
-                if (_checked != value)
-                {
-                    _checked = value;
-                    OnPropertyChanged();
-                }
-            }
+            get => _Checked;
+            set => SetProperty(ref _Checked, value);
         }
         #endregion
 

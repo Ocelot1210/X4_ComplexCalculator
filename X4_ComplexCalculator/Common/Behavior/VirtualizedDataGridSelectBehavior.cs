@@ -75,10 +75,14 @@ namespace X4_ComplexCalculator.Common.Behavior
 
             using (Dispatcher.CurrentDispatcher.DisableProcessing())
             {
-                var accessor = ((0 < e.AddedCells.Count) ? e.AddedCells[0].Item : e.RemovedCells[0].Item).GetType().GetProperty(GetMemberName((DependencyObject)sender)).ToAccessor();
+                var pinfo = ((0 < e.AddedCells.Count) ? e.AddedCells[0].Item : e.RemovedCells[0].Item).GetType().GetProperty(GetMemberName((DependencyObject)sender));
+                var accessor = pinfo?.ToAccessor();
 
-                SetSelectedStatus(e.AddedCells.Select(x => x.Item),   accessor, true);
-                SetSelectedStatus(e.RemovedCells.Select(x => x.Item), accessor, false);
+                if (accessor != null)
+                {
+                    SetSelectedStatus(e.AddedCells.Select(x => x.Item), accessor, true);
+                    SetSelectedStatus(e.RemovedCells.Select(x => x.Item), accessor, false);
+                }
             }
         }
 

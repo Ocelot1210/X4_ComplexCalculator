@@ -1,4 +1,5 @@
 ﻿using System.Data.SQLite;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB;
 
 namespace X4_ComplexCalculator.Main.ProductsGrid
@@ -6,7 +7,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
     /// <summary>
     /// ドロップダウンで表示するListViewのアイテム(製品用)
     /// </summary>
-    public class ProductDetailsListItem
+    public class ProductDetailsListItem : INotifyPropertyChangedBace
     {
         #region メンバ
         /// <summary>

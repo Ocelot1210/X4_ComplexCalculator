@@ -79,10 +79,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// </summary>
         public string SearchEquipmentName
         {
-            get
-            {
-                return _SearchEquipmentName;
-            }
+            get => _SearchEquipmentName;
             set
             {
                 if (_SearchEquipmentName != value)

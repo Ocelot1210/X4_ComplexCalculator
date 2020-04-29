@@ -39,10 +39,7 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         /// </summary>
         public long UnitPrice
         {
-            get
-            {
-                return _UnitPrice;
-            }
+            get => _UnitPrice;
             set
             {
                 // 最低価格≦ 入力価格 ≦ 最高価格かつ価格が変更された場合のみ更新
@@ -86,7 +83,6 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         public void SetUnitPricePercent(long percent)
         {
             UnitPrice = (long)(Ware.MinPrice + (Ware.MaxPrice - Ware.MinPrice) * 0.01 * percent);
-            //await Task.CompletedTask;
         }
         #endregion
 

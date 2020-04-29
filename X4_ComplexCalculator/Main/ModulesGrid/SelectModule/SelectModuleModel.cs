@@ -47,9 +47,9 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         {
             ItemCollection = itemCollection;
 
-            ModuleOwners.OnCollectionPropertyChanged += UpdateModules;
+            ModuleOwners.CollectionPropertyChanged += UpdateModules;
 
-            ModuleTypes.OnCollectionPropertyChanged += UpdateModules;
+            ModuleTypes.CollectionPropertyChanged += UpdateModules;
 
             InitModuleTypes();
             InitModuleOwners();
@@ -62,8 +62,8 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         /// </summary>
         public void Dispose()
         {
-            ModuleTypes.OnCollectionPropertyChanged -= UpdateModules;
-            ModuleOwners.OnCollectionPropertyChanged -= UpdateModules;
+            ModuleTypes.CollectionPropertyChanged -= UpdateModules;
+            ModuleOwners.CollectionPropertyChanged -= UpdateModules;
         }
 
 
@@ -76,7 +76,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
 
             void init(SQLiteDataReader dr, object[] args)
             {
-                bool chked = 0 < DBConnection.CommonDB.ExecQuery($"SELECT * FROM SelectModuleCheckStateModuleTypes WHERE ID = '{dr["ModuleTypeID"]}'", (SQLiteDataReader drDummy, object[] argsDummy) => { });
+                bool chked = 0 < DBConnection.CommonDB.ExecQuery($"SELECT * FROM SelectModuleCheckStateModuleTypes WHERE ID = '{dr["ModuleTypeID"]}'");
                 items.Add(new ModulesListItem(dr["ModuleTypeID"].ToString(), dr["Name"].ToString(), chked));
             }
             
@@ -104,9 +104,9 @@ ORDER BY Name", init, "SelectModuleCheckStateTypes");
 
             void init(SQLiteDataReader dr, object[] args)
             {
-                bool chked = 0 < DBConnection.CommonDB.ExecQuery($"SELECT * FROM SelectModuleCheckStateModuleOwners WHERE ID = '{dr["FactionID"]}'", (SQLiteDataReader drDummy, object[] argsDummy) => { });
+                bool @checked = 0 < DBConnection.CommonDB.ExecQuery($"SELECT * FROM SelectModuleCheckStateModuleOwners WHERE ID = '{dr["FactionID"]}'");
 
-                items.Add(new ModulesListItem(dr["FactionID"].ToString(), dr["Name"].ToString(), chked));
+                items.Add(new ModulesListItem(dr["FactionID"].ToString(), dr["Name"].ToString(), @checked));
             }
 
             DBConnection.X4DB.ExecQuery(@"

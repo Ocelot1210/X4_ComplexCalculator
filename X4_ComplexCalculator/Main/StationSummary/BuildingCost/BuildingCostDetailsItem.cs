@@ -41,16 +41,11 @@ namespace X4_ComplexCalculator.Main.StationSummary.BuildingCost
         /// </summary>
         public long Count
         {
-            get
-            {
-                return _Count;
-            }
+            get => _Count;
             set
             {
-                if (_Count != value)
+                if (SetProperty(ref _Count, value))
                 {
-                    _Count = value;
-                    OnPropertyChanged();
                     OnPropertyChanged(nameof(TotalPrice));
                 }
             }
@@ -62,16 +57,11 @@ namespace X4_ComplexCalculator.Main.StationSummary.BuildingCost
         /// </summary>
         public long UnitPrice
         {
-            get
-            {
-                return _UnitPrice;
-            }
+            get => _UnitPrice;
             set
             {
-                if (_UnitPrice != value)
+                if (SetProperty(ref _UnitPrice, value))
                 {
-                    _UnitPrice = value;
-                    OnPropertyChanged();
                     OnPropertyChanged(nameof(TotalPrice));
                 }
             }

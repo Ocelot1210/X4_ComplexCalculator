@@ -38,8 +38,8 @@ namespace X4_ComplexCalculator.Main.StoragesGrid
         public StoragesGridModel(ObservablePropertyChangedCollection<ModulesGridItem> modules)
         {
             Modules = modules;
-            Modules.OnCollectionChangedAsync += OnModulesChanged;
-            Modules.OnCollectionPropertyChangedAsync += OnModulePropertyChanged;
+            Modules.CollectionChangedAsync += OnModulesChanged;
+            Modules.CollectionPropertyChangedAsync += OnModulePropertyChanged;
         }
 
 
@@ -48,8 +48,8 @@ namespace X4_ComplexCalculator.Main.StoragesGrid
         /// </summary>
         public void Dispose()
         {
-            Modules.OnCollectionChangedAsync -= OnModulesChanged;
-            Modules.OnCollectionPropertyChangedAsync -= OnModulePropertyChanged;
+            Modules.CollectionChangedAsync -= OnModulesChanged;
+            Modules.CollectionPropertyChangedAsync -= OnModulePropertyChanged;
         }
 
         /// <summary>

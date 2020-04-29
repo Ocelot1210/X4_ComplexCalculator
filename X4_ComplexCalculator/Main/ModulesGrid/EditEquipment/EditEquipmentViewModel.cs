@@ -146,9 +146,9 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
 
 
         /// <summary>
-        /// プリセット保存
+        /// プリセット編集
         /// </summary>
-        public ICommand SavePresetCommand { get; }
+        public ICommand EditPresetCommand { get; }
 
 
         /// <summary>
@@ -186,7 +186,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
             // コマンド類
             SaveButtonClickedCommand = new DelegateCommand(SavebuttonClicked);
             CloseWindowCommand       = new DelegateCommand(CloseWindow);
-            SavePresetCommand        = new DelegateCommand(Model.SavePreset);
+            EditPresetCommand        = new DelegateCommand(Model.EditPreset);
             AddPresetCommand         = new DelegateCommand(Model.AddPreset);
             RemovePresetCommand      = new DelegateCommand(Model.RemovePreset);
             WindowClosingCommand     = new DelegateCommand<CancelEventArgs>(WindowClosing);

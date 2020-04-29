@@ -42,8 +42,8 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         {
             Resources = new ObservablePropertyChangedCollection<ResourcesGridItem>();
             Modules = modules;
-            Modules.OnCollectionChangedAsync += OnModulesCollectionChanged;
-            Modules.OnCollectionPropertyChangedAsync += OnModulesPropertyChanged;
+            Modules.CollectionChangedAsync += OnModulesCollectionChanged;
+            Modules.CollectionPropertyChangedAsync += OnModulesPropertyChanged;
         }
 
         /// <summary>
@@ -52,8 +52,8 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         public void Dispose()
         {
             Resources.Clear();
-            Modules.OnCollectionChangedAsync -= OnModulesCollectionChanged;
-            Modules.OnCollectionPropertyChangedAsync -= OnModulesPropertyChanged;
+            Modules.CollectionChangedAsync -= OnModulesCollectionChanged;
+            Modules.CollectionPropertyChangedAsync -= OnModulesPropertyChanged;
         }
 
         /// <summary>

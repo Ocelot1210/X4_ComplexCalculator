@@ -61,8 +61,8 @@ namespace X4_ComplexCalculator.Main.StationSummary.BuildingCost
         public BuildingCostModel(ObservablePropertyChangedCollection<ResourcesGridItem> resources)
         {
             Resources = resources;
-            Resources.OnCollectionChangedAsync += Resources_OnCollectionChangedAsync;
-            Resources.OnCollectionPropertyChangedAsync += Resources_OnPropertyChangedAsync;
+            Resources.CollectionChangedAsync += Resources_OnCollectionChangedAsync;
+            Resources.CollectionPropertyChangedAsync += Resources_OnPropertyChangedAsync;
         }
 
         /// <summary>
@@ -70,8 +70,8 @@ namespace X4_ComplexCalculator.Main.StationSummary.BuildingCost
         /// </summary>
         public void Dispose()
         {
-            Resources.OnCollectionChangedAsync -= Resources_OnCollectionChangedAsync;
-            Resources.OnCollectionPropertyChangedAsync -= Resources_OnPropertyChangedAsync;
+            Resources.CollectionChangedAsync -= Resources_OnCollectionChangedAsync;
+            Resources.CollectionPropertyChangedAsync -= Resources_OnPropertyChangedAsync;
             BuildingCostDetails.Clear();
         }
 

@@ -36,10 +36,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// </summary>
         public double UnitPricePercent
         {
-            get
-            {
-                return _UnitPricePercent;
-            }
+            get => _UnitPricePercent;
             set
             {
                 _UnitPricePercent = (long)value;

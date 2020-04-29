@@ -102,7 +102,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         {
             Module = module;
             Factions = factions;
-            Factions.OnCollectionPropertyChanged += UpdateEquipments;
+            Factions.CollectionPropertyChanged += UpdateEquipments;
         }
 
 
@@ -111,7 +111,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// </summary>
         public virtual void Dispose()
         {
-            Factions.OnCollectionPropertyChanged -= UpdateEquipments;
+            Factions.CollectionPropertyChanged -= UpdateEquipments;
         }
 
 

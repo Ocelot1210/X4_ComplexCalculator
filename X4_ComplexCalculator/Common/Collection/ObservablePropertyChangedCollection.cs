@@ -42,19 +42,19 @@ namespace X4_ComplexCalculator.Common.Collection
         /// <summary>
         /// コレクション変更時のイベント
         /// </summary>
-        public event NotifyCollectionChangedEventAsync OnCollectionChangedAsync;
+        public event NotifyCollectionChangedEventAsync CollectionChangedAsync;
 
 
         /// <summary>
         /// コレクションのプロパティ変更時のイベント(非同期)
         /// </summary>
-        public event NotifyPropertyChangedEventAsync OnCollectionPropertyChangedAsync;
+        public event NotifyPropertyChangedEventAsync CollectionPropertyChangedAsync;
 
 
         /// <summary>
         /// コレクションのプロパティ変更時のイベント
         /// </summary>
-        public event NotifyPropertyChangedEvent OnCollectionPropertyChanged;
+        public event NotifyPropertyChangedEvent CollectionPropertyChanged;
         #endregion
 
         #region コンストラクタ
@@ -92,14 +92,14 @@ namespace X4_ComplexCalculator.Common.Collection
             }
 
             // 非同期版イベントが購読されていなければ何もしない
-            if (OnCollectionChangedAsync == null)
+            if (CollectionChangedAsync == null)
             {
                 return;
             }
 
             
             Task.WhenAll(
-                OnCollectionChangedAsync.GetInvocationList()
+                CollectionChangedAsync.GetInvocationList()
                                         .OfType<NotifyCollectionChangedEventAsync>()
                                         .Select(x => x.Invoke(sender, e))
             );
@@ -118,10 +118,10 @@ namespace X4_ComplexCalculator.Common.Collection
                 return;
             }
 
-            OnCollectionPropertyChanged?.Invoke(sender, e);
+            CollectionPropertyChanged?.Invoke(sender, e);
 
             // 非同期版イベントが購読されていなければ何もしない
-            var handler = OnCollectionPropertyChangedAsync;
+            var handler = CollectionPropertyChangedAsync;
             if (handler == null)
             {
                 return;

@@ -38,15 +38,8 @@ namespace X4_ComplexCalculator.Main.StoragesGrid
         /// </summary>
         public bool IsExpanded
         {
-            get
-            {
-                return _IsExpanded;
-            }
-            set
-            {
-                _IsExpanded = value;
-                OnPropertyChanged();
-            }
+            get => _IsExpanded;
+            set => SetProperty(ref _IsExpanded, value);
         }
         #endregion
 

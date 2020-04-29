@@ -41,18 +41,8 @@ namespace X4_ComplexCalculator.Main.StationSummary.WorkForce
         /// </summary>
         public long NeedWorkforce
         {
-            get
-            {
-                return _NeedWorkforce;
-            }
-            set
-            {
-                if (_NeedWorkforce != value)
-                {
-                    _NeedWorkforce = value;
-                    OnPropertyChanged();
-                }
-            }
+            get => _NeedWorkforce;
+            set => SetProperty(ref _NeedWorkforce, value);
         }
 
 
@@ -61,18 +51,8 @@ namespace X4_ComplexCalculator.Main.StationSummary.WorkForce
         /// </summary>
         public long WorkForce
         {
-            get
-            {
-                return _WorkForce;
-            }
-            set
-            {
-                if (_WorkForce != value)
-                {
-                    _WorkForce = value;
-                    OnPropertyChanged();
-                }
-            }
+            get => _WorkForce;
+            set => SetProperty(ref _WorkForce, value);
         }
         #endregion
 
@@ -84,8 +64,8 @@ namespace X4_ComplexCalculator.Main.StationSummary.WorkForce
         public WorkForceModel(ObservablePropertyChangedCollection<ModulesGridItem> modules)
         {
             Modules = modules;
-            Modules.OnCollectionChangedAsync += OnModulesChanged;
-            Modules.OnCollectionPropertyChangedAsync += OnModulesPropertyChanged;
+            Modules.CollectionChangedAsync += OnModulesChanged;
+            Modules.CollectionPropertyChangedAsync += OnModulesPropertyChanged;
         }
 
 
@@ -94,8 +74,8 @@ namespace X4_ComplexCalculator.Main.StationSummary.WorkForce
         /// </summary>
         public void Dispose()
         {
-            Modules.OnCollectionChangedAsync -= OnModulesChanged;
-            Modules.OnCollectionPropertyChangedAsync -= OnModulesPropertyChanged;
+            Modules.CollectionChangedAsync -= OnModulesChanged;
+            Modules.CollectionPropertyChangedAsync -= OnModulesPropertyChanged;
             WorkForceDetails.Clear();
         }
 

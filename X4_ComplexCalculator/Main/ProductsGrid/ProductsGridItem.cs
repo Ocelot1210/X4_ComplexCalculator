@@ -54,10 +54,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// </summary>
         public long UnitPrice
         {
-            get
-            {
-                return _UnitPrice;
-            }
+            get => _UnitPrice;
             set
             {
                 // 最低価格≦ 入力価格 ≦ 最高価格かつ価格が変更された場合のみ更新
@@ -106,15 +103,8 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// </summary>
         public bool IsExpanded
         {
-            get
-            {
-                return _IsExpanded;
-            }
-            set
-            {
-                _IsExpanded = value;
-                OnPropertyChanged();
-            }
+            get => _IsExpanded;
+            set => SetProperty(ref _IsExpanded, value);
         }
 
 

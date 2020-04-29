@@ -89,13 +89,19 @@
                 <Button
                     Width="20"
                     Command="{Binding RemovePresetCommand, Mode=OneTime}"
-                    Content="🗑"
+                    Content="➖"
                     DockPanel.Dock="Right" />
 
                 <Button
                     Width="20"
                     Command="{Binding AddPresetCommand, Mode=OneTime}"
                     Content="➕"
+                    DockPanel.Dock="Right" />
+
+                <Button
+                    Width="20"
+                    Command="{Binding EditPresetCommand, Mode=OneTime}"
+                    Content="✏"
                     DockPanel.Dock="Right" />
 
                 <Button
@@ -111,7 +117,6 @@
                     Width="Auto"
                     DisplayMemberPath="Name"
                     DockPanel.Dock="Left"
-                    IsEditable="True"
                     IsSynchronizedWithCurrentItem="True"
                     IsTextSearchEnabled="True"
                     ItemsSource="{Binding Presets}"
