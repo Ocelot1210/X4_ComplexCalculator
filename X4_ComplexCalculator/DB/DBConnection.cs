@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Data.SQLite;
+using System.IO;
+using System.Reflection;
 using System.Windows;
 using X4_ComplexCalculator.Common;
 
@@ -241,12 +243,13 @@ namespace X4_ComplexCalculator.DB
         public static void Open()
         {
             var conf = Configuration.GetConfiguration();
+            var x4DBPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, conf["AppSettings:X4DBPath"]);
 
             try
             {
-                if (System.IO.File.Exists(conf["AppSettings:X4DBPath"]))
+                if (File.Exists(x4DBPath))
                 {
-                    X4DB = new DBConnection(conf["AppSettings:X4DBPath"]);
+                    X4DB = new DBConnection(x4DBPath);
                 }
                 else
                 {
@@ -277,7 +280,7 @@ namespace X4_ComplexCalculator.DB
             }
 
             
-            CommonDB = CreatePresetDB(conf["AppSettings:CommonDBPath"]);
+            CommonDB = CreatePresetDB(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, conf["AppSettings:CommonDBPath"]));
         }
 
 
@@ -290,15 +293,16 @@ namespace X4_ComplexCalculator.DB
             X4DB?.Dispose();
 
             var conf = Configuration.GetConfiguration();
+            
+            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, conf["AppSettings:X4DBPath"]);
 
-            var path = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, conf["AppSettings:X4DBPath"]);
-
-            var proc = System.Diagnostics.Process.Start(conf["AppSettings:ExporterExePath"], $"-o \"{System.IO.Path.GetFullPath(path)}\"");
+            var proc = System.Diagnostics.Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, conf["AppSettings:ExporterExePath"]), $"-o \"{path}\"");
             proc.WaitForExit();
 
-            if (System.IO.File.Exists(conf["AppSettings:X4DBPath"]))
+            path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, conf["AppSettings:X4DBPath"]);
+            if (File.Exists(path))
             {
-                X4DB = new DBConnection(conf["AppSettings:X4DBPath"]);
+                X4DB = new DBConnection(path);
                 return true;
             }
 

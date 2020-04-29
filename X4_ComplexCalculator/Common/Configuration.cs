@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
-using System.IO;
+using System;
+
 
 namespace X4_ComplexCalculator.Common
 {
@@ -20,7 +21,7 @@ namespace X4_ComplexCalculator.Common
             if (Config == null)
             {
                 Config = new ConfigurationBuilder()
-                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                     .AddJsonFile("App.config.json")
                     .Build();
             }
