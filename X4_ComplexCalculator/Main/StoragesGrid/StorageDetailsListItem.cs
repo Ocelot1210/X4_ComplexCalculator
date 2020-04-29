@@ -65,7 +65,7 @@ WHERE
 
             DBConnection.X4DB.ExecQuery(query, (SQLiteDataReader dr, object[] args) => 
             {
-                ModuleName = dr["Name"].ToString();
+                ModuleName = (string)dr["Name"];
                 Capacity = (long)dr["Amount"];
             });
         }

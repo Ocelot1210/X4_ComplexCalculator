@@ -93,7 +93,7 @@ namespace X4_ComplexCalculator.DB.X4DB
             DBConnection.X4DB.ExecQuery(query,
                 (SQLiteDataReader dr, object[] args) =>
                 {
-                    var size = new Size(dr["SizeID"].ToString());
+                    var size = new Size((string)dr["SizeID"]);
                     _Sizes.Add(size);
                     var maxAmount = (int)(long)dr["Amount"];
                     _MaxAmount.Add(size, maxAmount);

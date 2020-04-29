@@ -34,7 +34,7 @@ namespace X4_ComplexCalculator.DB.X4DB
                 $"SELECT Name FROM TransportType WHERE TransportTypeID = '{TransportTypeID}'",
                 (SQLiteDataReader dr, object[] args) =>
                 {
-                    name = dr["Name"].ToString();
+                    name = (string)dr["Name"];
                 });
 
             if (string.IsNullOrEmpty(name))

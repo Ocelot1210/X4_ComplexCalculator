@@ -42,8 +42,8 @@ namespace X4_ComplexCalculator.DB.X4DB
                 $"SELECT Name, RaceID FROM Faction WHERE FactionID = '{FactionID}'", 
                 (SQLiteDataReader dr, object[] args) => 
                 {
-                    name = dr["Name"].ToString();
-                    race = new Race(dr["RaceID"].ToString());
+                    name = (string)dr["Name"];
+                    race = new Race((string)dr["RaceID"]);
                 });
 
             if (string.IsNullOrEmpty(name))

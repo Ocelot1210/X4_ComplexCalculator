@@ -54,18 +54,8 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// </summary>
         public bool IsSelected
         {
-            get
-            {
-                return _IsSelected;
-            }
-            set
-            {
-                if (_IsSelected != value)
-                {
-                    _IsSelected = value;
-                    OnPropertyChanged();
-                }
-            }
+            get => _IsSelected;
+            set => SetProperty(ref _IsSelected, value);
         }
 
         /// <summary>
@@ -73,20 +63,13 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// </summary>
         public long ModuleCount
         {
-            get
-            {
-                return _ModuleCount;
-            }
+            get => _ModuleCount;
             set
             {
                 var setValue = (value < 0) ? 0L :
                                (99999 < value) ? 99999L : value;
 
-                if (setValue != ModuleCount)
-                {
-                    _ModuleCount = setValue;
-                    OnPropertyChanged();
-                }
+                SetProperty(ref _ModuleCount, setValue);
             }
         }
 
@@ -98,13 +81,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// <summary>
         /// タレットのツールチップ文字列
         /// </summary>
-        public string TurretsToolTip
-        {
-            get
-            {
-                return MakeEquipmentToolTipString(Module.Equipment.Turret);
-            }
-        }
+        public string TurretsToolTip => MakeEquipmentToolTipString(Module.Equipment.Turret);
 
 
         /// <summary>
@@ -115,13 +92,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// <summary>
         /// シールドのツールチップ文字列
         /// </summary>
-        public string ShieldsToolTip
-        {
-            get
-            {
-                return MakeEquipmentToolTipString(Module.Equipment.Shield);
-            }
-        }
+        public string ShieldsToolTip => MakeEquipmentToolTipString(Module.Equipment.Shield);
 
 
         /// <summary>
@@ -141,16 +112,8 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// </summary>
         public ModuleProduction SelectedMethod
         {
-            get
-            {
-                return _SelectedMethod;
-            }
-            set
-            {
-                _SelectedMethod = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(SelectedMethod.Method));
-            }
+            get => _SelectedMethod;
+            set => SetProperty(ref _SelectedMethod, value);
         }
         #endregion
 

@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Data.SQLite;
 using System.Linq;
-using System.Threading.Tasks;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
 
@@ -76,8 +73,8 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
 
             void init(SQLiteDataReader dr, object[] args)
             {
-                bool chked = 0 < DBConnection.CommonDB.ExecQuery($"SELECT * FROM SelectModuleCheckStateModuleTypes WHERE ID = '{dr["ModuleTypeID"]}'");
-                items.Add(new ModulesListItem(dr["ModuleTypeID"].ToString(), dr["Name"].ToString(), chked));
+                bool chked = 0 < DBConnection.CommonDB.ExecQuery($"SELECT * FROM SelectModuleCheckStateModuleTypes WHERE ID = '{dr["ModuleTypeID"]}'", (_, __) => { });
+                items.Add(new ModulesListItem((string)dr["ModuleTypeID"], (string)dr["Name"], chked));
             }
             
             DBConnection.X4DB.ExecQuery(@"
@@ -104,9 +101,9 @@ ORDER BY Name", init, "SelectModuleCheckStateTypes");
 
             void init(SQLiteDataReader dr, object[] args)
             {
-                bool @checked = 0 < DBConnection.CommonDB.ExecQuery($"SELECT * FROM SelectModuleCheckStateModuleOwners WHERE ID = '{dr["FactionID"]}'");
+                bool @checked = 0 < DBConnection.CommonDB.ExecQuery($"SELECT * FROM SelectModuleCheckStateModuleOwners WHERE ID = '{dr["FactionID"]}'", (_, __) => { });
 
-                items.Add(new ModulesListItem(dr["FactionID"].ToString(), dr["Name"].ToString(), @checked));
+                items.Add(new ModulesListItem((string)dr["FactionID"], (string)dr["Name"], @checked));
             }
 
             DBConnection.X4DB.ExecQuery(@"
@@ -154,7 +151,7 @@ WHERE
         private void SetModules(SQLiteDataReader dr, object[] args)
         {
             var list = (List<ModulesListItem>)args[0];
-            list.Add(new ModulesListItem(dr["ModuleID"].ToString(), dr["Name"].ToString(), false));
+            list.Add(new ModulesListItem((string)dr["ModuleID"], (string)dr["Name"], false));
         }
 
 

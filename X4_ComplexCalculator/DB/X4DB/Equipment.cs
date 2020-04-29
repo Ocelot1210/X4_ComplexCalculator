@@ -45,9 +45,9 @@ namespace X4_ComplexCalculator.DB.X4DB
                 $"SELECT * FROM Equipment WHERE EquipmentID = '{EquipmentID}'",
                 (SQLiteDataReader dr, object[] args) =>
                     {
-                        equipmentType = new EquipmentType(dr["EquipmentTypeID"].ToString());
-                        size = new Size(dr["SizeID"].ToString());
-                        name = dr["Name"].ToString();
+                        equipmentType = new EquipmentType((string)dr["EquipmentTypeID"]);
+                        size = new Size((string)dr["SizeID"]);
+                        name = (string)dr["Name"];
                     });
 
             if (string.IsNullOrEmpty(name))

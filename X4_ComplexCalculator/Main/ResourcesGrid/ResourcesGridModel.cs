@@ -65,7 +65,7 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         private async Task OnModulesPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             // モジュール変更時のみ処理
-            if (e.PropertyName != "Module")
+            if (!(e.PropertyName == "Module" || e.PropertyName == "SelectedMethod"))
             {
                 await Task.CompletedTask;
                 return;
@@ -185,7 +185,7 @@ WHERE
         {
             var dict = (Dictionary<string, long>)args[0];
 
-            var key = dr["WareID"].ToString();
+            var key = (string)dr["WareID"];
             var value = (long)dr["Amount"];
 
             // ディクショナリ内にウェアが存在するか？

@@ -69,12 +69,12 @@ namespace X4_ComplexCalculator.DB.X4DB
                 $"SELECT * FROM Ware WHERE WareID = '{WareID}'",
                 (SQLiteDataReader dr, object[] args) =>
                 {
-                    name          = dr["Name"].ToString();
+                    name          = (string)dr["Name"];
                     volume        = (long)dr["Volume"];
                     minPrice      = (long)dr["MinPrice"];
                     maxPrice      = (long)dr["MaxPrice"];
-                    wareGroup     = new WareGroup(dr["WareGroupID"].ToString());
-                    transportType = new TransportType(dr["TransportTypeID"].ToString());
+                    wareGroup     = new WareGroup((string)dr["WareGroupID"]);
+                    transportType = new TransportType((string)dr["TransportTypeID"]);
                 });
 
             if (string.IsNullOrEmpty(name))

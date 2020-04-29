@@ -86,7 +86,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
         {
             static void AddItem(SQLiteDataReader dr, object[] args)
             {
-                ((ICollection<Size>)args[0]).Add(new Size(dr["SizeID"].ToString()));
+                ((ICollection<Size>)args[0]).Add(new Size((string)dr["SizeID"]));
             }
 
             var sizes = new List<Size>();
@@ -102,9 +102,9 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
         {
             static void AddItem(SQLiteDataReader dr, object[] args)
             {
-                bool chkState = 0 < DBConnection.CommonDB.ExecQuery($"SELECT ID FROM SelectModuleEquipmentCheckStateFactions WHERE ID = '{dr["FactionID"]}'");
+                bool chkState = 0 < DBConnection.CommonDB.ExecQuery($"SELECT ID FROM SelectModuleEquipmentCheckStateFactions WHERE ID = '{dr["FactionID"]}'", (_, __) => { });
 
-                ((ICollection<FactionsListItem>)args[0]).Add(new FactionsListItem(dr["FactionID"].ToString(), chkState));
+                ((ICollection<FactionsListItem>)args[0]).Add(new FactionsListItem((string)dr["FactionID"], chkState));
             }
 
             var query = $@"
@@ -127,7 +127,7 @@ WHERE
         {
             DBConnection.CommonDB.ExecQuery($"SELECT DISTINCT PresetID, PresetName FROM ModulePresets WHERE ModuleID = '{moduleID}'", (SQLiteDataReader dr, object[] args) =>
             {
-                Presets.Add(new PresetComboboxItem((long)dr["PresetID"], dr["PresetName"].ToString()));
+                Presets.Add(new PresetComboboxItem((long)dr["PresetID"], (string)dr["PresetName"]));
             });
         }
 

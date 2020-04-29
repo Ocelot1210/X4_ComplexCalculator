@@ -28,7 +28,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         {
             ModuleTypeID = moduleTypeID;
             string name = "";
-            DBConnection.X4DB.ExecQuery($"SELECT Name FROM ModuleType WHERE ModuleTypeID = '{moduleTypeID}'", (SQLiteDataReader dr, object[] args) => { name = dr["Name"].ToString(); });
+            DBConnection.X4DB.ExecQuery($"SELECT Name FROM ModuleType WHERE ModuleTypeID = '{moduleTypeID}'", (SQLiteDataReader dr, object[] args) => { name = (string)dr["Name"]; });
 
             if (string.IsNullOrEmpty(name))
             {

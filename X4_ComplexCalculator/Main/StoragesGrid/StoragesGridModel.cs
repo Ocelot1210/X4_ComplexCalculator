@@ -103,7 +103,7 @@ namespace X4_ComplexCalculator.Main.StoragesGrid
         {
             var modules = Modules.Where(x => x.Module.ModuleType.ModuleTypeID == "storage")
                                  .GroupBy(x => x.Module.ModuleID)
-                                 .Select(x => new { x.First().Module.ModuleID, Count = x.Sum(y => y.ModuleCount) });
+                                 .Select(x => (x.First().Module.ModuleID, Count : x.Sum(y => y.ModuleCount) ));
 
             // 処理対象が無ければクリアして終わる
             if (!modules.Any())
@@ -171,7 +171,7 @@ WHERE
         {
             var transportDict = (Dictionary<string, long>)args[0];     // transportTypeID, Capacity
 
-            var transportTypeID = dr["TransportTypeID"].ToString();
+            var transportTypeID = (string)dr["TransportTypeID"];
             var amount          = (long)dr["Amount"];
 
             // ディクショナリ内にウェアが存在するか？
@@ -196,7 +196,7 @@ WHERE
                 modulesDict.Add(transportTypeID, new List<StorageDetailsListItem>());
             }
 
-            var moduleID = dr["ModuleID"].ToString();
+            var moduleID = (string)dr["ModuleID"];
             var moduleCount = (long)dr["Count"];
 
             // このカーゴ種別に対し、既にモジュールが追加されているか？

@@ -39,7 +39,7 @@ namespace X4_ComplexCalculator.DB.X4DB
             long tier = 0;
             DBConnection.X4DB.ExecQuery($"SELECT Name, Tier FROM WareGroup WHERE WareGroupID = '{WareGroupID}'",(SQLiteDataReader dr, object[] args) =>
             {
-                name = dr["Name"].ToString();
+                name = (string)dr["Name"];
                 tier = (long)dr["Tier"];
             });
 

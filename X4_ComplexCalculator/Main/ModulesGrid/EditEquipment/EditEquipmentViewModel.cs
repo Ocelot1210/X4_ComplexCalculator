@@ -110,13 +110,15 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
         /// </summary>
         public PresetComboboxItem SelectedPreset
         {
-            get
-            {
-                return Model.SelectedPreset;
-            }
+            get => Model.SelectedPreset;
             set
             {
-                Model.SelectedPreset = value;
+                if (Model.SelectedPreset != value)
+                {
+                    Model.SelectedPreset = value;
+                    TurretsViewModel.SelectedPreset = value;
+                    ShieldsViewModel.SelectedPreset = value;
+                }
             }
         }
 
@@ -158,6 +160,12 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
 
 
         /// <summary>
+        /// プリセット保存
+        /// </summary>
+        public ICommand SavePresetCommand { get; }
+
+
+        /// <summary>
         /// プリセット削除
         /// </summary>
         public ICommand RemovePresetCommand { get; }
@@ -186,6 +194,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
             // コマンド類
             SaveButtonClickedCommand = new DelegateCommand(SavebuttonClicked);
             CloseWindowCommand       = new DelegateCommand(CloseWindow);
+            SavePresetCommand        = new DelegateCommand(SavePreset);
             EditPresetCommand        = new DelegateCommand(Model.EditPreset);
             AddPresetCommand         = new DelegateCommand(Model.AddPreset);
             RemovePresetCommand      = new DelegateCommand(Model.RemovePreset);
@@ -285,6 +294,16 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment
         private void CloseWindow()
         {
             CloseWindowProperty = true;
+        }
+
+
+        /// <summary>
+        /// プリセット保存
+        /// </summary>
+        private void SavePreset()
+        {
+            TurretsViewModel.SavePreset();
+            ShieldsViewModel.SavePreset();
         }
     }
 }

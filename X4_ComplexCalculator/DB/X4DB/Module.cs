@@ -66,8 +66,8 @@ namespace X4_ComplexCalculator.DB.X4DB
             DBConnection.X4DB.ExecQuery($"SELECT ModuleTypeID, Name, MaxWorkers, WorkersCapacity FROM Module WHERE ModuleID = '{moduleID}'",
                 (SQLiteDataReader dr, object[] args) =>
                 {
-                    name            = dr["Name"].ToString();
-                    moduleType      = new ModuleType(dr["ModuleTypeID"].ToString());
+                    name            = (string)dr["Name"];
+                    moduleType      = new ModuleType((string)dr["ModuleTypeID"]);
                     maxWorkers      = (long)dr["MaxWorkers"];
                     workersCapacity = (long)dr["WorkersCapacity"];
                 });
@@ -87,7 +87,7 @@ namespace X4_ComplexCalculator.DB.X4DB
             DBConnection.X4DB.ExecQuery($"SELECT Method, Time FROM ModuleProduction WHERE ModuleID = '{moduleID}'",
                 (SQLiteDataReader dr, object[] args) =>
                 {
-                    mProd.Add(new ModuleProduction(dr["Method"].ToString(), (long)dr["Time"]));
+                    mProd.Add(new ModuleProduction((string)dr["Method"], (long)dr["Time"]));
                 });
             ModuleProductions = mProd;
         }

@@ -69,7 +69,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
 
 
             var moduleName = "";
-            DBConnection.X4DB.ExecQuery($"SELECT Name FROM Module WHERE ModuleID = '{moduleID}'", (SQLiteDataReader dr, object[] args) => { moduleName = dr["Name"].ToString(); });
+            DBConnection.X4DB.ExecQuery($"SELECT Name FROM Module WHERE ModuleID = '{moduleID}'", (SQLiteDataReader dr, object[] args) => { moduleName = (string)dr["Name"]; });
             ModuleName = moduleName;
         }
 

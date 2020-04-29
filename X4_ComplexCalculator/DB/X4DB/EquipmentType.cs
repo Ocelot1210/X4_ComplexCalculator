@@ -30,7 +30,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         {
             EquipmentTypeID = equipmentTypeID;
             string name = "";
-            DBConnection.X4DB.ExecQuery($"SELECT * FROM EquipmentType WHERE EquipmentTypeID = '{EquipmentTypeID}'", (SQLiteDataReader dr, object[] args) => { name = dr["Name"].ToString(); });
+            DBConnection.X4DB.ExecQuery($"SELECT * FROM EquipmentType WHERE EquipmentTypeID = '{EquipmentTypeID}'", (SQLiteDataReader dr, object[] args) => { name = (string)dr["Name"]; });
 
             if (string.IsNullOrEmpty(name))
             {

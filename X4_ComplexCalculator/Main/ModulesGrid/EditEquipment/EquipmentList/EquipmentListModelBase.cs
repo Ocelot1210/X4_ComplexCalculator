@@ -89,6 +89,12 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// 選択中の種族
         /// </summary>
         protected IReadOnlyList<FactionsListItem> SelectedFactions => Factions.Where(x => x.Checked).ToArray();
+
+
+        /// <summary>
+        /// 選択中のプリセット
+        /// </summary>
+        public abstract PresetComboboxItem SelectedPreset { protected get; set; }
         #endregion
 
 
@@ -127,6 +133,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// <param name="sender"></param>
         /// <param name="e"></param>
         public abstract void OnPresetsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e);
+
 
         /// <summary>
         /// 装備を追加
@@ -196,5 +203,31 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         /// 装備を保存
         /// </summary>
         public abstract void SaveEquipment();
+
+
+        /// <summary>
+        /// プリセット保存
+        /// </summary>
+        public virtual void SavePreset()
+        {
+            // 選択中のプリセットがあるか？
+            if (SelectedPreset != null)
+            {
+                var id = Equipped.Values.SelectMany((x) => x).FirstOrDefault()?.EquipmentType.EquipmentTypeID;
+
+                if (!string.IsNullOrEmpty(id))
+                {
+                    // 前回値削除
+                    DBConnection.CommonDB.ExecQuery($"DELETE FROM ModulePresetsEquipment WHERE ModuleID = '{Module.ModuleID}' AND PresetID = {SelectedPreset.ID} AND EquipmentType = '{id}'");
+
+                    // 装備中のプリセットを追加
+                    foreach (var equipment in Equipped.Values.SelectMany((x) => x))
+                    {
+                        var query = $"INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES('{Module.ModuleID}', {SelectedPreset.ID}, '{equipment.EquipmentID}', '{equipment.EquipmentType.EquipmentTypeID}')";
+                        DBConnection.CommonDB.ExecQuery(query);
+                    }
+                }
+            }
+        }
     }
 }

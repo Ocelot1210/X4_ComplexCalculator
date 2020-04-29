@@ -341,7 +341,7 @@ WHERE
             var wareDict = (Dictionary<string, long>)args[0];
 
 
-            var wareID = dr["WareID"].ToString();
+            var wareID = (string)dr["WareID"];
             var amount = (long)dr["Amount"];
 
             // ディクショナリ内にウェアが存在するか？
@@ -398,7 +398,7 @@ WHERE
         {
             var dict = (Dictionary<string, long>)args[0];
 
-            var wareID = dr["WareID"].ToString();
+            var wareID = (string)dr["WareID"];
             var amount = (long)dr["Amount"];
 
             // ディクショナリ内にウェアが存在するか？
@@ -416,7 +416,7 @@ WHERE
 
             // 関連モジュール集計
             var modulesDict = (Dictionary<string, List<ProductDetailsListItem>>)args[1];
-            var moduleID = dr["ModuleID"].ToString();
+            var moduleID = (string)dr["ModuleID"];
             var moduleCount = (long)dr["Count"];
 
             // このウェアに対して関連モジュール追加が初回か？

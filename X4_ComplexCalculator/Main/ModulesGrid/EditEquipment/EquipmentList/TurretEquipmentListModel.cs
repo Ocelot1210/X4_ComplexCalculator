@@ -15,6 +15,32 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
     /// </summary>
     class TurretEquipmentListModel : EquipmentListModelBase
     {
+        #region メンバ
+        /// <summary>
+        ///  選択中のプリセット
+        /// </summary>
+        private PresetComboboxItem _SelectedPreset;
+        #endregion
+
+
+        #region プロパティ
+        /// <summary>
+        /// 選択中のプリセット
+        /// </summary>
+        public override PresetComboboxItem SelectedPreset
+        {
+            protected get => _SelectedPreset;
+            set
+            {
+                _SelectedPreset = value;
+                if (_SelectedPreset != null)
+                {
+                    OnSelectedPresetChanged();
+                }
+            }
+        }
+        #endregion
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -63,9 +89,10 @@ WHERE
 
                 foreach (PresetComboboxItem item in e.NewItems)
                 {
-                    foreach (var equipment in Equipments.Values.SelectMany((x) => x))
+                    foreach (var equipment in Equipped.Values.SelectMany((x) => x))
                     {
-                        var query = $"INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES('{Module.ModuleID}', {item.ID}, '{equipment.EquipmentID}', '{equipment.EquipmentType}')";
+                        var query = $"INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES('{Module.ModuleID}', {item.ID}, '{equipment.EquipmentID}', '{equipment.EquipmentType.EquipmentTypeID}')";
+                        DBConnection.CommonDB.ExecQuery(query);
                     }
                 }
             }
@@ -99,7 +126,7 @@ WHERE
     EquipmentOwner.FactionID IN ({selectedFactions})
 ";
 
-            DBConnection.X4DB.ExecQuery(query, (SQLiteDataReader dr, object[] args) => { items.Add(new Equipment(dr["EquipmentID"].ToString())); });
+            DBConnection.X4DB.ExecQuery(query, (SQLiteDataReader dr, object[] args) => { items.Add(new Equipment((string)dr["EquipmentID"])); });
 
             Equipments[SelectedSize].Reset(items);
         }
@@ -113,6 +140,38 @@ WHERE
             foreach(var size in _Equipments.Keys)
             {
                 Module.Equipment.Turret.ResetEquipment(size, Equipped[size]);
+            }
+        }
+
+
+        /// <summary>
+        /// 選択中のプリセット変更時
+        /// </summary>
+        private void OnSelectedPresetChanged()
+        {
+            var query = @$"
+SELECT
+    EquipmentID
+
+FROM
+    ModulePresetsEquipment
+
+WHERE
+    ModuleID      = '{Module.ModuleID}' AND
+    PresetID      = {SelectedPreset.ID} AND
+    EquipmentType = 'turrets'";
+
+            var equipments = new List<Equipment>(_MaxAmount.Values.Count());
+
+            DBConnection.CommonDB.ExecQuery(query, (dr, args) =>
+            {
+                equipments.Add(new Equipment((string)dr["EquipmentID"]));
+            });
+
+            foreach (var size in Module.Equipment.Turret.Sizes)
+            {
+                _Equipped[size].Clear();
+                _Equipped[size].AddRange(equipments.Where(x => x.Size.Equals(size)));
             }
         }
     }

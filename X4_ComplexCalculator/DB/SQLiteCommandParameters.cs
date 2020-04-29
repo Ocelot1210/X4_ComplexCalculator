@@ -31,7 +31,7 @@ namespace X4_ComplexCalculator.DB
             get
             {
                 return _Parameters
-                                .Select((v, i) => new { v, i })
+                                .Select((v, i) => ( v, i ))
                                 .GroupBy(x => x.i / ValueCnt)
                                 .Select(g => g.Select(x => x.v));
             }

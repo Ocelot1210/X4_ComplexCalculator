@@ -274,13 +274,13 @@ namespace X4_ComplexCalculator.Main.WorkArea
             // モジュールを復元
             conn.ExecQuery("SELECT ModuleID, Count FROM Modules ORDER BY Row ASC", (dr, _) =>
             {
-                modules.Add(new ModulesGridItem(dr["ModuleID"].ToString(), (long)dr["Count"]));
+                modules.Add(new ModulesGridItem((string)dr["ModuleID"], (long)dr["Count"]));
             });
 
             // モジュールの装備を復元
             conn.ExecQuery($"SELECT * FROM Equipments", (dr, _) =>
             {
-                modules[(int)(long)dr["row"]].Module.AddEquipment(new Equipment(dr["EquipmentID"].ToString()));
+                modules[(int)(long)dr["row"]].Module.AddEquipment(new Equipment((string)dr["EquipmentID"]));
             });
 
             _Modules.Modules.Reset(modules);

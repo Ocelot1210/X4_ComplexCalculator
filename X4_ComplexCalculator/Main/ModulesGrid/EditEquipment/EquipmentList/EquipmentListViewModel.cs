@@ -123,6 +123,25 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
 
 
         /// <summary>
+        /// 選択中のプリセット
+        /// </summary>
+        public PresetComboboxItem SelectedPreset
+        {
+            set
+            {
+                _Model.SelectedPreset = value;
+                OnPropertyChanged(nameof(MaxAmount));
+                OnPropertyChanged(nameof(EquippedCount));
+                OnPropertyChanged(nameof(Equipped));
+                OnPropertyChanged(nameof(CanAddEquipment));
+                OnPropertyChanged(nameof(CanRemoveEquipment));
+                OnPropertyChanged(nameof(EquipmentsView));
+                Unsaved = true;
+            }
+        }
+
+
+        /// <summary>
         /// 未保存か
         /// </summary>
         public bool Unsaved { get; set; } = false;
@@ -224,6 +243,15 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.EditEquipment.EquipmentList
         {
             _Model.OnPresetsCollectionChanged(sender, e);
             Unsaved = true;
+        }
+
+
+        /// <summary>
+        /// プリセット保存
+        /// </summary>
+        public void SavePreset()
+        {
+            _Model.SavePreset();
         }
     }
 }

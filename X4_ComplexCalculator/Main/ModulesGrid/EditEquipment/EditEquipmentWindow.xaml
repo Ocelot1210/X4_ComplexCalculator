@@ -89,7 +89,7 @@
                 <Button
                     Width="20"
                     Command="{Binding RemovePresetCommand, Mode=OneTime}"
-                    Content="➖"
+                    Content="🗑️"
                     DockPanel.Dock="Right" />
 
                 <Button
