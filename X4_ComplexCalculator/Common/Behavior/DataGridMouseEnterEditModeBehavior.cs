@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xaml.Behaviors;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -10,6 +11,11 @@ namespace X4_ComplexCalculator.Common.Behavior
     public class DataGridMouseEnterEditModeBehavior : Behavior<DataGridCell>
     {
         /// <summary>
+        /// マウスカーソル座標
+        /// </summary>
+        private static Point _CursorPosition;
+
+        /// <summary>
         /// アタッチ時
         /// </summary>
         protected override void OnAttached()
@@ -17,7 +23,22 @@ namespace X4_ComplexCalculator.Common.Behavior
             base.OnAttached();
             AssociatedObject.MouseEnter += DataGridCell_MouseEnter;
             AssociatedObject.MouseLeave += DataGridCell_MouseLeave;
+            AssociatedObject.MouseMove  += DataGridCell_MouseMove;
             AssociatedObject.MouseLeftButtonDown += AssociatedObject_MouseLeftButtonDown;
+        }
+
+        /// <summary>
+        /// セル内でマウスが動いた場合
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DataGridCell_MouseMove(object sender, MouseEventArgs e)
+        {
+            // 編集可能なセルの場合のみ処理
+            if (!AssociatedObject.IsReadOnly)
+            {
+                _CursorPosition = Mouse.GetPosition(Application.Current.MainWindow);
+            }
         }
 
 
@@ -29,6 +50,7 @@ namespace X4_ComplexCalculator.Common.Behavior
             base.OnDetaching();
             AssociatedObject.MouseEnter -= DataGridCell_MouseEnter;
             AssociatedObject.MouseLeave -= DataGridCell_MouseLeave;
+            AssociatedObject.MouseMove  -= DataGridCell_MouseMove;
             AssociatedObject.MouseLeftButtonDown -= AssociatedObject_MouseLeftButtonDown;
         }
 
@@ -40,6 +62,7 @@ namespace X4_ComplexCalculator.Common.Behavior
         /// <param name="e"></param>
         private void AssociatedObject_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            // 編集可能なセルの場合のみ処理
             if (!AssociatedObject.IsReadOnly)
             {
                 AssociatedObject.IsEditing = true;
@@ -51,11 +74,16 @@ namespace X4_ComplexCalculator.Common.Behavior
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void DataGridCell_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        private void DataGridCell_MouseEnter(object sender, MouseEventArgs e)
         {
+            // 編集可能なセルの場合のみ処理
             if (!AssociatedObject.IsReadOnly)
             {
-                AssociatedObject.IsEditing = true;
+                // 前回の座標と異なれば編集モードにする(これが無いとEnterでセル移動時に意図せず編集モードになる場合がある)
+                if (Mouse.GetPosition(Application.Current.MainWindow) != _CursorPosition)
+                {
+                    AssociatedObject.IsEditing = true;
+                }
             }
         }
 
@@ -64,7 +92,7 @@ namespace X4_ComplexCalculator.Common.Behavior
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void DataGridCell_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        private void DataGridCell_MouseLeave(object sender, MouseEventArgs e)
         {
             if (!AssociatedObject.IsReadOnly)
             {

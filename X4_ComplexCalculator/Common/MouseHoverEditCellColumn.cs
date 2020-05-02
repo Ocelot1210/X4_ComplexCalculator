@@ -18,9 +18,7 @@ namespace X4_ComplexCalculator.Common
         /// <returns></returns>
         protected override FrameworkElement GenerateElement(DataGridCell cell, object dataItem)
         {
-            var behavior = new DataGridMouseEnterEditModeBehavior();
-
-            Interaction.GetBehaviors(cell).Add(behavior);
+            Interaction.GetBehaviors(cell).Add(new DataGridMouseEnterEditModeBehavior());
 
             return base.GenerateElement(cell, dataItem);
         }

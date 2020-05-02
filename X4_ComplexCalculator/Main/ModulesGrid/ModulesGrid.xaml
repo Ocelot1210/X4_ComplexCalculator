@@ -121,7 +121,7 @@
 
 
                 <!--  モジュール数  -->
-                <DataGridTemplateColumn
+                <x4cmn:MouseHoverEditCellColumn
                     ClipboardContentBinding="{Binding ModuleCount}"
                     Header="モジュール数"
                     SortMemberPath="ModuleCount">
@@ -144,11 +144,10 @@
                                 FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
                                 Maximum="99999"
                                 Minimum="0"
-                                UpdateValueOnEnterKey="True"
                                 Value="{Binding ModuleCount, UpdateSourceTrigger=PropertyChanged}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
-                </DataGridTemplateColumn>
+                </x4cmn:MouseHoverEditCellColumn>
 
 
                 <!--  装備編集  -->

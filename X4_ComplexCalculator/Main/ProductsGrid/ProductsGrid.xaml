@@ -131,7 +131,7 @@
             <!--  製品名  -->
             <DataGridTemplateColumn
                 ClipboardContentBinding="{Binding Ware.Name, Mode=OneTime}"
-                Header="階級"
+                Header="製品名"
                 SortMemberPath="Ware.Name">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>

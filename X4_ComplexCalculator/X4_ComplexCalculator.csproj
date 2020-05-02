@@ -18,6 +18,8 @@
     <Prefer32Bit>false</Prefer32Bit>
     <Optimize>true</Optimize>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
 
   <ItemGroup>

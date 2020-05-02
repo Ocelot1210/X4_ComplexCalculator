@@ -148,7 +148,6 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
             // 生産性(倍率)
             double efficiency = CalcEfficiency();
 
-
             // ウェア集計用ディクショナリ
             var wareDict = new Dictionary<string, long>();      // <ウェアID, 生産数>
 
@@ -164,13 +163,13 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
                 {
                     case "production":
                         prodParam.Add("efficiency", DbType.Double, efficiency);
-                        prodParam.Add("count", DbType.Int32, module.Count);
-                        prodParam.Add("moduleID", DbType.String, module.ModuleID);
+                        prodParam.Add("count",      DbType.Int32,  module.Count);
+                        prodParam.Add("moduleID",   DbType.String, module.ModuleID);
                         break;
 
                     case "habitation":
-                        habParam.Add("count", DbType.Int32, module.Count);
-                        habParam.Add("moduleID", DbType.String, module.ModuleID);
+                        habParam.Add("count",       DbType.Int32, module.Count);
+                        habParam.Add("moduleID",    DbType.String, module.ModuleID);
                         break;
 
                     default:
@@ -252,20 +251,47 @@ WHERE
 
 UNION ALL
 SELECT
-	NeedWareID AS 'WareID',
-    -1.0 AS Efficiency,
-	:count * CAST(-3600 / Time * WareResource.Amount AS INTEGER) AS Amount,
-    :count AS Count,
-    :moduleID AS ModuleID
+	NeedWareID  AS 'WareID',
+    -1.0        AS Efficiency,
+	:count * CAST(-3600 / 
+	(
+	SELECT
+		Time
+	FROM
+		ModuleProduct,
+		WareProduction
+	WHERE
+		ModuleProduct.ModuleID  = :moduleID AND
+		ModuleProduct.WareID    = WareProduction.WareID AND
+		WareProduction.Method   =
+		CASE
+			WHEN ModuleProduct.Method IN (
+				SELECT
+					WareProduction.Method
+				FROM
+					ModuleProduct,
+					WareProduction
+				WHERE
+					ModuleProduct.ModuleID = :moduleID AND
+					ModuleProduct.WareID   = WareProduction.WareID AND
+					ModuleProduct.Method   = WareProduction.Method
+			) THEN ModuleProduct.Method
+			ELSE 'default'
+		End
+	) * WareResource.Amount AS INTEGER) AS Amount,
+    :count      AS Count,
+    :moduleID   AS ModuleID
 FROM
 	WareProduction,
 	WareResource,
 	ModuleProduct
+
 WHERE
 	ModuleProduct.ModuleID  = :moduleID AND
 	ModuleProduct.WareID    = WareResource.WareID AND
 	WareResource.Method     = WareProduction.Method AND
-	WareResource.NeedWareID = WareProduction.WareID
+	ModuleProduct.WareID    = WareProduction.WareID
+	
 ";
 
             DBConnection.X4DB.ExecQuery(query, param, SumProduct, wareDict, moduleDict);
@@ -384,7 +410,7 @@ WHERE
 
 
         /// <summary>
-        /// 製品を集計
+        /// 生産に必要なウェアを集計
         /// </summary>
         /// <param name="dr"></param>
         /// <param name="args"></param>
