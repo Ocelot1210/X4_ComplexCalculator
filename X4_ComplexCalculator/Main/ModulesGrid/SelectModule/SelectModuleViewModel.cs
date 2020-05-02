@@ -199,7 +199,21 @@ namespace X4_ComplexCalculator.Main.ModulesGrid.SelectModule
         /// <returns></returns>
         private bool Filter(object obj)
         {
-            return obj is ModulesListItem src && (SearchModuleName == "" || 0 <= src.Name.IndexOf(SearchModuleName, StringComparison.InvariantCultureIgnoreCase));
+            // 表示するか
+            var ret = false;
+
+            if (obj is ModulesListItem src)
+            {
+                ret = SearchModuleName == "" || 0 <= src.Name.IndexOf(SearchModuleName, StringComparison.InvariantCultureIgnoreCase);
+
+                // 非表示になる場合、選択解除(選択解除しないと非表示のモジュールが意図せずモジュール一覧に追加される)
+                if (!ret)
+                {
+                    src.Checked = false;
+                }
+            }
+
+            return ret;
         }
     }
 }

@@ -106,7 +106,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
             // 生産性を0.0以上、1.0以下にする
             if (0 < workersCapacity)
             {
-                ret = (maxWorkers < workersCapacity) ? 1.0 : (double)maxWorkers / workersCapacity;
+                ret = (maxWorkers < workersCapacity) ? 1.0 : (double)workersCapacity / maxWorkers;
             }
 
             return ret;
@@ -156,6 +156,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
 
             // パラメータ設定
             var prodParam = new SQLiteCommandParameters(3);     // 製造モジュール用パラメーター
+            
             var habParam = new SQLiteCommandParameters(2);      // 居住モジュール用パラメーター
             foreach (var module in modules)
             {
@@ -265,7 +266,8 @@ SELECT
 		ModuleProduct.WareID    = WareProduction.WareID AND
 		WareProduction.Method   =
 		CASE
-			WHEN ModuleProduct.Method IN (
+			WHEN ModuleProduct.Method IN
+            (
 				SELECT
 					WareProduction.Method
 				FROM
@@ -275,7 +277,7 @@ SELECT
 					ModuleProduct.ModuleID = :moduleID AND
 					ModuleProduct.WareID   = WareProduction.WareID AND
 					ModuleProduct.Method   = WareProduction.Method
-			) THEN ModuleProduct.Method
+			)THEN ModuleProduct.Method
 			ELSE 'default'
 		End
 	) * WareResource.Amount AS INTEGER) AS Amount,
@@ -289,10 +291,22 @@ FROM
 WHERE
 	ModuleProduct.ModuleID  = :moduleID AND
 	ModuleProduct.WareID    = WareResource.WareID AND
-	WareResource.Method     = WareProduction.Method AND
-	ModuleProduct.WareID    = WareProduction.WareID
-	
-";
+	WareProduction.Method   = WareResource.Method AND
+	ModuleProduct.WareID    = WareProduction.WareID AND
+	WareResource.Method     = (
+		SELECT
+			DISTINCT ModuleProduct.Method
+		FROM
+			ModuleProduct,
+			WareResource	
+		WHERE
+			ModuleProduct.ModuleID  = :moduleID AND
+			ModuleProduct.Method    = WareResource.Method AND
+			ModuleProduct.WareID    = WareResource.WareID
+		UNION ALL
+			SELECT 'default'
+		LIMIT 1
+	)";
 
             DBConnection.X4DB.ExecQuery(query, param, SumProduct, wareDict, moduleDict);
         }
