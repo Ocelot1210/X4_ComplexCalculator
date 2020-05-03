@@ -101,26 +101,42 @@ namespace X4_ComplexCalculator.Main.StationSummary.WorkForce
                 return;
             }
 
-            // 製造モジュールか居住モジュールの場合のみ更新
-            if (module.Module.ModuleType.ModuleTypeID == "production" ||
-                module.Module.ModuleType.ModuleTypeID == "habitation"
-                )
+            switch (module.Module.ModuleType.ModuleTypeID)
             {
-                var itm = WorkForceDetails.Where(x => x.ModuleID == module.Module.ModuleID).First();
+                // 製造モジュールの場合
+                case "production":
+                    {
+                        // 変更があったモジュールのレコードを検索
+                        var itm = WorkForceDetails.Where(x => x.ModuleID == module.Module.ModuleID).First();
 
-                if (0 < itm.TotalWorkforce)
-                {
-                    WorkForce = WorkForce - Math.Abs(itm.TotalWorkforce) + module.Module.WorkersCapacity * module.ModuleCount;
-                }
-                else
-                {
+                        // 必要労働力を更新
+                        NeedWorkforce = NeedWorkforce - Math.Abs(itm.TotalWorkforce) + module.Module.MaxWorkers * module.ModuleCount;
+
+                        // モジュール数を更新
+                        itm.ModuleCount = module.ModuleCount;
+                    }
                     
-                    NeedWorkforce = NeedWorkforce - Math.Abs(itm.TotalWorkforce) + module.Module.MaxWorkers * module.ModuleCount;
-                }
-                
-                itm.ModuleCount = module.ModuleCount;
-            }
 
+                    break;
+
+                // 居住モジュールの場合
+                case "habitation":
+                    {
+                        // 変更があったモジュールのレコードを検索
+                        var itm = WorkForceDetails.Where(x => x.ModuleID == module.Module.ModuleID).First();
+
+                        // 現在の労働者数を更新
+                        WorkForce = WorkForce - Math.Abs(itm.TotalWorkforce) + module.Module.WorkersCapacity * module.ModuleCount;
+
+                        // モジュール数を更新
+                        itm.ModuleCount = module.ModuleCount;
+                    }
+                    
+                    break;
+
+                default:
+                    break;
+            }
 
             await Task.CompletedTask;
         }
@@ -148,17 +164,23 @@ namespace X4_ComplexCalculator.Main.StationSummary.WorkForce
 
             var details = Modules.Where(x => x.Module.ModuleType.ModuleTypeID == "production" || x.Module.ModuleType.ModuleTypeID == "habitation")
                                  .GroupBy(x => x.Module.ModuleID)
-                                 .Select(x =>
-                                 {
-                                     var ret = new WorkForceDetailsItem(x.First().Module, x.Sum(y => y.ModuleCount));
-                                     needWorkforce += ret.MaxWorkers * ret.ModuleCount;
-                                     workforce += ret.WorkersCapacity * ret.ModuleCount;
-                                     return ret;
-                                 })
+                                 .Select(x => new WorkForceDetailsItem(x.First().Module, x.Sum(y => y.ModuleCount)))
                                  .OrderBy(x => x.ModuleName);
 
             // 値を更新
             WorkForceDetails.Reset(details);
+
+            foreach (var item in WorkForceDetails)
+            {
+                if (item.TotalWorkforce < 0)
+                {
+                    needWorkforce -= item.TotalWorkforce;
+                }
+                else
+                {
+                    workforce += item.TotalWorkforce;
+                }
+            }
             NeedWorkforce = needWorkforce;
             WorkForce = workforce;
         }

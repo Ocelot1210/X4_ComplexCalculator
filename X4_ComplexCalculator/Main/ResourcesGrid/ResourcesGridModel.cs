@@ -65,23 +65,16 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         private async Task OnModulesPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             // モジュール変更時のみ処理
-            if (!(e.PropertyName == "Module" || e.PropertyName == "SelectedMethod"))
+            if (!(e.PropertyName == nameof(ModulesGridItem.Module) || 
+                  e.PropertyName == nameof(ModulesGridItem.SelectedMethod) ||
+                  e.PropertyName == nameof(ModulesGridItem.ModuleCount))
+                  )
             {
                 await Task.CompletedTask;
                 return;
             }
-
-            // 建造に必要なリソース集計用
-            var resourcesDict = new Dictionary<string, long>();
-
-            // モジュールの建造に必要なリソースを集計
-            AggregateModuleResources(Modules, resourcesDict);
-
-            // モジュールの装備の建造に必要なリソースを集計
-            AggregateEquipmentResources(Modules, resourcesDict);
-
-            Resources.Reset(resourcesDict.Select(x => new ResourcesGridItem(x.Key, x.Value)).OrderBy(x => x.Ware.Name));
-
+            
+            UpdateResources();
             await Task.CompletedTask;
         }
 
@@ -92,6 +85,29 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         /// <param name="e"></param>
         private async Task OnModulesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            if (e.NewItems != null)
+            {
+                OnModulesAdded(e.NewItems.Cast<ModulesGridItem>());
+            }
+
+            if (e.OldItems != null)
+            {
+                OnModulesRemoved(e.OldItems.Cast<ModulesGridItem>());
+            }
+
+            if (e.Action == NotifyCollectionChangedAction.Reset)
+            {
+                Resources.Clear();
+            }
+
+            await Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// 建造に必要なリソースを更新
+        /// </summary>
+        private void UpdateResources()
+        {
             // 建造に必要なリソース集計用
             var resourcesDict = new Dictionary<string, long>();
 
@@ -101,8 +117,93 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
             // モジュールの装備の建造に必要なリソースを集計
             AggregateEquipmentResources(Modules, resourcesDict);
 
-            Resources.Reset(resourcesDict.Select(x => new ResourcesGridItem(x.Key, x.Value)).OrderBy((x) => x.Ware.Name));
-            await Task.CompletedTask;
+            var addTarget = new List<ResourcesGridItem>();
+            foreach (var kvp in resourcesDict)
+            {
+                var item = Resources.Where(x => x.Ware.WareID == kvp.Key).FirstOrDefault();
+                if (item != null)
+                {
+                    // 既にウェアが一覧にある場合
+                    item.Count = kvp.Value;
+                }
+                else
+                {
+                    // ウェアが一覧にない場合
+                    addTarget.Add(new ResourcesGridItem(kvp.Key, kvp.Value));
+                }
+            }
+
+            Resources.AddRange(addTarget);
+        }
+
+
+        /// <summary>
+        /// モジュールが追加された場合
+        /// </summary>
+        /// <param name="modules">追加されたモジュール</param>
+        private void OnModulesAdded(IEnumerable<ModulesGridItem> modules)
+        {
+            Dictionary<string, long> resourcesDict = AggregateModule(modules);
+
+            var addTarget = new List<ResourcesGridItem>();
+            foreach (var kvp in resourcesDict)
+            {
+                var item = Resources.Where(x => x.Ware.WareID == kvp.Key).FirstOrDefault();
+                if (item != null)
+                {
+                    // 既にウェアが一覧にある場合
+                    item.Count = kvp.Value;
+                }
+                else
+                {
+                    // ウェアが一覧にない場合
+                    addTarget.Add(new ResourcesGridItem(kvp.Key, kvp.Value));
+                }
+            }
+
+            Resources.AddRange(addTarget);
+        }
+
+
+        /// <summary>
+        /// モジュールが削除された場合
+        /// </summary>
+        /// <param name="modules">削除されたモジュール</param>
+        private void OnModulesRemoved(IEnumerable<ModulesGridItem> modules)
+        {
+            Dictionary<string, long> resourcesDict = AggregateModule(modules);
+
+            foreach (var kvp in resourcesDict)
+            {
+                var item = Resources.Where(x => x.Ware.WareID == kvp.Key).FirstOrDefault();
+                if (item != null)
+                {
+                    item.Count = kvp.Value;
+                }
+            }
+
+            Resources.RemoveAll(x => x.Count == 0);
+        }
+
+
+
+        /// <summary>
+        /// 建造に必要な情報を集計
+        /// </summary>
+        /// <param name="modules">集計対象モジュール</param>
+        /// <returns>集計結果</returns>
+        private Dictionary<string, long> AggregateModule(IEnumerable<ModulesGridItem> modules)
+        {
+            // 建造に必要なリソース集計用
+            var resourcesDict = new Dictionary<string, long>();
+
+            // モジュールの建造に必要なリソースを集計
+            AggregateModuleResources(Modules, resourcesDict);
+
+            // モジュールの装備の建造に必要なリソースを集計
+            AggregateEquipmentResources(Modules, resourcesDict);
+
+            return resourcesDict;
         }
 
 

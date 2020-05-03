@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows.Data;
 using X4_ComplexCalculator.Common;
 
 namespace X4_ComplexCalculator.Main.ResourcesGrid
@@ -27,6 +29,11 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         /// </summary>
         public ObservableCollection<ResourcesGridItem> BuildResource => _Model.Resources;
 
+
+        /// <summary>
+        /// 建造に必要なリソース一覧
+        /// </summary>
+        public ICollectionView BuildResourceView { get; }
 
         /// <summary>
         /// 単価(百分率)
@@ -59,6 +66,9 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         public ResourcesGridViewModel(ResourcesGridModel resourcesGridModel)
         {
             _Model = resourcesGridModel;
+
+            BuildResourceView = CollectionViewSource.GetDefaultView(_Model.Resources);
+            BuildResourceView.SortDescriptions.Add(new SortDescription("Ware.Name", ListSortDirection.Ascending));
         }
 
         public void Dispose()

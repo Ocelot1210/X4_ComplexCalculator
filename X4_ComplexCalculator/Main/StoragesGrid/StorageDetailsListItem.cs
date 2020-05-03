@@ -9,6 +9,13 @@ namespace X4_ComplexCalculator.Main.StoragesGrid
     /// </summary>
     class StorageDetailsListItem : INotifyPropertyChangedBace
     {
+        #region メンバ
+        /// <summary>
+        /// モジュール数
+        /// </summary>
+        private long _ModuleCount;
+        #endregion
+
         #region プロパティ
         /// <summary>
         /// モジュールID
@@ -25,7 +32,17 @@ namespace X4_ComplexCalculator.Main.StoragesGrid
         /// <summary>
         /// モジュール数
         /// </summary>
-        public long ModuleCount { get; private set; }
+        public long ModuleCount
+        {
+            get => _ModuleCount;
+            set
+            {
+                if (SetProperty(ref _ModuleCount, value))
+                {
+                    OnPropertyChanged(nameof(TotalCapacity));
+                }
+            }
+        }
 
 
         /// <summary>

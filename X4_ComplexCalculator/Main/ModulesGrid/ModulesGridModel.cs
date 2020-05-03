@@ -57,7 +57,7 @@ namespace X4_ComplexCalculator.Main.ModulesGrid
         /// <param name="items">削除対象</param>
         public void DeleteModules(IEnumerable<ModulesGridItem> items)
         {
-            Modules.RemoveItems(items);
+            Modules.RemoveRange(items);
         }
 
         /// <summary>

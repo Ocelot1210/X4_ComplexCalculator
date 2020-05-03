@@ -14,6 +14,11 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         /// 単価
         /// </summary>
         private long _UnitPrice;
+
+        /// <summary>
+        /// 建造に必要なウェア数量
+        /// </summary>
+        private long _Count;
         #endregion
 
         #region プロパティ
@@ -24,9 +29,19 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
 
 
         /// <summary>
-        /// 建造に必要なウェア量
+        /// 建造に必要なウェア数量
         /// </summary>
-        public long Count { get; }
+        public long Count
+        {
+            get => _Count;
+            set
+            {
+                if (SetProperty(ref _Count, value))
+                {
+                    OnPropertyChanged(nameof(Price));
+                }
+            }
+        }
 
 
         /// <summary>

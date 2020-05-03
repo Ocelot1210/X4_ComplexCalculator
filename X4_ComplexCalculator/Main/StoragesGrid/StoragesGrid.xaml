@@ -32,7 +32,7 @@
                     <DataGridInline:InlineGridViewColumn Header="モジュール数" SortTargetPropertyName="ModuleCount">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding ModuleCount, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
+                                <TextBlock Text="{Binding ModuleCount, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </DataGridInline:InlineGridViewColumn>
@@ -42,7 +42,7 @@
                     <DataGridInline:InlineGridViewColumn Header="容量" SortTargetPropertyName="Capacity">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Capacity, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
+                                <TextBlock Text="{Binding Capacity, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </DataGridInline:InlineGridViewColumn>
@@ -52,7 +52,7 @@
                     <DataGridInline:InlineGridViewColumn Header="容量(合計)" SortTargetPropertyName="TotalCapacity">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding TotalCapacity, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
+                                <TextBlock Text="{Binding TotalCapacity, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </DataGridInline:InlineGridViewColumn>
@@ -74,7 +74,7 @@
 
             <!--  容量  -->
             <DataGridTextColumn
-                Binding="{Binding Capacity, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}"
+                Binding="{Binding Capacity, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}"
                 CellStyle="{StaticResource RightAlignedDataGridCell}"
                 Header="容量" />
 

@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB.X4DB;
-using System.Linq;  
+using System.Linq;
+using X4_ComplexCalculator.Common.Collection;
 
 namespace X4_ComplexCalculator.Main.ProductsGrid
 {
@@ -34,7 +35,10 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// <summary>
         /// ウェアの個数
         /// </summary>
-        public long Count { get; }
+        public long Count
+        {
+            get => Details.Sum(x => x.Amount);
+        }
 
 
         /// <summary>
@@ -89,7 +93,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// <summary>
         /// ウェア詳細(関連モジュール等)
         /// </summary>
-        public IReadOnlyCollection<ProductDetailsListItem> Details { get; }
+        public ObservableRangeCollection<ProductDetailsListItem> Details { get; }
 
 
         /// <summary>
@@ -127,13 +131,105 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// <param name="datails">ウェア詳細(関連モジュール等)</param>
         /// <param name="isExpanded">関連モジュールが展開されているか</param>
         /// <param name="price">価格</param>
-        public ProductsGridItem(string wareID, long count, IEnumerable<ProductDetailsListItem> datails, bool isExpanded = false, long price = 0)
+        public ProductsGridItem(string wareID, IEnumerable<ProductDetailsListItem> datails)
         {
             Ware = new Ware(wareID);
-            Count = count;
-            _IsExpanded = isExpanded;
-            UnitPrice = (price != 0) ? price : (Ware.MinPrice + Ware.MaxPrice) / 2;
-            Details = datails.ToArray();
+            UnitPrice = (Ware.MinPrice + Ware.MaxPrice) / 2;
+            Details = new ObservableRangeCollection<ProductDetailsListItem>(datails);
+        }
+
+
+        /// <summary>
+        /// 詳細情報を追加
+        /// </summary>
+        /// <param name="details"></param>
+        public void AddDetails(IEnumerable<ProductDetailsListItem> details)
+        {
+            var addItems = new List<ProductDetailsListItem>();
+
+            foreach (var item in details)
+            {
+                var tmp = Details.Where(x => x.ModuleID == item.ModuleID).FirstOrDefault();
+                if (tmp != null)
+                {
+                    // 既にモジュールがある場合
+                    tmp.ModuleCount += item.ModuleCount;
+                }
+                else
+                {
+                    // 初回追加の場合
+                    addItems.Add(item);
+                }
+            }
+
+            Details.AddRange(addItems);
+
+            OnPropertyChanged(nameof(Count));
+            OnPropertyChanged(nameof(Price));
+            OnPropertyChanged(nameof(IsLosing));
+        }
+
+        /// <summary>
+        /// 詳細情報を設定
+        /// </summary>
+        /// <param name="details"></param>
+        public void SetDetails(IEnumerable<ProductDetailsListItem> details)
+        {
+            foreach (var item in details)
+            {
+                // 更新対象のモジュールを検索
+                var tmp = Details.Where(x => x.ModuleID == item.ModuleID).FirstOrDefault();
+                if (tmp != null)
+                {
+                    tmp.ModuleCount = item.ModuleCount;
+                }
+            }
+
+            OnPropertyChanged(nameof(Count));
+            OnPropertyChanged(nameof(Price));
+            OnPropertyChanged(nameof(IsLosing));
+        }
+
+
+        /// <summary>
+        /// 詳細情報を削除
+        /// </summary>
+        /// <param name="details"></param>
+        public void RemoveDetails(IEnumerable<ProductDetailsListItem> details)
+        {
+            foreach (var item in details)
+            {
+                var tmp = Details.Where(x => x.ModuleID == item.ModuleID).FirstOrDefault();
+                if (tmp != null)
+                {
+                    // 既にモジュールがある場合
+                    tmp.ModuleCount -= item.ModuleCount;
+                }
+            }
+
+            // 空のレコードを削除
+            Details.RemoveAll(x => x.ModuleCount == 0);
+
+            OnPropertyChanged(nameof(Count));
+            OnPropertyChanged(nameof(Price));
+            OnPropertyChanged(nameof(IsLosing));
+        }
+
+
+        /// <summary>
+        /// 生産性を設定
+        /// </summary>
+        /// <param name="efficiency"></param>
+        public void SetEfficiency(double efficiency)
+        {
+            foreach (var item in Details)
+            {
+                item.EfficiencyValue = efficiency;
+            }
+
+            OnPropertyChanged(nameof(Count));
+            OnPropertyChanged(nameof(Price));
+            OnPropertyChanged(nameof(IsLosing));
         }
     }
 }

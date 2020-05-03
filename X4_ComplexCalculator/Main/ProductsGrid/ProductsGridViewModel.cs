@@ -4,6 +4,10 @@ using System.Windows.Controls;
 using X4_ComplexCalculator.Common;
 using System.Linq;
 using System.Windows.Input;
+using System.Windows.Data;
+using System.ComponentModel;
+using X4_ComplexCalculator.Main.ModulesGrid;
+using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.ProductsGrid
 {
@@ -29,7 +33,8 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// <summary>
         /// 製品一覧
         /// </summary>
-        public ObservableCollection<ProductsGridItem> Products => _Model.Products;
+        public ListCollectionView ProductsView { get; }
+
 
         /// <summary>
         /// 単価(百分率)
@@ -41,7 +46,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
             {
                 _UnitPricePercent = (long)value;
 
-                foreach (var product in Products)
+                foreach (var product in _Model.Products)
                 {
                     product.SetUnitPricePercent(_UnitPricePercent);
                 }
@@ -69,6 +74,13 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         public ProductsGridViewModel(ProductsGridModel productsGridModel)
         {
             _Model = productsGridModel;
+            ProductsView = (ListCollectionView)CollectionViewSource.GetDefaultView(_Model.Products);
+
+            // ソート方向設定
+            ProductsView.SortDescriptions.Clear();
+            ProductsView.SortDescriptions.Add(new SortDescription("Ware.WareGroup.Tier", ListSortDirection.Ascending));
+            ProductsView.SortDescriptions.Add(new SortDescription("Ware.Name", ListSortDirection.Ascending));
+
             SelectedExpand = new DelegateCommand<DataGrid>(SelectedExpandCommand);
             SelectedCollapse = new DelegateCommand<DataGrid>(SelectedCollapseCommand);
         }

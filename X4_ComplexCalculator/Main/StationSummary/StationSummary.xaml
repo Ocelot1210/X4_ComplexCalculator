@@ -92,7 +92,7 @@
                             <DataGridInline:InlineGridViewColumn Header="数量" SortTargetPropertyName="Count">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding Count, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
+                                        <TextBlock Text="{Binding Count, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </DataGridInline:InlineGridViewColumn>
@@ -143,7 +143,7 @@
                             <DataGridInline:InlineGridViewColumn Header="数量" SortTargetPropertyName="Count">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding Count, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
+                                        <TextBlock Text="{Binding Count, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </DataGridInline:InlineGridViewColumn>

@@ -24,7 +24,7 @@
         x4bhv:DataGridCurrentCellEditModeBehavior.Enabled="True"
         x4bhv:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
         IsReadOnly="False"
-        ItemsSource="{Binding BuildResource, Mode=OneTime}"
+        ItemsSource="{Binding BuildResourceView, Mode=OneTime}"
         SelectionUnit="Cell"
         Style="{StaticResource DefaultDataGridStyle}">
         <DataGrid.Columns>
@@ -37,7 +37,7 @@
 
             <!--  個数  -->
             <DataGridTextColumn
-                Binding="{Binding Count, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}"
+                Binding="{Binding Count, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}"
                 CellStyle="{StaticResource RightAlignedDataGridCell}"
                 Header="個数"
                 IsReadOnly="True" />

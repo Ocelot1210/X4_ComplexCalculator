@@ -83,19 +83,34 @@ namespace X4_ComplexCalculator.Main.StationSummary.BuildingCost
         /// <returns></returns>
         private async Task Resources_OnPropertyChangedAsync(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName != "UnitPrice")
-            {
-                return;
-            }
-
             if (!(sender is ResourcesGridItem resource))
             {
                 return;
             }
 
-            var item = BuildingCostDetails.Where(x => x.WareID == resource.Ware.WareID).First();
-            BuildingCost = BuildingCost - item.TotalPrice + resource.Price;
-            item.UnitPrice = resource.UnitPrice;
+            switch (e.PropertyName)
+            {
+                // 個数変更時
+                case nameof(ResourcesGridItem.Count):
+                    {
+                        var item = BuildingCostDetails.Where(x => x.WareID == resource.Ware.WareID).First();
+                        BuildingCost = BuildingCost - item.TotalPrice + resource.Price;
+                        item.Count = resource.Count;
+                    }
+                    break;
+
+                // 単価変更時
+                case nameof(ResourcesGridItem.UnitPrice):
+                    {
+                        var item = BuildingCostDetails.Where(x => x.WareID == resource.Ware.WareID).First();
+                        BuildingCost = BuildingCost - item.TotalPrice + resource.Price;
+                        item.UnitPrice = resource.UnitPrice;
+                    }
+                    break;
+
+                default:
+                    break;
+            }
 
             await Task.CompletedTask;
         }
@@ -109,17 +124,27 @@ namespace X4_ComplexCalculator.Main.StationSummary.BuildingCost
         /// <returns></returns>
         private async Task Resources_OnCollectionChangedAsync(object sender, NotifyCollectionChangedEventArgs e)
         {
-            var buildingCost = 0L;
-
-            var details = Resources.Select(x =>
+            if (e.NewItems != null)
             {
-                var ret = new BuildingCostDetailsItem(x.Ware.WareID, x.Ware.Name, x.Count, x.UnitPrice);
-                buildingCost += ret.TotalPrice;
-                return ret;
-            }).OrderBy(x => x.WareName);
+                var addItems = e.NewItems.Cast<ResourcesGridItem>()
+                                         .Select(x => new BuildingCostDetailsItem(x.Ware.WareID, x.Ware.Name, x.Count, x.UnitPrice));
 
-            BuildingCostDetails.Reset(details);
-            BuildingCost = buildingCost;
+                BuildingCostDetails.AddRange(addItems);
+            }
+
+            if (e.OldItems != null)
+            {
+                var removeItems = e.OldItems.Cast<ResourcesGridItem>().ToArray();
+                BuildingCostDetails.RemoveAll(x => removeItems.Where(y => x.WareID == y.Ware.WareID).Any());
+            }
+
+            if (e.Action == NotifyCollectionChangedAction.Reset)
+            {
+                BuildingCostDetails.Clear();
+            }
+
+
+            BuildingCost = BuildingCostDetails.Sum(x => x.TotalPrice);
             
             await Task.CompletedTask;
         }

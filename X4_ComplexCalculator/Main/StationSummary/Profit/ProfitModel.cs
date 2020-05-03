@@ -83,19 +83,39 @@ namespace X4_ComplexCalculator.Main.StationSummary.Profit
         /// <returns></returns>
         private async Task OnProductsPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName != "UnitPrice")
-            {
-                return;
-            }
-
             if (!(sender is ProductsGridItem product))
             {
                 return;
             }
 
-            var item = ProfitDetails.Where(x => x.WareID == product.Ware.WareID).First();
-            Profit = Profit - item.TotalPrice + product.Price;
-            item.UnitPrice = product.UnitPrice;
+            switch (e.PropertyName)
+            {
+                // ウェア数量変更の場合
+                case nameof(ProductsGridItem.Count):
+                    {
+                        // 編集対象のレコードを検索
+                        var item = ProfitDetails.Where(x => x.WareID == product.Ware.WareID).First();
+
+                        Profit = Profit - item.TotalPrice + product.Price;
+                        item.Count = product.Count;
+                    }
+                    break;
+
+                // 単価変更の場合
+                case nameof(ProductsGridItem.UnitPrice):
+                    {
+                        // 編集対象のレコードを検索
+                        var item = ProfitDetails.Where(x => x.WareID == product.Ware.WareID).First();
+
+                        Profit = Profit - item.TotalPrice + product.Price;
+                        item.UnitPrice = product.UnitPrice;
+                    }
+                    break;
+
+                // それ以外の場合
+                default:
+                    break;
+            }
 
             await Task.CompletedTask;
         }
@@ -106,16 +126,10 @@ namespace X4_ComplexCalculator.Main.StationSummary.Profit
         /// </summary>
         private void UpdateProfit()
         {
-            var profit = 0L;
-            var items = Products.Select(x =>
-            {
-                var ret = new ProfitDetailsItem(x.Ware.WareID, x.Ware.Name, x.Count, x.UnitPrice);
-                profit += ret.TotalPrice;
-                return ret;
-            });
+            var items = Products.Select(x => new ProfitDetailsItem(x.Ware.WareID, x.Ware.Name, x.Count, x.UnitPrice));
 
             ProfitDetails.Reset(items);
-            Profit = profit;
+            Profit = ProfitDetails.Sum(x => x.TotalPrice);
         }
     }
 }

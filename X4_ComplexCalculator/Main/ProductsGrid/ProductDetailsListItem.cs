@@ -5,7 +5,7 @@ using X4_ComplexCalculator.DB;
 namespace X4_ComplexCalculator.Main.ProductsGrid
 {
     /// <summary>
-    /// ドロップダウンで表示するListViewのアイテム(製品用)
+    /// ＋/－で表示するListViewのアイテム(製品用)
     /// </summary>
     public class ProductDetailsListItem : INotifyPropertyChangedBace
     {
@@ -13,12 +13,22 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// <summary>
         /// 製品数(モジュール追加用)
         /// </summary>
-        private readonly long _Amount;
+        private long _Amount;
+
+        /// <summary>
+        /// モジュール数
+        /// </summary>
+        private long _ModuleCount;
+
+        /// <summary>
+        /// 最大生産性
+        /// </summary>
+        private readonly double _MaxEfficiency;
 
         /// <summary>
         /// 生産性
         /// </summary>
-        private double _Efficiency;
+        private double _EfficiencyValue;
         #endregion
 
         /// <summary>
@@ -36,19 +46,46 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
         /// <summary>
         /// モジュール数
         /// </summary>
-        public long ModuleCount { get; private set; }
+        public long ModuleCount
+        {
+            get => _ModuleCount;
+            set
+            {
+                if (SetProperty(ref _ModuleCount, value))
+                {
+                    OnPropertyChanged(nameof(Amount));
+                }
+            }
+        }
 
 
         /// <summary>
         /// 生産性(効率)
         /// </summary>
-        public string Efficiency { get; private set; }
+        public string Efficiency => (_MaxEfficiency < 0) ? "-" : $"{(int)((_MaxEfficiency * _EfficiencyValue + 1.0) * 100)}%";
+
+
+        /// <summary>
+        /// 生産性
+        /// </summary>
+        public double EfficiencyValue
+        {
+            get => _EfficiencyValue;
+            set
+            {
+                if (0 < _MaxEfficiency && SetProperty(ref _EfficiencyValue, value))
+                {
+                    OnPropertyChanged(nameof(Efficiency));
+                    OnPropertyChanged(nameof(Amount));
+                }
+            }
+        }
 
 
         /// <summary>
         /// 製品数
         /// </summary>
-        public long Amount => _Amount * ModuleCount;
+        public long Amount => (long)((_MaxEfficiency * _EfficiencyValue + 1.0) * _Amount * ModuleCount);
 
 
         /// <summary>
@@ -63,10 +100,7 @@ namespace X4_ComplexCalculator.Main.ProductsGrid
             ModuleID = moduleID;
             ModuleCount = moduleCount;
             _Amount = amount;
-            _Efficiency = efficiency;
-
-            Efficiency = (efficiency < 0) ? "-" : $"{(int)(efficiency * 100)}%";
-
+            _MaxEfficiency = efficiency;
 
             var moduleName = "";
             DBConnection.X4DB.ExecQuery($"SELECT Name FROM Module WHERE ModuleID = '{moduleID}'", (SQLiteDataReader dr, object[] args) => { moduleName = (string)dr["Name"]; });

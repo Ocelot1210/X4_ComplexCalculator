@@ -82,21 +82,11 @@ namespace X4_ComplexCalculator.Common.Collection
         /// <param name="e"></param>
         private void CollectionChangedEvent(object sender, NotifyCollectionChangedEventArgs e)
         {
-            // イベントハンドラーの設定/解除
-            InitEventHandler(e);
-
-            // イベントが無効化されていれば何もしない
-            if (EventDisabled)
-            {
-                return;
-            }
-
             // 非同期版イベントが購読されていなければ何もしない
             if (CollectionChangedAsync == null)
             {
                 return;
             }
-
             
             Task.WhenAll(
                 CollectionChangedAsync.GetInvocationList()
@@ -112,12 +102,6 @@ namespace X4_ComplexCalculator.Common.Collection
         /// <param name="e"></param>
         private async void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            // イベントが無効化されていれば何もしない
-            if (EventDisabled)
-            {
-                return;
-            }
-
             CollectionPropertyChanged?.Invoke(sender, e);
 
             // 非同期版イベントが購読されていなければ何もしない
@@ -174,17 +158,6 @@ namespace X4_ComplexCalculator.Common.Collection
                 default:
                     break;
             }
-        }
-
-
-
-        /// <summary>
-        /// クリアしてコレクションを追加
-        /// </summary>
-        /// <param name="range">追加するコレクション</param>
-        public override void Reset(IEnumerable<INotifyPropertyChanged> range)
-        {
-            base.Reset(range);
         }
 
 

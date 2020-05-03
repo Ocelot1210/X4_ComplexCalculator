@@ -33,16 +33,11 @@ namespace X4_ComplexCalculator.Main.StationSummary.WorkForce
         /// </summary>
         public long ModuleCount
         {
-            get
-            {
-                return _ModuleCount;
-            }
+            get => _ModuleCount;
             set
             {
-                if (_ModuleCount != value)
+                if (SetProperty(ref _ModuleCount, value))
                 {
-                    _ModuleCount = value;
-                    OnPropertyChanged();
                     OnPropertyChanged(nameof(TotalWorkforce));
                 }
             }

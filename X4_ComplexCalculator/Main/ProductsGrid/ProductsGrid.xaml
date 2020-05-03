@@ -73,7 +73,7 @@
                     <DataGridInline:InlineGridViewColumn Header="モジュール数" SortTargetPropertyName="ModuleCount">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding ModuleCount, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
+                                <TextBlock Text="{Binding ModuleCount, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </DataGridInline:InlineGridViewColumn>
@@ -82,7 +82,7 @@
                     <DataGridInline:InlineGridViewColumn Header="生産性" SortTargetPropertyName="Efficiency">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Efficiency, Mode=OneTime}" TextAlignment="Right" />
+                                <TextBlock Text="{Binding Efficiency, Mode=OneWay}" TextAlignment="Right" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </DataGridInline:InlineGridViewColumn>
@@ -91,7 +91,7 @@
                     <DataGridInline:InlineGridViewColumn Header="生産量" SortTargetPropertyName="Amount">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Amount, Mode=OneTime, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
+                                <TextBlock Text="{Binding Amount, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </DataGridInline:InlineGridViewColumn>
@@ -107,7 +107,7 @@
         x4bhv:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
         CellStyle="{StaticResource DataGridCellDefaultStyle}"
         ContextMenu="{StaticResource ProductsGridContextMenu}"
-        ItemsSource="{Binding Products, Mode=OneTime}"
+        ItemsSource="{Binding ProductsView, Mode=OneTime}"
         SelectionUnit="Cell"
         Style="{StaticResource DetailsDataGridStyle}">
 
@@ -149,7 +149,7 @@
                 SortMemberPath="Count">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
-                        <TextBlock VerticalAlignment="Center" Text="{Binding Count, Mode=OneTime}" />
+                        <TextBlock VerticalAlignment="Center" Text="{Binding Count, Mode=OneWay}" />
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>

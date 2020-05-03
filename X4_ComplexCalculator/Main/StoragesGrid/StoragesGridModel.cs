@@ -77,7 +77,7 @@ namespace X4_ComplexCalculator.Main.StoragesGrid
             // 保管モジュールの場合のみ更新
             if (module.Module.ModuleType.ModuleTypeID == "storage")
             {
-                UpdateStorages();
+                OnModuleCountChanged(module);
             }
 
             await Task.CompletedTask;
@@ -91,28 +91,112 @@ namespace X4_ComplexCalculator.Main.StoragesGrid
         /// <param name="e"></param>
         private async Task OnModulesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            UpdateStorages();
+            if (e.NewItems != null)
+            {
+                OnModulesAdded(e.NewItems.Cast<ModulesGridItem>());
+            }
+
+            if (e.OldItems != null)
+            {
+                OnModulesRemoved(e.OldItems.Cast<ModulesGridItem>());
+            }
+
+            if (e.Action == NotifyCollectionChangedAction.Reset)
+            {
+                Storages.Clear();
+            }
+
             await Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// モジュールが追加された時
+        /// </summary>
+        /// <param name="modules"></param>
+        private void OnModulesAdded(IEnumerable<ModulesGridItem> modules)
+        {
+            Dictionary<string, List<StorageDetailsListItem>> storageModules = AggregateStorage(modules);
+
+            var addTarget = new List<StoragesGridItem>();
+
+            foreach (var kvp in storageModules)
+            {
+                // 一致するレコードを探す
+                var itm = Storages.Where(x => x.TransportType.TransportTypeID == kvp.Key).FirstOrDefault();
+                if (itm != null)
+                {
+                    // 既にレコードがある場合
+                    itm.AddDetails(kvp.Value);
+                }
+                else
+                {
+                    // 初回追加の場合
+                    addTarget.Add(new StoragesGridItem(kvp.Key, kvp.Value));
+                }
+            }
+
+            Storages.AddRange(addTarget);
+        }
+
+        /// <summary>
+        /// モジュールが削除された時
+        /// </summary>
+        /// <param name="modules"></param>
+        private void OnModulesRemoved(IEnumerable<ModulesGridItem> modules)
+        {
+            Dictionary<string, List<StorageDetailsListItem>> storageModules = AggregateStorage(modules);
+
+            foreach (var kvp in storageModules)
+            {
+                // 一致するレコードを探す
+                var itm = Storages.Where(x => x.TransportType.TransportTypeID == kvp.Key).FirstOrDefault();
+                if (itm != null)
+                {
+                    itm.RemoveDetails(kvp.Value);
+                }
+            }
+
+            // 空のレコードを削除
+            Storages.RemoveAll(x => x.Capacity == 0);
         }
 
 
         /// <summary>
-        /// 保管庫情報更新
+        /// モジュール数変更時
         /// </summary>
-        private void UpdateStorages()
+        /// <param name="module"></param>
+        private void OnModuleCountChanged(ModulesGridItem module)
         {
-            var modules = Modules.Where(x => x.Module.ModuleType.ModuleTypeID == "storage")
-                                 .GroupBy(x => x.Module.ModuleID)
-                                 .Select(x => (x.First().Module.ModuleID, Count : x.Sum(y => y.ModuleCount) ));
+            ModulesGridItem[] modules = { module };
 
-            // 処理対象が無ければクリアして終わる
-            if (!modules.Any())
+            Dictionary<string, List<StorageDetailsListItem>> storageModules = AggregateStorage(modules);
+
+            foreach (var kvp in storageModules)
             {
-                Storages.Clear();
-                return;
+                // 変更対象のウェアを検索
+                Storages.Where(x => x.TransportType.TransportTypeID == kvp.Key).FirstOrDefault()?.SetDetails(kvp.Value);
             }
+        }
 
-            var sqlParam = new SQLiteCommandParameters(2);
+
+        /// <summary>
+        /// モジュール情報を集計
+        /// </summary>
+        /// <param name="modules">集計対象</param>
+        /// <returns>集計結果</returns>
+        private Dictionary<string, List<StorageDetailsListItem>> AggregateStorage(IEnumerable<ModulesGridItem> modules)
+        {
+            // 保管庫情報集計用
+            var modulesDict = new Dictionary<string, List<StorageDetailsListItem>>();
+
+            var targetModules = modules.Where(x => x.Module.ModuleType.ModuleTypeID == "storage")
+                                       .GroupBy(x => x.Module.ModuleID)
+                                       .Select(x => (x.First().Module.ModuleID, Count: x.Sum(y => y.ModuleCount)));
+
+            if (!targetModules.Any())
+            {
+                return modulesDict;
+            }
 
             var query = $@"
 SELECT
@@ -127,37 +211,81 @@ FROM
 WHERE
     ModuleID = :moduleID";
 
-            // 保管モジュールのみ列挙)
-            foreach (var module in modules)
+            var sqlParam = new SQLiteCommandParameters(2);
+            foreach (var module in targetModules)
             {
                 sqlParam.Add("moduleID", System.Data.DbType.String, module.ModuleID);
                 sqlParam.Add("count", System.Data.DbType.Int32, module.Count);
             }
 
-
-            // カーゴ種別ごとの容量
-            var transportDict = new Dictionary<string, long>();  // transportTypeID, Capacity
-
-            // カーゴ種別ごとのモジュール集計用
-            var modulesDict = new Dictionary<string, List<StorageDetailsListItem>>();
-
             // 容量をタイプ別に集計
-            DBConnection.X4DB.ExecQuery(query, sqlParam, SumStorage, transportDict, modulesDict);
+            DBConnection.X4DB.ExecQuery(query, sqlParam, SumStorage, modulesDict);
 
-            // 前回値保存
-            var backup = Storages.ToDictionary(x => x.TransportType.TransportTypeID, x => x.IsExpanded);
-
-            // コレクションに設定
-            Storages.Reset(transportDict.Select(x =>
-            {
-                var details = modulesDict[x.Key].OrderBy(x => x.ModuleName).ToArray();
-                return backup.TryGetValue(x.Key, out bool expanded)
-                    ? new StoragesGridItem(x.Key, x.Value, details, expanded)
-                    : new StoragesGridItem(x.Key, x.Value, details);
-            })
-                .OrderBy(x => x.TransportType.Name)
-            );
+            return modulesDict;
         }
+
+//        /// <summary>
+//        /// 保管庫情報更新
+//        /// </summary>
+//        private void UpdateStorages()
+//        {
+//            var modules = Modules.Where(x => x.Module.ModuleType.ModuleTypeID == "storage")
+//                                 .GroupBy(x => x.Module.ModuleID)
+//                                 .Select(x => (x.First().Module.ModuleID, Count : x.Sum(y => y.ModuleCount)));
+
+//            // 処理対象が無ければクリアして終わる
+//            if (!modules.Any())
+//            {
+//                Storages.Clear();
+//                return;
+//            }
+
+//            var sqlParam = new SQLiteCommandParameters(2);
+
+//            var query = $@"
+//SELECT
+//    TransportTypeID,
+//    Amount * :count AS Amount,
+//    :count AS Count,
+//    ModuleID
+
+//FROM
+//    ModuleStorage
+
+//WHERE
+//    ModuleID = :moduleID";
+
+//            // 保管モジュールのみ列挙)
+//            foreach (var module in modules)
+//            {
+//                sqlParam.Add("moduleID", System.Data.DbType.String, module.ModuleID);
+//                sqlParam.Add("count", System.Data.DbType.Int32, module.Count);
+//            }
+
+
+//            // カーゴ種別ごとの容量
+//            var transportDict = new Dictionary<string, long>();  // transportTypeID, Capacity
+
+//            // 保管庫情報集計用
+//            var modulesDict = new Dictionary<string, List<StorageDetailsListItem>>();
+
+//            // 容量をタイプ別に集計
+//            DBConnection.X4DB.ExecQuery(query, sqlParam, SumStorage, transportDict, modulesDict);
+
+//            // 前回値保存
+//            var backup = Storages.ToDictionary(x => x.TransportType.TransportTypeID, x => x.IsExpanded);
+
+//            // コレクションに設定
+//            Storages.Reset(transportDict.Select(x =>
+//            {
+//                var details = modulesDict[x.Key].OrderBy(x => x.ModuleName).ToArray();
+//                return backup.TryGetValue(x.Key, out bool expanded)
+//                    ? new StoragesGridItem(x.Key, x.Value, details, expanded)
+//                    : new StoragesGridItem(x.Key, x.Value, details);
+//            })
+//                .OrderBy(x => x.TransportType.Name)
+//            );
+//        }
 
         /// <summary>
         /// 保管庫の容量を集計
@@ -165,30 +293,14 @@ WHERE
         /// <param name="dr"></param>
         /// <param name="args"></param>
         /// <remarks>
-        /// args[0] = Dictionary<string, int> : ウェア集計用ディクショナリ
+        /// args[0] = Dictionary<string, List<StorageDetailsListItem>> : 保管庫情報集計用ディクショナリ
         /// </remarks>
         private void SumStorage(SQLiteDataReader dr, object[] args)
         {
-            var transportDict = (Dictionary<string, long>)args[0];     // transportTypeID, Capacity
-
             var transportTypeID = (string)dr["TransportTypeID"];
-            var amount          = (long)dr["Amount"];
-
-            // ディクショナリ内にウェアが存在するか？
-            if (transportDict.ContainsKey(transportTypeID))
-            {
-                // すでにウェアが存在している場合
-                transportDict[transportTypeID] += amount;
-            }
-            else
-            {
-                // 新規追加
-                transportDict[transportTypeID] = amount;
-            }
-
 
             // 関連モジュール集計
-            var modulesDict = (Dictionary<string, List<StorageDetailsListItem>>)args[1];
+            var modulesDict = (Dictionary<string, List<StorageDetailsListItem>>)args[0];
 
             // このカーゴ種別に対して関連モジュール追加が初回か？
             if (!modulesDict.ContainsKey(transportTypeID))
@@ -200,11 +312,11 @@ WHERE
             var moduleCount = (long)dr["Count"];
 
             // このカーゴ種別に対し、既にモジュールが追加されているか？
-            var itm = modulesDict[transportTypeID].Where(x => x.ModuleID == moduleID);
-            if (itm.Any())
+            var itm = modulesDict[transportTypeID].Where(x => x.ModuleID == moduleID).FirstOrDefault();
+            if (itm != null)
             {
                 // 既にモジュールが追加されている場合、モジュール数を増やしてレコードがなるべく少なくなるようにする
-                itm.First().Incriment(moduleCount);
+                itm.Incriment(moduleCount);
             }
             else
             {
