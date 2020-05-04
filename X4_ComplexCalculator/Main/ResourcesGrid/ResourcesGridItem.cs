@@ -130,7 +130,7 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
                 else
                 {
                     // 新規追加
-                    addItems.Add(tmp);
+                    addItems.Add(item);
                 }
             }
 

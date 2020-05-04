@@ -285,24 +285,16 @@ WHERE
             var count   = (long)dr["Count"];
 
             // ディクショナリ内にウェアが存在するか？
-            if (dict.ContainsKey(wareID))
-            {
-                // すでにウェアが存在している場合
-                var itm = dict[wareID].Where(x => x.ID == id).FirstOrDefault();
-                if (itm != null)
-                {
-                    itm.Count += count;
-                }
-            }
-            else
+            if (!dict.ContainsKey(wareID))
             {
                 // 新規追加
-                var name   = (string)dr["Name"];
-                var amount = (long)dr["Amount"];
-
                 dict.Add(wareID, new List<ResourcesGridDetailsItem>());
-                dict[wareID].Add(new ResourcesGridDetailsItem(id, name, amount, count));
             }
+            
+            var name   = (string)dr["Name"];
+            var amount = (long)dr["Amount"];
+
+            dict[wareID].Add(new ResourcesGridDetailsItem(id, name, amount, count));
         }
     }
 }
