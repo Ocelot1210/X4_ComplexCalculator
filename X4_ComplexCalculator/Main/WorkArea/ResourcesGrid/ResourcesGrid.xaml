@@ -1,0 +1,120 @@
+﻿<UserControl
+    x:Class="X4_ComplexCalculator.Main.WorkArea.ResourcesGrid.ResourcesGrid"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
+    xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
+    xmlns:x4cvt="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
+    xmlns:x4mupsld="clr-namespace:X4_ComplexCalculator_CustomControlLibrary.MouseUpSlider;assembly=X4_ComplexCalculator_CustomControlLibrary"
+    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+
+        <!--  データ中継用  -->
+        <x4cmn:BindingProxy x:Key="ProxyUnitPricePercent" Data="{Binding UnitPricePercent, Mode=TwoWay}" />
+    </UserControl.Resources>
+
+    <DataGrid
+        x4bhv:DataGridCurrentCellEditModeBehavior.Enabled="True"
+        x4bhv:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
+        IsReadOnly="False"
+        ItemsSource="{Binding BuildResourceView, Mode=OneTime}"
+        SelectionUnit="Cell"
+        Style="{StaticResource DefaultDataGridStyle}">
+        <DataGrid.Columns>
+
+            <!--  建造に必要なウェア  -->
+            <DataGridTextColumn
+                Binding="{Binding Ware.Name, Mode=OneTime}"
+                Header="建造に必要なウェア"
+                IsReadOnly="True" />
+
+            <!--  個数  -->
+            <DataGridTextColumn
+                Binding="{Binding Amount, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}"
+                CellStyle="{StaticResource RightAlignedDataGridCell}"
+                Header="個数"
+                IsReadOnly="True" />
+
+            <!--  金額  -->
+            <DataGridTextColumn
+                Binding="{Binding Price, StringFormat='{}{0:N0} cr', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                CellStyle="{StaticResource RightAlignedDataGridCell}"
+                Header="金額"
+                IsReadOnly="True" />
+
+            <!--  単価  -->
+            <DataGridTemplateColumn
+                ClipboardContentBinding="{Binding UnitPrice, Mode=OneTime}"
+                Header="単価"
+                SortMemberPath="UnitPrice">
+                <!--  通常表示時のスタイル  -->
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <TextBlock
+                            Text="{Binding UnitPrice, StringFormat='{}{0:N0} cr', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                            TextAlignment="Right"
+                            TextDecorations="Underline" />
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+
+                <!--  編集時のスタイル  -->
+                <DataGridTemplateColumn.CellEditingTemplate>
+                    <DataTemplate>
+                        <xctk:IntegerUpDown
+                            ClipValueToMinMax="True"
+                            FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
+                            Maximum="{Binding Ware.MaxPrice}"
+                            Minimum="{Binding Ware.MinPrice}"
+                            Value="{Binding UnitPrice, Mode=TwoWay}" />
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellEditingTemplate>
+            </DataGridTemplateColumn>
+
+
+            <!--  単価(スライダー)  -->
+            <DataGridTemplateColumn
+                MinWidth="100"
+                IsReadOnly="True"
+                SortMemberPath="UnitPrice">
+                <!--  ヘッダのスタイル定義  -->
+                <DataGridTemplateColumn.HeaderStyle>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="Padding" Value="0" />
+                    </Style>
+                </DataGridTemplateColumn.HeaderStyle>
+
+                <!--  ヘッダの内容定義  -->
+                <DataGridTemplateColumn.Header>
+                    <DockPanel>
+                        <Slider
+                            DockPanel.Dock="Left"
+                            Maximum="100"
+                            Minimum="0"
+                            TickFrequency="1"
+                            Value="{Binding Data, Source={StaticResource ProxyUnitPricePercent}, Converter={StaticResource SliderValueConverter}, ConverterParameter=50.0}" />
+                    </DockPanel>
+                </DataGridTemplateColumn.Header>
+
+                <!--  セルの内容定義  -->
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <Slider
+                            Maximum="{Binding Ware.MaxPrice}"
+                            Minimum="{Binding Ware.MinPrice}"
+                            Value="{Binding UnitPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+
+        </DataGrid.Columns>
+    </DataGrid>
+</UserControl>

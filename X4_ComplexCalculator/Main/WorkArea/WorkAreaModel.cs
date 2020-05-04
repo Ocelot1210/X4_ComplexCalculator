@@ -7,9 +7,9 @@ using System.Data.SQLite;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
-using X4_ComplexCalculator.Main.ModulesGrid;
-using X4_ComplexCalculator.Main.ProductsGrid;
-using X4_ComplexCalculator.Main.ResourcesGrid;
+using X4_ComplexCalculator.Main.WorkArea.ModulesGrid;
+using X4_ComplexCalculator.Main.WorkArea.ProductsGrid;
+using X4_ComplexCalculator.Main.WorkArea.ResourcesGrid;
 
 namespace X4_ComplexCalculator.Main.WorkArea
 {

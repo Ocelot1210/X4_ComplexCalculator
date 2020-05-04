@@ -16,6 +16,16 @@
 
     <Window.Resources>
         <x4vcvt:ActiveDocumentConverter x:Key="ActiveDocumentConverter" />
+
+        <XmlDataProvider x:Key="MockList" XPath="/MockObjects/*">
+            <x:XData>
+                <MockObjects xmlns="">
+                    <MockObject Name="プリセット1" />
+                    <MockObject Name="プリセット2" />
+                    <MockObject Name="プリセット114514" />
+                </MockObjects>
+            </x:XData>
+        </XmlDataProvider>
     </Window.Resources>
 
     <Window.InputBindings>
@@ -32,7 +42,6 @@
     </i:Interaction.Triggers>
 
     <Grid>
-
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />

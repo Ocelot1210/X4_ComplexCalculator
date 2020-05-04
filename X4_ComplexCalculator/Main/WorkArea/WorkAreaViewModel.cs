@@ -5,11 +5,11 @@ using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common;
-using X4_ComplexCalculator.Main.ModulesGrid;
-using X4_ComplexCalculator.Main.ProductsGrid;
-using X4_ComplexCalculator.Main.ResourcesGrid;
-using X4_ComplexCalculator.Main.StationSummary;
-using X4_ComplexCalculator.Main.StoragesGrid;
+using X4_ComplexCalculator.Main.WorkArea.ModulesGrid;
+using X4_ComplexCalculator.Main.WorkArea.ProductsGrid;
+using X4_ComplexCalculator.Main.WorkArea.ResourcesGrid;
+using X4_ComplexCalculator.Main.WorkArea.StationSummary;
+using X4_ComplexCalculator.Main.WorkArea.StoragesGrid;
 using Xceed.Wpf.AvalonDock;
 using Xceed.Wpf.AvalonDock.Layout.Serialization;
 
