@@ -91,11 +91,11 @@ namespace X4_ComplexCalculator.Main.StationSummary.BuildingCost
             switch (e.PropertyName)
             {
                 // 個数変更時
-                case nameof(ResourcesGridItem.Count):
+                case nameof(ResourcesGridItem.Amount):
                     {
                         var item = BuildingCostDetails.Where(x => x.WareID == resource.Ware.WareID).First();
                         BuildingCost = BuildingCost - item.TotalPrice + resource.Price;
-                        item.Count = resource.Count;
+                        item.Count = resource.Amount;
                     }
                     break;
 
@@ -127,7 +127,7 @@ namespace X4_ComplexCalculator.Main.StationSummary.BuildingCost
             if (e.NewItems != null)
             {
                 var addItems = e.NewItems.Cast<ResourcesGridItem>()
-                                         .Select(x => new BuildingCostDetailsItem(x.Ware.WareID, x.Ware.Name, x.Count, x.UnitPrice));
+                                         .Select(x => new BuildingCostDetailsItem(x.Ware.WareID, x.Ware.Name, x.Amount, x.UnitPrice));
 
                 BuildingCostDetails.AddRange(addItems);
             }

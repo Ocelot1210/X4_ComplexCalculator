@@ -37,7 +37,7 @@
 
             <!--  個数  -->
             <DataGridTextColumn
-                Binding="{Binding Count, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}"
+                Binding="{Binding Amount, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}"
                 CellStyle="{StaticResource RightAlignedDataGridCell}"
                 Header="個数"
                 IsReadOnly="True" />

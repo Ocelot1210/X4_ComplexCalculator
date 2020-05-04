@@ -1,15 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Data;
 using System.Data.SQLite;
 using System.Linq;
-using X4_ComplexCalculator.DB;
-using X4_ComplexCalculator.DB.X4DB;
-using X4_ComplexCalculator.Main.ModulesGrid;
-using System.Collections.Specialized;
 using System.Threading.Tasks;
 using X4_ComplexCalculator.Common.Collection;
-using System.ComponentModel;
-using System;
+using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.Main.ModulesGrid;
 
 namespace X4_ComplexCalculator.Main.ResourcesGrid
 {
@@ -73,10 +72,15 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
                 await Task.CompletedTask;
                 return;
             }
+
+            if (sender is ModulesGridItem module)
+            {
+                OnModulePropertyChanged(module);
+            }
             
-            UpdateResources();
             await Task.CompletedTask;
         }
+
 
         /// <summary>
         /// モジュール一覧変更時
@@ -106,34 +110,18 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         /// <summary>
         /// 建造に必要なリソースを更新
         /// </summary>
-        private void UpdateResources()
+        /// <param name="module">変更対象モジュール</param>
+        private void OnModulePropertyChanged(ModulesGridItem module)
         {
+            ModulesGridItem[] modules = { module };
+
             // 建造に必要なリソース集計用
-            var resourcesDict = new Dictionary<string, long>();
+            Dictionary<string, List<ResourcesGridDetailsItem>> resourcesDict = AggregateModule(modules);
 
-            // モジュールの建造に必要なリソースを集計
-            AggregateModuleResources(Modules, resourcesDict);
-
-            // モジュールの装備の建造に必要なリソースを集計
-            AggregateEquipmentResources(Modules, resourcesDict);
-
-            var addTarget = new List<ResourcesGridItem>();
             foreach (var kvp in resourcesDict)
             {
-                var item = Resources.Where(x => x.Ware.WareID == kvp.Key).FirstOrDefault();
-                if (item != null)
-                {
-                    // 既にウェアが一覧にある場合
-                    item.Count = kvp.Value;
-                }
-                else
-                {
-                    // ウェアが一覧にない場合
-                    addTarget.Add(new ResourcesGridItem(kvp.Key, kvp.Value));
-                }
+                Resources.Where(x => x.Ware.WareID == kvp.Key).FirstOrDefault()?.SetDetails(kvp.Value);
             }
-
-            Resources.AddRange(addTarget);
         }
 
 
@@ -143,7 +131,7 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         /// <param name="modules">追加されたモジュール</param>
         private void OnModulesAdded(IEnumerable<ModulesGridItem> modules)
         {
-            Dictionary<string, long> resourcesDict = AggregateModule(modules);
+            Dictionary<string, List<ResourcesGridDetailsItem>> resourcesDict = AggregateModule(modules);
 
             var addTarget = new List<ResourcesGridItem>();
             foreach (var kvp in resourcesDict)
@@ -152,7 +140,7 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
                 if (item != null)
                 {
                     // 既にウェアが一覧にある場合
-                    item.Count = kvp.Value;
+                    item.AddDetails(kvp.Value);
                 }
                 else
                 {
@@ -171,18 +159,14 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         /// <param name="modules">削除されたモジュール</param>
         private void OnModulesRemoved(IEnumerable<ModulesGridItem> modules)
         {
-            Dictionary<string, long> resourcesDict = AggregateModule(modules);
+            Dictionary<string, List<ResourcesGridDetailsItem>> resourcesDict = AggregateModule(modules);
 
             foreach (var kvp in resourcesDict)
             {
-                var item = Resources.Where(x => x.Ware.WareID == kvp.Key).FirstOrDefault();
-                if (item != null)
-                {
-                    item.Count = kvp.Value;
-                }
+                Resources.Where(x => x.Ware.WareID == kvp.Key).FirstOrDefault()?.RemoveDetails(kvp.Value);
             }
 
-            Resources.RemoveAll(x => x.Count == 0);
+            Resources.RemoveAll(x => x.Amount == 0);
         }
 
 
@@ -192,16 +176,16 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         /// </summary>
         /// <param name="modules">集計対象モジュール</param>
         /// <returns>集計結果</returns>
-        private Dictionary<string, long> AggregateModule(IEnumerable<ModulesGridItem> modules)
+        private Dictionary<string, List<ResourcesGridDetailsItem>> AggregateModule(IEnumerable<ModulesGridItem> modules)
         {
             // 建造に必要なリソース集計用
-            var resourcesDict = new Dictionary<string, long>();
+            var resourcesDict = new Dictionary<string, List<ResourcesGridDetailsItem>>();
 
             // モジュールの建造に必要なリソースを集計
-            AggregateModuleResources(Modules, resourcesDict);
+            AggregateModuleResources(modules, resourcesDict);
 
             // モジュールの装備の建造に必要なリソースを集計
-            AggregateEquipmentResources(Modules, resourcesDict);
+            AggregateEquipmentResources(modules, resourcesDict);
 
             return resourcesDict;
         }
@@ -213,17 +197,22 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         /// <param name="modules">モジュール一覧</param>
         /// <param name="resourcesDict">集計用辞書</param>
         /// <returns></returns>
-        private void AggregateModuleResources(IEnumerable<ModulesGridItem> modules, Dictionary<string, long> resourcesDict)
+        private void AggregateModuleResources(IEnumerable<ModulesGridItem> modules, Dictionary<string, List<ResourcesGridDetailsItem>> resourcesDict)
         {
             var query = $@"
 SELECT
-    WareID,
-    Amount * :count AS Amount
+    Ware.WareID,
+    Ware.Name,
+    :moduleID AS ID,
+    Amount,
+    :count AS Count
 
 FROM
-    ModuleResource
+    ModuleResource,
+    Ware
 
 WHERE
+    Ware.WareID = ModuleResource.WareID AND
     ModuleID = :moduleID AND
     Method   = :method";
 
@@ -243,7 +232,7 @@ WHERE
         /// モジュールの装備の建造に必要なリソースを集計
         /// </summary>
         /// <returns></returns>
-        private void AggregateEquipmentResources(IEnumerable<ModulesGridItem> modules, Dictionary<string, long> resourcesDict)
+        private void AggregateEquipmentResources(IEnumerable<ModulesGridItem> modules, Dictionary<string, List<ResourcesGridDetailsItem>> resourcesDict)
         {
             // 装備IDごとに集計
             var equipments = modules.Where(x => x.Module.Equipment.CanEquipped)
@@ -254,13 +243,18 @@ WHERE
 
             var query = $@"
 SELECT
-    NeedWareID AS 'WareID',
-    Amount * :count AS Amount
+	Ware.WareID,
+    Ware.Name,
+    :equipmentID AS ID,
+    Amount,
+    :count AS Count
 
 FROM
-    EquipmentResource
+    EquipmentResource,
+    Ware
 
 WHERE
+    Ware.WareID = EquipmentResource.NeedWareID AND
     EquipmentID = :equipmentID AND
 	Method = 'default'";
 
@@ -284,21 +278,30 @@ WHERE
         /// </remarks>
         private void SumResource(SQLiteDataReader dr, object[] args)
         {
-            var dict = (Dictionary<string, long>)args[0];
+            var dict = (Dictionary<string, List<ResourcesGridDetailsItem>>)args[0];
 
-            var key = (string)dr["WareID"];
-            var value = (long)dr["Amount"];
+            var wareID  = (string)dr["WareID"];
+            var id      = (string)dr["ID"];
+            var count   = (long)dr["Count"];
 
             // ディクショナリ内にウェアが存在するか？
-            if (dict.ContainsKey(key))
+            if (dict.ContainsKey(wareID))
             {
                 // すでにウェアが存在している場合
-                dict[key] += value;
+                var itm = dict[wareID].Where(x => x.ID == id).FirstOrDefault();
+                if (itm != null)
+                {
+                    itm.Count += count;
+                }
             }
             else
             {
                 // 新規追加
-                dict[key] = value;
+                var name   = (string)dr["Name"];
+                var amount = (long)dr["Amount"];
+
+                dict.Add(wareID, new List<ResourcesGridDetailsItem>());
+                dict[wareID].Add(new ResourcesGridDetailsItem(id, name, amount, count));
             }
         }
     }

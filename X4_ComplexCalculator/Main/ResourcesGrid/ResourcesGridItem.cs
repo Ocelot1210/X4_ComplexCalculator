@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB.X4DB;
 
@@ -16,10 +18,11 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         private long _UnitPrice;
 
         /// <summary>
-        /// 建造に必要なウェア数量
+        /// 詳細情報
         /// </summary>
-        private long _Count;
+        private List<ResourcesGridDetailsItem> _Details;
         #endregion
+
 
         #region プロパティ
         /// <summary>
@@ -31,23 +34,17 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         /// <summary>
         /// 建造に必要なウェア数量
         /// </summary>
-        public long Count
+        public long Amount
         {
-            get => _Count;
-            set
-            {
-                if (SetProperty(ref _Count, value))
-                {
-                    OnPropertyChanged(nameof(Price));
-                }
-            }
+            get => _Details.Sum(x => x.TotalAmount);
         }
 
 
         /// <summary>
         /// 金額
         /// </summary>
-        public long Price => Count * UnitPrice;
+        public long Price => Amount * UnitPrice;
+
 
         /// <summary>
         /// 単価
@@ -105,12 +102,86 @@ namespace X4_ComplexCalculator.Main.ResourcesGrid
         /// コンストラクタ
         /// </summary>
         /// <param name="wareID">建造に必要なウェアID</param>
-        /// <param name="count">建造に必要なウェアの個数</param>
-        public ResourcesGridItem(string wareID, long count)
+        /// <param name="details">詳細情報</param>
+        public ResourcesGridItem(string wareID, IEnumerable<ResourcesGridDetailsItem> details)
         {
             Ware = new Ware(wareID);
-            Count = count;
+            _Details = new List<ResourcesGridDetailsItem>(details);
             UnitPrice = (Ware.MaxPrice + Ware.MinPrice) / 2;
+        }
+
+
+        /// <summary>
+        /// 詳細情報を追加
+        /// </summary>
+        /// <param name="details">追加対象</param>
+        public void AddDetails(IEnumerable<ResourcesGridDetailsItem> details)
+        {
+            var addItems = new List<ResourcesGridDetailsItem>();
+
+            foreach (var item in details)
+            {
+                var tmp = _Details.Where(x => x.ID == item.ID).FirstOrDefault();
+                if (tmp != null)
+                {
+                    // 既にレコードがある場合
+                    tmp.Count += item.Count;
+                }
+                else
+                {
+                    // 新規追加
+                    addItems.Add(tmp);
+                }
+            }
+
+            _Details.AddRange(addItems);
+
+            OnPropertyChanged(nameof(Amount));
+            OnPropertyChanged(nameof(Price));
+        }
+
+
+        /// <summary>
+        /// 詳細情報を削除
+        /// </summary>
+        /// <param name="details">削除対象</param>
+        public void RemoveDetails(IEnumerable<ResourcesGridDetailsItem> details)
+        {
+            foreach (var item in details)
+            {
+                var tmp = _Details.Where(x => x.ID == item.ID).FirstOrDefault();
+                if (tmp != null)
+                {
+                    // 既にレコードがある場合
+                    tmp.Count -= item.Count;
+                }
+            }
+
+            // 空のレコードを削除
+            _Details.RemoveAll(x => x.Count == 0);
+
+            OnPropertyChanged(nameof(Amount));
+            OnPropertyChanged(nameof(Price));
+        }
+
+
+        /// <summary>
+        /// 詳細情報を設定
+        /// </summary>
+        /// <param name="details">設定対象</param>
+        public void SetDetails(IEnumerable<ResourcesGridDetailsItem> details)
+        {
+            foreach (var item in details)
+            {
+                var tmp = _Details.Where(x => x.ID == item.ID).FirstOrDefault();
+                if (tmp != null)
+                {
+                    tmp.Count = item.Count;
+                }
+            }
+
+            OnPropertyChanged(nameof(Amount));
+            OnPropertyChanged(nameof(Price));
         }
     }
 }
