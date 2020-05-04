@@ -1,10 +1,9 @@
 ﻿using Prism.Commands;
 using System;
-using System.ComponentModel;
 using System.IO;
-using System.Windows;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common;
+using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.WorkArea.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.ProductsGrid;
 using X4_ComplexCalculator.Main.WorkArea.ResourcesGrid;
@@ -25,6 +24,19 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// モデル
         /// </summary>
         private readonly WorkAreaModel _Model;
+
+
+        /// <summary>
+        /// レイアウトID
+        /// </summary>
+        private long _LayoutID;
+
+
+        /// <summary>
+        /// ドッキングマネージャー
+        /// </summary>
+        private DockingManager _DockingManager;
+
 
         /// <summary>
         /// レイアウト保持用
@@ -106,21 +118,27 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public WorkAreaViewModel()
+        /// <param name="layoutID">レイアウトID</param>
+        /// <remarks>
+        /// レイアウトIDが負の場合、レイアウトは指定されていない事にする
+        /// </remarks>
+        public WorkAreaViewModel(long layoutID = -1)
         {
-            var moduleModel = new ModulesGridModel();
-            var productsModel = new ProductsGridModel(moduleModel.Modules);
-            var resourcesModel = new ResourcesGridModel(moduleModel.Modules);
+            _LayoutID = layoutID;
 
-            Summary = new StationSummaryViewModel(moduleModel.Modules, productsModel.Products, resourcesModel.Resources);
-            Modules = new ModulesGridViewModel(moduleModel);
-            Products = new ProductsGridViewModel(productsModel);
-            Resources = new ResourcesGridViewModel(resourcesModel);
-            Storages = new StoragesGridViewModel(moduleModel.Modules);
+            var moduleModel     = new ModulesGridModel();
+            var productsModel   = new ProductsGridModel(moduleModel.Modules);
+            var resourcesModel  = new ResourcesGridModel(moduleModel.Modules);
 
-            _Model = new WorkAreaModel(moduleModel, productsModel, resourcesModel);
-            OnLoadedCommand = new DelegateCommand<DockingManager>(OnLoaded);
-            OnUnloadedCommand = new DelegateCommand<DockingManager>(OnUnloaded);
+            Summary     = new StationSummaryViewModel(moduleModel.Modules, productsModel.Products, resourcesModel.Resources);
+            Modules     = new ModulesGridViewModel(moduleModel);
+            Products    = new ProductsGridViewModel(productsModel);
+            Resources   = new ResourcesGridViewModel(resourcesModel);
+            Storages    = new StoragesGridViewModel(moduleModel.Modules);
+
+            _Model              = new WorkAreaModel(moduleModel, productsModel, resourcesModel);
+            OnLoadedCommand     = new DelegateCommand<DockingManager>(OnLoaded);
+            OnUnloadedCommand   = new DelegateCommand(OnUnloaded);
 
             _Model.PropertyChanged += Model_PropertyChanged;
         }
@@ -155,33 +173,122 @@ namespace X4_ComplexCalculator.Main.WorkArea
 
 
         /// <summary>
-        /// ロード時
+        /// レイアウト保存
         /// </summary>
-        /// <param name="dockingManager"></param>
-        private void OnLoaded(DockingManager dockingManager)
+        /// <param name="layoutName">レイアウト名</param>
+        /// <returns>レイアウトID</returns>
+        public long SaveLayout(string layoutName)
         {
-            // 前回レイアウトがあれば、レイアウト復元
+            var id = 0L;
+
+            var query = @$"
+SELECT
+    ifnull(MIN( LayoutID + 1 ), 0) AS LayoutID
+FROM
+    WorkAreaLayouts
+WHERE
+    ( LayoutID + 1 ) NOT IN ( SELECT LayoutID FROM WorkAreaLayouts)";
+
+            DBConnection.CommonDB.ExecQuery(query, (dr, args) =>
+            {
+                id = (long)dr["LayoutID"];
+            });
+
+            
+            var param = new SQLiteCommandParameters(3);
+            param.Add("layoutID",   System.Data.DbType.Int32,   id);
+            param.Add("layoutName", System.Data.DbType.String,  layoutName);
+            param.Add("layout",     System.Data.DbType.Binary, GetCurrentLayout());
+
+            DBConnection.CommonDB.ExecQuery("INSERT INTO WorkAreaLayouts(LayoutID, LayoutName, Layout) VALUES(:layoutID, :layoutName, :layout)", param);
+
+            return id;
+        }
+
+        /// <summary>
+        /// レイアウトを上書き保存
+        /// </summary>
+        /// <param name="layoutID">レイアウトID</param>
+        public void OverwriteSaveLayout(long layoutID)
+        {
+            var param = new SQLiteCommandParameters(2);
+            param.Add("layout", System.Data.DbType.Binary, GetCurrentLayout());
+            param.Add("LayoutID", System.Data.DbType.Int32, layoutID);
+            DBConnection.CommonDB.ExecQuery($"UPDATE WorkAreaLayouts SET Layout = :layout WHERE LayoutID = :layoutID", param);
+        }
+
+
+        /// <summary>
+        /// レイアウトを設定
+        /// </summary>
+        /// <param name="layoutID"></param>
+        public void SetLayout(long layoutID)
+        {
+            DBConnection.CommonDB.ExecQuery($"SELECT Layout FROM WorkAreaLayouts WHERE LayoutID = {layoutID}", (dr, args) =>
+            {
+                _Layout = (byte[])dr["Layout"];
+            });
+
             if (_Layout != null)
             {
-                var serializer = new XmlLayoutSerializer(dockingManager);
+                var serializer = new XmlLayoutSerializer(_DockingManager);
 
-                using var ms = new MemoryStream(_Layout);
+                using var ms = new MemoryStream(_Layout, false);
                 serializer.Deserialize(ms);
             }
         }
 
 
         /// <summary>
-        /// アンロード時
+        /// ロード時
         /// </summary>
         /// <param name="dockingManager"></param>
-        private void OnUnloaded(DockingManager dockingManager)
+        private void OnLoaded(DockingManager dockingManager)
+        {
+            // ロードされるたびにDockingManagerが別物になるっぽいからここで再設定する
+            _DockingManager = dockingManager;
+
+            // レイアウトIDが指定されていればレイアウト設定
+            if (0 <= _LayoutID)
+            {
+                SetLayout(_LayoutID);
+                // 1回ロードしたので次回以降ロードしないようにする
+                _LayoutID = -1;
+                return;
+            }
+
+            // 前回レイアウトがあれば、レイアウト復元
+            if (_Layout != null)
+            {
+                var serializer = new XmlLayoutSerializer(dockingManager);
+
+                using var ms = new MemoryStream(_Layout, false);
+                serializer.Deserialize(ms);
+            }
+        }
+
+
+        /// <summary>
+        /// 現在のレイアウトを取得
+        /// </summary>
+        /// <returns></returns>
+        private byte[] GetCurrentLayout()
         {
             // レイアウト保存
-            var serializer = new XmlLayoutSerializer(dockingManager);
+            var serializer = new XmlLayoutSerializer(_DockingManager);
             using var ms = new MemoryStream();
             serializer.Serialize(ms);
-            _Layout = ms.ToArray();
+            ms.Position = 0;
+
+            return ms.ToArray();
+        }
+
+        /// <summary>
+        /// アンロード時
+        /// </summary>
+        private void OnUnloaded()
+        {
+            _Layout = GetCurrentLayout();
         }
 
 

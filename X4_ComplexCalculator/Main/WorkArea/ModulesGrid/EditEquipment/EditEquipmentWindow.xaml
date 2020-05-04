@@ -168,7 +168,7 @@
                 IsSelectAllActive="True"
                 ItemsSource="{Binding Factions}"
                 SelectAllContent="全選択"
-                SelectedMemberPath="Checked" />
+                SelectedMemberPath="IsChecked" />
         </DockPanel>
 
 

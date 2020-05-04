@@ -12,10 +12,6 @@ namespace X4_ComplexCalculator
         public MainWindow()
         {
             InitializeComponent();
-
-            // DB接続  
-            ContentRendered += (object sender, EventArgs e) => { DBConnection.Open(); };
-
             DataContext = new MainWindowViewModel();
         }
     }

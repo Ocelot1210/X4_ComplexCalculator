@@ -12,7 +12,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment
         /// <summary>
         /// チェックされたか
         /// </summary>
-        private bool _Checked = true;
+        private bool _IsChecked = true;
         #endregion
 
         #region プロパティ
@@ -25,10 +25,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment
         /// <summary>
         /// チェック状態
         /// </summary>
-        public bool Checked
+        public bool IsChecked
         {
-            get => _Checked;
-            set => SetProperty(ref _Checked, value);
+            get => _IsChecked;
+            set => SetProperty(ref _IsChecked, value);
         }
         #endregion
 
@@ -37,11 +37,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment
         /// コンストラクタ
         /// </summary>
         /// <param name="id">派閥ID</param>
-        /// <param name="checked">チェック状態</param>
-        public FactionsListItem(string id, bool @checked)
+        /// <param name="isChecked">チェック状態</param>
+        public FactionsListItem(string id, bool isChecked)
         {
             Faction = new Faction(id);
-            Checked = @checked;
+            IsChecked = isChecked;
         }
     }
 }

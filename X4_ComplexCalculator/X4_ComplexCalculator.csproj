@@ -37,8 +37,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Main\Menu\" />
     <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Common\Dialog\SelectStringDialog\SelectStringDialog.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Common\Dialog\SelectStringDialog\SelectStringDialog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
 
 </Project>

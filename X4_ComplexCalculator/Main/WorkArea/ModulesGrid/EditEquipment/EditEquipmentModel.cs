@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
+using System.Windows;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
-using X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment.EditPresetName;
 
 namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment
 {
@@ -31,7 +32,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment
         /// <summary>
         /// 装備サイズ一覧
         /// </summary>
-        public ObservableRangeCollection<Size> EquipmentSizes { get; private set; } = new ObservableRangeCollection<Size>();
+        public ObservableRangeCollection<DB.X4DB.Size> EquipmentSizes { get; private set; } = new ObservableRangeCollection<DB.X4DB.Size>();
 
 
         /// <summary>
@@ -86,10 +87,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment
         {
             static void AddItem(SQLiteDataReader dr, object[] args)
             {
-                ((ICollection<Size>)args[0]).Add(new Size((string)dr["SizeID"]));
+                ((ICollection<DB.X4DB.Size>)args[0]).Add(new DB.X4DB.Size((string)dr["SizeID"]));
             }
 
-            var sizes = new List<Size>();
+            var sizes = new List<DB.X4DB.Size>();
             DBConnection.X4DB.ExecQuery($"SELECT DISTINCT ModuleShield.SizeID FROM ModuleShield, ModuleTurret WHERE ModuleShield.ModuleID = ModuleTurret.ModuleID AND ModuleShield.ModuleID = '{moduleID}'", AddItem, sizes);
             EquipmentSizes.AddRange(sizes);
         }
@@ -144,7 +145,7 @@ WHERE
             DBConnection.CommonDB.BeginTransaction();
 
             // モジュール種別のチェック状態保存
-            foreach (var id in Factions.Where(x => x.Checked).Select(x => x.Faction.FactionID))
+            foreach (var id in Factions.Where(x => x.IsChecked).Select(x => x.Faction.FactionID))
             {
                 DBConnection.CommonDB.ExecQuery($"INSERT INTO SelectModuleEquipmentCheckStateFactions(ID) VALUES ('{id}')", null);
             }
@@ -165,8 +166,8 @@ WHERE
             }
 
             // 新プリセット名
-            var newPresetName = EditPresetNameWindow.ShowDialog(SelectedPreset.Name);
-            if (!string.IsNullOrEmpty(newPresetName))
+            var (onOK, newPresetName) = SelectStringDialog.ShowDialog("プリセット名編集", "プリセット名", SelectedPreset.Name, IsValidPresetName);
+            if (onOK)
             {
                 // 新プリセット名が設定された場合
 
@@ -204,14 +205,18 @@ WHERE
                 id = (long)dr["PresetID"];
             });
 
-            var item = new PresetComboboxItem(id, "新規プリセット");
+            var (onOK, presetName) = SelectStringDialog.ShowDialog("プリセット名編集", "プリセット名", "", IsValidPresetName);
+            if (!string.IsNullOrEmpty(presetName))
+            {
+                var item = new PresetComboboxItem(id, presetName);
 
-            DBConnection.CommonDB.BeginTransaction();
-            DBConnection.CommonDB.ExecQuery($"INSERT INTO ModulePresets(ModuleID, PresetID, PresetName) VALUES('{_Module.ModuleID}', {item.ID}, '{item.Name}')");
-            Presets.Add(item);
-            DBConnection.CommonDB.Commit();
+                DBConnection.CommonDB.BeginTransaction();
+                DBConnection.CommonDB.ExecQuery($"INSERT INTO ModulePresets(ModuleID, PresetID, PresetName) VALUES('{_Module.ModuleID}', {item.ID}, '{item.Name}')");
+                Presets.Add(item);
+                DBConnection.CommonDB.Commit();
 
-            SelectedPreset = item;
+                SelectedPreset = item;
+            }
         }
 
         /// <summary>
@@ -232,6 +237,24 @@ WHERE
             DBConnection.CommonDB.Commit();
 
             SelectedPreset = Presets.FirstOrDefault();
+        }
+
+        /// <summary>
+        /// プリセット名が有効か判定する
+        /// </summary>
+        /// <param name="presetName">判定対象プリセット名</param>
+        /// <returns>プリセット名が有効か</returns>
+        static private bool IsValidPresetName(string presetName)
+        {
+            var ret = true;
+
+            if (string.IsNullOrWhiteSpace(presetName))
+            {
+                MessageBox.Show("プリセット名が無効です。\r\n空白文字以外の文字を1文字以上入力して下さい。", "確認", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ret = false;
+            }
+
+            return ret;
         }
     }
 }

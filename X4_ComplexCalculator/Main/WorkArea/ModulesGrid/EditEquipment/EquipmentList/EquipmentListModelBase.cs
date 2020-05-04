@@ -88,7 +88,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment.Equipment
         /// <summary>
         /// 選択中の種族
         /// </summary>
-        protected IReadOnlyList<FactionsListItem> SelectedFactions => Factions.Where(x => x.Checked).ToArray();
+        protected IReadOnlyList<FactionsListItem> SelectedFactions => Factions.Where(x => x.IsChecked).ToArray();
 
 
         /// <summary>

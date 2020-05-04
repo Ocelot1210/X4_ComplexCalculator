@@ -89,7 +89,7 @@
                                     ScrollViewer.HorizontalScrollBarVisibility="Visible"
                                     ScrollViewer.VerticalScrollBarVisibility="Visible"
                                     SelectAllContent="全選択"
-                                    SelectedMemberPath="Checked" />
+                                    SelectedMemberPath="IsChecked" />
                             </xcad:LayoutDocument>
                         </xcad:LayoutDocumentPane>
 
@@ -103,7 +103,7 @@
                                     ScrollViewer.HorizontalScrollBarVisibility="Visible"
                                     ScrollViewer.VerticalScrollBarVisibility="Visible"
                                     SelectAllContent="全選択"
-                                    SelectedMemberPath="Checked" />
+                                    SelectedMemberPath="IsChecked" />
                             </xcad:LayoutDocument>
                         </xcad:LayoutDocumentPane>
                     </xcad:LayoutDocumentPaneGroup>
@@ -127,7 +127,7 @@
                                     VirtualizingPanel.IsVirtualizing="False">
                                     <ListBox.ItemContainerStyle>
                                         <Style TargetType="ListBoxItem">
-                                            <Setter Property="IsSelected" Value="{Binding Checked}" />
+                                            <Setter Property="IsSelected" Value="{Binding IsChecked}" />
                                         </Style>
                                     </ListBox.ItemContainerStyle>
                                 </ListBox>

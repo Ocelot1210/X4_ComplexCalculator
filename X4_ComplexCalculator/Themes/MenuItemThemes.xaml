@@ -23,6 +23,8 @@
                     <ColumnDefinition Width="Auto" SharedSizeGroup="MenuItemIGTColumnGroup" />
                     <ColumnDefinition Width="20" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <ContentPresenter
                     x:Name="Icon"
@@ -75,6 +77,16 @@
                     Text="{TemplateBinding InputGestureText}" />
                 <Button
                     Grid.Column="6"
+                    Margin="2"
+                    Command="{Binding SaveButtonClickedCommand, Mode=OneTime}"
+                    Content="💾" />
+                <Button
+                    Grid.Column="7"
+                    Margin="2"
+                    Command="{Binding EditButtonClickedCommand, Mode=OneTime}"
+                    Content="✏" />
+                <Button
+                    Grid.Column="8"
                     Margin="2"
                     Command="{Binding DeleteButtonClickedCommand, Mode=OneTime}"
                     Content="🗑️" />

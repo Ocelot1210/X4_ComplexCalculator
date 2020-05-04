@@ -1,42 +1,43 @@
 ﻿<Window
-    x:Class="X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment.EditPresetName.EditPresetNameWindow"
+    x:Class="X4_ComplexCalculator.Common.Dialog.SelectStringDialog.SelectStringDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment.EquipmentList"
+    xmlns:local="clr-namespace:X4_ComplexCalculator.Common.Dialog.SelectStringDialog"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
-    Title="プリセット名編集"
     Width="400"
-    Height="150"
+    Height="Auto"
     x4bhv:CloseWindowBehavior.Close="{Binding CloseDialogProperty, Mode=OneWay}"
     x4bhv:CloseWindowBehavior.Result="{Binding DialogResult, Mode=OneWay}"
     ResizeMode="NoResize"
+    SizeToContent="Height"
     Style="{StaticResource DefaultWindowBackgroundStyle}"
+    WindowStartupLocation="CenterOwner"
     WindowStyle="ToolWindow"
     mc:Ignorable="d">
 
-    <Grid Margin="5">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="1*" />
-            <RowDefinition Height="1*" />
-            <RowDefinition Height="1*" />
-        </Grid.RowDefinitions>
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding CancelButtonClickedCommand, Mode=OneTime}" Gesture="Esc" />
+    </Window.InputBindings>
 
-        <!--  変更前プリセット名  -->
-        <StackPanel Grid.Row="0">
-            <TextBlock Text="変更前プリセット名" />
-            <TextBox IsReadOnly="True" Text="{Binding OriginalPresetName, Mode=OneTime}" />
-        </StackPanel>
+    <StackPanel
+        Margin="5"
+        FocusManager.FocusedElement="{Binding ElementName=PresetNameTextBox}"
+        Orientation="Vertical">
 
-        <!--  変更後プリセット名  -->
-        <StackPanel Grid.Row="1">
-            <TextBlock Text="変更後プリセット名" />
-            <TextBox x:Name="NewPresetNameTextBox" Text="{Binding NewPresetName, Mode=OneWayToSource}" />
+        <!--  プリセット名  -->
+        <StackPanel>
+            <TextBlock x:Name="DescriptionLabel" />
+            <TextBox x:Name="PresetNameTextBox" Text="{Binding InputString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                <TextBox.InputBindings>
+                    <KeyBinding Command="{Binding OkButtonClickedCommand, Mode=OneTime}" Gesture="Enter" />
+                </TextBox.InputBindings>
+            </TextBox>
         </StackPanel>
 
         <!--  OK/Cancelボタン  -->
-        <DockPanel Grid.Row="2" HorizontalAlignment="Right">
+        <DockPanel HorizontalAlignment="Right">
             <Button
                 Width="75"
                 Height="20"
@@ -51,6 +52,5 @@
                 Command="{Binding CancelButtonClickedCommand, Mode=OneTime}"
                 Content="Cancel" />
         </DockPanel>
-
-    </Grid>
+    </StackPanel>
 </Window>

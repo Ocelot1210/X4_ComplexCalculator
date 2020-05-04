@@ -228,29 +228,25 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid
         /// </summary>
         private void EditEquipment()
         {
-            var window = new EditEquipmentWindow(Module);
-
             // 変更前
             var turretsOld = Module.Equipment.Turret.AllEquipments.Select(x => x.EquipmentID).OrderBy(x => x).ToArray();
             var shieldsOld = Module.Equipment.Shield.AllEquipments.Select(x => x.EquipmentID).OrderBy(x => x).ToArray();
 
+            var window = new EditEquipmentWindow(Module);
+            window.Owner = Application.Current.MainWindow;
             window.ShowDialog();
-
-            // 変更後
-            var turretsNew = Module.Equipment.Turret.AllEquipments.Select(x => x.EquipmentID).OrderBy(x => x).ToArray();
-            var shieldsNew = Module.Equipment.Shield.AllEquipments.Select(x => x.EquipmentID).OrderBy(x => x).ToArray();
 
             bool moduleChanged = false;
 
             // 変更があった場合のみ通知
-            if (!turretsOld.SequenceEqual(turretsNew))
+            if (!turretsOld.SequenceEqual(Module.Equipment.Turret.AllEquipments.Select(x => x.EquipmentID).OrderBy(x => x)))
             {
                 OnPropertyChanged(nameof(TurretsCount));
                 OnPropertyChanged(nameof(TurretsToolTip));
                 moduleChanged = true;
             }
 
-            if (!shieldsOld.SequenceEqual(shieldsNew))
+            if (!shieldsOld.SequenceEqual(Module.Equipment.Shield.AllEquipments.Select(x => x.EquipmentID).OrderBy(x => x)))
             {
                 OnPropertyChanged(nameof(ShieldsCount));
                 OnPropertyChanged(nameof(ShieldsToolTip));

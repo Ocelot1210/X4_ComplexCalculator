@@ -7,6 +7,10 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.WorkArea;
+using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
+using X4_ComplexCalculator.Main.Menu.Layout;
+using X4_ComplexCalculator.Common.Collection;
+using System.Collections.Generic;
 
 namespace X4_ComplexCalculator.Main
 {
@@ -15,6 +19,13 @@ namespace X4_ComplexCalculator.Main
     /// </summary>
     class MainWindowModel
     {
+        #region メンバ
+        /// <summary>
+        /// 現在のレイアウト
+        /// </summary>
+        private LayoutMenuItem _ActiveLayout;
+        #endregion
+
         #region プロパティ
         /// <summary>
         /// ワークエリア一覧
@@ -26,6 +37,33 @@ namespace X4_ComplexCalculator.Main
         /// アクティブなワークスペース
         /// </summary>
         public WorkAreaViewModel ActiveContent { set; get; }
+
+
+        /// <summary>
+        /// レイアウト一覧
+        /// </summary>
+        public ObservablePropertyChangedCollection<LayoutMenuItem> Layouts = new ObservablePropertyChangedCollection<LayoutMenuItem>();
+
+
+        /// <summary>
+        /// 現在のレイアウト
+        /// </summary>
+        private LayoutMenuItem ActiveLayout
+        {
+            get => _ActiveLayout;
+            set
+            {
+                if (ActiveLayout != value)
+                {
+                    _ActiveLayout = value;
+
+                    foreach (var document in Documents)
+                    {
+                        document.SetLayout(_ActiveLayout.LayoutID);
+                    }
+                }
+            }
+        }
         #endregion
 
 
@@ -34,7 +72,103 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         public MainWindowModel()
         {
+            Layouts.CollectionPropertyChanged += Layouts_CollectionPropertyChanged;
+        }
 
+
+        /// <summary>
+        /// レイアウト一覧のプロパティ変更時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Layouts_CollectionPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (!(sender is LayoutMenuItem menuItem))
+            {
+                return;
+            }
+
+
+            switch (e.PropertyName)
+            {
+                // チェック状態
+                case nameof(LayoutMenuItem.IsChecked):
+                    if (menuItem.IsChecked)
+                    {
+                        // プリセットが選択された場合、他のチェックを全部外す
+                        foreach (var layout in Layouts.Where(x => x != menuItem))
+                        {
+                            layout.IsChecked = false;
+                        }
+
+                        ActiveLayout = menuItem;
+                    }
+                    break;
+
+                // 削除されたか
+                case nameof(LayoutMenuItem.IsDeleted):
+                    if (menuItem.IsDeleted)
+                    {
+                        Layouts.Remove(menuItem);
+                        ActiveLayout = null;
+                    }
+                    break;
+
+                // レイアウト上書き保存
+                case nameof(LayoutMenuItem.SaveButtonClickedCommand):
+                    if (ActiveContent != null)
+                    {
+                        ActiveContent.OverwriteSaveLayout(menuItem.LayoutID);
+
+                        MessageBox.Show($"タブ「{ActiveContent.Title}」のレイアウトを「{menuItem.LayoutName}」として上書き保存しました。", "確認", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+
+        /// <summary>
+        /// ウィンドウがロードされた時
+        /// </summary>
+        public void WindowLoaded()
+        {
+            // DB接続開始
+            DBConnection.Open();
+
+            // レイアウト一覧読み込み
+            var layouts = new List<LayoutMenuItem>();
+            DBConnection.CommonDB.ExecQuery("SELECT LayoutID, LayoutName FROM WorkAreaLayouts", (dr, args) =>
+            {
+                layouts.Add(new LayoutMenuItem((long)dr["LayoutID"], (string)dr["LayoutName"]));
+            });
+            Layouts.AddRange(layouts);
+        }
+
+        /// <summary>
+        /// レイアウト保存
+        /// </summary>
+        public void SaveLayout()
+        {
+            if (ActiveContent != null)
+            {
+                var (onOK, layoutName) = SelectStringDialog.ShowDialog("レイアウト名編集", "レイアウト名", "", LayoutMenuItem.IsValidLayoutName);
+                if (onOK)
+                {
+                    var layoutID = ActiveContent.SaveLayout(layoutName);
+
+                    Layouts.Add(new LayoutMenuItem(layoutID, layoutName));
+
+                    MessageBox.Show($"タブ「{ActiveContent.Title}」のレイアウトを「{layoutName}」として保存しました。", "確認", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            else
+            {
+                MessageBox.Show("レイアウト保存対象のタブが選択されていません。\r\n保存対象のタブを選択後、再度実行して下さい。", "確認", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
 
         /// <summary>
@@ -66,7 +200,7 @@ namespace X4_ComplexCalculator.Main
                 Mouse.OverrideCursor = Cursors.Wait;
                 try
                 {
-                    var vm = new WorkAreaViewModel();
+                    var vm = new WorkAreaViewModel(ActiveLayout?.LayoutID ?? -1);
                     vm.LoadFile(dlg.FileName);
                     Documents.Add(vm);
                 }
@@ -89,7 +223,7 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         public void CreateNew()
         {
-            var vm = new WorkAreaViewModel();
+            var vm = new WorkAreaViewModel(ActiveLayout?.LayoutID ?? -1);
             Documents.Add(vm);
             ActiveContent = vm;
         }

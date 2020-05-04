@@ -209,7 +209,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.SelectModule
                 // 非表示になる場合、選択解除(選択解除しないと非表示のモジュールが意図せずモジュール一覧に追加される)
                 if (!ret)
                 {
-                    src.Checked = false;
+                    src.IsChecked = false;
                 }
             }
 

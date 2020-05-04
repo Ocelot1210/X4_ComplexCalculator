@@ -1,8 +1,11 @@
 ﻿using Prism.Commands;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common;
+using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.Main.Menu.Layout;
 using X4_ComplexCalculator.Main.WorkArea;
 using Xceed.Wpf.AvalonDock;
 
@@ -22,9 +25,21 @@ namespace X4_ComplexCalculator.Main
 
         #region プロパティ
         /// <summary>
+        /// Windowがロードされた時
+        /// </summary>
+        public ICommand WindowLoadedCommand { get; }
+
+        /// <summary>
         /// Windowが閉じられる時
         /// </summary>
         public ICommand WindowClosingCommand { get; }
+
+
+        /// <summary>
+        /// レイアウト保存
+        /// </summary>
+        public ICommand SaveLayout { get; }
+
 
         /// <summary>
         /// 新規作成
@@ -82,6 +97,12 @@ namespace X4_ComplexCalculator.Main
                 return _Model.ActiveContent;
             }
         }
+
+
+        /// <summary>
+        /// レイアウト一覧
+        /// </summary>
+        public ObservableCollection<LayoutMenuItem> Layouts => _Model.Layouts;
         #endregion
 
 
@@ -91,8 +112,10 @@ namespace X4_ComplexCalculator.Main
         public MainWindowViewModel()
         {
             _Model                 = new MainWindowModel();
+            WindowLoadedCommand    = new DelegateCommand(_Model.WindowLoaded);
             WindowClosingCommand   = new DelegateCommand<CancelEventArgs>(WindowClosing);
             CreateNewCommand       = new DelegateCommand(CreateNew);
+            SaveLayout             = new DelegateCommand(_Model.SaveLayout);
             SaveCommand            = new DelegateCommand(_Model.Save);
             SaveAsCommand          = new DelegateCommand(_Model.SaveAs);
             OpenCommand            = new DelegateCommand(Open);

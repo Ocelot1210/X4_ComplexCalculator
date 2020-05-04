@@ -8,7 +8,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.SelectModule
         /// <summary>
         /// チェックされたか
         /// </summary>
-        private bool _Checked;
+        private bool _IsChecked;
         #endregion
 
 
@@ -28,10 +28,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.SelectModule
         /// <summary>
         /// チェック状態
         /// </summary>
-        public bool Checked
+        public bool IsChecked
         {
-            get => _Checked;
-            set => SetProperty(ref _Checked, value);
+            get => _IsChecked;
+            set => SetProperty(ref _IsChecked, value);
         }
         #endregion
 
@@ -42,12 +42,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.SelectModule
         /// </summary>
         /// <param name="id">ID</param>
         /// <param name="name">名称</param>
-        /// <param name="checkState">チェック状態</param>
-        public ModulesListItem(string id, string name, bool checkState)
+        /// <param name="isChecked">チェック状態</param>
+        public ModulesListItem(string id, string name, bool isChecked)
         {
             ID = id;
             Name = name;
-            Checked = checkState;
+            IsChecked = isChecked;
         }
     }
 }

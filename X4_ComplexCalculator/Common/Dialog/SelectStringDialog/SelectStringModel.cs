@@ -1,24 +1,17 @@
 ﻿using Prism.Commands;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common;
+using System;
 
-namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment.EditPresetName
+namespace X4_ComplexCalculator.Common.Dialog.SelectStringDialog
 {
     /// <summary>
-    /// プリセット名編集用ViewModel
+    /// 文字列選択ダイアログのModel
     /// </summary>
-    class EditPresetNameViewModel : INotifyPropertyChangedBace
+    class SelectStringDialogModel : INotifyPropertyChangedBace
     {
         #region メンバ
-        /// <summary>
-        /// Model
-        /// </summary>
-        private readonly EditPresetNameModel _Model;
-
         /// <summary>
         /// ダイアログの戻り値
         /// </summary>
@@ -28,6 +21,16 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment.EditPrese
         /// ダイアログを閉じるか
         /// </summary>
         private bool _CloseDialogProperty;
+
+        /// <summary>
+        /// 入力文字列
+        /// </summary>
+        private string _InputString;
+
+        /// <summary>
+        /// 入力が有効か判定する関数
+        /// </summary>
+        private readonly Predicate<string> IsValidInput;
         #endregion
 
 
@@ -37,14 +40,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment.EditPrese
         /// </summary>
         public bool DialogResult
         {
-            get
-            {
-                return _DialogResult;
-            }
-            set
-            {
-                SetProperty(ref _DialogResult, value);
-            }
+            get => _DialogResult;
+            set => SetProperty(ref _DialogResult, value);
         }
 
 
@@ -53,35 +50,21 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment.EditPrese
         /// </summary>
         public bool CloseDialogProperty
         {
-            get
-            {
-                return _CloseDialogProperty;
-            }
-            set
-            {
-                SetProperty(ref _CloseDialogProperty, value);
-            }
+            get => _CloseDialogProperty;
+            set => SetProperty(ref _CloseDialogProperty, value);
         }
 
 
         /// <summary>
-        /// 変更前プリセット名
+        /// 入力文字列
         /// </summary>
-        public string OriginalPresetName => _Model.OrigPresetName;
+        public string InputString
+        {
+            get => _InputString;
+            set => SetProperty(ref _InputString, value);
+        }
 
         
-        /// <summary>
-        /// 変更後プリセット名
-        /// </summary>
-        public string NewPresetName
-        {
-            set
-            {
-                _Model.NewPresetName = value;
-            }
-        }
-
-
         /// <summary>
         /// OKボタンクリック時の処理
         /// </summary>
@@ -98,10 +81,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment.EditPrese
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="origModuleName">変更前プリセット名</param>
-        public EditPresetNameViewModel(string origModuleName)
+        /// <param name="initialString">初期文字列</param>
+        /// <param name="isValidInput">文字列が有効か判定する関数</param>
+        public SelectStringDialogModel(string initialString, Predicate<string> isValidInput)
         {
-            _Model = new EditPresetNameModel(origModuleName);
+            InputString = initialString;
+            IsValidInput = isValidInput;
             OkButtonClickedCommand = new DelegateCommand(OnOkButtonClick);
             CancelButtonClickedCommand = new DelegateCommand(OnCancelButtonClicked);
         }
@@ -112,15 +97,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment.EditPrese
         /// </summary>
         private void OnOkButtonClick()
         {
-            // プリセット名が有効か
-            if (_Model.IsValidPresetName)
+            // 入力が有効ならダイアログを閉じる
+            if (IsValidInput?.Invoke(InputString) ?? true)
             {
                 DialogResult = true;
                 CloseDialogProperty = true;
-            }
-            else
-            {
-                MessageBox.Show("プリセット名が無効です。\r\nプリセット名は空白文字以外の文字が1文字以上必要です。", "確認", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 

@@ -101,9 +101,9 @@ ORDER BY Name", init, "SelectModuleCheckStateTypes");
 
             void init(SQLiteDataReader dr, object[] args)
             {
-                bool @checked = 0 < DBConnection.CommonDB.ExecQuery($"SELECT * FROM SelectModuleCheckStateModuleOwners WHERE ID = '{dr["FactionID"]}'", (_, __) => { });
+                bool isChecked = 0 < DBConnection.CommonDB.ExecQuery($"SELECT * FROM SelectModuleCheckStateModuleOwners WHERE ID = '{dr["FactionID"]}'", (_, __) => { });
 
-                items.Add(new ModulesListItem((string)dr["FactionID"], (string)dr["Name"], @checked));
+                items.Add(new ModulesListItem((string)dr["FactionID"], (string)dr["Name"], isChecked));
             }
 
             DBConnection.X4DB.ExecQuery(@"
@@ -134,8 +134,8 @@ FROM
 	ModuleOwner
 WHERE
 	Module.ModuleID = ModuleOwner.ModuleID AND
-    Module.ModuleTypeID   IN ({string.Join(", ", ModuleTypes.Where(x => x.Checked).Select(x => $"'{x.ID}'"))}) AND
-	ModuleOwner.FactionID IN ({string.Join(", ", ModuleOwners.Where(x => x.Checked).Select(x => $"'{x.ID}'"))})";
+    Module.ModuleTypeID   IN ({string.Join(", ", ModuleTypes.Where(x => x.IsChecked).Select(x => $"'{x.ID}'"))}) AND
+	ModuleOwner.FactionID IN ({string.Join(", ", ModuleOwners.Where(x => x.IsChecked).Select(x => $"'{x.ID}'"))})";
 
             var list = new List<ModulesListItem>();
             DBConnection.X4DB.ExecQuery(query, SetModules, list);
@@ -161,7 +161,7 @@ WHERE
         public void AddSelectedModuleToItemCollection()
         {
             // 選択されているアイテムを追加
-            var items = Modules.Where(x => x.Checked).Select(x => new ModulesGridItem(x.ID));
+            var items = Modules.Where(x => x.IsChecked).Select(x => new ModulesGridItem(x.ID));
             ItemCollection.AddRange(items);
         }
 
@@ -178,13 +178,13 @@ WHERE
             DBConnection.CommonDB.BeginTransaction();
 
             // モジュール種別のチェック状態保存
-            foreach (var id in ModuleTypes.Where(x => x.Checked).Select(x => x.ID))
+            foreach (var id in ModuleTypes.Where(x => x.IsChecked).Select(x => x.ID))
             {
                 DBConnection.CommonDB.ExecQuery($"INSERT INTO SelectModuleCheckStateModuleTypes(ID) VALUES ('{id}')", null);
             }
 
             // 派閥一覧のチェック状態保存
-            foreach (var id in ModuleOwners.Where(x => x.Checked).Select(x => x.ID))
+            foreach (var id in ModuleOwners.Where(x => x.IsChecked).Select(x => x.ID))
             {
                 DBConnection.CommonDB.ExecQuery($"INSERT INTO SelectModuleCheckStateModuleOwners(ID) VALUES ('{id}')", null);
             }
