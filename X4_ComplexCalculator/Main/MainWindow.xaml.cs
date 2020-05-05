@@ -1,6 +1,4 @@
-﻿using System;
-using X4_ComplexCalculator.DB;
-using X4_ComplexCalculator.Main;
+﻿using X4_ComplexCalculator.Main;
 
 namespace X4_ComplexCalculator
 {

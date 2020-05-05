@@ -11,6 +11,7 @@ using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
 using X4_ComplexCalculator.Main.Menu.Layout;
 using X4_ComplexCalculator.Common.Collection;
 using System.Collections.Generic;
+using Xceed.Wpf.AvalonDock;
 
 namespace X4_ComplexCalculator.Main
 {
@@ -56,10 +57,12 @@ namespace X4_ComplexCalculator.Main
                 if (ActiveLayout != value)
                 {
                     _ActiveLayout = value;
-
-                    foreach (var document in Documents)
+                    if (_ActiveLayout != null)
                     {
-                        document.SetLayout(_ActiveLayout.LayoutID);
+                        foreach (var document in Documents)
+                        {
+                            document.SetLayout(_ActiveLayout.LayoutID);
+                        }
                     }
                 }
             }
@@ -103,6 +106,10 @@ namespace X4_ComplexCalculator.Main
 
                         ActiveLayout = menuItem;
                     }
+                    else
+                    {
+                        ActiveLayout = null;
+                    }
                     break;
 
                 // 削除されたか
@@ -120,7 +127,7 @@ namespace X4_ComplexCalculator.Main
                     {
                         ActiveContent.OverwriteSaveLayout(menuItem.LayoutID);
 
-                        MessageBox.Show($"タブ「{ActiveContent.Title}」のレイアウトを「{menuItem.LayoutName}」として上書き保存しました。", "確認", MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show($"計画「{ActiveContent.Title}」のレイアウトを「{menuItem.LayoutName}」として上書き保存しました。", "確認", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                     
                     break;
@@ -141,10 +148,17 @@ namespace X4_ComplexCalculator.Main
 
             // レイアウト一覧読み込み
             var layouts = new List<LayoutMenuItem>();
-            DBConnection.CommonDB.ExecQuery("SELECT LayoutID, LayoutName FROM WorkAreaLayouts", (dr, args) =>
+            DBConnection.CommonDB.ExecQuery("SELECT LayoutID, LayoutName, IsChecked FROM WorkAreaLayouts", (dr, args) =>
             {
-                layouts.Add(new LayoutMenuItem((long)dr["LayoutID"], (string)dr["LayoutName"]));
+                layouts.Add(new LayoutMenuItem((long)dr["LayoutID"], (string)dr["LayoutName"], (long)dr["IsChecked"] == 1));
             });
+
+            var checkedLayout = layouts.Where(x => x.IsChecked).FirstOrDefault();
+            if (checkedLayout != null)
+            {
+                ActiveLayout = checkedLayout;
+            }
+
             Layouts.AddRange(layouts);
         }
 
@@ -160,9 +174,9 @@ namespace X4_ComplexCalculator.Main
                 {
                     var layoutID = ActiveContent.SaveLayout(layoutName);
 
-                    Layouts.Add(new LayoutMenuItem(layoutID, layoutName));
+                    Layouts.Add(new LayoutMenuItem(layoutID, layoutName, false));
 
-                    MessageBox.Show($"タブ「{ActiveContent.Title}」のレイアウトを「{layoutName}」として保存しました。", "確認", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show($"計画「{ActiveContent.Title}」のレイアウトを「{layoutName}」として保存しました。", "確認", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
             else

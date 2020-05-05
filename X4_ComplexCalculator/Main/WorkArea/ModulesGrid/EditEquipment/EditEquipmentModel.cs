@@ -229,14 +229,16 @@ WHERE
                 return;
             }
 
-            var query = $"";
+            var result = MessageBox.Show($"プリセット「{SelectedPreset.Name}」を本当に削除しますか？", "警告", MessageBoxButton.YesNo, MessageBoxImage.Exclamation, MessageBoxResult.No);
+            if (result == MessageBoxResult.OK)
+            {
+                DBConnection.CommonDB.BeginTransaction();
+                DBConnection.CommonDB.ExecQuery($"DELETE FROM ModulePresets WHERE ModuleID = '{_Module.ModuleID}' AND PresetID = {SelectedPreset.ID}");
+                Presets.Remove(SelectedPreset);
+                DBConnection.CommonDB.Commit();
 
-            DBConnection.CommonDB.BeginTransaction();
-            DBConnection.CommonDB.ExecQuery($"DELETE FROM ModulePresets WHERE ModuleID = '{_Module.ModuleID}' AND PresetID = {SelectedPreset.ID}");
-            Presets.Remove(SelectedPreset);
-            DBConnection.CommonDB.Commit();
-
-            SelectedPreset = Presets.FirstOrDefault();
+                SelectedPreset = Presets.FirstOrDefault();
+            }
         }
 
         /// <summary>

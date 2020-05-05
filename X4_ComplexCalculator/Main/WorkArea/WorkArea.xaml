@@ -11,15 +11,18 @@
     xmlns:resGrid="clr-namespace:X4_ComplexCalculator.Main.WorkArea.ResourcesGrid"
     xmlns:storGrid="clr-namespace:X4_ComplexCalculator.Main.WorkArea.StoragesGrid"
     xmlns:stsmry="clr-namespace:X4_ComplexCalculator.Main.WorkArea.StationSummary"
+    xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
     xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
 
+    <UserControl.Resources>
+        <!--  データ中継用  -->
+        <x4cmn:BindingProxy x:Key="ProxyDockingManager" Data="{Binding CurrentDockingManager, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" />
+    </UserControl.Resources>
+
     <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Loaded">
-            <i:InvokeCommandAction Command="{Binding OnLoadedCommand, Mode=OneTime}" CommandParameter="{Binding ElementName=dockingManager}" />
-        </i:EventTrigger>
         <i:EventTrigger EventName="Unloaded">
             <i:InvokeCommandAction Command="{Binding OnUnloadedCommand, Mode=OneTime}" CommandParameter="{Binding ElementName=dockingManager}" />
         </i:EventTrigger>

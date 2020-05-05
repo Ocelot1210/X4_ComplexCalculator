@@ -33,9 +33,9 @@ namespace X4_ComplexCalculator.Main.WorkArea
 
 
         /// <summary>
-        /// ドッキングマネージャー
+        /// 現在のドッキングマネージャー
         /// </summary>
-        private DockingManager _DockingManager;
+        private DockingManager _CurrentDockingManager;
 
 
         /// <summary>
@@ -94,11 +94,36 @@ namespace X4_ComplexCalculator.Main.WorkArea
             }
         }
 
-
         /// <summary>
-        /// ロード時
+        /// 現在のドッキングマネージャー
         /// </summary>
-        public ICommand OnLoadedCommand { get; }
+        public DockingManager CurrentDockingManager
+        {
+            set
+            {
+                if (SetProperty(ref _CurrentDockingManager, value))
+                {
+                    // レイアウトIDが指定されていればレイアウト設定
+                    if (0 <= _LayoutID)
+                    {
+                        SetLayout(_LayoutID);
+                        // 1回ロードしたので次回以降ロードしないようにする
+                        _LayoutID = -1;
+                        return;
+                    }
+
+                    // 前回レイアウトがあれば、レイアウト復元
+                    if (_Layout != null)
+                    {
+                        var serializer = new XmlLayoutSerializer(_CurrentDockingManager);
+
+                        using var ms = new MemoryStream(_Layout, false);
+                        serializer.Deserialize(ms);
+                    }
+                }
+            }
+            private get => _CurrentDockingManager;
+        }
 
 
         /// <summary>
@@ -137,7 +162,6 @@ namespace X4_ComplexCalculator.Main.WorkArea
             Storages    = new StoragesGridViewModel(moduleModel.Modules);
 
             _Model              = new WorkAreaModel(moduleModel, productsModel, resourcesModel);
-            OnLoadedCommand     = new DelegateCommand<DockingManager>(OnLoaded);
             OnUnloadedCommand   = new DelegateCommand(OnUnloaded);
 
             _Model.PropertyChanged += Model_PropertyChanged;
@@ -231,36 +255,7 @@ WHERE
 
             if (_Layout != null)
             {
-                var serializer = new XmlLayoutSerializer(_DockingManager);
-
-                using var ms = new MemoryStream(_Layout, false);
-                serializer.Deserialize(ms);
-            }
-        }
-
-
-        /// <summary>
-        /// ロード時
-        /// </summary>
-        /// <param name="dockingManager"></param>
-        private void OnLoaded(DockingManager dockingManager)
-        {
-            // ロードされるたびにDockingManagerが別物になるっぽいからここで再設定する
-            _DockingManager = dockingManager;
-
-            // レイアウトIDが指定されていればレイアウト設定
-            if (0 <= _LayoutID)
-            {
-                SetLayout(_LayoutID);
-                // 1回ロードしたので次回以降ロードしないようにする
-                _LayoutID = -1;
-                return;
-            }
-
-            // 前回レイアウトがあれば、レイアウト復元
-            if (_Layout != null)
-            {
-                var serializer = new XmlLayoutSerializer(dockingManager);
+                var serializer = new XmlLayoutSerializer(_CurrentDockingManager);
 
                 using var ms = new MemoryStream(_Layout, false);
                 serializer.Deserialize(ms);
@@ -275,7 +270,7 @@ WHERE
         private byte[] GetCurrentLayout()
         {
             // レイアウト保存
-            var serializer = new XmlLayoutSerializer(_DockingManager);
+            var serializer = new XmlLayoutSerializer(_CurrentDockingManager);
             using var ms = new MemoryStream();
             serializer.Serialize(ms);
             ms.Position = 0;

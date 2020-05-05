@@ -72,7 +72,13 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
         public bool IsChecked
         {
             get => _IsChecked;
-            set => SetProperty(ref _IsChecked, value);
+            set
+            {
+                if (SetProperty(ref _IsChecked, value))
+                {
+                    DBConnection.CommonDB.ExecQuery($"UPDATE WorkAreaLayouts SET IsChecked = {(IsChecked? 1 : 0)} WHERE LayoutID = {LayoutID}");
+                }
+            }
         }
 
         /// <summary>
@@ -91,10 +97,12 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
         /// </summary>
         /// <param name="layoutID">レイアウトID</param>
         /// <param name="layoutName">レイアウト名</param>
-        public LayoutMenuItem(long layoutID, string layoutName)
+        /// <param name="isChecked">チェックされているか</param>
+        public LayoutMenuItem(long layoutID, string layoutName, bool isChecked)
         {
             LayoutID = layoutID;
             LayoutName = layoutName;
+            IsChecked = isChecked;
             SaveButtonClickedCommand    = new DelegateCommand(SaveLayout);
             EditButtonClickedCommand    = new DelegateCommand(EditLayoutName);
             DeleteButtonClickedCommand  = new DelegateCommand(DeleteLayout);
@@ -136,7 +144,7 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
         /// </summary>
         private void DeleteLayout()
         {
-            var result = MessageBox.Show($"レイアウト「{LayoutName}」を本当に削除しますか？", "警告", MessageBoxButton.YesNo, MessageBoxImage.Exclamation);
+            var result = MessageBox.Show($"レイアウト「{LayoutName}」を本当に削除しますか？", "警告", MessageBoxButton.YesNo, MessageBoxImage.Exclamation, MessageBoxResult.No);
 
             if (result == MessageBoxResult.Yes)
             {
