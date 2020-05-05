@@ -316,12 +316,13 @@ SELECT
     WareEffect.Product AS Efficiency,
 	CAST(Amount * :count * (3600 / WareProduction.Time) AS INTEGER) AS Amount,
     :count AS Count,
-    :moduleID AS ModuleID
+    ModuleProduct.ModuleID
     
 FROM
     WareProduction,
 	WareEffect,
 	ModuleProduct
+
 WHERE
 	WareProduction.WareID  = WareEffect.WareID AND
 	WareProduction.WareID  = ModuleProduct.WareID AND 
@@ -349,33 +350,7 @@ UNION ALL
 SELECT
 	NeedWareID  AS 'WareID',
     -1.0        AS Efficiency,
-	:count * CAST(-3600 / 
-	(
-	SELECT
-		Time
-	FROM
-		ModuleProduct,
-		WareProduction
-	WHERE
-		ModuleProduct.ModuleID  = :moduleID AND
-		ModuleProduct.WareID    = WareProduction.WareID AND
-		WareProduction.Method   =
-		CASE
-			WHEN ModuleProduct.Method IN
-            (
-				SELECT
-					WareProduction.Method
-				FROM
-					ModuleProduct,
-					WareProduction
-				WHERE
-					ModuleProduct.ModuleID = :moduleID AND
-					ModuleProduct.WareID   = WareProduction.WareID AND
-					ModuleProduct.Method   = WareProduction.Method
-			)THEN ModuleProduct.Method
-			ELSE 'default'
-		End
-	) * WareResource.Amount AS INTEGER) AS Amount,
+	:count * CAST(-3600 / WareProduction.Time * WareResource.Amount AS INTEGER) AS Amount,
     :count      AS Count,
     :moduleID   AS ModuleID
 FROM

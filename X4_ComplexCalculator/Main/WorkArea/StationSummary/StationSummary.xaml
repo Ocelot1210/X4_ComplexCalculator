@@ -70,9 +70,8 @@
                 <GroupStyle>
                     <GroupStyle.HeaderTemplate>
                         <DataTemplate>
-                            <StackPanel Background="LightBlue">
+                            <StackPanel Background="LightCyan">
                                 <TextBlock FontWeight="Bold" Text="{Binding Name}" />
-                                <Rectangle Height="1" Fill="Blue" />
                             </StackPanel>
                         </DataTemplate>
                     </GroupStyle.HeaderTemplate>
@@ -87,8 +86,8 @@
                         Header="ウェア名"
                         SortTargetPropertyName="WareName" />
 
-                    <!--  必要個数  -->
-                    <DataGridInline:InlineGridViewColumn Header="必要個数" SortTargetPropertyName="NeedAmount">
+                    <!--  必要数  -->
+                    <DataGridInline:InlineGridViewColumn Header="必要数" SortTargetPropertyName="NeedAmount">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding NeedAmount, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
@@ -96,8 +95,8 @@
                         </GridViewColumn.CellTemplate>
                     </DataGridInline:InlineGridViewColumn>
 
-                    <!--  生産個数  -->
-                    <DataGridInline:InlineGridViewColumn Header="生産個数" SortTargetPropertyName="ProductionAmount">
+                    <!--  生産数  -->
+                    <DataGridInline:InlineGridViewColumn Header="生産数" SortTargetPropertyName="ProductionAmount">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding ProductionAmount, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
