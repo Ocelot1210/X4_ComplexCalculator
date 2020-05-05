@@ -38,36 +38,14 @@
 
         <Menu Grid.Row="0">
             <!--  表示(V)  -->
-            <MenuItem Header="表示(_V)">
-                <!--  モジュール一覧  -->
-                <MenuItem
-                    Header="{Binding Title, Mode=OneTime, ElementName=_Modules}"
-                    IsCheckable="True"
-                    IsChecked="{Binding IsVisible, ElementName=_Modules}" />
-
-                <!--  概要  -->
-                <MenuItem
-                    Header="{Binding Title, Mode=OneTime, ElementName=_Summary}"
-                    IsCheckable="True"
-                    IsChecked="{Binding IsVisible, ElementName=_Summary}" />
-
-                <!--  製品  -->
-                <MenuItem
-                    Header="{Binding Title, Mode=OneTime, ElementName=_Products}"
-                    IsCheckable="True"
-                    IsChecked="{Binding IsVisible, ElementName=_Products}" />
-
-                <!--  建造リソース  -->
-                <MenuItem
-                    Header="{Binding Title, Mode=OneTime, ElementName=_Resources}"
-                    IsCheckable="True"
-                    IsChecked="{Binding IsVisible, ElementName=_Resources}" />
-
-                <!--  保管庫  -->
-                <MenuItem
-                    Header="{Binding Title, Mode=OneTime, ElementName=_Storages}"
-                    IsCheckable="True"
-                    IsChecked="{Binding IsVisible, ElementName=_Storages}" />
+            <MenuItem Header="表示(_V)" ItemsSource="{Binding VisiblityMenuItems}">
+                <MenuItem.ItemContainerStyle>
+                    <Style TargetType="{x:Type MenuItem}">
+                        <Setter Property="MenuItem.Header" Value="{Binding Title, Mode=OneTime}" />
+                        <Setter Property="MenuItem.IsChecked" Value="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <Setter Property="MenuItem.IsCheckable" Value="True" />
+                    </Style>
+                </MenuItem.ItemContainerStyle>
             </MenuItem>
         </Menu>
 

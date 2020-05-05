@@ -11,6 +11,10 @@ using X4_ComplexCalculator.Main.WorkArea.StationSummary;
 using X4_ComplexCalculator.Main.WorkArea.StoragesGrid;
 using Xceed.Wpf.AvalonDock;
 using Xceed.Wpf.AvalonDock.Layout.Serialization;
+using Xceed.Wpf.AvalonDock.Layout;
+using System.Linq;
+using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Main.WorkArea.Menu.View;
 
 namespace X4_ComplexCalculator.Main.WorkArea
 {
@@ -46,6 +50,12 @@ namespace X4_ComplexCalculator.Main.WorkArea
 
 
         #region プロパティ
+        /// <summary>
+        /// 表示/非表示用メニューアイテム一覧
+        /// </summary>
+        public ObservableRangeCollection<VisiblityMenuItem> VisiblityMenuItems { get; } = new ObservableRangeCollection<VisiblityMenuItem>();
+
+
         /// <summary>
         /// モジュール一覧
         /// </summary>
@@ -120,6 +130,8 @@ namespace X4_ComplexCalculator.Main.WorkArea
                         using var ms = new MemoryStream(_Layout, false);
                         serializer.Deserialize(ms);
                     }
+
+                    VisiblityMenuItems.Reset(_CurrentDockingManager.Layout.Descendents().OfType<LayoutAnchorable>().Select(x => new VisiblityMenuItem(x)));
                 }
             }
             private get => _CurrentDockingManager;
