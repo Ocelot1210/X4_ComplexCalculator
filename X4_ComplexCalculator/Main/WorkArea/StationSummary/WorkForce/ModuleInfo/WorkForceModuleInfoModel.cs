@@ -1,16 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.WorkArea.ModulesGrid;
-using System.ComponentModel;
 
-namespace X4_ComplexCalculator.Main.WorkArea.StationSummary.WorkForce
+namespace X4_ComplexCalculator.Main.WorkArea.StationSummary.WorkForce.ModuleInfo
 {
-    class WorkForceModel : INotifyPropertyChangedBace
+    class WorkForceModuleInfoModel : INotifyPropertyChangedBace
     {
         #region メンバ
         /// <summary>
@@ -34,7 +33,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StationSummary.WorkForce
         /// <summary>
         /// 労働力の詳細情報
         /// </summary>
-        public ObservableRangeCollection<WorkForceDetailsItem> WorkForceDetails { get; private set; } = new ObservableRangeCollection<WorkForceDetailsItem>();
+        public ObservableRangeCollection<WorkForceModuleInfoDetailsItem> WorkForceDetails { get; private set; } = new ObservableRangeCollection<WorkForceModuleInfoDetailsItem>();
 
         /// <summary>
         /// 必要な労働者数
@@ -61,7 +60,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StationSummary.WorkForce
         /// コンストラクタ
         /// </summary>
         /// <param name="moduleGridModel">モジュール一覧のModel</param>
-        public WorkForceModel(ObservablePropertyChangedCollection<ModulesGridItem> modules)
+        public WorkForceModuleInfoModel(ObservablePropertyChangedCollection<ModulesGridItem> modules)
         {
             Modules = modules;
             Modules.CollectionChangedAsync += OnModulesChanged;
@@ -154,7 +153,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StationSummary.WorkForce
 
             var details = Modules.Where(x => 0 < x.Module.MaxWorkers || 0 < x.Module.WorkersCapacity)
                                  .GroupBy(x => x.Module.ModuleID)
-                                 .Select(x => new WorkForceDetailsItem(x.First().Module, x.Sum(y => y.ModuleCount)))
+                                 .Select(x => new WorkForceModuleInfoDetailsItem(x.First().Module, x.Sum(y => y.ModuleCount)))
                                  .OrderBy(x => x.ModuleName);
 
             // 値を更新

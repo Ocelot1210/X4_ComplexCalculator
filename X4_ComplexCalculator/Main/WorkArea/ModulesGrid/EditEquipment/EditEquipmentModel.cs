@@ -189,9 +189,12 @@ WHERE
         /// </summary>
         public void AddPreset()
         {
-            var id = 0L;
+            var (onOK, presetName) = SelectStringDialog.ShowDialog("プリセット名編集", "プリセット名", "", IsValidPresetName);
+            if (onOK)
+            {
+                var id = 0L;
 
-            var query = @$"
+                var query = @$"
 SELECT
     ifnull(MIN( PresetID + 1 ), 0) AS PresetID
 FROM
@@ -200,14 +203,11 @@ WHERE
 	ModuleID = '{_Module.ModuleID}' AND
     ( PresetID + 1 ) NOT IN ( SELECT PresetID FROM ModulePresets WHERE ModuleID = '{_Module.ModuleID}')";
 
-            DBConnection.CommonDB.ExecQuery(query, (SQLiteDataReader dr, object[] args) =>
-            {
-                id = (long)dr["PresetID"];
-            });
+                DBConnection.CommonDB.ExecQuery(query, (SQLiteDataReader dr, object[] args) =>
+                {
+                    id = (long)dr["PresetID"];
+                });
 
-            var (onOK, presetName) = SelectStringDialog.ShowDialog("プリセット名編集", "プリセット名", "", IsValidPresetName);
-            if (!string.IsNullOrEmpty(presetName))
-            {
                 var item = new PresetComboboxItem(id, presetName);
 
                 DBConnection.CommonDB.BeginTransaction();
@@ -230,7 +230,7 @@ WHERE
             }
 
             var result = MessageBox.Show($"プリセット「{SelectedPreset.Name}」を本当に削除しますか？", "警告", MessageBoxButton.YesNo, MessageBoxImage.Exclamation, MessageBoxResult.No);
-            if (result == MessageBoxResult.OK)
+            if (result == MessageBoxResult.Yes)
             {
                 DBConnection.CommonDB.BeginTransaction();
                 DBConnection.CommonDB.ExecQuery($"DELETE FROM ModulePresets WHERE ModuleID = '{_Module.ModuleID}' AND PresetID = {SelectedPreset.ID}");

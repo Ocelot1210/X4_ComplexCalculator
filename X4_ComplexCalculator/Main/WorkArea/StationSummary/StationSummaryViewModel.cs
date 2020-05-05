@@ -2,13 +2,15 @@
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.WorkArea.ModulesGrid;
-using X4_ComplexCalculator.Main.WorkArea.StationSummary.WorkForce;
 using X4_ComplexCalculator.Main.WorkArea.StationSummary.Profit;
 using X4_ComplexCalculator.Main.WorkArea.ProductsGrid;
 using X4_ComplexCalculator.Main.WorkArea.ResourcesGrid;
 using System.ComponentModel;
 using X4_ComplexCalculator.Main.WorkArea.StationSummary.BuildingCost;
 using System.Windows;
+using X4_ComplexCalculator.Main.WorkArea.StationSummary.WorkForce.ModuleInfo;
+using X4_ComplexCalculator.Main.WorkArea.StationSummary.WorkForce.NeedWareInfo;
+using System.Windows.Data;
 
 namespace X4_ComplexCalculator.Main.WorkArea.StationSummary
 {
@@ -18,7 +20,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.StationSummary
         /// <summary>
         /// 労働力用Model
         /// </summary>
-        private readonly WorkForceModel _WorkForceModel;
+        private readonly WorkForceModuleInfoModel _WorkForceModuleInfoModel;
+
+        /// <summary>
+        /// 必要ウェア用Model
+        /// </summary>
+        private readonly NeedWareInfoModel _NeedWareInfoModel;
 
         /// <summary>
         /// 利益用Model
@@ -36,17 +43,22 @@ namespace X4_ComplexCalculator.Main.WorkArea.StationSummary
         /// <summary>
         /// 現在の労働力
         /// </summary>
-        public long WorkForce => _WorkForceModel.WorkForce;
+        public long WorkForce => _WorkForceModuleInfoModel.WorkForce;
 
         /// <summary>
         /// 必要労働力
         /// </summary>
-        public long NeedWorkforce => _WorkForceModel.NeedWorkforce;
+        public long NeedWorkforce => _WorkForceModuleInfoModel.NeedWorkforce;
 
         /// <summary>
-        /// 労働力情報詳細
+        /// 労働力関連モジュール情報
         /// </summary>
-        public ObservableCollection<WorkForceDetailsItem> WorkforceDetails => _WorkForceModel.WorkForceDetails;
+        public ObservableCollection<WorkForceModuleInfoDetailsItem> WorkforceModuleDetails => _WorkForceModuleInfoModel.WorkForceDetails;
+
+        /// <summary>
+        /// 必要ウェア情報
+        /// </summary>
+        public ListCollectionView WorkforceNeedWareCollectionView { get; }
         #endregion
 
 
@@ -84,24 +96,100 @@ namespace X4_ComplexCalculator.Main.WorkArea.StationSummary
         /// <param name="resources">建造に必要なリソース一覧</param>
         public StationSummaryViewModel(ObservablePropertyChangedCollection<ModulesGridItem> modules, ObservablePropertyChangedCollection<ProductsGridItem> products, ObservablePropertyChangedCollection<ResourcesGridItem> resources)
         {
-            _WorkForceModel = new WorkForceModel(modules);
-            _WorkForceModel.PropertyChanged += ModelPropertyChanged;
+            // 労働力関係初期化
+            {
+                _WorkForceModuleInfoModel = new WorkForceModuleInfoModel(modules);
+                _WorkForceModuleInfoModel.PropertyChanged += WorkForceModuleInfo_PropertyChanged;
+            }
 
-            _ProfitModel = new ProfitModel(products);
-            _ProfitModel.PropertyChanged += ModelPropertyChanged;
+            {
+                _NeedWareInfoModel = new NeedWareInfoModel(products);
 
-            _BuildingCostModel = new BuildingCostModel(resources);
-            _BuildingCostModel.PropertyChanged += ModelPropertyChanged;
+                WorkforceNeedWareCollectionView = (ListCollectionView)CollectionViewSource.GetDefaultView(_NeedWareInfoModel.NeedWareInfoDetails);
+                WorkforceNeedWareCollectionView.SortDescriptions.Clear();
+                WorkforceNeedWareCollectionView.SortDescriptions.Add(new SortDescription(nameof(NeedWareInfoDetailsItem.Method), ListSortDirection.Ascending));
+                WorkforceNeedWareCollectionView.SortDescriptions.Add(new SortDescription(nameof(NeedWareInfoDetailsItem.WareName), ListSortDirection.Ascending));
+                WorkforceNeedWareCollectionView.GroupDescriptions.Clear();
+
+                var grp = new NeedWareInfoGroupDescription();
+                grp.PropertyName = nameof(NeedWareInfoDetailsItem.Method);
+                WorkforceNeedWareCollectionView.GroupDescriptions.Add(grp);
+            }
+
+
+            // 損益関係初期化
+            {
+                _ProfitModel = new ProfitModel(products);
+                _ProfitModel.PropertyChanged += ProfitModel_PropertyChanged;
+            }
+
+
+            // 建造コスト関係初期化
+            {
+                _BuildingCostModel = new BuildingCostModel(resources);
+                _BuildingCostModel.PropertyChanged += BuildingCostModel_PropertyChanged;
+            }
         }
 
+
         /// <summary>
-        /// Modelのプロパティ変更時
+        /// 労働力関連モジュール情報用Modelのプロパティ変更時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ModelPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void WorkForceModuleInfo_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            OnPropertyChanged(e.PropertyName);
+            switch (e.PropertyName)
+            {
+                case nameof(WorkForceModuleInfoModel.NeedWorkforce):
+                    OnPropertyChanged(nameof(NeedWorkforce));
+                    _NeedWareInfoModel.NeedWorkforce = _WorkForceModuleInfoModel.NeedWorkforce;
+                    break;
+
+                case nameof(WorkForceModuleInfoModel.WorkForce):
+                    OnPropertyChanged(nameof(WorkForce));
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// 損益情報用Modelのプロパティ変更時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ProfitModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(ProfitModel.Profit):
+                    OnPropertyChanged(nameof(Profit));
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+
+        /// <summary>
+        /// 建造コスト用Modelのプロパティ変更時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BuildingCostModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(BuildingCostModel.BuildingCost):
+                    OnPropertyChanged(nameof(BuildingCost));
+                    break;
+
+                default:
+                    break;
+            }
         }
 
 
@@ -110,11 +198,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.StationSummary
         /// </summary>
         public void Dispose()
         {
-            _WorkForceModel.PropertyChanged -= ModelPropertyChanged;
-            _ProfitModel.PropertyChanged -= ModelPropertyChanged;
-            _BuildingCostModel.PropertyChanged -= ModelPropertyChanged;
+            _WorkForceModuleInfoModel.PropertyChanged   -= WorkForceModuleInfo_PropertyChanged;
+            _ProfitModel.PropertyChanged                -= ProfitModel_PropertyChanged;
+            _BuildingCostModel.PropertyChanged          -= BuildingCostModel_PropertyChanged;
 
-            _WorkForceModel.Dispose();
+            _WorkForceModuleInfoModel.Dispose();
+            _NeedWareInfoModel.Dispose();
             _ProfitModel.Dispose();
             _BuildingCostModel.Dispose();
         }

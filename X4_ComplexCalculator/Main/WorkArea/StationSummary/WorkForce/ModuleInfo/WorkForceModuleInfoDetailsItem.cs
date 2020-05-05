@@ -1,12 +1,12 @@
 ﻿using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB.X4DB;
 
-namespace X4_ComplexCalculator.Main.WorkArea.StationSummary.WorkForce
+namespace X4_ComplexCalculator.Main.WorkArea.StationSummary.WorkForce.ModuleInfo
 {
     /// <summary>
     /// 労働力用ListVierのアイテム
     /// </summary>
-    class WorkForceDetailsItem : INotifyPropertyChangedBace
+    class WorkForceModuleInfoDetailsItem : INotifyPropertyChangedBace
     {
         #region メンバ
         /// <summary>
@@ -74,7 +74,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StationSummary.WorkForce
         /// </summary>
         /// <param name="module">モジュールオブジェクト</param>
         /// <param name="moduleCount">モジュール数</param>
-        public WorkForceDetailsItem(Module module, long moduleCount)
+        public WorkForceModuleInfoDetailsItem(Module module, long moduleCount)
         {
             ModuleID = module.ModuleID;
             ModuleName = module.Name;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Linq;
 
 namespace X4_ComplexCalculator.Common.Dialog.SelectStringDialog
 {
@@ -37,7 +38,8 @@ namespace X4_ComplexCalculator.Common.Dialog.SelectStringDialog
         {
             var wnd = new SelectStringDialog(title, description, initialString, isValidInput);
 
-            wnd.Owner = Application.Current.MainWindow;
+            wnd.Owner = Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive) ?? Application.Current.MainWindow;
+
             var onOk = wnd.ShowDialog() == true;
 
             return (onOk, wnd.PresetNameTextBox.Text);
