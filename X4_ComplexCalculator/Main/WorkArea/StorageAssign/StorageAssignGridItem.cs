@@ -1,14 +1,14 @@
-﻿using System;
-using X4_ComplexCalculator.Common;
-using X4_ComplexCalculator.DB.X4DB;
+﻿using Prism.Mvvm;
+using System;
 using System.ComponentModel;
+using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.StorageAssign
 {
     /// <summary>
     /// 保管庫割当用Gridの1レコード分
     /// </summary>
-    class StorageAssignGridItem : INotifyPropertyChangedBace, IDisposable
+    class StorageAssignGridItem : BindableBase, IDisposable
     {
         #region メンバ
         /// <summary>
@@ -74,12 +74,24 @@ namespace X4_ComplexCalculator.Main.WorkArea.StorageAssign
             get => _AllocCount;
             set
             {
+                var prevCount = _AllocCount;
+
                 if (SetProperty(ref _AllocCount, value))
                 {
-                    OnPropertyChanged(nameof(AllocCapacity));
+                    RaisePropertyChanged(nameof(AllocCapacity));
+                    RaisePropertyChanged(nameof(StorageStatus));
+                    _CapacityInfo.UsedCapacity += (value - prevCount) * Volume;
                 }
             }
         }
+
+
+        /// <summary>
+        /// 保管庫状態
+        /// </summary>
+        public int StorageStatus => (AfterCount < 0) ? -1 :
+                                    (AfterCount <= AllocCount) ? 0 : 1;
+
 
         /// <summary>
         /// 割当容量
@@ -88,7 +100,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.StorageAssign
 
 
         /// <summary>
-        /// 割当可能容量
+        /// 割当可能容量最大
+        /// </summary>
+        public long MaxAllocableCount => (_CapacityInfo.FreeCapacity + AllocCapacity) / Volume;
+
+
+        /// <summary>
+        /// 残り割当可能容量
         /// </summary>
         public long AllocableCount => _CapacityInfo.FreeCapacity / Volume;
 
@@ -103,7 +121,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.StorageAssign
             {
                 if (SetProperty(ref _ProductPerHour, value))
                 {
-                    OnPropertyChanged(nameof(AfterCount));
+                    RaisePropertyChanged(nameof(AfterCount));
+                    RaisePropertyChanged(nameof(StorageStatus));
                 }
             }
         }
@@ -119,7 +138,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.StorageAssign
             {
                 if (SetProperty(ref _Hour, value))
                 {
-                    OnPropertyChanged(nameof(AfterCount));
+                    RaisePropertyChanged(nameof(AfterCount));
+                    RaisePropertyChanged(nameof(StorageStatus));
                 }
             }
         }
@@ -166,7 +186,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.StorageAssign
             switch (e.PropertyName)
             {
                 case nameof(StorageCapacityInfo.FreeCapacity):
-                    OnPropertyChanged(nameof(AllocableCount));
+                    RaisePropertyChanged(nameof(AllocableCount));
+                    RaisePropertyChanged(nameof(MaxAllocableCount));
                     break;
 
                 default:

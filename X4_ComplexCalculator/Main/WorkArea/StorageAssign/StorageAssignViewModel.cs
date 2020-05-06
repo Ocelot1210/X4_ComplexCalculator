@@ -1,25 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Prism.Mvvm;
+using System;
+using System.ComponentModel;
 using System.Windows.Data;
-using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.WorkArea.ProductsGrid;
 using X4_ComplexCalculator.Main.WorkArea.StoragesGrid;
-using System.ComponentModel;
 
 namespace X4_ComplexCalculator.Main.WorkArea.StorageAssign
 {
     /// <summary>
     /// 保管庫割当用ViewModel
     /// </summary>
-    class StorageAssignViewModel : INotifyPropertyChangedBace, IDisposable
+    class StorageAssignViewModel : BindableBase, IDisposable
     {
         #region メンバ
         /// <summary>
         /// 保管庫割当用Model
         /// </summary>
-        StorageAssignModel _Model;
+        readonly StorageAssignModel _Model;
         #endregion
 
         #region プロパティ
@@ -43,11 +41,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.StorageAssign
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="products">製品一覧</param>
-        /// <param name="storages">保管庫情報</param>
-        public StorageAssignViewModel(ObservablePropertyChangedCollection<ProductsGridItem> products, ObservablePropertyChangedCollection<StoragesGridItem> storages)
+        /// <param name="model">保管庫割当Model</param>
+        public StorageAssignViewModel(StorageAssignModel model)
         {
-            _Model = new StorageAssignModel(products, storages);
+            _Model = model;
 
             StorageAssignInfo = (ListCollectionView)CollectionViewSource.GetDefaultView(_Model.StorageAssignGridItems);
             StorageAssignInfo.SortDescriptions.Clear();

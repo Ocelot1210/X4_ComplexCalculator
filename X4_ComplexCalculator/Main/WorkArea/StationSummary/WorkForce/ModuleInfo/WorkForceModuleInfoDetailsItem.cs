@@ -1,4 +1,4 @@
-﻿using X4_ComplexCalculator.Common;
+﻿using Prism.Mvvm;
 using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.StationSummary.WorkForce.ModuleInfo
@@ -6,7 +6,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StationSummary.WorkForce.ModuleInfo
     /// <summary>
     /// 労働力用ListVierのアイテム
     /// </summary>
-    class WorkForceModuleInfoDetailsItem : INotifyPropertyChangedBace
+    class WorkForceModuleInfoDetailsItem : BindableBase    
     {
         #region メンバ
         /// <summary>
@@ -38,7 +38,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StationSummary.WorkForce.ModuleInfo
             {
                 if (SetProperty(ref _ModuleCount, value))
                 {
-                    OnPropertyChanged(nameof(TotalWorkforce));
+                    RaisePropertyChanged(nameof(TotalWorkforce));
                 }
             }
         }

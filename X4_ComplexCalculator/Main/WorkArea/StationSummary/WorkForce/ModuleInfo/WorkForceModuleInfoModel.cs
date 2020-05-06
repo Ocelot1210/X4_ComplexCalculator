@@ -1,15 +1,15 @@
-﻿using System;
+﻿using Prism.Mvvm;
+using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
-using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.WorkArea.ModulesGrid;
 
 namespace X4_ComplexCalculator.Main.WorkArea.StationSummary.WorkForce.ModuleInfo
 {
-    class WorkForceModuleInfoModel : INotifyPropertyChangedBace
+    class WorkForceModuleInfoModel : BindableBase
     {
         #region メンバ
         /// <summary>

@@ -1,20 +1,17 @@
 ﻿using Prism.Commands;
-using System.Collections.ObjectModel;
-using System.Windows.Controls;
-using X4_ComplexCalculator.Common;
-using System.Linq;
-using System.Windows.Input;
-using System.Windows.Data;
+using Prism.Mvvm;
 using System.ComponentModel;
-using X4_ComplexCalculator.Main.WorkArea.ModulesGrid;
-using X4_ComplexCalculator.DB.X4DB;
+using System.Linq;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Input;
 
 namespace X4_ComplexCalculator.Main.WorkArea.ProductsGrid
 {
     /// <summary>
     /// 製品一覧用DataGridViewのViewModel
     /// </summary>
-    class ProductsGridViewModel : INotifyPropertyChangedBace
+    class ProductsGridViewModel : BindableBase
     {
         #region メンバ
         /// <summary>
@@ -51,7 +48,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ProductsGrid
                     product.SetUnitPricePercent(_UnitPricePercent);
                 }
                 
-                OnPropertyChanged();
+                RaisePropertyChanged();
             }
         }
 

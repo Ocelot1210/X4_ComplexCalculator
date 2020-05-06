@@ -1,11 +1,11 @@
-﻿using X4_ComplexCalculator.Common;
+﻿using Prism.Mvvm;
 
 namespace X4_ComplexCalculator.Main.WorkArea.StorageAssign
 {
     /// <summary>
     /// 保管庫容量情報
     /// </summary>
-    class StorageCapacityInfo : INotifyPropertyChangedBace
+    class StorageCapacityInfo : BindableBase
     {
         #region メンバ
         /// <summary>
@@ -31,7 +31,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StorageAssign
             {
                 if (SetProperty(ref _TotalCapacity, value))
                 {
-                    OnPropertyChanged(nameof(FreeCapacity));
+                    RaisePropertyChanged(nameof(FreeCapacity));
                 }
             }
         }
@@ -46,7 +46,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StorageAssign
             {
                 if (SetProperty(ref _UsedCapacity, value))
                 {
-                    OnPropertyChanged(nameof(FreeCapacity));
+                    RaisePropertyChanged(nameof(FreeCapacity));
                 }
             }
         }

@@ -25,32 +25,52 @@
         x4bhv:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
         IsReadOnly="False"
         ItemsSource="{Binding BuildResourceView, Mode=OneTime}"
+        RowHeight="25"
         SelectionUnit="Cell"
         Style="{StaticResource DefaultDataGridStyle}">
         <DataGrid.Columns>
 
             <!--  建造に必要なウェア  -->
-            <DataGridTextColumn
-                Binding="{Binding Ware.Name, Mode=OneTime}"
+            <DataGridTemplateColumn
+                ClipboardContentBinding="{Binding Ware.Name, Mode=OneTime}"
                 Header="建造に必要なウェア"
-                IsReadOnly="True" />
+                SortMemberPath="Ware.Name">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <TextBlock VerticalAlignment="Center" Text="{Binding Ware.Name, Mode=OneTime}" />
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+
 
             <!--  個数  -->
-            <DataGridTextColumn
-                Binding="{Binding Amount, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}"
-                CellStyle="{StaticResource RightAlignedDataGridCell}"
+            <DataGridTemplateColumn
+                ClipboardContentBinding="{Binding Amount, Mode=OneTime}"
                 Header="個数"
-                IsReadOnly="True" />
+                SortMemberPath="Amount">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <TextBlock VerticalAlignment="Center" Text="{Binding Amount, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" />
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+
 
             <!--  金額  -->
-            <DataGridTextColumn
-                Binding="{Binding Price, StringFormat='{}{0:N0} cr', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                CellStyle="{StaticResource RightAlignedDataGridCell}"
+            <DataGridTemplateColumn
+                ClipboardContentBinding="{Binding Price, Mode=OneTime}"
                 Header="金額"
-                IsReadOnly="True" />
+                SortMemberPath="Price">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <TextBlock VerticalAlignment="Center" Text="{Binding Price, Mode=OneWay, StringFormat='{}{0:N0} cr', UpdateSourceTrigger=PropertyChanged}" />
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+
 
             <!--  単価  -->
-            <DataGridTemplateColumn
+            <x4cmn:MouseHoverEditCellColumn
                 ClipboardContentBinding="{Binding UnitPrice, Mode=OneTime}"
                 Header="単価"
                 SortMemberPath="UnitPrice">
@@ -58,6 +78,7 @@
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
                         <TextBlock
+                            VerticalAlignment="Center"
                             Text="{Binding UnitPrice, StringFormat='{}{0:N0} cr', Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                             TextAlignment="Right"
                             TextDecorations="Underline" />
@@ -72,10 +93,10 @@
                             FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
                             Maximum="{Binding Ware.MaxPrice}"
                             Minimum="{Binding Ware.MinPrice}"
-                            Value="{Binding UnitPrice, Mode=TwoWay}" />
+                            Value="{Binding UnitPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </DataTemplate>
                 </DataGridTemplateColumn.CellEditingTemplate>
-            </DataGridTemplateColumn>
+            </x4cmn:MouseHoverEditCellColumn>
 
 
             <!--  単価(スライダー)  -->
@@ -108,6 +129,7 @@
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
                         <Slider
+                            VerticalContentAlignment="Center"
                             Maximum="{Binding Ware.MaxPrice}"
                             Minimum="{Binding Ware.MinPrice}"
                             Value="{Binding UnitPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />

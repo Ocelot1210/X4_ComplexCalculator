@@ -1,11 +1,11 @@
-﻿using X4_ComplexCalculator.Common;
+﻿using Prism.Mvvm;
 
 namespace X4_ComplexCalculator.Main.WorkArea.StationSummary.Profit
 {
     /// <summary>
     /// 利益詳細表示用ListViewのアイテム
     /// </summary>
-    class ProfitDetailsItem : INotifyPropertyChangedBace
+    class ProfitDetailsItem : BindableBase    
     {
         #region メンバ
         /// <summary>
@@ -38,7 +38,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StationSummary.Profit
             {
                 if (SetProperty(ref _Count, value))
                 {
-                    OnPropertyChanged(nameof(TotalPrice));
+                    RaisePropertyChanged(nameof(TotalPrice));
                 }
             }
         }
@@ -54,7 +54,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StationSummary.Profit
             {
                 if (SetProperty(ref _UnitPrice, value))
                 {
-                    OnPropertyChanged(nameof(TotalPrice));
+                    RaisePropertyChanged(nameof(TotalPrice));
                 }
             }
         }

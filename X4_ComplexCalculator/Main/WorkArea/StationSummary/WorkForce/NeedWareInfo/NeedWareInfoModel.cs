@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
-using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.WorkArea.ProductsGrid;
@@ -13,7 +13,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StationSummary.WorkForce.NeedWareIn
     /// <summary>
     /// 必要ウェア情報
     /// </summary>
-    class NeedWareInfoModel : INotifyPropertyChangedBace, IDisposable
+    class NeedWareInfoModel : BindableBase, IDisposable
     {
         #region メンバ
         /// <summary>

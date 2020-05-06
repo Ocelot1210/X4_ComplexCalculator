@@ -70,8 +70,11 @@
                 <GroupStyle>
                     <GroupStyle.HeaderTemplate>
                         <DataTemplate>
-                            <StackPanel Background="LightCyan">
-                                <TextBlock FontWeight="Bold" Text="{Binding Name}" />
+                            <StackPanel Background="Aqua">
+                                <TextBlock
+                                    FontWeight="Bold"
+                                    Foreground="Black"
+                                    Text="{Binding Name}" />
                             </StackPanel>
                         </DataTemplate>
                     </GroupStyle.HeaderTemplate>

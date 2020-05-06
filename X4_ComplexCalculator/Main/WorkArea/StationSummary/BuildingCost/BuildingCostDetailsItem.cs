@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using X4_ComplexCalculator.Common;
+﻿using Prism.Mvvm;
 
 
 namespace X4_ComplexCalculator.Main.WorkArea.StationSummary.BuildingCost
@@ -9,7 +6,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StationSummary.BuildingCost
     /// <summary>
     /// 建造コスト詳細表示用ListViewのアイテム
     /// </summary>
-    class BuildingCostDetailsItem : INotifyPropertyChangedBace
+    class BuildingCostDetailsItem : BindableBase
     {
         #region メンバ
         /// <summary>
@@ -46,7 +43,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StationSummary.BuildingCost
             {
                 if (SetProperty(ref _Count, value))
                 {
-                    OnPropertyChanged(nameof(TotalPrice));
+                    RaisePropertyChanged(nameof(TotalPrice));
                 }
             }
         }
@@ -62,7 +59,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StationSummary.BuildingCost
             {
                 if (SetProperty(ref _UnitPrice, value))
                 {
-                    OnPropertyChanged(nameof(TotalPrice));
+                    RaisePropertyChanged(nameof(TotalPrice));
                 }
             }
         }

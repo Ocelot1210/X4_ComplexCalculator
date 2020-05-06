@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Prism.Mvvm;
+using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.ResourcesGrid
@@ -9,7 +8,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ResourcesGrid
     /// <summary>
     /// 建造に必要なウェアを表示するDataGridViewの1レコード分のクラス
     /// </summary>
-    public class ResourcesGridItem : INotifyPropertyChangedBace
+    public class ResourcesGridItem : BindableBase
     {
         #region メンバ
         /// <summary>
@@ -77,8 +76,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.ResourcesGrid
                     // 入力された値が最低価格以上、最高価格以下の場合、入力された値を設定する
                     _UnitPrice = value;
                 }
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(Price));
+                RaisePropertyChanged();
+                RaisePropertyChanged(nameof(Price));
             }
         }
 
@@ -136,8 +135,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.ResourcesGrid
 
             _Details.AddRange(addItems);
 
-            OnPropertyChanged(nameof(Amount));
-            OnPropertyChanged(nameof(Price));
+            RaisePropertyChanged(nameof(Amount));
+            RaisePropertyChanged(nameof(Price));
         }
 
 
@@ -160,8 +159,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.ResourcesGrid
             // 空のレコードを削除
             _Details.RemoveAll(x => x.Count == 0);
 
-            OnPropertyChanged(nameof(Amount));
-            OnPropertyChanged(nameof(Price));
+            RaisePropertyChanged(nameof(Amount));
+            RaisePropertyChanged(nameof(Price));
         }
 
 
@@ -180,8 +179,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.ResourcesGrid
                 }
             }
 
-            OnPropertyChanged(nameof(Amount));
-            OnPropertyChanged(nameof(Price));
+            RaisePropertyChanged(nameof(Amount));
+            RaisePropertyChanged(nameof(Price));
         }
     }
 }

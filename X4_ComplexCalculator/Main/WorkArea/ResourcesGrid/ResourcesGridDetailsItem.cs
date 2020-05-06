@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using X4_ComplexCalculator.Common;
+﻿using Prism.Mvvm;
 
 namespace X4_ComplexCalculator.Main.WorkArea.ResourcesGrid
 {
     /// <summary>
     /// 建造コスト詳細表示用ListView1レコード分
     /// </summary>
-    public class ResourcesGridDetailsItem : INotifyPropertyChangedBace
+    public class ResourcesGridDetailsItem : BindableBase
     {
         #region メンバ
         /// <summary>
@@ -46,7 +43,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ResourcesGrid
             {
                 if (SetProperty(ref _Count, value))
                 {
-                    OnPropertyChanged(nameof(TotalAmount));
+                    RaisePropertyChanged(nameof(TotalAmount));
                 }
             }
         }

@@ -1,11 +1,8 @@
 ﻿using Prism.Commands;
+using Prism.Mvvm;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Text;
 using System.Windows;
 using System.Windows.Input;
-using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
 using X4_ComplexCalculator.DB;
 
@@ -14,7 +11,7 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
     /// <summary>
     /// レイアウト一覧の1レコード分
     /// </summary>
-    public class LayoutMenuItem : INotifyPropertyChangedBace, IComparable
+    public class LayoutMenuItem : BindableBase, IComparable
     {
         #region メンバ
         /// <summary>
@@ -117,7 +114,7 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
             // このクラス内では現在のレイアウトが分からないのでPropertyChangedイベントを発火させて
             // MainWindowModelにてレイアウトを上書きする
             // → 何かいい方法が思いついたら直す
-            OnPropertyChanged(nameof(SaveButtonClickedCommand));
+            RaisePropertyChanged(nameof(SaveButtonClickedCommand));
         }
 
 

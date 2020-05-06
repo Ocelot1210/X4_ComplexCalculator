@@ -185,12 +185,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.StorageAssign
 
             if (e.OldItems != null)
             {
-                OnProductsRemoved(e.NewItems.Cast<ProductsGridItem>());
+                OnProductsRemoved(e.OldItems.Cast<ProductsGridItem>());
             }
 
             if (e.Action == NotifyCollectionChangedAction.Reset)
             {
-                OnProductsAdded(_Products);
+                StorageAssignGridItems.Clear();
             }
         }
 

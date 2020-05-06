@@ -1,8 +1,9 @@
-﻿using X4_ComplexCalculator.Common;
+﻿using Prism.Mvvm;
+using X4_ComplexCalculator.Common;
 
 namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.SelectModule
 {
-    public class ModulesListItem : INotifyPropertyChangedBace
+    public class ModulesListItem : BindableBase
     {
         #region メンバ
         /// <summary>

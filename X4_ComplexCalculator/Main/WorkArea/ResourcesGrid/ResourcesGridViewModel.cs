@@ -1,15 +1,15 @@
-﻿using System;
+﻿using Prism.Mvvm;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Data;
-using X4_ComplexCalculator.Common;
 
 namespace X4_ComplexCalculator.Main.WorkArea.ResourcesGrid
 {
     /// <summary>
     /// 建造に必要なリソースを表示するDataGridView用ViewModel
     /// </summary>
-    class ResourcesGridViewModel : INotifyPropertyChangedBace, IDisposable
+    class ResourcesGridViewModel : BindableBase, IDisposable
     {
         #region メンバ
         /// <summary>
@@ -53,7 +53,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ResourcesGrid
                     resource.SetUnitPricePercent(_UnitPricePercent);
                 }
 
-                OnPropertyChanged();
+                RaisePropertyChanged();
             }
         }
         #endregion

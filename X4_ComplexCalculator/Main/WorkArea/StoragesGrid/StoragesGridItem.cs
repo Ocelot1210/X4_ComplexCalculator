@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Prism.Mvvm;
+using System.Collections.Generic;
 using System.Linq;
-using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB.X4DB;
 
@@ -9,7 +9,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StoragesGrid
     /// <summary>
     /// 保管庫一覧表示用DataGridViewの1レコード分
     /// </summary>
-    class StoragesGridItem : INotifyPropertyChangedBace
+    class StoragesGridItem : BindableBase
     {
         #region メンバ
         /// <summary>
@@ -83,7 +83,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StoragesGrid
 
             Details.AddRange(addItems);
 
-            OnPropertyChanged(nameof(Capacity));
+            RaisePropertyChanged(nameof(Capacity));
         }
 
 
@@ -104,7 +104,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StoragesGrid
 
             Details.RemoveAll(x => x.ModuleCount == 0);
 
-            OnPropertyChanged(nameof(Capacity));
+            RaisePropertyChanged(nameof(Capacity));
         }
 
 
@@ -123,7 +123,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StoragesGrid
                 }
             }
 
-            OnPropertyChanged(nameof(Capacity));
+            RaisePropertyChanged(nameof(Capacity));
         }
     }
 }

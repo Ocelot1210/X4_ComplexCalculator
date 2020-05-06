@@ -1,10 +1,8 @@
 ﻿using Prism.Commands;
-using System;
+using Prism.Mvvm;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
-using X4_ComplexCalculator.Common;
-using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.Menu.Layout;
 using X4_ComplexCalculator.Main.WorkArea;
 using Xceed.Wpf.AvalonDock;
@@ -14,7 +12,7 @@ namespace X4_ComplexCalculator.Main
     /// <summary>
     /// メイン画面のViewModel
     /// </summary>
-    class MainWindowViewModel : INotifyPropertyChangedBace
+    class MainWindowViewModel : BindableBase
     {
         #region メンバ
         /// <summary>
@@ -130,7 +128,7 @@ namespace X4_ComplexCalculator.Main
         private void CreateNew()
         {
             _Model.CreateNew();
-            OnPropertyChanged(nameof(ActiveContent));
+            RaisePropertyChanged(nameof(ActiveContent));
         }
 
 
@@ -140,7 +138,7 @@ namespace X4_ComplexCalculator.Main
         private void Open()
         {
             _Model.Open();
-            OnPropertyChanged(nameof(ActiveContent));
+            RaisePropertyChanged(nameof(ActiveContent));
         }
 
 

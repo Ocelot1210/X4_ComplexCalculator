@@ -1,15 +1,14 @@
 ﻿using Prism.Commands;
-using System.Windows;
-using System.Windows.Input;
-using X4_ComplexCalculator.Common;
+using Prism.Mvvm;
 using System;
+using System.Windows.Input;
 
 namespace X4_ComplexCalculator.Common.Dialog.SelectStringDialog
 {
     /// <summary>
     /// 文字列選択ダイアログのModel
     /// </summary>
-    class SelectStringDialogModel : INotifyPropertyChangedBace
+    class SelectStringDialogModel : BindableBase
     {
         #region メンバ
         /// <summary>

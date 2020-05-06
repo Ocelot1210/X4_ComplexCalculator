@@ -219,9 +219,9 @@ WHERE
             var sqlParam = new SQLiteCommandParameters(3);
             foreach (ModulesGridItem mgi in modules)
             {
-                sqlParam.Add("count", DbType.Int32, mgi.ModuleCount);
+                sqlParam.Add("count",    DbType.Int32,  mgi.ModuleCount);
                 sqlParam.Add("moduleID", DbType.String, mgi.Module.ModuleID);
-                sqlParam.Add("method", DbType.String, mgi.SelectedMethod.Method);
+                sqlParam.Add("method",   DbType.String, mgi.SelectedMethod.Method);
             }
 
             DBConnection.X4DB.ExecQuery(query, sqlParam, SumResource, resourcesDict);

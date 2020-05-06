@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Prism.Mvvm;
+using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
 using System.Windows;
@@ -13,7 +14,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment
     /// <summary>
     /// 装備編集画面のModel
     /// </summary>
-    class EditEquipmentModel : INotifyPropertyChangedBace
+    class EditEquipmentModel : BindableBase
     {
         #region メンバ
         /// <summary>
@@ -59,7 +60,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment
             set
             {
                 _SelectedPreset = value;
-                OnPropertyChanged();
+                RaisePropertyChanged();
             }
         }
         #endregion

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -6,7 +7,6 @@ using System.Data;
 using System.Data.SQLite;
 using System.Linq;
 using System.Threading.Tasks;
-using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.WorkArea.ModulesGrid;
@@ -16,7 +16,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ProductsGrid
     /// <summary>
     /// 製品一覧用DataGridViewのModel
     /// </summary>
-    class ProductsGridModel : INotifyPropertyChangedBace, IDisposable
+    class ProductsGridModel : BindableBase, IDisposable
     {
         #region メンバ
         /// <summary>
@@ -183,7 +183,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ProductsGrid
             foreach (var item in prodDict)
             {
                 // 変更対象のウェアを検索
-                Products.Where(x => x.Ware.WareID == item.Key).FirstOrDefault()?.SetDetails(item.Value);
+                Products.Where(x => x.Ware.WareID == item.Key).FirstOrDefault()?.SetDetails(item.Value, module.PrevModuleCount);
             }
         }
 

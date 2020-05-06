@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Prism.Mvvm;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
-using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.WorkArea.ResourcesGrid;
 
@@ -12,7 +11,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StationSummary.BuildingCost
     /// <summary>
     /// 建造コスト用
     /// </summary>
-    class BuildingCostModel : INotifyPropertyChangedBace
+    class BuildingCostModel : BindableBase
     {
         #region メンバ
         /// <summary>
@@ -47,7 +46,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StationSummary.BuildingCost
                 if (value != _BuildingCost)
                 {
                     _BuildingCost = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }

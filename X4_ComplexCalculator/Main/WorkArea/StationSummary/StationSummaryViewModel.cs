@@ -1,20 +1,19 @@
-﻿using System.Collections.ObjectModel;
-using X4_ComplexCalculator.Common;
+﻿using Prism.Mvvm;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows.Data;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.WorkArea.ModulesGrid;
-using X4_ComplexCalculator.Main.WorkArea.StationSummary.Profit;
 using X4_ComplexCalculator.Main.WorkArea.ProductsGrid;
 using X4_ComplexCalculator.Main.WorkArea.ResourcesGrid;
-using System.ComponentModel;
 using X4_ComplexCalculator.Main.WorkArea.StationSummary.BuildingCost;
-using System.Windows;
+using X4_ComplexCalculator.Main.WorkArea.StationSummary.Profit;
 using X4_ComplexCalculator.Main.WorkArea.StationSummary.WorkForce.ModuleInfo;
 using X4_ComplexCalculator.Main.WorkArea.StationSummary.WorkForce.NeedWareInfo;
-using System.Windows.Data;
 
 namespace X4_ComplexCalculator.Main.WorkArea.StationSummary
 {
-    class StationSummaryViewModel : INotifyPropertyChangedBace
+    class StationSummaryViewModel : BindableBase
     {
         #region メンバ
         /// <summary>
@@ -111,9 +110,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StationSummary
                 WorkforceNeedWareCollectionView.SortDescriptions.Add(new SortDescription(nameof(NeedWareInfoDetailsItem.WareName), ListSortDirection.Ascending));
                 WorkforceNeedWareCollectionView.GroupDescriptions.Clear();
 
-                var grp = new NeedWareInfoGroupDescription();
-                grp.PropertyName = nameof(NeedWareInfoDetailsItem.Method);
-                WorkforceNeedWareCollectionView.GroupDescriptions.Add(grp);
+                WorkforceNeedWareCollectionView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(NeedWareInfoDetailsItem.Method)));
             }
 
 
@@ -142,12 +139,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.StationSummary
             switch (e.PropertyName)
             {
                 case nameof(WorkForceModuleInfoModel.NeedWorkforce):
-                    OnPropertyChanged(nameof(NeedWorkforce));
+                    RaisePropertyChanged(nameof(NeedWorkforce));
                     _NeedWareInfoModel.NeedWorkforce = _WorkForceModuleInfoModel.NeedWorkforce;
                     break;
 
                 case nameof(WorkForceModuleInfoModel.WorkForce):
-                    OnPropertyChanged(nameof(WorkForce));
+                    RaisePropertyChanged(nameof(WorkForce));
                     break;
 
                 default:
@@ -165,7 +162,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StationSummary
             switch (e.PropertyName)
             {
                 case nameof(ProfitModel.Profit):
-                    OnPropertyChanged(nameof(Profit));
+                    RaisePropertyChanged(nameof(Profit));
                     break;
 
                 default:
@@ -184,7 +181,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StationSummary
             switch (e.PropertyName)
             {
                 case nameof(BuildingCostModel.BuildingCost):
-                    OnPropertyChanged(nameof(BuildingCost));
+                    RaisePropertyChanged(nameof(BuildingCost));
                     break;
 
                 default:

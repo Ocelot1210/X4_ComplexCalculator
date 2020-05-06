@@ -1,4 +1,5 @@
 ﻿using Prism.Commands;
+using Prism.Mvvm;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment.Equipment
     /// <summary>
     /// 装備一覧用ViewModel
     /// </summary>
-    class EquipmentListViewModel : INotifyPropertyChangedBace, IDisposable
+    class EquipmentListViewModel : BindableBase, IDisposable
     {
         #region メンバ
         /// <summary>
@@ -85,7 +86,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment.Equipment
                 if (_SearchEquipmentName != value)
                 {
                     _SearchEquipmentName = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                     EquipmentsView.Refresh();
                 }
             }
@@ -112,12 +113,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment.Equipment
             set
             {
                 _Model.SelectedSize = value;
-                OnPropertyChanged(nameof(MaxAmount));
-                OnPropertyChanged(nameof(EquippedCount));
-                OnPropertyChanged(nameof(Equipped));
-                OnPropertyChanged(nameof(CanAddEquipment));
-                OnPropertyChanged(nameof(CanRemoveEquipment));
-                OnPropertyChanged(nameof(EquipmentsView));
+                RaisePropertyChanged(nameof(MaxAmount));
+                RaisePropertyChanged(nameof(EquippedCount));
+                RaisePropertyChanged(nameof(Equipped));
+                RaisePropertyChanged(nameof(CanAddEquipment));
+                RaisePropertyChanged(nameof(CanRemoveEquipment));
+                RaisePropertyChanged(nameof(EquipmentsView));
             }
         }
 
@@ -130,12 +131,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment.Equipment
             set
             {
                 _Model.SelectedPreset = value;
-                OnPropertyChanged(nameof(MaxAmount));
-                OnPropertyChanged(nameof(EquippedCount));
-                OnPropertyChanged(nameof(Equipped));
-                OnPropertyChanged(nameof(CanAddEquipment));
-                OnPropertyChanged(nameof(CanRemoveEquipment));
-                OnPropertyChanged(nameof(EquipmentsView));
+                RaisePropertyChanged(nameof(MaxAmount));
+                RaisePropertyChanged(nameof(EquippedCount));
+                RaisePropertyChanged(nameof(Equipped));
+                RaisePropertyChanged(nameof(CanAddEquipment));
+                RaisePropertyChanged(nameof(CanRemoveEquipment));
+                RaisePropertyChanged(nameof(EquipmentsView));
                 Unsaved = true;
             }
         }
@@ -199,9 +200,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment.Equipment
             {
                 _Model.AddEquipments(selectedEquipments.Cast<Equipment>());
                 Unsaved = true;
-                OnPropertyChanged(nameof(CanAddEquipment));
-                OnPropertyChanged(nameof(CanRemoveEquipment));
-                OnPropertyChanged(nameof(EquippedCount));
+                RaisePropertyChanged(nameof(CanAddEquipment));
+                RaisePropertyChanged(nameof(CanRemoveEquipment));
+                RaisePropertyChanged(nameof(EquippedCount));
             }
         }
 
@@ -216,9 +217,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment.Equipment
             {
                 _Model.RemoveEquipments(selectedEquipments.Cast<Equipment>().ToArray());
                 Unsaved = true;
-                OnPropertyChanged(nameof(CanAddEquipment));
-                OnPropertyChanged(nameof(CanRemoveEquipment));
-                OnPropertyChanged(nameof(EquippedCount));
+                RaisePropertyChanged(nameof(CanAddEquipment));
+                RaisePropertyChanged(nameof(CanRemoveEquipment));
+                RaisePropertyChanged(nameof(EquippedCount));
             }
         }
 

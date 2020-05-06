@@ -2,13 +2,14 @@
 using X4_ComplexCalculator.Common;
 using Xceed.Wpf.AvalonDock.Layout;
 using System.ComponentModel;
+using Prism.Mvvm;
 
 namespace X4_ComplexCalculator.Main.WorkArea.Menu.View
 {
     /// <summary>
     /// 表示状態メニュー1つ分
     /// </summary>
-    class VisiblityMenuItem : INotifyPropertyChangedBace
+    class VisiblityMenuItem : BindableBase
     {
         #region メンバ
         /// <summary>
@@ -43,7 +44,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.Menu.View
                     _LayoutAnchorable.IsVisible  = value;
                     _ShouldNotifyVisibiltyChange = true;
 
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -70,7 +71,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.Menu.View
         {
             if (_ShouldNotifyVisibiltyChange)
             {
-                OnPropertyChanged(nameof(IsChecked));
+                RaisePropertyChanged(nameof(IsChecked));
             }
         }
     }

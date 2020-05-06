@@ -1,4 +1,5 @@
 ﻿using Prism.Commands;
+using Prism.Mvvm;
 using System;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,6 @@ using System.Windows;
 using System.Windows.Input;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment;
 
@@ -15,7 +15,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid
     /// <summary>
     /// ModuleクラスをDataGrid表示用クラス
     /// </summary>
-    public class ModulesGridItem : INotifyPropertyChangedBace
+    public class ModulesGridItem : BindableBase
     {
         #region "メンバ変数"
         /// <summary>
@@ -59,6 +59,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid
         }
 
         /// <summary>
+        /// モジュール数前回値
+        /// </summary>
+        public long PrevModuleCount { get; private set; }
+
+
+        /// <summary>
         /// モジュール数
         /// </summary>
         public long ModuleCount
@@ -69,6 +75,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid
                 var setValue = (value < 0) ? 0L :
                                (99999 < value) ? 99999L : value;
 
+                PrevModuleCount = _ModuleCount;
                 SetProperty(ref _ModuleCount, setValue);
             }
         }
@@ -241,21 +248,21 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid
             // 変更があった場合のみ通知
             if (!turretsOld.SequenceEqual(Module.Equipment.Turret.AllEquipments.Select(x => x.EquipmentID).OrderBy(x => x)))
             {
-                OnPropertyChanged(nameof(TurretsCount));
-                OnPropertyChanged(nameof(TurretsToolTip));
+                RaisePropertyChanged(nameof(TurretsCount));
+                RaisePropertyChanged(nameof(TurretsToolTip));
                 moduleChanged = true;
             }
 
             if (!shieldsOld.SequenceEqual(Module.Equipment.Shield.AllEquipments.Select(x => x.EquipmentID).OrderBy(x => x)))
             {
-                OnPropertyChanged(nameof(ShieldsCount));
-                OnPropertyChanged(nameof(ShieldsToolTip));
+                RaisePropertyChanged(nameof(ShieldsCount));
+                RaisePropertyChanged(nameof(ShieldsToolTip));
                 moduleChanged = true;
             }
 
             if (moduleChanged)
             {
-                OnPropertyChanged(nameof(Module));
+                RaisePropertyChanged(nameof(Module));
             }
         }
 

@@ -1,14 +1,12 @@
-﻿using System.Collections.ObjectModel;
-using X4_ComplexCalculator.Common;
-using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.Main.WorkArea.ModulesGrid;
+﻿using Prism.Mvvm;
+using System.Collections.ObjectModel;
 
 namespace X4_ComplexCalculator.Main.WorkArea.StoragesGrid
 {
     /// <summary>
     /// 保管庫一覧表示用DataGridViewのViewModel
     /// </summary>
-    class StoragesGridViewModel : INotifyPropertyChangedBace
+    class StoragesGridViewModel : BindableBase
     {
         #region メンバ
         /// <summary>

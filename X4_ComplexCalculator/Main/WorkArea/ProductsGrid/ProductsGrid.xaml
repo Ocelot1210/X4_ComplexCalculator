@@ -27,7 +27,7 @@
                 <MultiDataTrigger>
                     <MultiDataTrigger.Conditions>
                         <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="False" />
-                        <Condition Binding="{Binding IsLosing}" Value="True" />
+                        <Condition Binding="{Binding Price, Converter={StaticResource IsLessThanConverter}, ConverterParameter=0}" Value="True" />
                     </MultiDataTrigger.Conditions>
                     <Setter Property="Background" Value="LightPink" />
                     <Setter Property="FontWeight" Value="Bold" />
@@ -107,6 +107,7 @@
         CellStyle="{StaticResource DataGridCellDefaultStyle}"
         ContextMenu="{StaticResource ProductsGridContextMenu}"
         ItemsSource="{Binding ProductsView, Mode=OneTime}"
+        RowHeight="25"
         SelectionUnit="Cell"
         Style="{StaticResource DetailsDataGridStyle}">
 
@@ -148,7 +149,7 @@
                 SortMemberPath="Count">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
-                        <TextBlock VerticalAlignment="Center" Text="{Binding Count, Mode=OneWay}" />
+                        <TextBlock VerticalAlignment="Center" Text="{Binding Count, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" />
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
@@ -172,7 +173,7 @@
 
 
             <!--  単価  -->
-            <DataGridTemplateColumn
+            <x4cmn:MouseHoverEditCellColumn
                 ClipboardContentBinding="{Binding UnitPrice, Mode=OneTime}"
                 Header="単価"
                 SortMemberPath="UnitPrice">
@@ -195,7 +196,7 @@
                             Value="{Binding UnitPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </DataTemplate>
                 </DataGridTemplateColumn.CellEditingTemplate>
-            </DataGridTemplateColumn>
+            </x4cmn:MouseHoverEditCellColumn>
 
 
             <!--  単価(スライダー)  -->
@@ -225,6 +226,7 @@
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
                         <Slider
+                            VerticalContentAlignment="Center"
                             Maximum="{Binding Ware.MaxPrice}"
                             Minimum="{Binding Ware.MinPrice}"
                             Value="{Binding UnitPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />

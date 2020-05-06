@@ -1,4 +1,5 @@
-﻿using X4_ComplexCalculator.Common;
+﻿using Prism.Mvvm;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment
@@ -6,7 +7,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment
     /// <summary>
     /// 派閥リストの1レコード分
     /// </summary>
-    class FactionsListItem : INotifyPropertyChangedBace
+    class FactionsListItem : BindableBase
     {
         #region メンバ
         /// <summary>

@@ -1,5 +1,5 @@
-﻿using System.Data.SQLite;
-using X4_ComplexCalculator.Common;
+﻿using Prism.Mvvm;
+using System.Data.SQLite;
 using X4_ComplexCalculator.DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.StoragesGrid
@@ -7,7 +7,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StoragesGrid
     /// <summary>
     /// ドロップダウンで表示するListViewのアイテム(保管庫用)
     /// </summary>
-    class StorageDetailsListItem : INotifyPropertyChangedBace
+    class StorageDetailsListItem : BindableBase 
     {
         #region メンバ
         /// <summary>
@@ -39,7 +39,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StoragesGrid
             {
                 if (SetProperty(ref _ModuleCount, value))
                 {
-                    OnPropertyChanged(nameof(TotalCapacity));
+                    RaisePropertyChanged(nameof(TotalCapacity));
                 }
             }
         }

@@ -1,4 +1,5 @@
 ﻿using Prism.Commands;
+using Prism.Mvvm;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -15,7 +16,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment
     /// <summary>
     /// 装備編集画面のViewModel
     /// </summary>
-    class EditEquipmentViewModel : INotifyPropertyChangedBace, IDisposable
+    class EditEquipmentViewModel : BindableBase, IDisposable
     {
         #region メンバ
         /// <summary>
@@ -55,7 +56,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment
             set
             {
                 _CloseWindow = value;
-                OnPropertyChanged();
+                RaisePropertyChanged();
             }
         }
 
@@ -88,7 +89,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment
                     _SelectedSize = value;
                     TurretsViewModel.SelectedSize = value;
                     ShieldsViewModel.SelectedSize = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                 }
             }
         }
@@ -228,7 +229,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.EditEquipment
             switch (e.PropertyName)
             {
                 case nameof(Model.SelectedPreset):
-                    OnPropertyChanged(nameof(SelectedPreset));
+                    RaisePropertyChanged(nameof(SelectedPreset));
                     break;
 
                 default:

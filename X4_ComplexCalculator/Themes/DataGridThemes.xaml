@@ -21,6 +21,7 @@
             </Trigger>
 
             <!--  コンテキストメニューを表示している場合の背景色  -->
+            <!--
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="True" />
@@ -29,30 +30,7 @@
                 <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
                 <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
                 <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
-            </MultiDataTrigger>
-        </Style.Triggers>
-    </Style>
-
-    <!--  コンテキストメニューを表示しても選択行が灰色にならないようにするスタイル  -->
-    <Style x:Key="DataGridRowDefaultStyle" TargetType="{x:Type DataGridRow}">
-        <Style.Triggers>
-            <!--  選択中のセルの色  -->
-            <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
-                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
-            </Trigger>
-
-            <!--  コンテキストメニューを表示している場合の背景色  -->
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="True" />
-                    <Condition Binding="{Binding ContextMenu.IsOpen, RelativeSource={RelativeSource AncestorType=DataGrid}}" Value="True" />
-                </MultiDataTrigger.Conditions>
-                <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
-                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
-            </MultiDataTrigger>
+            </MultiDataTrigger>-->
         </Style.Triggers>
     </Style>
 
@@ -68,8 +46,6 @@
         <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
         <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling" />
         <Setter Property="ColumnHeaderStyle" Value="{StaticResource DefaultDataGridColumnHeaderStyle}" />
-        <Setter Property="CellStyle" Value="{StaticResource DataGridCellDefaultStyle}" />
-        <!--<Setter Property="RowStyle" Value="{StaticResource DataGridRowDefaultStyle}" />-->
         <Setter Property="SelectionUnit" Value="FullRow" />
         <Setter Property="VerticalGridLinesBrush" Value="LightGray" />
         <Setter Property="HorizontalGridLinesBrush" Value="LightGray" />
@@ -77,7 +53,6 @@
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Visible" />
         <Setter Property="VerticalScrollBarVisibility" Value="Visible" />
     </Style>
-
 
 
     <!--  右寄せセル用  -->
@@ -88,11 +63,11 @@
         <Setter Property="TextBlock.TextAlignment" Value="Right" />
     </Style>
 
-
     <!--  ValueConverter  -->
     <x4conv:Visiblity2NullableBooleanConverter x:Key="Visiblity2NullableConverter" />
     <x4conv:Bool2VisiblityConverter x:Key="Bool2VisiblityConverter" />
     <x4conv:SliderValueConverter x:Key="SliderValueConverter" />
+    <x4conv:IsLessThanConverter x:Key="IsLessThanConverter" />
 
     <!--  RowDetailsを使用するDataGridのRowHeaderStyle  -->
     <Style x:Key="RowDetailsRowHeaderStyle" TargetType="{x:Type DataGridRowHeader}">

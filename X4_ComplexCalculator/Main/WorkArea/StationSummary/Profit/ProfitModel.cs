@@ -1,15 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using Prism.Mvvm;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
-using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.WorkArea.ProductsGrid;
-using System.ComponentModel;
 
 namespace X4_ComplexCalculator.Main.WorkArea.StationSummary.Profit
 {
-    class ProfitModel : INotifyPropertyChangedBace
+    class ProfitModel : BindableBase
     {
         #region メンバ
         /// <summary>

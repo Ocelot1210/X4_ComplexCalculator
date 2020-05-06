@@ -1,28 +1,28 @@
 ﻿using Prism.Commands;
+using Prism.Mvvm;
 using System;
 using System.IO;
+using System.Linq;
 using System.Windows.Input;
-using X4_ComplexCalculator.Common;
+using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.Main.WorkArea.Menu.View;
 using X4_ComplexCalculator.Main.WorkArea.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.ProductsGrid;
 using X4_ComplexCalculator.Main.WorkArea.ResourcesGrid;
 using X4_ComplexCalculator.Main.WorkArea.StationSummary;
+using X4_ComplexCalculator.Main.WorkArea.StorageAssign;
 using X4_ComplexCalculator.Main.WorkArea.StoragesGrid;
 using Xceed.Wpf.AvalonDock;
-using Xceed.Wpf.AvalonDock.Layout.Serialization;
 using Xceed.Wpf.AvalonDock.Layout;
-using System.Linq;
-using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.Main.WorkArea.Menu.View;
-using X4_ComplexCalculator.Main.WorkArea.StorageAssign;
+using Xceed.Wpf.AvalonDock.Layout.Serialization;
 
 namespace X4_ComplexCalculator.Main.WorkArea
 {
     /// <summary>
     /// 作業エリア用ViewModel
     /// </summary>
-    class WorkAreaViewModel : INotifyPropertyChangedBace, IDisposable
+    class WorkAreaViewModel : BindableBase, IDisposable
     {
         #region メンバ
         /// <summary>
@@ -180,9 +180,11 @@ namespace X4_ComplexCalculator.Main.WorkArea
             Products      = new ProductsGridViewModel(productsModel);
             Resources     = new ResourcesGridViewModel(resourcesModel);
             Storages      = new StoragesGridViewModel(storagesModel);
-            StorageAssign = new StorageAssignViewModel(productsModel.Products, storagesModel.Storages);
+            var storageAssignModel = new StorageAssignModel(productsModel.Products, storagesModel.Storages);
+            StorageAssign = new StorageAssignViewModel(storageAssignModel);
 
-            _Model              = new WorkAreaModel(moduleModel, productsModel, resourcesModel);
+            
+            _Model              = new WorkAreaModel(moduleModel, productsModel, resourcesModel, storageAssignModel);
             OnUnloadedCommand   = new DelegateCommand(OnUnloaded);
 
             _Model.PropertyChanged += Model_PropertyChanged;
@@ -318,12 +320,12 @@ WHERE
             switch (e.PropertyName)
             {
                 case nameof(_Model.HasChanged):
-                    OnPropertyChanged(nameof(HasChanged));
-                    OnPropertyChanged(nameof(Title));
+                    RaisePropertyChanged(nameof(HasChanged));
+                    RaisePropertyChanged(nameof(Title));
                     break;
 
                 case nameof(_Model.SaveFilePath):
-                    OnPropertyChanged(nameof(Title));
+                    RaisePropertyChanged(nameof(Title));
                     break;
 
                 default:

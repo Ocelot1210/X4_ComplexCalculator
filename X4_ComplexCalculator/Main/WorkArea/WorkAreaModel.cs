@@ -1,22 +1,25 @@
 ﻿using Microsoft.Win32;
+using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data.SQLite;
-using X4_ComplexCalculator.Common;
+using System.Linq;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.ProductsGrid;
 using X4_ComplexCalculator.Main.WorkArea.ResourcesGrid;
+using X4_ComplexCalculator.Main.WorkArea.SaveDataReader;
+using X4_ComplexCalculator.Main.WorkArea.StorageAssign;
 
 namespace X4_ComplexCalculator.Main.WorkArea
 {
     /// <summary>
     /// 作業エリア用Model
     /// </summary>
-    class WorkAreaModel : INotifyPropertyChangedBace, IDisposable
+    class WorkAreaModel : BindableBase, IDisposable
     {
         #region メンバ
         /// <summary>
@@ -35,6 +38,12 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// 建造リソース一覧
         /// </summary>
         private readonly ResourcesGridModel _Resources;
+
+
+        /// <summary>
+        /// 保管庫割当
+        /// </summary>
+        private readonly StorageAssignModel _StorageAssignModel;
 
 
         /// <summary>
@@ -65,7 +74,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
                 if (value != _HasChanged)
                 {
                     _HasChanged = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
 
                     if (value)
                     {
@@ -74,6 +83,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
                         _Modules.Modules.CollectionPropertyChanged -= OnPropertyChanged;
                         _Products.Products.CollectionPropertyChanged -= OnPropertyChanged;
                         _Resources.Resources.CollectionPropertyChanged -= OnPropertyChanged;
+                        _StorageAssignModel.StorageAssignGridItems.CollectionPropertyChanged -= OnPropertyChanged;
                     }
                     else
                     {
@@ -82,6 +92,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
                         _Modules.Modules.CollectionPropertyChanged += OnPropertyChanged;
                         _Products.Products.CollectionPropertyChanged += OnPropertyChanged;
                         _Resources.Resources.CollectionPropertyChanged += OnPropertyChanged;
+                        _StorageAssignModel.StorageAssignGridItems.CollectionPropertyChanged += OnPropertyChanged;
                     }
                 }
             }
@@ -95,11 +106,13 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <param name="modules">モジュール一覧</param>
         /// <param name="products">製品一覧</param>
         /// <param name="resources">建造リソース一覧</param>
-        public WorkAreaModel(ModulesGridModel modules, ProductsGridModel products, ResourcesGridModel resources)
+        /// <param name="storageAssignModel">保管庫割当</param>
+        public WorkAreaModel(ModulesGridModel modules, ProductsGridModel products, ResourcesGridModel resources, StorageAssignModel storageAssignModel)
         {
             _Modules = modules;
             _Products = products;
             _Resources = resources;
+            _StorageAssignModel = storageAssignModel;
 
             HasChanged = true;
         }
@@ -115,6 +128,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
             _Modules.Modules.CollectionPropertyChanged -= OnPropertyChanged;
             _Products.Products.CollectionPropertyChanged -= OnPropertyChanged;
             _Resources.Resources.CollectionPropertyChanged -= OnPropertyChanged;
+            _StorageAssignModel.StorageAssignGridItems.CollectionPropertyChanged -= OnPropertyChanged;
         }
 
 
@@ -140,6 +154,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
                 nameof(ModulesGridItem.ModuleCount),
                 nameof(ProductsGridItem.Price),
                 nameof(ResourcesGridItem.Price),
+                nameof(StorageAssignGridItem.AllocCount)
             };
 
             if (0 < Array.IndexOf(names, e.PropertyName))
@@ -179,6 +194,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
             }
         }
 
+
         /// <summary>
         /// 保存処理メイン
         /// </summary>
@@ -188,14 +204,22 @@ namespace X4_ComplexCalculator.Main.WorkArea
             conn.BeginTransaction();
 
             // 保存用テーブル初期化
+            conn.ExecQuery("DROP TABLE IF EXISTS Common");
             conn.ExecQuery("DROP TABLE IF EXISTS Modules");
             conn.ExecQuery("DROP TABLE IF EXISTS Equipments");
             conn.ExecQuery("DROP TABLE IF EXISTS Products");
             conn.ExecQuery("DROP TABLE IF EXISTS BuildResources");
+            conn.ExecQuery("DROP TABLE IF EXISTS StorageAssign");
+            conn.ExecQuery("CREATE TABLE Common(Item TEXT, Value INTEGER)");
             conn.ExecQuery("CREATE TABLE Modules(Row INTEGER, ModuleID TEXT, Count INTEGER)");
             conn.ExecQuery("CREATE TABLE Equipments(Row INTEGER, EquipmentID TEXT)");
             conn.ExecQuery("CREATE TABLE Products(WareID TEXT, Price INTEGER)");
             conn.ExecQuery("CREATE TABLE BuildResources(WareID TEXT, Price INTEGER)");
+            conn.ExecQuery("CREATE TABLE StorageAssign(WareID TEXT, AllocCount INTEGER)");
+
+            // ファイルフォーマットのバージョン保存
+            conn.ExecQuery($"INSERT INTO Common(Item, Value) VALUES('FormatVersion', 1)");
+
 
             // モジュール保存
             var rowCnt = 0;
@@ -211,6 +235,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
                 rowCnt++;
             }
 
+
             // 価格保存
             foreach (var product in _Products.Products)
             {
@@ -221,6 +246,12 @@ namespace X4_ComplexCalculator.Main.WorkArea
             foreach (var resource in _Resources.Resources)
             {
                 conn.ExecQuery($"INSERT INTO BuildResources(WareID, Price) Values('{resource.Ware.WareID}', {resource.UnitPrice})");
+            }
+
+            // 保管庫割当情報保存
+            foreach (var assign in _StorageAssignModel.StorageAssignGridItems)
+            {
+                conn.ExecQuery($"INSERT INTO StorageAssign(WareID, AllocCount) Values('{assign.WareID}', {assign.AllocCount})");
             }
 
             conn.Commit();
@@ -235,86 +266,13 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <param name="path"></param>
         public void Load(string path)
         {
-            using var conn = new DBConnection(path);
-            conn.BeginTransaction();
-
-            // モジュール復元
-            RestoreModules(conn);
-
-            // 製品価格を復元
-            RestoreProductsPrice(conn);
-
-            // 建造リソースを復元
-            RestoreBuildResource(conn);
-
-            conn.Rollback();
-
-            SaveFilePath = path;
-
-            HasChanged = false;
-        }
-
-
-        /// <summary>
-        /// モジュールを復元
-        /// </summary>
-        /// <param name="dr"></param>
-        /// <param name="args"></param>
-        private void RestoreModules(DBConnection conn)
-        {
-            var moduleCnt = 0;
-
-            conn.ExecQuery("SELECT count(*) AS Count from Modules", (dr, _) =>
+            var reader = SaveDataReaderFactory.CreateSaveDataReader(path, _Modules.Modules, _Products.Products, _Resources.Resources, _StorageAssignModel.StorageAssignGridItems);
+            
+            // 読み込み成功？
+            if (reader.Load())
             {
-                moduleCnt = (int)(long)dr[0];
-            });
-
-            var modules = new List<ModulesGridItem>(moduleCnt);
-
-            // モジュールを復元
-            conn.ExecQuery("SELECT ModuleID, Count FROM Modules ORDER BY Row ASC", (dr, _) =>
-            {
-                modules.Add(new ModulesGridItem((string)dr["ModuleID"], (long)dr["Count"]));
-            });
-
-            // モジュールの装備を復元
-            conn.ExecQuery($"SELECT * FROM Equipments", (dr, _) =>
-            {
-                modules[(int)(long)dr["row"]].Module.AddEquipment(new Equipment((string)dr["EquipmentID"]));
-            });
-
-            _Modules.Modules.Reset(modules);
-        }
-
-
-        /// <summary>
-        /// 製品価格を復元
-        /// </summary>
-        /// <param name="conn"></param>
-        private void RestoreProductsPrice(DBConnection conn)
-        {
-            foreach (var product in _Products.Products)
-            {
-                conn.ExecQuery($"SELECT Price FROM Products WHERE WareID = '{product.Ware.WareID}'", (SQLiteDataReader dr, object[] _) =>
-                {
-                    product.UnitPrice = (long)dr["Price"];
-                });
-            }
-        }
-
-
-        /// <summary>
-        /// 建造リソースを復元
-        /// </summary>
-        /// <param name="conn"></param>
-        private void RestoreBuildResource(DBConnection conn)
-        {
-            foreach (var resource in _Resources.Resources)
-            {
-                conn.ExecQuery($"SELECT Price FROM BuildResources WHERE WareID = '{resource.Ware.WareID}'", (SQLiteDataReader dr, object[] _) =>
-                {
-                    resource.UnitPrice = (long)dr["Price"];
-                });
+                SaveFilePath = path;
+                HasChanged = false;
             }
         }
     }

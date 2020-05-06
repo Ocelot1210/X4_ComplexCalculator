@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using X4_ComplexCalculator.Common;
-using X4_ComplexCalculator.DB;
-using X4_ComplexCalculator.DB.X4DB;
+﻿using Prism.Mvvm;
 
 namespace X4_ComplexCalculator.Main.WorkArea.StationSummary.WorkForce.NeedWareInfo
 {
     /// <summary>
     /// 必要ウェア詳細情報1レコード分
     /// </summary>
-    class NeedWareInfoDetailsItem : INotifyPropertyChangedBace
+    class NeedWareInfoDetailsItem : BindableBase
     {
         #region メンバ
         /// <summary>
@@ -52,7 +47,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StationSummary.WorkForce.NeedWareIn
             {
                 if (SetProperty(ref _NeedAmount, value))
                 {
-                    OnPropertyChanged(nameof(Diff));
+                    RaisePropertyChanged(nameof(Diff));
                 }
             }
         }
@@ -67,7 +62,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StationSummary.WorkForce.NeedWareIn
             {
                 if (SetProperty(ref _ProductionAmount, value))
                 {
-                    OnPropertyChanged(nameof(Diff));
+                    RaisePropertyChanged(nameof(Diff));
                 }
             }
         }

@@ -1,5 +1,5 @@
-﻿using System.Data.SQLite;
-using X4_ComplexCalculator.Common;
+﻿using Prism.Mvvm;
+using System.Data.SQLite;
 using X4_ComplexCalculator.DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.ProductsGrid
@@ -7,7 +7,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ProductsGrid
     /// <summary>
     /// ＋/－で表示するListViewのアイテム(製品用)
     /// </summary>
-    public class ProductDetailsListItem : INotifyPropertyChangedBace
+    public class ProductDetailsListItem : BindableBase
     {
         #region メンバ
         /// <summary>
@@ -53,7 +53,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ProductsGrid
             {
                 if (SetProperty(ref _ModuleCount, value))
                 {
-                    OnPropertyChanged(nameof(Amount));
+                    RaisePropertyChanged(nameof(Amount));
                 }
             }
         }
@@ -75,8 +75,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.ProductsGrid
             {
                 if (0 < _MaxEfficiency && SetProperty(ref _EfficiencyValue, value))
                 {
-                    OnPropertyChanged(nameof(Efficiency));
-                    OnPropertyChanged(nameof(Amount));
+                    RaisePropertyChanged(nameof(Efficiency));
+                    RaisePropertyChanged(nameof(Amount));
                 }
             }
         }

@@ -1,17 +1,17 @@
 ﻿using Prism.Commands;
+using Prism.Mvvm;
+using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using X4_ComplexCalculator.Common;
-using System;
-using X4_ComplexCalculator.Common.Collection;
-using System.ComponentModel;
 using System.Windows.Input;
-using System.Collections.ObjectModel;
+using X4_ComplexCalculator.Common.Collection;
 
 namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.SelectModule
 {
-    class SelectModuleViewModel : INotifyPropertyChangedBace
+    class SelectModuleViewModel : BindableBase
     {
         #region メンバ
         /// <summary>
@@ -52,7 +52,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.SelectModule
             set
             {
                 _CloseWindow = value;
-                OnPropertyChanged();
+                RaisePropertyChanged();
             }
         }
 
@@ -110,7 +110,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.SelectModule
                 if (_SearchModuleName != value)
                 {
                     _SearchModuleName = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                     ModulesView.Refresh();
                 }
             }
@@ -150,6 +150,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid.SelectModule
 
             ModulesView = (ListCollectionView)CollectionViewSource.GetDefaultView(Modules);
             ModulesView.Filter = Filter;
+            ModulesView.SortDescriptions.Clear();
+            ModulesView.SortDescriptions.Add(new SortDescription(nameof(ModulesListItem.Name), ListSortDirection.Ascending));
 
             OKButtonClickedCommand    = new DelegateCommand(OKButtonClicked);
             CloseButtonClickedCommand = new DelegateCommand(CloseWindow);

@@ -1,18 +1,16 @@
 ﻿using Prism.Commands;
+using Prism.Mvvm;
 using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Xml.Linq;
-using X4_ComplexCalculator.Common;
 
 namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid
 {
-    class ModulesGridViewModel : INotifyPropertyChangedBace
+    class ModulesGridViewModel : BindableBase
     {
         #region メンバ
         /// <summary>
@@ -49,7 +47,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.ModulesGrid
                 if (_SearchModuleName != value)
                 {
                     _SearchModuleName = value;
-                    OnPropertyChanged();
+                    RaisePropertyChanged();
                     ModulesView.Refresh();
                 }
             }

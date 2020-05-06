@@ -6,10 +6,54 @@
     xmlns:local="clr-namespace:X4_ComplexCalculator.Main.WorkArea.StorageAssign"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
+    xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <!--  保管庫容量強調用スタイル  -->
+        <Style
+            x:Key="CapacityEmphasisStyle"
+            BasedOn="{StaticResource RightAlignedDataGridCell}"
+            TargetType="DataGridCell">
+            <Style.Triggers>
+                <!--  通常時の強調  -->
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="False" />
+                        <Condition Binding="{Binding StorageStatus}" Value="0" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="FontWeight" Value="Normal" />
+                </MultiDataTrigger>
+
+
+                <!--  負の値の場合の強調  -->
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="False" />
+                        <Condition Binding="{Binding StorageStatus}" Value="-1" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="LightPink" />
+                    <Setter Property="FontWeight" Value="Bold" />
+                </MultiDataTrigger>
+
+                <!--  保管庫が不足している場合の強調  -->
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="False" />
+                        <Condition Binding="{Binding StorageStatus}" Value="1" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="LightYellow" />
+                    <Setter Property="FontWeight" Value="Bold" />
+                </MultiDataTrigger>
+
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -56,10 +100,40 @@
             Grid.ColumnSpan="2"
             x4bhv:DataGridCurrentCellEditModeBehavior.Enabled="True"
             x4bhv:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
-            CellStyle="{StaticResource DataGridCellDefaultStyle}"
             ItemsSource="{Binding StorageAssignInfo}"
+            RowHeight="25"
             SelectionUnit="Cell"
             Style="{StaticResource DefaultDataGridStyle}">
+
+            <DataGrid.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.ContainerStyle>
+                        <Style TargetType="{x:Type GroupItem}">
+                            <Setter Property="Margin" Value="0,0,0,5" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type GroupItem}">
+                                        <Expander Background="Aqua" IsExpanded="True">
+                                            <Expander.Header>
+                                                <DockPanel>
+                                                    <TextBlock
+                                                        Width="100"
+                                                        Margin="5,0,0,0"
+                                                        FontWeight="Bold"
+                                                        Text="{Binding Path=Name}" />
+                                                </DockPanel>
+                                            </Expander.Header>
+                                            <Expander.Content>
+                                                <ItemsPresenter />
+                                            </Expander.Content>
+                                        </Expander>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </GroupStyle.ContainerStyle>
+                </GroupStyle>
+            </DataGrid.GroupStyle>
 
             <DataGrid.Columns>
 
@@ -77,7 +151,7 @@
 
 
                 <!--  割当個数  -->
-                <DataGridTemplateColumn
+                <x4cmn:MouseHoverEditCellColumn
                     ClipboardContentBinding="{Binding AllocCount, Mode=OneTime}"
                     Header="割当個数"
                     SortMemberPath="AllocCount">
@@ -96,12 +170,12 @@
                                 ClipValueToMinMax="True"
                                 FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
                                 FormatString="{StaticResource DefaultNumericFormat}"
-                                Maximum="{Binding AllocableCount}"
+                                Maximum="{Binding MaxAllocableCount, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                 Minimum="0"
                                 Value="{Binding AllocCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
-                </DataGridTemplateColumn>
+                </x4cmn:MouseHoverEditCellColumn>
 
                 <!--  割当可能個数  -->
                 <DataGridTemplateColumn
@@ -121,6 +195,7 @@
 
                 <!--  指定時間後の個数  -->
                 <DataGridTemplateColumn
+                    CellStyle="{StaticResource CapacityEmphasisStyle}"
                     ClipboardContentBinding="{Binding AllocableCount, Mode=OneTime}"
                     Header="指定時間後の個数"
                     SortMemberPath="AfterCount">

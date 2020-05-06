@@ -1,16 +1,15 @@
-﻿using System;
+﻿using Prism.Mvvm;
 using System.Collections.Generic;
-using X4_ComplexCalculator.Common;
-using X4_ComplexCalculator.DB.X4DB;
 using System.Linq;
 using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.ProductsGrid
 {
     /// <summary>
     /// 製品一覧を表示するDataGridViewの1レコード分用クラス
     /// </summary>
-    public class ProductsGridItem : INotifyPropertyChangedBace
+    public class ProductsGridItem : BindableBase
     {
         #region メンバ
         /// <summary>
@@ -39,12 +38,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.ProductsGrid
         {
             get => Details.Sum(x => x.Amount);
         }
-
-
-        /// <summary>
-        /// 損しているか
-        /// </summary>
-        public bool IsLosing => Count < 0;
 
 
         /// <summary>
@@ -85,8 +78,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.ProductsGrid
                     // 入力された値が最低価格以上、最高価格以下の場合、入力された値を設定する
                     _UnitPrice = value;
                 }
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(Price));
+                RaisePropertyChanged();
+                RaisePropertyChanged(nameof(Price));
             }
         }
 
@@ -164,16 +157,15 @@ namespace X4_ComplexCalculator.Main.WorkArea.ProductsGrid
 
             Details.AddRange(addItems);
 
-            OnPropertyChanged(nameof(Count));
-            OnPropertyChanged(nameof(Price));
-            OnPropertyChanged(nameof(IsLosing));
+            RaisePropertyChanged(nameof(Count));
+            RaisePropertyChanged(nameof(Price));
         }
 
         /// <summary>
         /// 詳細情報を設定
         /// </summary>
         /// <param name="details"></param>
-        public void SetDetails(IEnumerable<ProductDetailsListItem> details)
+        public void SetDetails(IEnumerable<ProductDetailsListItem> details, long prevModuleCount)
         {
             foreach (var item in details)
             {
@@ -181,13 +173,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.ProductsGrid
                 var tmp = Details.Where(x => x.ModuleID == item.ModuleID).FirstOrDefault();
                 if (tmp != null)
                 {
-                    tmp.ModuleCount = item.ModuleCount;
+                    tmp.ModuleCount += (item.ModuleCount - prevModuleCount);
                 }
             }
 
-            OnPropertyChanged(nameof(Count));
-            OnPropertyChanged(nameof(Price));
-            OnPropertyChanged(nameof(IsLosing));
+            RaisePropertyChanged(nameof(Count));
+            RaisePropertyChanged(nameof(Price));
         }
 
 
@@ -210,9 +201,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.ProductsGrid
             // 空のレコードを削除
             Details.RemoveAll(x => x.ModuleCount == 0);
 
-            OnPropertyChanged(nameof(Count));
-            OnPropertyChanged(nameof(Price));
-            OnPropertyChanged(nameof(IsLosing));
+            RaisePropertyChanged(nameof(Count));
+            RaisePropertyChanged(nameof(Price));
         }
 
 
@@ -227,9 +217,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.ProductsGrid
                 item.EfficiencyValue = efficiency;
             }
 
-            OnPropertyChanged(nameof(Count));
-            OnPropertyChanged(nameof(Price));
-            OnPropertyChanged(nameof(IsLosing));
+            RaisePropertyChanged(nameof(Count));
+            RaisePropertyChanged(nameof(Price));
         }
     }
 }
