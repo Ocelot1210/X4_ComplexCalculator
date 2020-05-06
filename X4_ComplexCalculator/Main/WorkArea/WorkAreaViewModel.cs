@@ -15,6 +15,7 @@ using Xceed.Wpf.AvalonDock.Layout;
 using System.Linq;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.WorkArea.Menu.View;
+using X4_ComplexCalculator.Main.WorkArea.StorageAssign;
 
 namespace X4_ComplexCalculator.Main.WorkArea
 {
@@ -73,11 +74,17 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// </summary>
         public ResourcesGridViewModel Resources { get; }
 
-        
+
         /// <summary>
-        /// ストレージ一覧
+        /// 保管庫一覧
         /// </summary>
         public StoragesGridViewModel Storages { get; }
+
+
+        /// <summary>
+        /// 保管庫割当情報
+        /// </summary>
+        public StorageAssignViewModel StorageAssign { get; }
 
 
         /// <summary>
@@ -166,12 +173,14 @@ namespace X4_ComplexCalculator.Main.WorkArea
             var moduleModel     = new ModulesGridModel();
             var productsModel   = new ProductsGridModel(moduleModel.Modules);
             var resourcesModel  = new ResourcesGridModel(moduleModel.Modules);
+            var storagesModel   = new StoragesGridModel(moduleModel.Modules);
 
-            Summary     = new StationSummaryViewModel(moduleModel.Modules, productsModel.Products, resourcesModel.Resources);
-            Modules     = new ModulesGridViewModel(moduleModel);
-            Products    = new ProductsGridViewModel(productsModel);
-            Resources   = new ResourcesGridViewModel(resourcesModel);
-            Storages    = new StoragesGridViewModel(moduleModel.Modules);
+            Summary       = new StationSummaryViewModel(moduleModel.Modules, productsModel.Products, resourcesModel.Resources);
+            Modules       = new ModulesGridViewModel(moduleModel);
+            Products      = new ProductsGridViewModel(productsModel);
+            Resources     = new ResourcesGridViewModel(resourcesModel);
+            Storages      = new StoragesGridViewModel(storagesModel);
+            StorageAssign = new StorageAssignViewModel(productsModel.Products, storagesModel.Storages);
 
             _Model              = new WorkAreaModel(moduleModel, productsModel, resourcesModel);
             OnUnloadedCommand   = new DelegateCommand(OnUnloaded);

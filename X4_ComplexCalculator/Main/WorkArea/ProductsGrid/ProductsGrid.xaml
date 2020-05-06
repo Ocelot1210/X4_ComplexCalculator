@@ -102,7 +102,6 @@
 
     <DataGrid
         x:Name="productGrid"
-        PresentationOptions:Freeze="true"
         x4bhv:DataGridCurrentCellEditModeBehavior.Enabled="True"
         x4bhv:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
         CellStyle="{StaticResource DataGridCellDefaultStyle}"

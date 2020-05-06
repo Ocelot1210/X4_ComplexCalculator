@@ -27,7 +27,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.StoragesGrid
         /// <summary>
         /// ストレージ一覧
         /// </summary>
-        public ObservableRangeCollection<StoragesGridItem> Storages { get; private set; } = new ObservableRangeCollection<StoragesGridItem>();
+        public ObservablePropertyChangedCollection<StoragesGridItem> Storages { get; private set; } = new ObservablePropertyChangedCollection<StoragesGridItem>();
         #endregion
 
 

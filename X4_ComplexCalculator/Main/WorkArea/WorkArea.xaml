@@ -9,6 +9,7 @@
     xmlns:modGrid="clr-namespace:X4_ComplexCalculator.Main.WorkArea.ModulesGrid"
     xmlns:prodGrid="clr-namespace:X4_ComplexCalculator.Main.WorkArea.ProductsGrid"
     xmlns:resGrid="clr-namespace:X4_ComplexCalculator.Main.WorkArea.ResourcesGrid"
+    xmlns:storAsign="clr-namespace:X4_ComplexCalculator.Main.WorkArea.StorageAssign"
     xmlns:storGrid="clr-namespace:X4_ComplexCalculator.Main.WorkArea.StoragesGrid"
     xmlns:stsmry="clr-namespace:X4_ComplexCalculator.Main.WorkArea.StationSummary"
     xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
@@ -61,7 +62,7 @@
                                 Title="モジュール一覧"
                                 CanClose="False"
                                 ContentId="Modules">
-                                <modGrid:ModulesGrid x:Name="Modules" DataContext="{Binding Modules, Mode=OneTime}" />
+                                <modGrid:ModulesGrid DataContext="{Binding Modules, Mode=OneTime}" />
                             </xcad:LayoutAnchorable>
                         </xcad:LayoutAnchorablePane>
 
@@ -72,7 +73,7 @@
                                 Title="概要"
                                 CanClose="False"
                                 ContentId="Summary">
-                                <stsmry:StationSummary x:Name="Summary" DataContext="{Binding Summary, Mode=OneTime}" />
+                                <stsmry:StationSummary DataContext="{Binding Summary, Mode=OneTime}" />
                             </xcad:LayoutAnchorable>
 
                             <!--  製品  -->
@@ -81,7 +82,7 @@
                                 Title="製品"
                                 CanClose="False"
                                 ContentId="Products">
-                                <prodGrid:ProductsGrid x:Name="Products" DataContext="{Binding Products, Mode=OneTime}" />
+                                <prodGrid:ProductsGrid DataContext="{Binding Products, Mode=OneTime}" />
                             </xcad:LayoutAnchorable>
 
                             <!--  建造  -->
@@ -90,7 +91,7 @@
                                 Title="建造"
                                 CanClose="False"
                                 ContentId="Resources">
-                                <resGrid:ResourcesGrid x:Name="Build" DataContext="{Binding Resources, Mode=OneTime}" />
+                                <resGrid:ResourcesGrid DataContext="{Binding Resources, Mode=OneTime}" />
                             </xcad:LayoutAnchorable>
 
                             <!--  保管庫  -->
@@ -99,8 +100,17 @@
                                 Title="保管庫"
                                 CanClose="False"
                                 ContentId="Storages">
-                                <storGrid:StoragesGrid x:Name="Storages" DataContext="{Binding Storages, Mode=OneTime}" />
+                                <storGrid:StoragesGrid DataContext="{Binding Storages, Mode=OneTime}" />
                             </xcad:LayoutAnchorable>
+
+                            <!--  保管庫割当  -->
+                            <xcad:LayoutAnchorable
+                                Title="保管庫割当"
+                                CanClose="False"
+                                ContentId="StorageSim">
+                                <storAsign:StorageAssign DataContext="{Binding StorageAssign, Mode=OneTime}" />
+                            </xcad:LayoutAnchorable>
+
                         </xcad:LayoutAnchorablePane>
                     </xcad:LayoutAnchorablePaneGroup>
 
