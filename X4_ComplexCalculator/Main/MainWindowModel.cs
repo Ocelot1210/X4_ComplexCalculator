@@ -12,6 +12,9 @@ using X4_ComplexCalculator.Main.Menu.Layout;
 using X4_ComplexCalculator.Common.Collection;
 using System.Collections.Generic;
 using Xceed.Wpf.AvalonDock;
+using X4_ComplexCalculator.Main.Menu.File.Import;
+using X4_ComplexCalculator.Main.Menu.File.Export;
+using Prism.Commands;
 
 namespace X4_ComplexCalculator.Main
 {
@@ -76,6 +79,34 @@ namespace X4_ComplexCalculator.Main
         public MainWindowModel()
         {
             Layouts.CollectionPropertyChanged += Layouts_CollectionPropertyChanged;
+        }
+
+
+        /// <summary>
+        /// インポート実行
+        /// </summary>
+        /// <param name="import"></param>
+        public void Import(IImport import)
+        {
+            var vm = new WorkAreaViewModel(ActiveLayout?.LayoutID ?? -1);
+
+            if (vm.Import(import))
+            {
+                Documents.Add(vm);
+            }
+            else
+            {
+                vm.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// エクスポート実行
+        /// </summary>
+        /// <param name="export"></param>
+        public void Export(IExport export)
+        {
+            ActiveContent?.Export(export);
         }
 
 

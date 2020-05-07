@@ -5,10 +5,10 @@ using System.Text;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
-using X4_ComplexCalculator.Main.WorkArea.ModulesGrid;
-using X4_ComplexCalculator.Main.WorkArea.ProductsGrid;
-using X4_ComplexCalculator.Main.WorkArea.ResourcesGrid;
-using X4_ComplexCalculator.Main.WorkArea.StorageAssign;
+using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
+using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
+using X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid;
+using X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign;
 
 namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
 {
@@ -18,30 +18,21 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
         /// インスタンス作成
         /// </summary>
         /// <param name="path">読み込み対象ファイルパス</param>
-        /// <param name="modules">モジュール一覧</param>
-        /// <param name="products">製品一覧</param>
-        /// <param name="resources">建造リソース一覧</param>
-        /// <param name="storageAssignItems">保管庫割当情報</param>
+        /// <param name="workArea">作業エリア</param>
         /// <returns></returns>
-        public static ISaveDataReader CreateSaveDataReader(
-            string path,
-            ObservableRangeCollection<ModulesGridItem> modules,
-            ObservableRangeCollection<ProductsGridItem> products,
-            ObservableRangeCollection<ResourcesGridItem> resources,
-            ObservableRangeCollection<StorageAssignGridItem> storageAssignItems
-            )
+        public static ISaveDataReader CreateSaveDataReader(string path, IWorkArea workArea)
         {
             var version = GetVersion(path);
-            ISaveDataReader ret = null;
+            ISaveDataReader ret;
 
             switch (version)
             {
                 case 1:
-                    ret = new SaveDataReader1(modules, products, resources, storageAssignItems);
+                    ret = new SaveDataReader1(workArea);
                     break;
 
                 default:
-                    ret = new SaveDataReader0(modules, products, resources);
+                    ret = new SaveDataReader0(workArea);
                     break;
             }
 
@@ -62,24 +53,21 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             var ret = 0;
             var tableExists = false;
 
-            using (var conn = new DBConnection(path))
             {
+                using var conn = new DBConnection(path);
                 conn.ExecQuery("SELECT count(*) AS Count FROM sqlite_master WHERE type = 'table' AND name = 'Common'", (dr, _) =>
                 {
                     tableExists = 0L < (long)dr["Count"];
                 });
             }
 
-
             if (tableExists)
             {
-                using (var conn = new DBConnection(path))
+                using var conn = new DBConnection(path);
+                conn.ExecQuery("SELECT Value FROM Common WHERE Item = 'FormatVersion'", (dr, _) =>
                 {
-                    conn.ExecQuery("SELECT Value FROM Common WHERE Item = 'FormatVersion'", (dr, _) =>
-                    {
-                        ret = (int)(long)dr["Value"];
-                    });
-                }
+                    ret = (int)(long)dr["Value"];
+                });
             }
 
             return ret;

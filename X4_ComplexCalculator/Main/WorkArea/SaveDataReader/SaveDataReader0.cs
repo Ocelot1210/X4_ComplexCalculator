@@ -1,11 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
-using X4_ComplexCalculator.Main.WorkArea.ModulesGrid;
-using X4_ComplexCalculator.Main.WorkArea.ProductsGrid;
-using X4_ComplexCalculator.Main.WorkArea.ResourcesGrid;
+using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
 namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
 {
@@ -19,38 +16,19 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
         /// </summary>
         public string Path { set; protected get; }
 
-
         /// <summary>
-        /// モジュール一覧
+        /// 作業エリア
         /// </summary>
-        protected readonly ObservableRangeCollection<ModulesGridItem> _Modules;
-
-        /// <summary>
-        /// 製品一覧
-        /// </summary>
-        protected readonly ObservableRangeCollection<ProductsGridItem> _Products;
-
-        /// <summary>
-        /// 建造リソース一覧
-        /// </summary>
-        protected readonly ObservableRangeCollection<ResourcesGridItem> _Resources;
+        protected readonly IWorkArea _WorkArea;
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="modules">モジュール一覧</param>
-        /// <param name="products">製品一覧</param>
-        /// <param name="resources">建造リソース一覧</param>
-        public SaveDataReader0(
-            ObservableRangeCollection<ModulesGridItem> modules,
-            ObservableRangeCollection<ProductsGridItem> products,
-            ObservableRangeCollection<ResourcesGridItem> resources
-        )
+        /// <param name="workArea">作業エリア</param>
+        public SaveDataReader0(IWorkArea workArea)
         {
-            _Modules = modules;
-            _Products = products;
-            _Resources = resources;
+            _WorkArea = workArea;
         }
 
 
@@ -121,7 +99,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                 modules[(int)(long)dr["row"]].Module.AddEquipment(new Equipment((string)dr["EquipmentID"]));
             });
 
-            _Modules.Reset(modules);
+            _WorkArea.Modules.Reset(modules);
         }
 
 
@@ -134,7 +112,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             conn.ExecQuery($"SELECT WareID, Price FROM Products", (dr, _) =>
             {
                 var wareID = (string)dr["WareID"];
-                var itm = _Products.Where(x => x.Ware.WareID == wareID).FirstOrDefault();
+                var itm = _WorkArea.Products.Where(x => x.Ware.WareID == wareID).FirstOrDefault();
                 if (itm != null)
                 {
                     itm.UnitPrice = (long)dr["Price"];
@@ -153,7 +131,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             {
                 var wareID = (string)dr["WareID"];
 
-                var itm = _Resources.Where(x => x.Ware.WareID == wareID).FirstOrDefault();
+                var itm = _WorkArea.Resources.Where(x => x.Ware.WareID == wareID).FirstOrDefault();
                 if (itm != null)
                 {
                     itm.UnitPrice = (long)dr["Price"];

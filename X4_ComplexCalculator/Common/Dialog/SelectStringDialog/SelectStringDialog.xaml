@@ -26,10 +26,9 @@
         FocusManager.FocusedElement="{Binding ElementName=PresetNameTextBox}"
         Orientation="Vertical">
 
-        <!--  プリセット名  -->
         <StackPanel>
             <TextBlock x:Name="DescriptionLabel" />
-            <TextBox x:Name="PresetNameTextBox" Text="{Binding InputString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <TextBox x:Name="SelectTextBox" Text="{Binding InputString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <TextBox.InputBindings>
                     <KeyBinding Command="{Binding OkButtonClickedCommand, Mode=OneTime}" Gesture="Enter" />
                 </TextBox.InputBindings>
@@ -39,6 +38,7 @@
         <!--  OK/Cancelボタン  -->
         <DockPanel HorizontalAlignment="Right">
             <Button
+                x:Name="OkButton"
                 Width="75"
                 Height="20"
                 Margin="5"
@@ -46,6 +46,7 @@
                 Content="OK" />
 
             <Button
+                x:Name="CancelButton"
                 Width="75"
                 Height="20"
                 Margin="5"

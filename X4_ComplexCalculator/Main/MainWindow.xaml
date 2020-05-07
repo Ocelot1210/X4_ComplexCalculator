@@ -71,11 +71,44 @@
                     Header="開く"
                     InputGestureText="Ctrl+O" />
 
+                <Separator />
+
+                <!--  インポート  -->
+                <MenuItem
+                    Header="インポート"
+                    InputGestureText="Ctrl+I"
+                    ItemsSource="{Binding Imports}">
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="{x:Type MenuItem}">
+                            <Setter Property="MenuItem.Header" Value="{Binding Title, Mode=OneTime}" />
+                            <Setter Property="Command" Value="{Binding Command, Mode=OneTime}" />
+                            <Setter Property="CommandParameter" Value="{Binding ., Mode=OneTime}" />
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
+
+                <!--  エクスポート  -->
+                <MenuItem
+                    Header="エクスポート"
+                    InputGestureText="Ctrl+E"
+                    ItemsSource="{Binding Exports}">
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="{x:Type MenuItem}">
+                            <Setter Property="MenuItem.Header" Value="{Binding Title, Mode=OneTime}" />
+                            <Setter Property="Command" Value="{Binding Command, Mode=OneTime}" />
+                            <Setter Property="CommandParameter" Value="{Binding ., Mode=OneTime}" />
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
+
+                <Separator />
+
                 <!--  DB更新  -->
                 <MenuItem
                     Command="{Binding UpdateDBCommand, Mode=OneTime}"
                     Header="DB更新"
                     InputGestureText="Ctrl+U" />
+
             </MenuItem>
 
 

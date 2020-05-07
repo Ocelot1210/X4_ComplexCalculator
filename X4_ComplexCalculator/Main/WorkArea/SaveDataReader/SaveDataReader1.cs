@@ -4,10 +4,10 @@ using System.Linq;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
-using X4_ComplexCalculator.Main.WorkArea.ModulesGrid;
-using X4_ComplexCalculator.Main.WorkArea.ProductsGrid;
-using X4_ComplexCalculator.Main.WorkArea.ResourcesGrid;
-using X4_ComplexCalculator.Main.WorkArea.StorageAssign;
+using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
+using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
+using X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid;
+using X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign;
 
 namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
 {
@@ -17,25 +17,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
     class SaveDataReader1 : SaveDataReader0
     {
         /// <summary>
-        /// 保管庫割当情報
-        /// </summary>
-        protected readonly ObservableRangeCollection<StorageAssignGridItem> _StorageAssignItems;
-
-        /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="modules">モジュール一覧</param>
-        /// <param name="products">製品一覧</param>
-        /// <param name="resources">建造リソース一覧</param>
-        /// <param name="storageAssignItems">保管庫割当情報</param>
-        public SaveDataReader1(
-            ObservableRangeCollection<ModulesGridItem> modules,
-            ObservableRangeCollection<ProductsGridItem> products,
-            ObservableRangeCollection<ResourcesGridItem> resources,
-            ObservableRangeCollection<StorageAssignGridItem> storageAssignItems
-        ) : base(modules, products, resources)
+        /// <param name="workArea">作業エリア</param>
+        public SaveDataReader1(IWorkArea workArea) : base(workArea)
         {
-            _StorageAssignItems = storageAssignItems;
+            
         }
 
 
@@ -91,7 +78,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             {
                 var wareID = (string)dr["WareID"];
 
-                var itm = _StorageAssignItems.Where(x => x.WareID == wareID).FirstOrDefault();
+                var itm = _WorkArea.StorageAssign.Where(x => x.WareID == wareID).FirstOrDefault();
                 if (itm != null)
                 {
                     itm.AllocCount = (long)dr["AllocCount"];

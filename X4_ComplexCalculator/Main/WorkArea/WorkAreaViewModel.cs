@@ -6,13 +6,15 @@ using System.Linq;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
-using X4_ComplexCalculator.Main.WorkArea.Menu.View;
-using X4_ComplexCalculator.Main.WorkArea.ModulesGrid;
-using X4_ComplexCalculator.Main.WorkArea.ProductsGrid;
-using X4_ComplexCalculator.Main.WorkArea.ResourcesGrid;
-using X4_ComplexCalculator.Main.WorkArea.StationSummary;
-using X4_ComplexCalculator.Main.WorkArea.StorageAssign;
-using X4_ComplexCalculator.Main.WorkArea.StoragesGrid;
+using X4_ComplexCalculator.Main.Menu.File.Export;
+using X4_ComplexCalculator.Main.Menu.File.Import;
+using X4_ComplexCalculator.Main.WorkArea.UI.Menu.View;
+using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
+using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
+using X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid;
+using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary;
+using X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign;
+using X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid;
 using Xceed.Wpf.AvalonDock;
 using Xceed.Wpf.AvalonDock.Layout;
 using Xceed.Wpf.AvalonDock.Layout.Serialization;
@@ -188,6 +190,25 @@ namespace X4_ComplexCalculator.Main.WorkArea
             OnUnloadedCommand   = new DelegateCommand(OnUnloaded);
 
             _Model.PropertyChanged += Model_PropertyChanged;
+        }
+
+        /// <summary>
+        /// インポート実行
+        /// </summary>
+        /// <param name="import"></param>
+        public bool Import(IImport import)
+        {
+            return import.Import(_Model);
+        }
+
+
+        /// <summary>
+        /// エクスポート実行
+        /// </summary>
+        /// <param name="import"></param>
+        public bool Export(IExport export)
+        {
+            return export.Export(_Model);
         }
 
 

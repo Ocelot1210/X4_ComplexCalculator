@@ -1,8 +1,11 @@
 ﻿using Prism.Commands;
 using Prism.Mvvm;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
+using X4_ComplexCalculator.Main.Menu.File.Export;
+using X4_ComplexCalculator.Main.Menu.File.Import;
 using X4_ComplexCalculator.Main.Menu.Layout;
 using X4_ComplexCalculator.Main.WorkArea;
 using Xceed.Wpf.AvalonDock;
@@ -101,6 +104,18 @@ namespace X4_ComplexCalculator.Main
         /// レイアウト一覧
         /// </summary>
         public ObservableCollection<LayoutMenuItem> Layouts => _Model.Layouts;
+
+
+        /// <summary>
+        /// インポート処理一覧
+        /// </summary>
+        public List<IImport> Imports { get; }
+
+
+        /// <summary>
+        /// エクスポート処理一覧
+        /// </summary>
+        public List<IExport> Exports { get; }
         #endregion
 
 
@@ -119,6 +134,17 @@ namespace X4_ComplexCalculator.Main
             OpenCommand            = new DelegateCommand(Open);
             UpdateDBCommand        = new DelegateCommand(_Model.UpdateDB);
             DocumentClosingCommand = new DelegateCommand<DocumentClosingEventArgs>(DocumentClosing);
+
+
+            Imports = new List<IImport>()
+            {
+                new StationCalclatorImport(new DelegateCommand<IImport>(_Model.Import))
+            };
+
+            Exports = new List<IExport>()
+            {
+                new StationCalclatorExport(new DelegateCommand<IExport>(_Model.Export))
+            };
         }
 
 

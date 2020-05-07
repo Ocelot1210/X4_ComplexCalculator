@@ -6,20 +6,23 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data.SQLite;
 using System.Linq;
+using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
-using X4_ComplexCalculator.Main.WorkArea.ModulesGrid;
-using X4_ComplexCalculator.Main.WorkArea.ProductsGrid;
-using X4_ComplexCalculator.Main.WorkArea.ResourcesGrid;
+using X4_ComplexCalculator.Main.Menu.File.Export;
+using X4_ComplexCalculator.Main.Menu.File.Import;
+using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
+using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
+using X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid;
 using X4_ComplexCalculator.Main.WorkArea.SaveDataReader;
-using X4_ComplexCalculator.Main.WorkArea.StorageAssign;
+using X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign;
 
 namespace X4_ComplexCalculator.Main.WorkArea
 {
     /// <summary>
     /// 作業エリア用Model
     /// </summary>
-    class WorkAreaModel : BindableBase, IDisposable
+    class WorkAreaModel : BindableBase, IDisposable, IWorkArea
     {
         #region メンバ
         /// <summary>
@@ -43,7 +46,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <summary>
         /// 保管庫割当
         /// </summary>
-        private readonly StorageAssignModel _StorageAssignModel;
+        private readonly StorageAssignModel _StorageAssign;
 
 
         /// <summary>
@@ -58,6 +61,29 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// 保存先ファイルパス
         /// </summary>
         public string SaveFilePath { get; private set; }
+
+        /// <summary>
+        /// モジュール一覧
+        /// </summary>
+        public ObservableRangeCollection<ModulesGridItem> Modules => _Modules.Modules;
+
+
+        /// <summary>
+        /// 製品一覧
+        /// </summary>
+        public ObservableRangeCollection<ProductsGridItem> Products => _Products.Products;
+
+
+        /// <summary>
+        /// 建造リソース一覧
+        /// </summary>
+        public ObservableRangeCollection<ResourcesGridItem> Resources => _Resources.Resources;
+
+
+        /// <summary>
+        /// 保管庫割当情報
+        /// </summary>
+        public ObservableRangeCollection<StorageAssignGridItem> StorageAssign => _StorageAssign.StorageAssignGridItems;
 
 
         /// <summary>
@@ -83,7 +109,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
                         _Modules.Modules.CollectionPropertyChanged -= OnPropertyChanged;
                         _Products.Products.CollectionPropertyChanged -= OnPropertyChanged;
                         _Resources.Resources.CollectionPropertyChanged -= OnPropertyChanged;
-                        _StorageAssignModel.StorageAssignGridItems.CollectionPropertyChanged -= OnPropertyChanged;
+                        _StorageAssign.StorageAssignGridItems.CollectionPropertyChanged -= OnPropertyChanged;
                     }
                     else
                     {
@@ -92,7 +118,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
                         _Modules.Modules.CollectionPropertyChanged += OnPropertyChanged;
                         _Products.Products.CollectionPropertyChanged += OnPropertyChanged;
                         _Resources.Resources.CollectionPropertyChanged += OnPropertyChanged;
-                        _StorageAssignModel.StorageAssignGridItems.CollectionPropertyChanged += OnPropertyChanged;
+                        _StorageAssign.StorageAssignGridItems.CollectionPropertyChanged += OnPropertyChanged;
                     }
                 }
             }
@@ -112,7 +138,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
             _Modules = modules;
             _Products = products;
             _Resources = resources;
-            _StorageAssignModel = storageAssignModel;
+            _StorageAssign = storageAssignModel;
 
             HasChanged = true;
         }
@@ -128,7 +154,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
             _Modules.Modules.CollectionPropertyChanged -= OnPropertyChanged;
             _Products.Products.CollectionPropertyChanged -= OnPropertyChanged;
             _Resources.Resources.CollectionPropertyChanged -= OnPropertyChanged;
-            _StorageAssignModel.StorageAssignGridItems.CollectionPropertyChanged -= OnPropertyChanged;
+            _StorageAssign.StorageAssignGridItems.CollectionPropertyChanged -= OnPropertyChanged;
         }
 
 
@@ -223,7 +249,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
 
             // モジュール保存
             var rowCnt = 0;
-            foreach (var module in _Modules.Modules)
+            foreach (var module in Modules)
             {
                 conn.ExecQuery($"INSERT INTO Modules(Row, ModuleID, Count) Values({rowCnt}, '{module.Module.ModuleID}', {module.ModuleCount})");
 
@@ -237,19 +263,19 @@ namespace X4_ComplexCalculator.Main.WorkArea
 
 
             // 価格保存
-            foreach (var product in _Products.Products)
+            foreach (var product in Products)
             {
                 conn.ExecQuery($"INSERT INTO Products(WareID, Price) Values('{product.Ware.WareID}', {product.UnitPrice})");
             }
 
             // 建造リソース保存
-            foreach (var resource in _Resources.Resources)
+            foreach (var resource in Resources)
             {
                 conn.ExecQuery($"INSERT INTO BuildResources(WareID, Price) Values('{resource.Ware.WareID}', {resource.UnitPrice})");
             }
 
             // 保管庫割当情報保存
-            foreach (var assign in _StorageAssignModel.StorageAssignGridItems)
+            foreach (var assign in StorageAssign)
             {
                 conn.ExecQuery($"INSERT INTO StorageAssign(WareID, AllocCount) Values('{assign.WareID}', {assign.AllocCount})");
             }
@@ -266,7 +292,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <param name="path"></param>
         public void Load(string path)
         {
-            var reader = SaveDataReaderFactory.CreateSaveDataReader(path, _Modules.Modules, _Products.Products, _Resources.Resources, _StorageAssignModel.StorageAssignGridItems);
+            var reader = SaveDataReaderFactory.CreateSaveDataReader(path, this);
             
             // 読み込み成功？
             if (reader.Load())
