@@ -108,6 +108,12 @@ WHERE
         /// </summary>
         private void OnWorkersChanged()
         {
+            if (WorkersCount == 0)
+            {
+                NeedWareInfoDetails.Clear();
+                return;
+            }
+
             var query = @$"
 SELECT
 	ifnull(Race.Name, (SELECT Name FROM Race WHERE RaceID = 'argon')) AS Method,
