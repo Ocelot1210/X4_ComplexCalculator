@@ -122,25 +122,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
             {
                 if (SetProperty(ref _CurrentDockingManager, value))
                 {
-                    // レイアウトIDが指定されていればレイアウト設定
-                    if (0 <= _LayoutID)
-                    {
-                        SetLayout(_LayoutID);
-                        // 1回ロードしたので次回以降ロードしないようにする
-                        _LayoutID = -1;
-                        return;
-                    }
-
-                    // 前回レイアウトがあれば、レイアウト復元
-                    if (_Layout != null)
-                    {
-                        var serializer = new XmlLayoutSerializer(_CurrentDockingManager);
-
-                        using var ms = new MemoryStream(_Layout, false);
-                        serializer.Deserialize(ms);
-                    }
-
-                    VisiblityMenuItems.Reset(_CurrentDockingManager.Layout.Descendents().OfType<LayoutAnchorable>().Select(x => new VisiblityMenuItem(x)));
+                    RestoreLayout();
                 }
             }
             private get => _CurrentDockingManager;
@@ -321,6 +303,35 @@ WHERE
 
             return ms.ToArray();
         }
+
+
+        /// <summary>
+        /// レイアウトを復元する
+        /// </summary>
+        private void RestoreLayout()
+        {
+            // レイアウトIDが指定されていればレイアウト設定
+            if (0 <= _LayoutID)
+            {
+                SetLayout(_LayoutID);
+                // 1回ロードしたので次回以降ロードしないようにする
+                _LayoutID = -1;
+                return;
+            }
+
+            // 前回レイアウトがあれば、レイアウト復元
+            if (_Layout != null)
+            {
+                var serializer = new XmlLayoutSerializer(_CurrentDockingManager);
+
+                using var ms = new MemoryStream(_Layout, false);
+                serializer.Deserialize(ms);
+            }
+
+            // 表示メニューを初期化
+            VisiblityMenuItems.Reset(_CurrentDockingManager.Layout.Descendents().OfType<LayoutAnchorable>().Select(x => new VisiblityMenuItem(x)));
+        }
+
 
         /// <summary>
         /// アンロード時

@@ -10,7 +10,7 @@ using System.Xml.Linq;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
 {
-    class ModulesGridViewModel : BindableBase
+    class ModulesGridViewModel : BindableBase, IDisposable
     {
         #region メンバ
         /// <summary>
@@ -44,10 +44,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             }
             set
             {
-                if (_SearchModuleName != value)
+                if (SetProperty(ref _SearchModuleName, value))
                 {
-                    _SearchModuleName = value;
-                    RaisePropertyChanged();
                     ModulesView.Refresh();
                 }
             }

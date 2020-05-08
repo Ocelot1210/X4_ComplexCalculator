@@ -1,5 +1,6 @@
 ﻿using Prism.Commands;
 using Prism.Mvvm;
+using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Controls;
@@ -11,7 +12,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
     /// <summary>
     /// 製品一覧用DataGridViewのViewModel
     /// </summary>
-    class ProductsGridViewModel : BindableBase
+    class ProductsGridViewModel : BindableBase, IDisposable
     {
         #region メンバ
         /// <summary>

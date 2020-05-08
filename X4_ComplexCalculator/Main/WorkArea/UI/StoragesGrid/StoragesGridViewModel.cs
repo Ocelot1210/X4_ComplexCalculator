@@ -1,4 +1,5 @@
 ﻿using Prism.Mvvm;
+using System;
 using System.Collections.ObjectModel;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
@@ -6,7 +7,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
     /// <summary>
     /// 保管庫一覧表示用DataGridViewのViewModel
     /// </summary>
-    class StoragesGridViewModel : BindableBase
+    class StoragesGridViewModel : BindableBase, IDisposable
     {
         #region メンバ
         /// <summary>

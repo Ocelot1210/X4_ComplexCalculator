@@ -56,7 +56,7 @@
             </Button>
 
             <!--  検索ボックス  -->
-            <xctk:WatermarkTextBox Text="{Binding SearchModuleName, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}" Watermark="モジュール名を入力して検索" />
+            <xctk:WatermarkTextBox Text="{Binding SearchModuleName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Watermark="モジュール名を入力して検索" />
 
         </DockPanel>
 

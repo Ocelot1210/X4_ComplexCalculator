@@ -1,4 +1,5 @@
 ﻿using Prism.Mvvm;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Data;
@@ -13,7 +14,7 @@ using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWareInf
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary
 {
-    class StationSummaryViewModel : BindableBase
+    class StationSummaryViewModel : BindableBase, IDisposable
     {
         #region メンバ
         /// <summary>

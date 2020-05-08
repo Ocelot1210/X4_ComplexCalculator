@@ -10,6 +10,7 @@
     Height="Auto"
     x4bhv:CloseWindowBehavior.Close="{Binding CloseDialogProperty, Mode=OneWay}"
     x4bhv:CloseWindowBehavior.Result="{Binding DialogResult, Mode=OneWay}"
+    ContentRendered="Window_ContentRendered"
     ResizeMode="NoResize"
     SizeToContent="Height"
     Style="{StaticResource DefaultWindowBackgroundStyle}"
@@ -23,7 +24,7 @@
 
     <StackPanel
         Margin="5"
-        FocusManager.FocusedElement="{Binding ElementName=PresetNameTextBox}"
+        FocusManager.FocusedElement="{Binding ElementName=SelectTextBox}"
         Orientation="Vertical">
 
         <StackPanel>

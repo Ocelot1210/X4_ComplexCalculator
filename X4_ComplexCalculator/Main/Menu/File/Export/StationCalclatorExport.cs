@@ -52,7 +52,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Export
             }
             sb.Length -= 2;
 
-            SelectStringDialog.ShowDialog("Station Calclatorへエクスポート", "URLをコピーして下さい", sb.ToString());
+            SelectStringDialog.ShowDialog("Station Calclatorへエクスポート", "URLをコピーして下さい", sb.ToString(), hideCancelButton:true);
 
             return true;
         }

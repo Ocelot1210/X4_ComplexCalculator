@@ -71,6 +71,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
             BuildResourceView.SortDescriptions.Add(new SortDescription("Ware.Name", ListSortDirection.Ascending));
         }
 
+        /// <summary>
+        /// リソースを開放
+        /// </summary>
         public void Dispose()
         {
             _Model.Dispose();
