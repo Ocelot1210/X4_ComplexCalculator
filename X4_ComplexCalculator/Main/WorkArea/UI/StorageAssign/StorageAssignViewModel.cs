@@ -45,6 +45,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
 
             StorageAssignInfo = (ListCollectionView)CollectionViewSource.GetDefaultView(_Model.StorageAssignGridItems);
             StorageAssignInfo.SortDescriptions.Clear();
+            StorageAssignInfo.SortDescriptions.Add(new SortDescription(nameof(StorageAssignGridItem.Tier), ListSortDirection.Ascending));
             StorageAssignInfo.SortDescriptions.Add(new SortDescription(nameof(StorageAssignGridItem.WareName), ListSortDirection.Ascending));
 
             StorageAssignInfo.GroupDescriptions.Clear();

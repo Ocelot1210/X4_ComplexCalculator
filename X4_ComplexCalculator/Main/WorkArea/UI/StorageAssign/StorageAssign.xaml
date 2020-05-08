@@ -137,6 +137,19 @@
 
             <DataGrid.Columns>
 
+                <!--  階級  -->
+                <DataGridTemplateColumn
+                    ClipboardContentBinding="{Binding Tier, Mode=OneTime}"
+                    Header="階級"
+                    SortMemberPath="Tier">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock VerticalAlignment="Center" Text="{Binding Tier, Mode=OneTime}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+
                 <!--  ウェア名  -->
                 <DataGridTemplateColumn
                     ClipboardContentBinding="{Binding WareName, Mode=OneTime}"

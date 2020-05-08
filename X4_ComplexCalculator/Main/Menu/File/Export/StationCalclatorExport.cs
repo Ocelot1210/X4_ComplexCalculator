@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
@@ -46,13 +47,15 @@ namespace X4_ComplexCalculator.Main.Menu.File.Export
 
             // モジュール情報を追加
             sb.Append("l=@");
-            foreach (var module in workArea.Modules)
+            foreach (var module in workArea.Modules.Where(x => x.Module.ModuleType.ModuleTypeID != "connectionmodule" && 
+                                                               x.Module.ModuleType.ModuleTypeID != "ventureplatform" &&
+                                                               x.Module.ModuleID != "module_gen_dock_m_venturer_01"))
             {
                 sb.Append($"$module-{module.Module.ModuleID},count:{module.ModuleCount};,");
             }
             sb.Length -= 2;
 
-            SelectStringDialog.ShowDialog("Station Calclatorへエクスポート", "URLをコピーして下さい", sb.ToString(), hideCancelButton:true);
+            SelectStringDialog.ShowDialog("Station Calclatorへエクスポート", "URLをコピーして下さい\r\n注) 以下のモジュールは除外しています。\r\n・接続モジュール\r\n・探検モジュール", sb.ToString(), hideCancelButton:true);
 
             return true;
         }

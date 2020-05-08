@@ -49,6 +49,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
 
 
         /// <summary>
+        /// 階級
+        /// </summary>
+        public long Tier { get; }
+
+
+        /// <summary>
         /// ウェアID
         /// </summary>
         public string WareID { get; }
@@ -164,6 +170,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         {
             WareID = ware.WareID;
             WareName = ware.Name;
+            Tier = ware.WareGroup.Tier;
 
             TransportTypeID = ware.TransportType.TransportTypeID;
             TransportTypeName = ware.TransportType.Name;
