@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.IO;
 using System.Windows;
 using X4_ComplexCalculator.DB;
 
@@ -56,6 +57,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
                 try
                 {
                     SaveMain(workArea);
+                    workArea.Title = Path.GetFileNameWithoutExtension(SaveFilePath);
                     ret = true;
                 }
                 catch(Exception e)

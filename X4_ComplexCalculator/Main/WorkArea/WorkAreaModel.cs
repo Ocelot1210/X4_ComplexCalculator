@@ -21,6 +21,12 @@ namespace X4_ComplexCalculator.Main.WorkArea
     {
         #region メンバ
         /// <summary>
+        /// タイトル文字列
+        /// </summary>
+        private string _Title;
+
+
+        /// <summary>
         /// モジュール一覧
         /// </summary>
         private readonly ModulesGridModel _Modules;
@@ -59,9 +65,14 @@ namespace X4_ComplexCalculator.Main.WorkArea
 
         #region プロパティ
         /// <summary>
-        /// 保存先ファイルパス
+        /// タイトル文字列
         /// </summary>
-        public string SaveFilePath => _SaveDataWriter.SaveFilePath;
+        public string Title
+        {
+            get => _Title;
+            set => SetProperty(ref _Title, value);
+        }
+
 
         /// <summary>
         /// モジュール一覧

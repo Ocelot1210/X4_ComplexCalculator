@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
+using System.Text;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
@@ -182,7 +183,16 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <returns>ハッシュ値</returns>
         public override int GetHashCode()
         {
-            return _Equipments.GetHashCode();
+            var sb = new StringBuilder();
+            
+            foreach (var equipmentID in _Equipments.SelectMany(x => x.Value.Select(y => y.EquipmentID).OrderBy(x => x)))
+            {
+                sb.Append(equipmentID);
+            }
+
+            var ret = sb.ToString().GetHashCode();
+
+            return ret;
         }
     }
 }

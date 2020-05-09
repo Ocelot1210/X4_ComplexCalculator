@@ -83,7 +83,7 @@
                             <!--  モジュール種別  -->
                             <xcad:LayoutDocument Title="モジュール種別" CanClose="False">
                                 <xctk:CheckListBox
-                                    DisplayMemberPath="Name"
+                                    DisplayMemberPath="PlanName"
                                     IsSelectAllActive="True"
                                     ItemsSource="{Binding ModuleTypes}"
                                     ScrollViewer.HorizontalScrollBarVisibility="Visible"

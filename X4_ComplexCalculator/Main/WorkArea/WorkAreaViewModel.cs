@@ -102,12 +102,12 @@ namespace X4_ComplexCalculator.Main.WorkArea
         {
             get
             {
-                if (string.IsNullOrEmpty(_Model.SaveFilePath))
+                if (string.IsNullOrEmpty(_Model.Title))
                 {
                     return "no title*";
                 }
 
-                var ret = Path.GetFileNameWithoutExtension(_Model.SaveFilePath);
+                var ret = _Model.Title;
 
                 return (HasChanged) ? $"{ret}*" : ret;
             }
@@ -356,7 +356,7 @@ WHERE
                     RaisePropertyChanged(nameof(Title));
                     break;
 
-                case nameof(_Model.SaveFilePath):
+                case nameof(_Model.Title):
                     RaisePropertyChanged(nameof(Title));
                     break;
 

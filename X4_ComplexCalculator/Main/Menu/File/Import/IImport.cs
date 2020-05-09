@@ -1,4 +1,5 @@
-﻿using System.Windows.Input;
+﻿using System.Collections.Generic;
+using System.Windows.Input;
 using X4_ComplexCalculator.Main.WorkArea;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import
@@ -15,6 +16,13 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
         /// Viewより呼ばれるCommand
         /// </summary>
         public ICommand Command { get; }
+
+
+        /// <summary>
+        /// インポート対象を選択
+        /// </summary>
+        /// <returns>インポート対象数</returns>
+        public int Select();
 
 
         /// <summary>

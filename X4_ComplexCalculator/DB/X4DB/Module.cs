@@ -154,7 +154,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <returns>ハッシュ値</returns>
         public override int GetHashCode()
         {
-            return ModuleID.GetHashCode();
+            return HashCode.Combine(ModuleID, Equipment);
         }
     }
 }

@@ -88,15 +88,21 @@ namespace X4_ComplexCalculator.Main
         /// <param name="import"></param>
         public void Import(IImport import)
         {
-            var vm = new WorkAreaViewModel(ActiveLayout?.LayoutID ?? -1);
+            // インポート対象数を取得
+            var importCnt = import.Select();
 
-            if (vm.Import(import))
+            for (var cnt = 0; cnt < importCnt; cnt++)
             {
-                Documents.Add(vm);
-            }
-            else
-            {
-                vm.Dispose();
+                var vm = new WorkAreaViewModel(ActiveLayout?.LayoutID ?? -1);
+
+                if (vm.Import(import))
+                {
+                    Documents.Add(vm);
+                }
+                else
+                {
+                    vm.Dispose();
+                }
             }
         }
 
