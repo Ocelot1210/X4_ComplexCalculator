@@ -28,5 +28,14 @@ namespace X4_ComplexCalculator.DB.X4DB
             Method = method;
             Time = time;
         }
+
+        /// <summary>
+        /// ハッシュ値を取得
+        /// </summary>
+        /// <returns></returns>
+        public override int GetHashCode()
+        {
+            return Method.GetHashCode();
+        }
     }
 }

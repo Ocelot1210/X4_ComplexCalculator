@@ -124,7 +124,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// </summary>
         /// <param name="moduleID">モジュールID</param>
         /// <param name="moduleCount">モジュール数</param>
-        public ModulesGridItem(string moduleID, long moduleCount = 1) : this(new Module(moduleID), moduleCount)
+        public ModulesGridItem(string moduleID, long moduleCount = 1) : this(new Module(moduleID), null, moduleCount)
         {
 
         }
@@ -134,12 +134,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// </summary>
         /// <param name="moduleID">モジュール</param>
         /// <param name="moduleCount">モジュール数</param>
-        public ModulesGridItem(Module module, long moduleCount = 1)
+        public ModulesGridItem(Module module, ModuleProduction selectedMethod = null, long moduleCount = 1)
         {
             Module = module;
             ModuleCount = moduleCount;
             EditEquipmentCommand = new DelegateCommand(EditEquipment);
-            _SelectedMethod = Module.ModuleProductions[0];
+
+            _SelectedMethod = selectedMethod ?? Module.ModuleProductions[0];
         }
 
 

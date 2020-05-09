@@ -202,7 +202,7 @@ WHERE
             }
 
             // モジュール一覧に追加
-            var range = dict.Select(x => (x.Value)).OrderBy(x => x.Item1).Select(x => new ModulesGridItem(x.Item2, x.Item3));
+            var range = dict.Select(x => (x.Value)).OrderBy(x => x.Item1).Select(x => new ModulesGridItem(x.Item2, null, x.Item3));
             workArea.Modules.AddRange(range);
 
 

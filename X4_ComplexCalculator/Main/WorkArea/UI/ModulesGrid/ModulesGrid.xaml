@@ -47,13 +47,24 @@
 
             <!--  モジュール追加ボタン  -->
             <Button
-                Width="75"
+                Width="65"
+                Command="{Binding AddModuleCommand}"
                 Content="追加"
-                DockPanel.Dock="Right">
-                <Button.InputBindings>
-                    <MouseBinding Command="{Binding AddButtonClicked}" MouseAction="LeftClick" />
-                </Button.InputBindings>
-            </Button>
+                DockPanel.Dock="Right" />
+
+            <!--  モジュール自動追加ボタン  -->
+            <Button
+                Width="65"
+                Command="{Binding AutoAddModuleCommand}"
+                Content="自動追加"
+                DockPanel.Dock="Right" />
+
+            <!--  モジュールマージボタン  -->
+            <Button
+                Width="65"
+                Command="{Binding MergeModuleCommand}"
+                Content="マージ"
+                DockPanel.Dock="Right" />
 
             <!--  検索ボックス  -->
             <xctk:WatermarkTextBox Text="{Binding SearchModuleName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Watermark="モジュール名を入力して検索" />

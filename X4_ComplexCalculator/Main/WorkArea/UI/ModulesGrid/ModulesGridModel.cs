@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
@@ -107,6 +108,52 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
 
                 // 要素を入れ替える
                 Modules.Replace(oldItem, newItem);
+            }
+        }
+
+
+        /// <summary>
+        /// 同一モジュールをマージ
+        /// </summary>
+        public void MergeModule()
+        {
+            // モジュール数が1以下なら何もしない
+            if (Modules.Count <= 1)
+            {
+                return;
+            }
+
+            var result = MessageBox.Show("重複するモジュールをマージしますか？", "確認", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
+            if (result != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            var dict = new Dictionary<int, (int, Module, ModuleProduction, long)>();
+
+            var prevCnt = Modules.Count;
+
+            foreach (var (module, idx) in Modules.Select((x, idx) => (x, idx)))
+            {
+                var hash = HashCode.Combine(module.Module, module.SelectedMethod);
+                if (dict.ContainsKey(hash))
+                {
+                    var tmp = dict[hash];
+                    tmp.Item4 += module.ModuleCount;
+                    dict[hash] = tmp;
+                }
+                else
+                {
+                    dict.Add(hash, (idx, module.Module, module.SelectedMethod, module.ModuleCount));
+                }
+            }
+
+            // モジュール数に変更があった場合のみ処理
+            if (prevCnt != dict.Count)
+            {
+                Modules.Reset(dict.OrderBy(x => x.Value.Item1).Select(x => new ModulesGridItem(x.Value.Item2, x.Value.Item3, x.Value.Item4)));
+
+                MessageBox.Show($"{prevCnt - dict.Count}モジュールをマージしました。", "情報", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
     }

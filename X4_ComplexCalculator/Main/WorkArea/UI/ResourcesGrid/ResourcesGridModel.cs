@@ -22,7 +22,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
         /// <summary>
         /// モジュール一覧
         /// </summary>
-        readonly ObservablePropertyChangedCollection<ModulesGridItem> Modules;
+        private readonly ObservablePropertyChangedCollection<ModulesGridItem> Modules;
+
+        /// <summary>
+        /// 単価保存用
+        /// </summary>
+        private readonly Dictionary<string, long> _UnitPriceBakDict = new Dictionary<string, long>();
         #endregion
 
 
@@ -122,6 +127,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
 
             if (e.Action == NotifyCollectionChangedAction.Reset)
             {
+                // 単価保存
+                foreach (var resource in Resources)
+                {
+                    _UnitPriceBakDict.Add(resource.Ware.WareID, resource.UnitPrice);
+                }
+
                 Resources.Clear();
             }
 
@@ -196,7 +207,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
                 else
                 {
                     // ウェアが一覧にない場合
-                    addTarget.Add(new ResourcesGridItem(kvp.Key, kvp.Value));
+                    item = new ResourcesGridItem(kvp.Key, kvp.Value);
+                    if (_UnitPriceBakDict.ContainsKey(item.Ware.WareID))
+                    {
+                        item.UnitPrice = _UnitPriceBakDict[item.Ware.WareID];
+                    }
+                    addTarget.Add(item);
                 }
             }
 
@@ -225,10 +241,17 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
                 else
                 {
                     // ウェアが一覧にない場合
-                    addTarget.Add(new ResourcesGridItem(kvp.Key, kvp.Value));
+                    item = new ResourcesGridItem(kvp.Key, kvp.Value);
+                    if (_UnitPriceBakDict.ContainsKey(item.Ware.WareID))
+                    {
+                        item.UnitPrice = _UnitPriceBakDict[item.Ware.WareID];
+                    }
+                    addTarget.Add(item);
                 }
             }
 
+            // マージ処理以外で反応しないようにするためクリアする
+            _UnitPriceBakDict.Clear();
             Resources.AddRange(addTarget);
         }
 
@@ -252,7 +275,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
 
             Resources.RemoveAll(x => x.Amount == 0);
         }
-
 
 
         /// <summary>

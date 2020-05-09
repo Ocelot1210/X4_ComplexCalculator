@@ -29,6 +29,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// 生産性
         /// </summary>
         private double _Efficiency;
+
+
+        /// <summary>
+        /// 単価保存用
+        /// </summary>
+        private readonly Dictionary<string, long> _UnitPriceBakDict = new Dictionary<string, long>();
         #endregion
 
         #region プロパティ
@@ -144,6 +150,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
             if (e.Action == NotifyCollectionChangedAction.Reset)
             {
+                // 単価保存
+                foreach (var delProd in Products)
+                {
+                    _UnitPriceBakDict.Add(delProd.Ware.WareID, delProd.UnitPrice);
+                }
+
                 Products.Clear();
             }
 
@@ -217,9 +229,19 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 else
                 {
                     // ウェアが一覧に無い場合
-                    addItems.Add(new ProductsGridItem(item.Key, item.Value));
+                    prod = new ProductsGridItem(item.Key, item.Value);
+
+                    // 前回値単価がある場合、復元
+                    if (_UnitPriceBakDict.ContainsKey(prod.Ware.WareID))
+                    {
+                        prod.UnitPrice = _UnitPriceBakDict[prod.Ware.WareID];
+                    }
+                    addItems.Add(prod);
                 }
             }
+
+            // マージ処理以外で反応しないようにするためクリアする
+            _UnitPriceBakDict.Clear();
 
             Products.AddRange(addItems);
         }

@@ -22,19 +22,25 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         /// <summary>
         /// 製品一覧
         /// </summary>
-        private ObservablePropertyChangedCollection<ProductsGridItem> _Products;
+        private readonly ObservablePropertyChangedCollection<ProductsGridItem> _Products;
 
 
         /// <summary>
         /// 保管庫一覧
         /// </summary>
-        private ObservablePropertyChangedCollection<StoragesGridItem> _Storages;
+        private readonly ObservablePropertyChangedCollection<StoragesGridItem> _Storages;
 
 
         /// <summary>
         /// 保管庫容量情報
         /// </summary>
-        private Dictionary<string, StorageCapacityInfo> _CapacityDict = new Dictionary<string, StorageCapacityInfo>();
+        private readonly Dictionary<string, StorageCapacityInfo> _CapacityDict = new Dictionary<string, StorageCapacityInfo>();
+
+
+        /// <summary>
+        /// 保管庫割当保存用
+        /// </summary>
+        private readonly Dictionary<string, long> _AllocBakDict = new Dictionary<string, long>();
         #endregion
 
         #region プロパティ
@@ -190,6 +196,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
 
             if (e.Action == NotifyCollectionChangedAction.Reset)
             {
+                // 前回値保存
+                foreach (var itm in StorageAssignGridItems)
+                {
+                    _AllocBakDict.Add(itm.WareID, itm.AllocCount);
+                }
+
                 StorageAssignGridItems.Clear();
             }
         }
@@ -201,10 +213,25 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         /// <param name="products"></param>
         private void OnProductsAdded(IEnumerable<ProductsGridItem> products)
         {
-            StorageAssignGridItems.AddRange(products.Select(prod =>
+            // 前回値がある場合
+            if (StorageAssignGridItems.Count == 0 && 0 < _AllocBakDict.Count)
             {
-                return new StorageAssignGridItem(prod.Ware, _CapacityDict[prod.Ware.TransportType.TransportTypeID], prod.Count, Hour);
-            }));
+                StorageAssignGridItems.AddRange(products.Select(prod =>
+                {
+                    var ret = new StorageAssignGridItem(prod.Ware, _CapacityDict[prod.Ware.TransportType.TransportTypeID], prod.Count, Hour);
+                    ret.AllocCount = _AllocBakDict[ret.WareID];
+                    return ret;
+                }));
+
+                _AllocBakDict.Clear();
+            }
+            else
+            {
+                StorageAssignGridItems.AddRange(products.Select(prod =>
+                {
+                    return new StorageAssignGridItem(prod.Ware, _CapacityDict[prod.Ware.TransportType.TransportTypeID], prod.Count, Hour);
+                }));
+            }
         }
 
 

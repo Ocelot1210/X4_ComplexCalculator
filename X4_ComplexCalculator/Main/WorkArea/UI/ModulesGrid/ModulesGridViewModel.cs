@@ -55,7 +55,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <summary>
         /// モジュール追加ボタンクリック
         /// </summary>
-        public ICommand AddButtonClicked { get; }
+        public ICommand AddModuleCommand { get; }
 
 
         /// <summary>
@@ -86,6 +86,18 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// セルフォーカス用のコマンド
         /// </summary>
         public ICommand CellFocusCommand { private get; set; }
+
+
+        /// <summary>
+        /// モジュールマージコマンド
+        /// </summary>
+        public ICommand MergeModuleCommand { get; }
+
+
+        /// <summary>
+        /// モジュール自動追加コマンド
+        /// </summary>
+        public ICommand AutoAddModuleCommand { get; }
         #endregion
 
 
@@ -98,7 +110,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             _Model = model;
             ModulesView        = (ListCollectionView)CollectionViewSource.GetDefaultView(_Model.Modules);
             ModulesView.Filter = Filter;
-            AddButtonClicked   = new DelegateCommand(_Model.ShowAddModuleWindow);
+            AddModuleCommand   = new DelegateCommand(_Model.ShowAddModuleWindow);
+            MergeModuleCommand = new DelegateCommand(_Model.MergeModule);
             ReplaceModule      = new DelegateCommand<ModulesGridItem>(_Model.ReplaceModule);
             CopyModules        = new DelegateCommand(CopyModulesCommand);
             PasteModules       = new DelegateCommand<DataGrid>(PasteModulesCommand);
