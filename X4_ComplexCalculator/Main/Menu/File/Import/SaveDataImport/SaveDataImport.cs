@@ -1,53 +1,50 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Input;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
-using X4_ComplexCalculator.DB.X4DB;
-using System.Linq;
 
-namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
+namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
 {
     /// <summary>
-    /// 既存の計画ファイルからインポートする
+    /// X4のセーブデータからインポートする機能用クラス
     /// </summary>
-    class StationPlanImport : IImport
+    class SaveDataImport : IImport
     {
         #region メンバ
         /// <summary>
-        /// インポート対象計画一覧
+        /// インポート対象ステーション一覧
         /// </summary>
-        private List<StationPlanItem> _PlanItems = new List<StationPlanItem>();
+        private readonly List<SaveDataStationItem> Stations = new List<SaveDataStationItem>();
+
 
         /// <summary>
-        /// インポート対象計画要素番号
+        /// インポート対象ステーション要素番号
         /// </summary>
-        private int _PlanIdx = 0;
+        private int _StationIdx = 0;
         #endregion
 
-        #region プロパティ
         /// <summary>
         /// メニュー表示用タイトル
         /// </summary>
-        public string Title => "既存の計画";
+        public string Title => "X4 セーブデータ";
 
 
         /// <summary>
         /// Viewより呼ばれるCommand
         /// </summary>
         public ICommand Command { get; }
-        #endregion
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="command">Viewより呼ばれるCommand</param>
-        public StationPlanImport(ICommand command)
+        public SaveDataImport(ICommand command)
         {
             Command = command;
         }
@@ -59,31 +56,29 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
         /// <returns>インポート対象数</returns>
         public int Select()
         {
-            _PlanItems.Clear();
-
-            bool onOK = SelectPlanDialog.ShowDialog(_PlanItems);
+            var onOK = SelectStationDialog.ShowDialog(Stations);
             if (!onOK)
             {
-                _PlanItems.Clear();
+                Stations.Clear();
             }
 
-            _PlanIdx = 0;
-            return _PlanItems.Count;
+            _StationIdx = 0;
+            return Stations.Count;
         }
 
 
         /// <summary>
-        /// インポート処理
+        /// インポート実行
         /// </summary>
-        /// <param name="workArea"></param>
-        /// <returns></returns>
+        /// <param name="workArea">作業エリア</param>
+        /// <returns>インポートに成功したか</returns>
         public bool Import(IWorkArea workArea)
         {
             bool ret;
             try
             {
-                ret = ImportMain(workArea, _PlanItems[_PlanIdx]);
-                _PlanIdx++;
+                ret = ImportMain(workArea, Stations[_StationIdx]);
+                _StationIdx++;
             }
             catch
             {
@@ -95,23 +90,45 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
 
 
         /// <summary>
-        /// インポートメイン処理
+        /// インポート実行メイン
         /// </summary>
         /// <param name="workArea"></param>
-        /// <param name="planItem"></param>
+        /// <param name="saveData"></param>
         /// <returns></returns>
-        private bool ImportMain(IWorkArea workArea, StationPlanItem planItem)
+        private bool ImportMain(IWorkArea workArea, SaveDataStationItem saveData)
+        {
+            // モジュール一覧を設定
+            SetModules(workArea, saveData);
+
+            // 製品価格を設定
+            SetWarePrice(workArea, saveData);
+
+            // 保管庫割当状態を設定
+            SetStorageAssign(workArea, saveData);
+
+            workArea.Title = saveData.StationName;
+
+            return true;
+        }
+
+
+        /// <summary>
+        /// モジュール一覧を設定
+        /// </summary>
+        /// <param name="workArea"></param>
+        /// <param name="saveData"></param>
+        private void SetModules(IWorkArea workArea, SaveDataStationItem saveData)
         {
             var modParam = new SQLiteCommandParameters(1);
             var eqParam = new SQLiteCommandParameters(3);
             var moduleCount = 0;
 
-            foreach (var module in planItem.Plan.XPathSelectElements("entry"))
+            foreach (var entry in saveData.XElement.XPathSelectElements("construction/sequence/entry"))
             {
-                var index = int.Parse(module.Attribute("index").Value);
-                modParam.Add("macro", System.Data.DbType.String, module.Attribute("macro").Value);
+                var index = int.Parse(entry.Attribute("index").Value);
+                modParam.Add("macro", System.Data.DbType.String, entry.Attribute("macro").Value);
 
-                foreach (var equipmet in module.XPathSelectElements("upgrades/groups/*"))
+                foreach (var equipmet in entry.XPathSelectElements("upgrades/groups/*"))
                 {
                     eqParam.Add("index", System.Data.DbType.Int32, index);
                     eqParam.Add("macro", System.Data.DbType.String, equipmet.Attribute("macro").Value);
@@ -120,6 +137,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
 
                 moduleCount++;
             }
+
 
             var modules = new List<Module>(moduleCount);
 
@@ -139,6 +157,7 @@ WHERE
                     modules.Add(new Module((string)dr["ModuleID"]));
                 });
             }
+
 
             // 装備追加
             {
@@ -169,7 +188,7 @@ WHERE
 
                         default:
                             return;
-                            
+
                     }
 
                     var equipment = new Equipment((string)dr["EquipmentID"]);
@@ -180,7 +199,6 @@ WHERE
                     }
                 });
             }
-
 
             // 重複削除
             var dict = new Dictionary<int, (int, Module, long)>();
@@ -203,10 +221,49 @@ WHERE
             // モジュール一覧に追加
             var range = dict.Select(x => (x.Value)).OrderBy(x => x.Item1).Select(x => new ModulesGridItem(x.Item2, null, x.Item3));
             workArea.Modules.AddRange(range);
+        }
 
 
-            workArea.Title = planItem.PlanName;
-            return true;
+
+
+        /// <summary>
+        /// 製品価格を設定
+        /// </summary>
+        /// <param name="workArea"></param>
+        /// <param name="saveData"></param>
+        private void SetWarePrice(IWorkArea workArea, SaveDataStationItem saveData)
+        {
+            foreach (var ware in saveData.XElement.XPathSelectElements("/economylog/*[not(self::cargo)]"))
+            {
+                var wareID = ware.Attribute("ware").Value;
+                var prod = workArea.Products.Where(x => x.Ware.WareID == wareID).FirstOrDefault();
+                if (prod != null)
+                {
+                    prod.UnitPrice = long.Parse(ware.Attribute("price").Value);
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// 保管庫割当状態を設定
+        /// </summary>
+        /// <param name="workArea"></param>
+        /// <param name="saveData"></param>
+        private void SetStorageAssign(IWorkArea workArea, SaveDataStationItem saveData)
+        {
+            foreach (var ware in saveData.XElement.XPathSelectElements("overrides/max/ware"))
+            {
+                var wareID = ware.Attribute("ware").Value;
+
+                var storage = workArea.StorageAssign.Where(x => x.WareID == wareID).FirstOrDefault();
+                if (storage != null)
+                {
+                    var amount = long.Parse(ware.Attribute("amount").Value);
+
+                    storage.AllocCount = amount;
+                }
+            }
         }
     }
 }

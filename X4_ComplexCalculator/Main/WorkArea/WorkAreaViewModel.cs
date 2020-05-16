@@ -167,7 +167,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
             var storageAssignModel = new StorageAssignModel(productsModel.Products, storagesModel.Storages);
             StorageAssign = new StorageAssignViewModel(storageAssignModel);
 
-            
+            Modules.AutoAddModuleCommand = Products.AutoAddModuleCommand;
             _Model              = new WorkAreaModel(moduleModel, productsModel, resourcesModel, storageAssignModel);
             OnUnloadedCommand   = new DelegateCommand(OnUnloaded);
 
@@ -286,6 +286,9 @@ WHERE
                 using var ms = new MemoryStream(_Layout, false);
                 serializer.Deserialize(ms);
             }
+
+            // 表示メニューを初期化
+            VisiblityMenuItems.Reset(_CurrentDockingManager.Layout.Descendents().OfType<LayoutAnchorable>().Select(x => new VisiblityMenuItem(x)));
         }
 
 

@@ -6,7 +6,9 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.SQLite;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using System.Windows;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
@@ -23,12 +25,17 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// モジュール一覧
         /// </summary>
-        readonly ObservablePropertyChangedCollection<ModulesGridItem> _Modules;
+        private readonly ObservablePropertyChangedCollection<ModulesGridItem> _Modules;
 
         /// <summary>
         /// 生産性
         /// </summary>
         private double _Efficiency;
+
+        /// <summary>
+        /// 製品計算機
+        /// </summary>
+        private readonly ProductCalclator _ProductCalclator = ProductCalclator.Create();
 
 
         /// <summary>
@@ -67,6 +74,47 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             Products.Clear();
             _Modules.CollectionChangedAsync -= OnModulesChanged;
             _Modules.CollectionPropertyChangedAsync -= OnModulePropertyChanged;
+        }
+
+
+        /// <summary>
+        /// モジュール自動追加
+        /// </summary>
+        public void AutoAddModule()
+        {
+            var result = MessageBox.Show("不足している製品を生産するモジュールを追加しますか？", "確認", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            var addedRecords = 0L;              // 追加レコード数
+            var addedModules = 0L;              // 追加モジュール数
+
+            while(true)
+            {
+                // 追加モジュール一覧
+                var addModules = _ProductCalclator.CalcNeedModules(Products);
+
+                if (!addModules.Any())
+                {
+                    break;
+                }
+
+                addedRecords += addModules.Count;
+                addedModules += addModules.Sum(x => x.Count);
+
+                _Modules.AddRange(addModules.Select(x => new ModulesGridItem(x.ModuleID, x.Count)));
+            }
+
+            if (addedRecords == 0)
+            {
+                MessageBox.Show("不足している製品が無いためモジュールは追加されませんでした。", "情報", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show($"{addedRecords}レコード、{addedModules}モジュール追加されました。", "情報", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
 
 
@@ -281,22 +329,19 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                                                    0 < x.Module.WorkersCapacity ||
                                                    x.Module.ModuleType.ModuleTypeID == "production" ||
                                                    x.Module.ModuleType.ModuleTypeID == "habitation")
-                          .GroupBy(x => x.Module.ModuleID)
-                          .Select(x =>
-                          {
-                              var module = x.First().Module;
-                              return (module.ModuleID, module.ModuleType.ModuleTypeID, Count: x.Sum(y => y.ModuleCount));
-                          });
-
+                                       .GroupBy(x => x.Module.ModuleID)
+                                       .Select(x =>
+                                       {
+                                           var module = x.First().Module;
+                                           return (module.ModuleID, module.ModuleType.ModuleTypeID, Count: x.Sum(y => y.ModuleCount));
+                                       });
+                                      
             // 処理対象モジュールが無ければ何もしない
             if (!modules.Any())
             {
                 return prodDict;
             }
 
-            // パラメータ設定
-            var prodParam = new SQLiteCommandParameters(2);
-            var habParam = new SQLiteCommandParameters(2);
 
             foreach (var module in modules)
             {
@@ -304,14 +349,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 {
                     // 製造モジュールの場合
                     case "production":
-                        prodParam.Add("count", DbType.Int32, module.Count);
-                        prodParam.Add("moduleID", DbType.String, module.ModuleID);
+                        SumProduct(module.ModuleID, module.Count, prodDict);
                         break;
 
                     // 居住モジュールの場合
                     case "habitation":
-                        habParam.Add("count", DbType.Int32, module.Count);
-                        habParam.Add("moduleID", DbType.String, module.ModuleID);
+                        SumHabitation(module.ModuleID, module.Count, prodDict);
                         break;
 
                     default:
@@ -319,226 +362,68 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 }
             }
 
-            // 製造モジュール集計
-            AggregateProductionModule(prodParam, prodDict);
-
-            // 居住モジュール集計
-            AggregateHabitationModule(habParam, prodDict);
-
             return prodDict;
-        }
-
-
-        /// <summary>
-        /// 製造モジュールを更新
-        /// </summary>
-        /// <param name="param">製造モジュール情報のパラメータ</param>
-        /// <param name="moduleDict">生産情報辞書</param>
-        private void AggregateProductionModule(SQLiteCommandParameters param, Dictionary<string, List<ProductDetailsListItem>> prodDict)
-        {
-            //------------//
-            // 製品を集計 //
-            //------------//
-            var query = $@"
-SELECT
-    WareProduction.WareID,
-    WareEffect.Product AS Efficiency,
-	CAST(Amount * (3600 / WareProduction.Time) AS INTEGER) AS Amount,
-    :count AS Count,
-    ModuleProduct.ModuleID
-    
-FROM
-    WareProduction,
-	WareEffect,
-	ModuleProduct
-
-WHERE
-	WareProduction.WareID  = WareEffect.WareID AND
-	WareProduction.WareID  = ModuleProduct.WareID AND 
-	ModuleProduct.ModuleID = :moduleID AND
-	WareProduction.Method  = WareEffect.Method AND
-	WareProduction.Method  = 
-		CASE
-			WHEN ModuleProduct.Method IN (
-				SELECT
-					WareProduction.Method
-				FROM
-					ModuleProduct,
-					WareProduction
-				WHERE
-					ModuleProduct.ModuleID = :moduleID AND
-					ModuleProduct.WareID   = WareProduction.WareID AND
-					ModuleProduct.Method   = WareProduction.Method
-			) THEN ModuleProduct.Method
-			ELSE 'default'
-		END
-
--- 生産に必要なウェアを連結
-
-UNION ALL
-SELECT
-	NeedWareID  AS 'WareID',
-    -1.0        AS Efficiency,
-	CAST(-3600 / WareProduction.Time * WareResource.Amount AS INTEGER) AS Amount,
-    :count      AS Count,
-    :moduleID   AS ModuleID
-FROM
-	WareProduction,
-	WareResource,
-	ModuleProduct
-
-WHERE
-	ModuleProduct.ModuleID  = :moduleID AND
-	ModuleProduct.WareID    = WareResource.WareID AND
-	WareProduction.Method   = WareResource.Method AND
-	ModuleProduct.WareID    = WareProduction.WareID AND
-	WareResource.Method     = (
-		SELECT
-			DISTINCT ModuleProduct.Method
-		FROM
-			ModuleProduct,
-			WareResource	
-		WHERE
-			ModuleProduct.ModuleID  = :moduleID AND
-			ModuleProduct.Method    = WareResource.Method AND
-			ModuleProduct.WareID    = WareResource.WareID
-		UNION ALL
-			SELECT 'default'
-		LIMIT 1
-	)";
-
-            DBConnection.X4DB.ExecQuery(query, param, SumProduct, prodDict);
-        }
-
-
-
-        /// <summary>
-        /// 居住モジュール情報集計処理
-        /// </summary>
-        /// <param name="param">居住モジュール情報のパラメータ</param>
-        /// <param name="wareDict">ウェア情報辞書</param>
-        /// <param name="moduleDict">関連モジュール情報辞書</param>
-        private void AggregateHabitationModule(SQLiteCommandParameters param, Dictionary<string, List<ProductDetailsListItem>> prodDict)
-        {
-            var query = $@"
-SELECT
-	WorkUnitResource.WareID,
-	CAST((CAST(WorkUnitResource.Amount AS REAL)	/ WorkUnitProduction.Amount) * -Module.WorkersCapacity AS INTEGER) As Amount,
-	:count AS Count,
-    :moduleID AS ModuleID
-FROM
-	WorkUnitProduction,
-	WorkUnitResource,
-	Module
-	
-WHERE
-	WorkUnitResource.WorkUnitID = WorkUnitProduction.WorkUnitID AND
-	WorkUnitResource.WorkUnitID = 'workunit_busy' AND
-    Module.ModuleID             = :moduleID AND
-    WorkUnitResource.Method     = WorkUnitProduction.Method AND
-    WorkUnitResource.Method     =
-	(
-		SELECT
-			RaceID
-		FROM
-			(
-			SELECT
-				DISTINCT Race.RaceID
-			FROM
-				ModuleOwner,
-				Faction,
-				Race,
-				WorkUnitResource
-			WHERE
-				ModuleOwner.FactionID = Faction.FactionID AND
-				Faction.RaceID = Race.RaceID AND
-				WorkUnitResource.Method = Race.RaceID AND
-				ModuleOwner.ModuleID = :moduleID
-			UNION ALL
-			SELECT 'default'
-			)
-		LIMIT 1
-	)
-";
-            DBConnection.X4DB.ExecQuery(query, param, SumResource, prodDict);
         }
 
 
         /// <summary>
         /// 製品を集計
         /// </summary>
-        /// <param name="dr"></param>
-        /// <param name="args"></param>
-        /// <remarks>
-        /// args[0] = Dictionary<string, List<ProductDetailsListItem>> : 製品集計用ディクショナリ
-        /// </remarks>
-        private void SumProduct(SQLiteDataReader dr, object[] args)
+        /// <param name="moduleID"></param>
+        /// <param name="count"></param>
+        /// <param name="prodDict"></param>
+        private void SumProduct(string moduleID, long count, Dictionary<string, List<ProductDetailsListItem>> prodDict)
         {
-            var wareID = (string)dr["WareID"];
-            var amount = (long)dr["Amount"];
-
-            // 関連モジュール集計
-            var prodDict = (Dictionary<string, List<ProductDetailsListItem>>)args[0];
-            var moduleID = (string)dr["ModuleID"];
-            var moduleCount = (long)dr["Count"];
-            var efficiency = (double)dr["Efficiency"];
-
-            // このウェアに対して初回か？
-            if (!prodDict.ContainsKey(wareID))
+            foreach (var ware in _ProductCalclator.CalcProduction(moduleID))
             {
-                prodDict.Add(wareID, new List<ProductDetailsListItem>());
-            }
+                // ウェアがなければ追加する
+                if (!prodDict.ContainsKey(ware.WareID))
+                {
+                    prodDict.Add(ware.WareID, new List<ProductDetailsListItem>());
+                }
 
-            // このウェアに対し、既にモジュールが追加されているか？
-            var itm = prodDict[wareID].Where(x => x.ModuleID == moduleID).FirstOrDefault();
-            if (itm != null)
-            {
-                // すでにモジュールが追加されている場合、モジュール数を増やしてレコードがなるべく少なくなるようにする
-                itm.Incriment(moduleCount);
-            }
-            else
-            {
-                // 新規追加
-                prodDict[wareID].Add(new ProductDetailsListItem(moduleID, moduleCount, efficiency, amount));
+                
+                var detailsList = prodDict[ware.WareID];
+                var details = detailsList.Where(x => x.ModuleID == moduleID).FirstOrDefault();
+
+                // モジュールが既に追加されている場合、モジュール数を増やしてレコードが少なくなるようにする
+                if (details != null)
+                {
+                    details.Incriment(count);
+                }
+                else
+                {
+                    detailsList.Add(new ProductDetailsListItem(moduleID, count, ware.Efficiency, ware.Amount));
+                }
             }
         }
 
-
         /// <summary>
-        /// 生産に必要なウェアを集計
+        /// 
         /// </summary>
-        /// <param name="dr"></param>
-        /// <param name="args"></param>
-        /// <remarks>
-        /// args[0] = Dictionary<string, List<ProductDetailsListItem>> : 製品集計用ディクショナリ
-        /// </remarks>
-        private void SumResource(SQLiteDataReader dr, object[] args)
+        /// <param name="moduleID"></param>
+        /// <param name="moduleCount">モジュール数</param>
+        /// <param name="workers"></param>
+        /// <param name="prodDict"></param>
+        private void SumHabitation(string moduleID, long moduleCount, Dictionary<string, List<ProductDetailsListItem>> prodDict)
         {
-            var wareID = (string)dr["WareID"];
-            var amount = (long)dr["Amount"];
-
-            // 関連モジュール集計
-            var prodDict = (Dictionary<string, List<ProductDetailsListItem>>)args[0];
-            var moduleID = (string)dr["ModuleID"];
-            var moduleCount = (long)dr["Count"];
-
-            // このウェアに対して関連モジュール追加が初回か？
-            if (!prodDict.ContainsKey(wareID))
+            foreach (var ware in _ProductCalclator.CalcHabitation(moduleID))
             {
-                prodDict.Add(wareID, new List<ProductDetailsListItem>());
-            }
+                if (!prodDict.ContainsKey(ware.WareID))
+                {
+                    prodDict.Add(ware.WareID, new List<ProductDetailsListItem>());
+                }
 
-            // このウェアに対し、既にモジュールが追加されているか？
-            var itm = prodDict[wareID].Where(x => x.ModuleID == moduleID).FirstOrDefault();
-            if (itm != null)
-            {
-                // すでにモジュールが追加されている場合、モジュール数を増やしてレコードがなるべく少なくなるようにする
-                itm.Incriment(moduleCount);
-            }
-            else
-            {
-                // 新規追加
-                prodDict[wareID].Add(new ProductDetailsListItem(moduleID, moduleCount, -1, amount));
+                var detailsList = prodDict[ware.WareID];
+                var details = detailsList.Where(x => x.ModuleID == moduleID).FirstOrDefault();
+                if (details != null)
+                {
+                    details.Incriment(moduleCount);
+                }
+                else
+                {
+                    detailsList.Add(new ProductDetailsListItem(moduleID, moduleCount, -1, ware.Amount));
+                }
             }
         }
     }

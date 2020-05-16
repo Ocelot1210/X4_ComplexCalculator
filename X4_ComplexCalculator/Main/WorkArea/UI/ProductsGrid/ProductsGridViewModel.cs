@@ -62,6 +62,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// 選択されたアイテムを折りたたむ
         /// </summary>
         public ICommand SelectedCollapse { get; }
+
+
+        /// <summary>
+        /// モジュール自動追加
+        /// </summary>
+        public ICommand AutoAddModuleCommand { get; }
         #endregion
 
 
@@ -81,6 +87,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
             SelectedExpand = new DelegateCommand<DataGrid>(SelectedExpandCommand);
             SelectedCollapse = new DelegateCommand<DataGrid>(SelectedCollapseCommand);
+            AutoAddModuleCommand = new DelegateCommand(_Model.AutoAddModule);
         }
 
         /// <summary>

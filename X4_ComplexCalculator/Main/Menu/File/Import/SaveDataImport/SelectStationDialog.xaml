@@ -1,0 +1,127 @@
+﻿<Window
+    x:Class="X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport.SelectStationDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
+    xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
+    Title="ステーションを選択"
+    Width="400"
+    Height="400"
+    x4bhv:CloseWindowBehavior.Close="{Binding CloseDialogProperty, Mode=OneWay}"
+    x4bhv:CloseWindowBehavior.Result="{Binding DialogResult, Mode=OneWay}"
+    Style="{StaticResource DefaultWindowBackgroundStyle}"
+    WindowStartupLocation="CenterOwner"
+    WindowStyle="ToolWindow"
+    mc:Ignorable="d">
+
+    <Window.Resources>
+        <!--  データ中継用  -->
+        <x4cmn:BindingProxy x:Key="ProxyIsCheckedAll" Data="{Binding IsCheckedAll, Mode=TwoWay}" />
+    </Window.Resources>
+
+    <Grid Margin="5">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0">
+            <TextBlock Text="X4 セーブデータファイルパス" />
+            <DockPanel>
+                <Button
+                    Width="25"
+                    Command="{Binding SelectSaveDataFileCommand, Mode=OneTime}"
+                    Content="…"
+                    DockPanel.Dock="Right" />
+                <TextBox
+                    Width="Auto"
+                    IsReadOnly="True"
+                    Text="{Binding SaveDataFilePath, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+            </DockPanel>
+        </StackPanel>
+
+        <DockPanel
+            Grid.Row="1"
+            Margin="0,10,0,0"
+            LastChildFill="True">
+            <TextBlock DockPanel.Dock="Top" Text="インポートするステーションを選択" />
+
+            <DataGrid
+                AutoGenerateColumns="False"
+                CellStyle="{StaticResource DataGridCellDefaultStyle}"
+                ItemsSource="{Binding Stations}"
+                SelectionUnit="FullRow">
+
+                <DataGrid.Columns>
+
+                    <!--  選択/選択解除  -->
+                    <DataGridTemplateColumn CanUserResize="False" SortMemberPath="IsChecked">
+                        <!--  ヘッダのスタイル定義  -->
+                        <DataGridTemplateColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="Padding" Value="0" />
+                            </Style>
+                        </DataGridTemplateColumn.HeaderStyle>
+
+                        <!--  ヘッダの内容定義  -->
+                        <DataGridTemplateColumn.Header>
+                            <DockPanel>
+                                <CheckBox IsChecked="{Binding Data, Source={StaticResource ProxyIsCheckedAll}}" />
+                            </DockPanel>
+                        </DataGridTemplateColumn.Header>
+
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!--  ステーション名  -->
+                    <DataGridTemplateColumn
+                        ClipboardContentBinding="{Binding StationName, Mode=OneTime}"
+                        Header="ステーション名"
+                        IsReadOnly="True"
+                        SortMemberPath="StationName">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding StationName, Mode=OneTime}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </DockPanel>
+
+        <!--  OK/Cancelボタン  -->
+        <DockPanel Grid.Row="2" HorizontalAlignment="Right">
+            <Button
+                x:Name="OkButton"
+                Width="75"
+                Height="20"
+                Margin="5"
+                Command="{Binding OkButtonClickedCommand, Mode=OneTime}"
+                Content="OK" />
+
+            <Button
+                x:Name="CancelButton"
+                Width="75"
+                Height="20"
+                Margin="5"
+                Command="{Binding CancelButtonClickedCommand, Mode=OneTime}"
+                Content="Cancel" />
+        </DockPanel>
+
+    </Grid>
+
+</Window>

@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Windows.Input;
 using X4_ComplexCalculator.Main.Menu.File.Export;
 using X4_ComplexCalculator.Main.Menu.File.Import;
+using X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport;
 using X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport;
 using X4_ComplexCalculator.Main.Menu.Layout;
 using X4_ComplexCalculator.Main.WorkArea;
@@ -140,7 +141,8 @@ namespace X4_ComplexCalculator.Main
             Imports = new List<IImport>()
             {
                 new StationCalclatorImport(new DelegateCommand<IImport>(_Model.Import)),
-                new StationPlanImport(new DelegateCommand<IImport>(_Model.Import))
+                new StationPlanImport(new DelegateCommand<IImport>(_Model.Import)),
+                //new SaveDataImport(new DelegateCommand<IImport>(_Model.Import))   // 作成中のため未リリース
             };
 
             Exports = new List<IExport>()

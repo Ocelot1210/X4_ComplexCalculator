@@ -139,6 +139,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
             await Task.CompletedTask;
         }
 
+
         /// <summary>
         /// モジュール数変更時に建造に必要なリソースを更新
         /// </summary>
@@ -152,6 +153,14 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
             var resourcesDict = new Dictionary<string, long>();
             AggregateModuleResources(modules, resourcesDict);
 
+            // モジュールの装備の建造に必要なリソースを集計
+            // 装備IDごとに集計
+            var equipments = module.Module.Equipment.GetAllEquipment().Select(x => (ID: x.EquipmentID, Count: 1))
+                                   .GroupBy(x => x.ID)
+                                   .Select(x => (ID: x.Key, Count: x.LongCount()));
+
+            AggregateEquipmentResources(equipments, resourcesDict);
+
             foreach (var kvp in resourcesDict)
             {
                 var itm = Resources.Where(x => x.Ware.WareID == kvp.Key).FirstOrDefault();
@@ -163,6 +172,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
 
             resourcesDict.Clear();
         }
+
 
         /// <summary>
         /// モジュールの装備変更時に建造に必要なリソースを更新
@@ -202,17 +212,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
                 if (item != null)
                 {
                     // 既にウェアが一覧にある場合
-                    item.Amount += kvp.Value;
+                    item.Amount += (kvp.Value * module.ModuleCount);
                 }
                 else
                 {
                     // ウェアが一覧にない場合
-                    item = new ResourcesGridItem(kvp.Key, kvp.Value);
-                    if (_UnitPriceBakDict.ContainsKey(item.Ware.WareID))
-                    {
-                        item.UnitPrice = _UnitPriceBakDict[item.Ware.WareID];
-                    }
-                    addTarget.Add(item);
+                    addTarget.Add(new ResourcesGridItem(kvp.Key, kvp.Value * module.ModuleCount));
                 }
             }
 

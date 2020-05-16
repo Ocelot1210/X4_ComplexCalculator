@@ -155,6 +155,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
 
                 MessageBox.Show($"{prevCnt - dict.Count}モジュールをマージしました。", "情報", MessageBoxButton.OK, MessageBoxImage.Information);
             }
+            else
+            {
+                MessageBox.Show($"重複したモジュールはありませんでした。", "情報", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
     }
 }

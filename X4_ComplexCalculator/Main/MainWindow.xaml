@@ -139,23 +139,33 @@
             ActiveContent="{Binding ActiveContent, Mode=TwoWay, Converter={StaticResource ActiveDocumentConverter}, UpdateSourceTrigger=PropertyChanged}"
             DocumentsSource="{Binding Documents}">
 
+            <!--  作業エリアが閉じられるとき  -->
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="DocumentClosing">
                     <i:InvokeCommandAction Command="{Binding DocumentClosingCommand, Mode=OneTime}" PassEventArgsToCommand="True" />
                 </i:EventTrigger>
             </i:Interaction.Triggers>
 
+            <!--  作業エリアの内容設定  -->
             <xcad:DockingManager.Resources>
                 <DataTemplate DataType="{x:Type wkarea:WorkAreaViewModel}">
                     <wkarea:WorkArea DataContext="{Binding}" />
                 </DataTemplate>
             </xcad:DockingManager.Resources>
 
+            <!--  作業エリアのタイトル部の設定  -->
             <xcad:DockingManager.DocumentHeaderTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Content.Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                 </DataTemplate>
             </xcad:DockingManager.DocumentHeaderTemplate>
+
+            <!--  作業エリア一覧に表示する内容の設定  -->
+            <xcad:DockingManager.DocumentPaneMenuItemHeaderTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Content.Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                </DataTemplate>
+            </xcad:DockingManager.DocumentPaneMenuItemHeaderTemplate>
 
             <xcad:LayoutRoot />
 

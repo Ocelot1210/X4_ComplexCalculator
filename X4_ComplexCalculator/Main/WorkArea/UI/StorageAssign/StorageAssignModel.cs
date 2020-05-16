@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
-using X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using X4_ComplexCalculator.DB;
 using System.Linq;
+using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
+using X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
 {
@@ -172,8 +171,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
                 return;
             }
 
-            var assign = StorageAssignGridItems.Where(x => x.WareID == product.Ware.WareID).First();
-            assign.ProductPerHour = product.Count;
+            var assign = StorageAssignGridItems.Where(x => x.WareID == product.Ware.WareID).FirstOrDefault();
+            if (assign != null)
+            {
+                assign.ProductPerHour = product.Count;
+            }
         }
 
 

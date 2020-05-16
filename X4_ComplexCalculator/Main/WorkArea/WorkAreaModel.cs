@@ -1,10 +1,8 @@
-﻿using Microsoft.Win32;
-using Prism.Mvvm;
+﻿using Prism.Mvvm;
 using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.WorkArea.SaveDataReader;
 using X4_ComplexCalculator.Main.WorkArea.SaveDataWriter;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
@@ -59,7 +57,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <summary>
         /// 保存ファイル書き込み用
         /// </summary>
-        private ISaveDataWriter _SaveDataWriter;
+        private readonly ISaveDataWriter _SaveDataWriter;
         #endregion
 
 

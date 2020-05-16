@@ -97,7 +97,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <summary>
         /// モジュール自動追加コマンド
         /// </summary>
-        public ICommand AutoAddModuleCommand { get; }
+        public ICommand AutoAddModuleCommand { get; set; }
         #endregion
 
 

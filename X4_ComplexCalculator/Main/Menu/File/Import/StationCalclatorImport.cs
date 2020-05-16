@@ -54,7 +54,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
             var ret = 0;
             var onOK = false;
 
-            (onOK, _Url) = SelectStringDialog.ShowDialog("Station Calclatorからインポート", "URLを入力して下さい");
+            (onOK, _Url) = SelectStringDialog.ShowDialog("Station Calclatorからインポート", "Station Calclator上部のShareボタンをクリックした時に\r\n表示されるURLを入力してください");
             if (onOK)
             {
                 ret = 1;
