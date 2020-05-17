@@ -87,7 +87,7 @@ namespace X4_ComplexCalculator.DB.X4DB
             DBConnection.X4DB.ExecQuery($"SELECT Method, Time FROM ModuleProduction WHERE ModuleID = '{moduleID}'",
                 (SQLiteDataReader dr, object[] args) =>
                 {
-                    mProd.Add(new ModuleProduction((string)dr["Method"], (long)dr["Time"]));
+                    mProd.Add(new ModuleProduction((string)dr["Method"], (double)dr["Time"]));
                 });
             ModuleProductions = mProd;
         }

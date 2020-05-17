@@ -251,38 +251,76 @@ namespace X4_ComplexCalculator.DB
                 if (File.Exists(x4DBPath))
                 {
                     X4DB = new DBConnection(x4DBPath);
+                    if (GetDBVersion() < 1)
+                    {
+                        MessageBox.Show("現在のDBのフォーマットが旧形式です。\r\nゲームファイルよりDBを再度抽出して下さい。", "警告", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+                        if (!UpdateDB() || GetDBVersion() < 1)
+                        {
+                            MessageBox.Show("本アプリケーションの実行にはDBの更新が必要です。\r\n本アプリケーションを再度実行し、DBの更新を行ってください。", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                            Environment.Exit(-1);
+                        }
+                    }
                 }
                 else
                 {
-                    MessageBox.Show("DBが存在しません。\r\nゲームファイルよりDBを抽出する必要があります。\r\nデータ抽出画面が立ち上がるまでしばらくお待ち下さい。", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("DBが存在しません。\r\nゲームファイルよりDBを抽出する必要があります。\r\nデータ抽出画面が立ち上がるまでしばらくお待ち下さい。", "エラー", MessageBoxButton.OK, MessageBoxImage.Information);
 
                     if (!UpdateDB())
                     {
-                        MessageBox.Show("本アプリケーションの実行にはDBの作成が必要です。\n本アプリケーションを再度実行し、DBの更新を行ってください。", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show("本アプリケーションの実行にはDBの作成が必要です。\r\n本アプリケーションを再度実行し、DBの更新を行ってください。", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
                         Environment.Exit(-1);
                     }
                 }
             }
             catch
             {
-                if (MessageBox.Show("DBのオープンに失敗しました。\r\nゲームファイルよりDBを抽出する事で起動可能になるかもしれません。\r\nDBを更新しますか？", "Error", MessageBoxButton.YesNo, MessageBoxImage.Error) == MessageBoxResult.Yes)
+                if (MessageBox.Show("DBのオープンに失敗しました。\r\nゲームファイルよりDBを抽出する事で起動可能になるかもしれません。\r\nDBを更新しますか？", "エラー", MessageBoxButton.YesNo, MessageBoxImage.Error) == MessageBoxResult.Yes)
                 {
                     if (!UpdateDB())
                     {
-                        MessageBox.Show("本アプリケーションの実行にはDBの更新が必要です。\n本アプリケーションを再度実行し、DBの更新を行ってください。", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show("本アプリケーションの実行にはDBの更新が必要です。\r\n本アプリケーションを再度実行し、DBの更新を行ってください。", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
                         Environment.Exit(-1);
                     }
                 }
                 else
                 {
-                    MessageBox.Show("本アプリケーションの実行にはDBの更新が必要です。\n本アプリケーションを再度実行し、DBの更新を行ってください。", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("本アプリケーションの実行にはDBの更新が必要です。\n本アプリケーションを再度実行し、DBの更新を行ってください。", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
                     Environment.Exit(-1);
                 }
             }
-
+            
             
             CommonDB = CreatePresetDB(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, conf["AppSettings:CommonDBPath"]));
         }
+
+
+        /// <summary>
+        /// DBのバージョン取得
+        /// </summary>
+        private static long GetDBVersion()
+        {
+            var ret = 0L;
+            var tableExists = false;
+
+            {
+                X4DB.ExecQuery("SELECT count(*) AS Count FROM sqlite_master WHERE type = 'table' AND name = 'Common'", (dr, _) =>
+                {
+                    tableExists = 0L < (long)dr["Count"];
+                });
+            }
+
+            if (tableExists)
+            {
+                X4DB.ExecQuery("SELECT Value FROM Common WHERE Item = 'FormatVersion'", (dr, _) =>
+                {
+                    ret = (long)dr["Value"];
+                });
+            }
+
+            return ret;
+        }
+
 
 
         /// <summary>

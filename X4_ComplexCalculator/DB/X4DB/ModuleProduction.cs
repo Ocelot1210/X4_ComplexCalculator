@@ -16,14 +16,14 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// 建造時間
         /// </summary>
-        public long Time { get; }
+        public double Time { get; }
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="method">建造方式</param>
         /// <param name="time">建造時間</param>
-        public ModuleProduction(string method, long time)
+        public ModuleProduction(string method, double time)
         {
             Method = method;
             Time = time;

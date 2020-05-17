@@ -207,12 +207,18 @@
                 <StackPanel Margin="25,0,0,0" Orientation="Vertical">
                     <!--  必要ウェア情報  -->
                     <Expander Header="必要ウェア情報">
-                        <ContentControl Content="{StaticResource WorkersNeedWareDetailsListView}" DataContext="{Binding WorkforceNeedWareCollectionView, Mode=OneWay}" />
+                        <ContentControl
+                            Margin="25,0,0,0"
+                            Content="{StaticResource WorkersNeedWareDetailsListView}"
+                            DataContext="{Binding WorkforceNeedWareCollectionView, Mode=OneWay}" />
                     </Expander>
 
                     <!--  モジュール情報  -->
                     <Expander Header="モジュール情報">
-                        <ContentControl Content="{StaticResource WorkersDetailsListView}" DataContext="{Binding WorkforceModuleDetails, Mode=OneTime}" />
+                        <ContentControl
+                            Margin="25,0,0,0"
+                            Content="{StaticResource WorkersDetailsListView}"
+                            DataContext="{Binding WorkforceModuleDetails, Mode=OneTime}" />
                     </Expander>
                 </StackPanel>
             </Expander>
@@ -225,7 +231,10 @@
                         <TextBlock Text="{Binding Profit, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:N0} cr'}" />
                     </StackPanel>
                 </Expander.Header>
-                <ContentControl Content="{StaticResource WareDetailsListView}" DataContext="{Binding ProfitDetails, Mode=OneTime}" />
+                <ContentControl
+                    Margin="25,0,0,0"
+                    Content="{StaticResource WareDetailsListView}"
+                    DataContext="{Binding ProfitDetails, Mode=OneTime}" />
             </Expander>
 
             <!--  建造コスト  -->
@@ -236,7 +245,10 @@
                         <TextBlock Text="{Binding BuildingCost, StringFormat='{}{0:N0} cr'}" />
                     </StackPanel>
                 </Expander.Header>
-                <ContentControl Content="{StaticResource WareDetailsListView}" DataContext="{Binding BuildingCostDetails, Mode=OneTime}" />
+                <ContentControl
+                    Margin="25,0,0,0"
+                    Content="{StaticResource WareDetailsListView}"
+                    DataContext="{Binding BuildingCostDetails, Mode=OneTime}" />
             </Expander>
         </StackPanel>
     </ScrollViewer>
