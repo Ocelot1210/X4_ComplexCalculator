@@ -55,6 +55,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                     // 建造リソースを復元
                     RestoreBuildResource(conn);
 
+                    _WorkArea.Title = System.IO.Path.GetFileNameWithoutExtension(Path);
+
                     ret = true;
                 }
                 catch

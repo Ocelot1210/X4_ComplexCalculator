@@ -52,6 +52,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                     //保管庫割当情報を読み込み
                     RestoreStorageAssignInfo(conn);
 
+                    _WorkArea.Title = System.IO.Path.GetFileNameWithoutExtension(Path);
+
                     ret = true;
                 }
                 catch
