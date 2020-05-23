@@ -116,7 +116,7 @@ namespace X4_ComplexCalculator.Common
                 return null;
             }
             else
-                return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                return Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
         }
 
         private static Dictionary<int, string> executablePaths = new Dictionary<int, string>();
@@ -305,7 +305,7 @@ namespace X4_ComplexCalculator.Common
 
             while (culture != CultureInfo.InvariantCulture)
             {
-                csvPath = Path.Combine(csvDirectory, dictionary + (string.IsNullOrEmpty(culture.Name) ? "" : "." + culture.Name) + ".csv");
+                csvPath = Path.Combine(GetWorkingDirectory(), csvDirectory, dictionary + (string.IsNullOrEmpty(culture.Name) ? "" : "." + culture.Name) + ".csv");
 
                 if (File.Exists(csvPath))
                     break;
@@ -316,7 +316,7 @@ namespace X4_ComplexCalculator.Common
             if (!File.Exists(csvPath))
             {
                 // Take the invariant culture.
-                csvPath = Path.Combine(csvDirectory, dictionary + ".csv");
+                csvPath = Path.Combine(GetWorkingDirectory(), csvDirectory, dictionary + ".csv");
 
                 if (!File.Exists(csvPath))
                 {
