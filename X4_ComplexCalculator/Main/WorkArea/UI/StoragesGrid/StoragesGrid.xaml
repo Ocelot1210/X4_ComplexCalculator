@@ -44,20 +44,20 @@
 
 
                     <!--  容量  -->
-                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Capacity}" SortTargetPropertyName="Capacity">
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Capacity}" SortTargetPropertyName="Capacity">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Lang:Capacity, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
+                                <TextBlock Text="{Binding Capacity, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </DataGridInline:InlineGridViewColumn>
 
 
                     <!--  容量(合計)  -->
-                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc TotalCapacity}" SortTargetPropertyName="TotalCapacity">
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:TotalCapacity}" SortTargetPropertyName="TotalCapacity">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Lang:TotalCapacity, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
+                                <TextBlock Text="{Binding TotalCapacity, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </DataGridInline:InlineGridViewColumn>
