@@ -1,0 +1,175 @@
+﻿# ------------------------------------------------------
+# Common
+# ------------------------------------------------------
+WareName;Ware name
+Tier;Tier
+Price;Price
+UnitPrice;Unit price
+ModuleName;Module name
+ModuleCount;Module count
+Select;Select
+Close;Close
+SelectAll;Select all
+Save;Save
+OwnerFaction;Owner faction
+Turrets;Turrets
+Shields;Shields
+SearchByEnteringText;Search by entering text
+Confirmation;Confirmation
+Warning;Warning
+Error;Error
+
+
+# ------------------------------------------------------
+# DB
+# ------------------------------------------------------
+OldFormatMessage;The current DB format is the old format. \r\nPlease extract the DB from the game file again.
+DBUpdateRequestMessage;You need to update the DB to run this application. Please run this application again to update the DB.
+DBExtractionRequestMessage;The DB does not exist. It is necessary to extract the DB from the game file. Please wait for a while until the data extraction screen starts up.
+DBMakeRequestMessage;You need to create a DB to run this application. Please run this application again to update the DB.
+DBOpenFailMessage;Failed to open the DB. It may be possible to start it by extracting the DB from the game file. Do you want to update the DB?
+
+
+# ------------------------------------------------------
+# Main window
+# ------------------------------------------------------
+MainWindowTitle;X4: Complex Calclator
+FileMenu;File(_F)
+New;New
+OverwriteSave;Save
+SaveAs;Save as
+Open;Open
+Import;Import
+ExistingPlan;Existing plan
+Export;Export
+UpdateDB;Update DB
+Layout;Layout(_L)
+SaveLayout;Save layout
+LayoutList;Layout list
+EditLayoutName;Edit layout name
+LayoutName;Layout name
+Language;Language
+LayoutSavedMessage;Saved the layout of plan "{0}" as "{1}".
+LayoutOverwritedMessage;Saved the layout of plan "{0}" as "{1}" overwriting it.
+TabDoesNotSelectedMessage;No tab is selected to save the layout.\r\nSelect the tab you want to save, and run it again.
+FaildToLoadFileMessage;Failed to load the file.\r\n\r\n■Reason：\r\n{0}
+FaildToLoadFileMessageTitle;Read failure
+DBUpdateConfirmationMessage;Do you want to display the DB update screen? \r\nPlease wait for a moment until the screen starts.
+DBUpdateFailureMessage;Failed to update the DB, \r\nplease check if the DB file is accessible and try again.
+MainWindowClosingConfirmMessage;There are some unsaved items. Do you want to save it?
+PlanClosingConfirmMessage;Do you want to save the changes to your plan "{0}"?
+DeleteLayoutConfirmMessage;Do you really want to delete the layout "{0}"?
+InvalidLayoutNameMessage;Invalid layout name. Please enter at least one non-white space character.
+SaveDataWriteFailureMessage;Failed to save.\r\n\r\n■Reason：\r\n{0}\r\n\r\n■Stack trace：\r\n{1}
+ImportFailureMessage;Failed to import.\r\n■Reason：\r\n{0}
+StationCalclatorExportTitle;Export to Station Calclator
+StationCalclatorExportDescription;Please copy the URL.\r\nNote: The following modules are excluded.\r\n・Connection module\r\n・Venture module
+StationCalclatorImportTitle;Importing from Station Calclator
+StationCalclatorImportDescription;Please enter the URL displayed when you click the \r\nShare button at the top of Station Calclator.
+
+
+
+# ------------------------------------------------------
+# Plan
+# ------------------------------------------------------
+View;View(_V)
+ModuleList;Modules
+Products;Products
+Summary;Summary
+BuildResources;Build resources
+Storages;Storages
+StorageAssign;Storage assign
+
+# ------------------------------------------------------
+# Modules
+# ------------------------------------------------------
+Copy;Copy
+Paste;Paste
+Delete;Delete
+Add;Add
+AutoAdd;Auto add
+Merge;Merge
+ModuleEquipment;EQP
+Edit;Edit
+BuildMethod;Build method
+MergeModulesConfirmMessage;Do you want to merge duplicate modules?
+NoMergeModulesMessage;No duplicate modules were found.
+MergeModulesMessage;Merged {0} modules.
+AutoAddConfirm;Do you want to add a module to produce the missing product?
+NoAddedModulesAutomaticallyMessage;The module was not added because there is no missing product.
+AddedModulesAutomaticallyMessage;{0} records, {1} modules added.
+NotEquippedToolTipText;Not equipped with anything.
+
+# ------------------------------------------------------
+# Products
+# ------------------------------------------------------
+Expansion;Expansion
+Collapse;Collapse
+Efficiency;Efficiency
+Production;Production
+
+ProductName;Product name
+AmountPerHour;Amount/h
+
+
+# ------------------------------------------------------
+# Resources
+# ------------------------------------------------------
+NeedWare;NeedWare
+NeedWareAmount;Amount
+StorageType;Storage type
+
+# ------------------------------------------------------
+# Storage
+# ------------------------------------------------------
+Capacity;Capacity
+TotalCapacity;Total capacity
+
+
+# ------------------------------------------------------
+# Storage assign
+# ------------------------------------------------------
+StorageConditionAfterHour;Storage condition after {0} hour
+MaximumSliderValue; Maximum slider value
+Allocated;Allocated
+Allocable;Allocable
+NumberAfterTheSpecifiedTime;Number after the specified time
+
+
+# ------------------------------------------------------
+# Summary
+# ------------------------------------------------------
+WorkForce;Work force
+NecessaryWareInfo;Necessary wear ionfo
+ModuleInfo;Module info
+ProfitPerHour;Profit per hour
+BuildCost;Build cost
+Workers;Workers
+TotalWorkers;Total workers
+NecessaryAmount;Necessary amount
+Diff;Diff
+Quantity;Quantity
+
+# ------------------------------------------------------
+# Select module window
+# ------------------------------------------------------
+SelectModuleWindowTitle;Select module window
+ModuleNameBeforeChange;Module name before change：
+ModuleType;Module type
+
+
+
+# ------------------------------------------------------
+# Edit equipment window
+# ------------------------------------------------------
+EditEquipmentWindowTitle;Edit equipment window
+EquipmentSize;Equipment size
+Preset;Preset
+List;List
+Equiped;Equiped
+EquipmentAddButtonToolTip;You can add a selection at once by clicking while holding down the left Shift key.
+EditEquipmentWindowCloseConfirmMessage;Do you want to save your changes?
+EditPresetName;Edit preset name
+PresetName;Preset name
+DeletePresetConfirmMessage;Do you really want to remove the preset "{0}"?
+InvalidPresetNameMessage;Invalid preset name. Please enter at least one non-white space character.

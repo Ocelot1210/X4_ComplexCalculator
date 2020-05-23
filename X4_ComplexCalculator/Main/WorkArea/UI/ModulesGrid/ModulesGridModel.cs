@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule;
 
@@ -123,7 +124,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
                 return;
             }
 
-            var result = MessageBox.Show("重複するモジュールをマージしますか？", "確認", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
+            var result = Localize.ShowMessageBox("Lang:MergeModulesConfirmMessage", "Lang:Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
             if (result != MessageBoxResult.Yes)
             {
                 return;
@@ -152,12 +153,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             if (prevCnt != dict.Count)
             {
                 Modules.Reset(dict.OrderBy(x => x.Value.Item1).Select(x => new ModulesGridItem(x.Value.Item2, x.Value.Item3, x.Value.Item4)));
-
-                MessageBox.Show($"{prevCnt - dict.Count}モジュールをマージしました。", "情報", MessageBoxButton.OK, MessageBoxImage.Information);
+                Localize.ShowMessageBox("Lang:MergeModulesMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, prevCnt - dict.Count);
             }
             else
             {
-                MessageBox.Show($"重複したモジュールはありませんでした。", "情報", MessageBoxButton.OK, MessageBoxImage.Information);
+                Localize.ShowMessageBox("Lang:NoMergeModulesMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
     }

@@ -5,14 +5,19 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:eqlst="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
     xmlns:xctk="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
     x:Name="window"
-    Title="兵装編集画面"
+    Title="{lex:Loc Lang:EditEquipmentWindowTitle}"
     Width="800"
     Height="450"
+    lex:LocalizeDictionary.DefaultProvider="{StaticResource CSVLocalizationProvider}"
+    lex:LocalizeDictionary.DesignCulture="en-US"
+    lex:ResxLocalizationProvider.DefaultAssembly="WPFLocalizationExtension"
+    lex:ResxLocalizationProvider.DefaultDictionary="StringResources"
     x4bhv:CloseWindowBehavior.Close="{Binding CloseWindowProperty, Mode=OneWay}"
     ResizeMode="NoResize"
     Style="{StaticResource DefaultWindowBackgroundStyle}"
@@ -57,7 +62,7 @@
             Margin="5">
             <Label
                 Name="moduleNameLabel"
-                Content="モジュール名"
+                Content="{lex:Loc Lang:ModuleName}"
                 Style="{StaticResource DefaultTextStyle}" />
             <TextBox
                 IsReadOnly="True"
@@ -70,7 +75,7 @@
             Grid.Row="0"
             Grid.Column="1"
             Margin="5">
-            <Label Content="装備サイズ" Style="{StaticResource DefaultTextStyle}" />
+            <Label Content="{lex:Loc Lang:EquipmentSize}" Style="{StaticResource DefaultTextStyle}" />
             <ComboBox
                 Name="SizeComboBox"
                 DisplayMemberPath="Name"
@@ -84,7 +89,7 @@
             Grid.Row="0"
             Grid.Column="2"
             Margin="5">
-            <Label Content="プリセット" Style="{StaticResource DefaultTextStyle}" />
+            <Label Content="{lex:Loc Lang:Preset}" Style="{StaticResource DefaultTextStyle}" />
             <DockPanel>
                 <Button
                     Width="20"
@@ -142,7 +147,7 @@
                 Height="20"
                 Command="{Binding SaveButtonClickedCommand}"
                 CommandParameter="{Binding ElementName=window}"
-                Content="保存" />
+                Content="{lex:Loc Lang:Save}" />
 
             <Button
                 Grid.Column="1"
@@ -150,7 +155,7 @@
                 Height="{Binding ElementName=SaveButton, Path=Height}"
                 Command="{Binding CloseWindowCommand}"
                 CommandParameter="{Binding ElementName=window}"
-                Content="閉じる" />
+                Content="{lex:Loc Lang:Close}" />
         </Grid>
 
         <!--  絞り込み用チェックリストボックス  -->
@@ -161,13 +166,13 @@
             <Label
                 Height="28"
                 VerticalAlignment="Bottom"
-                Content="所有派閥"
+                Content="{lex:Loc Lang:OwnerFaction}"
                 DockPanel.Dock="Top" />
             <xctk:CheckListBox
                 DisplayMemberPath="Faction.Name"
                 IsSelectAllActive="True"
                 ItemsSource="{Binding Factions}"
-                SelectAllContent="全選択"
+                SelectAllContent="{lex:Loc Lang:SelectAll}"
                 SelectedMemberPath="IsChecked" />
         </DockPanel>
 
@@ -178,10 +183,10 @@
             Grid.Column="1"
             Grid.ColumnSpan="3"
             Margin="5,5,5,5">
-            <TabItem Header="タレット">
+            <TabItem Header="{lex:Loc Lang:Turrets}">
                 <eqlst:EquipmentList x:Name="TurretsList" />
             </TabItem>
-            <TabItem Header="シールド">
+            <TabItem Header="{lex:Loc Lang:Shields}">
                 <eqlst:EquipmentList x:Name="ShieldsList" />
             </TabItem>
         </TabControl>

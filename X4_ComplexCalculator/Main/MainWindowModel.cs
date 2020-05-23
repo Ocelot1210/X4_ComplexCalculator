@@ -1,20 +1,21 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
-using X4_ComplexCalculator.DB;
-using X4_ComplexCalculator.Main.WorkArea;
-using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
-using X4_ComplexCalculator.Main.Menu.Layout;
+using WPFLocalizeExtension.Engine;
 using X4_ComplexCalculator.Common.Collection;
-using System.Collections.Generic;
-using Xceed.Wpf.AvalonDock;
-using X4_ComplexCalculator.Main.Menu.File.Import;
+using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
+using X4_ComplexCalculator.Common.Localize;
+using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.Menu.File.Export;
-using Prism.Commands;
+using X4_ComplexCalculator.Main.Menu.File.Import;
+using X4_ComplexCalculator.Main.Menu.Lang;
+using X4_ComplexCalculator.Main.Menu.Layout;
+using X4_ComplexCalculator.Main.WorkArea;
 
 namespace X4_ComplexCalculator.Main
 {
@@ -70,6 +71,11 @@ namespace X4_ComplexCalculator.Main
                 }
             }
         }
+
+        /// <summary>
+        /// 言語一覧
+        /// </summary>
+        public ObservablePropertyChangedCollection<LangMenuItem> Languages = new ObservablePropertyChangedCollection<LangMenuItem>();
         #endregion
 
 
@@ -79,6 +85,43 @@ namespace X4_ComplexCalculator.Main
         public MainWindowModel()
         {
             Layouts.CollectionPropertyChanged += Layouts_CollectionPropertyChanged;
+
+            Languages.AddRange(LocalizeDictionary.Instance.DefaultProvider.AvailableCultures.Where(x => !string.IsNullOrEmpty(x.Name)).Select(x => new LangMenuItem(x)));
+            Languages.CollectionPropertyChanged += Languages_CollectionPropertyChanged;
+        }
+
+        /// <summary>
+        /// 言語一覧のプロパティ変更時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Languages_CollectionPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (!(sender is LangMenuItem langMenuItem))
+            {
+                return;
+            }
+
+            switch (e.PropertyName)
+            {
+                case nameof(LangMenuItem.IsChecked):
+                    {
+                        if (langMenuItem.IsChecked)
+                        {
+                            foreach (var lang in Languages)
+                            {
+                                if (!ReferenceEquals(lang, langMenuItem))
+                                {
+                                    lang.IsChecked = false;
+                                }
+                            }
+                        }
+                    }
+                    break;
+
+                default:
+                    break;
+            }
         }
 
 
@@ -164,7 +207,7 @@ namespace X4_ComplexCalculator.Main
                     {
                         ActiveContent.OverwriteSaveLayout(menuItem.LayoutID);
 
-                        MessageBox.Show($"計画「{ActiveContent.Title}」のレイアウトを「{menuItem.LayoutName}」として上書き保存しました。", "確認", MessageBoxButton.OK, MessageBoxImage.Information);
+                        Localize.ShowMessageBox("Lang:LayoutOverwritedMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, ActiveContent.Title, menuItem.LayoutName);
                     }
                     
                     break;
@@ -206,19 +249,19 @@ namespace X4_ComplexCalculator.Main
         {
             if (ActiveContent != null)
             {
-                var (onOK, layoutName) = SelectStringDialog.ShowDialog("レイアウト名編集", "レイアウト名", "", LayoutMenuItem.IsValidLayoutName);
+                var (onOK, layoutName) = SelectStringDialog.ShowDialog("Lang:EditLayoutName", "Lang:LayoutName", "", LayoutMenuItem.IsValidLayoutName);
                 if (onOK)
                 {
                     var layoutID = ActiveContent.SaveLayout(layoutName);
 
                     Layouts.Add(new LayoutMenuItem(layoutID, layoutName, false));
 
-                    MessageBox.Show($"計画「{ActiveContent.Title}」のレイアウトを「{layoutName}」として保存しました。", "確認", MessageBoxButton.OK, MessageBoxImage.Information);
+                    Localize.ShowMessageBox("Lang:LayoutSavedMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, ActiveContent.Title, layoutName);
                 }
             }
             else
             {
-                MessageBox.Show("レイアウト保存対象のタブが選択されていません。\r\n保存対象のタブを選択後、再度実行して下さい。", "確認", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Localize.ShowMessageBox("Lang:TabDoesNotSelectedMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -259,7 +302,7 @@ namespace X4_ComplexCalculator.Main
                 {
                     Dispatcher.CurrentDispatcher.BeginInvoke(() =>
                     {
-                        MessageBox.Show($"ファイルの読み込みに失敗しました。\r\n\r\n■理由：\r\n{e.Message}", "読み込み失敗", MessageBoxButton.OK, MessageBoxImage.Error);
+                        Localize.ShowMessageBox("Lang:FaildToLoadFileMessage", "Lang:FaildToLoadFileMessageTitle", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
                     });
                 }
                 finally
@@ -285,13 +328,13 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         public void UpdateDB()
         {
-            var result = MessageBox.Show("DB更新画面を表示しますか？\r\n※ 画面が起動するまでしばらくお待ち下さい。", "確認", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            var result = Localize.ShowMessageBox("Lang:DBUpdateConfirmationMessage", "Lang:Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
             if (result == MessageBoxResult.Yes)
             {
                 if (!DBConnection.UpdateDB())
                 {
-                    MessageBox.Show("DBの更新に失敗しました。\r\nDBファイルにアクセス可能か確認後、再度実行してください。", "確認", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Localize.ShowMessageBox("Lang:DBUpdateConfirmationMessage", "Lang:Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Error);
                 }
             }
         }
@@ -307,7 +350,7 @@ namespace X4_ComplexCalculator.Main
             // 未保存の内容が存在するか？
             if (Documents.Where(x => x.HasChanged).Any())
             {
-                var result = MessageBox.Show("未保存の項目があります。保存しますか？", "確認", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                var result = Localize.ShowMessageBox("Lang:MainWindowClosingConfirmMessage", "Lang:Confirmation", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 
                 switch (result)
                 {
@@ -355,7 +398,7 @@ namespace X4_ComplexCalculator.Main
             // 変更があったか？
             if (vm.HasChanged)
             {
-                var result = MessageBox.Show("変更内容を保存しますか？", "確認", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                var result = Localize.ShowMessageBox("Lang:PlanClosingConfirmMessage", "Lang:Confirmation", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Cancel, vm.Title);
 
                 switch (result)
                 {

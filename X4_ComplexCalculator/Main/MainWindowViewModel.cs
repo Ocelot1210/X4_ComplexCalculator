@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
+using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.Menu.File.Export;
 using X4_ComplexCalculator.Main.Menu.File.Import;
-using X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport;
 using X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport;
+using X4_ComplexCalculator.Main.Menu.Lang;
 using X4_ComplexCalculator.Main.Menu.Layout;
 using X4_ComplexCalculator.Main.WorkArea;
 using Xceed.Wpf.AvalonDock;
@@ -118,6 +119,12 @@ namespace X4_ComplexCalculator.Main
         /// エクスポート処理一覧
         /// </summary>
         public List<IExport> Exports { get; }
+
+
+        /// <summary>
+        /// 言語一覧
+        /// </summary>
+        public ObservableRangeCollection<LangMenuItem> Languages => _Model.Languages;
         #endregion
 
 

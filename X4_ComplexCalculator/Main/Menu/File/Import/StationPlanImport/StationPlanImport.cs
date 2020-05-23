@@ -9,13 +9,15 @@ using X4_ComplexCalculator.Main.WorkArea;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.DB.X4DB;
 using System.Linq;
+using Prism.Mvvm;
+using WPFLocalizeExtension.Engine;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
 {
     /// <summary>
     /// 既存の計画ファイルからインポートする
     /// </summary>
-    class StationPlanImport : IImport
+    class StationPlanImport : BindableBase, IImport
     {
         #region メンバ
         /// <summary>
@@ -33,7 +35,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
         /// <summary>
         /// メニュー表示用タイトル
         /// </summary>
-        public string Title => "既存の計画";
+        public string Title { get; private set; }
 
 
         /// <summary>
@@ -50,6 +52,23 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
         public StationPlanImport(ICommand command)
         {
             Command = command;
+            Title = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:ExistingPlan", null, null);
+            LocalizeDictionary.Instance.PropertyChanged += Instance_PropertyChanged;
+        }
+
+
+        /// <summary>
+        /// 選択言語変更時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Instance_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(LocalizeDictionary.Instance.Culture))
+            {
+                Title = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:ExistingPlan", null, null);
+                RaisePropertyChanged(nameof(Title));
+            }
         }
 
 
@@ -169,7 +188,6 @@ WHERE
 
                         default:
                             return;
-                            
                     }
 
                     var equipment = new Equipment((string)dr["EquipmentID"]);
@@ -182,7 +200,7 @@ WHERE
             }
 
 
-            // 重複削除
+            // 同一モジュールをマージ
             var dict = new Dictionary<int, (int, Module, long)>();
 
             foreach (var (module, idx) in modules.Select((x, idx) => (x, idx)))

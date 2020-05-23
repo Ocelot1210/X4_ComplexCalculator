@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
+using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Main.WorkArea;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
@@ -13,7 +15,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
     /// <summary>
     /// Station Calclatorからインポートする
     /// </summary>
-    class StationCalclatorImport : IImport
+    class StationCalclatorImport : BindableBase, IImport
     {
         private string _Url;
 
@@ -54,7 +56,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
             var ret = 0;
             var onOK = false;
 
-            (onOK, _Url) = SelectStringDialog.ShowDialog("Station Calclatorからインポート", "Station Calclator上部のShareボタンをクリックした時に\r\n表示されるURLを入力してください");
+            (onOK, _Url) = SelectStringDialog.ShowDialog("Lang:StationCalclatorImportTitle", "Lang:StationCalclatorImportDescription");
             if (onOK)
             {
                 ret = 1;
@@ -101,7 +103,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
             }
             catch (Exception e)
             {
-                MessageBox.Show($"インポートに失敗しました。\r\n■理由：\r\n{e.Message}\r\n", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                Localize.ShowMessageBox("Lang:ImportFailureMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
             }
 
             return ret;

@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 using X4_ComplexCalculator.Common;
+using X4_ComplexCalculator.Common.Localize;
 
 namespace X4_ComplexCalculator.DB
 {
@@ -253,39 +254,39 @@ namespace X4_ComplexCalculator.DB
                     X4DB = new DBConnection(x4DBPath);
                     if (GetDBVersion() < 1)
                     {
-                        MessageBox.Show("現在のDBのフォーマットが旧形式です。\r\nゲームファイルよりDBを再度抽出して下さい。", "警告", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        Localize.ShowMessageBox("Lang:OldFormatMessage", "Lang:Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
 
                         if (!UpdateDB() || GetDBVersion() < 1)
                         {
-                            MessageBox.Show("本アプリケーションの実行にはDBの更新が必要です。\r\n本アプリケーションを再度実行し、DBの更新を行ってください。", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                            Localize.ShowMessageBox("Lang:DBUpdateRequestMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error);
                             Environment.Exit(-1);
                         }
                     }
                 }
                 else
                 {
-                    MessageBox.Show("DBが存在しません。\r\nゲームファイルよりDBを抽出する必要があります。\r\nデータ抽出画面が立ち上がるまでしばらくお待ち下さい。", "エラー", MessageBoxButton.OK, MessageBoxImage.Information);
+                    Localize.ShowMessageBox("Lang:DBExtractionRequestMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);
 
                     if (!UpdateDB())
                     {
-                        MessageBox.Show("本アプリケーションの実行にはDBの作成が必要です。\r\n本アプリケーションを再度実行し、DBの更新を行ってください。", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                        Localize.ShowMessageBox("Lang:DBMakeRequestMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         Environment.Exit(-1);
                     }
                 }
             }
             catch
             {
-                if (MessageBox.Show("DBのオープンに失敗しました。\r\nゲームファイルよりDBを抽出する事で起動可能になるかもしれません。\r\nDBを更新しますか？", "エラー", MessageBoxButton.YesNo, MessageBoxImage.Error) == MessageBoxResult.Yes)
+                if (Localize.ShowMessageBox("Lang:DBOpenFailMessage", "Lang:Error", MessageBoxButton.YesNo, MessageBoxImage.Error) == MessageBoxResult.Yes)
                 {
                     if (!UpdateDB())
                     {
-                        MessageBox.Show("本アプリケーションの実行にはDBの更新が必要です。\r\n本アプリケーションを再度実行し、DBの更新を行ってください。", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                        Localize.ShowMessageBox("Lang:DBUpdateRequestMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         Environment.Exit(-1);
                     }
                 }
                 else
                 {
-                    MessageBox.Show("本アプリケーションの実行にはDBの更新が必要です。\n本アプリケーションを再度実行し、DBの更新を行ってください。", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Localize.ShowMessageBox("Lang:DBUpdateRequestMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     Environment.Exit(-1);
                 }
             }

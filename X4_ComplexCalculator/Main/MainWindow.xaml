@@ -4,13 +4,18 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:wkarea="clr-namespace:X4_ComplexCalculator.Main.WorkArea"
     xmlns:x4vcvt="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
     xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
-    Title="X4: ステーション計算機"
+    Title="{lex:Loc Lang:MainWindowTitle}"
     Width="1000"
     Height="600"
+    lex:LocalizeDictionary.DefaultProvider="{StaticResource CSVLocalizationProvider}"
+    lex:LocalizeDictionary.DesignCulture="en"
+    lex:ResxLocalizationProvider.DefaultAssembly="WPFLocalizationExtension"
+    lex:ResxLocalizationProvider.DefaultDictionary="StringResources"
     Style="{StaticResource DefaultWindowBackgroundStyle}"
     mc:Ignorable="d">
 
@@ -45,42 +50,42 @@
         <Menu Grid.Row="0">
 
             <!--  ファイル(F)  -->
-            <MenuItem Header="ファイル(_F)">
+            <MenuItem Header="{lex:Loc Lang:FileMenu}">
 
                 <!--  新規  -->
                 <MenuItem
                     Command="{Binding CreateNewCommand, Mode=OneTime}"
-                    Header="新規作成"
+                    Header="{lex:Loc Lang:New}"
                     InputGestureText="Ctrl+N" />
 
                 <!--  上書き保存  -->
                 <MenuItem
                     Command="{Binding SaveCommand, Mode=OneTime}"
-                    Header="上書き保存"
+                    Header="{lex:Loc Lang:OverwriteSave}"
                     InputGestureText="Ctrl+S" />
 
                 <!--  名前を付けて保存  -->
                 <MenuItem
                     Command="{Binding SaveAsCommand, Mode=OneTime}"
-                    Header="名前を付けて保存"
+                    Header="{lex:Loc Lang:SaveAs}"
                     InputGestureText="Shift+Ctrl+S" />
 
                 <!--  開く  -->
                 <MenuItem
                     Command="{Binding OpenCommand, Mode=OneTime}"
-                    Header="開く"
+                    Header="{lex:Loc Lang:Open}"
                     InputGestureText="Ctrl+O" />
 
                 <Separator />
 
                 <!--  インポート  -->
                 <MenuItem
-                    Header="インポート"
+                    Header="{lex:Loc Lang:Import}"
                     InputGestureText="Ctrl+I"
                     ItemsSource="{Binding Imports}">
                     <MenuItem.ItemContainerStyle>
                         <Style TargetType="{x:Type MenuItem}">
-                            <Setter Property="MenuItem.Header" Value="{Binding Title, Mode=OneTime}" />
+                            <Setter Property="MenuItem.Header" Value="{Binding Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                             <Setter Property="Command" Value="{Binding Command, Mode=OneTime}" />
                             <Setter Property="CommandParameter" Value="{Binding ., Mode=OneTime}" />
                         </Style>
@@ -89,12 +94,12 @@
 
                 <!--  エクスポート  -->
                 <MenuItem
-                    Header="エクスポート"
+                    Header="{lex:Loc Lang:Export}"
                     InputGestureText="Ctrl+E"
                     ItemsSource="{Binding Exports}">
                     <MenuItem.ItemContainerStyle>
                         <Style TargetType="{x:Type MenuItem}">
-                            <Setter Property="MenuItem.Header" Value="{Binding Title, Mode=OneTime}" />
+                            <Setter Property="MenuItem.Header" Value="{Binding Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                             <Setter Property="Command" Value="{Binding Command, Mode=OneTime}" />
                             <Setter Property="CommandParameter" Value="{Binding ., Mode=OneTime}" />
                         </Style>
@@ -106,19 +111,19 @@
                 <!--  DB更新  -->
                 <MenuItem
                     Command="{Binding UpdateDBCommand, Mode=OneTime}"
-                    Header="DB更新"
+                    Header="{lex:Loc Lang:UpdateDB}"
                     InputGestureText="Ctrl+U" />
 
             </MenuItem>
 
 
-            <MenuItem Header="レイアウト(_L)">
+            <MenuItem Header="{lex:Loc Lang:Layout}">
                 <!--  レイアウト保存  -->
-                <MenuItem Command="{Binding SaveLayout, Mode=OneTime}" Header="レイアウト保存" />
+                <MenuItem Command="{Binding SaveLayout, Mode=OneTime}" Header="{lex:Loc Lang:SaveLayout}" />
 
                 <!--  レイアウト一覧  -->
                 <MenuItem
-                    Header="レイアウト一覧"
+                    Header="{lex:Loc Lang:LayoutList}"
                     ItemsSource="{Binding Layouts}"
                     ToolBar.OverflowMode="Always">
                     <MenuItem.ItemContainerStyle>
@@ -130,6 +135,19 @@
                         </Style>
                     </MenuItem.ItemContainerStyle>
                 </MenuItem>
+            </MenuItem>
+
+            <MenuItem
+                Header="{lex:Loc Lang:Language}"
+                ItemsSource="{Binding Languages}"
+                ToolBar.OverflowMode="Always">
+                <MenuItem.ItemContainerStyle>
+                    <Style TargetType="{x:Type MenuItem}">
+                        <Setter Property="MenuItem.Header" Value="{Binding Name}" />
+                        <Setter Property="MenuItem.IsChecked" Value="{Binding IsChecked, Mode=TwoWay}" />
+                        <Setter Property="MenuItem.IsCheckable" Value="True" />
+                    </Style>
+                </MenuItem.ItemContainerStyle>
             </MenuItem>
         </Menu>
 
@@ -156,7 +174,7 @@
             <!--  作業エリアのタイトル部の設定  -->
             <xcad:DockingManager.DocumentHeaderTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Content.Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock MinWidth="30" Text="{Binding Content.Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                 </DataTemplate>
             </xcad:DockingManager.DocumentHeaderTemplate>
 

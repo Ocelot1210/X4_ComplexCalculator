@@ -12,6 +12,7 @@ using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Linq;
 using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Localize;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
 {
@@ -102,7 +103,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
                 {
                     Dispatcher.CurrentDispatcher.BeginInvoke(() =>
                     {
-                        MessageBox.Show($"ファイルの読み込みに失敗しました。\r\n\r\n■理由：\r\n{e.Message}", "読み込み失敗", MessageBoxButton.OK, MessageBoxImage.Error);
+                        Localize.ShowMessageBox("Lang:FaildToLoadFileMessage", "Lang:FaildToLoadFileMessageTitle", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
                     });
                 }
                 finally

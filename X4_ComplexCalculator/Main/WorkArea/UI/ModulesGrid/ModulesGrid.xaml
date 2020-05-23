@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
@@ -11,6 +12,10 @@
     x:Name="root"
     d:DesignHeight="450"
     d:DesignWidth="800"
+    lex:LocalizeDictionary.DefaultProvider="{StaticResource CSVLocalizationProvider}"
+    lex:LocalizeDictionary.DesignCulture="en-US"
+    lex:ResxLocalizationProvider.DefaultAssembly="WPFLocalizationExtension"
+    lex:ResxLocalizationProvider.DefaultDictionary="StringResources"
     mc:Ignorable="d">
     <UserControl.Resources>
 
@@ -19,21 +24,21 @@
             <!--  コピー  -->
             <MenuItem
                 Command="{Binding CopyModules}"
-                Header="コピー"
+                Header="{lex:Loc Lang:Copy}"
                 InputGestureText="Alt+C" />
 
             <!--  貼り付け  -->
             <MenuItem
                 Command="{Binding PasteModules}"
                 CommandParameter="{x:Reference Name=moduleGrid}"
-                Header="貼り付け"
+                Header="{lex:Loc Lang:Paste}"
                 InputGestureText="Alt+V" />
 
             <!--  削除  -->
             <MenuItem
                 Command="{Binding DeleteModules}"
                 CommandParameter="{x:Reference Name=moduleGrid}"
-                Header="削除"
+                Header="{lex:Loc Lang:Delete}"
                 InputGestureText="Delete" />
         </ContextMenu>
 
@@ -47,27 +52,27 @@
 
             <!--  モジュール追加ボタン  -->
             <Button
-                Width="65"
+                MinWidth="65"
                 Command="{Binding AddModuleCommand}"
-                Content="追加"
+                Content="{lex:Loc Lang:Add}"
                 DockPanel.Dock="Right" />
 
             <!--  モジュール自動追加ボタン  -->
             <Button
-                Width="65"
+                MinWidth="65"
                 Command="{Binding AutoAddModuleCommand}"
-                Content="自動追加"
+                Content="{lex:Loc Lang:AutoAdd}"
                 DockPanel.Dock="Right" />
 
             <!--  モジュールマージボタン  -->
             <Button
-                Width="65"
+                MinWidth="65"
                 Command="{Binding MergeModuleCommand}"
-                Content="マージ"
+                Content="{lex:Loc Lang:Merge}"
                 DockPanel.Dock="Right" />
 
             <!--  検索ボックス  -->
-            <xctk:WatermarkTextBox Text="{Binding SearchModuleName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Watermark="モジュール名を入力して検索" />
+            <xctk:WatermarkTextBox Text="{Binding SearchModuleName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Watermark="{lex:Loc Lang:SearchByEnteringText}" />
 
         </DockPanel>
 
@@ -110,7 +115,7 @@
                 <!--  モジュール名  -->
                 <DataGridTemplateColumn
                     ClipboardContentBinding="{Binding Module.Name}"
-                    Header="モジュール名"
+                    Header="{lex:Loc Lang:ModuleName}"
                     IsReadOnly="True"
                     SortMemberPath="Module.Name">
                     <DataGridTemplateColumn.CellTemplate>
@@ -134,7 +139,7 @@
                 <!--  モジュール数  -->
                 <x4cmn:MouseHoverEditCellColumn
                     ClipboardContentBinding="{Binding ModuleCount}"
-                    Header="モジュール数"
+                    Header="{lex:Loc Lang:ModuleCount}"
                     SortMemberPath="ModuleCount">
                     <!--  表示モード  -->
                     <DataGridTemplateColumn.CellTemplate>
@@ -164,7 +169,7 @@
                 <!--  装備編集  -->
                 <DataGridTemplateColumn
                     CanUserResize="False"
-                    Header="装備"
+                    Header="{lex:Loc Lang:ModuleEquipment}"
                     IsReadOnly="True"
                     SortMemberPath="EditEquipmentButtonVisiblity">
                     <DataGridTemplateColumn.CellTemplate>
@@ -172,7 +177,7 @@
                             <TextBlock
                                 VerticalAlignment="Center"
                                 Style="{StaticResource ClickableTextBlockStyle}"
-                                Text="編集"
+                                Text="{lex:Loc Lang:Edit}"
                                 TextAlignment="Center"
                                 Visibility="{Binding EditEquipmentButtonVisiblity, Mode=OneTime}">
                                 <TextBlock.InputBindings>
@@ -188,7 +193,7 @@
                 <DataGridTemplateColumn
                     CanUserResize="False"
                     ClipboardContentBinding="{Binding TurretsCount, Mode=OneTime}"
-                    Header="タレット"
+                    Header="{lex:Loc Lang:Turrets}"
                     SortMemberPath="TurretsCount">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
@@ -222,7 +227,7 @@
                 <DataGridTemplateColumn
                     CanUserResize="False"
                     ClipboardContentBinding="{Binding ShieldsCount, Mode=OneTime}"
-                    Header="シールド"
+                    Header="{lex:Loc Lang:Shields}"
                     SortMemberPath="ShieldsCount">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
@@ -254,7 +259,7 @@
                 <!--  建造方式  -->
                 <DataGridTemplateColumn
                     ClipboardContentBinding="{Binding SelectedMethod.Method, Mode=OneTime}"
-                    Header="建造方式"
+                    Header="{lex:Loc Lang:BuildMethod}"
                     SortMemberPath="SelectedMethod.Method">
 
                     <!--  表示モード  -->

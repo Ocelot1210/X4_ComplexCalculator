@@ -5,15 +5,19 @@
     xmlns:DataGridInline="clr-namespace:CustomControlLibrary.DataGridInline;assembly=X4_ComplexCalculator_CustomControlLibrary"
     xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
     xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
-    xmlns:x4conv="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     x:Name="Control"
     d:DesignHeight="450"
     d:DesignWidth="800"
+    lex:LocalizeDictionary.DefaultProvider="{StaticResource CSVLocalizationProvider}"
+    lex:LocalizeDictionary.DesignCulture="en-US"
+    lex:ResxLocalizationProvider.DefaultAssembly="WPFLocalizationExtension"
+    lex:ResxLocalizationProvider.DefaultDictionary="StringResources"
     mc:Ignorable="d PresentationOptions">
 
     <UserControl.Resources>
@@ -44,11 +48,11 @@
             <MenuItem
                 Command="{Binding SelectedExpand, Mode=OneTime}"
                 CommandParameter="{x:Reference productGrid}"
-                Header="展開" />
+                Header="{lex:Loc Lang:Expansion}" />
             <MenuItem
                 Command="{Binding SelectedCollapse, Mode=OneTime}"
                 CommandParameter="{x:Reference productGrid}"
-                Header="折りたたむ" />
+                Header="{lex:Loc Lang:Collapse}" />
         </ContextMenu>
 
         <!--  子要素のListView  -->
@@ -66,11 +70,11 @@
                     <!--  モジュール名  -->
                     <DataGridInline:InlineGridViewColumn
                         DisplayMemberBinding="{Binding ModuleName, Mode=OneTime}"
-                        Header="モジュール名"
+                        Header="{lex:Loc Lang:ModuleName}"
                         SortTargetPropertyName="ModuleName" />
 
                     <!--  モジュール数  -->
-                    <DataGridInline:InlineGridViewColumn Header="モジュール数" SortTargetPropertyName="ModuleCount">
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:ModuleCount}" SortTargetPropertyName="ModuleCount">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding ModuleCount, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
@@ -79,7 +83,7 @@
                     </DataGridInline:InlineGridViewColumn>
 
                     <!--  生産性  -->
-                    <DataGridInline:InlineGridViewColumn Header="生産性" SortTargetPropertyName="Efficiency">
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Efficiency}" SortTargetPropertyName="Efficiency">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Efficiency, Mode=OneWay}" TextAlignment="Right" />
@@ -88,7 +92,7 @@
                     </DataGridInline:InlineGridViewColumn>
 
                     <!--  生産量  -->
-                    <DataGridInline:InlineGridViewColumn Header="生産量" SortTargetPropertyName="Amount">
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Production}" SortTargetPropertyName="Amount">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Amount, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
@@ -118,7 +122,7 @@
             <DataGridTemplateColumn
                 CellStyle="{StaticResource RightAlignedDataGridCell}"
                 ClipboardContentBinding="{Binding Ware.WareGroup.Tier, Mode=OneTime}"
-                Header="階級"
+                Header="{lex:Loc Lang:Tier}"
                 SortMemberPath="Ware.WareGroup.Tier">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
@@ -131,7 +135,7 @@
             <!--  製品名  -->
             <DataGridTemplateColumn
                 ClipboardContentBinding="{Binding Ware.Name, Mode=OneTime}"
-                Header="製品名"
+                Header="{lex:Loc Lang:ProductName}"
                 SortMemberPath="Ware.Name">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
@@ -145,7 +149,7 @@
             <DataGridTemplateColumn
                 CellStyle="{StaticResource LossEmphasisStyle}"
                 ClipboardContentBinding="{Binding Count, Mode=OneTime}"
-                Header="個数/h"
+                Header="{lex:Loc Lang:AmountPerHour}"
                 SortMemberPath="Count">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
@@ -158,7 +162,7 @@
             <!--  金額  -->
             <DataGridTemplateColumn
                 ClipboardContentBinding="{Binding Price, Mode=OneTime}"
-                Header="金額"
+                Header="{lex:Loc Lang:Price}"
                 IsReadOnly="True"
                 SortMemberPath="Price">
                 <DataGridTemplateColumn.CellTemplate>
@@ -175,7 +179,7 @@
             <!--  単価  -->
             <x4cmn:MouseHoverEditCellColumn
                 ClipboardContentBinding="{Binding UnitPrice, Mode=OneTime}"
-                Header="単価"
+                Header="{lex:Loc Lang:UnitPrice}"
                 SortMemberPath="UnitPrice">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>

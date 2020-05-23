@@ -18,6 +18,11 @@ using X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid;
 using Xceed.Wpf.AvalonDock;
 using Xceed.Wpf.AvalonDock.Layout;
 using Xceed.Wpf.AvalonDock.Layout.Serialization;
+using WPFLocalizeExtension.Engine;
+using System.Xml.Linq;
+using System.Xml.XPath;
+using System.Collections.Generic;
+using System.Text;
 
 namespace X4_ComplexCalculator.Main.WorkArea
 {
@@ -172,6 +177,28 @@ namespace X4_ComplexCalculator.Main.WorkArea
             OnUnloadedCommand   = new DelegateCommand(OnUnloaded);
 
             _Model.PropertyChanged += Model_PropertyChanged;
+            LocalizeDictionary.Instance.PropertyChanged += Instance_PropertyChanged;
+        }
+
+
+        /// <summary>
+        /// 言語変更時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Instance_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(LocalizeDictionary.Instance.Culture))
+            {
+                var serializer = new XmlLayoutSerializer(_CurrentDockingManager);
+
+                using var ms = new MemoryStream(GetCurrentLayout(), false);
+                using var ms2 = new MemoryStream(SetTitle(ms), false);
+                serializer.Deserialize(ms2);
+
+                // 表示メニューを初期化
+                VisiblityMenuItems.Reset(_CurrentDockingManager.Layout.Descendents().OfType<LayoutAnchorable>().Select(x => new VisiblityMenuItem(x)));
+            }
         }
 
         /// <summary>
@@ -284,7 +311,8 @@ WHERE
                 var serializer = new XmlLayoutSerializer(_CurrentDockingManager);
 
                 using var ms = new MemoryStream(_Layout, false);
-                serializer.Deserialize(ms);
+                using var ms2 = new MemoryStream(SetTitle(ms), false);
+                serializer.Deserialize(ms2);
             }
 
             // 表示メニューを初期化
@@ -328,7 +356,8 @@ WHERE
                 var serializer = new XmlLayoutSerializer(_CurrentDockingManager);
 
                 using var ms = new MemoryStream(_Layout, false);
-                serializer.Deserialize(ms);
+                using var ms2 = new MemoryStream(SetTitle(ms), false);
+                serializer.Deserialize(ms2);
             }
 
             // 表示メニューを初期化
@@ -342,6 +371,42 @@ WHERE
         private void OnUnloaded()
         {
             _Layout = GetCurrentLayout();
+        }
+
+
+        /// <summary>
+        /// タイトルを再設定する
+        /// </summary>
+        /// <param name="stream"></param>
+        private byte[] SetTitle(Stream stream)
+        {
+            var xml = XDocument.Load(stream);
+
+            // コンテンツIDと言語IDのペア
+            var titleDict = new Dictionary<string, string>()
+            {
+                { "Modules",    "Lang:ModuleList" },        // モジュール一覧
+                { "Products",   "Lang:Products" },          // 製品一覧
+                { "Resources",  "Lang:BuildResources" },    // 建造リソース一覧
+                { "Storages",   "Lang:Storages" },          // 保管庫一覧
+                { "StorageSim", "Lang:StorageAssign" },     // 保管庫割当
+                { "Summary",    "Lang:Summary" },           // 概要
+            };
+
+            // タイトル再設定
+            foreach (var elm in xml.XPathSelectElements("LayoutRoot//LayoutAnchorable"))
+            {
+                if (titleDict.TryGetValue(elm.Attribute("ContentId").Value, out var langID))
+                {
+                    elm.Attribute("Title").Value = (string)LocalizeDictionary.Instance.GetLocalizedObject(langID, null, null);
+                }
+            }
+
+            var sb = new StringBuilder();
+            using var writer = new StringWriter(sb);
+            xml.Save(writer);
+
+            return Encoding.Unicode.GetBytes(sb.ToString());
         }
 
 
@@ -374,6 +439,7 @@ WHERE
         public void Dispose()
         {
             _Model.PropertyChanged -= Model_PropertyChanged;
+            LocalizeDictionary.Instance.PropertyChanged -= Instance_PropertyChanged;
             _Model.Dispose();
             Summary.Dispose();
             Modules.Dispose();

@@ -114,7 +114,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         public ModuleProduction SelectedMethod
         {
             get => _SelectedMethod;
-            set => SetProperty(ref _SelectedMethod, value);
+            set => SetPropertyEx(ref _SelectedMethod, value);
         }
         #endregion
 
@@ -300,7 +300,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
 
             if (sb.Length == 0)
             {
-                sb.Append("何も装備していません");
+                sb.Append((string)WPFLocalizeExtension.Engine.LocalizeDictionary.Instance.GetLocalizedObject("Lang:NotEquippedToolTipText", null, null));
             }
 
             return sb.ToString();

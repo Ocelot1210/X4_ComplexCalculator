@@ -4,14 +4,12 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
-using System.Data.SQLite;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
@@ -82,7 +80,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// </summary>
         public void AutoAddModule()
         {
-            var result = MessageBox.Show("不足している製品を生産するモジュールを追加しますか？", "確認", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            var result = Localize.ShowMessageBox("Lang:AutoAddConfirm", "Lang:Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
             if (result != MessageBoxResult.Yes)
             {
                 return;
@@ -109,11 +107,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
             if (addedRecords == 0)
             {
-                MessageBox.Show("不足している製品が無いためモジュールは追加されませんでした。", "情報", MessageBoxButton.OK, MessageBoxImage.Information);
+                Localize.ShowMessageBox("Lang:NoAddedModulesAutomaticallyMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else
             {
-                MessageBox.Show($"{addedRecords}レコード、{addedModules}モジュール追加されました。", "情報", MessageBoxButton.OK, MessageBoxImage.Information);
+                Localize.ShowMessageBox("Lang:AddedModulesAutomaticallyMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, addedRecords, addedModules);
             }
         }
 

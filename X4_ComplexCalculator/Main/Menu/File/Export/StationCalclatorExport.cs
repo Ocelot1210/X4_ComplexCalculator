@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +12,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Export
     /// <summary>
     /// StationCalclator向けにステーションの情報をエクスポートする
     /// </summary>
-    class StationCalclatorExport : IExport
+    class StationCalclatorExport : BindableBase, IExport
     {
         /// <summary>
         /// タイトル文字列
@@ -42,6 +43,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Export
         public bool Export(IWorkArea workArea)
         {
             var sb = new StringBuilder();
+            var exists = false;
 
             sb.Append(@"http://www.x4-game.com/#/station-calculator?");
 
@@ -52,10 +54,15 @@ namespace X4_ComplexCalculator.Main.Menu.File.Export
                                                                x.Module.ModuleID != "module_gen_dock_m_venturer_01"))
             {
                 sb.Append($"$module-{module.Module.ModuleID},count:{module.ModuleCount};,");
+                exists = true;
             }
-            sb.Length -= 2;
 
-            SelectStringDialog.ShowDialog("Station Calclatorへエクスポート", "URLをコピーして下さい\r\n注) 以下のモジュールは除外しています。\r\n・接続モジュール\r\n・探検モジュール", sb.ToString(), hideCancelButton:true);
+            if (exists)
+            {
+                sb.Length -= 2;
+            }
+
+            SelectStringDialog.ShowDialog("Lang:StationCalclatorExportTitle", "Lang:StationCalclatorExportDescription", sb.ToString(), hideCancelButton:true);
 
             return true;
         }

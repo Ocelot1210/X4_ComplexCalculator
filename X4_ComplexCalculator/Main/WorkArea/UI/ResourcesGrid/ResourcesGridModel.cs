@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
@@ -99,6 +100,16 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
                     
                     break;
 
+                // 建造方式変更の場合
+                case nameof(ModulesGridItem.SelectedMethod):
+                    {
+                        if (e is PropertyChangedExtendedEventArgs<ModuleProduction> ev)
+                        {
+                            OnModuleSelectedMethodChanged(module, ev.OldValue.Method);
+                        }
+                    }
+                    break;
+
                 default:
                     break;
             }
@@ -147,7 +158,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
         /// <param name="prevModuleCount">モジュール数前回値</param>
         private void OnModuleCountChanged(ModulesGridItem module, long prevModuleCount)
         {
-            (string, long, string)[] modules = { (module.Module.ModuleID, 1, module.SelectedMethod.Method) };
+            (string ModuleID, long ModuleCount, string Method)[] modules = 
+            {
+                (module.Module.ModuleID, 1, module.SelectedMethod.Method) 
+            };
 
             // モジュールの建造に必要なリソースを集計
             var resourcesDict = new Dictionary<string, long>();
@@ -169,9 +183,62 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
                     itm.Amount += kvp.Value * (module.ModuleCount - prevModuleCount);
                 }
             }
-
-            resourcesDict.Clear();
         }
+
+        /// <summary>
+        /// モジュールの建造方式変更時に必要なリソースを更新
+        /// </summary>
+        /// <param name="module"></param>
+        /// <param name="buildMethod"></param>
+        private void OnModuleSelectedMethodChanged(ModulesGridItem module, string buildMethod)
+        {
+            // モジュールの建造に必要なリソースを集計用
+            var resourcesDict = new Dictionary<string, long>();
+
+            // 変更前モジュールの必要リソース集計
+            {
+                (string ModuleID, long ModuleCount, string Method)[] oldModules =
+                {
+                    (module.Module.ModuleID, 1, buildMethod)
+                };
+                AggregateModuleResources(oldModules, resourcesDict);
+
+                // 変更前のモジュールのリソースはリソース一覧から引くため*-1する
+                foreach (var key in resourcesDict.Keys.ToArray())
+                {
+                    resourcesDict[key] *= -1;
+                }
+            }
+
+            // 変更後モジュールの必要リソース集計
+            {
+                (string ModuleID, long ModuleCount, string Method)[] newModules =
+                {
+                    (module.Module.ModuleID, 1, module.SelectedMethod.Method)
+                };
+                AggregateModuleResources(newModules, resourcesDict);
+            }
+
+            var addTarget = new List<ResourcesGridItem>();
+            foreach (var kvp in resourcesDict)
+            {
+                var item = Resources.Where(x => x.Ware.WareID == kvp.Key).FirstOrDefault();
+                if (item != null)
+                {
+                    // 既にウェアが一覧にある場合
+                    item.Amount += kvp.Value * module.ModuleCount;
+                }
+                else
+                {
+                    // ウェアが一覧にない場合
+                    addTarget.Add(new ResourcesGridItem(kvp.Key, kvp.Value * module.ModuleCount));
+                }
+            }
+
+            Resources.AddRange(addTarget);
+            Resources.RemoveAll(x => x.Amount == 0);
+        }
+
 
 
         /// <summary>

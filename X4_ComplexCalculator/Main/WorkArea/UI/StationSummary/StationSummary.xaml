@@ -4,10 +4,15 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:DataGridInline="clr-namespace:CustomControlLibrary.DataGridInline;assembly=X4_ComplexCalculator_CustomControlLibrary"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.StationSummary"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="450"
     d:DesignWidth="800"
+    lex:LocalizeDictionary.DefaultProvider="{StaticResource CSVLocalizationProvider}"
+    lex:LocalizeDictionary.DesignCulture="en-US"
+    lex:ResxLocalizationProvider.DefaultAssembly="WPFLocalizationExtension"
+    lex:ResxLocalizationProvider.DefaultDictionary="StringResources"
     Background="White"
     mc:Ignorable="d">
 
@@ -25,11 +30,11 @@
                     <!--  モジュール名  -->
                     <DataGridInline:InlineGridViewColumn
                         DisplayMemberBinding="{Binding ModuleName, Mode=OneTime}"
-                        Header="モジュール名"
+                        Header="{lex:Loc Lang:ModuleName}"
                         SortTargetPropertyName="ModuleName" />
 
                     <!--  モジュール数  -->
-                    <DataGridInline:InlineGridViewColumn Header="モジュール数" SortTargetPropertyName="ModuleCount">
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:ModuleCount}" SortTargetPropertyName="ModuleCount">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding ModuleCount, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
@@ -38,7 +43,7 @@
                     </DataGridInline:InlineGridViewColumn>
 
                     <!--  労働者数  -->
-                    <DataGridInline:InlineGridViewColumn Header="労働者数" SortTargetPropertyName="WorkForce">
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Workers}" SortTargetPropertyName="WorkForce">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding WorkForce, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
@@ -47,7 +52,7 @@
                     </DataGridInline:InlineGridViewColumn>
 
                     <!--  総労働者数  -->
-                    <DataGridInline:InlineGridViewColumn Header="総働者数" SortTargetPropertyName="TotalWorkforce">
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:TotalWorkers}" SortTargetPropertyName="TotalWorkforce">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding TotalWorkforce, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
@@ -86,11 +91,11 @@
                     <!--  ウェア名  -->
                     <DataGridInline:InlineGridViewColumn
                         DisplayMemberBinding="{Binding WareName, Mode=OneTime}"
-                        Header="ウェア名"
+                        Header="{lex:Loc Lang:WareName}"
                         SortTargetPropertyName="WareName" />
 
                     <!--  必要数  -->
-                    <DataGridInline:InlineGridViewColumn Header="必要数" SortTargetPropertyName="NeedAmount">
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:NecessaryAmount}" SortTargetPropertyName="NeedAmount">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding NeedAmount, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
@@ -99,7 +104,7 @@
                     </DataGridInline:InlineGridViewColumn>
 
                     <!--  生産数  -->
-                    <DataGridInline:InlineGridViewColumn Header="生産数" SortTargetPropertyName="ProductionAmount">
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Production}" SortTargetPropertyName="ProductionAmount">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding ProductionAmount, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
@@ -108,7 +113,7 @@
                     </DataGridInline:InlineGridViewColumn>
 
                     <!--  差  -->
-                    <DataGridInline:InlineGridViewColumn Header="差" SortTargetPropertyName="Diff">
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Diff}" SortTargetPropertyName="Diff">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Diff, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right">
@@ -143,11 +148,11 @@
                     <!--  ウェア名  -->
                     <DataGridInline:InlineGridViewColumn
                         DisplayMemberBinding="{Binding WareName, Mode=OneTime}"
-                        Header="ウェア名"
+                        Header="{lex:Loc Lang:WareName}"
                         SortTargetPropertyName="WareName" />
 
                     <!--  数量  -->
-                    <DataGridInline:InlineGridViewColumn Header="数量" SortTargetPropertyName="Count">
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Quantity}" SortTargetPropertyName="Count">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Count, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
@@ -156,7 +161,7 @@
                     </DataGridInline:InlineGridViewColumn>
 
                     <!--  単価  -->
-                    <DataGridInline:InlineGridViewColumn Header="単価" SortTargetPropertyName="UnitPrice">
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:UnitPrice}" SortTargetPropertyName="UnitPrice">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding UnitPrice, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:N0} cr'}" TextAlignment="Right" />
@@ -165,7 +170,7 @@
                     </DataGridInline:InlineGridViewColumn>
 
                     <!--  金額  -->
-                    <DataGridInline:InlineGridViewColumn Header="金額" SortTargetPropertyName="TotalPrice">
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Price}" SortTargetPropertyName="TotalPrice">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding TotalPrice, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:N0} cr'}" TextAlignment="Right">
@@ -196,17 +201,18 @@
             <Expander Margin="0,0,0,10">
                 <Expander.Header>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="労働力 = [" />
-                        <TextBlock Text="{Binding WorkForce, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat={StaticResource DefaultNumericFormat}}" />
-                        <TextBlock Text="/" />
-                        <TextBlock Text="{Binding NeedWorkforce, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat={StaticResource DefaultNumericFormat}}" />
-                        <TextBlock Text="]" />
+                        <TextBlock Text="{lex:Loc Lang:WorkForce}" />
+                        <TextBlock>
+                            <Run Text=" = " />
+                            [<Run Text="{Binding WorkForce, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat={StaticResource DefaultNumericFormat}}" />
+                            /<Run Text="{Binding NeedWorkforce, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat={StaticResource DefaultNumericFormat}}" />
+                            ]</TextBlock>
                     </StackPanel>
                 </Expander.Header>
 
                 <StackPanel Margin="25,0,0,0" Orientation="Vertical">
                     <!--  必要ウェア情報  -->
-                    <Expander Header="必要ウェア情報">
+                    <Expander Header="{lex:Loc Lang:NecessaryWareInfo}">
                         <ContentControl
                             Margin="25,0,0,0"
                             Content="{StaticResource WorkersNeedWareDetailsListView}"
@@ -214,7 +220,7 @@
                     </Expander>
 
                     <!--  モジュール情報  -->
-                    <Expander Header="モジュール情報">
+                    <Expander Header="{lex:Loc Lang:ModuleInfo}">
                         <ContentControl
                             Margin="25,0,0,0"
                             Content="{StaticResource WorkersDetailsListView}"
@@ -227,7 +233,10 @@
             <Expander Margin="0,10,0,10">
                 <Expander.Header>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="1時間あたりの損益 = " />
+                        <TextBlock>
+                            <Run Text="{lex:Loc Lang:ProfitPerHour}" />
+                            <Run Text=" = " />
+                        </TextBlock>
                         <TextBlock Text="{Binding Profit, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:N0} cr'}" />
                     </StackPanel>
                 </Expander.Header>
@@ -241,7 +250,11 @@
             <Expander Margin="0,10,0,0">
                 <Expander.Header>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="建造コスト = " />
+                        <TextBlock>
+                            <Run Text="{lex:Loc Lang:BuildCost}" />
+                            <Run Text=" = " />
+                        </TextBlock>
+
                         <TextBlock Text="{Binding BuildingCost, StringFormat='{}{0:N0} cr'}" />
                     </StackPanel>
                 </Expander.Header>

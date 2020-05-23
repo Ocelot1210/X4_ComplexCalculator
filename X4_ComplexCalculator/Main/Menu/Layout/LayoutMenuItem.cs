@@ -4,6 +4,7 @@ using System;
 using System.Windows;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
+using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
 
 namespace X4_ComplexCalculator.Main.Menu.Layout
@@ -123,7 +124,7 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
         /// </summary>
         private void EditLayoutName()
         {
-            var (onOK, newLayoutName) = SelectStringDialog.ShowDialog("レイアウト名編集", "レイアウト名", LayoutName, IsValidLayoutName);
+            var (onOK, newLayoutName) = SelectStringDialog.ShowDialog("Lang:EditLayoutName", "Lang:LayoutName", LayoutName, IsValidLayoutName);
             if (onOK && LayoutName != newLayoutName)
             {
                 LayoutName = newLayoutName;
@@ -141,7 +142,7 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
         /// </summary>
         private void DeleteLayout()
         {
-            var result = MessageBox.Show($"レイアウト「{LayoutName}」を本当に削除しますか？", "警告", MessageBoxButton.YesNo, MessageBoxImage.Exclamation, MessageBoxResult.No);
+            var result = Localize.ShowMessageBox("Lang:DeleteLayoutConfirmMessage", "Lang:Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No, LayoutName);
 
             if (result == MessageBoxResult.Yes)
             {
@@ -162,7 +163,7 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
 
             if (string.IsNullOrWhiteSpace(layoutName))
             {
-                MessageBox.Show("レイアウト名が無効です。\r\n空白文字以外の文字を1文字以上入力して下さい。", "確認", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Localize.ShowMessageBox("Lang:InvalidLayoutNameMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Warning);
                 ret = false;
             }
 

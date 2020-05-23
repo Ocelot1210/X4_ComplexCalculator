@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Windows;
+using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
@@ -32,7 +33,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
             }
             catch (Exception e)
             {
-                MessageBox.Show($"保存に失敗しました。\r\n■理由：\r\n{e.Message}\r\n\r\n■スタックトレース：\r\n{e.StackTrace}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                Localize.ShowMessageBox("Lang:SaveDataWriteFailureMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message, e.StackTrace);
             }
 
             return false;
@@ -62,7 +63,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
                 }
                 catch(Exception e)
                 {
-                    MessageBox.Show($"保存に失敗しました。\r\n■理由：\r\n{e.Message}\r\n\r\n■スタックトレース：\r\n{e.StackTrace}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Localize.ShowMessageBox("Lang:SaveDataWriteFailureMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message, e.StackTrace);
                 }
             }
 

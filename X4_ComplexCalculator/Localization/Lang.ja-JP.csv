@@ -1,0 +1,172 @@
+﻿# ------------------------------------------------------
+# Common
+# ------------------------------------------------------
+WareName;ウェア名
+Tier;階級
+Price;価格
+UnitPrice;単価
+ModuleName;モジュール名
+ModuleCount;モジュール数
+Select;選択
+Close;閉じる
+SelectAll;全選択
+Save;保存
+OwnerFaction;所有派閥
+Turrets;タレット
+Shields;シールド
+SearchByEnteringText;テキストを入力して検索
+Confirmation;確認
+Warning;警告
+Error;エラー
+
+# ------------------------------------------------------
+# DB
+# ------------------------------------------------------
+OldFormatMessage;現在のDBのフォーマットが旧形式です。\r\nゲームファイルよりDBを再度抽出して下さい。
+DBUpdateRequestMessage;本アプリケーションの実行にはDBの更新が必要です。\r\n本アプリケーションを再度実行し、DBの更新を行ってください。
+DBExtractionRequestMessage;DBが存在しません。\r\nゲームファイルよりDBを抽出する必要があります。\r\nデータ抽出画面が立ち上がるまでしばらくお待ち下さい。
+DBMakeRequestMessage;本アプリケーションの実行にはDBの作成が必要です。\r\n本アプリケーションを再度実行し、DBの更新を行ってください。
+DBOpenFailMessage;DBのオープンに失敗しました。\r\nゲームファイルよりDBを抽出する事で起動可能になるかもしれません。\r\nDBを更新しますか？
+
+
+# ------------------------------------------------------
+# Main window
+# ------------------------------------------------------
+MainWindowTitle;X4: ステーション計算機
+FileMenu;ファイル(_F)
+New;新規作成
+OverwriteSave;上書き保存
+SaveAs;名前を付けて保存
+Open;開く
+Import;インポート
+ExistingPlan;既存の計画
+Export;エクスポート
+UpdateDB;DB更新
+Layout;レイアウト(_L)
+SaveLayout;レイアウト保存
+LayoutList;レイアウト一覧
+EditLayoutName;レイアウト名編集
+LayoutName;レイアウト名
+Language;言語
+LayoutSavedMessage;計画「{0}」のレイアウトを「{1}」として保存しました。
+LayoutOverwritedMessage;計画「{0}」のレイアウトを「{1}」として上書き保存しました。
+TabDoesNotSelectedMessage;レイアウト保存対象のタブが選択されていません。\r\n保存対象のタブを選択後、再度実行して下さい。
+FaildToLoadFileMessage;ファイルの読み込みに失敗しました。\r\n\r\n■理由：\r\n{0}
+FaildToLoadFileMessageTitle;読み込み失敗
+DBUpdateConfirmationMessage;DB更新画面を表示しますか？\r\n※ 画面が起動するまでしばらくお待ち下さい。
+DBUpdateFailureMessage;DBの更新に失敗しました。\r\nDBファイルにアクセス可能か確認後、再度実行してください。
+MainWindowClosingConfirmMessage;未保存の項目があります。保存しますか？
+PlanClosingConfirmMessage;計画{0}の変更内容を保存しますか？
+DeleteLayoutConfirmMessage;レイアウト「{0}」を本当に削除しますか？
+InvalidLayoutNameMessage;レイアウト名が無効です。\r\n空白文字以外の文字を1文字以上入力して下さい。
+SaveDataWriteFailureMessage;保存に失敗しました。\r\n■理由：\r\n{0}\r\n\r\n■スタックトレース：\r\n{1}
+ImportFailureMessage;インポートに失敗しました。\r\n■理由：\r\n{e.Message}
+StationCalclatorExportTitle;Station Calclatorへエクスポート
+StationCalclatorExportDescription;URLをコピーして下さい\r\n注) 以下のモジュールは除外しています。\r\n・接続モジュール\r\n・探検モジュール
+StationCalclatorImportTitle;Station Calclatorからインポート
+StationCalclatorImportDescription;Station Calclator上部のShareボタンをクリックした時に\r\n表示されるURLを入力してください
+
+
+# ------------------------------------------------------
+# Plan
+# ------------------------------------------------------
+View;表示(_V)
+ModuleList;モジュール
+Products;製品
+Summary;概要
+BuildResources;建造
+Storages;保管庫
+StorageAssign;保管庫割当
+
+# ------------------------------------------------------
+# Modules
+# ------------------------------------------------------
+Copy;コピー
+Paste;ペースト
+Delete;削除
+Add;追加
+AutoAdd;自動追加
+Merge;マージ
+ModuleEquipment;装備
+Edit;編集
+BuildMethod;建造方式
+MergeModulesConfirmMessage;重複するモジュールをマージしますか？
+NoMergeModulesMessage;重複したモジュールはありませんでした。
+MergeModulesMessage;{0}モジュールをマージしました。
+AutoAddConfirm;不足している製品を生産するモジュールを追加しますか？
+NoAddedModulesAutomaticallyMessage;不足している製品が無いためモジュールは追加されませんでした。
+AddedModulesAutomaticallyMessage;{0}レコード、{1}モジュール追加されました。
+NotEquippedToolTipText;何も装備していません
+
+# ------------------------------------------------------
+# Products
+# ------------------------------------------------------
+Expansion;展開
+Collapse;折りたたむ
+Efficiency;生産性
+Production;生産量
+
+ProductName;製品名
+AmountPerHour;個数/h
+
+
+# ------------------------------------------------------
+# Resources
+# ------------------------------------------------------
+NeedWare;建造に必要なウェア
+NeedWareAmount;個数
+
+# ------------------------------------------------------
+# Storage
+# ------------------------------------------------------
+Capacity;容量
+TotalCapacity;容量(合計)
+StorageType;保管庫種別
+
+# ------------------------------------------------------
+# Storage assign
+# ------------------------------------------------------
+StorageConditionAfterHour;{0}時間後の保管庫状態
+MaximumSliderValue;スライダー最大値
+Allocated;割当個数
+Allocable;割当可能個数
+NumberAfterTheSpecifiedTime;指定時間後の数量
+
+
+# ------------------------------------------------------
+# Summary
+# ------------------------------------------------------
+WorkForce;労働力
+NecessaryWareInfo;必要ウェア情報
+ModuleInfo;モジュール情報
+ProfitPerHour;1時間あたりの損益
+BuildCost;建造コスト
+Workers;労働者数
+TotalWorkers;総労働者数
+NecessaryAmount;必要数
+Diff;差
+Quantity;数量
+
+
+# ------------------------------------------------------
+# Select module window
+# ------------------------------------------------------
+SelectModuleWindowTitle;モジュール選択画面
+ModuleNameBeforeChange;変更前モジュール名：
+ModuleType;モジュール種別
+
+
+# ------------------------------------------------------
+# Edit equipment window
+# ------------------------------------------------------
+EditEquipmentWindowTitle;兵装編集画面
+EquipmentSize;装備サイズ
+Preset;プリセット
+List;一覧
+Equiped;装備中
+EquipmentAddButtonToolTip;左Shiftキーを押しながらクリックで選択項目を一気に追加できます
+EditEquipmentWindowCloseConfirmMessage;変更内容を保存しますか？
+EditPresetName;プリセット名編集
+PresetName;プリセット名
+DeletePresetConfirmMessage;プリセット「{0}」を本当に削除しますか？
+InvalidPresetNameMessage;プリセット名が無効です。\r\n空白文字以外の文字を1文字以上入力して下さい。

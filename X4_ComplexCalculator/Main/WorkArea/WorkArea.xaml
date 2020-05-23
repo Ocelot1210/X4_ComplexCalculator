@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:X4_ComplexCalculator.Main.WorkArea"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:modGrid="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid"
@@ -16,6 +17,10 @@
     xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
     d:DesignHeight="450"
     d:DesignWidth="800"
+    lex:LocalizeDictionary.DefaultProvider="{StaticResource CSVLocalizationProvider}"
+    lex:LocalizeDictionary.DesignCulture="en"
+    lex:ResxLocalizationProvider.DefaultAssembly="WPFLocalizationExtension"
+    lex:ResxLocalizationProvider.DefaultDictionary="StringResources"
     mc:Ignorable="d">
 
     <UserControl.Resources>
@@ -39,7 +44,7 @@
 
         <Menu Grid.Row="0">
             <!--  表示(V)  -->
-            <MenuItem Header="表示(_V)" ItemsSource="{Binding VisiblityMenuItems}">
+            <MenuItem Header="{lex:Loc Lang:View}" ItemsSource="{Binding VisiblityMenuItems}">
                 <MenuItem.ItemContainerStyle>
                     <Style TargetType="{x:Type MenuItem}">
                         <Setter Property="MenuItem.Header" Value="{Binding Title, Mode=OneTime}" />
@@ -51,6 +56,9 @@
         </Menu>
 
         <xcad:DockingManager x:Name="dockingManager" Grid.Row="1">
+
+            <xcad:DockingManager.Resources />
+
             <xcad:LayoutRoot>
                 <xcad:LayoutPanel Orientation="Horizontal">
 
@@ -59,7 +67,7 @@
                             <!--  モジュール一覧  -->
                             <xcad:LayoutAnchorable
                                 x:Name="_Modules"
-                                Title="モジュール一覧"
+                                Title="{lex:Loc Lang:ModuleList}"
                                 CanClose="False"
                                 ContentId="Modules">
                                 <modGrid:ModulesGrid DataContext="{Binding Modules, Mode=OneTime}" />
@@ -70,7 +78,7 @@
                             <!--  概要  -->
                             <xcad:LayoutAnchorable
                                 x:Name="_Summary"
-                                Title="概要"
+                                Title="{lex:Loc Lang:Summary}"
                                 CanClose="False"
                                 ContentId="Summary">
                                 <stsmry:StationSummary DataContext="{Binding Summary, Mode=OneTime}" />
@@ -79,7 +87,7 @@
                             <!--  製品  -->
                             <xcad:LayoutAnchorable
                                 x:Name="_Products"
-                                Title="製品"
+                                Title="{lex:Loc Lang:Products}"
                                 CanClose="False"
                                 ContentId="Products">
                                 <prodGrid:ProductsGrid DataContext="{Binding Products, Mode=OneTime}" />
@@ -88,7 +96,7 @@
                             <!--  建造  -->
                             <xcad:LayoutAnchorable
                                 x:Name="_Resources"
-                                Title="建造"
+                                Title="{lex:Loc Lang:BuildResources}"
                                 CanClose="False"
                                 ContentId="Resources">
                                 <resGrid:ResourcesGrid DataContext="{Binding Resources, Mode=OneTime}" />
@@ -97,7 +105,7 @@
                             <!--  保管庫  -->
                             <xcad:LayoutAnchorable
                                 x:Name="_Storages"
-                                Title="保管庫"
+                                Title="{lex:Loc Lang:Storages}"
                                 CanClose="False"
                                 ContentId="Storages">
                                 <storGrid:StoragesGrid DataContext="{Binding Storages, Mode=OneTime}" />
@@ -105,7 +113,7 @@
 
                             <!--  保管庫割当  -->
                             <xcad:LayoutAnchorable
-                                Title="保管庫割当"
+                                Title="{lex:Loc Lang:StorageAssign}"
                                 CanClose="False"
                                 ContentId="StorageSim">
                                 <storAsign:StorageAssign DataContext="{Binding StorageAssign, Mode=OneTime}" />

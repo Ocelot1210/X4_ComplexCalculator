@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
 using System.Windows;
-using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
+using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
 
@@ -167,7 +167,7 @@ WHERE
             }
 
             // 新プリセット名
-            var (onOK, newPresetName) = SelectStringDialog.ShowDialog("プリセット名編集", "プリセット名", SelectedPreset.Name, IsValidPresetName);
+            var (onOK, newPresetName) = SelectStringDialog.ShowDialog("Lang:EditPresetName", "Lang:PresetName", SelectedPreset.Name, IsValidPresetName);
             if (onOK)
             {
                 // 新プリセット名が設定された場合
@@ -190,7 +190,7 @@ WHERE
         /// </summary>
         public void AddPreset()
         {
-            var (onOK, presetName) = SelectStringDialog.ShowDialog("プリセット名編集", "プリセット名", "", IsValidPresetName);
+            var (onOK, presetName) = SelectStringDialog.ShowDialog("Lang:EditPresetName", "Lang:PresetName", "", IsValidPresetName);
             if (onOK)
             {
                 var id = 0L;
@@ -230,7 +230,7 @@ WHERE
                 return;
             }
 
-            var result = MessageBox.Show($"プリセット「{SelectedPreset.Name}」を本当に削除しますか？", "警告", MessageBoxButton.YesNo, MessageBoxImage.Exclamation, MessageBoxResult.No);
+            var result = Localize.ShowMessageBox("Lang:DeletePresetConfirmMessage", "Lang:Error", MessageBoxButton.YesNo, MessageBoxImage.Exclamation, MessageBoxResult.No);
             if (result == MessageBoxResult.Yes)
             {
                 DBConnection.CommonDB.BeginTransaction();
@@ -253,7 +253,7 @@ WHERE
 
             if (string.IsNullOrWhiteSpace(presetName))
             {
-                MessageBox.Show("プリセット名が無効です。\r\n空白文字以外の文字を1文字以上入力して下さい。", "確認", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Localize.ShowMessageBox("Lang:InvalidPresetNameMessage", "Lang:Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                 ret = false;
             }
 

@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:X4_ComplexCalculator"
+    xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
     StartupUri="Main\MainWindow.xaml">
 
 
@@ -26,6 +27,8 @@
                 <ResourceDictionary Source="/Themes/OtherThemes.xaml" />
 
             </ResourceDictionary.MergedDictionaries>
+
+            <x4cmn:CSVLocalizationProvider x:Key="CSVLocalizationProvider" />
         </ResourceDictionary>
     </Application.Resources>
 

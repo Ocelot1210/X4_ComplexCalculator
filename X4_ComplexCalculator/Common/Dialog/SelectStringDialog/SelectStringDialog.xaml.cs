@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Linq;
+using WPFLocalizeExtension.Engine;
 
 namespace X4_ComplexCalculator.Common.Dialog.SelectStringDialog
 {
@@ -29,15 +30,20 @@ namespace X4_ComplexCalculator.Common.Dialog.SelectStringDialog
         /// <summary>
         /// 文字列選択画面を表示
         /// </summary>
-        /// <param name="title">ウィンドウのタイトル</param>
-        /// <param name="description">テキストボックスの説明文</param>
+        /// <param name="title">ウィンドウのタイトル用キー</param>
+        /// <param name="description">テキストボックスの説明文用キー</param>
         /// <param name="initialString">初期文字列</param>
         /// <param name="isValidInput">文字列が有効か判定する関数</param>
         /// <param name="hideCancelButton">Cancelボタンを非表示にするか</param>
         /// <returns>(OKを押されたか, 選択結果)</returns>
         public static (bool, string) ShowDialog(string title, string description, string initialString = "", Predicate<string> isValidInput = null, bool hideCancelButton = false)
         {
-            var wnd = new SelectStringDialog(title, description, initialString, isValidInput);
+            var wnd = new SelectStringDialog(
+                (string)LocalizeDictionary.Instance.GetLocalizedObject(title, null, null),
+                (string)LocalizeDictionary.Instance.GetLocalizedObject(description, null, null),
+                initialString,
+                isValidInput
+            );
 
             wnd.Owner = Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive) ?? Application.Current.MainWindow;
 

@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList;
 
@@ -247,7 +248,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
             // 装備が未保存の場合
             if (TurretsViewModel.Unsaved || ShieldsViewModel.Unsaved)
             {
-                var result = MessageBox.Show("変更内容を保存しますか？", "確認", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                var result = Localize.ShowMessageBox("Lang:EditEquipmentWindowCloseConfirmMessage", "Lang:Confirmation", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 
                 switch (result)
                 {
