@@ -174,7 +174,7 @@
             <!--  作業エリアのタイトル部の設定  -->
             <xcad:DockingManager.DocumentHeaderTemplate>
                 <DataTemplate>
-                    <TextBlock MinWidth="30" Text="{Binding Content.Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock MinWidth="70" Text="{Binding Content.Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
                 </DataTemplate>
             </xcad:DockingManager.DocumentHeaderTemplate>
 

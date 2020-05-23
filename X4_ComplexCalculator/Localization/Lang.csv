@@ -66,7 +66,9 @@ StationCalclatorExportTitle;Export to Station Calclator
 StationCalclatorExportDescription;Please copy the URL.\r\nNote: The following modules are excluded.\r\n・Connection module\r\n・Venture module
 StationCalclatorImportTitle;Importing from Station Calclator
 StationCalclatorImportDescription;Please enter the URL displayed when you click the \r\nShare button at the top of Station Calclator.
-
+SelectPlanWindowTitle;Select plan
+X4PlanFilePathDescription;X4 Construction plan file path
+ImportPlanDescription;Select a plan to import
 
 
 # ------------------------------------------------------

@@ -65,7 +65,9 @@ StationCalclatorExportTitle;Station Calclatorへエクスポート
 StationCalclatorExportDescription;URLをコピーして下さい\r\n注) 以下のモジュールは除外しています。\r\n・接続モジュール\r\n・探検モジュール
 StationCalclatorImportTitle;Station Calclatorからインポート
 StationCalclatorImportDescription;Station Calclator上部のShareボタンをクリックした時に\r\n表示されるURLを入力してください
-
+SelectPlanWindowTitle;計画を選択
+X4PlanFilePathDescription;X4 建造計画ファイルパス
+ImportPlanDescription;インポートする計画を選択
 
 # ------------------------------------------------------
 # Plan
