@@ -179,7 +179,7 @@ namespace System.Collections.ObjectModel
         /// </summary>
         /// <param name="collection">The items to remove.</param>        
         /// <exception cref="ArgumentNullException"><paramref name="collection"/> is null.</exception>
-        public void RemoveRange(IEnumerable<T> collection)
+        public virtual void RemoveRange(IEnumerable<T> collection)
         {
             if (collection == null)
                 throw new ArgumentNullException(nameof(collection));

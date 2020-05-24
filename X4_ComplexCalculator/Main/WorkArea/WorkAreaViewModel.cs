@@ -326,6 +326,11 @@ WHERE
         /// <returns></returns>
         private byte[] GetCurrentLayout()
         {
+            if (_CurrentDockingManager == null)
+            {
+                return _Layout;
+            }
+
             // レイアウト保存
             var serializer = new XmlLayoutSerializer(_CurrentDockingManager);
             using var ms = new MemoryStream();
@@ -347,6 +352,11 @@ WHERE
                 SetLayout(_LayoutID);
                 // 1回ロードしたので次回以降ロードしないようにする
                 _LayoutID = -1;
+                return;
+            }
+
+            if (_CurrentDockingManager == null)
+            {
                 return;
             }
 

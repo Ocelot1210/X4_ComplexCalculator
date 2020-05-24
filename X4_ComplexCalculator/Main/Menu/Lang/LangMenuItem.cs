@@ -36,7 +36,6 @@ namespace X4_ComplexCalculator.Main.Menu.Lang
                     {
                         LocalizeDictionary.Instance.Culture = _CultureInfo;
 
-                        var conf = Configuration.GetConfiguration();
                         Configuration.SetValue("AppSettings.Language", _CultureInfo.Name);
                     }
                 }
