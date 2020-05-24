@@ -39,7 +39,7 @@ This application is station calclator for X4: Foundations.
                 1. Existing plan ------- Import plans saved during the game.
             1. Export
                 1. Station Calclator --- Exporting the plan to [Station Calclator](http://www.x4-game.com/#/station-calculator).
-        1. Layout
+        1. Layout(L)
             1. Save layout --- Save the screen layout of the selected plan.
             1. Layout list ---- You can select a saved layout.
                 1. Click on the "💾" button to save the layout overwritten.
@@ -56,11 +56,12 @@ This application is station calclator for X4: Foundations.
             - Click the "Auto add" button to A module will be added to produce the missing product.
             - Clickable cells are underlined in the string.
                 - You can change the module by clicking on the module name cell.
+                -  You can change the number of modules by clicking the cell of the number of modules.
                 - Clicking on the "Edit" cell of a module with a equipment will launch the armament editing screen.
                 - You can select a construction method from the list by clicking the "Build method" cell of a module with multiple construction methods.
                 - When you hover over the number of turrets and shields in a module with equipment, you will see the current equipment.
                 - After selecting a module, you can copy, paste and delete it by right-clicking on it.
-            - Sub-windows
+            - Sub-windows of the modules tab
                 1. Select module window
                     - You can narrow down the displayed modules by checking or unchecking the list of "Module type"/"Owner faction", or by entering a string in the text box that says "Search by entering text".
                     - The selected module is added to the module list of the main screen when the module to be added is selected from the module list and the "Select" button is pushed.
@@ -106,7 +107,7 @@ This application is station calclator for X4: Foundations.
                 - The maximum value of the slider can be changed in the text box to the right of the slider.
             - The ware is grouped and displayed by storage type.
                 - Click the "Ⓥ" button to the left of the vault type to collapse/expand the group.
-            -  The "Allocated" cell can be set up to "Allocable" cell or less.
+            - The "Allocated" cell can be increased only by the value of the "Allocable" cell.
             - If the number of cells after the specified time is negative, the background color of the cell turns red.
             - When "Allocated" < "Number after the specified time", the background color of the cell will be yellow.
 
