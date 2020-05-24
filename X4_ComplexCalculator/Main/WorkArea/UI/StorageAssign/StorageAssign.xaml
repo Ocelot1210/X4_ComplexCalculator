@@ -18,6 +18,9 @@
     mc:Ignorable="d">
 
     <UserControl.Resources>
+
+        <local:StorageAssignGroupValueConverter x:Key="StorageAssignGroupValueConverter" />
+
         <!--  保管庫容量強調用スタイル  -->
         <Style
             x:Key="CapacityEmphasisStyle"
@@ -123,10 +126,9 @@
                                             <Expander.Header>
                                                 <DockPanel>
                                                     <TextBlock
-                                                        Width="100"
                                                         Margin="5,0,0,0"
                                                         FontWeight="Bold"
-                                                        Text="{Binding Path=Name}" />
+                                                        Text="{Binding Converter={StaticResource StorageAssignGroupValueConverter}, UpdateSourceTrigger=PropertyChanged}" />
                                                 </DockPanel>
                                             </Expander.Header>
                                             <Expander.Content>

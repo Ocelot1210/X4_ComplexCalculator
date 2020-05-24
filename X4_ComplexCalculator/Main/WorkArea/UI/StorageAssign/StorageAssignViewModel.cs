@@ -66,7 +66,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
             StorageAssignInfo.SortDescriptions.Add(new SortDescription(nameof(StorageAssignGridItem.WareName), ListSortDirection.Ascending));
 
             StorageAssignInfo.GroupDescriptions.Clear();
-            StorageAssignInfo.GroupDescriptions.Add(new PropertyGroupDescription(nameof(StorageAssignGridItem.TransportTypeName)));
+            StorageAssignInfo.GroupDescriptions.Add(new PropertyGroupDescription(nameof(StorageAssignGridItem.TransportTypeID)));
 
             LocalizeDictionary.Instance.PropertyChanged += Instance_PropertyChanged;
             _StorageConditionAfterHourFormat = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:StorageConditionAfterHour", null, null);

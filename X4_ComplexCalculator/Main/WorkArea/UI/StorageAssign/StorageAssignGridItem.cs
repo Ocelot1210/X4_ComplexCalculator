@@ -26,16 +26,16 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         /// 1時間あたりの生産量
         /// </summary>
         private long _ProductPerHour;
-
-
-        /// <summary>
-        /// 保管庫容量情報
-        /// </summary>
-        StorageCapacityInfo _CapacityInfo;
         #endregion
 
 
         #region プロパティ
+        /// <summary>
+        /// 保管庫容量情報
+        /// </summary>
+        public StorageCapacityInfo CapacityInfo { get; }
+
+
         /// <summary>
         /// カーゴ種別ID
         /// </summary>
@@ -86,7 +86,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
                 {
                     RaisePropertyChanged(nameof(AllocCapacity));
                     RaisePropertyChanged(nameof(StorageStatus));
-                    _CapacityInfo.UsedCapacity += (value - prevCount) * Volume;
+                    CapacityInfo.UsedCapacity += (value - prevCount) * Volume;
                 }
             }
         }
@@ -108,13 +108,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         /// <summary>
         /// 割当可能容量最大
         /// </summary>
-        public long MaxAllocableCount => (_CapacityInfo.FreeCapacity + AllocCapacity) / Volume;
+        public long MaxAllocableCount => (CapacityInfo.FreeCapacity + AllocCapacity) / Volume;
 
 
         /// <summary>
         /// 残り割当可能容量
         /// </summary>
-        public long AllocableCount => _CapacityInfo.FreeCapacity / Volume;
+        public long AllocableCount => CapacityInfo.FreeCapacity / Volume;
 
 
         /// <summary>
@@ -176,8 +176,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
             TransportTypeName = ware.TransportType.Name;
 
             Volume = ware.Volume;
-            _CapacityInfo = capacityInfo;
-            _CapacityInfo.PropertyChanged += CapacityInfo_PropertyChanged;
+            CapacityInfo = capacityInfo;
+            CapacityInfo.PropertyChanged += CapacityInfo_PropertyChanged;
 
             ProductPerHour = productPerHour;
             Hour = hour;
@@ -208,7 +208,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         /// </summary>
         public void Dispose()
         {
-            _CapacityInfo.PropertyChanged -= CapacityInfo_PropertyChanged;
+            CapacityInfo.PropertyChanged -= CapacityInfo_PropertyChanged;
         }
     }
 }
