@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Input;
-using X4_ComplexCalculator.Main.WorkArea;
+using X4_ComplexCalculator.Main.PlanningArea;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import
 {
@@ -28,8 +28,8 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
         /// <summary>
         /// インポート実行
         /// </summary>
-        /// <param name="workArea">作業エリア</param>
+        /// <param name="PlanningArea">作業エリア</param>
         /// <returns>インポートに成功したか</returns>
-        public bool Import(IWorkArea workArea);
+        public bool Import(IPlanningArea PlanningArea);
     }
 }

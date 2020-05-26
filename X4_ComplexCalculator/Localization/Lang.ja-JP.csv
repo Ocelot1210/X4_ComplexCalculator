@@ -138,11 +138,11 @@ NumberAfterTheSpecifiedTime;指定時間後の数量
 # ------------------------------------------------------
 # Summary
 # ------------------------------------------------------
-WorkForce;労働力
+WorkForce;労働力 = [{0:N0}/{1:N0}]
 NecessaryWareInfo;必要ウェア情報
 ModuleInfo;モジュール情報
-ProfitPerHour;1時間あたりの損益
-BuildCost;建造コスト
+ProfitPerHour;1時間あたりの損益 = {0:N0} cr
+BuildCost;建造コスト = {0:N0} cr
 Workers;労働者数
 TotalWorkers;総労働者数
 NecessaryAmount;必要数
@@ -165,7 +165,7 @@ EditEquipmentWindowTitle;兵装編集画面
 EquipmentSize;装備サイズ
 Preset;プリセット
 List;一覧
-Equiped;装備中
+Equiped;装備中 = [{0}/{1}]
 EquipmentAddButtonToolTip;左Shiftキーを押しながらクリックで選択項目を一気に追加できます
 EditEquipmentWindowCloseConfirmMessage;変更内容を保存しますか？
 EditPresetName;プリセット名編集

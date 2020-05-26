@@ -141,11 +141,11 @@ NumberAfterTheSpecifiedTime;Number after the specified time
 # ------------------------------------------------------
 # Summary
 # ------------------------------------------------------
-WorkForce;Work force
+WorkForce;Work force = [{0:N0}/{1:N0}]
 NecessaryWareInfo;Necessary ware info
 ModuleInfo;Module info
-ProfitPerHour;Profit per hour
-BuildCost;Build cost
+ProfitPerHour;Profit per hour = {0:N0} cr
+BuildCost;Build cost = {0:N0} cr
 Workers;Workers
 TotalWorkers;Total workers
 NecessaryAmount;Necessary amount
@@ -168,7 +168,7 @@ EditEquipmentWindowTitle;Edit equipment window
 EquipmentSize;Equipment size
 Preset;Preset
 List;List
-Equiped;Equiped
+Equiped;Equiped = [{0}/{1}]
 EquipmentAddButtonToolTip;You can add a selection at once by clicking while holding down the left Shift key.
 EditEquipmentWindowCloseConfirmMessage;Do you want to save your changes?
 EditPresetName;Edit preset name

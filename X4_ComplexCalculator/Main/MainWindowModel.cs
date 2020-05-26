@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,14 +16,14 @@ using X4_ComplexCalculator.Main.Menu.File.Export;
 using X4_ComplexCalculator.Main.Menu.File.Import;
 using X4_ComplexCalculator.Main.Menu.Lang;
 using X4_ComplexCalculator.Main.Menu.Layout;
-using X4_ComplexCalculator.Main.WorkArea;
+using X4_ComplexCalculator.Main.PlanningArea;
 
 namespace X4_ComplexCalculator.Main
 {
     /// <summary>
     /// メイン画面のModel
     /// </summary>
-    class MainWindowModel
+    class MainWindowModel : BindableBase
     {
         #region メンバ
         /// <summary>
@@ -35,13 +36,13 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// ワークエリア一覧
         /// </summary>
-        public ObservableCollection<WorkAreaViewModel> Documents = new ObservableCollection<WorkAreaViewModel>();
+        public ObservableCollection<PlanningAreaViewModel> Documents = new ObservableCollection<PlanningAreaViewModel>();
 
 
         /// <summary>
         /// アクティブなワークスペース
         /// </summary>
-        public WorkAreaViewModel ActiveContent { set; get; }
+        public PlanningAreaViewModel ActiveContent { set; get; }
 
 
         /// <summary>
@@ -136,7 +137,7 @@ namespace X4_ComplexCalculator.Main
 
             for (var cnt = 0; cnt < importCnt; cnt++)
             {
-                var vm = new WorkAreaViewModel(ActiveLayout?.LayoutID ?? -1);
+                var vm = new PlanningAreaViewModel(ActiveLayout?.LayoutID ?? -1);
 
                 if (vm.Import(import))
                 {
@@ -289,14 +290,21 @@ namespace X4_ComplexCalculator.Main
             var dlg = new OpenFileDialog();
 
             dlg.Filter = "X4 Station calclator data (*.x4)|*.x4|All Files|*.*";
+            dlg.Multiselect = true;
             if (dlg.ShowDialog() == true)
             {
                 Mouse.OverrideCursor = Cursors.Wait;
                 try
                 {
-                    var vm = new WorkAreaViewModel(ActiveLayout?.LayoutID ?? -1);
-                    vm.LoadFile(dlg.FileName);
-                    Documents.Add(vm);
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        foreach (var filePath in dlg.FileNames)
+                        {
+                            var vm = new PlanningAreaViewModel(ActiveLayout?.LayoutID ?? -1);
+                            vm.LoadFile(filePath);
+                            Documents.Add(vm);
+                        }
+                    });
                 }
                 catch (Exception e)
                 {
@@ -317,7 +325,7 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         public void CreateNew()
         {
-            var vm = new WorkAreaViewModel(ActiveLayout?.LayoutID ?? -1);
+            var vm = new PlanningAreaViewModel(ActiveLayout?.LayoutID ?? -1);
             Documents.Add(vm);
             ActiveContent = vm;
         }
@@ -391,7 +399,7 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         /// <param name="vm">閉じようとしている作業エリア</param>
         /// <returns></returns>
-        public bool DocumentClosing(WorkAreaViewModel vm)
+        public bool DocumentClosing(PlanningAreaViewModel vm)
         {
             var canceled = false;
 

@@ -1,0 +1,287 @@
+﻿<UserControl
+    x:Class="X4_ComplexCalculator.Main.PlanningArea.UI.StationSummary.StationSummary"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:DataGridInline="clr-namespace:CustomControlLibrary.DataGridInline;assembly=X4_ComplexCalculator_CustomControlLibrary"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:lex="http://wpflocalizeextension.codeplex.com"
+    xmlns:local="clr-namespace:X4_ComplexCalculator.Main.PlanningArea.UI.StationSummary"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    lex:LocalizeDictionary.DefaultProvider="{StaticResource CSVLocalizationProvider}"
+    lex:LocalizeDictionary.DesignCulture="en-US"
+    lex:ResxLocalizationProvider.DefaultAssembly="WPFLocalizationExtension"
+    lex:ResxLocalizationProvider.DefaultDictionary="StringResources"
+    Background="White"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+
+        <!--  労働力詳細表示用ListView  -->
+        <DataGridInline:InlineListView
+            x:Key="WorkersDetailsListView"
+            ItemContainerStyle="{StaticResource NoHighlightListViewItem}"
+            ItemsSource="{Binding}"
+            Style="{StaticResource DefaultListView}">
+            <ListView.View>
+                <GridView>
+
+                    <!--  モジュール名  -->
+                    <DataGridInline:InlineGridViewColumn
+                        DisplayMemberBinding="{Binding ModuleName, Mode=OneTime}"
+                        Header="{lex:Loc Lang:ModuleName}"
+                        SortTargetPropertyName="ModuleName" />
+
+                    <!--  モジュール数  -->
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:ModuleCount}" SortTargetPropertyName="ModuleCount">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding ModuleCount, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </DataGridInline:InlineGridViewColumn>
+
+                    <!--  労働者数  -->
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Workers}" SortTargetPropertyName="WorkForce">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding WorkForce, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </DataGridInline:InlineGridViewColumn>
+
+                    <!--  総労働者数  -->
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:TotalWorkers}" SortTargetPropertyName="TotalWorkforce">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding TotalWorkforce, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </DataGridInline:InlineGridViewColumn>
+                </GridView>
+            </ListView.View>
+        </DataGridInline:InlineListView>
+
+        <!--  労働者必要ウェア情報詳細用ListView  -->
+        <DataGridInline:InlineListView
+            x:Key="WorkersNeedWareDetailsListView"
+            x:Shared="false"
+            ItemContainerStyle="{StaticResource NoHighlightListViewItem}"
+            ItemsSource="{Binding}"
+            Style="{StaticResource DefaultListView}">
+
+            <ListView.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.HeaderTemplate>
+                        <DataTemplate>
+                            <StackPanel Background="Aqua">
+                                <TextBlock
+                                    FontWeight="Bold"
+                                    Foreground="Black"
+                                    Text="{Binding Name}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </GroupStyle.HeaderTemplate>
+                </GroupStyle>
+            </ListView.GroupStyle>
+
+            <ListView.View>
+                <GridView>
+                    <!--  ウェア名  -->
+                    <DataGridInline:InlineGridViewColumn
+                        DisplayMemberBinding="{Binding WareName, Mode=OneTime}"
+                        Header="{lex:Loc Lang:WareName}"
+                        SortTargetPropertyName="WareName" />
+
+                    <!--  必要数  -->
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:NecessaryAmount}" SortTargetPropertyName="NeedAmount">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding NeedAmount, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </DataGridInline:InlineGridViewColumn>
+
+                    <!--  生産数  -->
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Production}" SortTargetPropertyName="ProductionAmount">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding ProductionAmount, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </DataGridInline:InlineGridViewColumn>
+
+                    <!--  差  -->
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Diff}" SortTargetPropertyName="Diff">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Diff, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right">
+                                    <TextBlock.Style>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Diff, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource IsLessThanConverter}, ConverterParameter=0}" Value="True">
+                                                    <Setter Property="Background" Value="LightPink" />
+                                                    <Setter Property="FontWeight" Value="Bold" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </DataGridInline:InlineGridViewColumn>
+                </GridView>
+            </ListView.View>
+        </DataGridInline:InlineListView>
+
+
+        <!--  ウェア/数量/単価/金額表示用ListView  -->
+        <DataGridInline:InlineListView
+            x:Key="WareDetailsListView"
+            x:Shared="false"
+            ItemContainerStyle="{StaticResource NoHighlightListViewItem}"
+            ItemsSource="{Binding}"
+            Style="{StaticResource DefaultListView}">
+            <ListView.View>
+                <GridView>
+                    <!--  ウェア名  -->
+                    <DataGridInline:InlineGridViewColumn
+                        DisplayMemberBinding="{Binding WareName, Mode=OneTime}"
+                        Header="{lex:Loc Lang:WareName}"
+                        SortTargetPropertyName="WareName" />
+
+                    <!--  数量  -->
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Quantity}" SortTargetPropertyName="Count">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Count, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </DataGridInline:InlineGridViewColumn>
+
+                    <!--  単価  -->
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:UnitPrice}" SortTargetPropertyName="UnitPrice">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding UnitPrice, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:N0} cr'}" TextAlignment="Right" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </DataGridInline:InlineGridViewColumn>
+
+                    <!--  金額  -->
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Price}" SortTargetPropertyName="TotalPrice">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding TotalPrice, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:N0} cr'}" TextAlignment="Right">
+                                    <TextBlock.Style>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding TotalPrice, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource IsLessThanConverter}, ConverterParameter=0}" Value="True">
+                                                    <Setter Property="Background" Value="LightPink" />
+                                                    <Setter Property="FontWeight" Value="Bold" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </DataGridInline:InlineGridViewColumn>
+                </GridView>
+            </ListView.View>
+        </DataGridInline:InlineListView>
+
+    </UserControl.Resources>
+
+
+    <ScrollViewer HorizontalScrollBarVisibility="Auto">
+        <StackPanel Orientation="Vertical">
+            <!--  労働力  -->
+            <Expander Margin="0,0,0,10">
+                <Expander.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <MultiBinding Converter="{StaticResource FormatStringConverter}">
+                                    <lex:BLoc Key="Lang:WorkForce" />
+                                    <Binding
+                                        Mode="OneWay"
+                                        Path="WorkForce"
+                                        UpdateSourceTrigger="PropertyChanged" />
+                                    <Binding
+                                        Mode="OneWay"
+                                        Path="NeedWorkforce"
+                                        UpdateSourceTrigger="PropertyChanged" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </StackPanel>
+                </Expander.Header>
+
+                <StackPanel Margin="25,0,0,0" Orientation="Vertical">
+                    <!--  必要ウェア情報  -->
+                    <Expander Header="{lex:Loc Lang:NecessaryWareInfo}">
+                        <ContentControl
+                            Margin="25,0,0,0"
+                            Content="{StaticResource WorkersNeedWareDetailsListView}"
+                            DataContext="{Binding WorkforceNeedWareCollectionView, Mode=OneWay}" />
+                    </Expander>
+
+                    <!--  モジュール情報  -->
+                    <Expander Header="{lex:Loc Lang:ModuleInfo}">
+                        <ContentControl
+                            Margin="25,0,0,0"
+                            Content="{StaticResource WorkersDetailsListView}"
+                            DataContext="{Binding WorkforceModuleDetails, Mode=OneTime}" />
+                    </Expander>
+                </StackPanel>
+            </Expander>
+
+            <!--  1hあたりの損益  -->
+            <Expander Margin="0,10,0,10">
+                <Expander.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <MultiBinding Converter="{StaticResource FormatStringConverter}">
+                                    <lex:BLoc Key="Lang:ProfitPerHour" />
+                                    <Binding
+                                        Mode="OneWay"
+                                        Path="Profit"
+                                        UpdateSourceTrigger="PropertyChanged" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </StackPanel>
+                </Expander.Header>
+                <ContentControl
+                    Margin="25,0,0,0"
+                    Content="{StaticResource WareDetailsListView}"
+                    DataContext="{Binding ProfitDetails, Mode=OneTime}" />
+            </Expander>
+
+            <!--  建造コスト  -->
+            <Expander Margin="0,10,0,0">
+                <Expander.Header>
+                    <TextBlock>
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource FormatStringConverter}">
+                                <lex:BLoc Key="Lang:BuildCost" />
+                                <Binding
+                                    Mode="OneWay"
+                                    Path="BuildingCost"
+                                    UpdateSourceTrigger="PropertyChanged" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </Expander.Header>
+                <ContentControl
+                    Margin="25,0,0,0"
+                    Content="{StaticResource WareDetailsListView}"
+                    DataContext="{Binding BuildingCostDetails, Mode=OneTime}" />
+            </Expander>
+        </StackPanel>
+    </ScrollViewer>
+
+</UserControl>

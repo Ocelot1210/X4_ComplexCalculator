@@ -1,0 +1,146 @@
+﻿<Window
+    x:Class="X4_ComplexCalculator.Main.PlanningArea.UI.ModulesGrid.SelectModule.SelectModuleWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:lex="http://wpflocalizeextension.codeplex.com"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
+    xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
+    xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
+    xmlns:xctk="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+    x:Name="window"
+    Title="{lex:Loc Lang:SelectModuleWindowTitle}"
+    Width="800"
+    Height="500"
+    lex:LocalizeDictionary.DefaultProvider="{StaticResource CSVLocalizationProvider}"
+    lex:LocalizeDictionary.DesignCulture="en-US"
+    lex:ResxLocalizationProvider.DefaultAssembly="WPFLocalizationExtension"
+    lex:ResxLocalizationProvider.DefaultDictionary="StringResources"
+    x4bhv:CloseWindowBehavior.Close="{Binding CloseWindowProperty}"
+    Style="{StaticResource DefaultWindowBackgroundStyle}"
+    mc:Ignorable="d">
+
+    <i:Interaction.Triggers>
+        <!--  ウィンドウが閉じられる時のイベント  -->
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding WindowClosingCommand, Mode=OneTime}" PassEventArgsToCommand="True" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+    <Grid>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40" />
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+        <!--#endregion-->
+
+        <!--  変更前モジュール  -->
+        <StackPanel
+            Grid.Row="0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            Orientation="Horizontal"
+            Visibility="{Binding PrevModuleVisiblity}">
+            <TextBlock Margin="10" Text="{lex:Loc Lang:ModuleNameBeforeChange}" />
+            <TextBox
+                Width="250"
+                Margin="10"
+                IsReadOnly="True"
+                Text="{Binding PrevModuleName, Mode=OneTime}" />
+        </StackPanel>
+
+        <!--#region OK / Cancelボタン-->
+        <StackPanel
+            Grid.Column="1"
+            HorizontalAlignment="Right"
+            Orientation="Horizontal">
+            <Button
+                Width="75"
+                Margin="10"
+                Command="{Binding OKButtonClickedCommand, Mode=OneTime}"
+                CommandParameter="{Binding ElementName=window}"
+                Content="{lex:Loc Lang:Select}" />
+
+            <Button
+                Width="75"
+                Margin="10"
+                Command="{Binding CloseButtonClickedCommand, Mode=OneTime}"
+                CommandParameter="{Binding ElementName=window}"
+                Content="{lex:Loc Lang:Close}" />
+        </StackPanel>
+        <!--#endregion-->
+
+        <xcad:DockingManager Grid.Row="1" Grid.ColumnSpan="2">
+            <xcad:LayoutRoot>
+                <xcad:LayoutPanel Orientation="Horizontal">
+
+                    <!--  モジュール絞り込み用  -->
+                    <xcad:LayoutDocumentPaneGroup Orientation="Vertical">
+                        <xcad:LayoutDocumentPane>
+                            <!--  モジュール種別  -->
+                            <xcad:LayoutDocument Title="{lex:Loc Lang:ModuleType}" CanClose="False">
+                                <xctk:CheckListBox
+                                    DisplayMemberPath="Name"
+                                    IsSelectAllActive="True"
+                                    ItemsSource="{Binding ModuleTypes}"
+                                    ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                                    ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                    SelectAllContent="{lex:Loc Lang:SelectAll}"
+                                    SelectedMemberPath="IsChecked" />
+                            </xcad:LayoutDocument>
+                        </xcad:LayoutDocumentPane>
+
+                        <xcad:LayoutDocumentPane>
+                            <!--  所有派閥  -->
+                            <xcad:LayoutDocument Title="{lex:Loc Lang:OwnerFaction}" CanClose="False">
+                                <xctk:CheckListBox
+                                    DisplayMemberPath="Name"
+                                    IsSelectAllActive="True"
+                                    ItemsSource="{Binding ModuleOwners}"
+                                    ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                                    ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                    SelectAllContent="{lex:Loc Lang:SelectAll}"
+                                    SelectedMemberPath="IsChecked" />
+                            </xcad:LayoutDocument>
+                        </xcad:LayoutDocumentPane>
+                    </xcad:LayoutDocumentPaneGroup>
+
+                    <xcad:LayoutDocumentPane>
+                        <xcad:LayoutDocument Title="{lex:Loc Lang:ModuleName}" CanClose="False">
+                            <DockPanel>
+                                <!--  モジュール名検索  -->
+                                <xctk:WatermarkTextBox
+                                    DockPanel.Dock="Top"
+                                    Text="{Binding SearchModuleName, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"
+                                    Watermark="{lex:Loc Lang:SearchByEnteringText}" />
+
+                                <!--  モジュール一覧  -->
+                                <ListBox
+                                    DisplayMemberPath="Name"
+                                    ItemsSource="{Binding ModulesView}"
+                                    ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                                    ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                    SelectionMode="{Binding ModuleListSelectionMode}"
+                                    VirtualizingPanel.IsVirtualizing="False">
+                                    <ListBox.ItemContainerStyle>
+                                        <Style TargetType="ListBoxItem">
+                                            <Setter Property="IsSelected" Value="{Binding IsChecked}" />
+                                        </Style>
+                                    </ListBox.ItemContainerStyle>
+                                </ListBox>
+                            </DockPanel>
+                        </xcad:LayoutDocument>
+                    </xcad:LayoutDocumentPane>
+                </xcad:LayoutPanel>
+            </xcad:LayoutRoot>
+        </xcad:DockingManager>
+    </Grid>
+</Window>

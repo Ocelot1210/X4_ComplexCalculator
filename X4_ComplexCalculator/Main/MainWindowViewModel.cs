@@ -10,7 +10,7 @@ using X4_ComplexCalculator.Main.Menu.File.Import;
 using X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport;
 using X4_ComplexCalculator.Main.Menu.Lang;
 using X4_ComplexCalculator.Main.Menu.Layout;
-using X4_ComplexCalculator.Main.WorkArea;
+using X4_ComplexCalculator.Main.PlanningArea;
 using Xceed.Wpf.AvalonDock;
 
 namespace X4_ComplexCalculator.Main
@@ -84,13 +84,13 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// ワークエリア一覧
         /// </summary>
-        public ObservableCollection<WorkAreaViewModel> Documents => _Model.Documents;
+        public ObservableCollection<PlanningAreaViewModel> Documents => _Model.Documents;
 
 
         /// <summary>
         /// アクティブなワークスペース
         /// </summary>
-        public WorkAreaViewModel ActiveContent
+        public PlanningAreaViewModel ActiveContent
         {
             set
             {
@@ -144,7 +144,6 @@ namespace X4_ComplexCalculator.Main
             UpdateDBCommand        = new DelegateCommand(_Model.UpdateDB);
             DocumentClosingCommand = new DelegateCommand<DocumentClosingEventArgs>(DocumentClosing);
 
-
             Imports = new List<IImport>()
             {
                 new StationCalclatorImport(new DelegateCommand<IImport>(_Model.Import)),
@@ -193,9 +192,9 @@ namespace X4_ComplexCalculator.Main
         /// <param name="e"></param>
         private void DocumentClosing(DocumentClosingEventArgs e)
         {
-            if (e.Document.Content is WorkAreaViewModel workArea)
+            if (e.Document.Content is PlanningAreaViewModel PlanningArea)
             {
-                e.Cancel = _Model.DocumentClosing(workArea);
+                e.Cancel = _Model.DocumentClosing(PlanningArea);
             }
         }
     }

@@ -5,8 +5,8 @@ using System.Windows.Input;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_ComplexCalculator.DB;
-using X4_ComplexCalculator.Main.WorkArea;
-using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
+using X4_ComplexCalculator.Main.PlanningArea;
+using X4_ComplexCalculator.Main.PlanningArea.UI.ModulesGrid;
 using X4_ComplexCalculator.DB.X4DB;
 using System.Linq;
 using Prism.Mvvm;
@@ -94,14 +94,14 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
         /// <summary>
         /// インポート処理
         /// </summary>
-        /// <param name="workArea"></param>
+        /// <param name="PlanningArea"></param>
         /// <returns></returns>
-        public bool Import(IWorkArea workArea)
+        public bool Import(IPlanningArea PlanningArea)
         {
             bool ret;
             try
             {
-                ret = ImportMain(workArea, _PlanItems[_PlanIdx]);
+                ret = ImportMain(PlanningArea, _PlanItems[_PlanIdx]);
                 _PlanIdx++;
             }
             catch
@@ -116,10 +116,10 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
         /// <summary>
         /// インポートメイン処理
         /// </summary>
-        /// <param name="workArea"></param>
+        /// <param name="PlanningArea"></param>
         /// <param name="planItem"></param>
         /// <returns></returns>
-        private bool ImportMain(IWorkArea workArea, StationPlanItem planItem)
+        private bool ImportMain(IPlanningArea PlanningArea, StationPlanItem planItem)
         {
             var modParam = new SQLiteCommandParameters(1);
             var eqParam = new SQLiteCommandParameters(3);
@@ -220,10 +220,10 @@ WHERE
 
             // モジュール一覧に追加
             var range = dict.Select(x => (x.Value)).OrderBy(x => x.Item1).Select(x => new ModulesGridItem(x.Item2, null, x.Item3));
-            workArea.Modules.AddRange(range);
+            PlanningArea.Modules.AddRange(range);
 
 
-            workArea.Title = planItem.PlanName;
+            PlanningArea.Title = planItem.PlanName;
             return true;
         }
     }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Windows.Data;
-using X4_ComplexCalculator.Main.WorkArea;
+using X4_ComplexCalculator.Main.PlanningArea;
 
 namespace X4_ComplexCalculator.Common.ValueConverter
 {
@@ -11,7 +11,7 @@ namespace X4_ComplexCalculator.Common.ValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            if (value is WorkAreaViewModel)
+            if (value is PlanningAreaViewModel)
             {
                 return value;
             }
@@ -21,7 +21,7 @@ namespace X4_ComplexCalculator.Common.ValueConverter
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            if (value is WorkAreaViewModel)
+            if (value is PlanningAreaViewModel)
             {
                 return value;
             }
