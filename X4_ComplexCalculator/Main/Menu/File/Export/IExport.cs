@@ -1,5 +1,5 @@
 ﻿using System.Windows.Input;
-using X4_ComplexCalculator.Main.PlanningArea;
+using X4_ComplexCalculator.Main.WorkArea;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Export
 {
@@ -20,8 +20,8 @@ namespace X4_ComplexCalculator.Main.Menu.File.Export
         /// <summary>
         /// エクスポート実行
         /// </summary>
-        /// <param name="PlanningArea">作業エリア</param>
+        /// <param name="WorkArea">作業エリア</param>
         /// <returns>エクスポートに成功したか</returns>
-        public bool Export(IPlanningArea PlanningArea);
+        public bool Export(IWorkArea WorkArea);
     }
 }

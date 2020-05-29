@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
-using X4_ComplexCalculator.Main.PlanningArea;
+using X4_ComplexCalculator.Main.WorkArea;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Export
 {
@@ -38,9 +38,9 @@ namespace X4_ComplexCalculator.Main.Menu.File.Export
         /// <summary>
         /// エクスポート処理
         /// </summary>
-        /// <param name="PlanningArea"></param>
+        /// <param name="WorkArea"></param>
         /// <returns></returns>
-        public bool Export(IPlanningArea PlanningArea)
+        public bool Export(IWorkArea WorkArea)
         {
             var sb = new StringBuilder();
             var exists = false;
@@ -49,7 +49,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Export
 
             // モジュール情報を追加
             sb.Append("l=@");
-            foreach (var module in PlanningArea.Modules.Where(x => x.Module.ModuleType.ModuleTypeID != "connectionmodule" && 
+            foreach (var module in WorkArea.Modules.Where(x => x.Module.ModuleType.ModuleTypeID != "connectionmodule" && 
                                                                x.Module.ModuleType.ModuleTypeID != "ventureplatform" &&
                                                                x.Module.ModuleID != "module_gen_dock_m_venturer_01"))
             {

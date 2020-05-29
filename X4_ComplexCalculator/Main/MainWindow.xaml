@@ -6,9 +6,10 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:plnArea="clr-namespace:X4_ComplexCalculator.Main.PlanningArea"
+    xmlns:plnArea="clr-namespace:X4_ComplexCalculator.Main.WorkArea"
     xmlns:x4vcvt="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
     xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
+    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     Title="{lex:Loc Lang:MainWindowTitle}"
     Width="1000"
     Height="600"
@@ -167,8 +168,8 @@
 
             <!--  計画エリアの内容設定  -->
             <xcad:DockingManager.Resources>
-                <DataTemplate DataType="{x:Type plnArea:PlanningAreaViewModel}">
-                    <plnArea:PlanningArea DataContext="{Binding}" />
+                <DataTemplate DataType="{x:Type plnArea:WorkAreaViewModel}">
+                    <plnArea:WorkArea DataContext="{Binding}" />
                 </DataTemplate>
             </xcad:DockingManager.Resources>
 
@@ -189,5 +190,13 @@
             <xcad:LayoutRoot />
 
         </xcad:DockingManager>
+
+
+        <xctk:BusyIndicator
+            Grid.Row="0"
+            Grid.RowSpan="2"
+            IsBusy="{Binding IsBusy}">
+            <!--    -->
+        </xctk:BusyIndicator>
     </Grid>
 </Window>

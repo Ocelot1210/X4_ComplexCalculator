@@ -1,0 +1,195 @@
+﻿<Window
+    x:Class="X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EditEquipmentWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:eqlst="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:lex="http://wpflocalizeextension.codeplex.com"
+    xmlns:local="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
+    xmlns:xctk="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+    x:Name="window"
+    Title="{lex:Loc Lang:EditEquipmentWindowTitle}"
+    Width="800"
+    Height="450"
+    lex:LocalizeDictionary.DefaultProvider="{StaticResource CSVLocalizationProvider}"
+    lex:LocalizeDictionary.DesignCulture="en-US"
+    lex:ResxLocalizationProvider.DefaultAssembly="WPFLocalizationExtension"
+    lex:ResxLocalizationProvider.DefaultDictionary="StringResources"
+    x4bhv:CloseWindowBehavior.Close="{Binding CloseWindowProperty, Mode=OneWay}"
+    ResizeMode="NoResize"
+    Style="{StaticResource DefaultWindowBackgroundStyle}"
+    WindowStyle="ToolWindow"
+    mc:Ignorable="d">
+
+
+    <i:Interaction.Triggers>
+        <!--  ウィンドウが閉じられる時のイベント  -->
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding WindowClosingCommand, Mode=OneTime}" PassEventArgsToCommand="True" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+    <Window.Resources>
+        <Style x:Key="DefaultTextStyle" TargetType="{x:Type Label}">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Height" Value="18" />
+            <Setter Property="Padding" Value="0" />
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+
+        <!--  行列定義  -->
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1.5*" />
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="1.5*" />
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50" />
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+
+        <!--  モジュール名  -->
+        <StackPanel
+            Grid.Row="0"
+            Grid.Column="0"
+            Margin="5">
+            <Label
+                Name="moduleNameLabel"
+                Content="{lex:Loc Lang:ModuleName}"
+                Style="{StaticResource DefaultTextStyle}" />
+            <TextBox
+                IsReadOnly="True"
+                Text="{Binding ModuleName, Mode=OneWay}"
+                TextAlignment="Left" />
+        </StackPanel>
+
+        <!--  装備サイズ  -->
+        <StackPanel
+            Grid.Row="0"
+            Grid.Column="1"
+            Margin="5">
+            <Label Content="{lex:Loc Lang:EquipmentSize}" Style="{StaticResource DefaultTextStyle}" />
+            <ComboBox
+                Name="SizeComboBox"
+                DisplayMemberPath="Name"
+                ItemsSource="{Binding EquipmentSizes}"
+                SelectedIndex="0"
+                SelectedItem="{Binding SelectedSize, Mode=TwoWay}" />
+        </StackPanel>
+
+        <!--  プリセット  -->
+        <StackPanel
+            Grid.Row="0"
+            Grid.Column="2"
+            Margin="5">
+            <Label Content="{lex:Loc Lang:Preset}" Style="{StaticResource DefaultTextStyle}" />
+            <DockPanel>
+                <Button
+                    Width="20"
+                    Command="{Binding RemovePresetCommand, Mode=OneTime}"
+                    Content="🗑️"
+                    DockPanel.Dock="Right" />
+
+                <Button
+                    Width="20"
+                    Command="{Binding AddPresetCommand, Mode=OneTime}"
+                    Content="➕"
+                    DockPanel.Dock="Right" />
+
+                <Button
+                    Width="20"
+                    Command="{Binding EditPresetCommand, Mode=OneTime}"
+                    Content="✏"
+                    DockPanel.Dock="Right" />
+
+                <Button
+                    Width="20"
+                    Command="{Binding SavePresetCommand, Mode=OneTime}"
+                    Content="💾"
+                    DockPanel.Dock="Right" />
+
+                <ComboBox
+                    x:Name="presetCombobox"
+                    Grid.Row="0"
+                    Grid.Column="2"
+                    Width="Auto"
+                    DisplayMemberPath="Name"
+                    DockPanel.Dock="Left"
+                    IsSynchronizedWithCurrentItem="True"
+                    IsTextSearchEnabled="True"
+                    ItemsSource="{Binding Presets}"
+                    SelectedItem="{Binding SelectedPreset}" />
+
+            </DockPanel>
+        </StackPanel>
+
+        <!--  保存/キャンセル  -->
+        <Grid
+            Grid.Row="0"
+            Grid.Column="3"
+            Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+
+            <Button
+                x:Name="SaveButton"
+                Grid.Column="0"
+                Width="75"
+                Height="20"
+                Command="{Binding SaveButtonClickedCommand}"
+                CommandParameter="{Binding ElementName=window}"
+                Content="{lex:Loc Lang:Save}" />
+
+            <Button
+                Grid.Column="1"
+                Width="{Binding ElementName=SaveButton, Path=Width}"
+                Height="{Binding ElementName=SaveButton, Path=Height}"
+                Command="{Binding CloseWindowCommand}"
+                CommandParameter="{Binding ElementName=window}"
+                Content="{lex:Loc Lang:Close}" />
+        </Grid>
+
+        <!--  絞り込み用チェックリストボックス  -->
+        <DockPanel
+            Grid.Row="2"
+            Grid.Column="0"
+            Margin="5,0,5,5">
+            <Label
+                Height="28"
+                VerticalAlignment="Bottom"
+                Content="{lex:Loc Lang:OwnerFaction}"
+                DockPanel.Dock="Top" />
+            <xctk:CheckListBox
+                DisplayMemberPath="Faction.Name"
+                IsSelectAllActive="True"
+                ItemsSource="{Binding Factions}"
+                SelectAllContent="{lex:Loc Lang:SelectAll}"
+                SelectedMemberPath="IsChecked" />
+        </DockPanel>
+
+
+        <!--  装備編集領域  -->
+        <TabControl
+            Grid.Row="2"
+            Grid.Column="1"
+            Grid.ColumnSpan="3"
+            Margin="5,5,5,5">
+            <TabItem Header="{lex:Loc Lang:Turrets}">
+                <eqlst:EquipmentList x:Name="TurretsList" />
+            </TabItem>
+            <TabItem Header="{lex:Loc Lang:Shields}">
+                <eqlst:EquipmentList x:Name="ShieldsList" />
+            </TabItem>
+        </TabControl>
+
+    </Grid>
+</Window>

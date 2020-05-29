@@ -118,12 +118,14 @@ AmountPerHour;個数/h
 NeedWare;建造に必要なウェア
 NeedWareAmount;個数
 
+
 # ------------------------------------------------------
 # Storage
 # ------------------------------------------------------
 Capacity;容量
 TotalCapacity;容量(合計)
 StorageType;保管庫種別
+
 
 # ------------------------------------------------------
 # Storage assign
@@ -133,6 +135,7 @@ MaximumSliderValue;スライダー最大値
 Allocated;割当個数
 Allocable;割当可能個数
 NumberAfterTheSpecifiedTime;指定時間後の数量
+StorageAssignGroupHeader;{0} = {1:N0}/{2:N0}
 
 
 # ------------------------------------------------------

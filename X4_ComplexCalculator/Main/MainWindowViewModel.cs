@@ -5,12 +5,13 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.Menu.File.Export;
 using X4_ComplexCalculator.Main.Menu.File.Import;
 using X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport;
 using X4_ComplexCalculator.Main.Menu.Lang;
 using X4_ComplexCalculator.Main.Menu.Layout;
-using X4_ComplexCalculator.Main.PlanningArea;
+using X4_ComplexCalculator.Main.WorkArea;
 using Xceed.Wpf.AvalonDock;
 
 namespace X4_ComplexCalculator.Main
@@ -24,7 +25,27 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// メイン画面のModel
         /// </summary>
-        private readonly MainWindowModel _Model;
+        private readonly MainWindowModel _MainWindowModel;
+
+        /// <summary>
+        /// 言語一覧管理用
+        /// </summary>
+        private readonly LanguagesManager _LangMgr = new LanguagesManager();
+
+        /// <summary>
+        /// 作業エリア管理用
+        /// </summary>
+        private readonly WorkAreaManager _WorkAreaManager = new WorkAreaManager();
+
+        /// <summary>
+        /// 作業エリアファイル読み書き用
+        /// </summary>
+        private readonly WorkAreaFileIO _WorkAreaFileIO;
+
+        /// <summary>
+        /// インポート/エクスポート処理用
+        /// </summary>
+        private readonly ImportExporter _ImportExporter;
         #endregion
 
         #region プロパティ
@@ -84,21 +105,21 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// ワークエリア一覧
         /// </summary>
-        public ObservableCollection<PlanningAreaViewModel> Documents => _Model.Documents;
+        public ObservableCollection<WorkAreaViewModel> Documents => _WorkAreaManager.Documents;
 
 
         /// <summary>
         /// アクティブなワークスペース
         /// </summary>
-        public PlanningAreaViewModel ActiveContent
+        public WorkAreaViewModel ActiveContent
         {
             set
             {
-                _Model.ActiveContent = value;
+                _WorkAreaManager.ActiveContent = value;
             }
             get
             {
-                return _Model.ActiveContent;
+                return _WorkAreaManager.ActiveContent;
             }
         }
 
@@ -106,7 +127,7 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// レイアウト一覧
         /// </summary>
-        public ObservableCollection<LayoutMenuItem> Layouts => _Model.Layouts;
+        public ObservableCollection<LayoutMenuItem> Layouts => _WorkAreaManager.Layouts;
 
 
         /// <summary>
@@ -124,7 +145,13 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// 言語一覧
         /// </summary>
-        public ObservableRangeCollection<LangMenuItem> Languages => _Model.Languages;
+        public ObservableRangeCollection<LangMenuItem> Languages => _LangMgr.Languages;
+
+
+        /// <summary>
+        /// ビジー状態か
+        /// </summary>
+        public bool IsBusy => _WorkAreaFileIO.IsBusy;
         #endregion
 
 
@@ -133,28 +160,50 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         public MainWindowViewModel()
         {
-            _Model                 = new MainWindowModel();
-            WindowLoadedCommand    = new DelegateCommand(_Model.WindowLoaded);
+            _WorkAreaFileIO        = new WorkAreaFileIO(_WorkAreaManager);
+            _MainWindowModel       = new MainWindowModel(_WorkAreaManager);
+            WindowLoadedCommand    = new DelegateCommand(WindowLoaded);
             WindowClosingCommand   = new DelegateCommand<CancelEventArgs>(WindowClosing);
             CreateNewCommand       = new DelegateCommand(CreateNew);
-            SaveLayout             = new DelegateCommand(_Model.SaveLayout);
-            SaveCommand            = new DelegateCommand(_Model.Save);
-            SaveAsCommand          = new DelegateCommand(_Model.SaveAs);
+            SaveLayout             = new DelegateCommand(_WorkAreaManager.SaveLayout);
+            SaveCommand            = new DelegateCommand(_WorkAreaFileIO.Save);
+            SaveAsCommand          = new DelegateCommand(_WorkAreaFileIO.SaveAs);
             OpenCommand            = new DelegateCommand(Open);
-            UpdateDBCommand        = new DelegateCommand(_Model.UpdateDB);
+            UpdateDBCommand        = new DelegateCommand(_MainWindowModel.UpdateDB);
             DocumentClosingCommand = new DelegateCommand<DocumentClosingEventArgs>(DocumentClosing);
+            _WorkAreaFileIO.PropertyChanged += Member_PropertyChanged;
 
+            _ImportExporter = new ImportExporter(_WorkAreaManager);
             Imports = new List<IImport>()
             {
-                new StationCalclatorImport(new DelegateCommand<IImport>(_Model.Import)),
-                new StationPlanImport(new DelegateCommand<IImport>(_Model.Import)),
+                new StationCalclatorImport(new DelegateCommand<IImport>(_ImportExporter.Import)),
+                new StationPlanImport(new DelegateCommand<IImport>(_ImportExporter.Import)),
                 //new SaveDataImport(new DelegateCommand<IImport>(_Model.Import))   // 作成中のため未リリース
             };
 
             Exports = new List<IExport>()
             {
-                new StationCalclatorExport(new DelegateCommand<IExport>(_Model.Export))
+                new StationCalclatorExport(new DelegateCommand<IExport>(_ImportExporter.Export))
             };
+        }
+
+
+        /// <summary>
+        /// メンバのプロパティ変更時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Member_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(_WorkAreaFileIO.IsBusy):
+                    RaisePropertyChanged(nameof(IsBusy));
+                    break;
+
+                default:
+                    break;
+            }
         }
 
 
@@ -163,7 +212,7 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         private void CreateNew()
         {
-            _Model.CreateNew();
+            _WorkAreaFileIO.CreateNew();
             RaisePropertyChanged(nameof(ActiveContent));
         }
 
@@ -173,8 +222,18 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         private void Open()
         {
-            _Model.Open();
+            _WorkAreaFileIO.Open();
             RaisePropertyChanged(nameof(ActiveContent));
+        }
+
+        /// <summary>
+        /// ウィンドウがロードされた時
+        /// </summary>
+        private void WindowLoaded()
+        {
+            // DB接続開始
+            _MainWindowModel.Init();
+            _WorkAreaManager.Init();
         }
 
 
@@ -183,7 +242,7 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         private void WindowClosing(CancelEventArgs e)
         {
-            e.Cancel = _Model.WindowClosing();
+            e.Cancel = _MainWindowModel.WindowClosing();
         }
 
         /// <summary>
@@ -192,9 +251,9 @@ namespace X4_ComplexCalculator.Main
         /// <param name="e"></param>
         private void DocumentClosing(DocumentClosingEventArgs e)
         {
-            if (e.Document.Content is PlanningAreaViewModel PlanningArea)
+            if (e.Document.Content is WorkAreaViewModel WorkArea)
             {
-                e.Cancel = _Model.DocumentClosing(PlanningArea);
+                e.Cancel = _WorkAreaManager.DocumentClosing(WorkArea);
             }
         }
     }

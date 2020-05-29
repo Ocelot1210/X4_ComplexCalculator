@@ -136,6 +136,7 @@ MaximumSliderValue; Maximum slider value
 Allocated;Allocated
 Allocable;Allocable
 NumberAfterTheSpecifiedTime;Number after the specified time
+StorageAssignGroupHeader;{0} = {1:N0}/{2:N0}
 
 
 # ------------------------------------------------------

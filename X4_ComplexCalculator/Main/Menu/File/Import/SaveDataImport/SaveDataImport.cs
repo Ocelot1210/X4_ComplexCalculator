@@ -5,8 +5,8 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
-using X4_ComplexCalculator.Main.PlanningArea;
-using X4_ComplexCalculator.Main.PlanningArea.UI.ModulesGrid;
+using X4_ComplexCalculator.Main.WorkArea;
+using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
 {
@@ -70,14 +70,14 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
         /// <summary>
         /// インポート実行
         /// </summary>
-        /// <param name="PlanningArea">作業エリア</param>
+        /// <param name="WorkArea">作業エリア</param>
         /// <returns>インポートに成功したか</returns>
-        public bool Import(IPlanningArea PlanningArea)
+        public bool Import(IWorkArea WorkArea)
         {
             bool ret;
             try
             {
-                ret = ImportMain(PlanningArea, Stations[_StationIdx]);
+                ret = ImportMain(WorkArea, Stations[_StationIdx]);
                 _StationIdx++;
             }
             catch
@@ -92,21 +92,21 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
         /// <summary>
         /// インポート実行メイン
         /// </summary>
-        /// <param name="PlanningArea"></param>
+        /// <param name="WorkArea"></param>
         /// <param name="saveData"></param>
         /// <returns></returns>
-        private bool ImportMain(IPlanningArea PlanningArea, SaveDataStationItem saveData)
+        private bool ImportMain(IWorkArea WorkArea, SaveDataStationItem saveData)
         {
             // モジュール一覧を設定
-            SetModules(PlanningArea, saveData);
+            SetModules(WorkArea, saveData);
 
             // 製品価格を設定
-            SetWarePrice(PlanningArea, saveData);
+            SetWarePrice(WorkArea, saveData);
 
             // 保管庫割当状態を設定
-            SetStorageAssign(PlanningArea, saveData);
+            SetStorageAssign(WorkArea, saveData);
 
-            PlanningArea.Title = saveData.StationName;
+            WorkArea.Title = saveData.StationName;
 
             return true;
         }
@@ -115,9 +115,9 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
         /// <summary>
         /// モジュール一覧を設定
         /// </summary>
-        /// <param name="PlanningArea"></param>
+        /// <param name="WorkArea"></param>
         /// <param name="saveData"></param>
-        private void SetModules(IPlanningArea PlanningArea, SaveDataStationItem saveData)
+        private void SetModules(IWorkArea WorkArea, SaveDataStationItem saveData)
         {
             var modParam = new SQLiteCommandParameters(1);
             var eqParam = new SQLiteCommandParameters(3);
@@ -220,7 +220,7 @@ WHERE
 
             // モジュール一覧に追加
             var range = dict.Select(x => (x.Value)).OrderBy(x => x.Item1).Select(x => new ModulesGridItem(x.Item2, null, x.Item3));
-            PlanningArea.Modules.AddRange(range);
+            WorkArea.Modules.AddRange(range);
         }
 
 
@@ -229,14 +229,14 @@ WHERE
         /// <summary>
         /// 製品価格を設定
         /// </summary>
-        /// <param name="PlanningArea"></param>
+        /// <param name="WorkArea"></param>
         /// <param name="saveData"></param>
-        private void SetWarePrice(IPlanningArea PlanningArea, SaveDataStationItem saveData)
+        private void SetWarePrice(IWorkArea WorkArea, SaveDataStationItem saveData)
         {
             foreach (var ware in saveData.XElement.XPathSelectElements("/economylog/*[not(self::cargo)]"))
             {
                 var wareID = ware.Attribute("ware").Value;
-                var prod = PlanningArea.Products.Where(x => x.Ware.WareID == wareID).FirstOrDefault();
+                var prod = WorkArea.Products.Where(x => x.Ware.WareID == wareID).FirstOrDefault();
                 if (prod != null)
                 {
                     prod.UnitPrice = long.Parse(ware.Attribute("price").Value);
@@ -248,15 +248,15 @@ WHERE
         /// <summary>
         /// 保管庫割当状態を設定
         /// </summary>
-        /// <param name="PlanningArea"></param>
+        /// <param name="WorkArea"></param>
         /// <param name="saveData"></param>
-        private void SetStorageAssign(IPlanningArea PlanningArea, SaveDataStationItem saveData)
+        private void SetStorageAssign(IWorkArea WorkArea, SaveDataStationItem saveData)
         {
             foreach (var ware in saveData.XElement.XPathSelectElements("overrides/max/ware"))
             {
                 var wareID = ware.Attribute("ware").Value;
 
-                var storage = PlanningArea.StorageAssign.Where(x => x.WareID == wareID).FirstOrDefault();
+                var storage = WorkArea.StorageAssign.Where(x => x.WareID == wareID).FirstOrDefault();
                 if (storage != null)
                 {
                     var amount = long.Parse(ware.Attribute("amount").Value);

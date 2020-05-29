@@ -7,8 +7,8 @@ using System.Windows;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
 using X4_ComplexCalculator.Common.Localize;
-using X4_ComplexCalculator.Main.PlanningArea;
-using X4_ComplexCalculator.Main.PlanningArea.UI.ModulesGrid;
+using X4_ComplexCalculator.Main.WorkArea;
+using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import
 {
@@ -69,9 +69,9 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
         /// <summary>
         /// インポート実行
         /// </summary>
-        /// <param name="PlanningArea">作業エリア</param>
+        /// <param name="WorkArea">作業エリア</param>
         /// <returns>インポートに成功したか</returns>
-        public bool Import(IPlanningArea PlanningArea)
+        public bool Import(IWorkArea WorkArea)
         {
             var ret = false;
 
@@ -97,7 +97,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
 
                     return new ModulesGridItem(m.Groups[1].Value, long.Parse(m.Groups[2].Value));
                 });
-                PlanningArea.Modules.AddRange(modules);
+                WorkArea.Modules.AddRange(modules);
 
                 ret = true;
             }
