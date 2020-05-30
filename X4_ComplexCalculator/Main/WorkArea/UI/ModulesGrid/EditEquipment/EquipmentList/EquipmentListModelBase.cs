@@ -24,7 +24,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 選択中のサイズ
         /// </summary>
-        protected DB.X4DB.Size _SelectedSize;
+        protected DB.X4DB.Size? _SelectedSize;
 
 
         /// <summary>
@@ -74,13 +74,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 現在のサイズ
         /// </summary>
-        public DB.X4DB.Size SelectedSize
+        public DB.X4DB.Size? SelectedSize
         {
             get { return _SelectedSize; }
             set
             {
                 _SelectedSize = value;
-                UpdateEquipments(null, null);
+                UpdateEquipmentsMain();
             }
         }
 
@@ -94,7 +94,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 選択中のプリセット
         /// </summary>
-        public abstract PresetComboboxItem SelectedPreset { protected get; set; }
+        public abstract PresetComboboxItem? SelectedPreset { protected get; set; }
         #endregion
 
 
@@ -124,7 +124,17 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 装備一覧を更新
         /// </summary>
-        public abstract void UpdateEquipments(object sender, PropertyChangedEventArgs e);
+        private void UpdateEquipments(object sender, PropertyChangedEventArgs e)
+        {
+            UpdateEquipmentsMain();
+        }
+
+
+        /// <summary>
+        /// 装備一覧更新メイン
+        /// </summary>
+        protected abstract void UpdateEquipmentsMain();
+
 
 
         /// <summary>
@@ -141,6 +151,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <param name="targets">追加対象</param>
         public void AddEquipments(IEnumerable<Equipment> targets)
         {
+            if (SelectedSize == null)
+            {
+                throw new InvalidOperationException();
+            }
+
             int addRange = MaxAmount[SelectedSize] - Equipped[SelectedSize].Count;  // 追加可能な個数
 
             // 追加対象が無ければ何もしない
@@ -178,6 +193,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <param name="targets">削除対象</param>
         public void RemoveEquipments(IEnumerable<Equipment> targets)
         {
+            if (SelectedSize == null)
+            {
+                throw new InvalidOperationException();
+            }
+
             // 削除対象が無ければ何もしない
             if (!targets.Any())
             {

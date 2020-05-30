@@ -17,7 +17,7 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// 現在のレイアウト
         /// </summary>
-        private LayoutMenuItem _ActiveLayout;
+        private LayoutMenuItem? _ActiveLayout;
 
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// 現在のレイアウト
         /// </summary>
-        public LayoutMenuItem ActiveLayout
+        public LayoutMenuItem? ActiveLayout
         {
             get => _ActiveLayout;
             set

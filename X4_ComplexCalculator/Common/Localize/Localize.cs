@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Drawing;
+﻿using System.Windows;
 
 
 namespace X4_ComplexCalculator.Common.Localize

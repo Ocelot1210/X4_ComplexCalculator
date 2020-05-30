@@ -18,7 +18,7 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
         /// <summary>
         /// レイアウト名
         /// </summary>
-        private string _LayoutName;
+        private string _LayoutName = "";
 
         /// <summary>
         /// チェック状態
@@ -176,7 +176,7 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public int CompareTo(object obj)
+        public int CompareTo(object? obj)
         {
             if (obj == null)
             {

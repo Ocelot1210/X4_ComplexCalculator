@@ -174,7 +174,7 @@ WHERE
 
                 DBConnection.X4DB.ExecQuery(query, eqParam, (dr, _) =>
                 {
-                    ModuleEquipmentManager mng = null;
+                    ModuleEquipmentManager? mng = null;
 
                     switch ((string)dr["EquipmentTypeID"])
                     {

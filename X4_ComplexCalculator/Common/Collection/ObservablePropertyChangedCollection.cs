@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
@@ -42,19 +43,19 @@ namespace X4_ComplexCalculator.Common.Collection
         /// <summary>
         /// コレクション変更時のイベント
         /// </summary>
-        public event NotifyCollectionChangedEventAsync CollectionChangedAsync;
+        public event NotifyCollectionChangedEventAsync? CollectionChangedAsync;
 
 
         /// <summary>
         /// コレクションのプロパティ変更時のイベント(非同期)
         /// </summary>
-        public event NotifyPropertyChangedEventAsync CollectionPropertyChangedAsync;
+        public event NotifyPropertyChangedEventAsync? CollectionPropertyChangedAsync;
 
 
         /// <summary>
         /// コレクションのプロパティ変更時のイベント
         /// </summary>
-        public event NotifyPropertyChangedEvent CollectionPropertyChanged;
+        public event NotifyPropertyChangedEvent? CollectionPropertyChanged;
         #endregion
 
         #region コンストラクタ
@@ -100,8 +101,13 @@ namespace X4_ComplexCalculator.Common.Collection
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private async void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
+            if (sender == null)
+            {
+                throw new InvalidOperationException();
+            }
+
             CollectionPropertyChanged?.Invoke(sender, e);
 
             // 非同期版イベントが購読されていなければ何もしない
@@ -128,11 +134,11 @@ namespace X4_ComplexCalculator.Common.Collection
             {
                 // 置換の場合
                 case NotifyCollectionChangedAction.Replace:
-                    foreach (INotifyPropertyChanged item in e.OldItems)
+                    foreach (var item in e.OldItems.OfType<INotifyPropertyChanged>())
                     {
                         WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.RemoveHandler(item, "PropertyChanged", OnPropertyChanged);
                     }
-                    foreach (INotifyPropertyChanged item in e.NewItems)
+                    foreach (var item in e.NewItems.OfType<INotifyPropertyChanged>())
                     {
                         WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.AddHandler(item, "PropertyChanged", OnPropertyChanged);
                     }
@@ -140,7 +146,7 @@ namespace X4_ComplexCalculator.Common.Collection
 
                 // 新規追加の場合
                 case NotifyCollectionChangedAction.Add:
-                    foreach (INotifyPropertyChanged item in Items.Skip(e.NewStartingIndex).Take(e.NewItems.Count))
+                    foreach (var item in Items.Skip(e.NewStartingIndex).Take(e.NewItems.Count).OfType<INotifyPropertyChanged>())
                     {
                         WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.AddHandler(item, "PropertyChanged", OnPropertyChanged);
                     }
@@ -148,7 +154,7 @@ namespace X4_ComplexCalculator.Common.Collection
 
                 // 削除の場合
                 case NotifyCollectionChangedAction.Remove:
-                    foreach (INotifyPropertyChanged item in e.OldItems)
+                    foreach (var item in e.OldItems.OfType<INotifyPropertyChanged>())
                     {
                         WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.RemoveHandler(item, "PropertyChanged", OnPropertyChanged);
                     }

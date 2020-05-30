@@ -43,7 +43,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public int CompareTo(object obj)
+        public int CompareTo(object? obj)
         {
             return SizeID.CompareTo(obj is Size);
         }
@@ -54,7 +54,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="obj">比較対象</param>
         /// <returns></returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is Size tgt && tgt.SizeID == SizeID;
         }

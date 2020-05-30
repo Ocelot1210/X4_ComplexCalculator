@@ -15,7 +15,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <summary>
         /// モジュール選択ウィンドウ
         /// </summary>
-        private SelectModuleWindow _SelectModuleWindow;
+        private SelectModuleWindow? _SelectModuleWindow;
 
         /// <summary>
         /// モジュール選択ウィンドウがクローズ済みか
@@ -55,10 +55,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
                         module.UpdateTooltip();
                     }
                 });
-                //System.Threading.Tasks.Parallel.ForEach(Modules, (module) =>
-                //{
-                //    module.UpdateTooltip();
-                //});
             }
         }
 
@@ -95,7 +91,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         {
             if (_SelectModuleWindowClosed)
             {
-                void OnWindowClosed(object s, EventArgs ev)
+                void OnWindowClosed(object? s, EventArgs ev)
                 {
                     _SelectModuleWindowClosed = true;
                 }
@@ -106,10 +102,17 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             }
             _SelectModuleWindowClosed = false;
 
+
+            if (_SelectModuleWindow == null)
+            {
+                throw new InvalidOperationException();
+            }
+
+
             _SelectModuleWindow.Activate();
 
             // 最小化されていたら通常状態にする
-            _SelectModuleWindow.WindowState = (_SelectModuleWindow.WindowState == WindowState.Minimized)? WindowState.Normal : _SelectModuleWindow.WindowState;
+            _SelectModuleWindow.WindowState = (_SelectModuleWindow.WindowState == WindowState.Minimized) ? WindowState.Normal : _SelectModuleWindow.WindowState;
         }
 
 

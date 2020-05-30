@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data.SQLite;
 using System.IO;
-using System.Reflection;
 using System.Windows;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Localize;
@@ -22,7 +21,19 @@ namespace X4_ComplexCalculator.DB
         /// <summary>
         /// トランザクション用コマンド
         /// </summary>
-        private SQLiteCommand transCmd;
+        private SQLiteCommand? _TransCommand;
+
+
+        /// <summary>
+        /// X4DB用
+        /// </summary>
+        private static DBConnection? _X4DB;
+
+
+        /// <summary>
+        /// プリセット/その他用DB
+        /// </summary>
+        private static DBConnection? _CommonDB;
         #endregion
 
 
@@ -30,12 +41,20 @@ namespace X4_ComplexCalculator.DB
         /// <summary>
         /// X4DB用
         /// </summary>
-        public static DBConnection X4DB { get; private set; }
+        public static DBConnection X4DB
+        {
+            get => _X4DB ?? throw new InvalidOperationException();
+            private set => _X4DB = value;
+        }
 
         /// <summary>
         /// プリセット/その他用DB
         /// </summary>
-        public static DBConnection CommonDB { get; private set; }
+        public static DBConnection CommonDB
+        {
+            get => _CommonDB ?? throw new InvalidOperationException();
+            private set => _CommonDB = value;
+        }
         #endregion
 
         /// <summary>
@@ -64,10 +83,10 @@ namespace X4_ComplexCalculator.DB
         /// </summary>
         public void BeginTransaction()
         {
-            if (transCmd == null)
+            if (_TransCommand == null)
             {
-                transCmd = new SQLiteCommand(conn);
-                transCmd.Transaction = conn.BeginTransaction();
+                _TransCommand = new SQLiteCommand(conn);
+                _TransCommand.Transaction = conn.BeginTransaction();
             }
             else
             {
@@ -81,9 +100,13 @@ namespace X4_ComplexCalculator.DB
         /// </summary>
         public void Commit()
         {
-            transCmd.Transaction.Commit();
-            transCmd.Dispose();
-            transCmd = null;
+            if (_TransCommand == null)
+            {
+                throw new InvalidOperationException();
+            }
+            _TransCommand.Transaction.Commit();
+            _TransCommand.Dispose();
+            _TransCommand = null;
         }
 
 
@@ -92,9 +115,13 @@ namespace X4_ComplexCalculator.DB
         /// </summary>
         public void Rollback()
         {
-            transCmd.Transaction.Rollback();
-            transCmd.Dispose();
-            transCmd = null;
+            if (_TransCommand == null)
+            {
+                throw new InvalidOperationException();
+            }
+            _TransCommand.Transaction.Rollback();
+            _TransCommand.Dispose();
+            _TransCommand = null;
         }
 
 
@@ -105,14 +132,14 @@ namespace X4_ComplexCalculator.DB
         /// <param name="callback">実行結果に対する処理</param>
         /// <param name="args">可変長引数</param>
         /// <returns>結果の行数</returns>
-        public int ExecQuery(string query, Action<SQLiteDataReader, object[]> callback = null, params object[] args)
+        public int ExecQuery(string query, Action<SQLiteDataReader, object[]>? callback = null, params object[] args)
         {
             int ret = 0;
 
             // トランザクション開始済み？
-            if (transCmd != null)
+            if (_TransCommand != null)
             {
-                ret = ExecQueryMain(transCmd, query, null, callback, args);
+                ret = ExecQueryMain(_TransCommand, query, null, callback, args);
             }
             else
             {
@@ -134,14 +161,14 @@ namespace X4_ComplexCalculator.DB
         /// <param name="callback">実行結果に対する処理</param>
         /// <param name="args">可変長引数</param>
         /// <returns>結果の行数</returns>
-        public int ExecQuery(string query, SQLiteCommandParameters parameters, Action<SQLiteDataReader, object[]> callback = null, params object[] args)
+        public int ExecQuery(string query, SQLiteCommandParameters parameters, Action<SQLiteDataReader, object[]>? callback = null, params object[] args)
         {
             int ret = 0;
 
             // トランザクション開始済み？
-            if (transCmd != null)
+            if (_TransCommand != null)
             {
-                ret = ExecQueryMain(transCmd, query, null, callback, args);
+                ret = ExecQueryMain(_TransCommand, query, null, callback, args);
             }
             else
             {
@@ -165,7 +192,7 @@ namespace X4_ComplexCalculator.DB
         /// <param name="callback">実行結果に対する処理</param>
         /// <param name="args">可変長引数</param>
         /// <returns>結果の行数</returns>
-        private int ExecQueryMain(SQLiteCommand cmd, string query, SQLiteCommandParameters parameters, Action<SQLiteDataReader, object[]> callback, params object[] args)
+        private int ExecQueryMain(SQLiteCommand cmd, string query, SQLiteCommandParameters? parameters, Action<SQLiteDataReader, object[]>? callback, params object[] args)
         {
             int ret = 0;
 
@@ -235,6 +262,7 @@ namespace X4_ComplexCalculator.DB
             ret.ExecQuery("CREATE TABLE IF NOT EXISTS ModulePresets(ModuleID TEXT NOT NULL, PresetID INTEGER NOT NULL, PresetName TEXT NOT NULL)");
             ret.ExecQuery("CREATE TABLE IF NOT EXISTS ModulePresetsEquipment(ModuleID TEXT NOT NULL, PresetID INTEGER NOT NULL, EquipmentID TEXT NOT NULL, EquipmentType TEXT NOT NULL)");
             ret.ExecQuery("CREATE TABLE IF NOT EXISTS WorkAreaLayouts(LayoutID INTEGER NOT NULL, LayoutName TEXT NOT NULL, IsChecked INTEGER DEFAULT 0, Layout BLOB NOT NULL)");
+            ret.ExecQuery("CREATE TABLE IF NOT EXISTS OpenedFiles(Path TEXT NOT NULL)");
 
             return ret;
         }
@@ -245,7 +273,7 @@ namespace X4_ComplexCalculator.DB
         public static void Open()
         {
             var conf = Configuration.GetConfiguration();
-            var x4DBPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, conf["AppSettings:X4DBPath"]);
+            var x4DBPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? "", conf["AppSettings:X4DBPath"]);
 
             try
             {
@@ -292,7 +320,7 @@ namespace X4_ComplexCalculator.DB
             }
             
             
-            CommonDB = CreatePresetDB(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, conf["AppSettings:CommonDBPath"]));
+            CommonDB = CreatePresetDB(Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? "", conf["AppSettings:CommonDBPath"]));
         }
 
 
@@ -334,12 +362,12 @@ namespace X4_ComplexCalculator.DB
 
             var conf = Configuration.GetConfiguration();
             
-            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, conf["AppSettings:X4DBPath"]);
+            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? "", conf["AppSettings:X4DBPath"]);
 
-            var proc = System.Diagnostics.Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, conf["AppSettings:ExporterExePath"]), $"-o \"{path}\"");
+            var proc = System.Diagnostics.Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? "", conf["AppSettings:ExporterExePath"]), $"-o \"{path}\"");
             proc.WaitForExit();
 
-            path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, conf["AppSettings:X4DBPath"]);
+            path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? "", conf["AppSettings:X4DBPath"]);
             if (File.Exists(path))
             {
                 X4DB = new DBConnection(path);

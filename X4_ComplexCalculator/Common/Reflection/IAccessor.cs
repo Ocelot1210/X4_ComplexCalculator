@@ -11,7 +11,7 @@ namespace X4_ComplexCalculator.Common.Reflection
         /// </summary>
         /// <param name="target">インスタンス</param>
         /// <returns>値</returns>
-        object GetValue(object target);
+        object? GetValue(object target);
 
 
         /// <summary>
@@ -19,6 +19,6 @@ namespace X4_ComplexCalculator.Common.Reflection
         /// </summary>
         /// <param name="target">インスタンス</param>
         /// <param name="value">値</param>
-        void SetValue(object target, object value);
+        void SetValue(object target, object? value);
     }
 }

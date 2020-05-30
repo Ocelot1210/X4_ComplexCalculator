@@ -113,10 +113,12 @@ namespace X4_ComplexCalculator.Common
                     return dir;
                 }
 
-                return null;
+                throw new InvalidOperationException();
             }
             else
-                return Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
+            {
+                return Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) ?? throw new InvalidOperationException();
+            }
         }
 
         private static Dictionary<int, string> executablePaths = new Dictionary<int, string>();
@@ -152,7 +154,7 @@ namespace X4_ComplexCalculator.Common
                 }
             }
 
-            return null;
+            throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -165,9 +167,9 @@ namespace X4_ComplexCalculator.Common
         public static void ParseKey(string inKey, out string outAssembly, out string outDict, out string outKey)
         {
             // Reset everything to null.
-            outAssembly = null;
-            outDict = null;
-            outKey = null;
+            outAssembly = "";
+            outDict = "";
+            outKey = "";
 
             if (!string.IsNullOrEmpty(inKey))
             {
@@ -176,15 +178,15 @@ namespace X4_ComplexCalculator.Common
                 // assembly:dict:key
                 if (split.Length == 3)
                 {
-                    outAssembly = !string.IsNullOrEmpty(split[0]) ? split[0] : null;
-                    outDict = !string.IsNullOrEmpty(split[1]) ? split[1] : null;
+                    outAssembly = !string.IsNullOrEmpty(split[0]) ? split[0] : "";
+                    outDict = !string.IsNullOrEmpty(split[1]) ? split[1] : "";
                     outKey = split[2];
                 }
 
                 // dict:key
                 if (split.Length == 2)
                 {
-                    outDict = !string.IsNullOrEmpty(split[0]) ? split[0] : null;
+                    outDict = !string.IsNullOrEmpty(split[0]) ? split[0] : "";
                     outKey = split[1];
                 }
 
@@ -254,10 +256,12 @@ namespace X4_ComplexCalculator.Common
         /// </summary>
         /// <param name="target">The target object.</param>
         /// <returns>The assembly name, if available.</returns>
-        protected string GetAssembly(DependencyObject target)
+        protected string GetAssembly(DependencyObject? target)
         {
             if (target == null)
-                return null;
+            {
+                return "";
+            }
 
             return target.GetValueOrRegisterParentNotifier<string>(CSVEmbeddedLocalizationProvider.DefaultAssemblyProperty, ParentChangedAction, _parentNotifiers);
         }
@@ -267,10 +271,12 @@ namespace X4_ComplexCalculator.Common
         /// </summary>
         /// <param name="target">The target object.</param>
         /// <returns>The dictionary name, if available.</returns>
-        protected string GetDictionary(DependencyObject target)
+        protected string GetDictionary(DependencyObject? target)
         {
             if (target == null)
-                return null;
+            {
+                return "";
+            }
 
             return target.GetValueOrRegisterParentNotifier<string>(CSVEmbeddedLocalizationProvider.DefaultDictionaryProperty, ParentChangedAction, _parentNotifiers);
         }
@@ -321,12 +327,12 @@ namespace X4_ComplexCalculator.Common
                 if (!File.Exists(csvPath))
                 {
                     OnProviderError(target, key, "A file for the provided culture " + culture.EnglishName + " does not exist at " + csvPath + ".");
-                    return null;
+                    return "";
                 }
             }
 
             ReadCsv(culture, csvPath);
-            _LangageDict[culture].TryGetValue(key, out string ret);
+            _LangageDict[culture].TryGetValue(key, out string? ret);
 
             // 見つからなかったらデフォルトの言語ファイルから探す
             if (culture != CultureInfo.InvariantCulture && string.IsNullOrEmpty(ret))
@@ -338,7 +344,7 @@ namespace X4_ComplexCalculator.Common
             if (ret == null)
                 OnProviderError(target, key, "The key does not exist in " + csvPath + ".");
 
-            return ret;
+            return ret ?? key;
         }
 
         /// <summary>
@@ -398,31 +404,21 @@ namespace X4_ComplexCalculator.Common
         /// <summary>
         /// An observable list of available cultures.
         /// </summary>
-        private ObservableCollection<CultureInfo> availableCultures = null;
-        public ObservableCollection<CultureInfo> AvailableCultures
-        {
-            get
-            {
-                if (availableCultures == null)
-                    availableCultures = new ObservableCollection<CultureInfo>();
-
-                return availableCultures;
-            }
-        }
+        public ObservableCollection<CultureInfo> AvailableCultures { get; } = new ObservableCollection<CultureInfo>();
 
         /// <summary>
         /// Gets fired when the provider changed.
         /// </summary>
-        public event ProviderChangedEventHandler ProviderChanged;
+        public event ProviderChangedEventHandler? ProviderChanged;
 
         /// <summary>
         /// An event that is fired when an error occurred.
         /// </summary>
-        public event ProviderErrorEventHandler ProviderError;
+        public event ProviderErrorEventHandler? ProviderError;
 
         /// <summary>
         /// An event that is fired when a value changed.
         /// </summary>
-        public event ValueChangedEventHandler ValueChanged;
+        public event ValueChangedEventHandler? ValueChanged;
     }
 }

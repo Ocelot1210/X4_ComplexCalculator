@@ -22,7 +22,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
         /// <summary>
         /// セーブデータファイルパス
         /// </summary>
-        string _SaveDataFilePath;
+        string _SaveDataFilePath = "";
         #endregion
 
         /// <summary>

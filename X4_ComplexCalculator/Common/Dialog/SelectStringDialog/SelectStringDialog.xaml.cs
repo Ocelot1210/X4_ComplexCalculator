@@ -17,7 +17,7 @@ namespace X4_ComplexCalculator.Common.Dialog.SelectStringDialog
         /// <param name="description">テキストボックスの説明文</param>
         /// <param name="initialString">初期文字列</param>
         /// <param name="isValidInput">文字列が有効か判定する関数</param>
-        private SelectStringDialog(string title, string description, string initialString, Predicate<string> isValidInput)
+        private SelectStringDialog(string title, string description, string initialString, Predicate<string>? isValidInput)
         {
             InitializeComponent();
 
@@ -36,7 +36,7 @@ namespace X4_ComplexCalculator.Common.Dialog.SelectStringDialog
         /// <param name="isValidInput">文字列が有効か判定する関数</param>
         /// <param name="hideCancelButton">Cancelボタンを非表示にするか</param>
         /// <returns>(OKを押されたか, 選択結果)</returns>
-        public static (bool, string) ShowDialog(string title, string description, string initialString = "", Predicate<string> isValidInput = null, bool hideCancelButton = false)
+        public static (bool, string) ShowDialog(string title, string description, string initialString = "", Predicate<string>? isValidInput = null, bool hideCancelButton = false)
         {
             var wnd = new SelectStringDialog(
                 (string)LocalizeDictionary.Instance.GetLocalizedObject(title, null, null),

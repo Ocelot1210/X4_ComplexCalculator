@@ -46,8 +46,12 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public int CompareTo(object obj)
+        public int CompareTo(object? obj)
         {
+            if (obj == null)
+            {
+                return 1;
+            }
             return EquipmentTypeID.CompareTo(obj is EquipmentType);
         }
 
@@ -57,8 +61,12 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="obj">比較対象</param>
         /// <returns></returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
+            if (obj == null)
+            {
+                throw new ArgumentException($"parameter {nameof(obj)} should not be null.", nameof(obj));
+            }
             return obj is EquipmentType tgt && tgt.EquipmentTypeID == EquipmentTypeID;
         }
 

@@ -16,7 +16,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
         /// <summary>
         /// 読み込み対象ファイルパス
         /// </summary>
-        public string Path { set; protected get; }
+        public string Path { set; protected get; } = "";
 
         /// <summary>
         /// 作業エリア

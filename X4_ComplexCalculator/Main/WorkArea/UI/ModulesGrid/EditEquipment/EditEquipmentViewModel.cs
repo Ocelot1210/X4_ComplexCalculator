@@ -34,7 +34,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// 選択中の装備サイズ
         /// </summary>
-        private DB.X4DB.Size _SelectedSize;
+        private DB.X4DB.Size? _SelectedSize;
         #endregion
 
 
@@ -77,7 +77,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// 選択中の装備サイズ
         /// </summary>
-        public DB.X4DB.Size SelectedSize
+        public DB.X4DB.Size? SelectedSize
         {
             get
             {
@@ -85,6 +85,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
             }
             set
             {
+                if (value == null)
+                {
+                    throw new InvalidOperationException();
+                }
+
                 if (value.SizeID != (_SelectedSize?.SizeID ?? ""))
                 {
                     _SelectedSize = value;
@@ -110,7 +115,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// 選択中のプリセット
         /// </summary>
-        public PresetComboboxItem SelectedPreset
+        public PresetComboboxItem? SelectedPreset
         {
             get => Model.SelectedPreset;
             set

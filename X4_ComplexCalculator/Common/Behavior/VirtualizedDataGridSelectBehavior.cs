@@ -107,11 +107,15 @@ namespace X4_ComplexCalculator.Common.Behavior
 
             using (Dispatcher.CurrentDispatcher.DisableProcessing())
             {
-                var accessor = ((0 < e.AddedItems.Count) ? e.AddedItems[0] : e.RemovedItems[0]).GetType().GetProperty(GetMemberName((DependencyObject)sender))?.ToAccessor();
-                if (accessor != null)
+                var itm = ((0 < e.AddedItems.Count) ? e.AddedItems[0] : e.RemovedItems[0]);
+                if (itm != null)
                 {
-                    SetSelectedStatus(e.AddedItems, accessor, true);
-                    SetSelectedStatus(e.RemovedItems, accessor, false);
+                    var accessor = itm.GetType().GetProperty(GetMemberName((DependencyObject)sender))?.ToAccessor();
+                    if (accessor != null)
+                    {
+                        SetSelectedStatus(e.AddedItems, accessor, true);
+                        SetSelectedStatus(e.RemovedItems, accessor, false);
+                    }
                 }
             }
         }
@@ -127,7 +131,10 @@ namespace X4_ComplexCalculator.Common.Behavior
         {
             foreach(var item in items)
             {
-                accessor.SetValue(item, value);
+                if (item != null)
+                {
+                    accessor.SetValue(item, value);
+                }
             }
         }
     }

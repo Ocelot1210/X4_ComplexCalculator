@@ -45,12 +45,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
             ItemCollection = itemCollection;
 
             ModuleOwners.CollectionPropertyChanged += UpdateModules;
-
             ModuleTypes.CollectionPropertyChanged += UpdateModules;
 
             InitModuleTypes();
             InitModuleOwners();
-            UpdateModules(null, null);
+            UpdateModulesMain();
         }
 
 
@@ -125,6 +124,15 @@ ORDER BY Name ASC", init, "SelectModuleCheckStateTypes");
         /// </summary>
         private void UpdateModules(object sender, EventArgs e)
         {
+            UpdateModulesMain();
+        }
+
+
+        /// <summary>
+        /// モジュール一覧を更新する
+        /// </summary>
+        private void UpdateModulesMain()
+        {
             var query = $@"
 SELECT
     DISTINCT Module.ModuleID,
@@ -141,6 +149,7 @@ WHERE
             DBConnection.X4DB.ExecQuery(query, SetModules, list);
             Modules.Reset(list);
         }
+
 
 
         /// <summary>

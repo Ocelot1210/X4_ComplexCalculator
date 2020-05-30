@@ -38,8 +38,8 @@ namespace X4_ComplexCalculator.DB.X4DB
         {
             EquipmentID = equipmentID;
             string name = "";
-            EquipmentType equipmentType = null;
-            Size          size          = null;
+            EquipmentType? equipmentType = null;
+            Size?          size          = null;
 
             DBConnection.X4DB.ExecQuery(
                 $"SELECT * FROM Equipment WHERE EquipmentID = '{EquipmentID}'",
@@ -56,8 +56,8 @@ namespace X4_ComplexCalculator.DB.X4DB
             }
 
             Name = name;
-            Size = size;
-            EquipmentType = equipmentType;
+            Size = size ?? throw new InvalidOperationException($"{nameof(size)} should not be null.");
+            EquipmentType = equipmentType ?? throw new InvalidOperationException($"{nameof(equipmentType)} should not be null.");
         }
 
         /// <summary>
@@ -65,8 +65,12 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public int CompareTo(object obj)
+        public int CompareTo(object? obj)
         {
+            if (obj == null)
+            {
+                return 1;
+            }
             return EquipmentID.CompareTo(obj is Equipment);
         }
 
@@ -76,8 +80,12 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="obj">比較対象</param>
         /// <returns></returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
+            if (obj == null)
+            {
+                throw new ArgumentException($"parameter {nameof(obj)} should not be null.", nameof(obj));
+            }
             return obj is Equipment tgt && tgt.EquipmentID == EquipmentID;
         }
 

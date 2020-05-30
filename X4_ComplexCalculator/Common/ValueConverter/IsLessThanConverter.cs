@@ -13,7 +13,11 @@ namespace X4_ComplexCalculator.Common.ValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return System.Convert.ToInt64(value) < long.Parse(parameter as string);
+            if (!(parameter is string param))
+            {
+                throw new ArgumentException($"paran ${parameter} must be string.", nameof(parameter));
+            }
+            return System.Convert.ToInt64(value) < long.Parse(param);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -61,7 +61,7 @@ namespace X4_ComplexCalculator.DB.X4DB
             string name = "";
             long maxWorkers = 0;
             long workersCapacity = 0;
-            ModuleType moduleType = null;
+            ModuleType? moduleType = null;
 
             DBConnection.X4DB.ExecQuery($"SELECT ModuleTypeID, Name, MaxWorkers, WorkersCapacity FROM Module WHERE ModuleID = '{moduleID}'",
                 (SQLiteDataReader dr, object[] args) =>
@@ -78,7 +78,7 @@ namespace X4_ComplexCalculator.DB.X4DB
             }
 
             Name = name;
-            ModuleType = moduleType;
+            ModuleType = moduleType ?? throw new InvalidOperationException();
             MaxWorkers = maxWorkers;
             WorkersCapacity = workersCapacity;
             Equipment = new ModuleEquipment(moduleID);
@@ -125,7 +125,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public int CompareTo(object obj)
+        public int CompareTo(object? obj)
         {
             var tgt = obj as Module;
             if (tgt == null) return 1;
@@ -139,7 +139,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="obj">比較対象</param>
         /// <returns></returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             var tgt = obj as Module;
             if (tgt == null) return false;

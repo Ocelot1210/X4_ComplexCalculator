@@ -62,8 +62,8 @@ namespace X4_ComplexCalculator.DB.X4DB
             var volume   = 0L;
             var minPrice = 0L;
             var maxPrice = 0L;
-            WareGroup wareGroup = null;
-            TransportType transportType = null;
+            WareGroup? wareGroup = null;
+            TransportType? transportType = null;
 
             DBConnection.X4DB.ExecQuery(
                 $"SELECT * FROM Ware WHERE WareID = '{WareID}'",
@@ -86,8 +86,8 @@ namespace X4_ComplexCalculator.DB.X4DB
             Volume        = volume;
             MinPrice      = minPrice;
             MaxPrice      = maxPrice;
-            WareGroup     = wareGroup;
-            TransportType = transportType;
+            WareGroup     = wareGroup ?? throw new InvalidOperationException($"{nameof(wareGroup)} should not be null.");
+            TransportType = transportType ?? throw new InvalidOperationException($"{nameof(transportType)} should not be null.");
         }
 
 
@@ -96,7 +96,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public int CompareTo(object obj)
+        public int CompareTo(object? obj)
         {
             return WareID.CompareTo(obj);
         }
@@ -107,7 +107,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="obj">比較対象</param>
         /// <returns></returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is Ware tgt && tgt.WareID == WareID;
         }

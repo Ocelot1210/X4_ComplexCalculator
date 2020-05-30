@@ -60,7 +60,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// 製品計算用インスタンス
         /// </summary>
-        private static ProductCalclator _SingletonProductCalclator;
+        private static ProductCalclator? _SingletonProductCalclator;
         #endregion
 
         /// <summary>
@@ -243,10 +243,10 @@ WHERE
             }
 
             // ウェア生産に必要なウェア一覧(候補)
-            if (_WareResource.TryGetValue(modProd.WareID, out Tuple<string, string, long>[] wareResourceArr))
+            if (_WareResource.TryGetValue(modProd.WareID, out Tuple<string, string, long>[]? wareResourceArr))
             {
                 // ウェア生産に必要なウェア一覧
-                IEnumerable<Tuple<string, string, long>> wareResources = null;
+                IEnumerable<Tuple<string, string, long>> wareResources = Enumerable.Empty<Tuple<string, string, long>>();
 
                 if (modProd.Method != "default")
                 {
@@ -279,7 +279,7 @@ WHERE
                 module.raceID = "default";
             }
 
-            if (!_WorkUnitWares.TryGetValue(module.raceID, out (string WareID, double Amount)[] wares))
+            if (!_WorkUnitWares.TryGetValue(module.raceID, out (string WareID, double Amount)[]? wares))
             {
                 wares = _WorkUnitWares["default"];
             }

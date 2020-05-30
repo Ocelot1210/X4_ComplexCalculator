@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data.SQLite;
@@ -16,7 +17,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         ///  選択中のプリセット
         /// </summary>
-        private PresetComboboxItem _SelectedPreset;
+        private PresetComboboxItem? _SelectedPreset;
         #endregion
 
 
@@ -24,7 +25,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 選択中のプリセット
         /// </summary>
-        public override PresetComboboxItem SelectedPreset
+        public override PresetComboboxItem? SelectedPreset
         {
             protected get => _SelectedPreset;
             set
@@ -68,8 +69,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
             if (e.Action == NotifyCollectionChangedAction.Replace ||
                 e.Action == NotifyCollectionChangedAction.Remove)
             {
-                foreach (PresetComboboxItem item in e.OldItems)
+                foreach (PresetComboboxItem? item in e.OldItems)
                 {
+                    if (item == null)
+                    {
+                        throw new InvalidOperationException();
+                    }
+
                     var query = @$"
 DELETE FROM
     ModulePresetsEquipment
@@ -87,8 +93,13 @@ WHERE
                 e.Action == NotifyCollectionChangedAction.Add)
             {
 
-                foreach (PresetComboboxItem item in e.NewItems)
+                foreach (PresetComboboxItem? item in e.NewItems)
                 {
+                    if (item == null)
+                    {
+                        throw new InvalidOperationException();
+                    }
+
                     foreach (var equipment in Equipped.Values.SelectMany((x) => x))
                     {
                         var query = $"INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES('{Module.ModuleID}', {item.ID}, '{equipment.EquipmentID}', '{equipment.EquipmentType.EquipmentTypeID}')";
@@ -100,9 +111,9 @@ WHERE
 
 
         /// <summary>
-        /// 装備一覧を更新
+        /// 装備一覧を更新メイン
         /// </summary>
-        public override void UpdateEquipments(object sender, PropertyChangedEventArgs e)
+        protected override void UpdateEquipmentsMain()
         {
             if (SelectedSize == null)
             {
@@ -148,6 +159,11 @@ WHERE
         /// </summary>
         private void OnSelectedPresetChanged()
         {
+            if (SelectedPreset == null)
+            {
+                throw new InvalidOperationException();
+            }
+
             var query = @$"
 SELECT
     EquipmentID

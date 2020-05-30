@@ -17,7 +17,7 @@ namespace X4_ComplexCalculator.Common
         /// <param name="value"></param>
         /// <param name="propertyName"></param>
         /// <returns></returns>
-        protected bool SetPropertyEx<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+        protected bool SetPropertyEx<T>(ref T storage, T value, [CallerMemberName] string propertyName = "")
         {
             if (EqualityComparer<T>.Default.Equals(storage, value))
             {
@@ -39,7 +39,7 @@ namespace X4_ComplexCalculator.Common
         /// <param name="oldValue">前回値</param>
         /// <param name="newValue">今回値</param>
         /// <param name="propertyName">プロパティ名</param>
-        protected void RaisePropertyChangedEx<T>(T oldValue, T newValue, [CallerMemberName]string propertyName = null)
+        protected void RaisePropertyChangedEx<T>(T oldValue, T newValue, [CallerMemberName]string propertyName = "")
         {
             OnPropertyChanged(new PropertyChangedExtendedEventArgs<T>(propertyName, oldValue, newValue));
         }

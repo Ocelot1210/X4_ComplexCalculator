@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Controls;
+using System;
 
 namespace CustomControlLibrary.DataGridInline
 {
@@ -16,7 +17,7 @@ namespace CustomControlLibrary.DataGridInline
         /// <summary>
         /// スクロールイベントバブリング用
         /// </summary>
-        ScrollViewer scrollViewer;
+        ScrollViewer? _ScrollViewer;
         #endregion
 
         /// <summary>
@@ -112,15 +113,15 @@ namespace CustomControlLibrary.DataGridInline
         private void PreviewMouseWheelEventHandler(object sender, MouseWheelEventArgs e)
         {
             // ListViewn内のScrollViewerを取得する(初回のみ)
-            if (scrollViewer == null)
+            if (_ScrollViewer == null)
             {
-                scrollViewer = FindVisualChild<System.Windows.Controls.ScrollViewer>(this);
+                _ScrollViewer = FindVisualChild<System.Windows.Controls.ScrollViewer>(this) ?? throw new InvalidOperationException();
             }
 
-            var scrollPos = scrollViewer.ContentVerticalOffset;
+            var scrollPos = _ScrollViewer.ContentVerticalOffset;
 
             // スクロールすべきか？
-            if ((scrollPos == scrollViewer.ScrollableHeight && e.Delta < 0) || (scrollPos == 0 && e.Delta > 0))
+            if ((scrollPos == _ScrollViewer.ScrollableHeight && e.Delta < 0) || (scrollPos == 0 && e.Delta > 0))
             {
                 e.Handled = true;
 
@@ -137,9 +138,9 @@ namespace CustomControlLibrary.DataGridInline
         /// <typeparam name="T">取得したい子要素の型</typeparam>
         /// <param name="parent">親要素</param>
         /// <returns></returns>
-        private T FindVisualChild<T>(DependencyObject parent) where T : Visual
+        private T? FindVisualChild<T>(DependencyObject parent) where T : Visual
         {
-            T child = default;
+            T? child = default;
             int childrenCount = VisualTreeHelper.GetChildrenCount(parent);
 
             for (var i = 0; i < childrenCount; i++)

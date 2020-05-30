@@ -34,7 +34,7 @@ namespace X4_ComplexCalculator.Common.Behavior
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public static ICommand GetFocusCommand(DependencyObject obj)
+        public static ICommand? GetFocusCommand(DependencyObject obj)
         {
             return obj.GetValue(FocusCommandProperty) as ICommand;
         }
@@ -67,7 +67,7 @@ namespace X4_ComplexCalculator.Common.Behavior
         /// <param name="sender"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        private static object CoerceFocusCommand(DependencyObject sender, object value)
+        private static object? CoerceFocusCommand(DependencyObject sender, object value)
         {
             // コマンド未設定か？
             var hasCommand = (bool)sender.GetValue(HasFocusCommandProperty);
@@ -126,7 +126,7 @@ namespace X4_ComplexCalculator.Common.Behavior
         /// <typeparam name="T">子要素の型</typeparam>
         /// <param name="obj">子要素検索対象</param>
         /// <returns>子要素(なければnull)</returns>
-        private static T FindVisualChild<T>(DependencyObject obj) where T : DependencyObject
+        private static T? FindVisualChild<T>(DependencyObject? obj) where T : DependencyObject
         {
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
             {
@@ -137,7 +137,7 @@ namespace X4_ComplexCalculator.Common.Behavior
                 }
                 else
                 {
-                    T childOfChild = FindVisualChild<T>(child);
+                    var childOfChild = FindVisualChild<T>(child);
                     if (childOfChild != null)
                     {
                         return childOfChild;
@@ -155,7 +155,7 @@ namespace X4_ComplexCalculator.Common.Behavior
         /// <param name="row">行</param>
         /// <param name="column">列番号</param>
         /// <returns>セル</returns>
-        private static DataGridCell GetCell(DataGrid grid, DataGridRow row, int column)
+        private static DataGridCell? GetCell(DataGrid grid, DataGridRow row, int column)
         {
             if (row != null)
             {

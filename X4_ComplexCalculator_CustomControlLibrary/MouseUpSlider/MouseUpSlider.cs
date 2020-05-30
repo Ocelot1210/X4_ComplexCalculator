@@ -12,7 +12,7 @@ namespace X4_ComplexCalculator_CustomControlLibrary.MouseUpSlider
         /// <summary>
         /// ドラッグ中のバインディング退避用
         /// </summary>
-        private Binding EvacuatedBinding { get; set; }
+        private Binding? EvacuatedBinding { get; set; }
 
         /// <summary>
         /// ドラッグ開始時

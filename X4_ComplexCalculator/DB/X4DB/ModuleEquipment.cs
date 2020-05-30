@@ -66,7 +66,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         }
 
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is ModuleEquipment equipment &&
                    EqualityComparer<ModuleEquipmentManager>.Default.Equals(Turret, equipment.Turret) &&

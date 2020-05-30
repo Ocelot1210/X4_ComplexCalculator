@@ -9,7 +9,7 @@
 
     public class WpfObservableRangeCollection<T> : RangeObservableCollection<T>
     {
-        DeferredEventsCollection _deferredEvents;
+        DeferredEventsCollection? _deferredEvents;
 
         public WpfObservableRangeCollection()
         {
@@ -35,7 +35,7 @@
         /// </remarks>
         protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
-            var _deferredEvents = (ICollection<NotifyCollectionChangedEventArgs>)typeof(RangeObservableCollection<T>).GetField("_deferredEvents", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(this);
+            var _deferredEvents = (ICollection<NotifyCollectionChangedEventArgs>?)typeof(RangeObservableCollection<T>)?.GetField("_deferredEvents", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(this);
             if (_deferredEvents != null)
             {
                 _deferredEvents.Add(e);
@@ -54,8 +54,8 @@
         bool IsRange(NotifyCollectionChangedEventArgs e) => e.NewItems?.Count > 1 || e.OldItems?.Count > 1;
         IEnumerable<NotifyCollectionChangedEventHandler> GetHandlers()
         {
-            var info = typeof(ObservableCollection<T>).GetField(nameof(CollectionChanged), BindingFlags.Instance | BindingFlags.NonPublic);
-            var @event = (MulticastDelegate)info.GetValue(this);
+            var info = typeof(ObservableCollection<T>).GetField(nameof(CollectionChanged), BindingFlags.Instance | BindingFlags.NonPublic) ?? throw new InvalidOperationException();
+            var @event = (MulticastDelegate?)info.GetValue(this);
             return @event?.GetInvocationList()
               .Cast<NotifyCollectionChangedEventHandler>()
               .Distinct()

@@ -17,7 +17,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
     /// </summary>
     class StationCalclatorImport : BindableBase, IImport
     {
-        private string _Url;
+        private string _Url = "";
 
         /// <summary>
         /// メニュー表示用タイトル

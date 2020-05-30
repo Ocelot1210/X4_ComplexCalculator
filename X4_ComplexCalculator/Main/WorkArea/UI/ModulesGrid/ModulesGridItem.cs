@@ -134,7 +134,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// </summary>
         /// <param name="moduleID">モジュール</param>
         /// <param name="moduleCount">モジュール数</param>
-        public ModulesGridItem(Module module, ModuleProduction selectedMethod = null, long moduleCount = 1)
+        public ModulesGridItem(Module module, ModuleProduction? selectedMethod = null, long moduleCount = 1)
         {
             Module = module;
             ModuleCount = moduleCount;
@@ -157,6 +157,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             {
                 SelectedMethod = Module.ModuleProductions.First();
             }
+            _SelectedMethod = SelectedMethod;
             EditEquipmentCommand = new DelegateCommand(EditEquipment);
 
             // タレット追加
@@ -278,7 +279,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
 
             if (equipmentChanged)
             {
-                RaisePropertyChangedEx(turretsOld.Concat(shieldsOld), null, nameof(Module.Equipment));
+                RaisePropertyChangedEx(turretsOld.Concat(shieldsOld), Module.Equipment.GetAllEquipment().Select(x =>x.EquipmentID).ToArray(), nameof(Module.Equipment));
                 RaisePropertyChanged(nameof(Module));
             }
         }

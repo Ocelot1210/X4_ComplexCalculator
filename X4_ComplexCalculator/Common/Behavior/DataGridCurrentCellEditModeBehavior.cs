@@ -60,7 +60,7 @@ namespace X4_ComplexCalculator.Common.Behavior
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private static void DataGrid_CurrentCellChanged(object sender, EventArgs e)
+        private static void DataGrid_CurrentCellChanged(object? sender, EventArgs e)
         {
             if (!(sender is DataGrid dg) || dg.CurrentCell == null || dg.CurrentCell.Column == null)
             {

@@ -111,7 +111,7 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// アクティブなワークスペース
         /// </summary>
-        public WorkAreaViewModel ActiveContent
+        public WorkAreaViewModel? ActiveContent
         {
             set
             {

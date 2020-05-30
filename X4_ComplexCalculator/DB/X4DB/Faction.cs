@@ -36,7 +36,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         {
             FactionID = factionID;
             string name = "";
-            Race race = null;
+            Race? race = null;
 
             DBConnection.X4DB.ExecQuery(
                 $"SELECT Name, RaceID FROM Faction WHERE FactionID = '{FactionID}'", 
@@ -52,7 +52,7 @@ namespace X4_ComplexCalculator.DB.X4DB
             }
 
             Name = name;
-            Race = race;
+            Race = race ?? throw new InvalidOperationException();
         }
 
 
@@ -61,8 +61,12 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public int CompareTo(object obj)
+        public int CompareTo(object? obj)
         {
+            if (obj == null)
+            {
+                return 1;
+            }
             return FactionID.CompareTo(obj is Faction);
         }
 
@@ -72,8 +76,12 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="obj">比較対象</param>
         /// <returns></returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
+            if (obj == null)
+            {
+                throw new ArgumentException($"parameter {nameof(obj)} should not be null.", nameof(obj));
+            }
             return obj is Faction tgt && tgt.FactionID == FactionID;
         }
 

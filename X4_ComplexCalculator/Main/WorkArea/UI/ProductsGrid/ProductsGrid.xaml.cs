@@ -16,8 +16,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
         private void DataGridCell_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            var cell = sender as DataGridCell;
-            if (!cell.IsReadOnly)
+            if (sender is DataGridCell cell && !cell.IsReadOnly)
             {
                 cell.IsEditing = true;
             }
@@ -25,8 +24,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
         private void DataGridCell_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            var cell = sender as DataGridCell;
-            cell.IsEditing = false;
+            if (sender is DataGridCell cell)
+            {
+                cell.IsEditing = false;
+            }
         }
     }
 }

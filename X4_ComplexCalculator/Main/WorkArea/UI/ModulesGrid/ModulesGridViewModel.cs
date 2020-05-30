@@ -85,7 +85,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <summary>
         /// セルフォーカス用のコマンド
         /// </summary>
-        public ICommand CellFocusCommand { private get; set; }
+        public ICommand? CellFocusCommand { private get; set; }
 
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <summary>
         /// モジュール自動追加コマンド
         /// </summary>
-        public ICommand AutoAddModuleCommand { get; set; }
+        public ICommand? AutoAddModuleCommand { get; set; }
         #endregion
 
 

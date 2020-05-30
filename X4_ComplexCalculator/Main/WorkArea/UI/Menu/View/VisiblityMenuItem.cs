@@ -65,7 +65,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.Menu.View
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void LayoutAnchorable_IsVisibleChanged(object sender, EventArgs e)
+        private void LayoutAnchorable_IsVisibleChanged(object? sender, EventArgs e)
         {
             if (_ShouldNotifyVisibiltyChange)
             {

@@ -1,4 +1,5 @@
 ﻿using Prism.Mvvm;
+using System;
 using System.Data.SQLite;
 using X4_ComplexCalculator.DB;
 
@@ -20,13 +21,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         /// <summary>
         /// モジュールID
         /// </summary>
-        public string ModuleID { get; private set; }
+        public string ModuleID { get; }
 
 
         /// <summary>
         /// モジュール名
         /// </summary>
-        public string ModuleName { get; private set; }
+        public string ModuleName { get; }
 
 
         /// <summary>
@@ -80,11 +81,13 @@ WHERE
 	Module.ModuleID = ModuleStorage.ModuleID AND
 	Module.ModuleID = '{moduleID}'";
 
+            string? moduleName = null;
             DBConnection.X4DB.ExecQuery(query, (SQLiteDataReader dr, object[] args) => 
             {
-                ModuleName = (string)dr["Name"];
+                moduleName = (string)dr["Name"];
                 Capacity = (long)dr["Amount"];
             });
+            ModuleName = moduleName ?? throw new ArgumentException("Invalid moduleID.", nameof(moduleID));
         }
 
 

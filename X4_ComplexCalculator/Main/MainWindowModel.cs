@@ -1,8 +1,12 @@
 ﻿using Prism.Mvvm;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.Main.WorkArea;
 
 namespace X4_ComplexCalculator.Main
 {
@@ -35,6 +39,38 @@ namespace X4_ComplexCalculator.Main
         {
             // DB接続開始
             DBConnection.Open();
+
+            var vmList = new List<WorkAreaViewModel>();
+
+            DBConnection.CommonDB.ExecQuery("SELECT * FROM OpenedFiles", (dr, _) =>
+            {
+                var path = (string)dr["Path"];
+                if (File.Exists(path))
+                {
+                    var vm = new WorkAreaViewModel(_WorkAreaManager.ActiveLayout?.LayoutID ?? -1);
+                    var prg = new Progress<int>();
+                    if (vm.LoadFile(path, prg))
+                    {
+                        vmList.Add(vm);
+                    }
+                    else
+                    {
+                        vm.Dispose();
+                    }
+                }
+            });
+
+            // 開いているファイルテーブルを初期化
+            DBConnection.CommonDB.ExecQuery("DELETE FROM OpenedFiles");
+
+            if (vmList.Any())
+            {
+                _WorkAreaManager.Documents.AddRange(vmList);
+            }
+            else
+            {
+                _WorkAreaManager.Documents.Add(new WorkAreaViewModel(_WorkAreaManager.ActiveLayout?.LayoutID ?? -1));
+            }
         }
 
 
@@ -90,13 +126,18 @@ namespace X4_ComplexCalculator.Main
                 }
             }
 
-            // 閉じる場合、リソースを開放
+            // 閉じる場合、開いていたファイル一覧を保存する
             if (!canceled)
             {
+                var param = new SQLiteCommandParameters(1);
                 foreach (var doc in _WorkAreaManager.Documents)
                 {
-                    doc.Dispose();
+                    if (System.IO.File.Exists(doc.SaveFilePath))
+                    {
+                        param.Add("path", System.Data.DbType.String, doc.SaveFilePath);
+                    }
                 }
+                DBConnection.CommonDB.ExecQuery("INSERT INTO OpenedFiles(Path) VALUES(:path)", param);
             }
 
             return canceled;

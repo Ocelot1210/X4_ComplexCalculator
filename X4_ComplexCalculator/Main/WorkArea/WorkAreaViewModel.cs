@@ -47,13 +47,13 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <summary>
         /// 現在のドッキングマネージャー
         /// </summary>
-        private DockingManager _CurrentDockingManager;
+        private DockingManager? _CurrentDockingManager;
 
 
         /// <summary>
         /// レイアウト保持用
         /// </summary>
-        private byte[] _Layout;
+        private byte[]? _Layout;
         #endregion
 
 
@@ -121,7 +121,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <summary>
         /// 現在のドッキングマネージャー
         /// </summary>
-        public DockingManager CurrentDockingManager
+        public DockingManager? CurrentDockingManager
         {
             set
             {
@@ -144,6 +144,12 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// モジュールの内容に変更があったか
         /// </summary>
         public bool HasChanged => _Model.HasChanged;
+
+
+        /// <summary>
+        /// 保存先ファイルパス
+        /// </summary>
+        public string SaveFilePath => _Model.SaveFilePath;
         #endregion
 
 
@@ -243,9 +249,9 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// ファイル読み込み
         /// </summary>
         /// <param name="path">ファイルパス</param>
-        public void LoadFile(string path, IProgress<int> progress)
+        public bool LoadFile(string path, IProgress<int> progress)
         {
-            _Model.Load(path, progress);
+            return _Model.Load(path, progress);
         }
 
 
@@ -306,7 +312,7 @@ WHERE
                 _Layout = (byte[])dr["Layout"];
             });
 
-            if (_Layout != null)
+            if (_Layout != null && _CurrentDockingManager != null)
             {
                 var serializer = new XmlLayoutSerializer(_CurrentDockingManager);
 
@@ -316,7 +322,10 @@ WHERE
             }
 
             // 表示メニューを初期化
-            VisiblityMenuItems.Reset(_CurrentDockingManager.Layout.Descendents().OfType<LayoutAnchorable>().Select(x => new VisiblityMenuItem(x)));
+            if (_CurrentDockingManager != null)
+            {
+                VisiblityMenuItems.Reset(_CurrentDockingManager.Layout.Descendents().OfType<LayoutAnchorable>().Select(x => new VisiblityMenuItem(x)));
+            }
         }
 
 
@@ -328,7 +337,7 @@ WHERE
         {
             if (_CurrentDockingManager == null)
             {
-                return _Layout;
+                return _Layout ?? throw new InvalidOperationException();
             }
 
             // レイアウト保存

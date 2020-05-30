@@ -24,12 +24,12 @@ namespace X4_ComplexCalculator.Common.Dialog.SelectStringDialog
         /// <summary>
         /// 入力文字列
         /// </summary>
-        private string _InputString;
+        private string _InputString = "";
 
         /// <summary>
         /// 入力が有効か判定する関数
         /// </summary>
-        private readonly Predicate<string> IsValidInput;
+        private readonly Predicate<string>? IsValidInput;
         #endregion
 
 
@@ -82,7 +82,7 @@ namespace X4_ComplexCalculator.Common.Dialog.SelectStringDialog
         /// </summary>
         /// <param name="initialString">初期文字列</param>
         /// <param name="isValidInput">文字列が有効か判定する関数</param>
-        public SelectStringDialogModel(string initialString, Predicate<string> isValidInput)
+        public SelectStringDialogModel(string initialString, Predicate<string>? isValidInput)
         {
             InputString = initialString;
             IsValidInput = isValidInput;

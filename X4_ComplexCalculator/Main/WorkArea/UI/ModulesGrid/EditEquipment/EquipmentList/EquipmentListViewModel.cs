@@ -42,13 +42,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 装備一覧表示用
         /// </summary>
-        public ListCollectionView EquipmentsView => (_Model.SelectedSize != null) ? _EquipmentsViews[_Model.SelectedSize] : null;
+        public ListCollectionView? EquipmentsView => (_Model.SelectedSize != null) ? _EquipmentsViews[_Model.SelectedSize] : null;
 
 
         /// <summary>
         /// 装備中の装備
         /// </summary>
-        public ObservableCollection<Equipment> Equipped => (_Model.SelectedSize != null)? _Model.Equipped[_Model.SelectedSize] : null;
+        public ObservableCollection<Equipment>? Equipped => (_Model.SelectedSize != null)? _Model.Equipped[_Model.SelectedSize] : null;
 
 
         /// <summary>
@@ -87,6 +87,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
                 {
                     _SearchEquipmentName = value;
                     RaisePropertyChanged();
+                    if (EquipmentsView == null)
+                    {
+                        throw new InvalidOperationException();
+                    }
                     EquipmentsView.Refresh();
                 }
             }
@@ -126,7 +130,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 選択中のプリセット
         /// </summary>
-        public PresetComboboxItem SelectedPreset
+        public PresetComboboxItem? SelectedPreset
         {
             set
             {

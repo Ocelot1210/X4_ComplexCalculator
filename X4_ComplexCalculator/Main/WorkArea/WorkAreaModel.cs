@@ -21,7 +21,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <summary>
         /// タイトル文字列
         /// </summary>
-        private string _Title;
+        private string _Title = "";
 
 
         /// <summary>
@@ -133,6 +133,12 @@ namespace X4_ComplexCalculator.Main.WorkArea
                 }
             }
         }
+
+
+        /// <summary>
+        /// 保存先ファイルパス
+        /// </summary>
+        public string SaveFilePath => _SaveDataWriter.SaveFilePath;
         #endregion
 
 
@@ -230,16 +236,20 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// </summary>
         /// <param name="path">読み込み対象ファイルパス</param>
         /// <param name="progress">進捗</param>
-        public void Load(string path, IProgress<int> progress)
+        public bool Load(string path, IProgress<int> progress)
         {
             var reader = SaveDataReaderFactory.CreateSaveDataReader(path, this);
-            
+            var ret = false;
+
             // 読み込み成功？
             if (reader.Load(progress))
             {
                 _SaveDataWriter.SaveFilePath = path;
                 HasChanged = false;
+                ret = true;
             }
+
+            return ret;
         }
     }
 }

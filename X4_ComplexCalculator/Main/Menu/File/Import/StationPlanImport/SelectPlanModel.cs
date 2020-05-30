@@ -19,7 +19,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
         /// <summary>
         /// 計画ファイルパス
         /// </summary>
-        string _PlanFilePath;
+        string _PlanFilePath = "";
         #endregion
 
         /// <summary>

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Threading;
@@ -8,8 +7,6 @@ using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
-using X4_ComplexCalculator.Main.Menu.File.Export;
-using X4_ComplexCalculator.Main.Menu.File.Import;
 using X4_ComplexCalculator.Main.Menu.Layout;
 using X4_ComplexCalculator.Main.WorkArea;
 
@@ -24,7 +21,7 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// 現在のレイアウト
         /// </summary>
-        private LayoutMenuItem _ActiveLayout;
+        private LayoutMenuItem? _ActiveLayout;
 
 
         /// <summary>
@@ -36,7 +33,7 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// アクティブなワークスペース
         /// </summary>
-        public WorkAreaViewModel ActiveContent { set; get; }
+        public WorkAreaViewModel? ActiveContent { set; get; }
 
 
         /// <summary>
@@ -48,7 +45,7 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// 現在のレイアウト
         /// </summary>
-        public LayoutMenuItem ActiveLayout
+        public LayoutMenuItem? ActiveLayout
         {
             get => _ActiveLayout;
             set

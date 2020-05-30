@@ -26,7 +26,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// 選択中のプリセット
         /// </summary>
-        private PresetComboboxItem _SelectedPreset;
+        private PresetComboboxItem? _SelectedPreset;
         #endregion
 
         #region プロパティ
@@ -51,7 +51,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// 選択中のプリセット
         /// </summary>
-        public PresetComboboxItem SelectedPreset
+        public PresetComboboxItem? SelectedPreset
         {
             get
             {
