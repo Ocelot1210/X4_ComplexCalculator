@@ -183,12 +183,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// コンストラクタ
         /// </summary>
         /// <param name="module">編集対象モジュール</param>
-        public EditEquipmentViewModel(Module module)
+        public EditEquipmentViewModel(ModulesGridItem module)
         {
-            ModuleName = module.Name;
+            ModuleName = module.Module.Name;
 
             // Model類
-            Model = new EditEquipmentModel(module);
+            Model = new EditEquipmentModel(module.Module);
             Model.PropertyChanged += Model_PropertyChanged;
             
             // サブViewModel類

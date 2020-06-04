@@ -88,7 +88,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         {
             static void AddItem(SQLiteDataReader dr, object[] args)
             {
-                ((ICollection<DB.X4DB.Size>)args[0]).Add(new DB.X4DB.Size((string)dr["SizeID"]));
+                ((ICollection<DB.X4DB.Size>)args[0]).Add(DB.X4DB.Size.Get((string)dr["SizeID"]));
             }
 
             var sizes = new List<DB.X4DB.Size>();
@@ -230,7 +230,7 @@ WHERE
                 return;
             }
 
-            var result = Localize.ShowMessageBox("Lang:DeletePresetConfirmMessage", "Lang:Error", MessageBoxButton.YesNo, MessageBoxImage.Exclamation, MessageBoxResult.No);
+            var result = Localize.ShowMessageBox("Lang:DeletePresetConfirmMessage", "Lang:Error", MessageBoxButton.YesNo, MessageBoxImage.Exclamation, MessageBoxResult.No, SelectedPreset.Name);
             if (result == MessageBoxResult.Yes)
             {
                 DBConnection.CommonDB.BeginTransaction();

@@ -140,7 +140,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
                 moduleCount++;
             }
 
-            var modules = new List<Module>(moduleCount);
+            var modules = new List<ModulesGridItem>(moduleCount);
 
             // モジュール追加
             {
@@ -155,7 +155,7 @@ WHERE
 
                 DBConnection.X4DB.ExecQuery(query, modParam, (dr, _) =>
                 {
-                    modules.Add(new Module((string)dr["ModuleID"]));
+                    modules.Add(new ModulesGridItem((string)dr["ModuleID"]));
                 });
             }
 
@@ -179,18 +179,18 @@ WHERE
                     switch ((string)dr["EquipmentTypeID"])
                     {
                         case "shields":
-                            mng = modules[(int)(long)dr["Index"] - 1].Equipment.Shield;
+                            mng = modules[(int)(long)dr["Index"] - 1].ModuleEquipment.Shield;
                             break;
 
                         case "turrets":
-                            mng = modules[(int)(long)dr["Index"] - 1].Equipment.Turret;
+                            mng = modules[(int)(long)dr["Index"] - 1].ModuleEquipment.Turret;
                             break;
 
                         default:
                             return;
                     }
 
-                    var equipment = new Equipment((string)dr["EquipmentID"]);
+                    var equipment = Equipment.Get((string)dr["EquipmentID"]);
                     var max = (long)dr["Count"];
                     for (var cnt = 0L; cnt < max; cnt++)
                     {
@@ -201,26 +201,23 @@ WHERE
 
 
             // 同一モジュールをマージ
-            var dict = new Dictionary<int, (int, Module, long)>();
+            var dict = new Dictionary<int, ModulesGridItem>();
 
             foreach (var (module, idx) in modules.Select((x, idx) => (x, idx)))
             {
                 var hash = module.GetHashCode();
                 if (dict.ContainsKey(hash))
                 {
-                    var tmp = dict[hash];
-                    tmp.Item3++;
-                    dict[hash] = tmp;
+                    dict[hash].ModuleCount += module.ModuleCount;
                 }
                 else
                 {
-                    dict.Add(hash, (idx, module, 1));
+                    dict.Add(hash, module);
                 }
             }
 
             // モジュール一覧に追加
-            var range = dict.Select(x => (x.Value)).OrderBy(x => x.Item1).Select(x => new ModulesGridItem(x.Item2, null, x.Item3));
-            WorkArea.Modules.AddRange(range);
+            WorkArea.Modules.AddRange(dict.Select(x => x.Value).OrderBy(x => x.Module.Name));
 
 
             WorkArea.Title = planItem.PlanName;

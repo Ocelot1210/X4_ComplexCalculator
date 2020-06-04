@@ -33,7 +33,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// 製品計算機
         /// </summary>
-        private readonly ProductCalclator _ProductCalclator = ProductCalclator.Create();
+        private readonly ProductCalclator _ProductCalclator = ProductCalclator.Instance;
 
 
         /// <summary>

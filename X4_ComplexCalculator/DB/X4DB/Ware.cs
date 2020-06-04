@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.SQLite;
 
 namespace X4_ComplexCalculator.DB.X4DB
@@ -6,8 +7,16 @@ namespace X4_ComplexCalculator.DB.X4DB
     /// <summary>
     /// ウェア情報管理用クラス
     /// </summary>
-    public class Ware : IComparable
+    public class Ware
     {
+        #region スタティックメンバ
+        /// <summary>
+        /// ウェア一覧
+        /// </summary>
+        private readonly static Dictionary<string, Ware> _Wares = new Dictionary<string, Ware>();
+        #endregion
+
+
         #region プロパティ
         /// <summary>
         /// ウェアID
@@ -21,13 +30,13 @@ namespace X4_ComplexCalculator.DB.X4DB
 
 
         /// <summary>
-        /// ウェアグループ
+        /// ウェア種別
         /// </summary>
         public WareGroup WareGroup { get; }
 
 
         /// <summary>
-        /// カーゴ種別(輸送種別)
+        /// カーゴ種別
         /// </summary>
         public TransportType TransportType { get; }
 
@@ -55,51 +64,51 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// コンストラクタ
         /// </summary>
         /// <param name="wareID">ウェアID</param>
-        public Ware(string wareID)
+        /// <param name="name">ウェア名</param>
+        /// <param name="wareGroup">ウェア種別</param>
+        /// <param name="transportType">カーゴ種別</param>
+        /// <param name="volume">大きさ</param>
+        /// <param name="minPrice">最低価格</param>
+        /// <param name="maxPrice">最高価格</param>
+        private Ware(string wareID, string name, WareGroup wareGroup, TransportType transportType, long volume, long minPrice, long maxPrice)
         {
             WareID = wareID;
-            var name     = "";
-            var volume   = 0L;
-            var minPrice = 0L;
-            var maxPrice = 0L;
-            WareGroup? wareGroup = null;
-            TransportType? transportType = null;
-
-            DBConnection.X4DB.ExecQuery(
-                $"SELECT * FROM Ware WHERE WareID = '{WareID}'",
-                (SQLiteDataReader dr, object[] args) =>
-                {
-                    name          = (string)dr["Name"];
-                    volume        = (long)dr["Volume"];
-                    minPrice      = (long)dr["MinPrice"];
-                    maxPrice      = (long)dr["MaxPrice"];
-                    wareGroup     = new WareGroup((string)dr["WareGroupID"]);
-                    transportType = new TransportType((string)dr["TransportTypeID"]);
-                });
-
-            if (string.IsNullOrEmpty(name))
-            {
-                throw new ArgumentException("Invalid ware id.", nameof(wareID));
-            }
-
-            Name          = name;
-            Volume        = volume;
-            MinPrice      = minPrice;
-            MaxPrice      = maxPrice;
-            WareGroup     = wareGroup ?? throw new InvalidOperationException($"{nameof(wareGroup)} should not be null.");
-            TransportType = transportType ?? throw new InvalidOperationException($"{nameof(transportType)} should not be null.");
+            Name = name;
+            WareGroup = wareGroup;
+            TransportType = transportType;
+            Volume = volume;
+            MinPrice = minPrice;
+            MaxPrice = maxPrice;
         }
 
 
         /// <summary>
-        /// 比較
+        /// 初期化
         /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public int CompareTo(object? obj)
+        public static void Init()
         {
-            return WareID.CompareTo(obj);
+            _Wares.Clear();
+            DBConnection.X4DB.ExecQuery($"SELECT * FROM Ware", (dr, args) =>
+            {
+                var id = (string)dr["WareID"];
+                var name = (string)dr["Name"];
+                var volume = (long)dr["Volume"];
+                var minPrice = (long)dr["MinPrice"];
+                var maxPrice = (long)dr["MaxPrice"];
+                var wareGroup = WareGroup.Get((string)dr["WareGroupID"]);
+                var transportType = TransportType.Get((string)dr["TransportTypeID"]);
+
+                _Wares.Add(id, new Ware(id, name, WareGroup.Get((string)dr["WareGroupID"]), TransportType.Get((string)dr["TransportTypeID"]), volume, minPrice, maxPrice));
+            });
         }
+
+
+        /// <summary>
+        /// ウェアIDに対応するウェアを取得する
+        /// </summary>
+        /// <param name="wareID">ウェアID</param>
+        /// <returns>ウェア</returns>
+        public static Ware Get(string wareID) => _Wares[wareID];
 
 
         /// <summary>
@@ -111,6 +120,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         {
             return obj is Ware tgt && tgt.WareID == WareID;
         }
+
 
         /// <summary>
         /// ハッシュ値を取得

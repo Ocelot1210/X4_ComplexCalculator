@@ -115,6 +115,9 @@ namespace X4_ComplexCalculator.Common.Behavior
                 {
                     // フォーカス対象のセルを取得してフォーカス
                     GetCell(dataGrid, row, clmIdx)?.Focus();
+
+                    // 行もフォーカスしないと
+                    row.Focus();
                 }
             }
         }
@@ -131,9 +134,9 @@ namespace X4_ComplexCalculator.Common.Behavior
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
             {
                 DependencyObject child = VisualTreeHelper.GetChild(obj, i);
-                if (child != null && child is T)
+                if (child is T t)
                 {
-                    return (T)child;
+                    return t;
                 }
                 else
                 {

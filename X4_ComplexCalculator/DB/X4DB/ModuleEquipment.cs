@@ -8,17 +8,25 @@ namespace X4_ComplexCalculator.DB.X4DB
     /// </summary>
     public class ModuleEquipment
     {
+        #region スタティックメンバ
+        /// <summary>
+        /// モジュールの装備一覧(空の装備)
+        /// </summary>
+        private readonly static Dictionary<string, ModuleEquipment> _ModuleEquipments = new Dictionary<string, ModuleEquipment>();
+        #endregion
+
+
         #region "プロパティ"
         /// <summary>
         /// タレット情報
         /// </summary>
-        public ModuleEquipmentManager Turret { get; set; }
+        public ModuleEquipmentManager Turret { get; }
 
 
         /// <summary>
         /// シールド情報
         /// </summary>
-        public ModuleEquipmentManager Shield { get; set; }
+        public ModuleEquipmentManager Shield { get; }
 
 
         /// <summary>
@@ -32,20 +40,50 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// コンストラクタ
         /// </summary>
         /// <param name="moduleID">モジュールID</param>
-        public ModuleEquipment(string moduleID)
+        private ModuleEquipment(string moduleID)
         {
             Turret = new ModuleEquipmentManager(moduleID, "Turret");
             Shield = new ModuleEquipmentManager(moduleID, "Shield");
         }
 
+
         /// <summary>
         /// コピーコンストラクタ
         /// </summary>
         /// <param name="moduleEquipment"></param>
-        public ModuleEquipment(ModuleEquipment moduleEquipment)
+        private ModuleEquipment(ModuleEquipment moduleEquipment)
         {
             Turret = new ModuleEquipmentManager(moduleEquipment.Turret);
             Shield = new ModuleEquipmentManager(moduleEquipment.Shield);
+        }
+
+
+        /// <summary>
+        /// 初期化
+        /// </summary>
+        public static void Init()
+        {
+            _ModuleEquipments.Clear();
+
+            DBConnection.X4DB.ExecQuery($"SELECT ModuleID FROM Module", (dr, args) =>
+            {
+                var id = (string)dr["ModuleID"];
+                _ModuleEquipments.Add(id, new ModuleEquipment(id));
+            });
+        }
+
+
+        /// <summary>
+        /// モジュールIDに対応する空のモジュール装備を取得する
+        /// </summary>
+        /// <param name="moduleID">モジュールID</param>
+        /// <returns>空のモジュール装備</returns>
+        public static ModuleEquipment Get(string moduleID)
+        {
+            var ret = _ModuleEquipments[moduleID] ?? throw new ArgumentException();
+
+            // 装備不能なモジュールの場合、インスタンスを使い回す
+            return ret.CanEquipped? new ModuleEquipment(ret) : ret;
         }
 
 
@@ -66,6 +104,11 @@ namespace X4_ComplexCalculator.DB.X4DB
         }
 
 
+        /// <summary>
+        /// オブジェクトが同一か判定
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public override bool Equals(object? obj)
         {
             return obj is ModuleEquipment equipment &&
@@ -73,6 +116,11 @@ namespace X4_ComplexCalculator.DB.X4DB
                    EqualityComparer<ModuleEquipmentManager>.Default.Equals(Shield, equipment.Shield);
         }
 
+
+        /// <summary>
+        /// ハッシュ値を取得
+        /// </summary>
+        /// <returns>ハッシュ値</returns>
         public override int GetHashCode()
         {
             return HashCode.Combine(Turret, Shield);

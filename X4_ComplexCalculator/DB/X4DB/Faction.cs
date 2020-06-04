@@ -1,13 +1,20 @@
 ﻿using System;
-using System.Data.SQLite;
+using System.Collections.Generic;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
     /// <summary>
     /// 派閥管理用クラス
     /// </summary>
-    class Faction : IComparable
+    public class Faction
     {
+        #region スタティックメンバ
+        /// <summary>
+        /// 派閥一覧
+        /// </summary>
+        private readonly static Dictionary<string, Faction> _Factions = new Dictionary<string, Faction>();
+        #endregion
+
         #region プロパティ
         /// <summary>
         /// 派閥ID
@@ -22,7 +29,7 @@ namespace X4_ComplexCalculator.DB.X4DB
 
 
         /// <summary>
-        /// 種族
+        /// 派閥の種族
         /// </summary>
         public Race Race { get; }
         #endregion
@@ -32,43 +39,38 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// コンストラクタ
         /// </summary>
         /// <param name="factionID">派閥ID</param>
-        public Faction(string factionID)
+        /// <param name="name">派閥名</param>
+        /// <param name="race">種族</param>
+        private Faction(string factionID, string name, Race race)
         {
             FactionID = factionID;
-            string name = "";
-            Race? race = null;
-
-            DBConnection.X4DB.ExecQuery(
-                $"SELECT Name, RaceID FROM Faction WHERE FactionID = '{FactionID}'", 
-                (SQLiteDataReader dr, object[] args) => 
-                {
-                    name = (string)dr["Name"];
-                    race = new Race((string)dr["RaceID"]);
-                });
-
-            if (string.IsNullOrEmpty(name))
-            {
-                throw new ArgumentException("Invalid faction id.", nameof(factionID));
-            }
-
             Name = name;
-            Race = race ?? throw new InvalidOperationException();
+            Race = race;
         }
 
 
         /// <summary>
-        /// オブジェクト比較
+        /// 初期化
         /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public int CompareTo(object? obj)
+        public static void Init()
         {
-            if (obj == null)
+            _Factions.Clear();
+            DBConnection.X4DB.ExecQuery("SELECT FactionID, Name, RaceID FROM Faction", (dr, args) =>
             {
-                return 1;
-            }
-            return FactionID.CompareTo(obj is Faction);
+                var id = (string)dr["FactionID"];
+                var name = (string)dr["Name"];
+                var raceID = (string)dr["RaceID"];
+
+                _Factions.Add(id, new Faction(id, name, Race.Get(raceID)));
+            });
         }
+
+        /// <summary>
+        /// 派閥IDに対応する派閥を取得
+        /// </summary>
+        /// <param name="factionID">派閥ID</param>
+        /// <returns>派閥</returns>
+        public static Faction Get(string factionID) => _Factions[factionID];
 
 
         /// <summary>
@@ -78,10 +80,6 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <returns></returns>
         public override bool Equals(object? obj)
         {
-            if (obj == null)
-            {
-                throw new ArgumentException($"parameter {nameof(obj)} should not be null.", nameof(obj));
-            }
             return obj is Faction tgt && tgt.FactionID == FactionID;
         }
 

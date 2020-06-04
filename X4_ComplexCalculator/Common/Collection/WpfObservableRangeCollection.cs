@@ -6,6 +6,7 @@
     using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
+    using X4_ComplexCalculator.Common.Collection;
 
     public class WpfObservableRangeCollection<T> : RangeObservableCollection<T>
     {
@@ -43,10 +44,16 @@
             }
 
             foreach (var handler in GetHandlers())
+            {
                 if (IsRange(e) && handler.Target is CollectionView cv)
+                {
                     cv.Dispatcher.Invoke(() => cv.Refresh());
+                }
                 else
+                {
                     handler(this, e);
+                }
+            }
         }
 
         protected override IDisposable DeferEvents() => new DeferredEventsCollection(this);

@@ -7,8 +7,15 @@ namespace X4_ComplexCalculator.DB.X4DB
     /// <summary>
     /// 装備種別管理用クラス
     /// </summary>
-    public class EquipmentType : IComparable
+    public class EquipmentType
     {
+        #region スタティックメンバ
+        /// <summary>
+        /// 装備種別一覧
+        /// </summary>
+        private readonly static Dictionary<string, EquipmentType> _EquipmentTypes = new Dictionary<string, EquipmentType>();
+        #endregion
+
         #region プロパティ
         /// <summary>
         /// 装備種別ID
@@ -25,35 +32,37 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="equipmentTypeID">装備種別ID</param>
-        public EquipmentType(string equipmentTypeID)
+        /// <param name="equipmentTypeID"></param>
+        /// <param name="name"></param>
+        private EquipmentType(string equipmentTypeID, string name)
         {
             EquipmentTypeID = equipmentTypeID;
-            string name = "";
-            DBConnection.X4DB.ExecQuery($"SELECT * FROM EquipmentType WHERE EquipmentTypeID = '{EquipmentTypeID}'", (SQLiteDataReader dr, object[] args) => { name = (string)dr["Name"]; });
-
-            if (string.IsNullOrEmpty(name))
-            {
-                throw new ArgumentException("Invalid equipment type id.", nameof(equipmentTypeID));
-            }
-
             Name = name;
         }
 
 
         /// <summary>
-        /// オブジェクト比較
+        /// 初期化
         /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public int CompareTo(object? obj)
+        public static void Init()
         {
-            if (obj == null)
+            _EquipmentTypes.Clear();
+            DBConnection.X4DB.ExecQuery($"SELECT EquipmentTypeID, Name FROM EquipmentType", (dr, args) =>
             {
-                return 1;
-            }
-            return EquipmentTypeID.CompareTo(obj is EquipmentType);
+                var id = (string)dr["EquipmentTypeID"];
+                var name = (string)dr["Name"];
+
+                _EquipmentTypes.Add(id, new EquipmentType(id, name));
+            });
         }
+
+
+        /// <summary>
+        /// 装備種別IDに対応する装備種別を取得する
+        /// </summary>
+        /// <param name="equipmentTypeID">装備種別ID</param>
+        /// <returns>装備種別</returns>
+        public static EquipmentType Get(string equipmentTypeID) => _EquipmentTypes[equipmentTypeID];
 
 
         /// <summary>
@@ -63,10 +72,6 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <returns></returns>
         public override bool Equals(object? obj)
         {
-            if (obj == null)
-            {
-                throw new ArgumentException($"parameter {nameof(obj)} should not be null.", nameof(obj));
-            }
             return obj is EquipmentType tgt && tgt.EquipmentTypeID == EquipmentTypeID;
         }
 

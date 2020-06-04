@@ -3,9 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Data;
 using System.Linq;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWareInfo
@@ -17,9 +21,14 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
     {
         #region メンバ
         /// <summary>
-        /// 製品情報
+        /// モジュール情報一覧
         /// </summary>
-        private readonly ObservablePropertyChangedCollection<ProductsGridItem> Products;
+        private readonly ObservablePropertyChangedCollection<ModulesGridItem> _Modules;
+
+        /// <summary>
+        /// 製品情報一覧
+        /// </summary>
+        private readonly ObservablePropertyChangedCollection<ProductsGridItem> _Products;
 
 
         /// <summary>
@@ -38,6 +47,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
         /// イベントの発火順番が前後する事を考慮したいため、集計対象のウェアの情報をここに格納しておく
         /// </remarks>
         private readonly Dictionary<string, long> AggregateTargetProducts = new Dictionary<string, long>();
+
+
+        /// <summary>
+        /// 必要ウェア計算用
+        /// </summary>
+        private readonly WorkForceNeedWareCalclator _Calclator = WorkForceNeedWareCalclator.Instance;
         #endregion
 
 
@@ -46,34 +61,23 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
         /// 必要ウェア情報詳細
         /// </summary>
         public ObservableRangeCollection<NeedWareInfoDetailsItem> NeedWareInfoDetails { get; } = new ObservableRangeCollection<NeedWareInfoDetailsItem>();
-
-
-        /// <summary>
-        /// 必要労働者数
-        /// </summary>
-        public long WorkersCount
-        {
-            get => _WorkersCount;
-            set
-            {
-                if (SetProperty(ref _WorkersCount, value))
-                {
-                    OnWorkersChanged();
-                }
-            }
-        }
         #endregion
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
+        /// <param name="modules">モジュール一覧</param>
         /// <param name="products">製品一覧</param>
-        public NeedWareInfoModel(ObservablePropertyChangedCollection<ProductsGridItem> products)
+        public NeedWareInfoModel(ObservablePropertyChangedCollection<ModulesGridItem> modules, ObservablePropertyChangedCollection<ProductsGridItem> products)
         {
-            Products = products;
-            Products.CollectionChanged += Products_CollectionChanged;
-            Products.CollectionPropertyChanged += Products_CollectionPropertyChanged;
+            _Modules  = modules;
+            _Modules.CollectionChanged += Modules_CollectionChanged;
+            _Modules.CollectionPropertyChanged += Modules_CollectionPropertyChanged;
+
+            _Products = products;
+            _Products.CollectionChanged += Products_CollectionChanged;
+            _Products.CollectionPropertyChanged += Products_CollectionPropertyChanged;
 
             var query = @"
 SELECT
@@ -98,67 +102,208 @@ WHERE
         /// </summary>
         public void Dispose()
         {
-            Products.CollectionChanged -= Products_CollectionChanged;
-            Products.CollectionPropertyChanged -= Products_CollectionPropertyChanged;
+            _Modules.CollectionChanged -= Modules_CollectionChanged;
+            _Modules.CollectionPropertyChanged -= Modules_CollectionPropertyChanged;
+            _Products.CollectionChanged -= Products_CollectionChanged;
+            _Products.CollectionPropertyChanged -= Products_CollectionPropertyChanged;
+        }
+
+
+        /// <summary>
+        /// モジュールのプロパティ変更時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Modules_CollectionPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            // ModulesGridItemでなければ何もしない
+            if (!(sender is ModulesGridItem module))
+            {
+                return;
+            }
+
+            // 居住モジュールでなければ何もしない
+            if (module.Module.WorkersCapacity <= 0)
+            {
+                return;
+            }
+
+            // PropertyChangedExtendedEventArgsでない or モジュール数変更以外なら何もしない
+            if (!(e is PropertyChangedExtendedEventArgs<long> ev) || e.PropertyName != nameof(ModulesGridItem.ModuleCount))
+            {
+                return;
+            }
+
+            // 必要ウェア集計
+            Module[] modules = { module.Module };
+            var waresDict = _Calclator.Calc(modules);
+            foreach (var (method, wares) in waresDict)
+            {
+                foreach (var (wareID, amount) in wares)
+                {
+                    var item = NeedWareInfoDetails.Where(x => x.Method == method && x.WareID == wareID).First();
+                    item.NeedAmount += (ev.NewValue - ev.OldValue) * amount;
+                }
+            }
+
+            // 合計必要数量更新
+            UpdateTotalNeedAmount();
         }
 
         
         /// <summary>
-        /// 労働者数に変更があった場合
+        /// モジュール一覧変更時
         /// </summary>
-        private void OnWorkersChanged()
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Modules_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (WorkersCount == 0)
+            var addWares = new Dictionary<string, Dictionary<string, long>>();
+
+            // 削除予定のウェアを集計
+            if (e.OldItems != null)
             {
-                NeedWareInfoDetails.Clear();
-                return;
+                var wares = _Calclator.Calc(e.OldItems.Cast<ModulesGridItem>().Where(x => 0 < x.Module.WorkersCapacity));
+
+                foreach (var (method, wareArr) in wares)
+                {
+                    if (!addWares.ContainsKey(method))
+                    {
+                        addWares.Add(method, new Dictionary<string, long>());
+                    }
+                    
+                    foreach (var (wareID, amount) in wareArr)
+                    {
+                        if (!addWares[method].ContainsKey(wareID))
+                        {
+                            addWares[method].Add(wareID, -amount);
+                        }
+                        else
+                        {
+                            addWares[method][wareID] += -amount;
+                        }
+                    }
+                }
             }
 
-            var query = @$"
-SELECT
-	ifnull(Race.Name, (SELECT Name FROM Race WHERE RaceID = 'argon')) AS Method,
-	Ware.WareID,
-	Ware.Name,
-	CAST(((CAST({WorkersCount} AS REAL) / WorkUnitProduction.Amount) * WorkUnitResource.Amount + 0.5) AS INTEGER) AS Amount
-	
-FROM
-	Ware,
-	WorkUnitProduction,
-	WorkUnitResource
-	
-	LEFT JOIN Race
-		ON Race.RaceID = WorkUnitResource.Method
-	
-WHERE
-	WorkUnitProduction.WorkUnitID = WorkUnitResource.WorkUnitID AND
-	WorkUnitProduction.WorkUnitID = 'workunit_busy' AND
-	WorkUnitProduction.Method     = WorkUnitResource.Method AND
-	WorkUnitResource.WareID       = Ware.WareID";
-
-            var addItems = new List<NeedWareInfoDetailsItem>();
-
-            DBConnection.X4DB.ExecQuery(query, (dr, args) =>
+            // 追加予定のウェアを集計
+            if (e.NewItems != null)
             {
-                var method = (string)dr["Method"];
-                var wareID = (string)dr["WareID"];
+                var wares = _Calclator.Calc(e.NewItems.Cast<ModulesGridItem>().Where(x => 0 < x.Module.WorkersCapacity));
 
-                var item = NeedWareInfoDetails.Where(x => x.Method == method && x.WareID == wareID).FirstOrDefault();
-                if (item != null)
+                foreach (var (method, wareArr) in wares)
                 {
-                    // 既にウェアがある場合
-                    item.NeedAmount = (long)dr["Amount"];
-                    item.ProductionAmount = AggregateTargetProducts[wareID];
-                }
-                else
-                {
-                    // ウェアが無い場合
-                    addItems.Add(new NeedWareInfoDetailsItem(method, wareID, (string)dr["Name"], (long)dr["Amount"], AggregateTargetProducts[wareID]));
-                }
-            });
+                    if (!addWares.ContainsKey(method))
+                    {
+                        addWares.Add(method, new Dictionary<string, long>());
+                    }
 
-            NeedWareInfoDetails.AddRange(addItems);
+                    foreach (var (wareID, amount) in wareArr)
+                    {
+                        if (!addWares[method].ContainsKey(wareID))
+                        {
+                            addWares[method].Add(wareID, amount);
+                        }
+                        else
+                        {
+                            addWares[method][wareID] += amount;
+                        }
+                    }
+                }
+            }
+
+            // リセットされた場合
+            if (e.Action == NotifyCollectionChangedAction.Reset)
+            {
+                addWares.Clear();
+                NeedWareInfoDetails.Clear();
+
+                var wares = _Calclator.Calc((sender as IEnumerable<ModulesGridItem>).Where(x => 0 < x.Module.WorkersCapacity));
+                foreach (var (method, wareArr) in wares)
+                {
+                    if (!addWares.ContainsKey(method))
+                    {
+                        addWares.Add(method, new Dictionary<string, long>());
+                    }
+
+                    foreach (var (wareID, amount) in wareArr)
+                    {
+                        if (!addWares[method].ContainsKey(wareID))
+                        {
+                            addWares[method].Add(wareID, amount);
+                        }
+                        else
+                        {
+                            addWares[method][wareID] += amount;
+                        }
+                    }
+                }
+            }
+
+            // ウェア集計
+            // 削除対象レコード
+            var removeItems = new List<(string Method, string WareID)>();
+            foreach (var (method, wareArr) in addWares)
+            {
+                foreach (var (wareID, amount) in wareArr)
+                {
+                    var item = NeedWareInfoDetails.Where(x => x.Method == method && x.WareID == wareID).FirstOrDefault();
+
+                    if (item != null)
+                    {
+                        item.NeedAmount += amount;
+
+                        // 必要ウェア数が0なら削除対象に追加
+                        if (item.NeedAmount == 0)
+                        {
+                            removeItems.Add((method, wareID));
+                        }
+                    }
+                    else
+                    {
+                        NeedWareInfoDetails.Add(new NeedWareInfoDetailsItem(method, wareID, amount, AggregateTargetProducts[wareID]));
+                    }
+                }
+            }
+
+            // 不要な要素を消す
+            if (removeItems.Any())
+            {
+                // 居住モジュールの種族(メソッド)一覧
+                var habModuleMethods = _Modules.Where(x => 0 < x.Module.WorkersCapacity)
+                                               .Select(x =>
+                                                {
+                                                    var ret = x.Module.Owners.First().Race.RaceID;
+                                                    return (ret == "argon") ? "default" : ret;
+                                                })
+                                               .Distinct()
+                                               .ToArray();
+
+                // モジュールがまだあるなら削除対象から除外する
+                removeItems.RemoveAll(x => habModuleMethods.Any(y => x.Method == y));
+                NeedWareInfoDetails.RemoveAll(x => removeItems.Any(y => x.Method == y.Method && x.WareID == y.WareID));
+            }
+
+            // 合計必要数量更新
+            UpdateTotalNeedAmount();
         }
 
+
+        /// <summary>
+        /// 合計必要数量更新
+        /// </summary>
+        private void UpdateTotalNeedAmount()
+        {
+            var totalWares = NeedWareInfoDetails.GroupBy(x => x.WareID).Select(x => (WareID: x.Key, Amount: x.Sum(y => y.NeedAmount)));
+            foreach (var (WareID, Amount) in totalWares)
+            {
+                var items = NeedWareInfoDetails.Where(x => x.WareID == WareID);
+                foreach (var item in items)
+                {
+                    item.TotalNeedAmount = Amount;
+                }
+            }
+        }
 
 
         /// <summary>

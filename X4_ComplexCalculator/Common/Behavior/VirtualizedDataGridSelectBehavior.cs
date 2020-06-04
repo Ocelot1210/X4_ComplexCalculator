@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Linq;
 using X4_ComplexCalculator.Common.Reflection;
 using System.Windows.Threading;
+using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
 namespace X4_ComplexCalculator.Common.Behavior
 {
@@ -67,9 +68,21 @@ namespace X4_ComplexCalculator.Common.Behavior
                 return;
             }
 
-            // セル選択モードでなければ何もしない
+            // セル選択モード以外の場合
             if (dataGrid.SelectionUnit != DataGridSelectionUnit.Cell)
             {
+                // 選択解除されたセルがある場合、ここで選択状態を解除する
+                // → 解除しないとdelキーを押した時に意図しない要素が削除される
+                if (0 < e.RemovedCells.Count)
+                {
+                    var items = e.RemovedCells.Select(x => x.Item).Distinct();
+                    var accessor = items.First().GetType().GetProperty(GetMemberName((DependencyObject)sender))?.ToAccessor();
+
+                    if (accessor != null)
+                    {
+                        SetSelectedStatus(items, accessor, false);
+                    }
+                }
                 return;
             }
 

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
+
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
@@ -9,8 +9,17 @@ namespace X4_ComplexCalculator.DB.X4DB
     /// </summary>
     public class Module : IComparable
     {
+        #region スタティックメンバ
         /// <summary>
-        /// ID
+        /// モジュール一覧
+        /// </summary>
+        private readonly static Dictionary<string, Module> _Modules = new Dictionary<string, Module>();
+        #endregion
+
+
+        #region プロパティ
+        /// <summary>
+        /// モジュールID
         /// </summary>
         public string ModuleID { get; }
 
@@ -19,7 +28,6 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// モジュール種別
         /// </summary>
         public ModuleType ModuleType { get; }
-
 
         /// <summary>
         /// モジュール名称
@@ -40,85 +48,73 @@ namespace X4_ComplexCalculator.DB.X4DB
 
 
         /// <summary>
-        /// 装備情報
+        /// 建造方式
         /// </summary>
-        public ModuleEquipment Equipment { get; set; }
+        public ModuleProduction[] ModuleProductions { get; }
 
 
         /// <summary>
-        /// 建造方式
+        /// 所有派閥
         /// </summary>
-        public IReadOnlyList<ModuleProduction> ModuleProductions { get; }
+        public Faction[] Owners { get; }
+        #endregion
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="moduleID">モジュールID</param>
-        public Module(string moduleID)
+        /// <param name="name">モジュール名</param>
+        /// <param name="moduleType">モジュール種別</param>
+        /// <param name="maxWorkers">従業員数</param>
+        /// <param name="workersCapacity">従業員収容人数</param>
+        /// <param name="buildMethods">建造方式</param>
+        /// <param name="owners">所有派閥</param>
+        private Module(string moduleID, string name, ModuleType moduleType, long maxWorkers, long workersCapacity, ModuleProduction[] buildMethods, Faction[] owners)
         {
             ModuleID = moduleID;
-            string name = "";
-            long maxWorkers = 0;
-            long workersCapacity = 0;
-            ModuleType? moduleType = null;
-
-            DBConnection.X4DB.ExecQuery($"SELECT ModuleTypeID, Name, MaxWorkers, WorkersCapacity FROM Module WHERE ModuleID = '{moduleID}'",
-                (SQLiteDataReader dr, object[] args) =>
-                {
-                    name            = (string)dr["Name"];
-                    moduleType      = new ModuleType((string)dr["ModuleTypeID"]);
-                    maxWorkers      = (long)dr["MaxWorkers"];
-                    workersCapacity = (long)dr["WorkersCapacity"];
-                });
-
-            if (string.IsNullOrEmpty(name))
-            {
-                throw new ArgumentException("Invalid module id.", nameof(moduleID));
-            }
-
             Name = name;
-            ModuleType = moduleType ?? throw new InvalidOperationException();
+            ModuleType = moduleType;
             MaxWorkers = maxWorkers;
             WorkersCapacity = workersCapacity;
-            Equipment = new ModuleEquipment(moduleID);
+            Owners = owners;
+            ModuleProductions = buildMethods;
+        }
 
-            var mProd = new List<ModuleProduction>();
-            DBConnection.X4DB.ExecQuery($"SELECT Method, Time FROM ModuleProduction WHERE ModuleID = '{moduleID}'",
-                (SQLiteDataReader dr, object[] args) =>
+
+
+        /// <summary>
+        /// 初期化
+        /// </summary>
+        public static void Init()
+        {
+            _Modules.Clear();
+            DBConnection.X4DB.ExecQuery("SELECT ModuleID, ModuleTypeID, Name, MaxWorkers, WorkersCapacity FROM Module", (dr, args) =>
+            {
+                var id = (string)dr["ModuleID"];
+                var name = (string)dr["Name"];
+                var moduleType = ModuleType.Get((string)dr["ModuleTypeID"]);
+                var maxWorkers = (long)dr["MaxWorkers"];
+                var workersCapacity = (long)dr["WorkersCapacity"];
+
+                var moduleOwners = new List<Faction>();
+                DBConnection.X4DB.ExecQuery($"SELECT FactionID FROM ModuleOwner WHERE ModuleID = '{id}'", (dr2, args2) =>
                 {
-                    mProd.Add(new ModuleProduction((string)dr["Method"], (double)dr["Time"]));
+                    moduleOwners.Add(Faction.Get((string)dr2["FactionID"]));
                 });
-            ModuleProductions = mProd;
+
+                _Modules.Add(id, new Module(id, name, moduleType, maxWorkers, workersCapacity, ModuleProduction.Get(id), moduleOwners.ToArray()));
+            });
         }
 
 
         /// <summary>
-        /// 装備を追加
+        /// モジュールIDに対応するモジュールを取得
         /// </summary>
-        /// <param name="equipment">追加したい装備</param>
-        public void AddEquipment(Equipment equipment)
-        {
-            // 装備できないモジュールの場合、何もしない
-            if (!Equipment.CanEquipped)
-            {
-                return;
-            }
+        /// <param name="moduleID">モジュールID</param>
+        /// <returns>モジュール</returns>
+        public static Module Get(string moduleID) => _Modules[moduleID];
 
-            switch (equipment.EquipmentType.EquipmentTypeID)
-            {
-                case "turrets":
-                    Equipment.Turret.AddEquipment(equipment);
-                    break;
-
-                case "shields":
-                    Equipment.Shield.AddEquipment(equipment);
-                    break;
-
-                default:
-                    throw new InvalidOperationException("追加できるのはタレットかシールドのみです。");
-            }
-        }
 
         /// <summary>
         /// オブジェクト比較
@@ -141,10 +137,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <returns></returns>
         public override bool Equals(object? obj)
         {
-            var tgt = obj as Module;
-            if (tgt == null) return false;
-
-            return ModuleID == tgt.ModuleID && Equipment == tgt.Equipment;
+            return obj is Module tgt && ModuleID == tgt.ModuleID;
         }
 
 
@@ -154,7 +147,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <returns>ハッシュ値</returns>
         public override int GetHashCode()
         {
-            return HashCode.Combine(ModuleID, Equipment);
+            return ModuleID.GetHashCode();
         }
     }
 }

@@ -177,6 +177,22 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         {
             var currPos = ModulesView.CurrentPosition;
 
+            // モジュール数を編集した後に削除するとcurrPosが-1になる場合があるため、
+            // ここで最初に選択されている表示上のモジュールの要素番号を取得する
+            if (currPos == -1)
+            {
+                var cnt = 0;
+                foreach (var module in ModulesView.OfType<ModulesGridItem>())
+                {
+                    if (module.IsSelected)
+                    {
+                        currPos = cnt;
+                        break;
+                    }
+                    cnt++;
+                }
+            }
+
             var items = CollectionViewSource.GetDefaultView(ModulesView)
                                             .Cast<ModulesGridItem>()
                                             .Where(x => x.IsSelected);

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Windows;
 using System.Windows.Threading;
 
 namespace X4_ComplexCalculator.Common
@@ -63,7 +64,7 @@ namespace X4_ComplexCalculator.Common
                 ((DispatcherFrame)obj).Continue = false;
                 return null;
             });
-            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, callback, frame);
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, callback, frame);
             Dispatcher.PushFrame(frame);
         }
     }

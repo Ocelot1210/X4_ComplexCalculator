@@ -159,30 +159,30 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
                 return;
             }
 
-            var dict = new Dictionary<int, (int, Module, ModuleProduction, long)>();
+            var dict = new Dictionary<int, ModulesGridItem>();
 
             var prevCnt = Modules.Count;
+            var mergedModules = 0L;
 
             foreach (var (module, idx) in Modules.Select((x, idx) => (x, idx)))
             {
-                var hash = HashCode.Combine(module.Module, module.SelectedMethod);
+                var hash = module.GetHashCode();
                 if (dict.ContainsKey(hash))
                 {
-                    var tmp = dict[hash];
-                    tmp.Item4 += module.ModuleCount;
-                    dict[hash] = tmp;
+                    dict[hash].ModuleCount += module.ModuleCount;
+                    mergedModules += module.ModuleCount;
                 }
                 else
                 {
-                    dict.Add(hash, (idx, module.Module, module.SelectedMethod, module.ModuleCount));
+                    dict.Add(hash, new ModulesGridItem(module.ToXml()));
                 }
             }
 
             // モジュール数に変更があった場合のみ処理
             if (prevCnt != dict.Count)
             {
-                Modules.Reset(dict.OrderBy(x => x.Value.Item1).Select(x => new ModulesGridItem(x.Value.Item2, x.Value.Item3, x.Value.Item4)));
-                Localize.ShowMessageBox("Lang:MergeModulesMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, prevCnt - dict.Count);
+                Modules.Reset(dict.OrderBy(x => x.Value.Module.Name).Select(x => x.Value));
+                Localize.ShowMessageBox("Lang:MergeModulesMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, mergedModules, prevCnt - dict.Count);
             }
             else
             {

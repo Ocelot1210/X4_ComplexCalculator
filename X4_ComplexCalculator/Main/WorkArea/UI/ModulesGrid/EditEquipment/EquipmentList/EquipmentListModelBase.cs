@@ -30,7 +30,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 装備編集対象モジュール
         /// </summary>
-        protected Module Module;
+        protected ModulesGridItem Module;
 
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <param name="module">編集対象モジュール</param>
         /// <param name="factions">種族一覧</param>
         /// <param name="presetsCollectionChanged">プリセット変更時のイベントハンドラー</param>
-        public EquipmentListModelBase(Module module, ObservablePropertyChangedCollection<FactionsListItem> factions)
+        public EquipmentListModelBase(ModulesGridItem module, ObservablePropertyChangedCollection<FactionsListItem> factions)
         {
             Module = module;
             Factions = factions;
@@ -238,12 +238,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
                 if (!string.IsNullOrEmpty(id))
                 {
                     // 前回値削除
-                    DBConnection.CommonDB.ExecQuery($"DELETE FROM ModulePresetsEquipment WHERE ModuleID = '{Module.ModuleID}' AND PresetID = {SelectedPreset.ID} AND EquipmentType = '{id}'");
+                    DBConnection.CommonDB.ExecQuery($"DELETE FROM ModulePresetsEquipment WHERE ModuleID = '{Module.Module.ModuleID}' AND PresetID = {SelectedPreset.ID} AND EquipmentType = '{id}'");
 
                     // 装備中のプリセットを追加
                     foreach (var equipment in Equipped.Values.SelectMany((x) => x))
                     {
-                        var query = $"INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES('{Module.ModuleID}', {SelectedPreset.ID}, '{equipment.EquipmentID}', '{equipment.EquipmentType.EquipmentTypeID}')";
+                        var query = $"INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES('{Module.Module.ModuleID}', {SelectedPreset.ID}, '{equipment.EquipmentID}', '{equipment.EquipmentType.EquipmentTypeID}')";
                         DBConnection.CommonDB.ExecQuery(query);
                     }
                 }

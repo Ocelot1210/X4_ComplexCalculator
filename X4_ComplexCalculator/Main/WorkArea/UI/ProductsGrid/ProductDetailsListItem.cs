@@ -1,6 +1,8 @@
 ﻿using Prism.Mvvm;
 using System.Data.SQLite;
+using System.Reflection;
 using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 {
@@ -102,9 +104,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             _Amount = amount;
             _MaxEfficiency = efficiency;
 
-            var moduleName = "";
-            DBConnection.X4DB.ExecQuery($"SELECT Name FROM Module WHERE ModuleID = '{moduleID}'", (SQLiteDataReader dr, object[] args) => { moduleName = (string)dr["Name"]; });
-            ModuleName = moduleName;
+            ModuleName = DB.X4DB.Module.Get(moduleID).Name;
         }
 
         /// <summary>

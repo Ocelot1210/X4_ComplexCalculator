@@ -221,7 +221,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
                 StorageAssignGridItems.AddRange(products.Select(prod =>
                 {
                     var ret = new StorageAssignGridItem(prod.Ware, _CapacityDict[prod.Ware.TransportType.TransportTypeID], prod.Count, Hour);
-                    ret.AllocCount = _AllocBakDict[ret.WareID];
+                    if (_AllocBakDict.TryGetValue(ret.WareID, out long allocCount))
+                    {
+                        ret.AllocCount = allocCount;
+                    }
                     return ret;
                 }));
 

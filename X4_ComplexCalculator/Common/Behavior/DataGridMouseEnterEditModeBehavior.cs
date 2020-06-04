@@ -79,7 +79,7 @@ namespace X4_ComplexCalculator.Common.Behavior
             // 編集可能なセルの場合のみ処理
             if (!AssociatedObject.IsReadOnly)
             {
-                // 前回の座標と異なれば編集モードにする(これが無いとEnterでセル移動時に意図せず編集モードになる場合がある)
+                // 前回のマウスの座標と異なれば編集モードにする(これが無いとEnterでセル移動時に意図せず編集モードになる場合がある)
                 if (Mouse.GetPosition(Application.Current.MainWindow) != _CursorPosition)
                 {
                     AssociatedObject.IsEditing = true;

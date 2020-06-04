@@ -1,5 +1,4 @@
-﻿using Prism.Mvvm;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,22 +12,29 @@ namespace X4_ComplexCalculator.Main
     /// <summary>
     /// メイン画面のModel
     /// </summary>
-    class MainWindowModel : BindableBase
+    class MainWindowModel
     {
         #region メンバ
         /// <summary>
         /// 作業エリア管理用
         /// </summary>
         private readonly WorkAreaManager _WorkAreaManager;
+
+
+        /// <summary>
+        /// 作業エリアファイル入出力用
+        /// </summary>
+        private readonly WorkAreaFileIO _WorkAreFileIO;
         #endregion
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public MainWindowModel(WorkAreaManager workAreaManager)
+        public MainWindowModel(WorkAreaManager workAreaManager, WorkAreaFileIO workAreaFileIO)
         {
             _WorkAreaManager = workAreaManager;
+            _WorkAreFileIO = workAreaFileIO;
         }
 
 
@@ -40,6 +46,8 @@ namespace X4_ComplexCalculator.Main
             // DB接続開始
             DBConnection.Open();
 
+            var pathes = new List<string>();
+
             var vmList = new List<WorkAreaViewModel>();
 
             DBConnection.CommonDB.ExecQuery("SELECT * FROM OpenedFiles", (dr, _) =>
@@ -47,29 +55,19 @@ namespace X4_ComplexCalculator.Main
                 var path = (string)dr["Path"];
                 if (File.Exists(path))
                 {
-                    var vm = new WorkAreaViewModel(_WorkAreaManager.ActiveLayout?.LayoutID ?? -1);
-                    var prg = new Progress<int>();
-                    if (vm.LoadFile(path, prg))
-                    {
-                        vmList.Add(vm);
-                    }
-                    else
-                    {
-                        vm.Dispose();
-                    }
+                    pathes.Add(path);
                 }
             });
 
             // 開いているファイルテーブルを初期化
             DBConnection.CommonDB.ExecQuery("DELETE FROM OpenedFiles");
 
-            if (vmList.Any())
+            _WorkAreFileIO.OpenFiles(pathes);
+
+            // 何も開かなければ空の計画を追加する
+            if (!pathes.Any())
             {
-                _WorkAreaManager.Documents.AddRange(vmList);
-            }
-            else
-            {
-                _WorkAreaManager.Documents.Add(new WorkAreaViewModel(_WorkAreaManager.ActiveLayout?.LayoutID ?? -1));
+                _WorkAreFileIO.CreateNew();
             }
         }
 
@@ -130,13 +128,12 @@ namespace X4_ComplexCalculator.Main
             if (!canceled)
             {
                 var param = new SQLiteCommandParameters(1);
-                foreach (var doc in _WorkAreaManager.Documents)
-                {
-                    if (System.IO.File.Exists(doc.SaveFilePath))
-                    {
-                        param.Add("path", System.Data.DbType.String, doc.SaveFilePath);
-                    }
-                }
+
+                var pathes = _WorkAreaManager.Documents.Where(x => File.Exists(x.SaveFilePath))
+                                                       .Select(x => x.SaveFilePath);
+
+                param.AddRange("path", System.Data.DbType.String, pathes);
+
                 DBConnection.CommonDB.ExecQuery("INSERT INTO OpenedFiles(Path) VALUES(:path)", param);
             }
 

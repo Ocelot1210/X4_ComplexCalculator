@@ -69,6 +69,7 @@ StationCalclatorImportDescription;Please enter the URL displayed when you click 
 SelectPlanWindowTitle;Select plan
 X4PlanFilePathDescription;X4 Construction plan file path
 ImportPlanDescription;Select a plan to import
+UnexpectedErrorMessage;Unexpected error occurred.\r\n■Error contents：\r\n{0}\r\n\r\n■Stack trace：\r\n{1}
 
 
 # ------------------------------------------------------
@@ -96,7 +97,7 @@ Edit;Edit
 BuildMethod;Build method
 MergeModulesConfirmMessage;Do you want to merge duplicate modules?
 NoMergeModulesMessage;No duplicate modules were found.
-MergeModulesMessage;Merged {0} modules.
+MergeModulesMessage;Merged {0} modules, {1} records.
 AutoAddConfirm;Do you want to add a module to produce the missing product?
 NoAddedModulesAutomaticallyMessage;The module was not added because there is no missing product.
 AddedModulesAutomaticallyMessage;{0} records, {1} modules added.

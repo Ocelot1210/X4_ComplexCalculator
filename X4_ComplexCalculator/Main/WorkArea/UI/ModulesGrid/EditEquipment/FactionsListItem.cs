@@ -41,7 +41,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <param name="isChecked">チェック状態</param>
         public FactionsListItem(string id, bool isChecked)
         {
-            Faction = new Faction(id);
+            Faction = Faction.Get(id);
             IsChecked = isChecked;
         }
     }

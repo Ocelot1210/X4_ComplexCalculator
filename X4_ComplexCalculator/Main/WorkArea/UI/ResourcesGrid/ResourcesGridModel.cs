@@ -29,6 +29,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
         /// 単価保存用
         /// </summary>
         private readonly Dictionary<string, long> _UnitPriceBakDict = new Dictionary<string, long>();
+
+        /// <summary>
+        /// 建造リソース計算用
+        /// </summary>
+        private ResourceCalclator _Calclator = ResourceCalclator.Instance;
         #endregion
 
 
@@ -90,7 +95,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
                     break;
 
                 // 装備変更の場合
-                case nameof(ModulesGridItem.Module.Equipment):
+                case nameof(ModulesGridItem.ModuleEquipment):
                     {
                         if (e is PropertyChangedExtendedEventArgs<IEnumerable<string>> ev)
                         {
@@ -113,7 +118,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
                 default:
                     break;
             }
-
 
             await Task.CompletedTask;
         }
@@ -158,24 +162,20 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
         /// <param name="prevModuleCount">モジュール数前回値</param>
         private void OnModuleCountChanged(ModulesGridItem module, long prevModuleCount)
         {
-            (string ModuleID, long ModuleCount, string Method)[] modules = 
+            (string ModuleID, string Method, long ModuleCount)[] modules = 
             {
-                (module.Module.ModuleID, 1, module.SelectedMethod.Method) 
+                (module.Module.ModuleID, module.SelectedMethod.Method, 1) 
             };
 
             // モジュールの建造に必要なリソースを集計
-            var resourcesDict = new Dictionary<string, long>();
-            AggregateModuleResources(modules, resourcesDict);
-
-            // モジュールの装備の建造に必要なリソースを集計
-            // 装備IDごとに集計
-            var equipments = module.Module.Equipment.GetAllEquipment().Select(x => (ID: x.EquipmentID, Count: 1))
+            // モジュールの装備一覧(装備IDごとに集計)
+            var equipments = module.ModuleEquipment.GetAllEquipment().Select(x => (ID: x.EquipmentID, Count: 1))
                                    .GroupBy(x => x.ID)
-                                   .Select(x => (ID: x.Key, Count: x.LongCount()));
+                                   .Select(x => (ID: x.Key, Method:"default", Count: x.LongCount()));
 
-            AggregateEquipmentResources(equipments, resourcesDict);
+            Dictionary<string, long> resources = _Calclator.CalcResource(modules.Concat(equipments));
 
-            foreach (var kvp in resourcesDict)
+            foreach (var kvp in resources)
             {
                 var itm = Resources.Where(x => x.Ware.WareID == kvp.Key).FirstOrDefault();
                 if (itm != null)
@@ -192,35 +192,16 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
         /// <param name="buildMethod"></param>
         private void OnModuleSelectedMethodChanged(ModulesGridItem module, string buildMethod)
         {
-            // モジュールの建造に必要なリソースを集計用
-            var resourcesDict = new Dictionary<string, long>();
-
-            // 変更前モジュールの必要リソース集計
+            (string ModuleID, string Method, long ModuleCount)[] modules =
             {
-                (string ModuleID, long ModuleCount, string Method)[] oldModules =
-                {
-                    (module.Module.ModuleID, 1, buildMethod)
-                };
-                AggregateModuleResources(oldModules, resourcesDict);
+                (module.Module.ModuleID, buildMethod, -1),                  // 変更前のため-1
+                (module.Module.ModuleID, module.SelectedMethod.Method, 1)   // 変更後のため+1
+            };
 
-                // 変更前のモジュールのリソースはリソース一覧から引くため*-1する
-                foreach (var key in resourcesDict.Keys.ToArray())
-                {
-                    resourcesDict[key] *= -1;
-                }
-            }
-
-            // 変更後モジュールの必要リソース集計
-            {
-                (string ModuleID, long ModuleCount, string Method)[] newModules =
-                {
-                    (module.Module.ModuleID, 1, module.SelectedMethod.Method)
-                };
-                AggregateModuleResources(newModules, resourcesDict);
-            }
+            Dictionary<string, long> resources = _Calclator.CalcResource(modules);
 
             var addTarget = new List<ResourcesGridItem>();
-            foreach (var kvp in resourcesDict)
+            foreach (var kvp in resources)
             {
                 var item = Resources.Where(x => x.Ware.WareID == kvp.Key).FirstOrDefault();
                 if (item != null)
@@ -248,32 +229,17 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
         /// <param name="prevEquipments">前回装備</param>
         private void OnModuleEquipmentChanged(ModulesGridItem module, IEnumerable<string> prevEquipments)
         {
-            // モジュールの建造に必要なリソースを集計
-            var equipments = module.Module.Equipment.GetAllEquipment().GroupBy(x => x.EquipmentID)
-                                                                      .Select(x => (x.Key, (long)x.Count()));
+            // 新しい装備一覧
+            var newEquipments = module.ModuleEquipment.GetAllEquipment().GroupBy(x => x.EquipmentID).Select(x => (x.Key, "default", (long)x.Count()));
 
-            var equipmentResources = new Dictionary<string, long>();
-            AggregateEquipmentResources(equipments, equipmentResources);
+            // 古い装備一覧
+            var oldEquipments = prevEquipments.GroupBy(x => x).Select(x => (x.Key, "default", -(long)x.Count()));
 
-            // 不要になったリソースを集計
-            var wasteResources = new Dictionary<string, long>();
-            AggregateEquipmentResources(prevEquipments.GroupBy(x => x).Select(x => (x.Key, (long)x.Count())), wasteResources);
-            
-            // 不要になったリソースの分減らす
-            foreach (var kvp in wasteResources)
-            {
-                if (equipmentResources.ContainsKey(kvp.Key))
-                {
-                    equipmentResources[kvp.Key] -= kvp.Value;
-                }
-                else
-                {
-                    equipmentResources.Add(kvp.Key, -kvp.Value);
-                }
-            }
+            // リソース集計
+            Dictionary<string, long> resources = _Calclator.CalcResource(newEquipments.Concat(oldEquipments));
 
             var addTarget = new List<ResourcesGridItem>();
-            foreach (var kvp in equipmentResources)
+            foreach (var kvp in resources)
             {
                 var item = Resources.Where(x => x.Ware.WareID == kvp.Key).FirstOrDefault();
                 if (item != null)
@@ -299,7 +265,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
         /// <param name="modules">追加されたモジュール</param>
         private void OnModulesAdded(IEnumerable<ModulesGridItem> modules)
         {
-            Dictionary<string, long> resourcesDict = AggregateModule(modules);
+            Dictionary<string, long> resourcesDict = AggregateModules(modules);
 
             var addTarget = new List<ResourcesGridItem>();
             foreach (var kvp in resourcesDict)
@@ -334,7 +300,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
         /// <param name="modules">削除されたモジュール</param>
         private void OnModulesRemoved(IEnumerable<ModulesGridItem> modules)
         {
-            Dictionary<string, long> resourcesDict = AggregateModule(modules);
+            Dictionary<string, long> resourcesDict = AggregateModules(modules);
 
             foreach (var kvp in resourcesDict)
             {
@@ -354,117 +320,19 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
         /// </summary>
         /// <param name="modules">集計対象モジュール</param>
         /// <returns>集計結果</returns>
-        private Dictionary<string, long> AggregateModule(IEnumerable<ModulesGridItem> modules)
+        private Dictionary<string, long> AggregateModules(IEnumerable<ModulesGridItem> modules)
         {
-            // 建造に必要なリソース集計用
-            var resourcesDict = new Dictionary<string, long>();
+            // モジュール一覧
+            var moduleList = modules.Select(x => (x.Module.ModuleID, x.SelectedMethod.Method, x.ModuleCount));
 
-            // モジュールの建造に必要なリソースを集計
-            AggregateModuleResources(modules.Select(x => (x.Module.ModuleID, x.ModuleCount, x.SelectedMethod.Method)), resourcesDict);
-
-            // モジュールの装備の建造に必要なリソースを集計
-            // 装備IDごとに集計
-            var equipments = modules.Where(x => x.Module.Equipment.CanEquipped)
-                                    .Select(x => x.Module.Equipment.GetAllEquipment().Select(y => (ID: y.EquipmentID, Count: x.ModuleCount)))
+            // モジュールの装備一覧(装備IDごとに集計)
+            var equipments = modules.Where(x => x.ModuleEquipment.CanEquipped)
+                                    .Select(x => x.ModuleEquipment.GetAllEquipment().Select(y => (ID: y.EquipmentID, Count: x.ModuleCount)))
                                     .Where(x => x.Any())
                                     .GroupBy(x => x.First().ID)
-                                    .Select(x => (ID: x.Key, Count: x.Sum(y => y.Sum(z => z.Count))));
+                                    .Select(x => (ID: x.Key, Method:"default", Count: x.Sum(y => y.Sum(z => z.Count))));
 
-            AggregateEquipmentResources(equipments, resourcesDict);
-
-            return resourcesDict;
-        }
-
-
-        /// <summary>
-        /// モジュールの建造に必要なリソースを集計
-        /// </summary>
-        /// <param name="modules">モジュール一覧</param>
-        /// <param name="resourcesDict">集計用辞書</param>
-        /// <returns></returns>
-        private void AggregateModuleResources(IEnumerable<(string ModuleID, long ModuleCount, string Method)> modules, Dictionary<string, long> resourcesDict)
-        {
-            var query = $@"
-SELECT
-    Ware.WareID,
-    Amount * :count AS Amount
-
-FROM
-    ModuleResource,
-    Ware
-
-WHERE
-    Ware.WareID = ModuleResource.WareID AND
-    ModuleID = :moduleID AND
-    Method   = :method";
-
-            var sqlParam = new SQLiteCommandParameters(3);
-            foreach (var (ModuleID, ModuleCount, Method) in modules)
-            {
-                sqlParam.Add("count",    DbType.Int32,  ModuleCount);
-                sqlParam.Add("moduleID", DbType.String, ModuleID);
-                sqlParam.Add("method",   DbType.String, Method);
-            }
-
-            DBConnection.X4DB.ExecQuery(query, sqlParam, SumResource, resourcesDict);
-        }
-
-
-        /// <summary>
-        /// 装備のリソース集計メイン
-        /// </summary>
-        /// <param name="equipments">(装備ID, 個数)</param>
-        /// <param name="resourcesDict">集計結果</param>
-        private void AggregateEquipmentResources(IEnumerable<(string EquipmentID, long Count)> equipments, Dictionary<string, long> resourcesDict)
-        {
-            var query = $@"
-SELECT
-	Ware.WareID,
-    Amount * :count AS Amount
-
-FROM
-    EquipmentResource,
-    Ware
-
-WHERE
-    Ware.WareID = EquipmentResource.NeedWareID AND
-    EquipmentID = :equipmentID AND
-	Method = 'default'";
-
-            var sqlParam = new SQLiteCommandParameters(2);
-            foreach (var (equipmentID, equipmentCount) in equipments)
-            {
-                sqlParam.Add("equipmentID", DbType.String, equipmentID);
-                sqlParam.Add("count", DbType.Int32, equipmentCount);
-            }
-            DBConnection.X4DB.ExecQuery(query, sqlParam, SumResource, resourcesDict);
-        }
-
-
-        /// <summary>
-        /// ウェアID別にリソースを集計
-        /// </summary>
-        /// <param name="dr"></param>
-        /// <param name="args"></param>
-        /// <remarks>
-        /// args[0] = Dictionary<string, long> : ウェア集計用ディクショナリ
-        /// </remarks>
-        private void SumResource(SQLiteDataReader dr, object[] args)
-        {
-            var dict = (Dictionary<string, long>)args[0];
-
-            var wareID  = (string)dr["WareID"];
-
-            // ディクショナリ内にウェアが存在するか？
-            if (!dict.ContainsKey(wareID))
-            {
-                // 新規追加
-                dict.Add(wareID, 0);
-            }
-            
-            var amount = (long)dr["Amount"];
-
-            dict[wareID] += amount;
+            return _Calclator.CalcResource(moduleList.Concat(equipments));
         }
     }
 }

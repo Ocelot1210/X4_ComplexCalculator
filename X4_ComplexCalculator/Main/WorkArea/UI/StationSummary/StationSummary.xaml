@@ -18,6 +18,17 @@
 
     <UserControl.Resources>
 
+        <!--  負の値を強調するスタイル  -->
+        <Style x:Key="NegativeValueEmphasisStyle" TargetType="{x:Type TextBlock}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource IsLessThanConverter}, ConverterParameter=0}" Value="True">
+                    <Setter Property="Background" Value="LightPink" />
+                    <Setter Property="FontWeight" Value="Bold" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+
         <!--  労働力詳細表示用ListView  -->
         <DataGridInline:InlineListView
             x:Key="WorkersDetailsListView"
@@ -79,12 +90,13 @@
                                 <TextBlock
                                     FontWeight="Bold"
                                     Foreground="Black"
-                                    Text="{Binding Name}" />
+                                    Text="{Binding Items[0].Race.Name}" />
                             </StackPanel>
                         </DataTemplate>
                     </GroupStyle.HeaderTemplate>
                 </GroupStyle>
             </ListView.GroupStyle>
+
 
             <ListView.View>
                 <GridView>
@@ -116,18 +128,11 @@
                     <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Diff}" SortTargetPropertyName="Diff">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Diff, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right">
-                                    <TextBlock.Style>
-                                        <Style TargetType="{x:Type TextBlock}">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Diff, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource IsLessThanConverter}, ConverterParameter=0}" Value="True">
-                                                    <Setter Property="Background" Value="LightPink" />
-                                                    <Setter Property="FontWeight" Value="Bold" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
+                                <TextBlock
+                                    Style="{StaticResource NegativeValueEmphasisStyle}"
+                                    Tag="{Binding Diff, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                    Text="{Binding Diff, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat={StaticResource DefaultNumericFormat}}"
+                                    TextAlignment="Right" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </DataGridInline:InlineGridViewColumn>
@@ -173,18 +178,11 @@
                     <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Price}" SortTargetPropertyName="TotalPrice">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding TotalPrice, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:N0} cr'}" TextAlignment="Right">
-                                    <TextBlock.Style>
-                                        <Style TargetType="{x:Type TextBlock}">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding TotalPrice, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource IsLessThanConverter}, ConverterParameter=0}" Value="True">
-                                                    <Setter Property="Background" Value="LightPink" />
-                                                    <Setter Property="FontWeight" Value="Bold" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
+                                <TextBlock
+                                    Style="{StaticResource NegativeValueEmphasisStyle}"
+                                    Tag="{Binding TotalPrice, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                    Text="{Binding TotalPrice, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:N0} cr'}"
+                                    TextAlignment="Right" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </DataGridInline:InlineGridViewColumn>

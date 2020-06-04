@@ -1,5 +1,5 @@
-﻿using System;
-using System.Data.SQLite;
+﻿using System.Collections.Generic;
+
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
@@ -8,6 +8,13 @@ namespace X4_ComplexCalculator.DB.X4DB
     /// </summary>
     public class TransportType
     {
+        #region スタティックメンバ
+        /// <summary>
+        /// カーゴタイプ一覧
+        /// </summary>
+        private readonly static Dictionary<string, TransportType> _TransportTypes = new Dictionary<string, TransportType>();
+        #endregion
+
         #region プロパティ
         /// <summary>
         /// カーゴ種別ID
@@ -16,7 +23,7 @@ namespace X4_ComplexCalculator.DB.X4DB
 
 
         /// <summary>
-        /// ウェアグループ名
+        /// カーゴ種別名
         /// </summary>
         public string Name { get; }
         #endregion
@@ -25,25 +32,37 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="transportTypeID">カーゴタイプID</param>
-        public TransportType(string transportTypeID)
+        /// <param name="transportTypeID">カーゴ種別ID</param>
+        /// <param name="name">カーゴ種別名</param>
+        private TransportType(string transportTypeID, string name)
         {
             TransportTypeID = transportTypeID;
-            string name = "";
-            DBConnection.X4DB.ExecQuery(
-                $"SELECT Name FROM TransportType WHERE TransportTypeID = '{TransportTypeID}'",
-                (SQLiteDataReader dr, object[] args) =>
-                {
-                    name = (string)dr["Name"];
-                });
-
-            if (string.IsNullOrEmpty(name))
-            {
-                throw new ArgumentException("Invalid transport type id.", nameof(transportTypeID));
-            }
-
             Name = name;
         }
+
+
+        /// <summary>
+        /// 初期化
+        /// </summary>
+        public static void Init()
+        {
+            _TransportTypes.Clear();
+            DBConnection.X4DB.ExecQuery($"SELECT TransportTypeID, Name FROM TransportType", (dr, args) =>
+            {
+                var id = (string)dr["TransportTypeID"];
+                var name = (string)dr["Name"];
+
+                _TransportTypes.Add(id, new TransportType(id, name));
+            });
+        }
+
+
+        /// <summary>
+        /// カーゴ種別IDに対応するカーゴ種別を取得する
+        /// </summary>
+        /// <param name="transportTypeID">カーゴ種別ID</param>
+        /// <returns>カーゴ種別</returns>
+        public static TransportType Get(string transportTypeID) => _TransportTypes[transportTypeID];
 
 
         /// <summary>

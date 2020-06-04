@@ -1,13 +1,19 @@
-﻿using System;
-using System.Data.SQLite;
+﻿using System.Collections.Generic;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
     /// <summary>
     /// サイズ管理用クラス
     /// </summary>
-    public class Size : IComparable
+    public class Size
     {
+        #region スタティックメンバ
+        /// <summary>
+        /// サイズ一覧
+        /// </summary>
+        private readonly static Dictionary<string, Size> _Sizes = new Dictionary<string, Size>();
+        #endregion
+
         /// <summary>
         /// サイズID
         /// </summary>
@@ -23,30 +29,36 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// コンストラクタ
         /// </summary>
         /// <param name="sizeID">サイズID</param>
-        public Size(string sizeID)
+        /// <param name="name">サイズ名</param>
+        private Size(string sizeID, string name)
         {
             SizeID = sizeID;
-            string name = "";
-            DBConnection.X4DB.ExecQuery($"SELECT * FROM Size WHERE SizeID = '{sizeID}'", (SQLiteDataReader dr, object[] args) => { name = (string)dr["Name"]; });
-
-            if (string.IsNullOrEmpty(name))
-            {
-                throw new ArgumentException("Invalid size id.", nameof(sizeID));
-            }
-
             Name = name;
         }
 
 
         /// <summary>
-        /// オブジェクト比較
+        /// 初期化
         /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public int CompareTo(object? obj)
+        public static void Init()
         {
-            return SizeID.CompareTo(obj is Size);
+            _Sizes.Clear();
+            DBConnection.X4DB.ExecQuery("SELECT SizeID, Name FROM Size", (dr, args) =>
+            {
+                var id = (string)dr["SizeID"];
+                var name = (string)dr["Name"];
+
+                _Sizes.Add(id, new Size(id, name));
+            });
         }
+
+
+        /// <summary>
+        /// サイズIDに対応するサイズを取得
+        /// </summary>
+        /// <param name="sizeID">サイズID</param>
+        /// <returns>サイズ</returns>
+        public static Size Get(string sizeID) => _Sizes[sizeID];
 
 
         /// <summary>

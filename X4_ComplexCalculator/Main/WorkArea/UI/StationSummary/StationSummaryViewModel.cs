@@ -103,7 +103,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary
             }
 
             {
-                _NeedWareInfoModel = new NeedWareInfoModel(products);
+                _NeedWareInfoModel = new NeedWareInfoModel(modules, products);
 
                 WorkforceNeedWareCollectionView = (ListCollectionView)CollectionViewSource.GetDefaultView(_NeedWareInfoModel.NeedWareInfoDetails);
                 WorkforceNeedWareCollectionView.SortDescriptions.Clear();
@@ -141,11 +141,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary
             {
                 case nameof(WorkForceModuleInfoModel.NeedWorkforce):
                     RaisePropertyChanged(nameof(NeedWorkforce));
-                    //_NeedWareInfoModel.NeedWorkforce = _WorkForceModuleInfoModel.NeedWorkforce;
                     break;
 
                 case nameof(WorkForceModuleInfoModel.WorkForce):
-                    _NeedWareInfoModel.WorkersCount = _WorkForceModuleInfoModel.WorkForce;
                     RaisePropertyChanged(nameof(WorkForce));
                     break;
 

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data.SQLite;
+﻿using System.Collections.Generic;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
@@ -8,6 +7,14 @@ namespace X4_ComplexCalculator.DB.X4DB
     /// </summary>
     public class ModuleType
     {
+        #region スタティックメンバ
+        /// <summary>
+        /// モジュール種別一覧
+        /// </summary>
+        static readonly Dictionary<string, ModuleType> _ModuleTypes = new Dictionary<string, ModuleType>();
+        #endregion
+
+        #region プロパティ
         /// <summary>
         /// モジュール種別ID
         /// </summary>
@@ -18,35 +25,43 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// モジュール種別名
         /// </summary>
         public string Name { get; }
+        #endregion
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="moduleTypeID">モジュール種別ID</param>
-        public ModuleType(string moduleTypeID)
+        /// <param name="name">モジュール種別名</param>
+        private ModuleType(string moduleTypeID, string name)
         {
             ModuleTypeID = moduleTypeID;
-            string name = "";
-            DBConnection.X4DB.ExecQuery($"SELECT Name FROM ModuleType WHERE ModuleTypeID = '{moduleTypeID}'", (SQLiteDataReader dr, object[] args) => { name = (string)dr["Name"]; });
-
-            if (string.IsNullOrEmpty(name))
-            {
-                throw new ArgumentException("Invalid module type id.", nameof(moduleTypeID));
-            }
-
             Name = name;
         }
 
+
         /// <summary>
-        /// コピーコンストラクタ
+        /// 初期化
         /// </summary>
-        /// <param name="moduleType"></param>
-        public ModuleType(ModuleType moduleType)
+        public static void Init()
         {
-            ModuleTypeID = moduleType.ModuleTypeID;
-            Name = moduleType.Name;
+            _ModuleTypes.Clear();
+            DBConnection.X4DB.ExecQuery($"SELECT ModuleTypeID, Name FROM ModuleType", (dr, args) =>
+            {
+                var id = (string)dr["ModuleTypeID"];
+                var name = (string)dr["Name"];
+
+                _ModuleTypes.Add(id, new ModuleType(id, name));
+            });
         }
+
+
+        /// <summary>
+        /// モジュール種別IDに対応するモジュール種別を取得
+        /// </summary>
+        /// <param name="moduleTypeID">ジュール種別ID</param>
+        /// <returns>モジュール種別</returns>
+        public static ModuleType Get(string moduleTypeID) => _ModuleTypes[moduleTypeID];
 
 
         /// <summary>

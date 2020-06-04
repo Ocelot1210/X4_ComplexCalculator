@@ -11,8 +11,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="module">モジュール</param>
-        public EditEquipmentWindow(Module module)
+        /// <param name="module">編集対象モジュール</param>
+        public EditEquipmentWindow(ModulesGridItem module)
         {
             InitializeComponent();
 

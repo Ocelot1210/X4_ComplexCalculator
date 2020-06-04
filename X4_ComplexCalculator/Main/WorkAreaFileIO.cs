@@ -2,8 +2,15 @@
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Main.WorkArea;
 
@@ -86,37 +93,130 @@ namespace X4_ComplexCalculator.Main
         {
             var dlg = new OpenFileDialog();
 
-            dlg.Filter = "X4 Station calclator data (*.x4)|*.x4|All Files|*.*";
+            dlg.Filter = "X4: Complex calclator data file(*.x4)|*.x4|All Files|*.*";
             dlg.Multiselect = true;
             if (dlg.ShowDialog() == true)
             {
-                Mouse.OverrideCursor = Cursors.Wait;
-                try
-                {
-                    IsBusy = true;
-                    var tmpList = new List<WorkAreaViewModel>();
-
-                    foreach (var filePath in dlg.FileNames)
-                    {
-                        var prg = new Progress<int>();
-
-                        var vm = new WorkAreaViewModel(_WorkAreaManager.ActiveLayout?.LayoutID ?? -1);
-                        vm.LoadFile(filePath, prg);
-                        tmpList.Add(vm);
-                    }
-
-                    _WorkAreaManager.Documents.AddRange(tmpList);
-                }
-                catch (Exception e)
-                {
-                    Localize.ShowMessageBox("Lang:FaildToLoadFileMessage", "Lang:FaildToLoadFileMessageTitle", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
-                }
-                finally
-                {
-                    IsBusy = false;
-                    Mouse.OverrideCursor = null;
-                }
+                OpenFiles(dlg.FileNames);
             }
+        }
+
+        //BackgroundWorker? _BackgroundWorker;
+
+        /// <summary>
+        /// ファイルを開く
+        /// </summary>
+        /// <param name="pathes">開く対象のファイルパス一覧</param>
+        public void OpenFiles(IEnumerable<string> pathes)
+        {
+            if (!pathes.Any())
+            {
+                return;
+            }
+
+            try
+            {
+                Mouse.OverrideCursor = Cursors.Wait;
+                // Application.Current.Dispatcher.Invoke(() => IsBusy = true);
+
+                //var op = Dispatcher.CurrentDispatcher.BeginInvoke(() =>
+                //{
+                //    AddMain(pathes);
+                //});
+                IsBusy = true;
+                AddMain(pathes);
+                //_BackgroundWorker = new BackgroundWorker();
+                //_BackgroundWorker.WorkerReportsProgress = true;
+
+                //_BackgroundWorker.DoWork += (s, evt) => AddMain(pathes);
+                //_BackgroundWorker.ProgressChanged += (s, evt) => { };
+                //_BackgroundWorker.RunWorkerCompleted += (s, evt) => { IsBusy = false; };
+
+                //_BackgroundWorker.RunWorkerAsync();
+            }
+            catch (Exception e)
+            {
+                Localize.ShowMessageBox("Lang:FaildToLoadFileMessage", "Lang:FaildToLoadFileMessageTitle", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
+            }
+            finally
+            {
+                
+            }
+        }
+
+
+
+
+        private void AddMain(IEnumerable<string> pathes)
+        {
+            //var worker = new Thread(delegate()
+            //{
+            //    Application.Current.Dispatcher.Invoke(() =>
+            //    {
+            //        var tmpList = new List<WorkAreaViewModel>();
+
+            //        foreach (var path in pathes)
+            //        {
+            //            var prg = new Progress<int>();
+
+            //            var vm = new WorkAreaViewModel(_WorkAreaManager.ActiveLayout?.LayoutID ?? -1);
+            //            vm.LoadFile(path, prg);
+            //            tmpList.Add(vm);
+            //        }
+            //        _WorkAreaManager.Documents.AddRange(tmpList);
+
+            //        IsBusy = false;
+            //        Mouse.OverrideCursor = null;
+            //    });
+            //});
+            //worker.IsBackground = true;
+            //worker.Start();
+
+
+            //var tmpList = new List<WorkAreaViewModel>();
+            //foreach (var path in pathes)
+            //{
+            //    var prg = new Progress<int>();
+
+            //    var vm = new WorkAreaViewModel(_WorkAreaManager.ActiveLayout?.LayoutID ?? -1);
+            //    vm.LoadFile(path, prg);
+            //    tmpList.Add(vm);
+            //}
+            //_WorkAreaManager.Documents.AddRange(tmpList);
+            //IsBusy = false;
+
+            void test()
+            {
+                var tmpList = new List<WorkAreaViewModel>();
+                foreach (var path in pathes)
+                {
+                    var prg = new Progress<int>();
+
+                    var vm = new WorkAreaViewModel(_WorkAreaManager.ActiveLayout?.LayoutID ?? -1);
+                    vm.LoadFile(path, prg);
+                    tmpList.Add(vm);
+                }
+                _WorkAreaManager.Documents.AddRange(tmpList);
+                IsBusy = false;
+                Mouse.OverrideCursor = null;
+            }
+
+            ThreadStart start = delegate ()
+            {
+                var op = Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(test));
+
+                var status = op.Status;
+                while (status != DispatcherOperationStatus.Completed)
+                {
+                    status = op.Wait(TimeSpan.FromMilliseconds(100));
+                    if (status == DispatcherOperationStatus.Aborted)
+                    {
+                        
+                    }
+                }
+            };
+
+            new Thread(start).Start();
         }
     }
 }

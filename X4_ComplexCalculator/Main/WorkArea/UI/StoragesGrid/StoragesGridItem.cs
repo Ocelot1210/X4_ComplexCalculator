@@ -53,7 +53,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         /// <param name="details">詳細情報</param>
         public StoragesGridItem(string transportTypeID, IEnumerable<StorageDetailsListItem> details)
         {
-            TransportType = new TransportType(transportTypeID);
+            TransportType = TransportType.Get(transportTypeID);
             Details = new ObservableRangeCollection<StorageDetailsListItem>(details);
         }
 
@@ -120,7 +120,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
                 var tmp = Details.Where(x => x.ModuleID == item.ModuleID).FirstOrDefault();
                 if (tmp != null)
                 {
-                    tmp.ModuleCount += (item.ModuleCount - prevModuleCount);
+                    tmp.ModuleCount += item.ModuleCount - prevModuleCount;
                 }
             }
 

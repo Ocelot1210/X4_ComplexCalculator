@@ -159,6 +159,7 @@
             ActiveContent="{Binding ActiveContent, Mode=TwoWay, Converter={StaticResource ActiveDocumentConverter}, UpdateSourceTrigger=PropertyChanged}"
             DocumentsSource="{Binding Documents}">
 
+
             <!--  計画エリアが閉じられるとき  -->
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="DocumentClosing">

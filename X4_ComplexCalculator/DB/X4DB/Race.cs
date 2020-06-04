@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data.SQLite;
+﻿using System.Collections.Generic;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
@@ -8,6 +7,14 @@ namespace X4_ComplexCalculator.DB.X4DB
     /// </summary>
     public class Race
     {
+        #region スタティックメンバ
+        /// <summary>
+        /// 種族一覧
+        /// </summary>
+        private readonly static Dictionary<string, Race> _Races = new Dictionary<string, Race>();
+        #endregion
+
+        #region プロパティ
         /// <summary>
         /// 種族ID
         /// </summary>
@@ -18,25 +25,44 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// 種族名
         /// </summary>
         public string Name { get; }
+        #endregion
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="raceID">種族ID</param>
-        public Race(string raceID)
+        /// <param name="name">種族名</param>
+        private Race(string raceID, string name)
         {
             RaceID = raceID;
-            string name = "";
-            DBConnection.X4DB.ExecQuery($"SELECT Name FROM Race WHERE RaceID = '{RaceID}'", (SQLiteDataReader dr, object[] args) => { name = (string)dr["Name"]; });
-
-            if (string.IsNullOrEmpty(name))
-            {
-                throw new ArgumentException("Invalid race id.", nameof(raceID));
-            }
-
             Name = name;
         }
+
+
+        /// <summary>
+        /// 初期化
+        /// </summary>
+        public static void Init()
+        {
+            _Races.Clear();
+            DBConnection.X4DB.ExecQuery("SELECT RaceID, Name FROM Race", (dr, args) =>
+            {
+                var id = (string)dr["RaceID"];
+                var name = (string)dr["Name"];
+
+                _Races.Add(id, new Race(id, name));
+            });
+        }
+
+
+        /// <summary>
+        /// 種族を取得
+        /// </summary>
+        /// <param name="raceID">種族ID</param>
+        /// <returns>種族IDに対応する種族</returns>
+        public static Race Get(string raceID) => _Races[raceID];
+
 
         /// <summary>
         /// 比較

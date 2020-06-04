@@ -106,7 +106,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
             {
                 conn.ExecQuery($"INSERT INTO Modules(Row, ModuleID, Count) Values({rowCnt}, '{module.Module.ModuleID}', {module.ModuleCount})");
 
-                foreach (var equipment in module.Module.Equipment.GetAllEquipment())
+                foreach (var equipment in module.ModuleEquipment.GetAllEquipment())
                 {
                     conn.ExecQuery($"INSERT INTO Equipments(Row, EquipmentID) Values({rowCnt}, '{equipment.EquipmentID}')");
                 }

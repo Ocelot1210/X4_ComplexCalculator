@@ -1,8 +1,10 @@
 ﻿using Prism.Commands;
 using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Windows;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
@@ -161,7 +163,7 @@ namespace X4_ComplexCalculator.Main
         public MainWindowViewModel()
         {
             _WorkAreaFileIO        = new WorkAreaFileIO(_WorkAreaManager);
-            _MainWindowModel       = new MainWindowModel(_WorkAreaManager);
+            _MainWindowModel       = new MainWindowModel(_WorkAreaManager, _WorkAreaFileIO);
             WindowLoadedCommand    = new DelegateCommand(WindowLoaded);
             WindowClosingCommand   = new DelegateCommand<CancelEventArgs>(WindowClosing);
             CreateNewCommand       = new DelegateCommand(CreateNew);
@@ -231,9 +233,17 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         private void WindowLoaded()
         {
-            // DB接続開始
-            _MainWindowModel.Init();
-            _WorkAreaManager.Init();
+            try
+            {
+                // DB接続開始
+                _MainWindowModel.Init();
+                _WorkAreaManager.Init();
+            }
+            catch(Exception e)
+            {
+                X4_ComplexCalculator.Common.Localize.Localize.ShowMessageBox("Lang:UnexpectedErrorMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message, e.StackTrace ?? "");
+                Environment.Exit(-1);
+            }
         }
 
 

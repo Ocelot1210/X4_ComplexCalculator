@@ -21,7 +21,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// 装備可能な数
         /// </summary>
-        private readonly Dictionary<Size, int> _MaxAmount = new Dictionary<Size, int>();
+        private readonly Dictionary<Size, int> _MaxAmount;
 
 
         /// <summary>
@@ -83,6 +83,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         public ModuleEquipmentManager(string moduleID, string equipmentType)
         {
             CanEquipped = false;
+            _MaxAmount = new Dictionary<Size, int>();
 
             if (string.IsNullOrEmpty(equipmentType))
             {
@@ -91,16 +92,15 @@ namespace X4_ComplexCalculator.DB.X4DB
 
             var query = $@"SELECT SizeID, Amount FROM Module{equipmentType} WHERE ModuleID = '{moduleID}'";
 
-            DBConnection.X4DB.ExecQuery(query,
-                (SQLiteDataReader dr, object[] args) =>
-                {
-                    var size = new Size((string)dr["SizeID"]);
-                    _Sizes.Add(size);
-                    var maxAmount = (int)(long)dr["Amount"];
-                    _MaxAmount.Add(size, maxAmount);
-                    _Equipments.Add(size, new List<Equipment>(maxAmount));
-                    CanEquipped = true;
-                });
+            DBConnection.X4DB.ExecQuery(query, (dr, args) =>
+            {
+                var size = Size.Get((string)dr["SizeID"]);
+                _Sizes.Add(size);
+                var maxAmount = (int)(long)dr["Amount"];
+                _MaxAmount.Add(size, maxAmount);
+                _Equipments.Add(size, new List<Equipment>(maxAmount));
+                CanEquipped = true;
+            });
         }
 
         /// <summary>
@@ -110,17 +110,13 @@ namespace X4_ComplexCalculator.DB.X4DB
         public ModuleEquipmentManager(ModuleEquipmentManager manager)
         {
             CanEquipped = manager.CanEquipped;
-            _Sizes      = manager._Sizes.ToList();
-            _MaxAmount  = new Dictionary<Size, int>();
-            foreach(var amount in manager._MaxAmount)
-            {
-                _MaxAmount.Add(amount.Key, amount.Value);
-            }
-            
+            _Sizes      = manager._Sizes;
+            _MaxAmount  = manager._MaxAmount;
+
             _Equipments = new Dictionary<Size, List<Equipment>>();
             foreach(var equipment in manager._Equipments)
             {
-                _Equipments.Add(equipment.Key, equipment.Value.ToList());
+                _Equipments.Add(equipment.Key, new List<Equipment>(equipment.Value));
             }
         }
 
@@ -171,9 +167,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <returns></returns>
         public override bool Equals(object? obj)
         {
-            if (!(obj is ModuleEquipmentManager tgt)) return false;
-
-            return _Equipments.Equals(tgt._Equipments);
+            return obj is ModuleEquipmentManager tgt && _Equipments.Equals(tgt._Equipments);
         }
 
 

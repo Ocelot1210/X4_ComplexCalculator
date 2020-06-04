@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
+using System.Windows.Threading;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
@@ -73,7 +75,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             return ret;
         }
 
-
         /// <summary>
         /// モジュールを復元
         /// </summary>
@@ -89,6 +90,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             });
 
             var modules = new List<ModulesGridItem>(moduleCnt);
+            
 
             // モジュールを復元
             conn.ExecQuery("SELECT ModuleID, Count FROM Modules ORDER BY Row ASC", (dr, _) =>
@@ -99,7 +101,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             // モジュールの装備を復元
             conn.ExecQuery($"SELECT * FROM Equipments", (dr, _) =>
             {
-                modules[(int)(long)dr["row"]].Module.AddEquipment(new Equipment((string)dr["EquipmentID"]));
+                modules[(int)(long)dr["row"]].AddEquipment(Equipment.Get((string)dr["EquipmentID"]));
             });
 
             _WorkArea.Modules.Reset(modules);

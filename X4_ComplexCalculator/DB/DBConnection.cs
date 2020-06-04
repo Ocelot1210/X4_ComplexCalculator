@@ -4,6 +4,7 @@ using System.IO;
 using System.Windows;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Localize;
+using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.DB
 {
@@ -212,7 +213,7 @@ namespace X4_ComplexCalculator.DB
                     {
                         while (dr.Read())
                         {
-                            callback.Invoke(dr, args);
+                            callback(dr, args);
                             ret++;
                         }
                     }
@@ -280,7 +281,11 @@ namespace X4_ComplexCalculator.DB
                 if (File.Exists(x4DBPath))
                 {
                     X4DB = new DBConnection(x4DBPath);
-                    if (GetDBVersion() < 1)
+                    if (0 < GetDBVersion())
+                    {
+                        InitX4DB();
+                    }
+                    else
                     {
                         Localize.ShowMessageBox("Lang:OldFormatMessage", "Lang:Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
 
@@ -318,7 +323,6 @@ namespace X4_ComplexCalculator.DB
                     Environment.Exit(-1);
                 }
             }
-            
             
             CommonDB = CreatePresetDB(Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? "", conf["AppSettings:CommonDBPath"]));
         }
@@ -371,10 +375,32 @@ namespace X4_ComplexCalculator.DB
             if (File.Exists(path))
             {
                 X4DB = new DBConnection(path);
+                InitX4DB();
                 return true;
             }
 
             return false;
+        }
+
+
+        /// <summary>
+        /// X4DBを初期化
+        /// </summary>
+        private static void InitX4DB()
+        {
+            DB.X4DB.Size.Init();
+            ModuleType.Init();
+            Race.Init();
+            Faction.Init();
+            EquipmentType.Init();
+            Equipment.Init();
+            TransportType.Init();
+            WareGroup.Init();
+            Ware.Init();
+            ModuleType.Init();
+            ModuleProduction.Init();
+            ModuleEquipment.Init();
+            Module.Init();
         }
     }
 }

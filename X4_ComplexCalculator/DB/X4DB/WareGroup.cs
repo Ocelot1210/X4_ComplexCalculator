@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.SQLite;
 
 namespace X4_ComplexCalculator.DB.X4DB
@@ -8,23 +9,30 @@ namespace X4_ComplexCalculator.DB.X4DB
     /// </summary>
     public class WareGroup
     {
+        #region スタティックメンバ
+        /// <summary>
+        /// ウェア種別一覧
+        /// </summary>
+        private static readonly Dictionary<string, WareGroup> _WareGroups = new Dictionary<string, WareGroup>();
+        #endregion
+
         #region プロパティ
         /// <summary>
         /// ウェアグループID
         /// </summary>
-        public string WareGroupID { private set; get; }
+        public string WareGroupID { get; }
 
 
         /// <summary>
         /// ウェアグループ名
         /// </summary>
-        public string Name { private set; get; }
+        public string Name { get; }
 
 
         /// <summary>
-        /// 階層
+        /// 階級
         /// </summary>
-        public long Tier { private set; get; }
+        public long Tier { get; }
         #endregion
 
 
@@ -32,25 +40,39 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// コンストラクタ
         /// </summary>
         /// <param name="wareGroupID">ウェアグループID</param>
-        public WareGroup(string wareGroupID)
+        /// <param name="name">ウェアグループ名</param>
+        /// <param name="Tier">階級</param>
+        private WareGroup(string wareGroupID, string name, long tier)
         {
             WareGroupID = wareGroupID;
-            string name = "";
-            long tier = 0;
-            DBConnection.X4DB.ExecQuery($"SELECT Name, Tier FROM WareGroup WHERE WareGroupID = '{WareGroupID}'",(SQLiteDataReader dr, object[] args) =>
-            {
-                name = (string)dr["Name"];
-                tier = (long)dr["Tier"];
-            });
-
-            if (string.IsNullOrEmpty(name))
-            {
-                throw new ArgumentException("Invalid ware group id.", nameof(wareGroupID));
-            }
-
             Name = name;
             Tier = tier;
         }
+
+
+        /// <summary>
+        /// 初期化
+        /// </summary>
+        public static void Init()
+        {
+            _WareGroups.Clear();
+            DBConnection.X4DB.ExecQuery($"SELECT WareGroupID, Name, Tier FROM WareGroup", (dr, args) =>
+            {
+                var id = (string)dr["WareGroupID"];
+                var name = (string)dr["Name"];
+                var tier = (long)dr["Tier"];
+
+                _WareGroups.Add(id, new WareGroup(id, name, tier));
+            });
+        }
+
+
+        /// <summary>
+        /// ウェア種別IDに対応するウェア種別を取得する
+        /// </summary>
+        /// <param name="wareGroupID">ウェア種別ID</param>
+        /// <returns>ウェア種別</returns>
+        public static WareGroup Get(string wareGroupID) => _WareGroups[wareGroupID];
 
 
         /// <summary>

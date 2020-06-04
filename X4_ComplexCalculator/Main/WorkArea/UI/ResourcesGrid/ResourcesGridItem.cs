@@ -111,7 +111,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
         /// <param name="amount">建造に必要なウェア数</param>
         public ResourcesGridItem(string wareID, long amount)
         {
-            Ware = new Ware(wareID);
+            Ware = Ware.Get(wareID);
             UnitPrice = (Ware.MaxPrice + Ware.MinPrice) / 2;
             Amount = amount;
         }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
 using X4_ComplexCalculator.Common.Collection;
@@ -17,19 +19,31 @@ namespace X4_ComplexCalculator.Main
     /// </summary>
     class WorkAreaManager
     {
-        #region プロパティ
+        #region メンバ
         /// <summary>
         /// 現在のレイアウト
         /// </summary>
         private LayoutMenuItem? _ActiveLayout;
+
+        /// <summary>
+        /// ガーベジコレクション用ストップウォッチ
+        /// </summary>
+        private readonly Stopwatch _GCStopWatch = new Stopwatch();
+
+        /// <summary>
+        /// ガーベジコレクション用タイマー
+        /// </summary>
+        private DispatcherTimer _GCTimer;
 
 
         /// <summary>
         /// ワークエリア一覧
         /// </summary>
         public ObservableRangeCollection<WorkAreaViewModel> Documents = new ObservableRangeCollection<WorkAreaViewModel>();
+        #endregion
 
 
+        #region プロパティ
         /// <summary>
         /// アクティブなワークスペース
         /// </summary>
@@ -72,6 +86,8 @@ namespace X4_ComplexCalculator.Main
         public WorkAreaManager()
         {
             Layouts.CollectionPropertyChanged += Layouts_CollectionPropertyChanged;
+
+            _GCTimer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, new EventHandler(GarvageCollect), Application.Current.Dispatcher);
         }
 
 
@@ -225,12 +241,40 @@ namespace X4_ComplexCalculator.Main
                     ActiveContent = null;
                 }
 
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-                GC.Collect();
+                // ガーベジコレクション用タイマー開始
+                if (!_GCTimer.IsEnabled)
+                {
+                    _GCTimer.Start();
+                }
+
+                // 時間計測用ストップウォッチを初期化
+                _GCStopWatch.Reset();
+
             }
 
             return canceled;
+        }
+
+
+        /// <summary>
+        /// ガーベジコレクション実行
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void GarvageCollect(object? sender, EventArgs e)
+        {
+            // 最後のタブクローズから1000ミリ秒経過してからガーベジコレクションを発動する
+            _GCStopWatch.Stop();
+            if (1000 < _GCStopWatch.ElapsedMilliseconds)
+            {
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+
+                // ガーベジコレクション無効化
+                _GCTimer.Stop();
+            }
+            _GCStopWatch.Start();
         }
     }
 }

@@ -10,6 +10,14 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
     /// </summary>
     class ProductCalclator
     {
+        #region スタティックメンバ
+        /// <summary>
+        /// 製品計算用シングルトンインスタンス
+        /// </summary>
+        private static ProductCalclator? _SingletonInstance;
+        #endregion
+
+
         #region メンバ
         /// <summary>
         /// key = ModuleID
@@ -55,13 +63,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         private readonly IReadOnlyDictionary<string, (string WareID, double Amount)[]> _WorkUnitWares;
         #endregion
 
-
-        #region 静的メンバ
-        /// <summary>
-        /// 製品計算用インスタンス
-        /// </summary>
-        private static ProductCalclator? _SingletonProductCalclator;
-        #endregion
 
         /// <summary>
         /// コンストラクタ
@@ -199,18 +200,20 @@ WHERE
 
 
         /// <summary>
-        /// 製品計算用クラスのインスタンスを作成
+        /// 製品計算用クラスのインスタンス
         /// </summary>
-        /// <returns>製品計算用クラスのインスタンス</returns>
-        public static ProductCalclator Create()
+        public static ProductCalclator Instance
         {
-            // 未作成なら作成する
-            if (_SingletonProductCalclator == null)
+            get
             {
-                _SingletonProductCalclator = new ProductCalclator();
-            }
+                // 未作成なら作成する
+                if (_SingletonInstance == null)
+                {
+                    _SingletonInstance = new ProductCalclator();
+                }
 
-            return _SingletonProductCalclator;
+                return _SingletonInstance;
+            }
         }
 
 

@@ -126,7 +126,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <param name="price">価格</param>
         public ProductsGridItem(string wareID, IEnumerable<ProductDetailsListItem> datails)
         {
-            Ware = new Ware(wareID);
+            Ware = Ware.Get(wareID);
             UnitPrice = (Ware.MinPrice + Ware.MaxPrice) / 2;
             Details = new ObservableRangeCollection<ProductDetailsListItem>(datails);
         }

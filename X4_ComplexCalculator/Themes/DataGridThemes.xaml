@@ -21,7 +21,8 @@
             </Trigger>
 
             <!--  コンテキストメニューを表示している場合の背景色  -->
-            <MultiDataTrigger>
+            <!--  ※ ↓が無くても動くみたいだからコメントアウトして様子見  -->
+            <!--<MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="True" />
                     <Condition Binding="{Binding ContextMenu.IsOpen, RelativeSource={RelativeSource AncestorType=DataGrid}}" Value="True" />
@@ -29,7 +30,7 @@
                 <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
                 <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
                 <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
-            </MultiDataTrigger>
+            </MultiDataTrigger>-->
         </Style.Triggers>
     </Style>
 

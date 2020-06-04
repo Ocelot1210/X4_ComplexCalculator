@@ -19,6 +19,7 @@ Confirmation;確認
 Warning;警告
 Error;エラー
 
+
 # ------------------------------------------------------
 # DB
 # ------------------------------------------------------
@@ -60,7 +61,7 @@ PlanClosingConfirmMessage;計画{0}の変更内容を保存しますか？
 DeleteLayoutConfirmMessage;レイアウト「{0}」を本当に削除しますか？
 InvalidLayoutNameMessage;レイアウト名が無効です。\r\n空白文字以外の文字を1文字以上入力して下さい。
 SaveDataWriteFailureMessage;保存に失敗しました。\r\n■理由：\r\n{0}\r\n\r\n■スタックトレース：\r\n{1}
-ImportFailureMessage;インポートに失敗しました。\r\n■理由：\r\n{e.Message}
+ImportFailureMessage;インポートに失敗しました。\r\n■理由：\r\n{0}
 StationCalclatorExportTitle;Station Calclatorへエクスポート
 StationCalclatorExportDescription;URLをコピーして下さい\r\n注) 以下のモジュールは除外しています。\r\n・接続モジュール\r\n・探検モジュール
 StationCalclatorImportTitle;Station Calclatorからインポート
@@ -68,6 +69,7 @@ StationCalclatorImportDescription;Station Calclator上部のShareボタンをク
 SelectPlanWindowTitle;計画を選択
 X4PlanFilePathDescription;X4 建造計画ファイルパス
 ImportPlanDescription;インポートする計画を選択
+UnexpectedErrorMessage;予期しないエラーが発生しました。\r\n■エラー内容：\r\n{0}\r\n\r\n■スタックトレース：\r\n{1}
 
 # ------------------------------------------------------
 # Plan
@@ -94,7 +96,7 @@ Edit;編集
 BuildMethod;建造方式
 MergeModulesConfirmMessage;重複するモジュールをマージしますか？
 NoMergeModulesMessage;重複したモジュールはありませんでした。
-MergeModulesMessage;{0}モジュールをマージしました。
+MergeModulesMessage;{0}モジュール、{1}レコードをマージしました。
 AutoAddConfirm;不足している製品を生産するモジュールを追加しますか？
 NoAddedModulesAutomaticallyMessage;不足している製品が無いためモジュールは追加されませんでした。
 AddedModulesAutomaticallyMessage;{0}レコード、{1}モジュール追加されました。

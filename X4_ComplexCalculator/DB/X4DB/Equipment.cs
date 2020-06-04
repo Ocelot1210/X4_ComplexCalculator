@@ -1,18 +1,26 @@
-﻿using System;
-using System.Data.SQLite;
+﻿using System.Collections.Generic;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
     /// <summary>
     /// 装備品管理用クラス
     /// </summary>
-    public class Equipment : IComparable
+    public class Equipment
     {
+        #region スタティックメンバ
+        /// <summary>
+        /// 装備一覧
+        /// </summary>
+        private readonly static Dictionary<string, Equipment> _Equipments = new Dictionary<string, Equipment>();
+        #endregion
+
+
         #region プロパティ
         /// <summary>
         /// 装備品ID
         /// </summary>
         public string EquipmentID { get; }
+
 
         /// <summary>
         /// 装備種別
@@ -30,49 +38,47 @@ namespace X4_ComplexCalculator.DB.X4DB
         public string Name { get; }
         #endregion
 
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="equipmentID">装備品ID</param>
-        public Equipment(string equipmentID)
+        /// <param name="equipmentID"></param>
+        /// <param name="name"></param>
+        /// <param name="equipmentType"></param>
+        /// <param name="size"></param>
+        private Equipment(string equipmentID, string name, EquipmentType equipmentType, Size size)
         {
             EquipmentID = equipmentID;
-            string name = "";
-            EquipmentType? equipmentType = null;
-            Size?          size          = null;
-
-            DBConnection.X4DB.ExecQuery(
-                $"SELECT * FROM Equipment WHERE EquipmentID = '{EquipmentID}'",
-                (SQLiteDataReader dr, object[] args) =>
-                    {
-                        equipmentType = new EquipmentType((string)dr["EquipmentTypeID"]);
-                        size = new Size((string)dr["SizeID"]);
-                        name = (string)dr["Name"];
-                    });
-
-            if (string.IsNullOrEmpty(name))
-            {
-                throw new ArgumentException("Invalid equipment id.", nameof(equipmentID));
-            }
-
             Name = name;
-            Size = size ?? throw new InvalidOperationException($"{nameof(size)} should not be null.");
-            EquipmentType = equipmentType ?? throw new InvalidOperationException($"{nameof(equipmentType)} should not be null.");
+            EquipmentType = equipmentType;
+            Size = size;
         }
+
 
         /// <summary>
-        /// オブジェクト比較
+        /// 初期化
         /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public int CompareTo(object? obj)
+        public static void Init()
         {
-            if (obj == null)
+            _Equipments.Clear();
+            DBConnection.X4DB.ExecQuery("SELECT EquipmentID, EquipmentTypeID, SizeID, Name FROM Equipment", (dr, args) =>
             {
-                return 1;
-            }
-            return EquipmentID.CompareTo(obj is Equipment);
+                var id = (string)dr["EquipmentID"];
+                var type = (string)dr["EquipmentTypeID"];
+                var size = (string)dr["SizeID"];
+                var name = (string)dr["Name"];
+
+                _Equipments.Add(id, new Equipment(id, name, EquipmentType.Get(type), Size.Get(size)));
+            });
         }
+
+
+        /// <summary>
+        /// 装備IDに対応する装備を取得する
+        /// </summary>
+        /// <param name="equipmentID">装備ID</param>
+        /// <returns>装備</returns>
+        public static Equipment Get(string equipmentID) => _Equipments[equipmentID];
 
 
         /// <summary>
@@ -82,11 +88,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <returns></returns>
         public override bool Equals(object? obj)
         {
-            if (obj == null)
-            {
-                throw new ArgumentException($"parameter {nameof(obj)} should not be null.", nameof(obj));
-            }
-            return obj is Equipment tgt && tgt.EquipmentID == EquipmentID;
+            return obj is Equipment tgt && EquipmentID == tgt.EquipmentID;
         }
 
 

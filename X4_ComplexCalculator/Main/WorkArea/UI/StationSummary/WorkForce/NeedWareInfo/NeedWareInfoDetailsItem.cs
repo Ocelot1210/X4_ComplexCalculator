@@ -1,4 +1,5 @@
 ﻿using Prism.Mvvm;
+using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWareInfo
 {
@@ -14,10 +15,20 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
         private long _NeedAmount;
 
         /// <summary>
+        /// 合計必要数量
+        /// </summary>
+        private long _TotalNeedAmount;
+
+        /// <summary>
         /// 生産数量
         /// </summary>
         private long _ProductionAmount;
         #endregion
+
+        /// <summary>
+        /// 種族
+        /// </summary>
+        public Race Race { get; }
 
         /// <summary>
         /// 労働方式
@@ -53,6 +64,16 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
         }
 
         /// <summary>
+        /// 合計必要数量
+        /// </summary>
+        public long TotalNeedAmount
+        {
+            get => _TotalNeedAmount;
+            set => SetProperty(ref _TotalNeedAmount, value);
+        }
+
+
+        /// <summary>
         /// 生産数量
         /// </summary>
         public long ProductionAmount
@@ -79,14 +100,14 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
         /// </summary>
         /// <param name="method">労働方式</param>
         /// <param name="wareID">ウェアID</param>
-        /// <param name="wareName">ウェア名</param>
         /// <param name="needAmount">必要数量</param>
         /// <param name="productionAmount">生産数量</param>
-        public NeedWareInfoDetailsItem(string method, string wareID, string wareName, long needAmount = 0, long productionAmount = 0)
+        public NeedWareInfoDetailsItem(string method, string wareID, long needAmount = 0, long productionAmount = 0)
         {
+            Race             = (method == "default") ? Race.Get("argon") : Race.Get(method);
             Method           = method;
             WareID           = wareID;
-            WareName         = wareName;
+            WareName         = Ware.Get(wareID).Name;
             NeedAmount       = needAmount;
             ProductionAmount = productionAmount;
         }

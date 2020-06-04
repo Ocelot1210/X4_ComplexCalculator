@@ -2,6 +2,7 @@
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
@@ -63,19 +64,43 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit
         }
 
         /// <summary>
-        /// 製品のプロパティが変更された時
+        /// 製品が追加/削除された場合
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <returns></returns>
         private async Task OnProductsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            UpdateProfit();
+            // 製品が削除された場合
+            if (e.OldItems != null)
+            {
+                var items = e.OldItems.Cast<ProductsGridItem>().Select(x => x.Ware.WareID).ToArray();
+
+                // 削除された製品と一致するレコードを全削除
+                ProfitDetails.RemoveAll(x => items.Contains(x.WareID));
+            }
+
+            // 製品が追加された場合
+            if (e.NewItems != null)
+            {
+                var items = e.NewItems.Cast<ProductsGridItem>();
+
+                ProfitDetails.AddRange(items.Select(x => new ProfitDetailsItem(x.Ware.WareID, x.Ware.Name, x.Count, x.UnitPrice)));
+            }
+
+            if (e.Action == NotifyCollectionChangedAction.Reset)
+            {
+                var items = Products.Select(x => new ProfitDetailsItem(x.Ware.WareID, x.Ware.Name, x.Count, x.UnitPrice));
+
+                ProfitDetails.Reset(items);
+                Profit = ProfitDetails.Sum(x => x.TotalPrice);
+            }
+
             await Task.CompletedTask;
         }
 
         /// <summary>
-        /// 製品一覧が変更された時
+        /// 製品のプロパティが変更された時
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -117,18 +142,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit
             }
 
             await Task.CompletedTask;
-        }
-
-
-        /// <summary>
-        /// 利益を更新
-        /// </summary>
-        private void UpdateProfit()
-        {
-            var items = Products.Select(x => new ProfitDetailsItem(x.Ware.WareID, x.Ware.Name, x.Count, x.UnitPrice));
-
-            ProfitDetails.Reset(items);
-            Profit = ProfitDetails.Sum(x => x.TotalPrice);
         }
     }
 }
