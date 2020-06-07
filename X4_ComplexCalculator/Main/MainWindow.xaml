@@ -7,6 +7,7 @@
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:plnArea="clr-namespace:X4_ComplexCalculator.Main.WorkArea"
+    xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
     xmlns:x4vcvt="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
     xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
@@ -192,12 +193,36 @@
 
         </xcad:DockingManager>
 
-
+        <!--  IsBusy="{Binding FileLoadingIsBusy, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">  -->
         <xctk:BusyIndicator
             Grid.Row="0"
             Grid.RowSpan="2"
-            IsBusy="{Binding IsBusy}">
-            <!--    -->
+            IsBusy="{Binding FileLoadingIsBusy, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+            <xctk:BusyIndicator.BusyContentTemplate>
+                <DataTemplate>
+                    <StackPanel Margin="4">
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            FontWeight="Bold"
+                            Text="{lex:Loc Lang:LoadingFile}" />
+                        <StackPanel Margin="0,4,4,4">
+                            <TextBlock HorizontalAlignment="Center" Text="{Binding DataContext.LoadingFileName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" />
+                            <ProgressBar
+                                Width="200"
+                                Height="15"
+                                Value="{Binding DataContext.FileLoadingProgress, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" />
+                        </StackPanel>
+                    </StackPanel>
+                </DataTemplate>
+            </xctk:BusyIndicator.BusyContentTemplate>
+
+
+            <!--  元々用意されているプログレスバーを非表示  -->
+            <xctk:BusyIndicator.ProgressBarStyle>
+                <Style TargetType="ProgressBar">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </Style>
+            </xctk:BusyIndicator.ProgressBarStyle>
         </xctk:BusyIndicator>
     </Grid>
 </Window>

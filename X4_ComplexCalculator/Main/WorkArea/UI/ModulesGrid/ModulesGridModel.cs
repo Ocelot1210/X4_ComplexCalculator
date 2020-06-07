@@ -4,7 +4,6 @@ using System.Linq;
 using System.Windows;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Localize;
-using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid

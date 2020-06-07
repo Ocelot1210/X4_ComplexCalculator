@@ -18,9 +18,16 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         /// 保管庫使用容量
         /// </summary>
         private long _UsedCapacity;
+
+
+        /// <summary>
+        /// 折りたたみ/展開状態
+        /// </summary>
+        private bool _IsExpanded;
         #endregion
 
 
+        #region プロパティ
         /// <summary>
         /// 保管庫総容量
         /// </summary>
@@ -56,6 +63,17 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         /// 保管庫空き容量
         /// </summary>
         public long FreeCapacity => TotalCapacity - _UsedCapacity;
+
+
+        /// <summary>
+        /// 折りたたみ/展開状態
+        /// </summary>
+        public bool IsExpanded
+        {
+            get => _IsExpanded;
+            set => SetProperty(ref _IsExpanded, value);
+        }
+        #endregion
 
 
         /// <summary>

@@ -151,9 +151,21 @@ namespace X4_ComplexCalculator.Main
 
 
         /// <summary>
-        /// ビジー状態か
+        /// ファイル読み込みがビジー状態か
         /// </summary>
-        public bool IsBusy => _WorkAreaFileIO.IsBusy;
+        public bool FileLoadingIsBusy => _WorkAreaFileIO.IsBusy;
+
+
+        /// <summary>
+        /// ファイル読み込み進捗
+        /// </summary>
+        public int FileLoadingProgress => _WorkAreaFileIO.Progress;
+
+
+        /// <summary>
+        /// 読込中のファイル名
+        /// </summary>
+        public string LoadingFileName => _WorkAreaFileIO.LoadingFileName;
         #endregion
 
 
@@ -200,7 +212,15 @@ namespace X4_ComplexCalculator.Main
             switch (e.PropertyName)
             {
                 case nameof(_WorkAreaFileIO.IsBusy):
-                    RaisePropertyChanged(nameof(IsBusy));
+                    RaisePropertyChanged(nameof(FileLoadingIsBusy));
+                    break;
+
+                case nameof(_WorkAreaFileIO.Progress):
+                    RaisePropertyChanged(nameof(FileLoadingProgress));
+                    break;
+
+                case nameof(_WorkAreaFileIO.LoadingFileName):
+                    RaisePropertyChanged(nameof(LoadingFileName));
                     break;
 
                 default:

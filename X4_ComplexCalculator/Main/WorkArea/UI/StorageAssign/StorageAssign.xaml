@@ -107,6 +107,7 @@
                 <TextBlock Text="{lex:Loc Lang:MaximumSliderValue}" />
                 <xctk:IntegerUpDown
                     x:Name="MaxHourUpDown"
+                    ClipValueToMinMax="True"
                     Maximum="99999"
                     Minimum="2"
                     Value="10" />
@@ -131,7 +132,7 @@
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="{x:Type GroupItem}">
-                                        <Expander Background="Aqua" IsExpanded="True">
+                                        <Expander Background="Aqua" IsExpanded="{Binding Items[0].IsExpanded}">
                                             <Expander.Header>
                                                 <DockPanel>
                                                     <TextBlock Margin="5,0,0,0" FontWeight="Bold">

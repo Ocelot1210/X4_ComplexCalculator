@@ -6,7 +6,6 @@
     using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
-    using X4_ComplexCalculator.Common.Collection;
 
     public class WpfObservableRangeCollection<T> : RangeObservableCollection<T>
     {

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -82,9 +81,15 @@ namespace X4_ComplexCalculator.Main
 
             if (result == MessageBoxResult.Yes)
             {
-                if (!DBConnection.UpdateDB())
+                if (DBConnection.UpdateDB())
                 {
-                    Localize.ShowMessageBox("Lang:DBUpdateConfirmationMessage", "Lang:Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Error);
+                    // DB更新成功
+                    Localize.ShowMessageBox("Lang:DBUpdateRestartRequestMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    // DB更新失敗
+                    Localize.ShowMessageBox("Lang:DBUpdateFailureMessage", "Lang:Error", MessageBoxButton.YesNo, MessageBoxImage.Error);
                 }
             }
         }

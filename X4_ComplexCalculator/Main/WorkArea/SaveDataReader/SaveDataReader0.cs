@@ -25,6 +25,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
         /// </summary>
         protected readonly IWorkArea _WorkArea;
 
+        protected readonly DoEventsExecuter _DoEventsExec = new DoEventsExecuter(-1, 32);
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -50,13 +52,16 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                     conn.BeginTransaction();
 
                     // モジュール復元
-                    RestoreModules(conn);
+                    RestoreModules(conn, progress, 90);
+                    progress.Report(90);
 
                     // 製品価格を復元
                     RestoreProductsPrice(conn);
+                    progress.Report(95);
 
                     // 建造リソースを復元
                     RestoreBuildResource(conn);
+                    progress.Report(100);
 
                     _WorkArea.Title = System.IO.Path.GetFileNameWithoutExtension(Path);
 
@@ -78,31 +83,47 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
         /// <summary>
         /// モジュールを復元
         /// </summary>
-        /// <param name="dr"></param>
-        /// <param name="args"></param>
-        protected virtual void RestoreModules(DBConnection conn)
+        /// <param name="conn">DB接続情報</param>
+        /// <param name="maxProgress">進捗最大</param>
+        protected virtual void RestoreModules(DBConnection conn, IProgress<int> progress, int maxProgress)
         {
+            var records = 0;
             var moduleCnt = 0;
 
+            // レコード数取得
             conn.ExecQuery("SELECT count(*) AS Count from Modules", (dr, _) =>
             {
                 moduleCnt = (int)(long)dr[0];
             });
 
+            records += moduleCnt;
+            conn.ExecQuery("SELECT count(*) AS Count from Equipments", (dr, _) =>
+            {
+                records += (int)(long)dr[0];
+            });
+
+
             var modules = new List<ModulesGridItem>(moduleCnt);
-            
+            var progressCnt = 1;
 
             // モジュールを復元
             conn.ExecQuery("SELECT ModuleID, Count FROM Modules ORDER BY Row ASC", (dr, _) =>
             {
                 modules.Add(new ModulesGridItem((string)dr["ModuleID"], (long)dr["Count"]));
+                progress.Report((int)((double)progressCnt++ / records * maxProgress));
+                _DoEventsExec.DoEvents();
             });
+
 
             // モジュールの装備を復元
             conn.ExecQuery($"SELECT * FROM Equipments", (dr, _) =>
             {
-                modules[(int)(long)dr["row"]].AddEquipment(Equipment.Get((string)dr["EquipmentID"]));
+                var row = (int)(long)dr["row"];
+                modules[row].AddEquipment(Equipment.Get((string)dr["EquipmentID"]));
+                progress.Report((int)((double)progressCnt++ / records * maxProgress));
+                _DoEventsExec.DoEvents();
             });
+
 
             _WorkArea.Modules.Reset(modules);
         }
@@ -122,6 +143,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                 {
                     itm.UnitPrice = (long)dr["Price"];
                 }
+                _DoEventsExec.DoEvents();
             });
         }
 
@@ -141,6 +163,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                 {
                     itm.UnitPrice = (long)dr["Price"];
                 }
+                _DoEventsExec.DoEvents();
             });
         }
     }

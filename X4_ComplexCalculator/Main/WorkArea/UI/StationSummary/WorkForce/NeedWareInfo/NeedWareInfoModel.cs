@@ -32,12 +32,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
 
 
         /// <summary>
-        /// 労働者数
-        /// </summary>
-        private long _WorkersCount;
-
-
-        /// <summary>
         /// 集計対象ウェア数量ディクショナリ
         /// </summary>
         /// <remarks>

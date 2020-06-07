@@ -2,14 +2,8 @@
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
-using System.Windows.Threading;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Main.WorkArea;
@@ -32,6 +26,18 @@ namespace X4_ComplexCalculator.Main
         /// 作業エリア管理用
         /// </summary>
         private readonly WorkAreaManager _WorkAreaManager;
+
+
+        /// <summary>
+        /// ファイル読み込み進捗
+        /// </summary>
+        private int _Progress;
+
+
+        /// <summary>
+        /// 読込中のファイル名
+        /// </summary>
+        private string _LoadingFileName = "";
         #endregion
 
 
@@ -43,6 +49,26 @@ namespace X4_ComplexCalculator.Main
         {
             get => _IsBusy;
             private set => SetProperty(ref _IsBusy, value);
+        }
+
+
+        /// <summary>
+        /// ファイル読み込み進捗
+        /// </summary>
+        public int Progress
+        {
+            get => _Progress;
+            set => SetProperty(ref _Progress, value);
+        }
+
+
+        /// <summary>
+        /// 読込中のファイル名
+        /// </summary>
+        public string LoadingFileName
+        {
+            get => _LoadingFileName;
+            set => SetProperty(ref _LoadingFileName, value);
         }
         #endregion
 
@@ -101,7 +127,6 @@ namespace X4_ComplexCalculator.Main
             }
         }
 
-        //BackgroundWorker? _BackgroundWorker;
 
         /// <summary>
         /// ファイルを開く
@@ -116,23 +141,36 @@ namespace X4_ComplexCalculator.Main
 
             try
             {
-                Mouse.OverrideCursor = Cursors.Wait;
-                // Application.Current.Dispatcher.Invoke(() => IsBusy = true);
+                var doevents = new DoEventsExecuter(0, 0);
 
-                //var op = Dispatcher.CurrentDispatcher.BeginInvoke(() =>
-                //{
-                //    AddMain(pathes);
-                //});
+                var prg = new ProgressEx<int>(0);
+                var loaded = 0;
+                var pathesCount = pathes.Count();
+                var rate = 1.0 / pathesCount;
+
+                prg.ProgressChanged += (sender, e) =>
+                {
+                    Progress = (int)(e * rate + (loaded * rate * 100));
+                    doevents.ForceDoEvents();
+                };
+
                 IsBusy = true;
-                AddMain(pathes);
-                //_BackgroundWorker = new BackgroundWorker();
-                //_BackgroundWorker.WorkerReportsProgress = true;
+                doevents.ForceDoEvents();
+                var viewModels = new List<WorkAreaViewModel>(pathesCount);
 
-                //_BackgroundWorker.DoWork += (s, evt) => AddMain(pathes);
-                //_BackgroundWorker.ProgressChanged += (s, evt) => { };
-                //_BackgroundWorker.RunWorkerCompleted += (s, evt) => { IsBusy = false; };
+                foreach (var path in pathes)
+                {
+                    var vm = new WorkAreaViewModel(_WorkAreaManager.ActiveLayout?.LayoutID ?? -1);
 
-                //_BackgroundWorker.RunWorkerAsync();
+                    LoadingFileName = System.IO.Path.GetFileName(path);
+                    doevents.ForceDoEvents();
+
+                    vm.LoadFile(path, prg);
+                    viewModels.Add(vm);
+                    loaded++;
+                }
+
+                _WorkAreaManager.Documents.AddRange(viewModels);
             }
             catch (Exception e)
             {
@@ -140,83 +178,9 @@ namespace X4_ComplexCalculator.Main
             }
             finally
             {
-                
-            }
-        }
-
-
-
-
-        private void AddMain(IEnumerable<string> pathes)
-        {
-            //var worker = new Thread(delegate()
-            //{
-            //    Application.Current.Dispatcher.Invoke(() =>
-            //    {
-            //        var tmpList = new List<WorkAreaViewModel>();
-
-            //        foreach (var path in pathes)
-            //        {
-            //            var prg = new Progress<int>();
-
-            //            var vm = new WorkAreaViewModel(_WorkAreaManager.ActiveLayout?.LayoutID ?? -1);
-            //            vm.LoadFile(path, prg);
-            //            tmpList.Add(vm);
-            //        }
-            //        _WorkAreaManager.Documents.AddRange(tmpList);
-
-            //        IsBusy = false;
-            //        Mouse.OverrideCursor = null;
-            //    });
-            //});
-            //worker.IsBackground = true;
-            //worker.Start();
-
-
-            //var tmpList = new List<WorkAreaViewModel>();
-            //foreach (var path in pathes)
-            //{
-            //    var prg = new Progress<int>();
-
-            //    var vm = new WorkAreaViewModel(_WorkAreaManager.ActiveLayout?.LayoutID ?? -1);
-            //    vm.LoadFile(path, prg);
-            //    tmpList.Add(vm);
-            //}
-            //_WorkAreaManager.Documents.AddRange(tmpList);
-            //IsBusy = false;
-
-            void test()
-            {
-                var tmpList = new List<WorkAreaViewModel>();
-                foreach (var path in pathes)
-                {
-                    var prg = new Progress<int>();
-
-                    var vm = new WorkAreaViewModel(_WorkAreaManager.ActiveLayout?.LayoutID ?? -1);
-                    vm.LoadFile(path, prg);
-                    tmpList.Add(vm);
-                }
-                _WorkAreaManager.Documents.AddRange(tmpList);
                 IsBusy = false;
-                Mouse.OverrideCursor = null;
+                Progress = 0;
             }
-
-            ThreadStart start = delegate ()
-            {
-                var op = Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(test));
-
-                var status = op.Status;
-                while (status != DispatcherOperationStatus.Completed)
-                {
-                    status = op.Wait(TimeSpan.FromMilliseconds(100));
-                    if (status == DispatcherOperationStatus.Aborted)
-                    {
-                        
-                    }
-                }
-            };
-
-            new Thread(start).Start();
         }
     }
 }

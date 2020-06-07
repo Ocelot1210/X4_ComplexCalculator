@@ -42,16 +42,20 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                     conn.BeginTransaction();
 
                     // モジュール復元
-                    RestoreModules(conn);
+                    RestoreModules(conn, progress, 90);
+                    progress.Report(90);
 
                     // 製品価格を復元
                     RestoreProductsPrice(conn);
+                    progress.Report(93);
 
                     // 建造リソースを復元
                     RestoreBuildResource(conn);
+                    progress.Report(96);
 
                     //保管庫割当情報を読み込み
                     RestoreStorageAssignInfo(conn);
+                    progress.Report(100);
 
                     _WorkArea.Title = System.IO.Path.GetFileNameWithoutExtension(Path);
 

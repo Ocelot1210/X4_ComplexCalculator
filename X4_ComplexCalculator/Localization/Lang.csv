@@ -55,6 +55,7 @@ TabDoesNotSelectedMessage;No tab is selected to save the layout.\r\nSelect the t
 FaildToLoadFileMessage;Failed to load the file.\r\n\r\n■Reason：\r\n{0}
 FaildToLoadFileMessageTitle;Read failure
 DBUpdateConfirmationMessage;Do you want to display the DB update screen? \r\nPlease wait for a moment until the screen starts.
+DBUpdateRestartRequestMessage;Please restart the application to apply the DB update.
 DBUpdateFailureMessage;Failed to update the DB, \r\nplease check if the DB file is accessible and try again.
 MainWindowClosingConfirmMessage;There are some unsaved items. Do you want to save it?
 PlanClosingConfirmMessage;Do you want to save the changes to your plan "{0}"?
@@ -70,6 +71,7 @@ SelectPlanWindowTitle;Select plan
 X4PlanFilePathDescription;X4 Construction plan file path
 ImportPlanDescription;Select a plan to import
 UnexpectedErrorMessage;Unexpected error occurred.\r\n■Error contents：\r\n{0}\r\n\r\n■Stack trace：\r\n{1}
+LoadingFile;Loading file.
 
 
 # ------------------------------------------------------

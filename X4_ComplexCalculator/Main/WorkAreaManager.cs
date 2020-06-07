@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.ServiceModel.Channels;
 using System.Threading;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Threading;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
@@ -88,6 +90,7 @@ namespace X4_ComplexCalculator.Main
             Layouts.CollectionPropertyChanged += Layouts_CollectionPropertyChanged;
 
             _GCTimer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, new EventHandler(GarvageCollect), Application.Current.Dispatcher);
+            _GCTimer.Stop();
         }
 
 

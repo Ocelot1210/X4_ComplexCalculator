@@ -155,6 +155,16 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         /// 指定時間後の個数
         /// </summary>
         public long AfterCount => ProductPerHour * Hour;
+
+
+        /// <summary>
+        /// 折りたたみ/展開状態
+        /// </summary>
+        public bool IsExpanded
+        {
+            get => CapacityInfo.IsExpanded;
+            set => CapacityInfo.IsExpanded = value;
+        }
         #endregion
 
 
@@ -181,6 +191,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
 
             ProductPerHour = productPerHour;
             Hour = hour;
+            IsExpanded = true;
         }
 
         /// <summary>
@@ -195,6 +206,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
                 case nameof(StorageCapacityInfo.FreeCapacity):
                     RaisePropertyChanged(nameof(AllocableCount));
                     RaisePropertyChanged(nameof(MaxAllocableCount));
+                    break;
+
+                case nameof(StorageCapacityInfo.IsExpanded):
+                    RaisePropertyChanged(nameof(IsExpanded));
                     break;
 
                 default:

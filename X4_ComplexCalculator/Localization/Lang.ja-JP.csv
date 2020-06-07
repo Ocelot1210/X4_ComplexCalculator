@@ -55,6 +55,7 @@ TabDoesNotSelectedMessage;レイアウト保存対象のタブが選択されて
 FaildToLoadFileMessage;ファイルの読み込みに失敗しました。\r\n\r\n■理由：\r\n{0}
 FaildToLoadFileMessageTitle;読み込み失敗
 DBUpdateConfirmationMessage;DB更新画面を表示しますか？\r\n※ 画面が起動するまでしばらくお待ち下さい。
+DBUpdateRestartRequestMessage;DBの更新を適用するためには本アプリケーションの再起動を行ってください。
 DBUpdateFailureMessage;DBの更新に失敗しました。\r\nDBファイルにアクセス可能か確認後、再度実行してください。
 MainWindowClosingConfirmMessage;未保存の項目があります。保存しますか？
 PlanClosingConfirmMessage;計画{0}の変更内容を保存しますか？
@@ -70,6 +71,7 @@ SelectPlanWindowTitle;計画を選択
 X4PlanFilePathDescription;X4 建造計画ファイルパス
 ImportPlanDescription;インポートする計画を選択
 UnexpectedErrorMessage;予期しないエラーが発生しました。\r\n■エラー内容：\r\n{0}\r\n\r\n■スタックトレース：\r\n{1}
+LoadingFile;ファイルを読込中
 
 # ------------------------------------------------------
 # Plan

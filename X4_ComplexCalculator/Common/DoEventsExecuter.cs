@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -27,12 +28,21 @@ namespace X4_ComplexCalculator.Common
         int CallCount;
 
         /// <summary>
+        /// コールバック処理
+        /// </summary>
+        DispatcherOperationCallback _DispatcherOperationCallback = new DispatcherOperationCallback(obj => { ((DispatcherFrame)obj).Continue = false; return null; });
+
+        /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="executeNum">N回に1回実行するか</param>
-        /// <param name="executeMs">最低でも実行する間隔</param>
+        /// <param name="executeNum">N回に1回実行するか(-1で判定無効化)</param>
+        /// <param name="executeMs">最低でも実行する間隔(-1で判定無効化)</param>
         public DoEventsExecuter(int executeNum, long executeMs)
         {
+            if (executeNum == -1 && executeMs == -1)
+            {
+                throw new ArgumentException();
+            }
             _ExecuteNum = executeNum;
             _ExecuteMs = executeMs;
             _Stopwatch.Start();
@@ -44,7 +54,7 @@ namespace X4_ComplexCalculator.Common
         /// </summary>
         public void DoEvents()
         {
-            if (_ExecuteNum < CallCount++ || _ExecuteMs < _Stopwatch.ElapsedMilliseconds)
+            if ((_ExecuteNum != -1 && _ExecuteNum < CallCount++) || (_ExecuteMs != -1 && _ExecuteMs < _Stopwatch.ElapsedMilliseconds))
             {
                 DoEventsMain();
                 CallCount = 0;
@@ -52,6 +62,20 @@ namespace X4_ComplexCalculator.Common
             }
         }
 
+        /// <summary>
+        /// DoEventsを強制的に発生させる
+        /// </summary>
+        /// <param name="resetTimer">タイマーをリセットするか</param>
+        public void ForceDoEvents(bool resetTimer = false)
+        {
+            DoEventsMain();
+            if (resetTimer)
+            {
+                CallCount = 0;
+                _Stopwatch.Restart();
+            }
+        }
+        
 
         /// <summary>
         /// DoEvents実行メイン
@@ -59,12 +83,7 @@ namespace X4_ComplexCalculator.Common
         private void DoEventsMain()
         {
             var frame = new DispatcherFrame();
-            var callback = new DispatcherOperationCallback(obj =>
-            {
-                ((DispatcherFrame)obj).Continue = false;
-                return null;
-            });
-            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, callback, frame);
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, _DispatcherOperationCallback, frame);
             Dispatcher.PushFrame(frame);
         }
     }
