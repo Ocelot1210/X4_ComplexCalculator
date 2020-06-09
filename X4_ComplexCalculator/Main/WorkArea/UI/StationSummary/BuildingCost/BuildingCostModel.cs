@@ -17,7 +17,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost
         /// <summary>
         /// 建造に必要なウェア一覧
         /// </summary>
-        private readonly ObservablePropertyChangedCollection<ResourcesGridItem> Resources;
+        private readonly ObservablePropertyChangedCollection<ResourcesGridItem> _Resources;
 
         /// <summary>
         /// 建造コスト
@@ -59,9 +59,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost
         /// <param name="resources"></param>
         public BuildingCostModel(ObservablePropertyChangedCollection<ResourcesGridItem> resources)
         {
-            Resources = resources;
-            Resources.CollectionChangedAsync += Resources_OnCollectionChangedAsync;
-            Resources.CollectionPropertyChangedAsync += Resources_OnPropertyChangedAsync;
+            _Resources = resources;
+            _Resources.CollectionChangedAsync += Resources_OnCollectionChangedAsync;
+            _Resources.CollectionPropertyChangedAsync += Resources_OnPropertyChangedAsync;
         }
 
         /// <summary>
@@ -69,8 +69,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost
         /// </summary>
         public void Dispose()
         {
-            Resources.CollectionChangedAsync -= Resources_OnCollectionChangedAsync;
-            Resources.CollectionPropertyChangedAsync -= Resources_OnPropertyChangedAsync;
+            _Resources.CollectionChangedAsync -= Resources_OnCollectionChangedAsync;
+            _Resources.CollectionPropertyChangedAsync -= Resources_OnPropertyChangedAsync;
             BuildingCostDetails.Clear();
         }
 
@@ -140,6 +140,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost
             if (e.Action == NotifyCollectionChangedAction.Reset)
             {
                 BuildingCostDetails.Clear();
+                BuildingCostDetails.AddRange(_Resources.Select(x => new BuildingCostDetailsItem(x.Ware.WareID, x.Ware.Name, x.Amount, x.UnitPrice)));
             }
 
 

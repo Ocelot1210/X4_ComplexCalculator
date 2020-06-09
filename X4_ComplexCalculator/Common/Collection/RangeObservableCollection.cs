@@ -249,7 +249,8 @@ namespace System.Collections.ObjectModel
         public virtual void Reset(IEnumerable<T> collection)
         {
             ClearItems();
-            AddRange(collection);
+            ((List<T>)Items).AddRange(collection);
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
 

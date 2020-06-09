@@ -1,5 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Globalization;
+using System.Linq;
 using WPFLocalizeExtension.Engine;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.Menu.Lang;
 
@@ -21,6 +24,23 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         public LanguagesManager()
         {
+            if (LocalizeDictionary.Instance.DefaultProvider is CSVLocalizationProvider provider)
+            {
+                provider.FileName = "Lang";
+            }
+
+            var config = Configuration.GetConfiguration();
+            // 言語が設定されていればそれを使用
+            try
+            {
+                LocalizeDictionary.Instance.Culture = CultureInfo.GetCultureInfo(config["AppSettings:Language"]);
+            }
+            // 言語が設定されていない、または無効な言語が指定されている場合はシステムのロケールを設定
+            catch (ArgumentException e) when (e is ArgumentNullException || e is CultureNotFoundException)
+            {
+                LocalizeDictionary.Instance.Culture = CultureInfo.CurrentUICulture;
+            }
+
             Languages.AddRange(LocalizeDictionary.Instance.DefaultProvider.AvailableCultures.Where(x => !string.IsNullOrEmpty(x.Name)).Select(x => new LangMenuItem(x)));
             Languages.CollectionPropertyChanged += Languages_CollectionPropertyChanged;
         }

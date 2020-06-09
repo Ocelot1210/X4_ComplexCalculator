@@ -115,8 +115,6 @@ namespace X4_ComplexCalculator.Common.Behavior
                 {
                     // フォーカス対象のセルを取得してフォーカス
                     GetCell(dataGrid, row, clmIdx)?.Focus();
-
-                    // 行もフォーカスしないと
                     row.Focus();
                 }
             }

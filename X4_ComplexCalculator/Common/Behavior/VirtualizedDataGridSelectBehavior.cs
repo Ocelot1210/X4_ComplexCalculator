@@ -1,12 +1,9 @@
 ﻿using System.Collections;
-using System.Reflection;
-using System.Threading.Tasks;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Linq;
-using X4_ComplexCalculator.Common.Reflection;
 using System.Windows.Threading;
-using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
+using X4_ComplexCalculator.Common.Reflection;
 
 namespace X4_ComplexCalculator.Common.Behavior
 {

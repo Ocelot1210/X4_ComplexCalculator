@@ -228,7 +228,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             }
 
             // セルフォーカス
-            CellFocusCommand?.Execute(new Tuple<DataGrid, int, int>(dataGrid, ModulesView.CurrentPosition, dataGrid.CurrentCell.Column.DisplayIndex));
+            if (dataGrid.CurrentCell.Column != null)
+            {
+                CellFocusCommand?.Execute(new Tuple<DataGrid, int, int>(dataGrid, ModulesView.CurrentPosition, dataGrid.CurrentCell.Column.DisplayIndex));
+            }
         }
 
 

@@ -141,7 +141,7 @@ namespace X4_ComplexCalculator.Main
 
             try
             {
-                var doevents = new DoEventsExecuter(0, 0);
+                var doevents = new DoEventsExecuter(0, 10);
 
                 var prg = new ProgressEx<int>(0);
                 var loaded = 0;
@@ -151,7 +151,7 @@ namespace X4_ComplexCalculator.Main
                 prg.ProgressChanged += (sender, e) =>
                 {
                     Progress = (int)(e * rate + (loaded * rate * 100));
-                    doevents.ForceDoEvents();
+                    doevents.DoEvents();
                 };
 
                 IsBusy = true;

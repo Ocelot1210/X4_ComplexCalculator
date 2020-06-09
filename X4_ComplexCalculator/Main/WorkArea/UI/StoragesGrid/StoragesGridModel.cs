@@ -20,7 +20,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         /// <summary>
         /// モジュール一覧
         /// </summary>
-        readonly ObservablePropertyChangedCollection<ModulesGridItem> Modules;
+        readonly ObservablePropertyChangedCollection<ModulesGridItem> _Modules;
         #endregion
 
 
@@ -38,9 +38,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         /// <param name="moduleGridModel">モジュール一覧</param>
         public StoragesGridModel(ObservablePropertyChangedCollection<ModulesGridItem> modules)
         {
-            Modules = modules;
-            Modules.CollectionChangedAsync += OnModulesChanged;
-            Modules.CollectionPropertyChangedAsync += OnModulePropertyChanged;
+            _Modules = modules;
+            _Modules.CollectionChangedAsync += OnModulesChanged;
+            _Modules.CollectionPropertyChangedAsync += OnModulePropertyChanged;
         }
 
 
@@ -49,8 +49,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         /// </summary>
         public void Dispose()
         {
-            Modules.CollectionChangedAsync -= OnModulesChanged;
-            Modules.CollectionPropertyChangedAsync -= OnModulePropertyChanged;
+            _Modules.CollectionChangedAsync -= OnModulesChanged;
+            _Modules.CollectionPropertyChangedAsync -= OnModulePropertyChanged;
         }
 
         /// <summary>
@@ -110,6 +110,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
             if (e.Action == NotifyCollectionChangedAction.Reset)
             {
                 Storages.Clear();
+                OnModulesAdded(_Modules);
             }
 
             await Task.CompletedTask;

@@ -21,7 +21,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
         /// <summary>
         /// モジュール一覧
         /// </summary>
-        private readonly ObservablePropertyChangedCollection<ModulesGridItem> Modules;
+        private readonly ObservablePropertyChangedCollection<ModulesGridItem> _Modules;
 
         /// <summary>
         /// 単価保存用
@@ -31,7 +31,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
         /// <summary>
         /// 建造リソース計算用
         /// </summary>
-        private ResourceCalclator _Calclator = ResourceCalclator.Instance;
+        private readonly ResourceCalclator _Calclator = ResourceCalclator.Instance;
         #endregion
 
 
@@ -50,9 +50,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
         public ResourcesGridModel(ObservablePropertyChangedCollection<ModulesGridItem> modules)
         {
             Resources = new ObservablePropertyChangedCollection<ResourcesGridItem>();
-            Modules = modules;
-            Modules.CollectionChangedAsync += OnModulesCollectionChanged;
-            Modules.CollectionPropertyChangedAsync += OnModulesPropertyChanged;
+            _Modules = modules;
+            _Modules.CollectionChangedAsync += OnModulesCollectionChanged;
+            _Modules.CollectionPropertyChangedAsync += OnModulesPropertyChanged;
         }
 
         /// <summary>
@@ -61,8 +61,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
         public void Dispose()
         {
             Resources.Clear();
-            Modules.CollectionChangedAsync -= OnModulesCollectionChanged;
-            Modules.CollectionPropertyChangedAsync -= OnModulesPropertyChanged;
+            _Modules.CollectionChangedAsync -= OnModulesCollectionChanged;
+            _Modules.CollectionPropertyChangedAsync -= OnModulesPropertyChanged;
         }
 
         /// <summary>
@@ -147,6 +147,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
                 }
 
                 Resources.Clear();
+                OnModulesAdded(_Modules);
             }
 
             await Task.CompletedTask;

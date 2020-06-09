@@ -25,7 +25,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
         /// </summary>
         protected readonly IWorkArea _WorkArea;
 
-        protected readonly DoEventsExecuter _DoEventsExec = new DoEventsExecuter(-1, 32);
 
         /// <summary>
         /// コンストラクタ
@@ -111,7 +110,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             {
                 modules.Add(new ModulesGridItem((string)dr["ModuleID"], (long)dr["Count"]));
                 progress.Report((int)((double)progressCnt++ / records * maxProgress));
-                _DoEventsExec.DoEvents();
             });
 
 
@@ -121,7 +119,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                 var row = (int)(long)dr["row"];
                 modules[row].AddEquipment(Equipment.Get((string)dr["EquipmentID"]));
                 progress.Report((int)((double)progressCnt++ / records * maxProgress));
-                _DoEventsExec.DoEvents();
             });
 
 
@@ -143,7 +140,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                 {
                     itm.UnitPrice = (long)dr["Price"];
                 }
-                _DoEventsExec.DoEvents();
             });
         }
 
@@ -163,7 +159,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                 {
                     itm.UnitPrice = (long)dr["Price"];
                 }
-                _DoEventsExec.DoEvents();
             });
         }
     }

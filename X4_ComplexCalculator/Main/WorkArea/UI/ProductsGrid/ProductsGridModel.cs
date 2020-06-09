@@ -203,6 +203,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 }
 
                 Products.Clear();
+                OnModuleAdded(_Modules);
             }
 
             UpdateEfficiency();

@@ -160,6 +160,14 @@ namespace X4_ComplexCalculator.Common.Collection
                     }
                     break;
 
+                // リセットの場合
+                case NotifyCollectionChangedAction.Reset:
+                    foreach (var item in Items)
+                    {
+                        WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.AddHandler(item, "PropertyChanged", OnPropertyChanged);
+                    }
+                    break;
+
                 // それ以外の場合
                 default:
                     break;
