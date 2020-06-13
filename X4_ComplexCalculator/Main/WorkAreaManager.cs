@@ -37,6 +37,10 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         private DispatcherTimer _GCTimer;
 
+        /// <summary>
+        /// レイアウト管理用クラス
+        /// </summary>
+        private readonly LayoutsManager _LayoutsManager;
 
         /// <summary>
         /// ワークエリア一覧
@@ -55,30 +59,13 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// レイアウト一覧
         /// </summary>
-        public ObservablePropertyChangedCollection<LayoutMenuItem> Layouts = new ObservablePropertyChangedCollection<LayoutMenuItem>();
+        public ObservablePropertyChangedCollection<LayoutMenuItem> Layouts => _LayoutsManager.Layouts;
 
 
         /// <summary>
-        /// 現在のレイアウト
+        /// 現在のレイアウトID
         /// </summary>
-        public LayoutMenuItem? ActiveLayout
-        {
-            get => _ActiveLayout;
-            set
-            {
-                if (ActiveLayout != value)
-                {
-                    _ActiveLayout = value;
-                    if (_ActiveLayout != null)
-                    {
-                        foreach (var document in Documents)
-                        {
-                            document.SetLayout(_ActiveLayout.LayoutID);
-                        }
-                    }
-                }
-            }
-        }
+        public long ActiveLayoutID => _LayoutsManager.ActiveLayout?.LayoutID ?? -1;
         #endregion
 
 
@@ -87,7 +74,7 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         public WorkAreaManager()
         {
-            Layouts.CollectionPropertyChanged += Layouts_CollectionPropertyChanged;
+            _LayoutsManager = new LayoutsManager(this);
 
             _GCTimer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, new EventHandler(GarvageCollect), Application.Current.Dispatcher);
             _GCTimer.Stop();
@@ -97,106 +84,13 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// 初期化
         /// </summary>
-        public void Init()
-        {
-            // レイアウト一覧読み込み
-            var layouts = new List<LayoutMenuItem>();
-            DBConnection.CommonDB.ExecQuery("SELECT LayoutID, LayoutName, IsChecked FROM WorkAreaLayouts", (dr, args) =>
-            {
-                layouts.Add(new LayoutMenuItem((long)dr["LayoutID"], (string)dr["LayoutName"], (long)dr["IsChecked"] == 1));
-            });
-
-            var checkedLayout = layouts.Where(x => x.IsChecked).FirstOrDefault();
-            if (checkedLayout != null)
-            {
-                ActiveLayout = checkedLayout;
-            }
-
-            Layouts.AddRange(layouts);
-        }
+        public void Init() => _LayoutsManager.Init();
 
 
         /// <summary>
         /// レイアウト保存
         /// </summary>
-        public void SaveLayout()
-        {
-            if (ActiveContent != null)
-            {
-                var (onOK, layoutName) = SelectStringDialog.ShowDialog("Lang:EditLayoutName", "Lang:LayoutName", "", LayoutMenuItem.IsValidLayoutName);
-                if (onOK)
-                {
-                    var layoutID = ActiveContent.SaveLayout(layoutName);
-
-                    Layouts.Add(new LayoutMenuItem(layoutID, layoutName, false));
-
-                    Localize.ShowMessageBox("Lang:LayoutSavedMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, ActiveContent.Title, layoutName);
-                }
-            }
-            else
-            {
-                Localize.ShowMessageBox("Lang:TabDoesNotSelectedMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
-
-
-        /// <summary>
-        /// レイアウト一覧のプロパティ変更時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Layouts_CollectionPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (!(sender is LayoutMenuItem menuItem))
-            {
-                return;
-            }
-
-
-            switch (e.PropertyName)
-            {
-                // チェック状態
-                case nameof(LayoutMenuItem.IsChecked):
-                    if (menuItem.IsChecked)
-                    {
-                        // プリセットが選択された場合、他のチェックを全部外す
-                        foreach (var layout in Layouts.Where(x => x != menuItem))
-                        {
-                            layout.IsChecked = false;
-                        }
-
-                        ActiveLayout = menuItem;
-                    }
-                    else
-                    {
-                        ActiveLayout = null;
-                    }
-                    break;
-
-                // 削除されたか
-                case nameof(LayoutMenuItem.IsDeleted):
-                    if (menuItem.IsDeleted)
-                    {
-                        Layouts.Remove(menuItem);
-                        ActiveLayout = null;
-                    }
-                    break;
-
-                // レイアウト上書き保存
-                case nameof(LayoutMenuItem.SaveButtonClickedCommand):
-                    if (ActiveContent != null)
-                    {
-                        ActiveContent.OverwriteSaveLayout(menuItem.LayoutID);
-
-                        Localize.ShowMessageBox("Lang:LayoutOverwritedMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, ActiveContent.Title, menuItem.LayoutName);
-                    }
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
+        public void SaveLayout() => _LayoutsManager.SaveLayout(ActiveContent);
 
 
         /// <summary>

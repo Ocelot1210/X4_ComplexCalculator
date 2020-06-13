@@ -198,12 +198,16 @@ namespace X4_ComplexCalculator.Main.WorkArea
             {
                 var serializer = new XmlLayoutSerializer(_CurrentDockingManager);
 
-                using var ms = new MemoryStream(GetCurrentLayout(), false);
-                using var ms2 = new MemoryStream(SetTitle(ms), false);
-                serializer.Deserialize(ms2);
+                var layout = GetCurrentLayout();
+                if (layout != null)
+                {
+                    using var ms = new MemoryStream(layout, false);
+                    using var ms2 = new MemoryStream(SetTitle(ms), false);
+                    serializer.Deserialize(ms2);
 
-                // 表示メニューを初期化
-                VisiblityMenuItems.Reset(_CurrentDockingManager.Layout.Descendents().OfType<LayoutAnchorable>().Select(x => new VisiblityMenuItem(x)));
+                    // 表示メニューを初期化
+                    VisiblityMenuItems.Reset(_CurrentDockingManager.Layout.Descendents().OfType<LayoutAnchorable>().Select(x => new VisiblityMenuItem(x)));
+                }
             }
         }
 
@@ -277,11 +281,10 @@ WHERE
                 id = (long)dr["LayoutID"];
             });
 
-            
             var param = new SQLiteCommandParameters(3);
-            param.Add("layoutID",   System.Data.DbType.Int32,   id);
-            param.Add("layoutName", System.Data.DbType.String,  layoutName);
-            param.Add("layout",     System.Data.DbType.Binary, GetCurrentLayout());
+            param.Add("layoutID",   System.Data.DbType.Int32,  id);
+            param.Add("layoutName", System.Data.DbType.String, layoutName);
+            param.Add("layout",     System.Data.DbType.Binary, GetCurrentLayout() ?? throw new InvalidOperationException());
 
             DBConnection.CommonDB.ExecQuery("INSERT INTO WorkAreaLayouts(LayoutID, LayoutName, Layout) VALUES(:layoutID, :layoutName, :layout)", param);
 
@@ -295,7 +298,7 @@ WHERE
         public void OverwriteSaveLayout(long layoutID)
         {
             var param = new SQLiteCommandParameters(2);
-            param.Add("layout", System.Data.DbType.Binary, GetCurrentLayout());
+            param.Add("layout", System.Data.DbType.Binary, GetCurrentLayout() ?? throw new InvalidOperationException());
             param.Add("LayoutID", System.Data.DbType.Int32, layoutID);
             DBConnection.CommonDB.ExecQuery($"UPDATE WorkAreaLayouts SET Layout = :layout WHERE LayoutID = :layoutID", param);
         }
@@ -333,11 +336,11 @@ WHERE
         /// 現在のレイアウトを取得
         /// </summary>
         /// <returns></returns>
-        private byte[] GetCurrentLayout()
+        private byte[]? GetCurrentLayout()
         {
             if (_CurrentDockingManager == null)
             {
-                return _Layout ?? throw new InvalidOperationException();
+                return null;
             }
 
             // レイアウト保存

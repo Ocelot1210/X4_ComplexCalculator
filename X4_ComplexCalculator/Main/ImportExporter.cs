@@ -38,7 +38,7 @@ namespace X4_ComplexCalculator.Main
 
             for (var cnt = 0; cnt < importCnt; cnt++)
             {
-                var vm = new WorkAreaViewModel(_WorkAreaManager.ActiveLayout?.LayoutID ?? -1);
+                var vm = new WorkAreaViewModel(_WorkAreaManager.ActiveLayoutID);
 
                 if (vm.Import(import))
                 {

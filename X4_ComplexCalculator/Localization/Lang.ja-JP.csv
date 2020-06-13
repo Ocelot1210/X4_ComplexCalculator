@@ -50,7 +50,9 @@ EditLayoutName;レイアウト名編集
 LayoutName;レイアウト名
 Language;言語
 LayoutSavedMessage;計画「{0}」のレイアウトを「{1}」として保存しました。
+LayoutSaveFailedMessage;レイアウトの保存に失敗しました。\r\n\r\n■理由：\r\n{0}
 LayoutOverwritedMessage;計画「{0}」のレイアウトを「{1}」として上書き保存しました。
+LayoutOverwriteFailedMessage;レイアウトの上書き保存に失敗しました。\r\n\r\n■理由：\r\n{0}
 TabDoesNotSelectedMessage;レイアウト保存対象のタブが選択されていません。\r\n保存対象のタブを選択後、再度実行して下さい。
 FaildToLoadFileMessage;ファイルの読み込みに失敗しました。\r\n\r\n■理由：\r\n{0}
 FaildToLoadFileMessageTitle;読み込み失敗

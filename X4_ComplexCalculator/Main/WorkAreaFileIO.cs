@@ -106,7 +106,7 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         public void CreateNew()
         {
-            var vm = new WorkAreaViewModel(_WorkAreaManager.ActiveLayout?.LayoutID ?? -1);
+            var vm = new WorkAreaViewModel(_WorkAreaManager.ActiveLayoutID);
             _WorkAreaManager.Documents.Add(vm);
             _WorkAreaManager.ActiveContent = vm;
         }
@@ -160,7 +160,7 @@ namespace X4_ComplexCalculator.Main
 
                 foreach (var path in pathes)
                 {
-                    var vm = new WorkAreaViewModel(_WorkAreaManager.ActiveLayout?.LayoutID ?? -1);
+                    var vm = new WorkAreaViewModel(_WorkAreaManager.ActiveLayoutID);
 
                     LoadingFileName = System.IO.Path.GetFileName(path);
                     doevents.ForceDoEvents();

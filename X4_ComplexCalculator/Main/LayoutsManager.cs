@@ -1,10 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel.Channels;
 using System.Windows;
 using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.Menu.Layout;
+using X4_ComplexCalculator.Main.WorkArea;
 
 namespace X4_ComplexCalculator.Main
 {
@@ -31,7 +35,7 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// レイアウト一覧
         /// </summary>
-        public ObservablePropertyChangedCollection<LayoutMenuItem> Layouts = new ObservablePropertyChangedCollection<LayoutMenuItem>();
+        public ObservablePropertyChangedCollection<LayoutMenuItem> Layouts { get; } = new ObservablePropertyChangedCollection<LayoutMenuItem>();
 
 
         /// <summary>
@@ -40,9 +44,9 @@ namespace X4_ComplexCalculator.Main
         public LayoutMenuItem? ActiveLayout
         {
             get => _ActiveLayout;
-            set
+            private set
             {
-                if (ActiveLayout != value)
+                if (_ActiveLayout != value)
                 {
                     _ActiveLayout = value;
                     if (_ActiveLayout != null)
@@ -66,6 +70,7 @@ namespace X4_ComplexCalculator.Main
         public LayoutsManager(WorkAreaManager workAreaManager)
         {
             _WorkAreaManager = workAreaManager;
+            Layouts.CollectionPropertyChanged += Layouts_CollectionPropertyChanged;
         }
 
 
@@ -90,6 +95,39 @@ namespace X4_ComplexCalculator.Main
             Layouts.AddRange(layouts);
         }
 
+
+        /// <summary>
+        /// レイアウト保存
+        /// </summary>
+        public void SaveLayout(WorkAreaViewModel? vm)
+        {
+            if (vm != null)
+            {
+                var (onOK, layoutName) = SelectStringDialog.ShowDialog("Lang:EditLayoutName", "Lang:LayoutName", "", LayoutMenuItem.IsValidLayoutName);
+                if (onOK)
+                {
+                    try
+                    {
+                        DBConnection.CommonDB.BeginTransaction();
+                        var layoutID = vm.SaveLayout(layoutName);
+                        DBConnection.CommonDB.Commit();
+
+                        Layouts.Add(new LayoutMenuItem(layoutID, layoutName, false));
+                    }
+                    catch(Exception ex)
+                    {
+                        DBConnection.CommonDB.Rollback();
+                        Localize.ShowMessageBox("Lang:LayoutSaveFailedMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, ex.Message);
+                    }
+
+                    Localize.ShowMessageBox("Lang:LayoutSavedMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, vm.Title, layoutName);
+                }
+            }
+            else
+            {
+                Localize.ShowMessageBox("Lang:TabDoesNotSelectedMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
 
 
         /// <summary>
@@ -138,9 +176,19 @@ namespace X4_ComplexCalculator.Main
                 case nameof(LayoutMenuItem.SaveButtonClickedCommand):
                     if (_WorkAreaManager.ActiveContent != null)
                     {
-                        _WorkAreaManager.ActiveContent.OverwriteSaveLayout(menuItem.LayoutID);
-
-                        Localize.ShowMessageBox("Lang:LayoutOverwritedMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, _WorkAreaManager.ActiveContent.Title, menuItem.LayoutName);
+                        try
+                        {
+                            DBConnection.CommonDB.BeginTransaction();
+                            _WorkAreaManager.ActiveContent.OverwriteSaveLayout(menuItem.LayoutID);
+                            DBConnection.CommonDB.Commit();
+                            
+                            Localize.ShowMessageBox("Lang:LayoutOverwritedMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, _WorkAreaManager.ActiveContent.Title, menuItem.LayoutName);
+                        }
+                        catch(Exception ex)
+                        {
+                            DBConnection.CommonDB.Rollback();
+                            Localize.ShowMessageBox("Lang:LayoutOverwriteFailedMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, ex.Message);
+                        }
                     }
                     break;
 
