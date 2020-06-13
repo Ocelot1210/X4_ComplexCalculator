@@ -1,13 +1,15 @@
-﻿using Prism.Commands;
+﻿using GongSolutions.Wpf.DragDrop;
+using Prism.Commands;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.Menu.File.Export;
 using X4_ComplexCalculator.Main.Menu.File.Import;
 using X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport;
@@ -21,7 +23,7 @@ namespace X4_ComplexCalculator.Main
     /// <summary>
     /// メイン画面のViewModel
     /// </summary>
-    class MainWindowViewModel : BindableBase
+    class MainWindowViewModel : BindableBase, IDropTarget
     {
         #region メンバ
         /// <summary>
@@ -199,6 +201,69 @@ namespace X4_ComplexCalculator.Main
             {
                 new StationCalclatorExport(new DelegateCommand<IExport>(_ImportExporter.Export))
             };
+        }
+
+
+        /// <summary>
+        /// ファイル/フォルダ内の.x4ファイルを列挙する
+        /// </summary>
+        /// <param name="pathes">ファイル/フォルダパス</param>
+        /// <param name="maxRecursion">最大再帰回数</param>
+        /// <param name="currRecursion">現在の再帰回数</param>
+        /// <returns></returns>
+        private IEnumerable<string> GetX4Files(IEnumerable<string> pathes, int maxRecursion, int currRecursion = 0)
+        {
+            // 再帰最大の場合、何もしない
+            if (maxRecursion < currRecursion)
+            {
+                yield break;
+            }
+
+            foreach (var path in pathes)
+            {
+                // パスはフォルダか？
+                if (Directory.Exists(path))
+                {
+                    // フォルダの場合
+                    var files = GetX4Files(Directory.EnumerateFileSystemEntries(path), maxRecursion, currRecursion++);
+                    
+                    foreach (var file in files)
+                    {
+                        yield return file;
+                    }
+                }
+                else
+                {
+                    // ファイルの場合
+                    if (Path.GetExtension(path) == ".x4")
+                    {
+                        yield return path;
+                    }
+                }
+            }
+
+            yield break;
+        }
+
+        /// <summary>
+        /// ドラッグ中
+        /// </summary>
+        /// <param name="dropInfo"></param>
+        public void DragOver(IDropInfo dropInfo)
+        {
+            bool x4FileExists = GetX4Files(((DataObject)dropInfo.Data).GetFileDropList().OfType<string>(), 1).Any();
+
+            dropInfo.Effects = x4FileExists ? DragDropEffects.Copy : DragDropEffects.None;
+        }
+
+
+        /// <summary>
+        /// ドロップされた時
+        /// </summary>
+        /// <param name="dropInfo"></param>
+        public void Drop(IDropInfo dropInfo)
+        {
+            _WorkAreaFileIO.OpenFiles(GetX4Files(((DataObject)dropInfo.Data).GetFileDropList().OfType<string>(), 1));
         }
 
 
