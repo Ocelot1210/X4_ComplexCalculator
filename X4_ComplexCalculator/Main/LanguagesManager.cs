@@ -30,14 +30,25 @@ namespace X4_ComplexCalculator.Main
             }
 
             var config = Configuration.GetConfiguration();
-            // 言語が設定されていればそれを使用
+            var lang = config["AppSettings:Language"];
+            
             try
             {
-                LocalizeDictionary.Instance.Culture = CultureInfo.GetCultureInfo(config["AppSettings:Language"]);
+                // 言語が設定されているか？
+                if (!string.IsNullOrWhiteSpace(lang))
+                {
+                    // 言語が設定されていればそれを使用
+                    LocalizeDictionary.Instance.Culture = CultureInfo.GetCultureInfo(lang);
+                }
+                else
+                {
+                    // 言語が設定されていない場合、システムのロケールを設定
+                    LocalizeDictionary.Instance.Culture = CultureInfo.CurrentUICulture;
+                }
             }
-            // 言語が設定されていない、または無効な言語が指定されている場合はシステムのロケールを設定
             catch (ArgumentException e) when (e is ArgumentNullException || e is CultureNotFoundException)
             {
+                // 無効な言語が指定されている場合はシステムのロケールを設定
                 LocalizeDictionary.Instance.Culture = CultureInfo.CurrentUICulture;
             }
 
