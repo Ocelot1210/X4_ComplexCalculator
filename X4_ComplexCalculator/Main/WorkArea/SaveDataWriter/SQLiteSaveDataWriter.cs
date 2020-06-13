@@ -78,6 +78,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
         /// <param name="WorkArea"></param>
         private void SaveMain(IWorkArea WorkArea)
         {
+            // フォルダが無ければ作る
+            Directory.CreateDirectory(Path.GetDirectoryName(SaveFilePath));
+
             using var conn = new DBConnection(SaveFilePath);
 
             conn.BeginTransaction();
