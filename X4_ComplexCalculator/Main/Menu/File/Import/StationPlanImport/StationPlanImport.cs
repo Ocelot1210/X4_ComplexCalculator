@@ -1,16 +1,13 @@
-﻿using System;
+﻿using Prism.Mvvm;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using System.Windows.Input;
-using System.Xml.Linq;
 using System.Xml.XPath;
+using WPFLocalizeExtension.Engine;
 using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
-using X4_ComplexCalculator.DB.X4DB;
-using System.Linq;
-using Prism.Mvvm;
-using WPFLocalizeExtension.Engine;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
 {

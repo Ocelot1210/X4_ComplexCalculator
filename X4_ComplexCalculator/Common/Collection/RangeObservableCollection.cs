@@ -594,7 +594,10 @@ namespace System.Collections.ObjectModel
             base.OnCollectionChanged(e);
         }
 
-        protected virtual IDisposable DeferEvents() => new DeferredEventsCollection(this);
+        protected virtual IDisposable DeferEvents()
+        {
+            return new DeferredEventsCollection(this);
+        }
 
         #endregion Protected Methods
 
@@ -619,20 +622,26 @@ namespace System.Collections.ObjectModel
         /// <summary>
         /// /// Helper to raise a PropertyChanged event for the Indexer property
         /// /// </summary>
-        void OnIndexerPropertyChanged() =>
-         OnPropertyChanged(EventArgsCache.IndexerPropertyChanged);
+        void OnIndexerPropertyChanged()
+        {
+            OnPropertyChanged(EventArgsCache.IndexerPropertyChanged);
+        }
 
         /// <summary>
         /// Helper to raise CollectionChanged event to any listeners
         /// </summary>
-        void OnCollectionChanged(NotifyCollectionChangedAction action, object oldItem, object newItem, int index) =>
-         OnCollectionChanged(new NotifyCollectionChangedEventArgs(action, newItem, oldItem, index));
+        void OnCollectionChanged(NotifyCollectionChangedAction action, object oldItem, object newItem, int index)
+        {
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(action, newItem, oldItem, index));
+        }
 
         /// <summary>
         /// Helper to raise CollectionChanged event with action == Reset to any listeners
         /// </summary>
-        void OnCollectionReset() =>
-         OnCollectionChanged(EventArgsCache.ResetCollectionChanged);
+        void OnCollectionReset()
+        {
+            OnCollectionChanged(EventArgsCache.ResetCollectionChanged);
+        }
 
         /// <summary>
         /// Helper to raise event for clustered action and clear cluster.

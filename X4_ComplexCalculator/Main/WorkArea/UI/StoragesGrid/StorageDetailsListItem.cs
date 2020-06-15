@@ -8,7 +8,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
     /// <summary>
     /// ドロップダウンで表示するListViewのアイテム(保管庫用)
     /// </summary>
-    class StorageDetailsListItem : BindableBase 
+    class StorageDetailsListItem : BindableBase
     {
         #region メンバ
         /// <summary>
@@ -82,10 +82,10 @@ WHERE
 	Module.ModuleID = '{moduleID}'";
 
             string? moduleName = null;
-            DBConnection.X4DB.ExecQuery(query, (SQLiteDataReader dr, object[] args) => 
+            DBConnection.X4DB.ExecQuery(query, (dr, args) =>
             {
                 moduleName = (string)dr["Name"];
-                Capacity = (long)dr["Amount"];
+                Capacity   = (long)dr["Amount"];
             });
             ModuleName = moduleName ?? throw new ArgumentException("Invalid moduleID.", nameof(moduleID));
         }

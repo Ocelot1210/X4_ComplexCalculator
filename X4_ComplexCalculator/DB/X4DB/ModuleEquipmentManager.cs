@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 
@@ -75,6 +74,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         public int AllEquipmentsCount => (CanEquipped) ? _Equipments.Sum(x => x.Value.Count) : 0;
         #endregion
 
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -103,6 +103,7 @@ namespace X4_ComplexCalculator.DB.X4DB
             });
         }
 
+
         /// <summary>
         /// コピーコンストラクタ
         /// </summary>
@@ -120,15 +121,13 @@ namespace X4_ComplexCalculator.DB.X4DB
             }
         }
 
+
         /// <summary>
         /// 装備一覧を取得
         /// </summary>
         /// <param name="size">サイズ</param>
         /// <returns>装備一覧</returns>
-        public IReadOnlyList<Equipment> GetEquipment(Size size)
-        {
-            return _Equipments[size];
-        }
+        public IReadOnlyList<Equipment> GetEquipment(Size size) => _Equipments[size];
 
 
         /// <summary>
@@ -165,10 +164,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="obj">比較対象</param>
         /// <returns></returns>
-        public override bool Equals(object? obj)
-        {
-            return obj is ModuleEquipmentManager tgt && _Equipments.Equals(tgt._Equipments);
-        }
+        public override bool Equals(object? obj) => obj is ModuleEquipmentManager tgt && _Equipments.Equals(tgt._Equipments);
 
 
         /// <summary>

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace X4_ComplexCalculator.Common.Reflection
+﻿namespace X4_ComplexCalculator.Common.Reflection
 {
     public interface IAccessor
     {

@@ -48,7 +48,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 {
                     product.SetUnitPricePercent(_UnitPricePercent);
                 }
-                
+
                 RaisePropertyChanged();
             }
         }
@@ -104,7 +104,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <param name="dataGrid"></param>
         private void SelectedExpandCommand(DataGrid dataGrid)
         {
-            foreach(ProductsGridItem item in dataGrid.SelectedCells.Select(x => x.Item))
+            foreach (ProductsGridItem item in dataGrid.SelectedCells.Select(x => x.Item))
             {
                 item.IsExpanded = true;
             }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
+
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
@@ -80,18 +80,13 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="obj">比較対象</param>
         /// <returns></returns>
-        public override bool Equals(object? obj)
-        {
-            return obj is WareGroup tgt && tgt.WareGroupID == WareGroupID;
-        }
+        public override bool Equals(object? obj) => obj is WareGroup tgt && tgt.WareGroupID == WareGroupID;
+
 
         /// <summary>
         /// ハッシュ値を取得
         /// </summary>
         /// <returns>ハッシュ値</returns>
-        public override int GetHashCode()
-        {
-            return WareGroupID.GetHashCode();
-        }
+        public override int GetHashCode() => HashCode.Combine(WareGroupID);
     }
 }

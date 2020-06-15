@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Data.SQLite;
 using System.Linq;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
@@ -147,7 +145,7 @@ WHERE
         /// </summary>
         public override void SaveEquipment()
         {
-            foreach(var size in _Equipments.Keys)
+            foreach (var size in _Equipments.Keys)
             {
                 Module.ModuleEquipment.Turret.ResetEquipment(size, Equipped[size]);
             }

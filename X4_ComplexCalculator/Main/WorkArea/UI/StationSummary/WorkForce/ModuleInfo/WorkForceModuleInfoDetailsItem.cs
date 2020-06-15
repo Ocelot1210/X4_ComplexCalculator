@@ -6,7 +6,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
     /// <summary>
     /// 労働力用ListVierのアイテム
     /// </summary>
-    class WorkForceModuleInfoDetailsItem : BindableBase    
+    class WorkForceModuleInfoDetailsItem : BindableBase
     {
         #region メンバ
         /// <summary>

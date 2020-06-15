@@ -61,7 +61,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
                     WorkArea.Title = Path.GetFileNameWithoutExtension(SaveFilePath);
                     ret = true;
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     LocalizedMessageBox.Show("Lang:SaveDataWriteFailureMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message, e.StackTrace ?? "");
                 }

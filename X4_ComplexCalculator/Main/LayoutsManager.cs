@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.ServiceModel.Channels;
 using System.Windows;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
@@ -114,7 +113,7 @@ namespace X4_ComplexCalculator.Main
 
                         Layouts.Add(new LayoutMenuItem(layoutID, layoutName, false));
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         DBConnection.CommonDB.Rollback();
                         LocalizedMessageBox.Show("Lang:LayoutSaveFailedMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, ex.Message);
@@ -181,10 +180,10 @@ namespace X4_ComplexCalculator.Main
                             DBConnection.CommonDB.BeginTransaction();
                             _WorkAreaManager.ActiveContent.OverwriteSaveLayout(menuItem.LayoutID);
                             DBConnection.CommonDB.Commit();
-                            
+
                             LocalizedMessageBox.Show("Lang:LayoutOverwritedMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, _WorkAreaManager.ActiveContent.Title, menuItem.LayoutName);
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
                             DBConnection.CommonDB.Rollback();
                             LocalizedMessageBox.Show("Lang:LayoutOverwriteFailedMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, ex.Message);

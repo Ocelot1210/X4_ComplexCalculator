@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Threading;
 using System.Windows;
-using X4_ComplexCalculator.Common;
 
 namespace X4_ComplexCalculator.Common.Localize
 {
@@ -107,9 +105,9 @@ namespace X4_ComplexCalculator.Common.Localize
         {
             Win32.UnhookWindowsHookEx(_hHook);
             _hHook = 0;
-            _HookProcDelegate = null;
-            _Msg = null;
+            _Msg   = null;
             _Title = null;
+            _HookProcDelegate = null;
         }
 
 

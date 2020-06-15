@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
@@ -69,18 +70,13 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="obj">比較対象</param>
         /// <returns></returns>
-        public override bool Equals(object? obj)
-        {
-            return obj is Race tgt && tgt.RaceID == RaceID;
-        }
+        public override bool Equals(object? obj) => obj is Race tgt && tgt.RaceID == RaceID;
+
 
         /// <summary>
         /// ハッシュ値を取得
         /// </summary>
         /// <returns>ハッシュ値</returns>
-        public override int GetHashCode()
-        {
-            return RaceID.GetHashCode();
-        }
+        public override int GetHashCode() => HashCode.Combine(RaceID);
     }
 }

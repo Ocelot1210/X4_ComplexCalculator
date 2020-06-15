@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace X4_ComplexCalculator.DB.X4DB
@@ -73,9 +74,6 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// ハッシュ値を取得
         /// </summary>
         /// <returns></returns>
-        public override int GetHashCode()
-        {
-            return Method.GetHashCode();
-        }
+        public override int GetHashCode() => HashCode.Combine(Method);
     }
 }

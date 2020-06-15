@@ -75,7 +75,7 @@ namespace X4_ComplexCalculator.Common
                 _Stopwatch.Restart();
             }
         }
-        
+
 
         /// <summary>
         /// DoEvents実行メイン

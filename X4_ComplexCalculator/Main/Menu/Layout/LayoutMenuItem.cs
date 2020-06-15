@@ -74,7 +74,7 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
             {
                 if (SetProperty(ref _IsChecked, value))
                 {
-                    DBConnection.CommonDB.ExecQuery($"UPDATE WorkAreaLayouts SET IsChecked = {(IsChecked? 1 : 0)} WHERE LayoutID = {LayoutID}");
+                    DBConnection.CommonDB.ExecQuery($"UPDATE WorkAreaLayouts SET IsChecked = {(IsChecked ? 1 : 0)} WHERE LayoutID = {LayoutID}");
                 }
             }
         }
@@ -101,9 +101,9 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
             LayoutID = layoutID;
             LayoutName = layoutName;
             IsChecked = isChecked;
-            SaveButtonClickedCommand    = new DelegateCommand(SaveLayout);
-            EditButtonClickedCommand    = new DelegateCommand(EditLayoutName);
-            DeleteButtonClickedCommand  = new DelegateCommand(DeleteLayout);
+            SaveButtonClickedCommand   = new DelegateCommand(SaveLayout);
+            EditButtonClickedCommand   = new DelegateCommand(EditLayoutName);
+            DeleteButtonClickedCommand = new DelegateCommand(DeleteLayout);
         }
 
 
@@ -188,8 +188,8 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
                 throw new InvalidOperationException();
             }
 
-            return (item.LayoutID < LayoutID)?  1 :
-                   (item.LayoutID > LayoutID)? -1 : 0;
+            return (item.LayoutID < LayoutID) ?  1 :
+                   (item.LayoutID > LayoutID) ? -1 : 0;
         }
     }
 }

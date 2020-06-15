@@ -242,7 +242,7 @@ WHERE
                 var effect = effectArr.Where(x => x.Item1 == modProd.Method).FirstOrDefault() ??
                              effectArr.Where(x => x.Item1 == "default").FirstOrDefault();
 
-                yield return (modProd.WareID, (long)Math.Floor(wareProd.Item2 * (3600 / wareProd.Item3)) , effect.Item3);
+                yield return (modProd.WareID, (long)Math.Floor(wareProd.Item2 * (3600 / wareProd.Item3)), effect.Item3);
             }
 
             // ウェア生産に必要なウェア一覧(候補)

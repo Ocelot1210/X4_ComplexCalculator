@@ -65,7 +65,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
         /// <param name="products">製品一覧</param>
         public NeedWareInfoModel(ObservablePropertyChangedCollection<ModulesGridItem> modules, ObservablePropertyChangedCollection<ProductsGridItem> products)
         {
-            _Modules  = modules;
+            _Modules = modules;
             _Modules.CollectionChanged += Modules_CollectionChanged;
             _Modules.CollectionPropertyChanged += Modules_CollectionPropertyChanged;
 
@@ -144,7 +144,7 @@ WHERE
             UpdateTotalNeedAmount();
         }
 
-        
+
         /// <summary>
         /// モジュール一覧変更時
         /// </summary>
@@ -165,7 +165,7 @@ WHERE
                     {
                         addWares.Add(method, new Dictionary<string, long>());
                     }
-                    
+
                     foreach (var (wareID, amount) in wareArr)
                     {
                         if (!addWares[method].ContainsKey(wareID))

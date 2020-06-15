@@ -1,6 +1,4 @@
 ﻿using Prism.Mvvm;
-using System.Collections.Generic;
-using System.Linq;
 using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid

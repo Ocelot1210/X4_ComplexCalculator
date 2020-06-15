@@ -40,10 +40,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
         /// </summary>
         public double UnitPricePercent
         {
-            get
-            {
-                return _UnitPricePercent;
-            }
+            get => _UnitPricePercent;
             set
             {
                 _UnitPricePercent = (long)value;

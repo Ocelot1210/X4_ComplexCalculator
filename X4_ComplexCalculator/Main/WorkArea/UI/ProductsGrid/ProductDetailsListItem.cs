@@ -1,8 +1,4 @@
 ﻿using Prism.Mvvm;
-using System.Data.SQLite;
-using System.Reflection;
-using X4_ComplexCalculator.DB;
-using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 {

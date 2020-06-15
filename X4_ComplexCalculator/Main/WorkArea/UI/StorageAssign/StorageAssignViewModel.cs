@@ -2,8 +2,6 @@
 using System;
 using System.ComponentModel;
 using System.Windows.Data;
-using WPFLocalizeExtension.Engine;
-using WPFLocalizeExtension.Providers;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
 {
@@ -32,10 +30,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         public long Hour
         {
             get => _Model.Hour;
-            set
-            {
-                _Model.Hour = value;
-            }
+            set => _Model.Hour = value;
         }
         #endregion
 

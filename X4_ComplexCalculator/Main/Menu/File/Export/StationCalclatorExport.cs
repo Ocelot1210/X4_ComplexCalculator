@@ -1,6 +1,4 @@
 ﻿using Prism.Mvvm;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Input;
@@ -49,7 +47,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Export
 
             // モジュール情報を追加
             sb.Append("l=@");
-            foreach (var module in WorkArea.Modules.Where(x => x.Module.ModuleType.ModuleTypeID != "connectionmodule" && 
+            foreach (var module in WorkArea.Modules.Where(x => x.Module.ModuleType.ModuleTypeID != "connectionmodule" &&
                                                                x.Module.ModuleType.ModuleTypeID != "ventureplatform" &&
                                                                x.Module.ModuleID != "module_gen_dock_m_venturer_01"))
             {
@@ -62,7 +60,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Export
                 sb.Length -= 2;
             }
 
-            SelectStringDialog.ShowDialog("Lang:StationCalclatorExportTitle", "Lang:StationCalclatorExportDescription", sb.ToString(), hideCancelButton:true);
+            SelectStringDialog.ShowDialog("Lang:StationCalclatorExportTitle", "Lang:StationCalclatorExportDescription", sb.ToString(), hideCancelButton: true);
 
             return true;
         }

@@ -6,7 +6,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
     /// <summary>
     /// X4 セーブデータインポート時のステーション一覧1レコード分
     /// </summary>
-    public class SaveDataStationItem :  BindableBase
+    public class SaveDataStationItem : BindableBase
     {
         #region メンバ
         /// <summary>

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
+﻿namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
 {
     /// <summary>
     /// プリセットコンボボックス用アイテム

@@ -38,10 +38,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// </summary>
         public string SearchModuleName
         {
-            get
-            {
-                return _SearchModuleName;
-            }
+            get => _SearchModuleName;
             set
             {
                 if (SetProperty(ref _SearchModuleName, value))
@@ -108,7 +105,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         public ModulesGridViewModel(ModulesGridModel model)
         {
             _Model = model;
-            ModulesView        = (ListCollectionView)CollectionViewSource.GetDefaultView(_Model.Modules);
+            ModulesView = (ListCollectionView)CollectionViewSource.GetDefaultView(_Model.Modules);
             ModulesView.Filter = Filter;
             AddModuleCommand   = new DelegateCommand(_Model.ShowAddModuleWindow);
             MergeModuleCommand = new DelegateCommand(_Model.MergeModule);
@@ -136,7 +133,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             var selectedModules = CollectionViewSource.GetDefaultView(ModulesView)
                                                       .Cast<ModulesGridItem>()
                                                       .Where(x => x.IsSelected);
-            
+
             foreach (var module in selectedModules)
             {
                 xml.Add(module.ToXml());
@@ -164,7 +161,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             }
             catch
             {
-                
+
             }
         }
 

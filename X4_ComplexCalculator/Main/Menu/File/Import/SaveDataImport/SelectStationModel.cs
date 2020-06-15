@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -95,9 +94,9 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
                         default:
                             throw new InvalidOperationException();
                     }
-                    
+
                     SaveDataFilePath = dlg.FileName;
-                    
+
                 }
                 catch (Exception e)
                 {

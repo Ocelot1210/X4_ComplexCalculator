@@ -25,14 +25,8 @@ namespace X4_ComplexCalculator.Common
         /// </summary>
         public object Data
         {
-            get
-            {
-                return GetValue(DataProperty) ?? DefaultData;
-            }
-            set
-            {
-                SetValue(DataProperty, value);
-            }
+            get => GetValue(DataProperty) ?? DefaultData;
+            set => SetValue(DataProperty, value);
         }
 
 
@@ -48,14 +42,8 @@ namespace X4_ComplexCalculator.Common
         /// </summary>
         public object DefaultData
         {
-            get
-            {
-                return GetValue(DefaultDataProperty);
-            }
-            set
-            {
-                SetValue(DefaultDataProperty, value);
-            }
+            get => GetValue(DefaultDataProperty);
+            set => SetValue(DefaultDataProperty, value);
         }
     }
 }

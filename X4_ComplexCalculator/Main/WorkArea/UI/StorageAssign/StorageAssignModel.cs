@@ -278,7 +278,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
             }
         }
 
-        
+
         /// <summary>
         /// リソースを開放
         /// </summary>

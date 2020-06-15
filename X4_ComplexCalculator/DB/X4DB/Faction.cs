@@ -78,19 +78,13 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="obj">比較対象</param>
         /// <returns></returns>
-        public override bool Equals(object? obj)
-        {
-            return obj is Faction tgt && tgt.FactionID == FactionID;
-        }
+        public override bool Equals(object? obj) => obj is Faction tgt && tgt.FactionID == FactionID;
 
 
         /// <summary>
         /// ハッシュ値を取得
         /// </summary>
         /// <returns>ハッシュ値</returns>
-        public override int GetHashCode()
-        {
-            return FactionID.GetHashCode();
-        }
+        public override int GetHashCode() => HashCode.Combine(FactionID);
     }
 }

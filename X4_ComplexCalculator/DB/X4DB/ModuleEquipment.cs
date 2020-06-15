@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
@@ -91,17 +92,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// 全装備を列挙する
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<Equipment> GetAllEquipment()
-        {
-            foreach(var turret in Turret.AllEquipments)
-            {
-                yield return turret;
-            }
-            foreach(var shiled in Shield.AllEquipments)
-            {
-                yield return shiled;
-            }
-        }
+        public IEnumerable<Equipment> GetAllEquipment() => Turret.AllEquipments.Concat(Shield.AllEquipments);
 
 
         /// <summary>
@@ -121,9 +112,6 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// ハッシュ値を取得
         /// </summary>
         /// <returns>ハッシュ値</returns>
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Turret, Shield);
-        }
+        public override int GetHashCode() => HashCode.Combine(Turret, Shield);
     }
 }

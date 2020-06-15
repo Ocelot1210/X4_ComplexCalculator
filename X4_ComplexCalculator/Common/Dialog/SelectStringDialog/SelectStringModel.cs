@@ -63,7 +63,7 @@ namespace X4_ComplexCalculator.Common.Dialog.SelectStringDialog
             set => SetProperty(ref _InputString, value);
         }
 
-        
+
         /// <summary>
         /// OKボタンクリック時の処理
         /// </summary>

@@ -1,10 +1,7 @@
 ﻿using Prism.Mvvm;
-using System;
-using System.Collections.Generic;
-using X4_ComplexCalculator.Common;
 using System.Globalization;
-using System.Text;
 using WPFLocalizeExtension.Engine;
+using X4_ComplexCalculator.Common;
 
 namespace X4_ComplexCalculator.Main.Menu.Lang
 {

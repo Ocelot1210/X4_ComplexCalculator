@@ -45,10 +45,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
         /// </summary>
         public bool CloseWindowProperty
         {
-            get
-            {
-                return _CloseWindow;
-            }
+            get => _CloseWindow;
             set
             {
                 _CloseWindow = value;
@@ -104,7 +101,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
         /// </summary>
         public string SearchModuleName
         {
-            private get { return _SearchModuleName; }
+            private get => _SearchModuleName;
             set
             {
                 if (_SearchModuleName != value)
@@ -146,7 +143,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
             _Model = new SelectModuleModel(modules);
 
             PrevModuleName = prevModuleName;
-            _IsReplaceMode  = prevModuleName != "";
+            _IsReplaceMode = prevModuleName != "";
 
             ModulesView = (ListCollectionView)CollectionViewSource.GetDefaultView(Modules);
             ModulesView.Filter = Filter;

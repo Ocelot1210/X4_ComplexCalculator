@@ -34,10 +34,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// ウェアの個数
         /// </summary>
-        public long Count
-        {
-            get => Details.Sum(x => x.Amount);
-        }
+        public long Count => Details.Sum(x => x.Amount);
 
 
         /// <summary>
@@ -62,7 +59,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                     return;
                 }
 
-                
+
                 if (value < Ware.MinPrice)
                 {
                     // 入力された値が最低価格未満の場合、最低価格を設定する

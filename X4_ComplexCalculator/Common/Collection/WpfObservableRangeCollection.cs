@@ -55,9 +55,16 @@
             }
         }
 
-        protected override IDisposable DeferEvents() => new DeferredEventsCollection(this);
+        protected override IDisposable DeferEvents()
+        {
+            return new DeferredEventsCollection(this);
+        }
 
-        bool IsRange(NotifyCollectionChangedEventArgs e) => e.NewItems?.Count > 1 || e.OldItems?.Count > 1;
+        bool IsRange(NotifyCollectionChangedEventArgs e)
+        {
+            return e.NewItems?.Count > 1 || e.OldItems?.Count > 1;
+        }
+
         IEnumerable<NotifyCollectionChangedEventHandler> GetHandlers()
         {
             var info = typeof(ObservableCollection<T>).GetField(nameof(CollectionChanged), BindingFlags.Instance | BindingFlags.NonPublic) ?? throw new InvalidOperationException();

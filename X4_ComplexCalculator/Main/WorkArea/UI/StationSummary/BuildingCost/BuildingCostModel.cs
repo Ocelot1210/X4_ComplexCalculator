@@ -37,10 +37,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost
         /// </summary>
         public long BuildingCost
         {
-            get
-            {
-                return _BuildingCost;
-            }
+            get => _BuildingCost;
             set
             {
                 if (value != _BuildingCost)
@@ -145,7 +142,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost
 
 
             BuildingCost = BuildingCostDetails.Sum(x => x.TotalPrice);
-            
+
             await Task.CompletedTask;
         }
     }

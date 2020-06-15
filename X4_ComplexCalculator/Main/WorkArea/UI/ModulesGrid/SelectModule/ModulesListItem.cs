@@ -1,5 +1,4 @@
 ﻿using Prism.Mvvm;
-using X4_ComplexCalculator.Common;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
 {

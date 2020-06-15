@@ -14,15 +14,13 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Management;
-using System.Reflection;
 using System.Text;
 using System.Windows;
 using WPFLocalizeExtension.Engine;
 using WPFLocalizeExtension.Providers;
-using XAMLMarkupExtensions.Base;
 
 namespace X4_ComplexCalculator.Common
-{ 
+{
     /// <summary>
     /// A localization provider for comma separated files
     /// </summary>
@@ -34,7 +32,7 @@ namespace X4_ComplexCalculator.Common
         /// </summary>
         public string FileName
         {
-            get { return fileName; }
+            get => fileName;
             set
             {
                 if (fileName != value)
@@ -64,7 +62,7 @@ namespace X4_ComplexCalculator.Common
         /// </summary>
         public bool HasHeader
         {
-            get { return hasHeader; }
+            get => hasHeader;
             set
             {
                 hasHeader = value;

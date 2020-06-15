@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Windows;
 using System.Linq;
+using System.Windows;
 using WPFLocalizeExtension.Engine;
 
 namespace X4_ComplexCalculator.Common.Dialog.SelectStringDialog

@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Data.SQLite;
 using System.Linq;
+using System.Threading.Tasks;
+using X4_ComplexCalculator.Common;
+using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
-using System.Collections.Specialized;
-using System.Threading.Tasks;
-using X4_ComplexCalculator.Common.Collection;
-using System;
-using X4_ComplexCalculator.Common;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
 {
@@ -232,68 +232,7 @@ WHERE
             return modulesDict;
         }
 
-//        /// <summary>
-//        /// 保管庫情報更新
-//        /// </summary>
-//        private void UpdateStorages()
-//        {
-//            var modules = Modules.Where(x => x.Module.ModuleType.ModuleTypeID == "storage")
-//                                 .GroupBy(x => x.Module.ModuleID)
-//                                 .Select(x => (x.First().Module.ModuleID, Count : x.Sum(y => y.ModuleCount)));
 
-//            // 処理対象が無ければクリアして終わる
-//            if (!modules.Any())
-//            {
-//                Storages.Clear();
-//                return;
-//            }
-
-//            var sqlParam = new SQLiteCommandParameters(2);
-
-//            var query = $@"
-//SELECT
-//    TransportTypeID,
-//    Amount * :count AS Amount,
-//    :count AS Count,
-//    ModuleID
-
-//FROM
-//    ModuleStorage
-
-//WHERE
-//    ModuleID = :moduleID";
-
-//            // 保管モジュールのみ列挙)
-//            foreach (var module in modules)
-//            {
-//                sqlParam.Add("moduleID", System.Data.DbType.String, module.ModuleID);
-//                sqlParam.Add("count", System.Data.DbType.Int32, module.Count);
-//            }
-
-
-//            // カーゴ種別ごとの容量
-//            var transportDict = new Dictionary<string, long>();  // transportTypeID, Capacity
-
-//            // 保管庫情報集計用
-//            var modulesDict = new Dictionary<string, List<StorageDetailsListItem>>();
-
-//            // 容量をタイプ別に集計
-//            DBConnection.X4DB.ExecQuery(query, sqlParam, SumStorage, transportDict, modulesDict);
-
-//            // 前回値保存
-//            var backup = Storages.ToDictionary(x => x.TransportType.TransportTypeID, x => x.IsExpanded);
-
-//            // コレクションに設定
-//            Storages.Reset(transportDict.Select(x =>
-//            {
-//                var details = modulesDict[x.Key].OrderBy(x => x.ModuleName).ToArray();
-//                return backup.TryGetValue(x.Key, out bool expanded)
-//                    ? new StoragesGridItem(x.Key, x.Value, details, expanded)
-//                    : new StoragesGridItem(x.Key, x.Value, details);
-//            })
-//                .OrderBy(x => x.TransportType.Name)
-//            );
-//        }
 
         /// <summary>
         /// 保管庫の容量を集計

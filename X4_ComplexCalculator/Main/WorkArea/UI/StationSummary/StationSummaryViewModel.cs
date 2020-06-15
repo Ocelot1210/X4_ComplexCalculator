@@ -110,7 +110,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary
                 WorkforceNeedWareCollectionView.SortDescriptions.Add(new SortDescription(nameof(NeedWareInfoDetailsItem.Method), ListSortDirection.Ascending));
                 WorkforceNeedWareCollectionView.SortDescriptions.Add(new SortDescription(nameof(NeedWareInfoDetailsItem.WareName), ListSortDirection.Ascending));
                 WorkforceNeedWareCollectionView.GroupDescriptions.Clear();
-                
+
                 WorkforceNeedWareCollectionView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(NeedWareInfoDetailsItem.Method)));
             }
 
@@ -195,9 +195,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary
         /// </summary>
         public void Dispose()
         {
-            _WorkForceModuleInfoModel.PropertyChanged                -= WorkForceModuleInfo_PropertyChanged;
-            _ProfitModel.PropertyChanged                             -= ProfitModel_PropertyChanged;
-            _BuildingCostModel.PropertyChanged                       -= BuildingCostModel_PropertyChanged;
+            _WorkForceModuleInfoModel.PropertyChanged -= WorkForceModuleInfo_PropertyChanged;
+            _ProfitModel.PropertyChanged              -= ProfitModel_PropertyChanged;
+            _BuildingCostModel.PropertyChanged        -= BuildingCostModel_PropertyChanged;
 
             _WorkForceModuleInfoModel.Dispose();
             _NeedWareInfoModel.Dispose();

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using X4_ComplexCalculator.Main.WorkArea;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import

@@ -1,5 +1,4 @@
 ﻿using Prism.Mvvm;
-using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment

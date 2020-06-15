@@ -5,7 +5,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit
     /// <summary>
     /// 利益詳細表示用ListViewのアイテム
     /// </summary>
-    class ProfitDetailsItem : BindableBase    
+    class ProfitDetailsItem : BindableBase
     {
         #region メンバ
         /// <summary>

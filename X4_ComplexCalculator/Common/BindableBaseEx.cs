@@ -1,8 +1,6 @@
-﻿using System;
+﻿using Prism.Mvvm;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Text;
-using Prism.Mvvm;
 
 namespace X4_ComplexCalculator.Common
 {
@@ -39,7 +37,7 @@ namespace X4_ComplexCalculator.Common
         /// <param name="oldValue">前回値</param>
         /// <param name="newValue">今回値</param>
         /// <param name="propertyName">プロパティ名</param>
-        protected void RaisePropertyChangedEx<T>(T oldValue, T newValue, [CallerMemberName]string propertyName = "")
+        protected void RaisePropertyChangedEx<T>(T oldValue, T newValue, [CallerMemberName] string propertyName = "")
         {
             OnPropertyChanged(new PropertyChangedExtendedEventArgs<T>(propertyName, oldValue, newValue));
         }

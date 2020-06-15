@@ -88,7 +88,7 @@ namespace X4_ComplexCalculator.Common.Collection
             {
                 return;
             }
-            
+
             Task.WhenAll(
                 CollectionChangedAsync.GetInvocationList()
                                         .OfType<NotifyCollectionChangedEventAsync>()

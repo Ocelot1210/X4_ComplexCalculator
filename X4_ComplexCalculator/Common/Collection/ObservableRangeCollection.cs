@@ -4,7 +4,6 @@ using System.Collections.Specialized;
 using System.Threading;
 using System.Windows;
 using System.Windows.Data;
-using System.Windows.Threading;
 
 namespace X4_ComplexCalculator.Common.Collection
 {
@@ -31,7 +30,7 @@ namespace X4_ComplexCalculator.Common.Collection
         }
         #endregion
 
-        
+
         /// <summary>
         /// コレクション変更時
         /// </summary>

@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.Linq;
 using System.Windows.Data;
-using WPFLocalizeExtension.Engine;
 
 namespace X4_ComplexCalculator.Common.ValueConverter
 {

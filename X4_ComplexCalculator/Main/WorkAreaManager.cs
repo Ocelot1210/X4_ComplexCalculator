@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.ServiceModel.Channels;
-using System.Threading;
 using System.Windows;
-using System.Windows.Data;
 using System.Windows.Threading;
 using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
 using X4_ComplexCalculator.Common.Localize;
-using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.Menu.Layout;
 using X4_ComplexCalculator.Main.WorkArea;
 
@@ -23,11 +16,6 @@ namespace X4_ComplexCalculator.Main
     {
         #region メンバ
         /// <summary>
-        /// 現在のレイアウト
-        /// </summary>
-        private LayoutMenuItem? _ActiveLayout;
-
-        /// <summary>
         /// ガーベジコレクション用ストップウォッチ
         /// </summary>
         private readonly Stopwatch _GCStopWatch = new Stopwatch();
@@ -35,7 +23,7 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// ガーベジコレクション用タイマー
         /// </summary>
-        private DispatcherTimer _GCTimer;
+        private readonly DispatcherTimer _GCTimer;
 
         /// <summary>
         /// レイアウト管理用クラス
@@ -84,13 +72,19 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// 初期化
         /// </summary>
-        public void Init() => _LayoutsManager.Init();
+        public void Init()
+        {
+            _LayoutsManager.Init();
+        }
 
 
         /// <summary>
         /// レイアウト保存
         /// </summary>
-        public void SaveLayout() => _LayoutsManager.SaveLayout(ActiveContent);
+        public void SaveLayout()
+        {
+            _LayoutsManager.SaveLayout(ActiveContent);
+        }
 
 
         /// <summary>

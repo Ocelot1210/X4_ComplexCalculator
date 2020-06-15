@@ -1,9 +1,14 @@
 ﻿using Prism.Commands;
 using Prism.Mvvm;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows.Input;
+using System.Xml.Linq;
+using System.Xml.XPath;
+using WPFLocalizeExtension.Engine;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.Menu.File.Export;
@@ -18,11 +23,6 @@ using X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid;
 using Xceed.Wpf.AvalonDock;
 using Xceed.Wpf.AvalonDock.Layout;
 using Xceed.Wpf.AvalonDock.Layout.Serialization;
-using WPFLocalizeExtension.Engine;
-using System.Xml.Linq;
-using System.Xml.XPath;
-using System.Collections.Generic;
-using System.Text;
 
 namespace X4_ComplexCalculator.Main.WorkArea
 {

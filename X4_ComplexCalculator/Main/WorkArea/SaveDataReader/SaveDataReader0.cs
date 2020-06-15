@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows;
-using System.Windows.Threading;
-using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;

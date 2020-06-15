@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
-using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;

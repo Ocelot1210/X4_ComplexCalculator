@@ -101,10 +101,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// </summary>
         public bool HasChanged
         {
-            get
-            {
-                return _HasChanged;
-            }
+            get => _HasChanged;
             set
             {
                 if (value != _HasChanged)

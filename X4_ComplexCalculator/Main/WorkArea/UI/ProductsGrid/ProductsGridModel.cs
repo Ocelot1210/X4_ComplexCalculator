@@ -89,7 +89,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             var addedRecords = 0L;              // 追加レコード数
             var addedModules = 0L;              // 追加モジュール数
 
-            while(true)
+            while (true)
             {
                 // 追加モジュール一覧
                 var addModules = _ProductCalclator.CalcNeedModules(Products);
@@ -131,7 +131,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 return;
             }
 
-            if(!(sender is ModulesGridItem module))
+            if (!(sender is ModulesGridItem module))
             {
                 await Task.CompletedTask;
                 return;
@@ -324,7 +324,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             var prodDict = new Dictionary<string, List<ProductDetailsListItem>>();    // <ウェアID, 詳細情報>
 
             // 処理対象モジュール一覧
-            var modules = targetModules.Where(x => 0 < x.Module.MaxWorkers || 
+            var modules = targetModules.Where(x => 0 < x.Module.MaxWorkers ||
                                                    0 < x.Module.WorkersCapacity ||
                                                    x.Module.ModuleType.ModuleTypeID == "production" ||
                                                    x.Module.ModuleType.ModuleTypeID == "habitation")
@@ -334,7 +334,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                                            var module = x.First().Module;
                                            return (module.ModuleID, module.ModuleType.ModuleTypeID, Count: x.Sum(y => y.ModuleCount));
                                        });
-                                      
+
             // 処理対象モジュールが無ければ何もしない
             if (!modules.Any())
             {
@@ -381,7 +381,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                     prodDict.Add(ware.WareID, new List<ProductDetailsListItem>());
                 }
 
-                
+
                 var detailsList = prodDict[ware.WareID];
                 var details = detailsList.Where(x => x.ModuleID == moduleID).FirstOrDefault();
 

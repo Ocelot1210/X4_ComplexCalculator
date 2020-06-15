@@ -123,8 +123,10 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <returns></returns>
         public int CompareTo(object? obj)
         {
-            var tgt = obj as Module;
-            if (tgt == null) return 1;
+            if (!(obj is Module tgt))
+            {
+                return 1;
+            }
 
             return ModuleID.CompareTo(tgt.ModuleID);
         }
@@ -135,19 +137,13 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="obj">比較対象</param>
         /// <returns></returns>
-        public override bool Equals(object? obj)
-        {
-            return obj is Module tgt && ModuleID == tgt.ModuleID;
-        }
+        public override bool Equals(object? obj) => obj is Module tgt && ModuleID == tgt.ModuleID;
 
 
         /// <summary>
         /// ハッシュ値を取得
         /// </summary>
         /// <returns>ハッシュ値</returns>
-        public override int GetHashCode()
-        {
-            return ModuleID.GetHashCode();
-        }
+        public override int GetHashCode() => HashCode.Combine(ModuleID);
     }
 }

@@ -31,7 +31,7 @@ namespace X4_ComplexCalculator.Main
 
             var config = Configuration.GetConfiguration();
             var lang = config["AppSettings:Language"];
-            
+
             try
             {
                 // 言語が設定されているか？

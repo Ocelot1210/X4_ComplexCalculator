@@ -75,7 +75,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
                 bool chked = 0 < DBConnection.CommonDB.ExecQuery($"SELECT * FROM SelectModuleCheckStateModuleTypes WHERE ID = '{dr["ModuleTypeID"]}'", (_, __) => { });
                 items.Add(new ModulesListItem((string)dr["ModuleTypeID"], (string)dr["Name"], chked));
             }
-            
+
             DBConnection.X4DB.ExecQuery(@"
 SELECT
     ModuleTypeID,

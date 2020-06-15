@@ -1,14 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data.SQLite;
 using System.Linq;
-using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
-using X4_ComplexCalculator.DB.X4DB;
-using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
-using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
-using X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid;
-using X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign;
 
 namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
 {
@@ -23,7 +15,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
         /// <param name="WorkArea">作業エリア</param>
         public SaveDataReader1(IWorkArea WorkArea) : base(WorkArea)
         {
-            
+
         }
 
 

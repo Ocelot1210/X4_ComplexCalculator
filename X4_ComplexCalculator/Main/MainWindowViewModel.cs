@@ -10,6 +10,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Main.Menu.File.Export;
 using X4_ComplexCalculator.Main.Menu.File.Import;
 using X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport;
@@ -117,14 +118,8 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         public WorkAreaViewModel? ActiveContent
         {
-            set
-            {
-                _WorkAreaManager.ActiveContent = value;
-            }
-            get
-            {
-                return _WorkAreaManager.ActiveContent;
-            }
+            set => _WorkAreaManager.ActiveContent = value;
+            get => _WorkAreaManager.ActiveContent;
         }
 
 
@@ -176,17 +171,17 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         public MainWindowViewModel()
         {
-            _WorkAreaFileIO        = new WorkAreaFileIO(_WorkAreaManager);
-            _MainWindowModel       = new MainWindowModel(_WorkAreaManager, _WorkAreaFileIO);
-            WindowLoadedCommand    = new DelegateCommand(WindowLoaded);
-            WindowClosingCommand   = new DelegateCommand<CancelEventArgs>(WindowClosing);
-            CreateNewCommand       = new DelegateCommand(CreateNew);
-            SaveLayout             = new DelegateCommand(_WorkAreaManager.SaveLayout);
-            SaveCommand            = new DelegateCommand(_WorkAreaFileIO.Save);
-            SaveAsCommand          = new DelegateCommand(_WorkAreaFileIO.SaveAs);
-            OpenCommand            = new DelegateCommand(Open);
-            UpdateDBCommand        = new DelegateCommand(_MainWindowModel.UpdateDB);
-            DocumentClosingCommand = new DelegateCommand<DocumentClosingEventArgs>(DocumentClosing);
+            _WorkAreaFileIO                  = new WorkAreaFileIO(_WorkAreaManager);
+            _MainWindowModel                 = new MainWindowModel(_WorkAreaManager, _WorkAreaFileIO);
+            WindowLoadedCommand              = new DelegateCommand(WindowLoaded);
+            WindowClosingCommand             = new DelegateCommand<CancelEventArgs>(WindowClosing);
+            CreateNewCommand                 = new DelegateCommand(CreateNew);
+            SaveLayout                       = new DelegateCommand(_WorkAreaManager.SaveLayout);
+            SaveCommand                      = new DelegateCommand(_WorkAreaFileIO.Save);
+            SaveAsCommand                    = new DelegateCommand(_WorkAreaFileIO.SaveAs);
+            OpenCommand                      = new DelegateCommand(Open);
+            UpdateDBCommand                  = new DelegateCommand(_MainWindowModel.UpdateDB);
+            DocumentClosingCommand           = new DelegateCommand<DocumentClosingEventArgs>(DocumentClosing);
             _WorkAreaFileIO.PropertyChanged += Member_PropertyChanged;
 
             _ImportExporter = new ImportExporter(_WorkAreaManager);
@@ -226,7 +221,7 @@ namespace X4_ComplexCalculator.Main
                 {
                     // フォルダの場合
                     var files = GetX4Files(Directory.EnumerateFileSystemEntries(path), maxRecursion, currRecursion++);
-                    
+
                     foreach (var file in files)
                     {
                         yield return file;
@@ -324,9 +319,9 @@ namespace X4_ComplexCalculator.Main
                 _MainWindowModel.Init();
                 _WorkAreaManager.Init();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                X4_ComplexCalculator.Common.Localize.LocalizedMessageBox.Show("Lang:UnexpectedErrorMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message, e.StackTrace ?? "");
+                LocalizedMessageBox.Show("Lang:UnexpectedErrorMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message, e.StackTrace ?? "");
                 Environment.Exit(-1);
             }
         }

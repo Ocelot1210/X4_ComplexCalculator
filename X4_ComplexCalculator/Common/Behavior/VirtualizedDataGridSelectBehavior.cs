@@ -23,14 +23,20 @@ namespace X4_ComplexCalculator.Common.Behavior
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="value"></param>
-        public static void SetMemberName(DependencyObject obj, string value) => obj.SetValue(MemberNameProperty, value);
+        public static void SetMemberName(DependencyObject obj, string value)
+        {
+            obj.SetValue(MemberNameProperty, value);
+        }
 
         /// <summary>
         /// 選択状態を設定するメンバ名を取得
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public static string GetMemberName(DependencyObject obj) => (string)obj.GetValue(MemberNameProperty);
+        public static string GetMemberName(DependencyObject obj)
+        {
+            return (string)obj.GetValue(MemberNameProperty);
+        }
 
 
         /// <summary>
@@ -54,7 +60,7 @@ namespace X4_ComplexCalculator.Common.Behavior
             else
             {
                 dg.SelectionChanged -= SelectedItemsChanged;
-                dg.SelectedCellsChanged  -= SelectedCellsChanged;
+                dg.SelectedCellsChanged -= SelectedCellsChanged;
             }
         }
 
@@ -139,7 +145,7 @@ namespace X4_ComplexCalculator.Common.Behavior
         /// <param name="value">設定値</param>
         static void SetSelectedStatus(IEnumerable items, IAccessor accessor, object value)
         {
-            foreach(var item in items)
+            foreach (var item in items)
             {
                 if (item != null)
                 {

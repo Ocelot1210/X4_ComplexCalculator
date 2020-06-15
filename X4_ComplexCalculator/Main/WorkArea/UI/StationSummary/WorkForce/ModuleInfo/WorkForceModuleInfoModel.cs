@@ -169,7 +169,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
         {
             var details = modules.Where(x => 0 < x.Module.MaxWorkers || 0 < x.Module.WorkersCapacity)
                                  .GroupBy(x => x.Module.ModuleID)
-                                 .Select(x => (x.First().Module, ModuleCount : x.Sum(y => y.ModuleCount)))
+                                 .Select(x => (x.First().Module, ModuleCount: x.Sum(y => y.ModuleCount)))
                                  .OrderBy(x => x.Module.Name);
 
             var needWorkforce = 0L;
