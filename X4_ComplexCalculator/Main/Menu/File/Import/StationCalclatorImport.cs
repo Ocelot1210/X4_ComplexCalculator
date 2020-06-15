@@ -103,7 +103,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
             }
             catch (Exception e)
             {
-                Localize.ShowMessageBox("Lang:ImportFailureMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
+                LocalizedMessageBox.Show("Lang:ImportFailureMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
             }
 
             return ret;

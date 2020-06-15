@@ -326,7 +326,7 @@ namespace X4_ComplexCalculator.Main
             }
             catch(Exception e)
             {
-                X4_ComplexCalculator.Common.Localize.Localize.ShowMessageBox("Lang:UnexpectedErrorMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message, e.StackTrace ?? "");
+                X4_ComplexCalculator.Common.Localize.LocalizedMessageBox.Show("Lang:UnexpectedErrorMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message, e.StackTrace ?? "");
                 Environment.Exit(-1);
             }
         }

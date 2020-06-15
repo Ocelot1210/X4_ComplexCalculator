@@ -174,7 +174,7 @@ namespace X4_ComplexCalculator.Main
             }
             catch (Exception e)
             {
-                Localize.ShowMessageBox("Lang:FaildToLoadFileMessage", "Lang:FaildToLoadFileMessageTitle", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
+                LocalizedMessageBox.Show("Lang:FaildToLoadFileMessage", "Lang:FaildToLoadFileMessageTitle", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
             }
             finally
             {

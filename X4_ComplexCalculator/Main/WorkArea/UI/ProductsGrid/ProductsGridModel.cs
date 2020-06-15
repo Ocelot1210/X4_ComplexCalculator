@@ -80,7 +80,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// </summary>
         public void AutoAddModule()
         {
-            var result = Localize.ShowMessageBox("Lang:AutoAddConfirm", "Lang:Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
+            var result = LocalizedMessageBox.Show("Lang:AutoAddConfirm", "Lang:Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
             if (result != MessageBoxResult.Yes)
             {
                 return;
@@ -107,11 +107,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
             if (addedRecords == 0)
             {
-                Localize.ShowMessageBox("Lang:NoAddedModulesAutomaticallyMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);
+                LocalizedMessageBox.Show("Lang:NoAddedModulesAutomaticallyMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else
             {
-                Localize.ShowMessageBox("Lang:AddedModulesAutomaticallyMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, addedRecords, addedModules);
+                LocalizedMessageBox.Show("Lang:AddedModulesAutomaticallyMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, addedRecords, addedModules);
             }
         }
 

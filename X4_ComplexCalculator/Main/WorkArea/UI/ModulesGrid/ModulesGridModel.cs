@@ -152,7 +152,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
                 return;
             }
 
-            var result = Localize.ShowMessageBox("Lang:MergeModulesConfirmMessage", "Lang:Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
+            var result = LocalizedMessageBox.Show("Lang:MergeModulesConfirmMessage", "Lang:Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
             if (result != MessageBoxResult.Yes)
             {
                 return;
@@ -181,11 +181,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             if (prevCnt != dict.Count)
             {
                 Modules.Reset(dict.OrderBy(x => x.Value.Module.Name).Select(x => x.Value));
-                Localize.ShowMessageBox("Lang:MergeModulesMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, mergedModules, prevCnt - dict.Count);
+                LocalizedMessageBox.Show("Lang:MergeModulesMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, mergedModules, prevCnt - dict.Count);
             }
             else
             {
-                Localize.ShowMessageBox("Lang:NoMergeModulesMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);
+                LocalizedMessageBox.Show("Lang:NoMergeModulesMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
     }

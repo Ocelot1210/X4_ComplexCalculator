@@ -253,7 +253,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
             // 装備が未保存の場合
             if (TurretsViewModel.Unsaved || ShieldsViewModel.Unsaved)
             {
-                var result = Localize.ShowMessageBox("Lang:EditEquipmentWindowCloseConfirmMessage", "Lang:Confirmation", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                var result = LocalizedMessageBox.Show("Lang:EditEquipmentWindowCloseConfirmMessage", "Lang:Confirmation", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 
                 switch (result)
                 {

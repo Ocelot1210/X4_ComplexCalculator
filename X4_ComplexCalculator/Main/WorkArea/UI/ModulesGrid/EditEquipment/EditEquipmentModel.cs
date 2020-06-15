@@ -230,7 +230,7 @@ WHERE
                 return;
             }
 
-            var result = Localize.ShowMessageBox("Lang:DeletePresetConfirmMessage", "Lang:Error", MessageBoxButton.YesNo, MessageBoxImage.Exclamation, MessageBoxResult.No, SelectedPreset.Name);
+            var result = LocalizedMessageBox.Show("Lang:DeletePresetConfirmMessage", "Lang:Error", MessageBoxButton.YesNo, MessageBoxImage.Exclamation, MessageBoxResult.No, SelectedPreset.Name);
             if (result == MessageBoxResult.Yes)
             {
                 DBConnection.CommonDB.BeginTransaction();
@@ -253,7 +253,7 @@ WHERE
 
             if (string.IsNullOrWhiteSpace(presetName))
             {
-                Localize.ShowMessageBox("Lang:InvalidPresetNameMessage", "Lang:Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                LocalizedMessageBox.Show("Lang:InvalidPresetNameMessage", "Lang:Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                 ret = false;
             }
 

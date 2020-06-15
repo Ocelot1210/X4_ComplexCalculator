@@ -22,7 +22,7 @@ namespace X4_ComplexCalculator
             }
             catch(Exception e)
             {
-                Common.Localize.Localize.ShowMessageBox("Lang:UnexpectedErrorMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message, e.StackTrace ?? "");
+                Common.Localize.LocalizedMessageBox.Show("Lang:UnexpectedErrorMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message, e.StackTrace ?? "");
                 Environment.Exit(-1);
             }
         }

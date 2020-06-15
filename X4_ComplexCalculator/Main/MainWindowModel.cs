@@ -77,19 +77,19 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         public void UpdateDB()
         {
-            var result = Localize.ShowMessageBox("Lang:DBUpdateConfirmationMessage", "Lang:Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            var result = LocalizedMessageBox.Show("Lang:DBUpdateConfirmationMessage", "Lang:Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
             if (result == MessageBoxResult.Yes)
             {
                 if (DBConnection.UpdateDB())
                 {
                     // DB更新成功
-                    Localize.ShowMessageBox("Lang:DBUpdateRestartRequestMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);
+                    LocalizedMessageBox.Show("Lang:DBUpdateRestartRequestMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
                     // DB更新失敗
-                    Localize.ShowMessageBox("Lang:DBUpdateFailureMessage", "Lang:Error", MessageBoxButton.YesNo, MessageBoxImage.Error);
+                    LocalizedMessageBox.Show("Lang:DBUpdateFailureMessage", "Lang:Error", MessageBoxButton.YesNo, MessageBoxImage.Error);
                 }
             }
         }
@@ -106,7 +106,7 @@ namespace X4_ComplexCalculator.Main
             // 未保存の内容が存在するか？
             if (_WorkAreaManager.Documents.Where(x => x.HasChanged).Any())
             {
-                var result = Localize.ShowMessageBox("Lang:MainWindowClosingConfirmMessage", "Lang:Confirmation", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                var result = LocalizedMessageBox.Show("Lang:MainWindowClosingConfirmMessage", "Lang:Confirmation", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 
                 switch (result)
                 {

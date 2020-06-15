@@ -142,7 +142,7 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
         /// </summary>
         private void DeleteLayout()
         {
-            var result = Localize.ShowMessageBox("Lang:DeleteLayoutConfirmMessage", "Lang:Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No, LayoutName);
+            var result = LocalizedMessageBox.Show("Lang:DeleteLayoutConfirmMessage", "Lang:Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No, LayoutName);
 
             if (result == MessageBoxResult.Yes)
             {
@@ -163,7 +163,7 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
 
             if (string.IsNullOrWhiteSpace(layoutName))
             {
-                Localize.ShowMessageBox("Lang:InvalidLayoutNameMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                LocalizedMessageBox.Show("Lang:InvalidLayoutNameMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Warning);
                 ret = false;
             }
 
