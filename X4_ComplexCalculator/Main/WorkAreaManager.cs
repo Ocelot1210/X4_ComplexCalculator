@@ -129,13 +129,12 @@ namespace X4_ComplexCalculator.Main
 
                     // 最後のタブを閉じた時にAvalonDockのActiveContentが更新されないためここでnullにする
                     // → nullにしないと閉じたはずのタブを保存できてしまう
-                    if (Documents.Count == 1)
+                    if (Documents.Count == 0)
                     {
                         ActiveContent = null;
                     }
 
                 }), DispatcherPriority.Background);
-
 
                 // ガーベジコレクション用タイマー開始
                 if (!_GCTimer.IsEnabled)
