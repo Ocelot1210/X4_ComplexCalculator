@@ -35,8 +35,9 @@ This application is station calclator for X4: Foundations.
             1. Save as -- Save your current plan under a different name.
             1. Open ---- Open the saved plan.
             1. Import
-                1. Station Calclator --- Importing plan from [Station Calclator](http://www.x4-game.com/#/station-calculator).
-                1. Existing plan ------- Import plans saved during the game.
+                1. Station Calclator ------ Importing plan from [Station Calclator](http://www.x4-game.com/#/station-calculator).
+                1. Existing plan ---------- Import plans saved during the game.
+                1. Module equipment --- Imports equipment presets for modules saved during the game.
             1. Export
                 1. Station Calclator --- Exporting the plan to [Station Calclator](http://www.x4-game.com/#/station-calculator).
         1. Layout(L)
@@ -112,7 +113,7 @@ This application is station calclator for X4: Foundations.
             - When "Allocated" < "Number after the specified time", the background color of the cell will be yellow.
 
 ## Tips
-Items in the planning area or the planning area (such as modules tab, summary tab, etc) can be freely docked/undocked.
+- Plan or items in the plan area (such as modules tab, summary tab, etc) can be freely docked/undocked.
 
 ## How to Uninstall
 The registry is not edited at all, so please delete the entire folder.
