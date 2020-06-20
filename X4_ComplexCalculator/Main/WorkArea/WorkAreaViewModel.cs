@@ -340,7 +340,7 @@ WHERE
         {
             if (_CurrentDockingManager == null)
             {
-                return null;
+                return _Layout;
             }
 
             // レイアウト保存
