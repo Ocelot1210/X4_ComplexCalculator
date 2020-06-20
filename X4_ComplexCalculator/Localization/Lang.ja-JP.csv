@@ -75,6 +75,21 @@ ImportPlanDescription;インポートする計画を選択
 UnexpectedErrorMessage;予期しないエラーが発生しました。\r\n■エラー内容：\r\n{0}\r\n\r\n■スタックトレース：\r\n{1}
 LoadingFile;ファイルを読込中
 
+
+# ------------------------------------------------------
+# Import loadouts
+# ------------------------------------------------------
+LoadoutImportTitle;モジュールの装備
+LoadoutImportWindowTitle;モジュールの装備をインポート
+LoadoutFilePathDescription;X4 装備ファイルパス
+PresetListDescription;インポートするプリセットを選択
+PresetImportSucceededMessage;プリセットのインポートに成功しました。\r\nインポート件数 = {0}
+PresetImportFailedMessage;プリセットのインポートに失敗しました。\r\n成功：{0}\r\n失敗：{1}
+NoPresetSelectedMessage;プリセットが選択されていません。\r\nプリセットを選択した後、再度実行してください。
+ImportButton;インポート
+Remarks;備考
+PresetImported;インポート済み
+
 # ------------------------------------------------------
 # Plan
 # ------------------------------------------------------

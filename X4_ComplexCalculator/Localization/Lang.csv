@@ -77,6 +77,21 @@ LoadingFile;Loading file.
 
 
 # ------------------------------------------------------
+# Import loadouts
+# ------------------------------------------------------
+LoadoutImportTitle;Module equipment
+LoadoutImportWindowTitle;Import module equipment
+LoadoutFilePathDescription;X4 loadout file path
+PresetListDescription;Select a preset to import
+PresetImportSucceededMessage;The presets have been successfully imported.\r\nNumber of imports = {0}
+PresetImportFailedMessage;The import of the preset failed.\r\nSuccess：{0}\r\nFailure：{1}
+NoPresetSelectedMessage;No presets are selected.\r\nPlease selecting a preset and run it again.
+ImportButton;Import
+Remarks;Remarks
+PresetImported;Imported.
+
+
+# ------------------------------------------------------
 # Plan
 # ------------------------------------------------------
 View;View(_V)

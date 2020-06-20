@@ -13,6 +13,7 @@ using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Main.Menu.File.Export;
 using X4_ComplexCalculator.Main.Menu.File.Import;
+using X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport;
 using X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport;
 using X4_ComplexCalculator.Main.Menu.Lang;
 using X4_ComplexCalculator.Main.Menu.Layout;
@@ -189,6 +190,7 @@ namespace X4_ComplexCalculator.Main
             {
                 new StationCalclatorImport(new DelegateCommand<IImport>(_ImportExporter.Import)),
                 new StationPlanImport(new DelegateCommand<IImport>(_ImportExporter.Import)),
+                new LoadoutImport(new DelegateCommand<IImport>(_ImportExporter.Import)),
                 //new SaveDataImport(new DelegateCommand<IImport>(_Model.Import))   // 作成中のため未リリース
             };
 

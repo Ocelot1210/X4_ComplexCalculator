@@ -169,15 +169,13 @@ namespace X4_ComplexCalculator.DB
             // トランザクション開始済み？
             if (_TransCommand != null)
             {
-                ret = ExecQueryMain(_TransCommand, query, null, callback, args);
+                ret = ExecQueryMain(_TransCommand, query, parameters, callback, args);
             }
             else
             {
                 // クエリ使用準備
-                using (var cmd = new SQLiteCommand(conn))
-                {
-                    ret = ExecQueryMain(cmd, query, parameters, callback, args);
-                }
+                using var cmd = new SQLiteCommand(conn);
+                ret = ExecQueryMain(cmd, query, parameters, callback, args);
             }
 
             return ret;
