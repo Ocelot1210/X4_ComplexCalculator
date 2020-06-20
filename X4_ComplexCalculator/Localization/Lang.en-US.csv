@@ -34,6 +34,20 @@ DBOpenFailMessage;Failed to open the DB. It may be possible to start it by extra
 # Main window
 # ------------------------------------------------------
 MainWindowTitle;X4: Complex Calclator
+FaildToLoadFileMessage;Failed to load the file.\r\n\r\n■Reason：\r\n{0}
+FaildToLoadFileMessageTitle;Read failure
+MainWindowClosingConfirmMessage;There are some unsaved items. Do you want to save it?
+PlanClosingConfirmMessage;Do you want to save the changes to your plan "{0}"?
+SaveDataWriteFailureMessage;Failed to save.\r\n\r\n■Reason：\r\n{0}\r\n\r\n■Stack trace：\r\n{1}
+ImportFailureMessage;Failed to import.\r\n■Reason：\r\n{0}
+UnexpectedErrorMessage;Unexpected error occurred.\r\n■Error contents：\r\n{0}\r\n\r\n■Stack trace：\r\n{1}
+LoadingFile;Loading file.
+
+# ------------------------------------------------------
+# Main window menu
+# ------------------------------------------------------
+
+# File(F) ----------------------------------------------
 FileMenu;File(_F)
 New;New
 OverwriteSave;Save
@@ -43,37 +57,43 @@ Import;Import
 ExistingPlan;Existing plan
 Export;Export
 UpdateDB;Update DB
+DBUpdateConfirmationMessage;Do you want to display the DB update screen? \r\nPlease wait for a moment until the screen starts.
+DBUpdateRestartRequestMessage;Please restart the application to apply the DB update.
+DBUpdateFailureMessage;Failed to update the DB, \r\nplease check if the DB file is accessible and try again.
+
+# Layout(L) --------------------------------------------
 Layout;Layout(_L)
 SaveLayout;Save layout
 LayoutList;Layout list
 EditLayoutName;Edit layout name
 LayoutName;Layout name
-Language;Language
 LayoutSavedMessage;Saved the layout of plan "{0}" as "{1}".
 LayoutSaveFailedMessage;Failed to save the layout.\r\n\r\n■Reason：\r\n{0}
 LayoutOverwritedMessage;Saved the layout of plan "{0}" as "{1}" overwriting it.
 LayoutOverwriteFailedMessage;Failed to save the layout overwrite.\r\n\r\n■Reason：\r\n{0}
 TabDoesNotSelectedMessage;No tab is selected to save the layout.\r\nSelect the tab you want to save, and run it again.
-FaildToLoadFileMessage;Failed to load the file.\r\n\r\n■Reason：\r\n{0}
-FaildToLoadFileMessageTitle;Read failure
-DBUpdateConfirmationMessage;Do you want to display the DB update screen? \r\nPlease wait for a moment until the screen starts.
-DBUpdateRestartRequestMessage;Please restart the application to apply the DB update.
-DBUpdateFailureMessage;Failed to update the DB, \r\nplease check if the DB file is accessible and try again.
-MainWindowClosingConfirmMessage;There are some unsaved items. Do you want to save it?
-PlanClosingConfirmMessage;Do you want to save the changes to your plan "{0}"?
 DeleteLayoutConfirmMessage;Do you really want to delete the layout "{0}"?
 InvalidLayoutNameMessage;Invalid layout name. Please enter at least one non-white space character.
-SaveDataWriteFailureMessage;Failed to save.\r\n\r\n■Reason：\r\n{0}\r\n\r\n■Stack trace：\r\n{1}
-ImportFailureMessage;Failed to import.\r\n■Reason：\r\n{0}
+
+# Language ---------------------------------------------
+Language;Language
+
+
+# ------------------------------------------------------
+# Station Calclator import/export dialog
+# ------------------------------------------------------
 StationCalclatorExportTitle;Export to Station Calclator
 StationCalclatorExportDescription;Please copy the URL.\r\nNote: The following modules are excluded.\r\n・Connection module\r\n・Venture module
 StationCalclatorImportTitle;Importing from Station Calclator
 StationCalclatorImportDescription;Please enter the URL displayed when you click the \r\nShare button at the top of Station Calclator.
+
+
+# ------------------------------------------------------
+# Select plan dialog
+# ------------------------------------------------------
 SelectPlanWindowTitle;Select plan
 X4PlanFilePathDescription;X4 Construction plan file path
 ImportPlanDescription;Select a plan to import
-UnexpectedErrorMessage;Unexpected error occurred.\r\n■Error contents：\r\n{0}\r\n\r\n■Stack trace：\r\n{1}
-LoadingFile;Loading file.
 
 
 # ------------------------------------------------------
@@ -102,6 +122,7 @@ BuildResources;Build resources
 Storages;Storages
 StorageAssign;Storage assign
 
+
 # ------------------------------------------------------
 # Modules
 # ------------------------------------------------------
@@ -122,6 +143,7 @@ NoAddedModulesAutomaticallyMessage;The module was not added because there is no 
 AddedModulesAutomaticallyMessage;{0} records, {1} modules added.
 NotEquippedToolTipText;Not equipped with anything.
 
+
 # ------------------------------------------------------
 # Products
 # ------------------------------------------------------
@@ -129,7 +151,6 @@ Expansion;Expansion
 Collapse;Collapse
 Efficiency;Efficiency
 Production;Production
-
 ProductName;Product name
 AmountPerHour;Amount/h
 
@@ -140,6 +161,7 @@ AmountPerHour;Amount/h
 NeedWare;NeedWare
 NeedWareAmount;Amount
 StorageType;Storage type
+
 
 # ------------------------------------------------------
 # Storage
@@ -173,13 +195,13 @@ NecessaryAmount;Necessary amount
 Diff;Diff
 Quantity;Quantity
 
+
 # ------------------------------------------------------
 # Select module window
 # ------------------------------------------------------
 SelectModuleWindowTitle;Select module window
 ModuleNameBeforeChange;Module name before change：
 ModuleType;Module type
-
 
 
 # ------------------------------------------------------

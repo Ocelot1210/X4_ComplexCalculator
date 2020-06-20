@@ -34,6 +34,20 @@ DBOpenFailMessage;DBのオープンに失敗しました。\r\nゲームファ�
 # Main window
 # ------------------------------------------------------
 MainWindowTitle;X4: ステーション計算機
+FaildToLoadFileMessage;ファイルの読み込みに失敗しました。\r\n\r\n■理由：\r\n{0}
+FaildToLoadFileMessageTitle;読み込み失敗
+MainWindowClosingConfirmMessage;未保存の項目があります。保存しますか？
+PlanClosingConfirmMessage;計画{0}の変更内容を保存しますか？
+SaveDataWriteFailureMessage;保存に失敗しました。\r\n■理由：\r\n{0}\r\n\r\n■スタックトレース：\r\n{1}
+ImportFailureMessage;インポートに失敗しました。\r\n■理由：\r\n{0}
+UnexpectedErrorMessage;予期しないエラーが発生しました。\r\n■エラー内容：\r\n{0}\r\n\r\n■スタックトレース：\r\n{1}
+LoadingFile;ファイルを読込中
+
+# ------------------------------------------------------
+# Main window menu
+# ------------------------------------------------------
+
+# File(F) ----------------------------------------------
 FileMenu;ファイル(_F)
 New;新規作成
 OverwriteSave;上書き保存
@@ -43,37 +57,43 @@ Import;インポート
 ExistingPlan;既存の計画
 Export;エクスポート
 UpdateDB;DB更新
+DBUpdateConfirmationMessage;DB更新画面を表示しますか？\r\n※ 画面が起動するまでしばらくお待ち下さい。
+DBUpdateRestartRequestMessage;DBの更新を適用するためには本アプリケーションの再起動を行ってください。
+DBUpdateFailureMessage;DBの更新に失敗しました。\r\nDBファイルにアクセス可能か確認後、再度実行してください。
+
+# Layout(L) --------------------------------------------
 Layout;レイアウト(_L)
 SaveLayout;レイアウト保存
 LayoutList;レイアウト一覧
 EditLayoutName;レイアウト名編集
 LayoutName;レイアウト名
-Language;言語
 LayoutSavedMessage;計画「{0}」のレイアウトを「{1}」として保存しました。
 LayoutSaveFailedMessage;レイアウトの保存に失敗しました。\r\n\r\n■理由：\r\n{0}
 LayoutOverwritedMessage;計画「{0}」のレイアウトを「{1}」として上書き保存しました。
 LayoutOverwriteFailedMessage;レイアウトの上書き保存に失敗しました。\r\n\r\n■理由：\r\n{0}
 TabDoesNotSelectedMessage;レイアウト保存対象のタブが選択されていません。\r\n保存対象のタブを選択後、再度実行して下さい。
-FaildToLoadFileMessage;ファイルの読み込みに失敗しました。\r\n\r\n■理由：\r\n{0}
-FaildToLoadFileMessageTitle;読み込み失敗
-DBUpdateConfirmationMessage;DB更新画面を表示しますか？\r\n※ 画面が起動するまでしばらくお待ち下さい。
-DBUpdateRestartRequestMessage;DBの更新を適用するためには本アプリケーションの再起動を行ってください。
-DBUpdateFailureMessage;DBの更新に失敗しました。\r\nDBファイルにアクセス可能か確認後、再度実行してください。
-MainWindowClosingConfirmMessage;未保存の項目があります。保存しますか？
-PlanClosingConfirmMessage;計画{0}の変更内容を保存しますか？
 DeleteLayoutConfirmMessage;レイアウト「{0}」を本当に削除しますか？
 InvalidLayoutNameMessage;レイアウト名が無効です。\r\n空白文字以外の文字を1文字以上入力して下さい。
-SaveDataWriteFailureMessage;保存に失敗しました。\r\n■理由：\r\n{0}\r\n\r\n■スタックトレース：\r\n{1}
-ImportFailureMessage;インポートに失敗しました。\r\n■理由：\r\n{0}
+
+# Language ---------------------------------------------
+Language;言語
+
+
+# ------------------------------------------------------
+# Station Calclator import/export dialog
+# ------------------------------------------------------
 StationCalclatorExportTitle;Station Calclatorへエクスポート
 StationCalclatorExportDescription;URLをコピーして下さい\r\n注) 以下のモジュールは除外しています。\r\n・接続モジュール\r\n・探検モジュール
 StationCalclatorImportTitle;Station Calclatorからインポート
 StationCalclatorImportDescription;Station Calclator上部のShareボタンをクリックした時に\r\n表示されるURLを入力してください
+
+
+# ------------------------------------------------------
+# Select plan dialog
+# ------------------------------------------------------
 SelectPlanWindowTitle;計画を選択
 X4PlanFilePathDescription;X4 建造計画ファイルパス
 ImportPlanDescription;インポートする計画を選択
-UnexpectedErrorMessage;予期しないエラーが発生しました。\r\n■エラー内容：\r\n{0}\r\n\r\n■スタックトレース：\r\n{1}
-LoadingFile;ファイルを読込中
 
 
 # ------------------------------------------------------
@@ -90,6 +110,7 @@ ImportButton;インポート
 Remarks;備考
 PresetImported;インポート済み
 
+
 # ------------------------------------------------------
 # Plan
 # ------------------------------------------------------
@@ -100,6 +121,7 @@ Summary;概要
 BuildResources;建造
 Storages;保管庫
 StorageAssign;保管庫割当
+
 
 # ------------------------------------------------------
 # Modules
@@ -121,6 +143,7 @@ NoAddedModulesAutomaticallyMessage;不足している製品が無いためモジ
 AddedModulesAutomaticallyMessage;{0}レコード、{1}モジュール追加されました。
 NotEquippedToolTipText;何も装備していません
 
+
 # ------------------------------------------------------
 # Products
 # ------------------------------------------------------
@@ -128,7 +151,6 @@ Expansion;展開
 Collapse;折りたたむ
 Efficiency;生産性
 Production;生産量
-
 ProductName;製品名
 AmountPerHour;個数/h
 
