@@ -214,7 +214,6 @@
         <!--  インポート/閉じるボタン  -->
         <DockPanel Grid.Row="2" HorizontalAlignment="Right">
             <Button
-                x:Name="ImportButton"
                 Width="75"
                 Height="20"
                 Margin="5"
@@ -222,7 +221,6 @@
                 Content="{lex:Loc Lang:ImportButton}" />
 
             <Button
-                x:Name="CloseButton"
                 Width="75"
                 Height="20"
                 Margin="5"

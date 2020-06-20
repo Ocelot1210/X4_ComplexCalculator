@@ -63,7 +63,6 @@
         <!--  OK/Cancelボタン  -->
         <DockPanel Grid.Row="2" HorizontalAlignment="Right">
             <Button
-                x:Name="OkButton"
                 Width="75"
                 Height="20"
                 Margin="5"
@@ -71,7 +70,6 @@
                 Content="OK" />
 
             <Button
-                x:Name="CancelButton"
                 Width="75"
                 Height="20"
                 Margin="5"
