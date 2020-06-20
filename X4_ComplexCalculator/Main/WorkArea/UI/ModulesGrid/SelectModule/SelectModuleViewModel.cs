@@ -153,6 +153,19 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
             OKButtonClickedCommand    = new DelegateCommand(OKButtonClicked);
             CloseButtonClickedCommand = new DelegateCommand(CloseWindow);
             WindowClosingCommand      = new DelegateCommand<CancelEventArgs>(WindowClosing);
+
+            // 親ウィンドウが閉じられたときに子のウィンドウも閉じるようにする
+            Application.Current.MainWindow.Closed += MainWindow_Closed;
+        }
+
+        /// <summary>
+        /// 親ウィンドウが閉じられた時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MainWindow_Closed(object? sender, EventArgs e)
+        {
+            CloseWindowProperty = true;
         }
 
 
@@ -164,6 +177,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
         {
             _Model.SaveCheckState();
             _Model.Dispose();
+
+            if (Application.Current.MainWindow != null)
+            {
+                Application.Current.MainWindow.Closed -= MainWindow_Closed;
+            }
         }
 
 
