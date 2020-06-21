@@ -33,6 +33,12 @@ namespace X4_ComplexCalculator.Common
             return Config;
         }
 
+
+        /// <summary>
+        /// App.config.jsonに値を設定する
+        /// </summary>
+        /// <param name="key">キー</param>
+        /// <param name="value">設定値</param>
         public static void SetValue(string key, string value)
         {
             if (Config == null)
@@ -46,14 +52,20 @@ namespace X4_ComplexCalculator.Common
 
             var jsonText = File.ReadAllText(path);
             var jsonObj = (JObject?)JsonConvert.DeserializeObject(jsonText) ?? throw new InvalidOperationException();
-            dynamic token = jsonObj.SelectToken(key) ?? throw new InvalidOperationException();
-            token.Value = value;
-            string output = JsonConvert.SerializeObject(jsonObj, Formatting.Indented);
-            File.WriteAllText(path, output);
+            var token = jsonObj.SelectToken(key) ?? throw new InvalidOperationException();
+            if (token is JValue jValue)
+            {
+                jValue.Value = value;
 
-            Config.Reload();
+                string output = JsonConvert.SerializeObject(jsonObj, Formatting.Indented);
+                File.WriteAllText(path, output);
+
+                Config.Reload();
+            }
+            else
+            {
+                throw new InvalidOperationException();
+            }
         }
-
-
     }
 }
