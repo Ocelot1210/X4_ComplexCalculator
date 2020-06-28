@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Data.SQLite;
 using System.IO;
 using System.Windows;
@@ -366,7 +367,9 @@ namespace X4_ComplexCalculator.DB
             
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? "", conf["AppSettings:X4DBPath"]);
 
-            var proc = System.Diagnostics.Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? "", conf["AppSettings:ExporterExePath"]), $"-o \"{path}\"");
+            var param = @$"-i ""{GetX4InstallDirectory()}"" -o ""{path}""";
+
+            var proc = System.Diagnostics.Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? "", conf["AppSettings:ExporterExePath"]), param);
             proc.WaitForExit();
 
             path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? "", conf["AppSettings:X4DBPath"]);
@@ -378,6 +381,54 @@ namespace X4_ComplexCalculator.DB
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// X4のインストール先フォルダを取得する
+        /// </summary>
+        /// <returns>X4のインストール先フォルダパス</returns>
+        private static string GetX4InstallDirectory()
+        {
+            // アプリケーションのアンインストール情報が保存されている場所
+            var location = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
+
+            // レジストリ情報の取得を試みる
+            RegistryKey? parent = Registry.LocalMachine.OpenSubKey(location, false);
+            if (parent == null)
+            {
+                // だめだった場合諦める
+                return "";
+            }
+
+            var ret = "";
+
+            // 子のレジストリの名前の数だけ処理をする
+            foreach (var subKeyName in parent.GetSubKeyNames())
+            {
+                // 子のレジストリの情報を取得する
+                RegistryKey? child = Registry.LocalMachine.OpenSubKey(@$"{location}\{subKeyName}", false);
+                if (child == null)
+                {
+                    // 取得に失敗したら次のレジストリを見に行く
+                    continue;
+                }
+                
+                // 表示名を保持しているオブジェクトを取得する
+                object value = child.GetValue("DisplayName");
+                if (value == null)
+                {
+                    // 取得に失敗したら次のレジストリを見に行く
+                    continue;
+                }
+
+                if (value.ToString() == "X4: Foundations")
+                {
+                    ret = child.GetValue("InstallLocation")?.ToString() ?? "";
+                    break;
+                }
+            }
+
+            return ret;
         }
 
 
