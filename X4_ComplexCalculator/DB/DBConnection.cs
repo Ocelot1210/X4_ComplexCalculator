@@ -274,10 +274,13 @@ namespace X4_ComplexCalculator.DB
         public static void Open()
         {
             var conf = Configuration.GetConfiguration();
-            var x4DBPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? "", conf["AppSettings:X4DBPath"]);
+            var x4DBPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? "", conf["AppSettings:X4DBPath"]));
 
             try
             {
+                // DB格納先フォルダが無ければ作る
+                Directory.CreateDirectory(Path.GetDirectoryName(x4DBPath));
+
                 if (File.Exists(x4DBPath))
                 {
                     X4DB = new DBConnection(x4DBPath);
