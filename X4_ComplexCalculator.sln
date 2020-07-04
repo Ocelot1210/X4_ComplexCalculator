@@ -3,9 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "X4_ComplexCalculator", "X4_ComplexCalculator\X4_ComplexCalculator.csproj", "{1E389320-5E3E-4F78-8334-EBF3972CE9EB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "X4_ComplexCalculator", "X4_ComplexCalculator\X4_ComplexCalculator.csproj", "{1E389320-5E3E-4F78-8334-EBF3972CE9EB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "X4_ComplexCalculator_CustomControlLibrary", "X4_ComplexCalculator_CustomControlLibrary\X4_ComplexCalculator_CustomControlLibrary.csproj", "{8FC248D1-F77A-4BC8-B179-4994F764F541}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "X4_ComplexCalculator_CustomControlLibrary", "X4_ComplexCalculator_CustomControlLibrary\X4_ComplexCalculator_CustomControlLibrary.csproj", "{8FC248D1-F77A-4BC8-B179-4994F764F541}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibX4", "LibX4\LibX4.csproj", "{DAC31A3D-9432-4D7D-9A9A-F5052017AB5D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "X4_DataExporterWPF", "X4_DataExporterWPF\X4_DataExporterWPF.csproj", "{B4315308-79F8-4F96-B6D2-F66FF8B001C6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{8FC248D1-F77A-4BC8-B179-4994F764F541}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8FC248D1-F77A-4BC8-B179-4994F764F541}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8FC248D1-F77A-4BC8-B179-4994F764F541}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAC31A3D-9432-4D7D-9A9A-F5052017AB5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAC31A3D-9432-4D7D-9A9A-F5052017AB5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAC31A3D-9432-4D7D-9A9A-F5052017AB5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAC31A3D-9432-4D7D-9A9A-F5052017AB5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4315308-79F8-4F96-B6D2-F66FF8B001C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4315308-79F8-4F96-B6D2-F66FF8B001C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4315308-79F8-4F96-B6D2-F66FF8B001C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4315308-79F8-4F96-B6D2-F66FF8B001C6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

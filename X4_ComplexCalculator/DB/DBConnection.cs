@@ -6,6 +6,7 @@ using System.Windows;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB.X4DB;
+using X4_DataExporterWPF.DataExportWindow;
 
 namespace X4_ComplexCalculator.DB
 {
@@ -364,18 +365,14 @@ namespace X4_ComplexCalculator.DB
             X4DB?.Dispose();
 
             var conf = Configuration.GetConfiguration();
-            
-            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? "", conf["AppSettings:X4DBPath"]);
 
-            var param = @$"-i ""{GetX4InstallDirectory()}"" -o ""{path}""";
+            var dbFilePath = conf["AppSettings:X4DBPath"];
 
-            var proc = System.Diagnostics.Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? "", conf["AppSettings:ExporterExePath"]), param);
-            proc.WaitForExit();
+            DataExportWindow.ShowDialog(GetX4InstallDirectory(), dbFilePath);
 
-            path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? "", conf["AppSettings:X4DBPath"]);
-            if (File.Exists(path))
+            if (File.Exists(dbFilePath))
             {
-                X4DB = new DBConnection(path);
+                X4DB = new DBConnection(dbFilePath);
                 InitX4DB();
                 return true;
             }

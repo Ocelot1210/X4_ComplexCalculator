@@ -24,20 +24,25 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.0.35" />
     <PackageReference Include="Extended.Wpf.Toolkit" Version="3.8.1" />
     <PackageReference Include="gong-wpf-dragdrop" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="3.1.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.2" />
+    <PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.19" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Prism.Core" Version="7.2.0.1422" />
-    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.112.2" />
+    <PackageReference Include="ReactiveProperty" Version="7.1.0" />
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.113.1" />
     <PackageReference Include="WPFLocalizeExtension" Version="3.6.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\LibX4\LibX4.csproj" />
     <ProjectReference Include="..\X4_ComplexCalculator_CustomControlLibrary\X4_ComplexCalculator_CustomControlLibrary.csproj" />
+    <ProjectReference Include="..\X4_DataExporterWPF\X4_DataExporterWPF.csproj" />
   </ItemGroup>
 
   <ItemGroup>

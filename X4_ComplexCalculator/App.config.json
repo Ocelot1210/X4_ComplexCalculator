@@ -2,7 +2,6 @@
   "AppSettings": {
     "X4DBPath": ".\\db\\x4.db",
     "CommonDBPath": ".\\db\\common.db",
-    "ExporterExePath": ".\\db\\Exporter\\X4_DataExporterWPF.exe",
     "Language": ""
   }
 }
