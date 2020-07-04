@@ -365,7 +365,7 @@ namespace X4_ComplexCalculator.DB
         /// <returns></returns>
         public static bool UpdateDB()
         {
-            X4DB?.Dispose();
+            _X4DB?.Dispose();
 
             var conf = Configuration.GetConfiguration();
 
