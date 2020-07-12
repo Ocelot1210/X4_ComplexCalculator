@@ -414,9 +414,11 @@ namespace X4_ComplexCalculator.Common
         /// </summary>
         public event ProviderErrorEventHandler? ProviderError;
 
+#pragma warning disable CS0067
         /// <summary>
         /// An event that is fired when a value changed.
         /// </summary>
         public event ValueChangedEventHandler? ValueChanged;
+#pragma warning restore CS0067
     }
 }
