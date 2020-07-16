@@ -324,7 +324,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 else
                 {
                     // ウェアが一覧に無い場合
-                    prod = new ProductsGridItem(item.Key, item.Value);
+                    prod = new ProductsGridItem(item.Key, item.Value, _Settings.IsAssignMiner, _Settings.IsSupplyingScareResourcesFromOtherStations);
 
                     // 前回値単価がある場合、復元
                     if (_UnitPriceBakDict.ContainsKey(prod.Ware.WareID))

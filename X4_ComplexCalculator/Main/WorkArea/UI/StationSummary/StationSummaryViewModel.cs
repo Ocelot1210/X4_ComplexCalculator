@@ -71,7 +71,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary
         /// <summary>
         /// 損益詳細
         /// </summary>
-        public ObservableCollection<ProfitDetailsItem> ProfitDetails => _ProfitModel.ProfitDetails;
+        public ObservableCollection<ProductsGridItem> ProfitDetails => _ProfitModel.ProfitDetails;
         #endregion
 
 

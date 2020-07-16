@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB.X4DB;
 
@@ -10,7 +11,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
     /// <summary>
     /// 製品一覧を表示するDataGridViewの1レコード分用クラス
     /// </summary>
-    public class ProductsGridItem : BindableBase
+    public class ProductsGridItem : BindableBaseEx
     {
         #region メンバ
         /// <summary>
@@ -79,30 +80,32 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             {
                 // 最低価格≦ 入力価格 ≦ 最高価格かつ価格が変更された場合のみ更新
 
+
+                var setValue = value;
+                
+                if (setValue < Ware.MinPrice)
+                {
+                    // 入力された値が最低価格未満の場合、最低価格を設定する
+                    setValue = Ware.MinPrice;
+                }
+                else if (Ware.MaxPrice < setValue)
+                {
+                    // 入力された値が最高価格を超える場合、最高価格を設定する
+                    setValue = Ware.MaxPrice;
+                }
+
                 // 変更無しの場合は何もしない
                 if (_UnitPrice == value)
                 {
                     return;
                 }
 
+                var oldUnitPrice = _UnitPrice;
+                var oldPrice = Price;
+                _UnitPrice = setValue;
 
-                if (value < Ware.MinPrice)
-                {
-                    // 入力された値が最低価格未満の場合、最低価格を設定する
-                    _UnitPrice = Ware.MinPrice;
-                }
-                else if (Ware.MaxPrice < value)
-                {
-                    // 入力された値が最高価格を超える場合、最高価格を設定する
-                    _UnitPrice = Ware.MaxPrice;
-                }
-                else
-                {
-                    // 入力された値が最低価格以上、最高価格以下の場合、入力された値を設定する
-                    _UnitPrice = value;
-                }
-                RaisePropertyChanged();
-                RaisePropertyChanged(nameof(Price));
+                RaisePropertyChangedEx(oldUnitPrice, setValue);
+                RaisePropertyChangedEx(oldPrice, Price, nameof(Price));
             }
         }
 
@@ -152,6 +155,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                     throw new InvalidOperationException();
                 }
 
+                var oldPrice = Price;
+
                 if (SetProperty(ref _IsAssignMiner, value))
                 {
                     // 不足リソースを他ステーションから供給ONの場合、価格は既に0なのでPriceの変更通知しない
@@ -160,7 +165,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                         return;
                     }
 
-                    RaisePropertyChanged(nameof(Price));
+                    RaisePropertyChangedEx(oldPrice, Price, nameof(Price));
                 }
             }
         }
@@ -174,6 +179,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             get => _IsSupplyingScareResourcesFromOtherStations;
             set
             {
+                var oldPrice = Price;
+
                 if (SetProperty(ref _IsSupplyingScareResourcesFromOtherStations, value))
                 {
                     // 採掘船を割り当てONの場合、価格は既に0なのでPriceの変更通知しない
@@ -182,7 +189,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                         return;
                     }
 
-                    RaisePropertyChanged(nameof(Price));
+                    RaisePropertyChangedEx(oldPrice, Price, nameof(Price));
                 }
             }
         }
@@ -193,15 +200,17 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// コンストラクタ
         /// </summary>
         /// <param name="wareID">ウェアID</param>
-        /// <param name="count">ウェア個数</param>
         /// <param name="datails">ウェア詳細(関連モジュール等)</param>
-        /// <param name="isExpanded">関連モジュールが展開されているか</param>
-        /// <param name="price">価格</param>
-        public ProductsGridItem(string wareID, IEnumerable<ProductDetailsListItem> datails)
+        /// <param name="isAssignMiner">採掘船を割り当てるか</param>
+        /// <param name="isSupplyingScareResourcesFromOtherStations">不足しているウェアを他ステーションから供給するか</param>
+        public ProductsGridItem(string wareID, IEnumerable<ProductDetailsListItem> datails, bool isAssignMiner, bool isSupplyingScareResourcesFromOtherStations)
         {
             Ware = Ware.Get(wareID);
-            UnitPrice = (Ware.MinPrice + Ware.MaxPrice) / 2;
             Details = new ObservableRangeCollection<ProductDetailsListItem>(datails);
+
+            _IsAssignMiner = isAssignMiner && 0 == Ware.WareGroup.Tier;
+            _IsSupplyingScareResourcesFromOtherStations = isSupplyingScareResourcesFromOtherStations;
+            UnitPrice = (Ware.MinPrice + Ware.MaxPrice) / 2;
         }
 
 
