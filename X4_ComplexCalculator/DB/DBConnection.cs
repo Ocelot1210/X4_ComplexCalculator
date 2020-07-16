@@ -370,6 +370,12 @@ namespace X4_ComplexCalculator.DB
             var conf = Configuration.GetConfiguration();
 
             var dbFilePath = conf["AppSettings:X4DBPath"];
+            if (!Path.IsPathRooted(dbFilePath))
+            {
+                // DBファイルが相対パスの場合、実行ファイルのパスをベースにパスを正規化する
+                var exeDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? "";
+                dbFilePath = Path.GetFullPath(Path.Combine(exeDir, conf["AppSettings:X4DBPath"]));
+            }
 
             DataExportWindow.ShowDialog(GetX4InstallDirectory(), dbFilePath);
 
