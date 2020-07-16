@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS Module
     Macro           TEXT    NOT NULL,
     MaxWorkers      INTEGER NOT NULL,
     WorkersCapacity INTEGER NOT NULL,
+    NoBlueprint     INTEGER NOT NULL,
     FOREIGN KEY (ModuleTypeID)  REFERENCES ModuleType(ModuleTypeID)
 ) WITHOUT ROWID");
             }
@@ -73,7 +74,7 @@ CREATE TABLE IF NOT EXISTS Module
             // データ抽出 //
             ////////////////
             {
-                var items = _WaresXml.Root.XPathSelectElements("ware[@tags='module']").Select
+                var items = _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'module')]").Select
                 (
                     module => GetRecord(module)
                 )
@@ -82,7 +83,7 @@ CREATE TABLE IF NOT EXISTS Module
                     x => x != null
                 );
 
-                connection.Execute("INSERT INTO Module (ModuleID, ModuleTypeID, Name, Macro, MaxWorkers, WorkersCapacity) VALUES (@ModuleID, @ModuleTypeID, @Name, @Macro, @MaxWorkers, @WorkersCapacity)", items);
+                connection.Execute("INSERT INTO Module (ModuleID, ModuleTypeID, Name, Macro, MaxWorkers, WorkersCapacity, NoBlueprint) VALUES (@ModuleID, @ModuleTypeID, @Name, @Macro, @MaxWorkers, @WorkersCapacity, @NoBlueprint)", items);
             }
         }
 
@@ -114,7 +115,9 @@ CREATE TABLE IF NOT EXISTS Module
                 var name = _Resolver.Resolve(module.Attribute("name")?.Value ?? "");
                 name = string.IsNullOrEmpty(name) ? macroName : name;
 
-                return new Module(moduleID, moduleTypeID, name, macroName, maxWorkers, capacity);
+                var noBluePrint = module.Attribute("tags").Value.Contains("noblueprint") ? 1 : 0;
+
+                return new Module(moduleID, moduleTypeID, name, macroName, maxWorkers, capacity, noBluePrint);
             }
             catch
             {

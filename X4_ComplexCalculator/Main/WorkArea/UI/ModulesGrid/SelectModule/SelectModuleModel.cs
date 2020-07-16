@@ -142,6 +142,7 @@ FROM
 	ModuleOwner
 WHERE
 	Module.ModuleID = ModuleOwner.ModuleID AND
+    Module.NoBlueprint = 0 AND
     Module.ModuleTypeID   IN ({string.Join(", ", ModuleTypes.Where(x => x.IsChecked).Select(x => $"'{x.ID}'"))}) AND
 	ModuleOwner.FactionID IN ({string.Join(", ", ModuleOwners.Where(x => x.IsChecked).Select(x => $"'{x.ID}'"))})";
 

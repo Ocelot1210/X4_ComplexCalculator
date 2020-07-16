@@ -17,6 +17,7 @@ using X4_ComplexCalculator.Main.WorkArea.UI.Menu.View;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid;
+using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary;
 using X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign;
 using X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid;
@@ -101,6 +102,12 @@ namespace X4_ComplexCalculator.Main.WorkArea
 
 
         /// <summary>
+        /// 設定
+        /// </summary>
+        public StationSettingsModel Settings { get; }
+
+
+        /// <summary>
         /// タブのタイトル文字列
         /// </summary>
         public string Title
@@ -165,8 +172,10 @@ namespace X4_ComplexCalculator.Main.WorkArea
         {
             _LayoutID = layoutID;
 
+            Settings = new StationSettingsModel();
+
             var moduleModel     = new ModulesGridModel();
-            var productsModel   = new ProductsGridModel(moduleModel.Modules);
+            var productsModel   = new ProductsGridModel(moduleModel.Modules, Settings);
             var resourcesModel  = new ResourcesGridModel(moduleModel.Modules);
             var storagesModel   = new StoragesGridModel(moduleModel.Modules);
 

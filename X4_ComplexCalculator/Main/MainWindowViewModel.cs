@@ -315,17 +315,21 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         private void WindowLoaded()
         {
+#if _DEBUG
             try
+#endif
             {
                 // DB接続開始
                 _MainWindowModel.Init();
                 _WorkAreaManager.Init();
             }
+#if _DEBUG
             catch (Exception e)
             {
                 LocalizedMessageBox.Show("Lang:UnexpectedErrorMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message, e.StackTrace ?? "");
                 Environment.Exit(-1);
             }
+#endif
         }
 
 

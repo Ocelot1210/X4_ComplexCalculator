@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS ModuleProduction
             // データ抽出 //
             ////////////////
             {
-                var items = _WaresXml.Root.XPathSelectElements("ware[@tags='module']").SelectMany
+                var items = _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'module')]").SelectMany
                 (
                     module => module.XPathSelectElements("production").Select
                     (

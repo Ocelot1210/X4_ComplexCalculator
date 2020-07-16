@@ -1,4 +1,5 @@
 ﻿using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using X4_ComplexCalculator.Common.Collection;
@@ -21,6 +22,17 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// Expanderが展開されているか
         /// </summary>
         private bool _IsExpanded;
+
+
+        /// <summary>
+        /// 採掘船を割り当て
+        /// </summary>
+        private bool _IsAssignMiner;
+
+        /// <summary>
+        /// 不足リソースを他ステーションから供給
+        /// </summary>
+        private bool _IsSupplyingScareResourcesFromOtherStations;
         #endregion
 
 
@@ -40,7 +52,21 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// 金額
         /// </summary>
-        public long Price => UnitPrice * Count;
+        public long Price
+        {
+            get
+            {
+                var ret = UnitPrice * Count;
+
+                // 購入が必要だが、他の手段で供給を受けられる場合金額を0にする
+                if (ret < 0 && (IsAssignMiner || IsSupplyingScareResourcesFromOtherStations))
+                {
+                    ret = 0;
+                }
+
+                return ret;
+            }
+        }
 
 
         /// <summary>
@@ -109,6 +135,56 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         public void SetUnitPricePercent(long percent)
         {
             UnitPrice = (long)(Ware.MinPrice + (Ware.MaxPrice - Ware.MinPrice) * 0.01 * percent);
+        }
+
+
+        /// <summary>
+        /// 採掘船を割り当て
+        /// </summary>
+        public bool IsAssignMiner
+        {
+            get => _IsAssignMiner;
+            set
+            {
+                // 採掘船の収集対象以外？
+                if (0 < Ware.WareGroup.Tier)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                if (SetProperty(ref _IsAssignMiner, value))
+                {
+                    // 不足リソースを他ステーションから供給ONの場合、価格は既に0なのでPriceの変更通知しない
+                    if (IsSupplyingScareResourcesFromOtherStations && value)
+                    {
+                        return;
+                    }
+
+                    RaisePropertyChanged(nameof(Price));
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// 不足リソースを他ステーションから供給
+        /// </summary>
+        public bool IsSupplyingScareResourcesFromOtherStations
+        {
+            get => _IsSupplyingScareResourcesFromOtherStations;
+            set
+            {
+                if (SetProperty(ref _IsSupplyingScareResourcesFromOtherStations, value))
+                {
+                    // 採掘船を割り当てONの場合、価格は既に0なのでPriceの変更通知しない
+                    if (IsAssignMiner)
+                    {
+                        return;
+                    }
+
+                    RaisePropertyChanged(nameof(Price));
+                }
+            }
         }
         #endregion
 

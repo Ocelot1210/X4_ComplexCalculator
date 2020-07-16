@@ -11,6 +11,7 @@ using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
+using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 {
@@ -25,10 +26,18 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// </summary>
         private readonly ObservablePropertyChangedCollection<ModulesGridItem> _Modules;
 
+
+        /// <summary>
+        /// ステーションの設定
+        /// </summary>
+        private readonly StationSettingsModel _Settings;
+
+
         /// <summary>
         /// 生産性
         /// </summary>
         private double _Efficiency;
+
 
         /// <summary>
         /// 製品計算機
@@ -52,8 +61,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="moduleGridModel">モジュール一覧</param>
-        public ProductsGridModel(ObservablePropertyChangedCollection<ModulesGridItem> modules)
+        /// <param name="modules">モジュール一覧</param>
+        /// <param name="settings">ステーションの設定</param>
+        public ProductsGridModel(ObservablePropertyChangedCollection<ModulesGridItem> modules, StationSettingsModel settings)
         {
             Products = new ObservablePropertyChangedCollection<ProductsGridItem>();
 
@@ -61,6 +71,43 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             modules.CollectionPropertyChangedAsync += OnModulePropertyChanged;
 
             _Modules = modules;
+            _Settings = settings;
+            _Settings.PropertyChanged += Settings_PropertyChanged;
+        }
+
+
+        /// <summary>
+        /// 設定に変更があった場合
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                // ステーションに採掘船を割り当てたか
+                case nameof(StationSettingsModel.IsAssignMiner):
+                    foreach (var prod in Products.Where(x => x.Ware.WareGroup.Tier == 0))
+                    {
+                        prod.IsAssignMiner = _Settings.IsAssignMiner;
+                    }
+                    break;
+
+                // 不足したリソースを他ステーションから供給するか
+                case nameof(StationSettingsModel.IsSupplyingScareResourcesFromOtherStations):
+                    foreach (var prod in Products)
+                    {
+                        prod.IsSupplyingScareResourcesFromOtherStations = _Settings.IsSupplyingScareResourcesFromOtherStations;
+                    }
+                    break;
+
+                // 本部か
+                case nameof(StationSettingsModel.IsHeadquarters):
+                    break;
+
+                default:
+                    break;
+            }
         }
 
 
@@ -72,6 +119,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             Products.Clear();
             _Modules.CollectionChangedAsync -= OnModulesChanged;
             _Modules.CollectionPropertyChangedAsync -= OnModulePropertyChanged;
+            _Settings.PropertyChanged -= Settings_PropertyChanged;
         }
 
 

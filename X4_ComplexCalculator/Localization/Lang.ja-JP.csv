@@ -197,6 +197,15 @@ Quantity;数量
 
 
 # ------------------------------------------------------
+# Settings
+# ------------------------------------------------------
+Settings;設定
+Headquarters;本部
+AssignMinersToStation;ステーションに採掘船を割り当てる
+SupplyingScareResourcesFromOtherStations;不足している資源を他ステーションから供給させる
+Sunlight;日光 =
+
+# ------------------------------------------------------
 # Select module window
 # ------------------------------------------------------
 SelectModuleWindowTitle;モジュール選択画面
