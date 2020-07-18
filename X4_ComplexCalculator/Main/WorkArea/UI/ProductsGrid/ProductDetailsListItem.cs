@@ -78,14 +78,19 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         {
             get
             {
-                var ret = _MaxEfficiencies["work"] * _Efficiencies["work"] + 1.0;
+                var ret = 1.0;
+
+                if (_Efficiencies.ContainsKey("work"))
+                {
+                    ret *= _MaxEfficiencies["work"] * _Efficiencies["work"] + 1.0;
+                }
 
                 if (_Efficiencies.ContainsKey("sunlight"))
                 {
                     ret *= _Efficiencies["sunlight"] / 100;
                 }
 
-                return Math.Round(ret, 2);
+                return ret;
             }
         }
 
