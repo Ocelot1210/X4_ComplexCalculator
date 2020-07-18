@@ -1,4 +1,4 @@
-﻿using Prism.Mvvm;
+﻿using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
@@ -6,7 +6,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
     /// <summary>
     /// 建造に必要なウェアを表示するDataGridViewの1レコード分のクラス
     /// </summary>
-    public class BuildResourcesGridItem : BindableBase
+    public class BuildResourcesGridItem : BindableBaseEx
     {
         #region メンバ
         /// <summary>
@@ -59,30 +59,35 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             set
             {
                 // 最低価格≦ 入力価格 ≦ 最高価格かつ価格が変更された場合のみ更新
-                if (_UnitPrice == value)
-                {
-                    // 変更無しの場合は何もしない
-                    return;
-                }
 
+
+                var setValue = value;
 
                 if (value < Ware.MinPrice)
                 {
                     // 入力された値が最低価格未満の場合、最低価格を設定する
-                    _UnitPrice = Ware.MinPrice;
+                    setValue = Ware.MinPrice;
                 }
                 else if (Ware.MaxPrice < value)
                 {
                     // 入力された値が最高価格を超える場合、最高価格を設定する
-                    _UnitPrice = Ware.MaxPrice;
+                    setValue = Ware.MaxPrice;
                 }
-                else
+
+
+                // 変更無しの場合は何もしない
+                if (setValue == _UnitPrice)
                 {
-                    // 入力された値が最低価格以上、最高価格以下の場合、入力された値を設定する
-                    _UnitPrice = value;
+                    return;
                 }
-                RaisePropertyChanged();
-                RaisePropertyChanged(nameof(Price));
+
+
+                var oldUnitPrice = _UnitPrice;
+                var oldPrice = Price;
+                _UnitPrice = setValue;
+
+                RaisePropertyChangedEx(oldUnitPrice, setValue);
+                RaisePropertyChangedEx(oldPrice, Price, nameof(Price));
             }
         }
 

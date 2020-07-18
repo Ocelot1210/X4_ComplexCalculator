@@ -79,7 +79,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 }
 
                 // 変更無しの場合は何もしない
-                if (_UnitPrice == value)
+                if (setValue == _UnitPrice)
                 {
                     return;
                 }

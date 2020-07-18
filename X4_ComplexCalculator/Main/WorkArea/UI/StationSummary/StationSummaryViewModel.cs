@@ -86,7 +86,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary
         /// <summary>
         /// 建造コスト詳細
         /// </summary>
-        public ObservableCollection<BuildingCostDetailsItem> BuildingCostDetails => _BuildingCostModel.BuildingCostDetails;
+        public ObservableCollection<BuildResourcesGridItem> BuildingCostDetails => _BuildingCostModel.Resources;
         #endregion
 
         /// <summary>

@@ -202,15 +202,15 @@
                 <GridView>
                     <!--  ウェア名  -->
                     <DataGridInline:InlineGridViewColumn
-                        DisplayMemberBinding="{Binding WareName, Mode=OneTime}"
+                        DisplayMemberBinding="{Binding Ware.Name, Mode=OneTime}"
                         Header="{lex:Loc Lang:WareName}"
-                        SortTargetPropertyName="WareName" />
+                        SortTargetPropertyName="Ware.Name" />
 
                     <!--  数量  -->
-                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Quantity}" SortTargetPropertyName="Count">
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Quantity}" SortTargetPropertyName="Amount">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Count, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
+                                <TextBlock Text="{Binding Amount, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </DataGridInline:InlineGridViewColumn>
@@ -225,13 +225,13 @@
                     </DataGridInline:InlineGridViewColumn>
 
                     <!--  金額  -->
-                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Price}" SortTargetPropertyName="TotalPrice">
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Price}" SortTargetPropertyName="Price">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock
                                     Style="{StaticResource NegativeValueEmphasisStyle}"
-                                    Tag="{Binding TotalPrice, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                    Text="{Binding TotalPrice, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:N0} cr'}"
+                                    Tag="{Binding Price, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                    Text="{Binding Price, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:N0} cr'}"
                                     TextAlignment="Right" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>

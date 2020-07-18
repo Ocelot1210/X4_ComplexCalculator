@@ -3,11 +3,9 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
-using System.Threading.Tasks;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
-using Xceed.Wpf.Toolkit.Core;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit
 {
@@ -51,17 +49,18 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit
         public ProfitModel(ObservablePropertyChangedCollection<ProductsGridItem> products)
         {
             _Products = products;
-            _Products.CollectionChangedAsync += OnProductsCollectionChanged;
-            _Products.CollectionPropertyChangedAsync += OnProductsPropertyChanged;
+            _Products.CollectionChanged += OnProductsCollectionChanged;
+            _Products.CollectionPropertyChanged += OnProductsPropertyChanged;
         }
+
 
         /// <summary>
         /// リソースを開放
         /// </summary>
         public void Dispose()
         {
-            _Products.CollectionChangedAsync -= OnProductsCollectionChanged;
-            _Products.CollectionPropertyChangedAsync -= OnProductsPropertyChanged;
+            _Products.CollectionChanged -= OnProductsCollectionChanged;
+            _Products.CollectionPropertyChanged -= OnProductsPropertyChanged;
         }
 
         /// <summary>
@@ -70,7 +69,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <returns></returns>
-        private async Task OnProductsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void OnProductsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             // 製品が削除された場合
             if (e.OldItems != null)
@@ -89,9 +88,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit
             {
                 Profit = _Products.Sum(x => x.Price);
             }
-
-            await Task.CompletedTask;
         }
+
 
         /// <summary>
         /// 製品のプロパティが変更された時
@@ -99,7 +97,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <returns></returns>
-        private async Task OnProductsPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void OnProductsPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {
@@ -115,8 +113,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit
                 default:
                     break;
             }
-
-            await Task.CompletedTask;
         }
     }
 }
