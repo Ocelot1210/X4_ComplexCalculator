@@ -82,5 +82,21 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
             MaxWorkers = module.MaxWorkers;
             WorkersCapacity = module.WorkersCapacity;
         }
+
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="moduleID">モジュールID</param>
+        /// <param name="moduleCount">モジュール数</param>
+        /// <param name="maxWorkers">必要従業員数</param>
+        /// <param name="workersCapacity">従業員容量</param>
+        public WorkForceModuleInfoDetailsItem(string moduleID, long moduleCount, long maxWorkers, long workersCapacity)
+        {
+            ModuleID = moduleID;
+            ModuleName = Module.Get(moduleID).Name;
+            MaxWorkers = maxWorkers;
+            WorkersCapacity = workersCapacity;
+        }
     }
 }

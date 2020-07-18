@@ -2,6 +2,7 @@
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid;
+using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
 using X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign;
 
 namespace X4_ComplexCalculator.Main.WorkArea
@@ -32,5 +33,10 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// 保管庫割当情報
         /// </summary>
         public ObservableRangeCollection<StorageAssignGridItem> StorageAssign { get; }
+
+        /// <summary>
+        /// ステーションの設定
+        /// </summary>
+        public StationSettingsModel Settings { get; }
     }
 }

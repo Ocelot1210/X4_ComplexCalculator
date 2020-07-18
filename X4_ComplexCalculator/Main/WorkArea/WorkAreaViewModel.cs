@@ -179,7 +179,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
             var resourcesModel  = new ResourcesGridModel(moduleModel.Modules);
             var storagesModel   = new StoragesGridModel(moduleModel.Modules);
 
-            Summary       = new StationSummaryViewModel(moduleModel.Modules, productsModel.Products, resourcesModel.Resources);
+            Summary       = new StationSummaryViewModel(moduleModel.Modules, productsModel.Products, resourcesModel.Resources, Settings);
             Modules       = new ModulesGridViewModel(moduleModel);
             Products      = new ProductsGridViewModel(productsModel);
             Resources     = new ResourcesGridViewModel(resourcesModel);
@@ -188,7 +188,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
             StorageAssign = new StorageAssignViewModel(storageAssignModel);
 
             Modules.AutoAddModuleCommand = Products.AutoAddModuleCommand;
-            _Model              = new WorkAreaModel(moduleModel, productsModel, resourcesModel, storageAssignModel);
+            _Model              = new WorkAreaModel(moduleModel, productsModel, resourcesModel, storageAssignModel, Settings);
             OnUnloadedCommand   = new DelegateCommand(OnUnloaded);
 
             _Model.PropertyChanged += Model_PropertyChanged;

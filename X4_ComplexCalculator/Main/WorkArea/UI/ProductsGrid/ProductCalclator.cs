@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 {
@@ -221,49 +222,53 @@ WHERE
         /// 製品と必要ウェアを計算
         /// </summary>
         /// <param name="moduleID">モジュールID</param>
-        /// <param name="count">モジュール数</param>
+        /// <param name="settings">ステーションの設定</param>
         /// <returns>製品と必要ウェア</returns>
-        public IEnumerable<(string WareID, long Amount, double Efficiency)> CalcProduction(string moduleID)
+        public IEnumerable<(string WareID, long Amount, Dictionary<string, double>? Efficiency)> CalcProduction(string moduleID)
         {
             // モジュールの生産品を取得
-            var modProd = _ModuleProduct[moduleID];
+            var (prodWareID, prodMethod) = _ModuleProduct[moduleID];
 
             // ウェア生産に必要な時間(候補)
-            var wareProdArr = _WareProduction[modProd.WareID];
+            var wareProdArr = _WareProduction[prodWareID];
 
             // ウェア生産に必要な時間
-            var wareProd = wareProdArr.Where(x => x.Item1 == modProd.Method).FirstOrDefault() ??
+            var wareProd = wareProdArr.Where(x => x.Item1 == prodMethod).FirstOrDefault() ??
                            wareProdArr.Where(x => x.Item1 == "default").FirstOrDefault();
 
             {
-                // モジュールの追加効果一覧(候補)
-                var effectArr = _WareEffect[modProd.WareID];
+                // ウェア生産時の追加効果一覧
+                var effectArr = _WareEffect[prodWareID];
 
-                var effect = effectArr.Where(x => x.Item1 == modProd.Method).FirstOrDefault() ??
-                             effectArr.Where(x => x.Item1 == "default").FirstOrDefault();
+                // ウェア生産時の追加効果一覧をウェア生産方式別に抽出
+                var effects = effectArr.Where(x => x.Item1 == prodMethod);
+                if (!effects.Any())
+                {
+                    effects = effectArr.Where(x => x.Item1 == "default");
+                }
 
-                yield return (modProd.WareID, (long)Math.Floor(wareProd.Item2 * (3600 / wareProd.Item3)), effect.Item3);
+                yield return (prodWareID, (long)Math.Floor(wareProd.Item2 * (3600 / wareProd.Item3)), effects.ToDictionary(x => x.Item2, x => x.Item3));
             }
 
             // ウェア生産に必要なウェア一覧(候補)
-            if (_WareResource.TryGetValue(modProd.WareID, out Tuple<string, string, long>[]? wareResourceArr))
+            if (_WareResource.TryGetValue(prodWareID, out Tuple<string, string, long>[]? wareResourceArr))
             {
                 // ウェア生産に必要なウェア一覧
-                IEnumerable<Tuple<string, string, long>> wareResources = Enumerable.Empty<Tuple<string, string, long>>();
+                var wareResources = Enumerable.Empty<Tuple<string, string, long>>();
 
-                if (modProd.Method != "default")
+                if (prodMethod != "default")
                 {
-                    wareResources = wareResourceArr.Where(x => x.Item1 != "default" && x.Item1 == modProd.Method);
+                    wareResources = wareResourceArr.Where(x => x.Item1 != "default" && x.Item1 == prodMethod);
                 }
 
-                if (wareResources == null || !wareResources.Any())
+                if (!wareResources.Any())
                 {
                     wareResources = wareResourceArr.Where(x => x.Item1 == "default");
                 }
 
                 foreach (var res in wareResources)
                 {
-                    yield return (res.Item2, (long)Math.Floor(-3600 / wareProd.Item3 * res.Item3), -1.0);
+                    yield return (res.Item2, (long)Math.Floor(-3600 / wareProd.Item3 * res.Item3), null);
                 }
             }
         }
@@ -277,19 +282,21 @@ WHERE
         /// <returns>労働者に必要なウェア</returns>
         public IEnumerable<(string WareID, long Amount)> CalcHabitation(string moduleID)
         {
+            // 居住モジュールの種族を取得
             if (!_HabitationModuleOwners.TryGetValue(moduleID, out (string raceID, long Capacity) module))
             {
                 module.raceID = "default";
             }
 
+            // 居住モジュールの種族に対応するウェア一覧を取得
             if (!_WorkUnitWares.TryGetValue(module.raceID, out (string WareID, double Amount)[]? wares))
             {
                 wares = _WorkUnitWares["default"];
             }
 
-            foreach (var ware in wares)
+            foreach (var (wareID, amount) in wares)
             {
-                yield return (ware.WareID, (long)Math.Ceiling(-ware.Amount * module.Capacity));
+                yield return (wareID, (long)Math.Ceiling(-amount * module.Capacity));
             }
         }
 
@@ -297,35 +304,58 @@ WHERE
         /// <summary>
         /// 必要モジュールを計算
         /// </summary>
-        /// <param name="products"></param>
-        public List<(string ModuleID, long Count)> CalcNeedModules(IReadOnlyList<ProductsGridItem> products)
+        /// <param name="products">製品一覧</param>
+        /// <param name="settings">ステーションの設定</param>
+        public List<(string ModuleID, long Count)> CalcNeedModules(IReadOnlyList<ProductsGridItem> products, StationSettingsModel settings)
         {
-            var addModules = new List<(string ModuleID, long Count)>();
-            var addModuleProducts = new List<(string WareID, long Count)>();
+            var addModules = new List<(string ModuleID, long Count)>();             // 追加予定モジュール
+            var addModuleProducts = new List<(string WareID, long Count)>();        // 追加予定モジュールの製品一覧
+            var excludeWares = new List<string>();                                  // 計算除外製品一覧
 
             foreach (var prod in products.Where(x => 0 < x.Ware.WareGroup.Tier).OrderBy(x => x.Ware.WareGroup.Tier))
             {
+                // 追加予定のモジュールも含めた製造ウェア数
                 var totalCount = prod.Count + addModuleProducts.Where(x => x.WareID == prod.Ware.WareID).FirstOrDefault().Count;
 
-                // 不足していなければ何もしない
-                if (0 <= totalCount)
+                // 不足していない or 計算除外ウェアの場合、何もしない
+                if (0 <= totalCount || excludeWares.Contains(prod.Ware.WareID))
                 {
                     continue;
                 }
 
+                // 不足しているウェアを製造するモジュールを検索
                 var module = _ModuleProduct.Where(x => x.Value.WareID == prod.Ware.WareID && x.Value.Method == "default").FirstOrDefault();
                 if (module.Key == null)
                 {
                     module = _ModuleProduct.Where(x => x.Value.WareID == prod.Ware.WareID).FirstOrDefault();
                 }
 
+                // モジュールが製造するウェア数を計算
                 var addProducts = CalcProduction(module.Key);
-                var modCount = (long)Math.Ceiling(-(double)totalCount / addProducts.First().Amount);
-
-                addModules.Add((module.Key, modCount));
-                foreach (var p in addProducts)
+                var (_, addAmount, addEfficiency) = addProducts.First();
+                if (addEfficiency?.ContainsKey("sunlight") ?? false)
                 {
-                    addModuleProducts.Add((p.WareID, p.Amount * modCount));
+                    addAmount = (long)Math.Floor(addAmount * addEfficiency["sunlight"] * settings.Sunlight);
+                }
+
+                // 生産数が0の場合、計算除外製品一覧に突っ込む
+                if (addAmount == 0)
+                {
+                    excludeWares.Add(prod.Ware.WareID);
+                    continue;
+                }
+
+                // モジュールが製造するウェア数からあと何モジュール必要か計算する
+                var modCount = (long)Math.Ceiling(-(double)totalCount / addAmount);
+
+
+                // 追加予定モジュールにモジュールを追加
+                addModules.Add((module.Key, modCount));
+
+                // 追加予定モジュールの製品一覧を更新
+                foreach (var (wareID, amount, _) in addProducts)
+                {
+                    addModuleProducts.Add((wareID, amount * modCount));
                 }
             }
 

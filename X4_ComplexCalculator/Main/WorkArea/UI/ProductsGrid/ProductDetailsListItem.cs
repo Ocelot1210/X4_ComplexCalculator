@@ -1,33 +1,41 @@
 ﻿using Prism.Mvvm;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 {
     /// <summary>
-    /// ＋/－で表示するListViewのアイテム(製品用)
+    /// 製品一覧DataGridの＋/－で表示するListViewのアイテム(生産品)
     /// </summary>
-    public class ProductDetailsListItem : BindableBase
+    public class ProductDetailsListItem :  BindableBase, IProductDetailsListItem
     {
         #region メンバ
         /// <summary>
         /// 製品数(モジュール追加用)
         /// </summary>
-        private long _Amount;
+        private readonly long _Amount;
+
 
         /// <summary>
         /// モジュール数
         /// </summary>
         private long _ModuleCount;
 
-        /// <summary>
-        /// 最大生産性
-        /// </summary>
-        private readonly double _MaxEfficiency;
 
         /// <summary>
         /// 生産性
         /// </summary>
-        private double _EfficiencyValue;
+        private readonly Dictionary<string, double> _Efficiencies;
+
+
+        /// <summary>
+        /// 最大生産性
+        /// </summary>
+        private readonly Dictionary<string, double> _MaxEfficiencies;
         #endregion
+
 
         /// <summary>
         /// モジュールID
@@ -58,32 +66,28 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
 
         /// <summary>
-        /// 生産性(効率)
-        /// </summary>
-        public string Efficiency => (_MaxEfficiency < 0) ? "-" : $"{(int)((_MaxEfficiency * _EfficiencyValue + 1.0) * 100)}%";
-
-
-        /// <summary>
-        /// 生産性
-        /// </summary>
-        public double EfficiencyValue
-        {
-            get => _EfficiencyValue;
-            set
-            {
-                if (0 < _MaxEfficiency && SetProperty(ref _EfficiencyValue, value))
-                {
-                    RaisePropertyChanged(nameof(Efficiency));
-                    RaisePropertyChanged(nameof(Amount));
-                }
-            }
-        }
-
-
-        /// <summary>
         /// 製品数
         /// </summary>
-        public long Amount => (long)((_MaxEfficiency * _EfficiencyValue + 1.0) * _Amount * ModuleCount);
+        public long Amount => (long)(Efficiency * _Amount * ModuleCount);
+
+
+        /// <summary>
+        /// 生産性(効率)
+        /// </summary>
+        public double Efficiency
+        {
+            get
+            {
+                var ret = _MaxEfficiencies["work"] * _Efficiencies["work"] + 1.0;
+
+                if (_Efficiencies.ContainsKey("sunlight"))
+                {
+                    ret *= _Efficiencies["sunlight"] / 100;
+                }
+
+                return Math.Round(ret, 2);
+            }
+        }
 
 
         /// <summary>
@@ -93,23 +97,54 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <param name="moduleCount">モジュール数</param>
         /// <param name="efficiency">効率</param>
         /// <param name="amount">製品数</param>
-        public ProductDetailsListItem(string moduleID, long moduleCount, double efficiency, long amount)
+        /// <param name="settings">ステーションの設定</param>
+        public ProductDetailsListItem(string moduleID, long moduleCount, Dictionary<string, double> efficiency, long amount, StationSettingsModel settings)
         {
             ModuleID = moduleID;
             ModuleCount = moduleCount;
             _Amount = amount;
-            _MaxEfficiency = efficiency;
+            _MaxEfficiencies = efficiency;
+
+            _Efficiencies = _MaxEfficiencies.ToDictionary(x => x.Key, _ => 1.0);
+
+            if (_Efficiencies.ContainsKey("sunlight"))
+            {
+                _Efficiencies["sunlight"] = settings.Sunlight;
+            }
 
             ModuleName = DB.X4DB.Module.Get(moduleID).Name;
         }
 
+
         /// <summary>
-        /// モジュールが増えたことにする
+        /// 生産性を設定
         /// </summary>
-        /// <param name="count">増分量</param>
-        public void Incriment(long count)
+        /// <param name="effectID">効果ID</param>
+        /// <param name="value">設定値</param>
+        public void SetEfficiency(string effectID, double value)
         {
-            ModuleCount += count;
+            switch (effectID)
+            {
+                // 労働者による効果の場合
+                case "work":
+                    _Efficiencies["work"] = value;
+                    RaisePropertyChanged(nameof(Amount));
+                    RaisePropertyChanged(nameof(Efficiency));
+                    break;
+
+                // 日光の場合
+                case "sunlight":
+                    if (_Efficiencies.ContainsKey("sunlight"))
+                    {
+                        _Efficiencies["sunlight"] = value;
+                        RaisePropertyChanged(nameof(Amount));
+                        RaisePropertyChanged(nameof(Efficiency));
+                    }
+                    break;
+
+                default:
+                    break;
+            }
         }
     }
 }

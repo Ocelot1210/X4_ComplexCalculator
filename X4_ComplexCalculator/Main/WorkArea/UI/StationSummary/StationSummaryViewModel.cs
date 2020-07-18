@@ -7,6 +7,7 @@ using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid;
+using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleInfo;
@@ -94,11 +95,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary
         /// <param name="modules">モジュール一覧</param>
         /// <param name="products">製品一覧</param>
         /// <param name="resources">建造に必要なリソース一覧</param>
-        public StationSummaryViewModel(ObservablePropertyChangedCollection<ModulesGridItem> modules, ObservablePropertyChangedCollection<ProductsGridItem> products, ObservablePropertyChangedCollection<ResourcesGridItem> resources)
+        /// <param name="settings">ステーションの設定</param>
+        public StationSummaryViewModel(ObservablePropertyChangedCollection<ModulesGridItem> modules, ObservablePropertyChangedCollection<ProductsGridItem> products, ObservablePropertyChangedCollection<ResourcesGridItem> resources, StationSettingsModel settings)
         {
             // 労働力関係初期化
             {
-                _WorkForceModuleInfoModel = new WorkForceModuleInfoModel(modules);
+                _WorkForceModuleInfoModel = new WorkForceModuleInfoModel(modules, settings);
                 _WorkForceModuleInfoModel.PropertyChanged += WorkForceModuleInfo_PropertyChanged;
             }
 

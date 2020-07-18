@@ -21,6 +21,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                     ret = new SaveDataReader1(WorkArea);
                     break;
 
+                case 2:
+                    ret = new SaveDataReader2(WorkArea);
+                    break;
+
                 default:
                     ret = new SaveDataReader0(WorkArea);
                     break;

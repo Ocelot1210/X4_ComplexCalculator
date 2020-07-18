@@ -8,6 +8,7 @@ using X4_ComplexCalculator.Main.WorkArea.SaveDataWriter;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid;
+using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
 using X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign;
 
 namespace X4_ComplexCalculator.Main.WorkArea
@@ -97,6 +98,12 @@ namespace X4_ComplexCalculator.Main.WorkArea
 
 
         /// <summary>
+        /// ステーションの設定
+        /// </summary>
+        public StationSettingsModel Settings { get; }
+
+
+        /// <summary>
         /// 変更されたか
         /// </summary>
         public bool HasChanged
@@ -104,11 +111,8 @@ namespace X4_ComplexCalculator.Main.WorkArea
             get => _HasChanged;
             set
             {
-                if (value != _HasChanged)
+                if (SetProperty(ref _HasChanged, value))
                 {
-                    _HasChanged = value;
-                    RaisePropertyChanged();
-
                     if (value)
                     {
                         // 変更検知イベントを購読解除
@@ -117,6 +121,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
                         _Products.Products.CollectionPropertyChanged -= OnPropertyChanged;
                         _Resources.Resources.CollectionPropertyChanged -= OnPropertyChanged;
                         _StorageAssign.StorageAssignGridItems.CollectionPropertyChanged -= OnPropertyChanged;
+                        Settings.PropertyChanged -= OnPropertyChanged;
                     }
                     else
                     {
@@ -126,6 +131,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
                         _Products.Products.CollectionPropertyChanged += OnPropertyChanged;
                         _Resources.Resources.CollectionPropertyChanged += OnPropertyChanged;
                         _StorageAssign.StorageAssignGridItems.CollectionPropertyChanged += OnPropertyChanged;
+                        Settings.PropertyChanged += OnPropertyChanged;
                     }
                 }
             }
@@ -146,12 +152,13 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <param name="products">製品一覧</param>
         /// <param name="resources">建造リソース一覧</param>
         /// <param name="storageAssignModel">保管庫割当</param>
-        public WorkAreaModel(ModulesGridModel modules, ProductsGridModel products, ResourcesGridModel resources, StorageAssignModel storageAssignModel)
+        public WorkAreaModel(ModulesGridModel modules, ProductsGridModel products, ResourcesGridModel resources, StorageAssignModel storageAssignModel, StationSettingsModel settings)
         {
             _Modules = modules;
             _Products = products;
             _Resources = resources;
             _StorageAssign = storageAssignModel;
+            Settings = settings;
 
             HasChanged = true;
             _SaveDataWriter = new SQLiteSaveDataWriter();
@@ -169,6 +176,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
             _Products.Products.CollectionPropertyChanged -= OnPropertyChanged;
             _Resources.Resources.CollectionPropertyChanged -= OnPropertyChanged;
             _StorageAssign.StorageAssignGridItems.CollectionPropertyChanged -= OnPropertyChanged;
+            Settings.PropertyChanged -= OnPropertyChanged;
         }
 
 
@@ -194,7 +202,9 @@ namespace X4_ComplexCalculator.Main.WorkArea
                 nameof(ModulesGridItem.ModuleCount),
                 nameof(ProductsGridItem.Price),
                 nameof(ResourcesGridItem.Price),
-                nameof(StorageAssignGridItem.AllocCount)
+                nameof(StorageAssignGridItem.AllocCount),
+                nameof(StationSettingsModel.IsHeadquarters),
+                nameof(StationSettingsModel.Sunlight),
             };
 
             if (0 < Array.IndexOf(names, e.PropertyName))

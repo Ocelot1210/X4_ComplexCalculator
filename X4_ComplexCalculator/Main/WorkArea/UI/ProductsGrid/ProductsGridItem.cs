@@ -24,16 +24,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// </summary>
         private bool _IsExpanded;
 
-
         /// <summary>
-        /// 採掘船を割り当て
+        /// 売買オプション
         /// </summary>
-        private bool _IsAssignMiner;
-
-        /// <summary>
-        /// 不足リソースを他ステーションから供給
-        /// </summary>
-        private bool _IsSupplyingScareResourcesFromOtherStations;
+        TradeOption _TradeOption;
         #endregion
 
 
@@ -51,22 +45,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
 
         /// <summary>
-        /// 金額
+        /// 価格
         /// </summary>
         public long Price
         {
-            get
-            {
-                var ret = UnitPrice * Count;
-
-                // 購入が必要だが、他の手段で供給を受けられる場合金額を0にする
-                if (ret < 0 && (IsAssignMiner || IsSupplyingScareResourcesFromOtherStations))
-                {
-                    ret = 0;
-                }
-
-                return ret;
-            }
+            // ウェアが不足しているが購入しない or ウェアが余っているが販売しない場合、価格を0にする
+            get => (Count< 0 && NoBuy) || (0 < Count && NoSell)? 0 : UnitPrice* Count;
         }
 
 
@@ -112,7 +96,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// ウェア詳細(関連モジュール等)
         /// </summary>
-        public ObservableRangeCollection<ProductDetailsListItem> Details { get; }
+        public ObservableRangeCollection<IProductDetailsListItem> Details { get; }
 
 
         /// <summary>
@@ -142,54 +126,42 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
 
         /// <summary>
-        /// 採掘船を割り当て
+        /// 購入しないか
         /// </summary>
-        public bool IsAssignMiner
+        public bool NoBuy
         {
-            get => _IsAssignMiner;
+            get => _TradeOption.NoBuy;
             set
             {
-                // 採掘船の収集対象以外？
-                if (0 < Ware.WareGroup.Tier)
-                {
-                    throw new InvalidOperationException();
-                }
-
                 var oldPrice = Price;
 
-                if (SetProperty(ref _IsAssignMiner, value))
+                if (SetProperty(ref _TradeOption.NoBuy, value))
                 {
-                    // 不足リソースを他ステーションから供給ONの場合、価格は既に0なのでPriceの変更通知しない
-                    if (IsSupplyingScareResourcesFromOtherStations && value)
+                    if (oldPrice != Price)
                     {
-                        return;
+                        RaisePropertyChangedEx(oldPrice, Price, nameof(Price));
                     }
-
-                    RaisePropertyChangedEx(oldPrice, Price, nameof(Price));
                 }
             }
         }
 
 
         /// <summary>
-        /// 不足リソースを他ステーションから供給
+        /// 販売しないか
         /// </summary>
-        public bool IsSupplyingScareResourcesFromOtherStations
+        public bool NoSell
         {
-            get => _IsSupplyingScareResourcesFromOtherStations;
+            get => _TradeOption.NoSell;
             set
             {
                 var oldPrice = Price;
 
-                if (SetProperty(ref _IsSupplyingScareResourcesFromOtherStations, value))
+                if (SetProperty(ref _TradeOption.NoSell, value))
                 {
-                    // 採掘船を割り当てONの場合、価格は既に0なのでPriceの変更通知しない
-                    if (IsAssignMiner)
+                    if (oldPrice != Price)
                     {
-                        return;
+                        RaisePropertyChangedEx(oldPrice, Price, nameof(Price));
                     }
-
-                    RaisePropertyChangedEx(oldPrice, Price, nameof(Price));
                 }
             }
         }
@@ -201,15 +173,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// </summary>
         /// <param name="wareID">ウェアID</param>
         /// <param name="datails">ウェア詳細(関連モジュール等)</param>
-        /// <param name="isAssignMiner">採掘船を割り当てるか</param>
-        /// <param name="isSupplyingScareResourcesFromOtherStations">不足しているウェアを他ステーションから供給するか</param>
-        public ProductsGridItem(string wareID, IEnumerable<ProductDetailsListItem> datails, bool isAssignMiner, bool isSupplyingScareResourcesFromOtherStations)
+        /// <param name="tradeOption">売買オプション</param>
+        public ProductsGridItem(string wareID, IEnumerable<IProductDetailsListItem> datails, TradeOption tradeOption)
         {
             Ware = Ware.Get(wareID);
-            Details = new ObservableRangeCollection<ProductDetailsListItem>(datails);
+            Details = new ObservableRangeCollection<IProductDetailsListItem>(datails);
 
-            _IsAssignMiner = isAssignMiner && 0 == Ware.WareGroup.Tier;
-            _IsSupplyingScareResourcesFromOtherStations = isSupplyingScareResourcesFromOtherStations;
+            _TradeOption = tradeOption;
             UnitPrice = (Ware.MinPrice + Ware.MaxPrice) / 2;
         }
 
@@ -218,9 +188,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// 詳細情報を追加
         /// </summary>
         /// <param name="details"></param>
-        public void AddDetails(IEnumerable<ProductDetailsListItem> details)
+        public void AddDetails(IEnumerable<IProductDetailsListItem> details)
         {
-            var addItems = new List<ProductDetailsListItem>();
+            var addItems = new List<IProductDetailsListItem>();
 
             foreach (var item in details)
             {
@@ -247,7 +217,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// 詳細情報を設定
         /// </summary>
         /// <param name="details"></param>
-        public void SetDetails(IEnumerable<ProductDetailsListItem> details, long prevModuleCount)
+        public void SetDetails(IEnumerable<IProductDetailsListItem> details, long prevModuleCount)
         {
             foreach (var item in details)
             {
@@ -268,7 +238,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// 詳細情報を削除
         /// </summary>
         /// <param name="details"></param>
-        public void RemoveDetails(IEnumerable<ProductDetailsListItem> details)
+        public void RemoveDetails(IEnumerable<IProductDetailsListItem> details)
         {
             foreach (var item in details)
             {
@@ -291,12 +261,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// 生産性を設定
         /// </summary>
-        /// <param name="efficiency"></param>
-        public void SetEfficiency(double efficiency)
+        /// <param name="effectID">効果ID</param>
+        /// <param name="efficiency">設定値</param>
+        public void SetEfficiency(string effectID, double efficiency)
         {
             foreach (var item in Details)
             {
-                item.EfficiencyValue = efficiency;
+                item.SetEfficiency(effectID, efficiency);
             }
 
             RaisePropertyChanged(nameof(Count));

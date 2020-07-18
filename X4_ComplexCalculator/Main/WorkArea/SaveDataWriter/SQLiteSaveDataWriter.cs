@@ -92,15 +92,22 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
             conn.ExecQuery("DROP TABLE IF EXISTS Products");
             conn.ExecQuery("DROP TABLE IF EXISTS BuildResources");
             conn.ExecQuery("DROP TABLE IF EXISTS StorageAssign");
+            conn.ExecQuery("DROP TABLE IF EXISTS StationSettings");
             conn.ExecQuery("CREATE TABLE Common(Item TEXT, Value INTEGER)");
             conn.ExecQuery("CREATE TABLE Modules(Row INTEGER, ModuleID TEXT, Count INTEGER)");
             conn.ExecQuery("CREATE TABLE Equipments(Row INTEGER, EquipmentID TEXT)");
-            conn.ExecQuery("CREATE TABLE Products(WareID TEXT, Price INTEGER)");
+            conn.ExecQuery("CREATE TABLE Products(WareID TEXT, Price INTEGER, NoBuy INTEGER, NoSell INTEGER)");
             conn.ExecQuery("CREATE TABLE BuildResources(WareID TEXT, Price INTEGER)");
             conn.ExecQuery("CREATE TABLE StorageAssign(WareID TEXT, AllocCount INTEGER)");
+            conn.ExecQuery("CREATE TABLE StationSettings(Key TEXT, Value TEXT)");
+
 
             // ファイルフォーマットのバージョン保存
-            conn.ExecQuery($"INSERT INTO Common(Item, Value) VALUES('FormatVersion', 1)");
+            conn.ExecQuery($"INSERT INTO Common(Item, Value) VALUES('FormatVersion', 2)");
+
+            // ステーションの設定保存
+            conn.ExecQuery($"INSERT INTO StationSettings(Key, Value) VALUES('IsHeadquarters', '{WorkArea.Settings.IsHeadquarters}')");
+            conn.ExecQuery($"INSERT INTO StationSettings(Key, Value) VALUES('Sunlight', '{WorkArea.Settings.Sunlight}')");
 
 
             // モジュール保存
@@ -121,7 +128,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
             // 価格保存
             foreach (var product in WorkArea.Products)
             {
-                conn.ExecQuery($"INSERT INTO Products(WareID, Price) Values('{product.Ware.WareID}', {product.UnitPrice})");
+                conn.ExecQuery($"INSERT INTO Products(WareID, Price, NoBuy, NoSell) Values('{product.Ware.WareID}', {product.UnitPrice}, {(product.NoBuy? 1 : 0)}, {(product.NoSell ? 1 : 0)})");
             }
 
             // 建造リソース保存

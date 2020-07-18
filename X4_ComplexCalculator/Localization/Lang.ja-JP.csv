@@ -153,7 +153,8 @@ Efficiency;生産性
 Production;生産量
 ProductName;製品名
 AmountPerHour;個数/h
-
+NoBuy;購入しない
+NoSell;販売しない
 
 # ------------------------------------------------------
 # Resources
@@ -201,8 +202,6 @@ Quantity;数量
 # ------------------------------------------------------
 Settings;設定
 Headquarters;本部
-AssignMinersToStation;ステーションに採掘船を割り当てる
-SupplyingScareResourcesFromOtherStations;不足している資源を他ステーションから供給させる
 Sunlight;日光 =
 
 # ------------------------------------------------------

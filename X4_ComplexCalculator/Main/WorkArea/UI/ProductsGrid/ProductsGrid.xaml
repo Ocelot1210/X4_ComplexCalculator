@@ -40,8 +40,17 @@
         </Style>
 
 
+        <!--  ValueConverter  -->
+        <local:Efficiency2TextConverter x:Key="Efficiency2TextConverter" />
+
+
         <!--  データ中継用  -->
         <x4cmn:BindingProxy x:Key="ProxyUnitPricePercent" Data="{Binding UnitPricePercent, Mode=TwoWay}" />
+
+        <x4cmn:BindingProxy x:Key="ProxyNoBuy" Data="{Binding NoBuy, Mode=TwoWay}" />
+
+        <x4cmn:BindingProxy x:Key="ProxyNoSell" Data="{Binding NoSell, Mode=TwoWay}" />
+
 
         <!--  DataGridのコンテキストメニュー  -->
         <ContextMenu x:Key="ProductsGridContextMenu">
@@ -86,7 +95,7 @@
                     <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Efficiency}" SortTargetPropertyName="Efficiency">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Efficiency, Mode=OneWay}" TextAlignment="Right" />
+                                <TextBlock Text="{Binding Efficiency, Mode=OneWay, Converter={StaticResource Efficiency2TextConverter}}" TextAlignment="Right" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </DataGridInline:InlineGridViewColumn>
@@ -237,6 +246,57 @@
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
+
+
+            <!--  購入しない  -->
+            <x4cmn:MouseHoverEditCellColumn ClipboardContentBinding="{Binding NoBuy, Mode=OneTime}" SortMemberPath="NoBuy">
+
+                <!--  ヘッダの内容定義  -->
+                <DataGridTemplateColumn.Header>
+                    <DockPanel>
+                        <CheckBox
+                            Content="{lex:Loc Lang:NoBuy}"
+                            DockPanel.Dock="Left"
+                            IsChecked="{Binding Data, Source={StaticResource ProxyNoBuy}}" />
+                    </DockPanel>
+                </DataGridTemplateColumn.Header>
+
+                <!--  セルの内容定義  -->
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <CheckBox
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            IsChecked="{Binding NoBuy, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </x4cmn:MouseHoverEditCellColumn>
+
+
+            <!--  販売しない  -->
+            <x4cmn:MouseHoverEditCellColumn ClipboardContentBinding="{Binding NoSell, Mode=OneTime}" SortMemberPath="NoSell">
+
+                <!--  ヘッダの内容定義  -->
+                <DataGridTemplateColumn.Header>
+                    <DockPanel>
+                        <CheckBox
+                            Content="{lex:Loc Lang:NoSell}"
+                            DockPanel.Dock="Left"
+                            IsChecked="{Binding Data, Source={StaticResource ProxyNoSell}}" />
+                    </DockPanel>
+                </DataGridTemplateColumn.Header>
+
+                <!--  セルの内容定義  -->
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <CheckBox
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            IsChecked="{Binding NoSell, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </x4cmn:MouseHoverEditCellColumn>
+
         </DataGrid.Columns>
 
         <!--  行の詳細表示用  -->

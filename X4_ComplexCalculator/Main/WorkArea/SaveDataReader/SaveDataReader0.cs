@@ -52,7 +52,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                     progress.Report(90);
 
                     // 製品価格を復元
-                    RestoreProductsPrice(conn);
+                    RestoreProducts(conn);
                     progress.Report(95);
 
                     // 建造リソースを復元
@@ -127,7 +127,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
         /// 製品価格を復元
         /// </summary>
         /// <param name="conn"></param>
-        protected virtual void RestoreProductsPrice(DBConnection conn)
+        protected virtual void RestoreProducts(DBConnection conn)
         {
             conn.ExecQuery($"SELECT WareID, Price FROM Products", (dr, _) =>
             {

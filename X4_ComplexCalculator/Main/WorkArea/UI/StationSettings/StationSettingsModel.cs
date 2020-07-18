@@ -1,11 +1,12 @@
 ﻿using Prism.Mvvm;
+using System;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSettings
 {
     /// <summary>
     /// ステーション設定用Model
     /// </summary>
-    class StationSettingsModel : BindableBase
+    public class StationSettingsModel : BindableBase
     {
         #region メンバ
         /// <summary>
@@ -13,15 +14,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSettings
         /// </summary>
         private bool _IsHeadquarters;
 
-        /// <summary>
-        /// 採掘船を割り当て
-        /// </summary>
-        private bool _IsAssignMiner;
-
-        /// <summary>
-        /// 不足リソースを他ステーションから供給
-        /// </summary>
-        private bool _IsSupplyingScareResourcesFromOtherStations;
 
         /// <summary>
         /// 日光[%]
@@ -48,32 +40,19 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSettings
 
 
         /// <summary>
-        /// 採掘船を割り当て
-        /// </summary>
-        public bool IsAssignMiner
-        {
-            get => _IsAssignMiner;
-            set => SetProperty(ref _IsAssignMiner, value);
-        }
-
-
-        /// <summary>
-        /// 不足リソースを他ステーションから供給
-        /// </summary>
-        public bool IsSupplyingScareResourcesFromOtherStations
-        {
-            get => _IsSupplyingScareResourcesFromOtherStations;
-            set => SetProperty(ref _IsSupplyingScareResourcesFromOtherStations, value);
-        }
-
-
-        /// <summary>
         /// 日光[%]
         /// </summary>
         public int Sunlight
         {
             get => _Sunlight;
-            set => SetProperty(ref _Sunlight, value);
+            set
+            {
+                const int digit = 1;
+
+                var tmp = Math.Pow(10.0, digit);
+
+                SetProperty(ref _Sunlight, (int)(Math.Round(value / tmp, 0, MidpointRounding.AwayFromZero) * tmp));
+            }
         }
         #endregion
 
