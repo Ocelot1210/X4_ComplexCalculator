@@ -87,16 +87,27 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
 
             dlg.InitialDirectory = GetInitialDirectory();
             dlg.RestoreDirectory = true;
-            dlg.Filter = "X4 Construction planes file (constructionplans.xml)|constructionplans.xml";
+            dlg.Filter = "X4 Construction planes file (*.xml)|*.xml";
+            dlg.Multiselect = true;
+
             if (dlg.ShowDialog() == true)
             {
                 Mouse.OverrideCursor = Cursors.Wait;
                 try
                 {
-                    var xml = XDocument.Load(dlg.FileName);
+                    Planes.Clear();
 
-                    Planes.Reset(xml.Root.XPathSelectElements("plan").Select(x => new StationPlanItem(x)));
-                    PlanFilePath = dlg.FileName;
+                    foreach (var fileName in dlg.FileNames)
+                    {
+                        var xml = XDocument.Load(fileName);
+
+                        Planes.AddRange(xml.Root.XPathSelectElements("plan").Select(x => new StationPlanItem(x)));
+                    }
+
+                    // 複数選択されたら親フォルダパスを表示
+                    // 1つだけ選択されたらそのファイルパスを表示
+                    PlanFilePath = (1 < dlg.FileNames.Length)? Path.GetDirectoryName(dlg.FileName) ?? "" : dlg.FileName;
+
                 }
                 catch (Exception e)
                 {
