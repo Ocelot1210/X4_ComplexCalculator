@@ -153,14 +153,15 @@ Efficiency;Efficiency
 Production;Production
 ProductName;Product name
 AmountPerHour;Amount/h
+NoBuy;No buy
+NoSell;No sell
 
 
 # ------------------------------------------------------
-# Resources
+# Build
 # ------------------------------------------------------
 NeedWare;NeedWare
 NeedWareAmount;Amount
-StorageType;Storage type
 
 
 # ------------------------------------------------------
@@ -168,6 +169,7 @@ StorageType;Storage type
 # ------------------------------------------------------
 Capacity;Capacity
 TotalCapacity;Total capacity
+StorageType;Storage type
 
 
 # ------------------------------------------------------
@@ -194,6 +196,14 @@ TotalWorkers;Total workers
 NecessaryAmount;Necessary amount
 Diff;Diff
 Quantity;Quantity
+
+
+# ------------------------------------------------------
+# Settings
+# ------------------------------------------------------
+Settings;Settings
+Headquarters;Headquarters
+Sunlight;Sunlight =
 
 
 # ------------------------------------------------------

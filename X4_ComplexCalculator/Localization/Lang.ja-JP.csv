@@ -156,8 +156,9 @@ AmountPerHour;個数/h
 NoBuy;購入しない
 NoSell;販売しない
 
+
 # ------------------------------------------------------
-# Resources
+# Build
 # ------------------------------------------------------
 NeedWare;建造に必要なウェア
 NeedWareAmount;個数
@@ -203,6 +204,7 @@ Quantity;数量
 Settings;設定
 Headquarters;本部
 Sunlight;日光 =
+
 
 # ------------------------------------------------------
 # Select module window
