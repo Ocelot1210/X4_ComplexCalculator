@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using X4_ComplexCalculator.DB;
 
-namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
+namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
 {
     /// <summary>
     /// 建造リソース計算用クラス
     /// </summary>
-    class ResourceCalclator
+    class BuildResourceCalclator
     {
         #region スタティックメンバ
         /// <summary>
         /// 建造リソース計算用シングルトンインスタンス
         /// </summary>
-        private static ResourceCalclator? _SingletonInstance;
+        private static BuildResourceCalclator? _SingletonInstance;
         #endregion
 
 
@@ -30,7 +30,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        private ResourceCalclator()
+        private BuildResourceCalclator()
         {
             var resources = new Dictionary<string, Dictionary<string, List<(string, long)>>>();
 
@@ -100,14 +100,14 @@ WHERE
         /// <summary>
         /// 建造リソース計算用クラスのインスタンス
         /// </summary>
-        public static ResourceCalclator Instance
+        public static BuildResourceCalclator Instance
         {
             get
             {
                 // 未作成なら作成する
                 if (_SingletonInstance == null)
                 {
-                    _SingletonInstance = new ResourceCalclator();
+                    _SingletonInstance = new BuildResourceCalclator();
                 }
 
                 return _SingletonInstance;

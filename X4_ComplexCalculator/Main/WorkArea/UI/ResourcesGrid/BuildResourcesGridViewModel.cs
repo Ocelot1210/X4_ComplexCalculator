@@ -4,18 +4,18 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Data;
 
-namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
+namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
 {
     /// <summary>
     /// 建造に必要なリソースを表示するDataGridView用ViewModel
     /// </summary>
-    class ResourcesGridViewModel : BindableBase, IDisposable
+    class BuildResourcesGridViewModel : BindableBase, IDisposable
     {
         #region メンバ
         /// <summary>
         /// 建造に必要なリソースを表示するDataGridView用Model
         /// </summary>
-        readonly ResourcesGridModel _Model;
+        readonly BuildResourcesGridModel _Model;
 
         /// <summary>
         /// 価格割合
@@ -27,7 +27,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
         /// <summary>
         /// 建造に必要なリソース一覧
         /// </summary>
-        public ObservableCollection<ResourcesGridItem> BuildResource => _Model.Resources;
+        public ObservableCollection<BuildResourcesGridItem> BuildResource => _Model.Resources;
 
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
         /// コンストラクタ
         /// </summary>
         /// <param name="moduleGridModel">建造リソース用Model</param>
-        public ResourcesGridViewModel(ResourcesGridModel resourcesGridModel)
+        public BuildResourcesGridViewModel(BuildResourcesGridModel resourcesGridModel)
         {
             _Model = resourcesGridModel;
 

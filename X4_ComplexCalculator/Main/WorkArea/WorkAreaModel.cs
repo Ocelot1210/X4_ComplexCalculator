@@ -7,7 +7,7 @@ using X4_ComplexCalculator.Main.WorkArea.SaveDataReader;
 using X4_ComplexCalculator.Main.WorkArea.SaveDataWriter;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
-using X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid;
+using X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
 using X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign;
 
@@ -40,7 +40,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <summary>
         /// 建造リソース一覧
         /// </summary>
-        private readonly ResourcesGridModel _Resources;
+        private readonly BuildResourcesGridModel _Resources;
 
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <summary>
         /// 建造リソース一覧
         /// </summary>
-        public ObservableRangeCollection<ResourcesGridItem> Resources => _Resources.Resources;
+        public ObservableRangeCollection<BuildResourcesGridItem> Resources => _Resources.Resources;
 
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <param name="products">製品一覧</param>
         /// <param name="resources">建造リソース一覧</param>
         /// <param name="storageAssignModel">保管庫割当</param>
-        public WorkAreaModel(ModulesGridModel modules, ProductsGridModel products, ResourcesGridModel resources, StorageAssignModel storageAssignModel, StationSettingsModel settings)
+        public WorkAreaModel(ModulesGridModel modules, ProductsGridModel products, BuildResourcesGridModel resources, StorageAssignModel storageAssignModel, StationSettingsModel settings)
         {
             _Modules = modules;
             _Products = products;
@@ -201,7 +201,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
             {
                 nameof(ModulesGridItem.ModuleCount),
                 nameof(ProductsGridItem.Price),
-                nameof(ResourcesGridItem.Price),
+                nameof(BuildResourcesGridItem.Price),
                 nameof(StorageAssignGridItem.AllocCount),
                 nameof(StationSettingsModel.IsHeadquarters),
                 nameof(StationSettingsModel.Sunlight),

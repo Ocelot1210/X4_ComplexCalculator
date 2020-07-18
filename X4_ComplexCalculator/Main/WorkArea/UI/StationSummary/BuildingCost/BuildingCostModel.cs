@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid;
+using X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost
 {
@@ -17,7 +17,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost
         /// <summary>
         /// 建造に必要なウェア一覧
         /// </summary>
-        private readonly ObservablePropertyChangedCollection<ResourcesGridItem> _Resources;
+        private readonly ObservablePropertyChangedCollection<BuildResourcesGridItem> _Resources;
 
         /// <summary>
         /// 建造コスト
@@ -54,7 +54,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost
         /// コンストラクタ
         /// </summary>
         /// <param name="resources"></param>
-        public BuildingCostModel(ObservablePropertyChangedCollection<ResourcesGridItem> resources)
+        public BuildingCostModel(ObservablePropertyChangedCollection<BuildResourcesGridItem> resources)
         {
             _Resources = resources;
             _Resources.CollectionChangedAsync += Resources_OnCollectionChangedAsync;
@@ -79,7 +79,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost
         /// <returns></returns>
         private async Task Resources_OnPropertyChangedAsync(object sender, PropertyChangedEventArgs e)
         {
-            if (!(sender is ResourcesGridItem resource))
+            if (!(sender is BuildResourcesGridItem resource))
             {
                 return;
             }
@@ -87,7 +87,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost
             switch (e.PropertyName)
             {
                 // 個数変更時
-                case nameof(ResourcesGridItem.Amount):
+                case nameof(BuildResourcesGridItem.Amount):
                     {
                         var item = BuildingCostDetails.Where(x => x.WareID == resource.Ware.WareID).First();
                         BuildingCost = BuildingCost - item.TotalPrice + resource.Price;
@@ -96,7 +96,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost
                     break;
 
                 // 単価変更時
-                case nameof(ResourcesGridItem.UnitPrice):
+                case nameof(BuildResourcesGridItem.UnitPrice):
                     {
                         var item = BuildingCostDetails.Where(x => x.WareID == resource.Ware.WareID).First();
                         BuildingCost = BuildingCost - item.TotalPrice + resource.Price;
@@ -122,7 +122,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost
         {
             if (e.NewItems != null)
             {
-                var addItems = e.NewItems.Cast<ResourcesGridItem>()
+                var addItems = e.NewItems.Cast<BuildResourcesGridItem>()
                                          .Select(x => new BuildingCostDetailsItem(x.Ware.WareID, x.Ware.Name, x.Amount, x.UnitPrice));
 
                 BuildingCostDetails.AddRange(addItems);
@@ -130,7 +130,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost
 
             if (e.OldItems != null)
             {
-                var removeItems = e.OldItems.Cast<ResourcesGridItem>().ToArray();
+                var removeItems = e.OldItems.Cast<BuildResourcesGridItem>().ToArray();
                 BuildingCostDetails.RemoveAll(x => removeItems.Where(y => x.WareID == y.Ware.WareID).Any());
             }
 

@@ -1,12 +1,12 @@
 ﻿using Prism.Mvvm;
 using X4_ComplexCalculator.DB.X4DB;
 
-namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
+namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
 {
     /// <summary>
     /// 建造に必要なウェアを表示するDataGridViewの1レコード分のクラス
     /// </summary>
-    public class ResourcesGridItem : BindableBase
+    public class BuildResourcesGridItem : BindableBase
     {
         #region メンバ
         /// <summary>
@@ -107,7 +107,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
         /// </summary>
         /// <param name="wareID">建造に必要なウェアID</param>
         /// <param name="amount">建造に必要なウェア数</param>
-        public ResourcesGridItem(string wareID, long amount)
+        public BuildResourcesGridItem(string wareID, long amount)
         {
             Ware = Ware.Get(wareID);
             UnitPrice = (Ware.MaxPrice + Ware.MinPrice) / 2;

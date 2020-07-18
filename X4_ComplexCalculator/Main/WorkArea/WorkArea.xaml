@@ -9,7 +9,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:modGrid="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid"
     xmlns:prodGrid="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid"
-    xmlns:resGrid="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid"
+    xmlns:resGrid="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid"
     xmlns:storAsign="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign"
     xmlns:storGrid="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid"
     xmlns:stsmry="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.StationSummary"
@@ -109,7 +109,7 @@
                                 Title="{lex:Loc Lang:BuildResources}"
                                 CanClose="False"
                                 ContentId="Resources">
-                                <resGrid:ResourcesGrid DataContext="{Binding Resources, Mode=OneTime}" />
+                                <resGrid:BuildResourcesGrid DataContext="{Binding Resources, Mode=OneTime}" />
                             </xcad:LayoutAnchorable>
 
                             <!--  保管庫  -->

@@ -16,7 +16,7 @@ using X4_ComplexCalculator.Main.Menu.File.Import;
 using X4_ComplexCalculator.Main.WorkArea.UI.Menu.View;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
-using X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid;
+using X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary;
 using X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign;
@@ -80,7 +80,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <summary>
         /// 建造リソース一覧
         /// </summary>
-        public ResourcesGridViewModel Resources { get; }
+        public BuildResourcesGridViewModel Resources { get; }
 
 
         /// <summary>
@@ -176,13 +176,13 @@ namespace X4_ComplexCalculator.Main.WorkArea
 
             var moduleModel     = new ModulesGridModel();
             var productsModel   = new ProductsGridModel(moduleModel.Modules, Settings);
-            var resourcesModel  = new ResourcesGridModel(moduleModel.Modules);
+            var resourcesModel  = new BuildResourcesGridModel(moduleModel.Modules);
             var storagesModel   = new StoragesGridModel(moduleModel.Modules);
 
             Summary       = new StationSummaryViewModel(moduleModel.Modules, productsModel.Products, resourcesModel.Resources, Settings);
             Modules       = new ModulesGridViewModel(moduleModel);
             Products      = new ProductsGridViewModel(productsModel);
-            Resources     = new ResourcesGridViewModel(resourcesModel);
+            Resources     = new BuildResourcesGridViewModel(resourcesModel);
             Storages      = new StoragesGridViewModel(storagesModel);
             var storageAssignModel = new StorageAssignModel(productsModel.Products, storagesModel.Storages);
             StorageAssign = new StorageAssignViewModel(storageAssignModel);
