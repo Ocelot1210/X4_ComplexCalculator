@@ -131,6 +131,7 @@ WHERE
 	EquipmentTypeID = 'turrets' AND
 	SizeID = '{SelectedSize.SizeID}' AND
 	Equipment.EquipmentID = EquipmentOwner.EquipmentID AND
+    Equipment.EquipmentID IN (SELECT EquipmentResource.EquipmentID FROM EquipmentResource) AND
     EquipmentOwner.FactionID IN ({selectedFactions})
 ";
 

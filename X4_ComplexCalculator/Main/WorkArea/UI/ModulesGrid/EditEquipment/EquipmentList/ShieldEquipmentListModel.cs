@@ -132,6 +132,7 @@ WHERE
 	EquipmentTypeID = 'shields' AND
 	SizeID = '{SelectedSize.SizeID}' AND
 	Equipment.EquipmentID = EquipmentOwner.EquipmentID AND
+    Equipment.EquipmentID IN (SELECT EquipmentResource.EquipmentID FROM EquipmentResource) AND
     EquipmentOwner.FactionID IN ({selectedFactions})";
 
             DBConnection.X4DB.ExecQuery(query, (SQLiteDataReader dr, object[] args) => { items.Add(Equipment.Get((string)dr["EquipmentID"])); });
