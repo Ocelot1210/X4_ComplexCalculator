@@ -1,10 +1,13 @@
 ﻿using Prism.Mvvm;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
+using Xceed.Wpf.Toolkit.Core;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit
 {
@@ -14,7 +17,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit
         /// <summary>
         /// 製品一覧
         /// </summary>
-        private readonly ObservablePropertyChangedCollection<ProductsGridItem> Products;
+        private readonly ObservablePropertyChangedCollection<ProductsGridItem> _Products;
 
         /// <summary>
         /// 利益
@@ -27,7 +30,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit
         /// <summary>
         /// 利益詳細
         /// </summary>
-        public ObservableRangeCollection<ProfitDetailsItem> ProfitDetails { get; } = new ObservableRangeCollection<ProfitDetailsItem>();
+        public ObservableCollection<ProductsGridItem> ProfitDetails => _Products;
 
 
         /// <summary>
@@ -47,9 +50,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit
         /// <param name="products">製品一覧</param>
         public ProfitModel(ObservablePropertyChangedCollection<ProductsGridItem> products)
         {
-            Products = products;
-            Products.CollectionChangedAsync += OnProductsCollectionChanged;
-            Products.CollectionPropertyChangedAsync += OnProductsPropertyChanged;
+            _Products = products;
+            _Products.CollectionChangedAsync += OnProductsCollectionChanged;
+            _Products.CollectionPropertyChangedAsync += OnProductsPropertyChanged;
         }
 
         /// <summary>
@@ -57,9 +60,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit
         /// </summary>
         public void Dispose()
         {
-            Products.CollectionChangedAsync -= OnProductsCollectionChanged;
-            Products.CollectionPropertyChangedAsync -= OnProductsPropertyChanged;
-            ProfitDetails.Clear();
+            _Products.CollectionChangedAsync -= OnProductsCollectionChanged;
+            _Products.CollectionPropertyChangedAsync -= OnProductsPropertyChanged;
         }
 
         /// <summary>
@@ -73,26 +75,19 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit
             // 製品が削除された場合
             if (e.OldItems != null)
             {
-                var items = e.OldItems.Cast<ProductsGridItem>().Select(x => x.Ware.WareID).ToArray();
-
-                // 削除された製品と一致するレコードを全削除
-                ProfitDetails.RemoveAll(x => items.Contains(x.WareID));
+                Profit -= e.OldItems.Cast<ProductsGridItem>().Sum(x => x.Price);
             }
 
             // 製品が追加された場合
             if (e.NewItems != null)
             {
-                var items = e.NewItems.Cast<ProductsGridItem>();
-
-                ProfitDetails.AddRange(items.Select(x => new ProfitDetailsItem(x.Ware.WareID, x.Ware.Name, x.Count, x.UnitPrice)));
+                Profit += e.NewItems.Cast<ProductsGridItem>().Sum(x => x.Price);
             }
 
+            // リセットされた場合
             if (e.Action == NotifyCollectionChangedAction.Reset)
             {
-                var items = Products.Select(x => new ProfitDetailsItem(x.Ware.WareID, x.Ware.Name, x.Count, x.UnitPrice));
-
-                ProfitDetails.Reset(items);
-                Profit = ProfitDetails.Sum(x => x.TotalPrice);
+                Profit = _Products.Sum(x => x.Price);
             }
 
             await Task.CompletedTask;
@@ -106,32 +101,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit
         /// <returns></returns>
         private async Task OnProductsPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (!(sender is ProductsGridItem product))
-            {
-                return;
-            }
-
             switch (e.PropertyName)
             {
-                // ウェア数量変更の場合
-                case nameof(ProductsGridItem.Count):
+                // 価格変更の場合
+                case nameof(ProductsGridItem.Price):
+                    if (e is PropertyChangedExtendedEventArgs<long> ev)
                     {
-                        // 編集対象のレコードを検索
-                        var item = ProfitDetails.Where(x => x.WareID == product.Ware.WareID).First();
-
-                        Profit = Profit - item.TotalPrice + product.Price;
-                        item.Count = product.Count;
-                    }
-                    break;
-
-                // 単価変更の場合
-                case nameof(ProductsGridItem.UnitPrice):
-                    {
-                        // 編集対象のレコードを検索
-                        var item = ProfitDetails.Where(x => x.WareID == product.Ware.WareID).First();
-
-                        Profit = Profit - item.TotalPrice + product.Price;
-                        item.UnitPrice = product.UnitPrice;
+                        Profit -= (ev.OldValue - ev.NewValue);
                     }
                     break;
 

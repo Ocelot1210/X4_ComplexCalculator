@@ -10,12 +10,12 @@ using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
-namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
+namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
 {
     /// <summary>
     /// 建造に必要なリソースを表示するDataGridView用Model
     /// </summary>
-    class ResourcesGridModel : IDisposable
+    class BuildResourcesGridModel : IDisposable
     {
         #region メンバ
         /// <summary>
@@ -31,7 +31,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
         /// <summary>
         /// 建造リソース計算用
         /// </summary>
-        private readonly ResourceCalclator _Calclator = ResourceCalclator.Instance;
+        private readonly BuildResourceCalclator _Calclator = BuildResourceCalclator.Instance;
         #endregion
 
 
@@ -39,7 +39,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
         /// <summary>
         /// 建造に必要なリソース
         /// </summary>
-        public ObservablePropertyChangedCollection<ResourcesGridItem> Resources { get; private set; }
+        public ObservablePropertyChangedCollection<BuildResourcesGridItem> Resources { get; private set; }
         #endregion
 
 
@@ -47,9 +47,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
         /// コンストラクタ
         /// </summary>
         /// <param name="moduleGridModel">モジュール一覧</param>
-        public ResourcesGridModel(ObservablePropertyChangedCollection<ModulesGridItem> modules)
+        public BuildResourcesGridModel(ObservablePropertyChangedCollection<ModulesGridItem> modules)
         {
-            Resources = new ObservablePropertyChangedCollection<ResourcesGridItem>();
+            Resources = new ObservablePropertyChangedCollection<BuildResourcesGridItem>();
             _Modules = modules;
             _Modules.CollectionChangedAsync += OnModulesCollectionChanged;
             _Modules.CollectionPropertyChangedAsync += OnModulesPropertyChanged;
@@ -199,7 +199,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
 
             Dictionary<string, long> resources = _Calclator.CalcResource(modules);
 
-            var addTarget = new List<ResourcesGridItem>();
+            var addTarget = new List<BuildResourcesGridItem>();
             foreach (var kvp in resources)
             {
                 var item = Resources.Where(x => x.Ware.WareID == kvp.Key).FirstOrDefault();
@@ -211,7 +211,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
                 else
                 {
                     // ウェアが一覧にない場合
-                    addTarget.Add(new ResourcesGridItem(kvp.Key, kvp.Value * module.ModuleCount));
+                    addTarget.Add(new BuildResourcesGridItem(kvp.Key, kvp.Value * module.ModuleCount));
                 }
             }
 
@@ -237,7 +237,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
             // リソース集計
             Dictionary<string, long> resources = _Calclator.CalcResource(newEquipments.Concat(oldEquipments));
 
-            var addTarget = new List<ResourcesGridItem>();
+            var addTarget = new List<BuildResourcesGridItem>();
             foreach (var kvp in resources)
             {
                 var item = Resources.Where(x => x.Ware.WareID == kvp.Key).FirstOrDefault();
@@ -249,7 +249,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
                 else
                 {
                     // ウェアが一覧にない場合
-                    addTarget.Add(new ResourcesGridItem(kvp.Key, kvp.Value * module.ModuleCount));
+                    addTarget.Add(new BuildResourcesGridItem(kvp.Key, kvp.Value * module.ModuleCount));
                 }
             }
 
@@ -266,7 +266,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
         {
             Dictionary<string, long> resourcesDict = AggregateModules(modules);
 
-            var addTarget = new List<ResourcesGridItem>();
+            var addTarget = new List<BuildResourcesGridItem>();
             foreach (var kvp in resourcesDict)
             {
                 var item = Resources.Where(x => x.Ware.WareID == kvp.Key).FirstOrDefault();
@@ -278,7 +278,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ResourcesGrid
                 else
                 {
                     // ウェアが一覧にない場合
-                    item = new ResourcesGridItem(kvp.Key, kvp.Value);
+                    item = new BuildResourcesGridItem(kvp.Key, kvp.Value);
                     if (_UnitPriceBakDict.ContainsKey(item.Ware.WareID))
                     {
                         item.UnitPrice = _UnitPriceBakDict[item.Ware.WareID];

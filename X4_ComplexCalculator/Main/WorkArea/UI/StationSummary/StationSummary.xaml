@@ -141,9 +141,59 @@
         </DataGridInline:InlineListView>
 
 
-        <!--  ウェア/数量/単価/金額表示用ListView  -->
+        <!--  損益詳細表示用ListView  -->
         <DataGridInline:InlineListView
-            x:Key="WareDetailsListView"
+            x:Key="ProfitDetailsListView"
+            x:Shared="false"
+            ItemContainerStyle="{StaticResource NoHighlightListViewItem}"
+            ItemsSource="{Binding}"
+            Style="{StaticResource DefaultListView}">
+            <ListView.View>
+                <GridView>
+                    <!--  ウェア名  -->
+                    <DataGridInline:InlineGridViewColumn
+                        DisplayMemberBinding="{Binding Ware.Name, Mode=OneTime}"
+                        Header="{lex:Loc Lang:WareName}"
+                        SortTargetPropertyName="WareName" />
+
+                    <!--  数量  -->
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Quantity}" SortTargetPropertyName="Count">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Count, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </DataGridInline:InlineGridViewColumn>
+
+                    <!--  単価  -->
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:UnitPrice}" SortTargetPropertyName="UnitPrice">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding UnitPrice, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:N0} cr'}" TextAlignment="Right" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </DataGridInline:InlineGridViewColumn>
+
+                    <!--  金額  -->
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Price}" SortTargetPropertyName="TotalPrice">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Style="{StaticResource NegativeValueEmphasisStyle}"
+                                    Tag="{Binding Price, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                    Text="{Binding Price, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:N0} cr'}"
+                                    TextAlignment="Right" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </DataGridInline:InlineGridViewColumn>
+                </GridView>
+            </ListView.View>
+        </DataGridInline:InlineListView>
+
+
+        <!--  建造コスト詳細表示用ListView  -->
+        <DataGridInline:InlineListView
+            x:Key="BuildCostDetailsListView"
             x:Shared="false"
             ItemContainerStyle="{StaticResource NoHighlightListViewItem}"
             ItemsSource="{Binding}"
@@ -255,7 +305,7 @@
                 </Expander.Header>
                 <ContentControl
                     Margin="25,0,0,0"
-                    Content="{StaticResource WareDetailsListView}"
+                    Content="{StaticResource ProfitDetailsListView}"
                     DataContext="{Binding ProfitDetails, Mode=OneTime}" />
             </Expander>
 
@@ -276,7 +326,7 @@
                 </Expander.Header>
                 <ContentControl
                     Margin="25,0,0,0"
-                    Content="{StaticResource WareDetailsListView}"
+                    Content="{StaticResource BuildCostDetailsListView}"
                     DataContext="{Binding BuildingCostDetails, Mode=OneTime}" />
             </Expander>
         </StackPanel>

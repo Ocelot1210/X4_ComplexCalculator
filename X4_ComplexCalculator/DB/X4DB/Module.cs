@@ -89,13 +89,14 @@ namespace X4_ComplexCalculator.DB.X4DB
         public static void Init()
         {
             _Modules.Clear();
-            DBConnection.X4DB.ExecQuery("SELECT ModuleID, ModuleTypeID, Name, MaxWorkers, WorkersCapacity FROM Module", (dr, args) =>
+            DBConnection.X4DB.ExecQuery("SELECT ModuleID, ModuleTypeID, Name, MaxWorkers, WorkersCapacity, NoBlueprint FROM Module", (dr, args) =>
             {
                 var id = (string)dr["ModuleID"];
                 var name = (string)dr["Name"];
                 var moduleType = ModuleType.Get((string)dr["ModuleTypeID"]);
                 var maxWorkers = (long)dr["MaxWorkers"];
                 var workersCapacity = (long)dr["WorkersCapacity"];
+                var noBlueprint = (long)dr["NoBlueprint"] == 1;
 
                 var moduleOwners = new List<Faction>();
                 DBConnection.X4DB.ExecQuery($"SELECT FactionID FROM ModuleOwner WHERE ModuleID = '{id}'", (dr2, args2) =>
@@ -103,7 +104,9 @@ namespace X4_ComplexCalculator.DB.X4DB
                     moduleOwners.Add(Faction.Get((string)dr2["FactionID"]));
                 });
 
-                _Modules.Add(id, new Module(id, name, moduleType, maxWorkers, workersCapacity, ModuleProduction.Get(id), moduleOwners.ToArray()));
+                var prod = (noBlueprint) ? Array.Empty<ModuleProduction>() : ModuleProduction.Get(id);
+
+                _Modules.Add(id, new Module(id, name, moduleType, maxWorkers, workersCapacity, prod, moduleOwners.ToArray()));
             });
         }
 

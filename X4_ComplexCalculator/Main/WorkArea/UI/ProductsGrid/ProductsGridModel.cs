@@ -11,6 +11,7 @@ using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
+using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 {
@@ -25,10 +26,18 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// </summary>
         private readonly ObservablePropertyChangedCollection<ModulesGridItem> _Modules;
 
+
+        /// <summary>
+        /// ステーションの設定
+        /// </summary>
+        private readonly StationSettingsModel _Settings;
+
+
         /// <summary>
         /// 生産性
         /// </summary>
         private double _Efficiency;
+
 
         /// <summary>
         /// 製品計算機
@@ -40,6 +49,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// 単価保存用
         /// </summary>
         private readonly Dictionary<string, long> _UnitPriceBakDict = new Dictionary<string, long>();
+
+
+        /// <summary>
+        /// 売買オプション保存用
+        /// </summary>
+        private readonly Dictionary<string, TradeOption> _TradeOptionDict = new Dictionary<string, TradeOption>();
         #endregion
 
         #region プロパティ
@@ -52,8 +67,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="moduleGridModel">モジュール一覧</param>
-        public ProductsGridModel(ObservablePropertyChangedCollection<ModulesGridItem> modules)
+        /// <param name="modules">モジュール一覧</param>
+        /// <param name="settings">ステーションの設定</param>
+        public ProductsGridModel(ObservablePropertyChangedCollection<ModulesGridItem> modules, StationSettingsModel settings)
         {
             Products = new ObservablePropertyChangedCollection<ProductsGridItem>();
 
@@ -61,6 +77,36 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             modules.CollectionPropertyChangedAsync += OnModulePropertyChanged;
 
             _Modules = modules;
+            _Settings = settings;
+            _Settings.PropertyChanged += Settings_PropertyChanged;
+        }
+
+
+        /// <summary>
+        /// 設定に変更があった場合
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                // 本部か
+                case nameof(StationSettingsModel.IsHeadquarters):
+                    UpdateWorkerEfficiency();
+                    break;
+
+                // 日光
+                case nameof(StationSettingsModel.Sunlight):
+                    foreach (var prod in Products)
+                    {
+                        prod.SetEfficiency("sunlight", _Settings.Sunlight);
+                    }
+                    break;
+
+                default:
+                    break;
+            }
         }
 
 
@@ -72,6 +118,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             Products.Clear();
             _Modules.CollectionChangedAsync -= OnModulesChanged;
             _Modules.CollectionPropertyChangedAsync -= OnModulePropertyChanged;
+            _Settings.PropertyChanged -= Settings_PropertyChanged;
         }
 
 
@@ -92,18 +139,22 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             while (true)
             {
                 // 追加モジュール一覧
-                var addModules = _ProductCalclator.CalcNeedModules(Products);
+                var addModules = _ProductCalclator.CalcNeedModules(Products, _Settings);
 
+                // 追加モジュールが無ければ(不足が無くなれば)終了
                 if (!addModules.Any())
                 {
                     break;
                 }
 
+                // 追加レコード数とモジュール数を更新
                 addedRecords += addModules.Count;
                 addedModules += addModules.Sum(x => x.Count);
 
+                // モジュール一覧に追加対象モジュールを追加
                 _Modules.AddRange(addModules.Select(x => new ModulesGridItem(x.ModuleID, x.Count)));
             }
+
 
             if (addedRecords == 0)
             {
@@ -150,7 +201,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 }
 
                 OnModuleCountChanged(module, ev.OldValue);
-                UpdateEfficiency();
+                UpdateWorkerEfficiency();
             }
 
             await Task.CompletedTask;
@@ -158,15 +209,20 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
 
         /// <summary>
-        /// 生産性を計算
+        /// 労働者による生産性を計算
         /// </summary>
         /// <returns>生産性</returns>
-        private double CalcEfficiency()
+        private double CalcWorkerEfficiency()
         {
             var ret = 0.0;
 
             var maxWorkers = _Modules.Sum(x => x.Module.MaxWorkers * x.ModuleCount);
             var workersCapacity = _Modules.Sum(x => x.Module.WorkersCapacity * x.ModuleCount);
+
+            if (_Settings.IsHeadquarters)
+            {
+                maxWorkers += StationSettingsModel.HQ_WORKERS;
+            }
 
             // 生産性を0.0以上、1.0以下にする
             if (0 < workersCapacity)
@@ -206,7 +262,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 OnModuleAdded(_Modules);
             }
 
-            UpdateEfficiency();
+            // 労働者による生産性を更新
+            UpdateWorkerEfficiency();
 
             await Task.CompletedTask;
         }
@@ -215,12 +272,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// 生産性を更新
         /// </summary>
-        private void UpdateEfficiency()
+        private void UpdateWorkerEfficiency()
         {
-            // 生産性(倍率)
-            double efficiency = CalcEfficiency();
+            // 労働者による生産性(倍率)
+            double efficiency = CalcWorkerEfficiency();
 
-            // 生産性が変化しない場合、何もしない
+            // 労働による生産性が変化しない場合、何もしない
             if (efficiency == _Efficiency)
             {
                 return;
@@ -228,7 +285,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
             foreach (var prod in Products)
             {
-                prod.SetEfficiency(efficiency);
+                prod.SetEfficiency("work", efficiency);
             }
 
             _Efficiency = efficiency;
@@ -244,7 +301,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         {
             ModulesGridItem[] modules = { module };
 
-            Dictionary<string, List<ProductDetailsListItem>> prodDict = AggregateProduct(modules);
+            Dictionary<string, List<IProductDetailsListItem>> prodDict = AggregateProduct(modules);
 
             foreach (var item in prodDict)
             {
@@ -261,7 +318,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         private void OnModuleAdded(IEnumerable<ModulesGridItem> addedModules)
         {
             // 生産品集計用ディクショナリ
-            Dictionary<string, List<ProductDetailsListItem>> prodDict = AggregateProduct(addedModules);
+            Dictionary<string, List<IProductDetailsListItem>> prodDict = AggregateProduct(addedModules);
 
             var addItems = new List<ProductsGridItem>();
             foreach (var item in prodDict)
@@ -276,7 +333,16 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 else
                 {
                     // ウェアが一覧に無い場合
-                    prod = new ProductsGridItem(item.Key, item.Value);
+
+                    // 売買オプション前回値があれば取得する
+                    if (!_TradeOptionDict.TryGetValue(item.Key, out var option))
+                    {
+                        // 前回値がない場合
+                        option = new TradeOption();
+                        _TradeOptionDict.Add(item.Key, option);
+                    }
+
+                    prod = new ProductsGridItem(item.Key, item.Value, option);
 
                     // 前回値単価がある場合、復元
                     if (_UnitPriceBakDict.ContainsKey(prod.Ware.WareID))
@@ -301,7 +367,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         private void OnModuleRemoved(IEnumerable<ModulesGridItem> removedModules)
         {
             // 生産品集計用ディクショナリ
-            Dictionary<string, List<ProductDetailsListItem>> prodDict = AggregateProduct(removedModules);
+            Dictionary<string, List<IProductDetailsListItem>> prodDict = AggregateProduct(removedModules);
 
             foreach (var item in prodDict)
             {
@@ -318,10 +384,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// </summary>
         /// <param name="targetModules">集計対象モジュール</param>
         /// <returns>集計結果</returns>
-        private Dictionary<string, List<ProductDetailsListItem>> AggregateProduct(IEnumerable<ModulesGridItem> targetModules)
+        private Dictionary<string, List<IProductDetailsListItem>> AggregateProduct(IEnumerable<ModulesGridItem> targetModules)
         {
             // 生産品集計用ディクショナリ
-            var prodDict = new Dictionary<string, List<ProductDetailsListItem>>();    // <ウェアID, 詳細情報>
+            var prodDict = new Dictionary<string, List<IProductDetailsListItem>>();    // <ウェアID, 詳細情報>
 
             // 処理対象モジュール一覧
             var modules = targetModules.Where(x => 0 < x.Module.MaxWorkers ||
@@ -371,14 +437,14 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <param name="moduleID"></param>
         /// <param name="count"></param>
         /// <param name="prodDict"></param>
-        private void SumProduct(string moduleID, long count, Dictionary<string, List<ProductDetailsListItem>> prodDict)
+        private void SumProduct(string moduleID, long count, Dictionary<string, List<IProductDetailsListItem>> prodDict)
         {
             foreach (var ware in _ProductCalclator.CalcProduction(moduleID))
             {
                 // ウェアがなければ追加する
                 if (!prodDict.ContainsKey(ware.WareID))
                 {
-                    prodDict.Add(ware.WareID, new List<ProductDetailsListItem>());
+                    prodDict.Add(ware.WareID, new List<IProductDetailsListItem>());
                 }
 
 
@@ -388,40 +454,47 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 // モジュールが既に追加されている場合、モジュール数を増やしてレコードが少なくなるようにする
                 if (details != null)
                 {
-                    details.Incriment(count);
+                    details.ModuleCount += count;
                 }
                 else
                 {
-                    detailsList.Add(new ProductDetailsListItem(moduleID, count, ware.Efficiency, ware.Amount));
+                    if (ware.Efficiency != null)
+                    {
+                        detailsList.Add(new ProductDetailsListItem(moduleID, count, ware.Efficiency, ware.Amount, _Settings));
+                    }
+                    else
+                    {
+                        detailsList.Add(new ProductDetailsListItemConsumption(moduleID, count, ware.Amount));
+                    }
                 }
             }
         }
 
         /// <summary>
-        /// 
+        /// 居住モジュールを集計
         /// </summary>
         /// <param name="moduleID"></param>
         /// <param name="moduleCount">モジュール数</param>
         /// <param name="workers"></param>
         /// <param name="prodDict"></param>
-        private void SumHabitation(string moduleID, long moduleCount, Dictionary<string, List<ProductDetailsListItem>> prodDict)
+        private void SumHabitation(string moduleID, long moduleCount, Dictionary<string, List<IProductDetailsListItem>> prodDict)
         {
             foreach (var ware in _ProductCalclator.CalcHabitation(moduleID))
             {
                 if (!prodDict.ContainsKey(ware.WareID))
                 {
-                    prodDict.Add(ware.WareID, new List<ProductDetailsListItem>());
+                    prodDict.Add(ware.WareID, new List<IProductDetailsListItem>());
                 }
 
                 var detailsList = prodDict[ware.WareID];
                 var details = detailsList.Where(x => x.ModuleID == moduleID).FirstOrDefault();
                 if (details != null)
                 {
-                    details.Incriment(moduleCount);
+                    details.ModuleCount += moduleCount;
                 }
                 else
                 {
-                    detailsList.Add(new ProductDetailsListItem(moduleID, moduleCount, -1, ware.Amount));
+                    detailsList.Add(new ProductDetailsListItemConsumption(moduleID, moduleCount, ware.Amount));
                 }
             }
         }

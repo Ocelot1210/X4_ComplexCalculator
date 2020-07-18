@@ -5,8 +5,11 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
+using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleInfo
 {
@@ -18,15 +21,29 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
         /// </summary>
         private long _NeedWorkforce = 0;
 
+
         /// <summary>
         /// 現在の労働者数
         /// </summary>
         private long _WorkForce = 0;
 
+
         /// <summary>
         /// モジュール一覧
         /// </summary>
-        readonly ObservablePropertyChangedCollection<ModulesGridItem> _Modules;
+        private readonly ObservablePropertyChangedCollection<ModulesGridItem> _Modules;
+
+
+        /// <summary>
+        /// ステーションの設定
+        /// </summary>
+        private readonly StationSettingsModel _Settings;
+
+
+        /// <summary>
+        /// 本部モジュール用データ
+        /// </summary>
+        private static readonly WorkForceModuleInfoDetailsItem _HQ = new WorkForceModuleInfoDetailsItem("module_player_prod_hq_01_macro", 1, StationSettingsModel.HQ_WORKERS, 0);
         #endregion
 
 
@@ -61,11 +78,44 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
         /// コンストラクタ
         /// </summary>
         /// <param name="moduleGridModel">モジュール一覧のModel</param>
-        public WorkForceModuleInfoModel(ObservablePropertyChangedCollection<ModulesGridItem> modules)
+        public WorkForceModuleInfoModel(ObservablePropertyChangedCollection<ModulesGridItem> modules, StationSettingsModel settings)
         {
             _Modules = modules;
             _Modules.CollectionChangedAsync += OnModulesChanged;
             _Modules.CollectionPropertyChangedAsync += OnModulesPropertyChanged;
+
+            _Settings = settings;
+            _Settings.PropertyChanged += Settings_PropertyChanged;
+        }
+
+
+        /// <summary>
+        /// ステーションの設定変更時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(StationSettingsModel.IsHeadquarters):
+                    {
+                        if (_Settings.IsHeadquarters)
+                        {
+                            NeedWorkforce += StationSettingsModel.HQ_WORKERS;
+                            WorkForceDetails.Add(_HQ);
+                        }
+                        else
+                        {
+                            NeedWorkforce -= StationSettingsModel.HQ_WORKERS;
+                            WorkForceDetails.Remove(_HQ);
+                        }
+                    }
+                    break;
+
+                default:
+                    break;
+            }
         }
 
 
@@ -76,6 +126,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
         {
             _Modules.CollectionChangedAsync -= OnModulesChanged;
             _Modules.CollectionPropertyChangedAsync -= OnModulesPropertyChanged;
+            _Settings.PropertyChanged -= Settings_PropertyChanged;
             WorkForceDetails.Clear();
         }
 

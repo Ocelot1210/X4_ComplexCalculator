@@ -17,9 +17,12 @@
 
         public int WorkersCapacity { get; }
 
+        public int NoBlueprint { get; }
+
         public Module(
             string moduleID, string moduleTypeID, string name,
-            string macro, int maxWorkers, int workersCapacity
+            string macro, int maxWorkers, int workersCapacity,
+            int noBluePrint
         )
         {
             this.ModuleID = moduleID;
@@ -28,6 +31,7 @@
             this.Macro = macro;
             this.MaxWorkers = maxWorkers;
             this.WorkersCapacity = workersCapacity;
+            this.NoBlueprint = noBluePrint;
         }
 
     }

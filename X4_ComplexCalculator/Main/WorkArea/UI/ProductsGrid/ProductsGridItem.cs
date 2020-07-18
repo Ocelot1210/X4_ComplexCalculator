@@ -1,6 +1,8 @@
 ﻿using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB.X4DB;
 
@@ -9,7 +11,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
     /// <summary>
     /// 製品一覧を表示するDataGridViewの1レコード分用クラス
     /// </summary>
-    public class ProductsGridItem : BindableBase
+    public class ProductsGridItem : BindableBaseEx
     {
         #region メンバ
         /// <summary>
@@ -21,6 +23,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// Expanderが展開されているか
         /// </summary>
         private bool _IsExpanded;
+
+        /// <summary>
+        /// 売買オプション
+        /// </summary>
+        TradeOption _TradeOption;
         #endregion
 
 
@@ -38,9 +45,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
 
         /// <summary>
-        /// 金額
+        /// 価格
         /// </summary>
-        public long Price => UnitPrice * Count;
+        public long Price
+        {
+            // ウェアが不足しているが購入しない or ウェアが余っているが販売しない場合、価格を0にする
+            get => (Count< 0 && NoBuy) || (0 < Count && NoSell)? 0 : UnitPrice* Count;
+        }
 
 
         /// <summary>
@@ -53,37 +64,39 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             {
                 // 最低価格≦ 入力価格 ≦ 最高価格かつ価格が変更された場合のみ更新
 
+
+                var setValue = value;
+                
+                if (setValue < Ware.MinPrice)
+                {
+                    // 入力された値が最低価格未満の場合、最低価格を設定する
+                    setValue = Ware.MinPrice;
+                }
+                else if (Ware.MaxPrice < setValue)
+                {
+                    // 入力された値が最高価格を超える場合、最高価格を設定する
+                    setValue = Ware.MaxPrice;
+                }
+
                 // 変更無しの場合は何もしない
                 if (_UnitPrice == value)
                 {
                     return;
                 }
 
+                var oldUnitPrice = _UnitPrice;
+                var oldPrice = Price;
+                _UnitPrice = setValue;
 
-                if (value < Ware.MinPrice)
-                {
-                    // 入力された値が最低価格未満の場合、最低価格を設定する
-                    _UnitPrice = Ware.MinPrice;
-                }
-                else if (Ware.MaxPrice < value)
-                {
-                    // 入力された値が最高価格を超える場合、最高価格を設定する
-                    _UnitPrice = Ware.MaxPrice;
-                }
-                else
-                {
-                    // 入力された値が最低価格以上、最高価格以下の場合、入力された値を設定する
-                    _UnitPrice = value;
-                }
-                RaisePropertyChanged();
-                RaisePropertyChanged(nameof(Price));
+                RaisePropertyChangedEx(oldUnitPrice, setValue);
+                RaisePropertyChangedEx(oldPrice, Price, nameof(Price));
             }
         }
 
         /// <summary>
         /// ウェア詳細(関連モジュール等)
         /// </summary>
-        public ObservableRangeCollection<ProductDetailsListItem> Details { get; }
+        public ObservableRangeCollection<IProductDetailsListItem> Details { get; }
 
 
         /// <summary>
@@ -110,6 +123,48 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         {
             UnitPrice = (long)(Ware.MinPrice + (Ware.MaxPrice - Ware.MinPrice) * 0.01 * percent);
         }
+
+
+        /// <summary>
+        /// 購入しないか
+        /// </summary>
+        public bool NoBuy
+        {
+            get => _TradeOption.NoBuy;
+            set
+            {
+                var oldPrice = Price;
+
+                if (SetProperty(ref _TradeOption.NoBuy, value))
+                {
+                    if (oldPrice != Price)
+                    {
+                        RaisePropertyChangedEx(oldPrice, Price, nameof(Price));
+                    }
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// 販売しないか
+        /// </summary>
+        public bool NoSell
+        {
+            get => _TradeOption.NoSell;
+            set
+            {
+                var oldPrice = Price;
+
+                if (SetProperty(ref _TradeOption.NoSell, value))
+                {
+                    if (oldPrice != Price)
+                    {
+                        RaisePropertyChangedEx(oldPrice, Price, nameof(Price));
+                    }
+                }
+            }
+        }
         #endregion
 
 
@@ -117,15 +172,15 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// コンストラクタ
         /// </summary>
         /// <param name="wareID">ウェアID</param>
-        /// <param name="count">ウェア個数</param>
         /// <param name="datails">ウェア詳細(関連モジュール等)</param>
-        /// <param name="isExpanded">関連モジュールが展開されているか</param>
-        /// <param name="price">価格</param>
-        public ProductsGridItem(string wareID, IEnumerable<ProductDetailsListItem> datails)
+        /// <param name="tradeOption">売買オプション</param>
+        public ProductsGridItem(string wareID, IEnumerable<IProductDetailsListItem> datails, TradeOption tradeOption)
         {
             Ware = Ware.Get(wareID);
+            Details = new ObservableRangeCollection<IProductDetailsListItem>(datails);
+
+            _TradeOption = tradeOption;
             UnitPrice = (Ware.MinPrice + Ware.MaxPrice) / 2;
-            Details = new ObservableRangeCollection<ProductDetailsListItem>(datails);
         }
 
 
@@ -133,9 +188,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// 詳細情報を追加
         /// </summary>
         /// <param name="details"></param>
-        public void AddDetails(IEnumerable<ProductDetailsListItem> details)
+        public void AddDetails(IEnumerable<IProductDetailsListItem> details)
         {
-            var addItems = new List<ProductDetailsListItem>();
+            var addItems = new List<IProductDetailsListItem>();
 
             foreach (var item in details)
             {
@@ -162,7 +217,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// 詳細情報を設定
         /// </summary>
         /// <param name="details"></param>
-        public void SetDetails(IEnumerable<ProductDetailsListItem> details, long prevModuleCount)
+        public void SetDetails(IEnumerable<IProductDetailsListItem> details, long prevModuleCount)
         {
             foreach (var item in details)
             {
@@ -183,7 +238,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// 詳細情報を削除
         /// </summary>
         /// <param name="details"></param>
-        public void RemoveDetails(IEnumerable<ProductDetailsListItem> details)
+        public void RemoveDetails(IEnumerable<IProductDetailsListItem> details)
         {
             foreach (var item in details)
             {
@@ -206,12 +261,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// 生産性を設定
         /// </summary>
-        /// <param name="efficiency"></param>
-        public void SetEfficiency(double efficiency)
+        /// <param name="effectID">効果ID</param>
+        /// <param name="efficiency">設定値</param>
+        public void SetEfficiency(string effectID, double efficiency)
         {
             foreach (var item in Details)
             {
-                item.EfficiencyValue = efficiency;
+                item.SetEfficiency(effectID, efficiency);
             }
 
             RaisePropertyChanged(nameof(Count));
