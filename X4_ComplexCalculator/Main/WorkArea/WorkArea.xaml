@@ -67,7 +67,6 @@
                         <xcad:LayoutAnchorablePane>
                             <!--  モジュール一覧  -->
                             <xcad:LayoutAnchorable
-                                x:Name="_Modules"
                                 Title="{lex:Loc Lang:ModuleList}"
                                 CanClose="False"
                                 ContentId="Modules">
@@ -78,7 +77,6 @@
                         <xcad:LayoutAnchorablePane>
                             <!--  概要  -->
                             <xcad:LayoutAnchorable
-                                x:Name="_Summary"
                                 Title="{lex:Loc Lang:Summary}"
                                 CanClose="False"
                                 ContentId="Summary">
@@ -87,7 +85,6 @@
 
                             <!--  設定  -->
                             <xcad:LayoutAnchorable
-                                x:Name="_Settings"
                                 Title="{lex:Loc Lang:Settings}"
                                 CanClose="False"
                                 ContentId="Settings">
@@ -96,7 +93,6 @@
 
                             <!--  製品  -->
                             <xcad:LayoutAnchorable
-                                x:Name="_Products"
                                 Title="{lex:Loc Lang:Products}"
                                 CanClose="False"
                                 ContentId="Products">
@@ -105,7 +101,6 @@
 
                             <!--  建造  -->
                             <xcad:LayoutAnchorable
-                                x:Name="_Resources"
                                 Title="{lex:Loc Lang:BuildResources}"
                                 CanClose="False"
                                 ContentId="Resources">
@@ -114,7 +109,6 @@
 
                             <!--  保管庫  -->
                             <xcad:LayoutAnchorable
-                                x:Name="_Storages"
                                 Title="{lex:Loc Lang:Storages}"
                                 CanClose="False"
                                 ContentId="Storages">
