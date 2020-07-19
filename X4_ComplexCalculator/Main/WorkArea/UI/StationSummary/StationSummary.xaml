@@ -154,7 +154,7 @@
                     <DataGridInline:InlineGridViewColumn
                         DisplayMemberBinding="{Binding Ware.Name, Mode=OneTime}"
                         Header="{lex:Loc Lang:WareName}"
-                        SortTargetPropertyName="WareName" />
+                        SortTargetPropertyName="Ware.Name" />
 
                     <!--  数量  -->
                     <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Quantity}" SortTargetPropertyName="Count">
@@ -175,7 +175,7 @@
                     </DataGridInline:InlineGridViewColumn>
 
                     <!--  金額  -->
-                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Price}" SortTargetPropertyName="TotalPrice">
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Price}" SortTargetPropertyName="Price">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock

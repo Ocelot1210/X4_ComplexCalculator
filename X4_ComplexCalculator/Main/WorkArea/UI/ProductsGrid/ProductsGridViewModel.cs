@@ -43,7 +43,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// 製品一覧
         /// </summary>
-        public ListCollectionView ProductsView { get; }
+        public ICollectionView ProductsView { get; }
 
 
         /// <summary>
@@ -127,7 +127,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         public ProductsGridViewModel(ProductsGridModel productsGridModel)
         {
             _Model = productsGridModel;
-            ProductsView = (ListCollectionView)CollectionViewSource.GetDefaultView(_Model.Products);
+
+            ProductsView = new CollectionViewSource { Source = _Model.Products }.View;
 
             // ソート方向設定
             ProductsView.SortDescriptions.Clear();

@@ -91,7 +91,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         {
             _Model = resourcesGridModel;
 
-            BuildResourceView = CollectionViewSource.GetDefaultView(_Model.Resources);
+            BuildResourceView = new CollectionViewSource { Source = _Model.Resources }.View;
             BuildResourceView.SortDescriptions.Add(new SortDescription("Ware.Name", ListSortDirection.Ascending));
         }
 
