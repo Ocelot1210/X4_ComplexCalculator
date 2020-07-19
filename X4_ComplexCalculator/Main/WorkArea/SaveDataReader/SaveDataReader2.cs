@@ -113,5 +113,25 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                 }
             });
         }
+
+
+        /// <summary>
+        /// 建造リソースを復元
+        /// </summary>
+        /// <param name="conn"></param>
+        protected override void RestoreBuildResource(DBConnection conn)
+        {
+            conn.ExecQuery($"SELECT WareID, Price, NoBuy FROM BuildResources", (dr, _) =>
+            {
+                var wareID = (string)dr["WareID"];
+
+                var itm = _WorkArea.Resources.Where(x => x.Ware.WareID == wareID).FirstOrDefault();
+                if (itm != null)
+                {
+                    itm.UnitPrice = (long)dr["Price"];
+                    itm.NoBuy = (long)dr["NoBuy"] == 1;
+                }
+            });
+        }
     }
 }

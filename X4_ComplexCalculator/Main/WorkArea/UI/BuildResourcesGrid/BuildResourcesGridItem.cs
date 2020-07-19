@@ -18,6 +18,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         /// 建造に必要なウェア数量
         /// </summary>
         private long _Amount;
+
+
+        /// <summary>
+        /// 建造ウェアを購入しない
+        /// </summary>
+        private bool _NoBuy;
         #endregion
 
 
@@ -47,7 +53,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         /// <summary>
         /// 金額
         /// </summary>
-        public long Price => Amount * UnitPrice;
+        public long Price => NoBuy? 0 : Amount * UnitPrice;
 
 
         /// <summary>
@@ -87,7 +93,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
                 _UnitPrice = setValue;
 
                 RaisePropertyChangedEx(oldUnitPrice, setValue);
-                RaisePropertyChangedEx(oldPrice, Price, nameof(Price));
+
+                if (!NoBuy)
+                {
+                    RaisePropertyChangedEx(oldPrice, Price, nameof(Price));
+                }
             }
         }
 
@@ -98,14 +108,23 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
 
 
         /// <summary>
-        /// 百分率ベースで価格を設定する
+        /// 建造ウェアを購入しない
         /// </summary>
-        /// <param name="percent">百分率の値</param>
-        public void SetUnitPricePercent(long percent)
+        public bool NoBuy
         {
-            UnitPrice = (long)(Ware.MinPrice + (Ware.MaxPrice - Ware.MinPrice) * 0.01 * percent);
+            get => _NoBuy;
+            set
+            {
+                var oldPrice = Price;
+
+                if (SetProperty(ref _NoBuy, value))
+                {
+                    RaisePropertyChangedEx(oldPrice, Price, nameof(Price));
+                }
+            }
         }
         #endregion
+
 
         /// <summary>
         /// コンストラクタ
@@ -117,6 +136,17 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             Ware = Ware.Get(wareID);
             UnitPrice = (Ware.MaxPrice + Ware.MinPrice) / 2;
             Amount = amount;
+        }
+
+
+
+        /// <summary>
+        /// 百分率ベースで価格を設定する
+        /// </summary>
+        /// <param name="percent">百分率の値</param>
+        public void SetUnitPricePercent(long percent)
+        {
+            UnitPrice = (long)(Ware.MinPrice + (Ware.MaxPrice - Ware.MinPrice) * 0.01 * percent);
         }
     }
 }

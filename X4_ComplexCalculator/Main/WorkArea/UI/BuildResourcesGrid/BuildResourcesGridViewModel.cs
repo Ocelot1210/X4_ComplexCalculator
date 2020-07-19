@@ -15,13 +15,21 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         /// <summary>
         /// 建造に必要なリソースを表示するDataGridView用Model
         /// </summary>
-        readonly BuildResourcesGridModel _Model;
+        private readonly BuildResourcesGridModel _Model;
+
 
         /// <summary>
         /// 価格割合
         /// </summary>
-        long _UnitPricePercent = 50;
+        private long _UnitPricePercent = 50;
+
+
+        /// <summary>
+        /// 建造に必要なウェアを購入しない
+        /// </summary>
+        private bool _NoBuy;
         #endregion
+
 
         #region プロパティ
         /// <summary>
@@ -51,6 +59,25 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
                 }
 
                 RaisePropertyChanged();
+            }
+        }
+
+
+        /// <summary>
+        /// 建造に必要なウェアを購入しない
+        /// </summary>
+        public bool NoBuy
+        {
+            get => _NoBuy;
+            set
+            {
+                if (SetProperty(ref _NoBuy, value))
+                {
+                    foreach (var ware in BuildResource)
+                    {
+                        ware.NoBuy = value;
+                    }
+                }
             }
         }
         #endregion

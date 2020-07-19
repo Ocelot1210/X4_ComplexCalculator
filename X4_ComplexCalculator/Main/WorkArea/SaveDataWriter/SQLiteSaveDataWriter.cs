@@ -97,7 +97,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
             conn.ExecQuery("CREATE TABLE Modules(Row INTEGER, ModuleID TEXT, Count INTEGER)");
             conn.ExecQuery("CREATE TABLE Equipments(Row INTEGER, EquipmentID TEXT)");
             conn.ExecQuery("CREATE TABLE Products(WareID TEXT, Price INTEGER, NoBuy INTEGER, NoSell INTEGER)");
-            conn.ExecQuery("CREATE TABLE BuildResources(WareID TEXT, Price INTEGER)");
+            conn.ExecQuery("CREATE TABLE BuildResources(WareID TEXT, Price INTEGER, NoBuy INTEGER)");
             conn.ExecQuery("CREATE TABLE StorageAssign(WareID TEXT, AllocCount INTEGER)");
             conn.ExecQuery("CREATE TABLE StationSettings(Key TEXT, Value TEXT)");
 
@@ -134,7 +134,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
             // 建造リソース保存
             foreach (var resource in WorkArea.Resources)
             {
-                conn.ExecQuery($"INSERT INTO BuildResources(WareID, Price) Values('{resource.Ware.WareID}', {resource.UnitPrice})");
+                conn.ExecQuery($"INSERT INTO BuildResources(WareID, Price, NoBuy) Values('{resource.Ware.WareID}', {resource.UnitPrice}, {(resource.NoBuy? 1 : 0)})");
             }
 
             // 保管庫割当情報保存
