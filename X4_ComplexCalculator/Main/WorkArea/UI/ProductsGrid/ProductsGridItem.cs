@@ -192,6 +192,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         {
             var addItems = new List<IProductDetailsListItem>();
 
+            var oldCount = Count;
+            var oldPrice = Price;
+
             foreach (var item in details)
             {
                 var tmp = Details.Where(x => x.ModuleID == item.ModuleID).FirstOrDefault();
@@ -209,8 +212,20 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
             Details.AddRange(addItems);
 
-            RaisePropertyChanged(nameof(Count));
-            RaisePropertyChanged(nameof(Price));
+            {
+                var newCount = Count;
+                if (oldCount != newCount)
+                {
+                    RaisePropertyChangedEx(oldCount, newCount, nameof(Count));
+                }
+            }
+            {
+                var newPrice = Price;
+                if (oldPrice != newPrice)
+                {
+                    RaisePropertyChangedEx(oldPrice, newPrice, nameof(Price));
+                }
+            }
         }
 
         /// <summary>
@@ -219,6 +234,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <param name="details"></param>
         public void SetDetails(IEnumerable<IProductDetailsListItem> details, long prevModuleCount)
         {
+            var oldCount = Count;
+            var oldPrice = Price;
+
             foreach (var item in details)
             {
                 // 更新対象のモジュールを検索
@@ -229,8 +247,21 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 }
             }
 
-            RaisePropertyChanged(nameof(Count));
-            RaisePropertyChanged(nameof(Price));
+
+            {
+                var newCount = Count;
+                if (oldCount != newCount)
+                {
+                    RaisePropertyChangedEx(oldCount, newCount, nameof(Count));
+                }
+            }
+            {
+                var newPrice = Price;
+                if (oldPrice != newPrice)
+                {
+                    RaisePropertyChangedEx(oldPrice, newPrice, nameof(Price));
+                }
+            }
         }
 
 
@@ -240,6 +271,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <param name="details"></param>
         public void RemoveDetails(IEnumerable<IProductDetailsListItem> details)
         {
+            var oldCount = Count;
+            var oldPrice = Price;
+
             foreach (var item in details)
             {
                 var tmp = Details.Where(x => x.ModuleID == item.ModuleID).FirstOrDefault();
@@ -253,8 +287,20 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             // 空のレコードを削除
             Details.RemoveAll(x => x.ModuleCount == 0);
 
-            RaisePropertyChanged(nameof(Count));
-            RaisePropertyChanged(nameof(Price));
+            {
+                var newCount = Count;
+                if (oldCount != newCount)
+                {
+                    RaisePropertyChangedEx(oldCount, newCount, nameof(Count));
+                }
+            }
+            {
+                var newPrice = Price;
+                if (oldPrice != newPrice)
+                {
+                    RaisePropertyChangedEx(oldPrice, newPrice, nameof(Price));
+                }
+            }
         }
 
 
@@ -265,13 +311,29 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <param name="efficiency">設定値</param>
         public void SetEfficiency(string effectID, double efficiency)
         {
+            var oldCount = Count;
+            var oldPrice = Price;
+
             foreach (var item in Details)
             {
                 item.SetEfficiency(effectID, efficiency);
             }
 
-            RaisePropertyChanged(nameof(Count));
-            RaisePropertyChanged(nameof(Price));
+
+            {
+                var newCount = Count;
+                if (oldCount != newCount)
+                {
+                    RaisePropertyChangedEx(oldCount, newCount, nameof(Count));
+                }
+            }
+            {
+                var newPrice = Price;
+                if (oldPrice != newPrice)
+                {
+                    RaisePropertyChangedEx(oldPrice, newPrice, nameof(Price));
+                }
+            }
         }
     }
 }
