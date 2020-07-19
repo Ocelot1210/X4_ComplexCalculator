@@ -103,7 +103,7 @@
                             <xcad:LayoutAnchorable
                                 Title="{lex:Loc Lang:BuildResources}"
                                 CanClose="False"
-                                ContentId="Resources">
+                                ContentId="BuildResources">
                                 <resGrid:BuildResourcesGrid DataContext="{Binding Resources, Mode=OneTime}" />
                             </xcad:LayoutAnchorable>
 
@@ -119,7 +119,7 @@
                             <xcad:LayoutAnchorable
                                 Title="{lex:Loc Lang:StorageAssign}"
                                 CanClose="False"
-                                ContentId="StorageSim">
+                                ContentId="StorageAssign">
                                 <storAsign:StorageAssign DataContext="{Binding StorageAssign, Mode=OneTime}" />
                             </xcad:LayoutAnchorable>
 

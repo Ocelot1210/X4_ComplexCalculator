@@ -416,13 +416,13 @@ WHERE
             // コンテンツIDと言語IDのペア
             var titleDict = new Dictionary<string, string>()
             {
-                { "Modules",    "Lang:ModuleList" },        // モジュール一覧
-                { "Products",   "Lang:Products" },          // 製品一覧
-                { "Resources",  "Lang:BuildResources" },    // 建造リソース一覧
-                { "Storages",   "Lang:Storages" },          // 保管庫一覧
-                { "StorageSim", "Lang:StorageAssign" },     // 保管庫割当
-                { "Summary",    "Lang:Summary" },           // 概要
-                { "Settings",   "Lang:Settings" },          // 設定
+                { "Modules",        "Lang:ModuleList" },        // モジュール一覧
+                { "Products",       "Lang:Products" },          // 製品一覧
+                { "BuildResources", "Lang:BuildResources" },    // 建造リソース一覧
+                { "Storages",       "Lang:Storages" },          // 保管庫一覧
+                { "StorageAssign",  "Lang:StorageAssign" },     // 保管庫割当
+                { "Summary",        "Lang:Summary" },           // 概要
+                { "Settings",       "Lang:Settings" },          // 設定
             };
 
             // タイトル再設定
