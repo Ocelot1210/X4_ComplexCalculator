@@ -255,11 +255,11 @@
                                     <lex:BLoc Key="Lang:WorkForce" />
                                     <Binding
                                         Mode="OneWay"
-                                        Path="WorkForce"
+                                        Path="Workforce.Actual"
                                         UpdateSourceTrigger="PropertyChanged" />
                                     <Binding
                                         Mode="OneWay"
-                                        Path="NeedWorkforce"
+                                        Path="Workforce.Need"
                                         UpdateSourceTrigger="PropertyChanged" />
                                 </MultiBinding>
                             </TextBlock.Text>

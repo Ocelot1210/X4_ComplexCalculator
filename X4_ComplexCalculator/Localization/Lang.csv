@@ -202,7 +202,10 @@ Quantity;Quantity
 # Settings
 # ------------------------------------------------------
 Settings;Settings
+Station;Station
 Headquarters;Headquarters
+ActualWorkforce;Actual workforce = 
+Sector;Sector
 Sunlight;Sunlight =
 
 

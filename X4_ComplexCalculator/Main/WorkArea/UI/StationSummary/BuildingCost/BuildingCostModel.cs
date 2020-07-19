@@ -112,7 +112,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost
 
             if (e.OldItems != null)
             {
-                BuildingCost -= e.NewItems.Cast<BuildResourcesGridItem>().Sum(x => x.Price);
+                BuildingCost -= e.OldItems.Cast<BuildResourcesGridItem>().Sum(x => x.Price);
             }
 
             if (e.Action == NotifyCollectionChangedAction.Reset)

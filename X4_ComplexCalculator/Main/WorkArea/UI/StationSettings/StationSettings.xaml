@@ -11,31 +11,73 @@
     d:DesignWidth="800"
     Background="White"
     mc:Ignorable="d">
-    <Grid>
+    <ScrollViewer HorizontalScrollBarVisibility="Auto">
         <StackPanel Orientation="Vertical">
-            <CheckBox
-                Margin="0,0,0,10"
-                Content="{lex:Loc Lang:Headquarters}"
-                IsChecked="{Binding IsHeadquarters, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-            <StackPanel Orientation="Horizontal">
-                <TextBlock
-                    Margin="0,0,5,0"
-                    VerticalAlignment="Center"
-                    Text="{lex:Loc Lang:Sunlight}" />
+            <GroupBox
+                Margin="5"
+                BorderBrush="Gray"
+                Header="{lex:Loc Lang:Station}">
+                <StackPanel Margin="5">
+                    <CheckBox
+                        Margin="0,0,0,20"
+                        Content="{lex:Loc Lang:Headquarters}"
+                        IsChecked="{Binding IsHeadquarters, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-                <xctk:IntegerUpDown
-                    Width="100"
-                    HorizontalAlignment="Left"
-                    ClipValueToMinMax="True"
-                    DefaultValue="100"
-                    FormatString="{}{0}%"
-                    Increment="10"
-                    Maximum="1000"
-                    Minimum="0"
-                    Value="{Binding Sunlight, Mode=TwoWay}" />
-            </StackPanel>
+                    <Grid HorizontalAlignment="Left">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*" />
+                            <RowDefinition Height="1*" />
+                            <RowDefinition Height="1*" />
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <TextBlock Text="{lex:Loc Lang:ActualWorkforce}" />
+                            <xctk:LongUpDown
+                                Width="100"
+                                FormatString="{StaticResource DefaultNumericFormat}"
+                                Maximum="{Binding Workforce.Capacity, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                Minimum="0"
+                                Value="{Binding Workforce.Actual, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+                        <Slider
+                            Grid.Row="1"
+                            Maximum="{Binding Workforce.Capacity, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                            Minimum="0"
+                            TickFrequency="1"
+                            Value="{Binding Workforce.Actual, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </Grid>
+
+                </StackPanel>
+            </GroupBox>
+
+
+            <GroupBox
+                Margin="5"
+                BorderBrush="Gray"
+                Header="{lex:Loc Lang:Sector}">
+                <StackPanel Margin="5">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock
+                            Margin="0,0,5,0"
+                            VerticalAlignment="Center"
+                            Text="{lex:Loc Lang:Sunlight}" />
+
+                        <xctk:IntegerUpDown
+                            Width="100"
+                            HorizontalAlignment="Left"
+                            ClipValueToMinMax="True"
+                            DefaultValue="100"
+                            FormatString="{}{0}%"
+                            Increment="10"
+                            Maximum="1000"
+                            Minimum="0"
+                            Value="{Binding Sunlight, Mode=TwoWay}" />
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
 
         </StackPanel>
-    </Grid>
+    </ScrollViewer>
 </UserControl>

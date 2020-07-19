@@ -79,6 +79,27 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             _Modules = modules;
             _Settings = settings;
             _Settings.PropertyChanged += Settings_PropertyChanged;
+            _Settings.Workforce.PropertyChanged += Workforce_PropertyChanged;
+        }
+
+
+
+        /// <summary>
+        /// 労働者情報に変更があった場合
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Workforce_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(WorkforceManager.Proportion):
+                    UpdateWorkerEfficiency();
+                    break;
+
+                default:
+                    break;
+            }
         }
 
 
@@ -91,11 +112,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         {
             switch (e.PropertyName)
             {
-                // 本部か
-                case nameof(StationSettingsModel.IsHeadquarters):
-                    UpdateWorkerEfficiency();
-                    break;
-
                 // 日光
                 case nameof(StationSettingsModel.Sunlight):
                     foreach (var prod in Products)
@@ -119,6 +135,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             _Modules.CollectionChangedAsync -= OnModulesChanged;
             _Modules.CollectionPropertyChangedAsync -= OnModulePropertyChanged;
             _Settings.PropertyChanged -= Settings_PropertyChanged;
+            _Settings.Workforce.PropertyChanged -= Workforce_PropertyChanged;
         }
 
 
@@ -201,7 +218,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 }
 
                 OnModuleCountChanged(module, ev.OldValue);
-                UpdateWorkerEfficiency();
             }
 
             await Task.CompletedTask;
@@ -262,9 +278,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 OnModuleAdded(_Modules);
             }
 
-            // 労働者による生産性を更新
-            UpdateWorkerEfficiency();
-
             await Task.CompletedTask;
         }
 
@@ -275,7 +288,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         private void UpdateWorkerEfficiency()
         {
             // 労働者による生産性(倍率)
-            double efficiency = CalcWorkerEfficiency();
+            double efficiency = _Settings.Workforce.Proportion;
+
+            if (1.0 < efficiency)
+            {
+                efficiency = 1.0;
+            }
 
             // 労働による生産性が変化しない場合、何もしない
             if (efficiency == _Efficiency)

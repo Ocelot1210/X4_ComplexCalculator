@@ -40,6 +40,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSettings
 
 
         /// <summary>
+        /// 労働者
+        /// </summary>
+        public WorkforceManager Workforce { get; } = new WorkforceManager();
+
+
+        /// <summary>
         /// 日光[%]
         /// </summary>
         public int Sunlight
