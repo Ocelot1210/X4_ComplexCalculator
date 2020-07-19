@@ -422,6 +422,7 @@ WHERE
                 { "Storages",   "Lang:Storages" },          // 保管庫一覧
                 { "StorageSim", "Lang:StorageAssign" },     // 保管庫割当
                 { "Summary",    "Lang:Summary" },           // 概要
+                { "Settings",   "Lang:Settings" },          // 設定
             };
 
             // タイトル再設定

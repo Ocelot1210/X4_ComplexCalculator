@@ -90,7 +90,7 @@
                                 x:Name="_Settings"
                                 Title="{lex:Loc Lang:Settings}"
                                 CanClose="False"
-                                ContentId="Setting">
+                                ContentId="Settings">
                                 <stst:StationSettings DataContext="{Binding Settings, Mode=OneTime}" />
                             </xcad:LayoutAnchorable>
 
