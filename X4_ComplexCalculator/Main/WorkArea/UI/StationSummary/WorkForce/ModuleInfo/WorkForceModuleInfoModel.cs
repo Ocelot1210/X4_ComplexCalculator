@@ -17,18 +17,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
     {
         #region メンバ
         /// <summary>
-        /// 必要な労働者数
-        /// </summary>
-        private long _NeedWorkforce = 0;
-
-
-        /// <summary>
-        /// 現在の労働者数
-        /// </summary>
-        private long _WorkForce = 0;
-
-
-        /// <summary>
         /// モジュール一覧
         /// </summary>
         private readonly ObservablePropertyChangedCollection<ModulesGridItem> _Modules;
@@ -52,25 +40,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
         /// 労働力の詳細情報
         /// </summary>
         public ObservableRangeCollection<WorkForceModuleInfoDetailsItem> WorkForceDetails { get; private set; } = new ObservableRangeCollection<WorkForceModuleInfoDetailsItem>();
-
-        /// <summary>
-        /// 必要な労働者数
-        /// </summary>
-        public long NeedWorkforce
-        {
-            get => _NeedWorkforce;
-            set => SetProperty(ref _NeedWorkforce, value);
-        }
-
-
-        /// <summary>
-        /// 現在の労働者数
-        /// </summary>
-        public long WorkForce
-        {
-            get => _WorkForce;
-            set => SetProperty(ref _WorkForce, value);
-        }
         #endregion
 
 
@@ -102,12 +71,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
                     {
                         if (_Settings.IsHeadquarters)
                         {
-                            NeedWorkforce += StationSettingsModel.HQ_WORKERS;
+                            _Settings.Workforce.Need += StationSettingsModel.HQ_WORKERS;
                             WorkForceDetails.Add(_HQ);
                         }
                         else
                         {
-                            NeedWorkforce -= StationSettingsModel.HQ_WORKERS;
+                            _Settings.Workforce.Need -= StationSettingsModel.HQ_WORKERS;
                             WorkForceDetails.Remove(_HQ);
                         }
                     }
@@ -159,7 +128,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
                 var itm = WorkForceDetails.Where(x => x.ModuleID == module.Module.ModuleID).First();
 
                 // 必要労働力を更新
-                NeedWorkforce = NeedWorkforce - Math.Abs(itm.TotalWorkforce) + module.Module.MaxWorkers * module.ModuleCount;
+                _Settings.Workforce.Need = _Settings.Workforce.Need - Math.Abs(itm.TotalWorkforce) + module.Module.MaxWorkers * module.ModuleCount;
 
                 // モジュール数を更新
                 itm.ModuleCount = module.ModuleCount;
@@ -173,7 +142,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
                 var itm = WorkForceDetails.Where(x => x.ModuleID == module.Module.ModuleID).First();
 
                 // 現在の労働者数を更新
-                WorkForce = WorkForce - Math.Abs(itm.TotalWorkforce) + module.Module.WorkersCapacity * module.ModuleCount;
+                _Settings.Workforce.Capacity = _Settings.Workforce.Capacity - Math.Abs(itm.TotalWorkforce) + module.Module.WorkersCapacity * module.ModuleCount;
 
                 // モジュール数を更新
                 itm.ModuleCount = module.ModuleCount;
@@ -203,8 +172,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
             if (e.Action == NotifyCollectionChangedAction.Reset)
             {
                 WorkForceDetails.Clear();
-                NeedWorkforce = 0;
-                WorkForce = 0;
+                _Settings.Workforce.Clear();
                 OnModuleAdded(_Modules);
             }
 
@@ -224,7 +192,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
                                  .OrderBy(x => x.Module.Name);
 
             var needWorkforce = 0L;
-            var workForce = 0L;
+            var capacity = 0L;
 
             var addItems = new List<WorkForceModuleInfoDetailsItem>();
             foreach (var d in details)
@@ -234,7 +202,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
                 {
                     if (0 < itm.WorkForce)
                     {
-                        workForce += d.ModuleCount * itm.WorkForce;
+                        capacity += d.ModuleCount * itm.WorkForce;
                     }
                     else
                     {
@@ -249,7 +217,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
 
                     if (0 < d.Module.WorkersCapacity)
                     {
-                        workForce += d.Module.WorkersCapacity * d.ModuleCount;
+                        capacity += d.Module.WorkersCapacity * d.ModuleCount;
                     }
                     else
                     {
@@ -259,8 +227,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
             }
 
             WorkForceDetails.AddRange(addItems);
-            NeedWorkforce += needWorkforce;
-            WorkForce += workForce;
+            _Settings.Workforce.Need += needWorkforce;
+            _Settings.Workforce.Capacity += capacity;
         }
 
 
@@ -276,7 +244,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
                                  .OrderBy(x => x.Module.Name);
 
             var needWorkforce = 0L;
-            var workForce = 0L;
+            var capacity = 0L;
 
             foreach (var d in details)
             {
@@ -285,7 +253,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
                 {
                     if (0 < itm.WorkForce)
                     {
-                        workForce += d.ModuleCount * itm.WorkForce;
+                        capacity += d.ModuleCount * itm.WorkForce;
                     }
                     else
                     {
@@ -296,9 +264,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
                 }
             }
 
-
-            NeedWorkforce -= needWorkforce;
-            WorkForce -= workForce;
+            _Settings.Workforce.Need -= needWorkforce;
+            _Settings.Workforce.Capacity -= capacity;
 
             WorkForceDetails.RemoveAll(x => x.ModuleCount == 0);
         }

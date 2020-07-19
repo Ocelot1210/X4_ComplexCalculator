@@ -202,7 +202,10 @@ Quantity;数量
 # Settings
 # ------------------------------------------------------
 Settings;設定
+Station;ステーション
 Headquarters;本部
+ActualWorkforce;現在の労働者数 = 
+Sector;セクター
 Sunlight;日光 =
 
 

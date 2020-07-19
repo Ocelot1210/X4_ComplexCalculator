@@ -42,14 +42,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary
 
         #region 労働力関連プロパティ
         /// <summary>
-        /// 現在の労働力
+        /// 労働者管理用
         /// </summary>
-        public long WorkForce => _WorkForceModuleInfoModel.WorkForce;
-
-        /// <summary>
-        /// 必要労働力
-        /// </summary>
-        public long NeedWorkforce => _WorkForceModuleInfoModel.NeedWorkforce;
+        public WorkforceManager Workforce { get; }
 
         /// <summary>
         /// 労働力関連モジュール情報
@@ -89,6 +84,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary
         public ObservableCollection<BuildResourcesGridItem> BuildingCostDetails => _BuildingCostModel.Resources;
         #endregion
 
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -98,10 +94,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary
         /// <param name="settings">ステーションの設定</param>
         public StationSummaryViewModel(ObservablePropertyChangedCollection<ModulesGridItem> modules, ObservablePropertyChangedCollection<ProductsGridItem> products, ObservablePropertyChangedCollection<BuildResourcesGridItem> resources, StationSettingsModel settings)
         {
+            Workforce = settings.Workforce;
+
             // 労働力関係初期化
             {
                 _WorkForceModuleInfoModel = new WorkForceModuleInfoModel(modules, settings);
-                _WorkForceModuleInfoModel.PropertyChanged += WorkForceModuleInfo_PropertyChanged;
             }
 
             {
@@ -131,28 +128,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary
             }
         }
 
-
-        /// <summary>
-        /// 労働力関連モジュール情報用Modelのプロパティ変更時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void WorkForceModuleInfo_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            switch (e.PropertyName)
-            {
-                case nameof(WorkForceModuleInfoModel.NeedWorkforce):
-                    RaisePropertyChanged(nameof(NeedWorkforce));
-                    break;
-
-                case nameof(WorkForceModuleInfoModel.WorkForce):
-                    RaisePropertyChanged(nameof(WorkForce));
-                    break;
-
-                default:
-                    break;
-            }
-        }
 
         /// <summary>
         /// 損益情報用Modelのプロパティ変更時
@@ -197,7 +172,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary
         /// </summary>
         public void Dispose()
         {
-            _WorkForceModuleInfoModel.PropertyChanged -= WorkForceModuleInfo_PropertyChanged;
             _ProfitModel.PropertyChanged              -= ProfitModel_PropertyChanged;
             _BuildingCostModel.PropertyChanged        -= BuildingCostModel_PropertyChanged;
 

@@ -32,9 +32,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                 {
                     conn.BeginTransaction();
 
-                    // ステーション設定復元
-                    RestoreSettings(conn);
-
                     // モジュール復元
                     RestoreModules(conn, progress, 90);
                     progress.Report(90);
@@ -49,6 +46,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
 
                     //保管庫割当情報を読み込み
                     RestoreStorageAssignInfo(conn);
+
+                    // ステーション設定復元
+                    RestoreSettings(conn);
+
                     progress.Report(100);
 
                     _WorkArea.Title = System.IO.Path.GetFileNameWithoutExtension(Path);
@@ -89,6 +90,16 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                 if (int.TryParse(value, out var sunLight))
                 {
                     _WorkArea.Settings.Sunlight = sunLight;
+                }
+            });
+
+            conn.ExecQuery("SELECT Value FROM StationSettings WHERE Key = 'ActualWorkforce'", (dr, _) =>
+            {
+                var value = (string)dr["Value"];
+
+                if (long.TryParse(value, out var actualWorkforce))
+                {
+                    _WorkArea.Settings.Workforce.Actual = actualWorkforce;
                 }
             });
         }
