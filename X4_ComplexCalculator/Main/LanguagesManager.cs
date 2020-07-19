@@ -4,6 +4,7 @@ using System.Linq;
 using WPFLocalizeExtension.Engine;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Main.Menu.Lang;
 
 namespace X4_ComplexCalculator.Main

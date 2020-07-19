@@ -19,7 +19,7 @@ using System.Windows;
 using WPFLocalizeExtension.Engine;
 using WPFLocalizeExtension.Providers;
 
-namespace X4_ComplexCalculator.Common
+namespace X4_ComplexCalculator.Common.Localize
 {
     /// <summary>
     /// A localization provider for comma separated files
@@ -39,16 +39,16 @@ namespace X4_ComplexCalculator.Common
                 {
                     fileName = value;
 
-                    this.AvailableCultures.Clear();
+                    AvailableCultures.Clear();
 
                     var appPath = GetWorkingDirectory();
                     var cultures = CultureInfo.GetCultures(CultureTypes.AllCultures);
 
                     foreach (var c in cultures)
                     {
-                        var csv = Path.Combine(appPath, "Localization", this.FileName + ((string.IsNullOrEmpty(c.Name)) ? "" : $".{c.Name}") + ".csv");
+                        var csv = Path.Combine(appPath, "Localization", FileName + (string.IsNullOrEmpty(c.Name) ? "" : $".{c.Name}") + ".csv");
                         if (File.Exists(csv))
-                            this.AvailableCultures.Add(c);
+                            AvailableCultures.Add(c);
                     }
 
                     OnProviderChanged();
@@ -203,10 +203,10 @@ namespace X4_ComplexCalculator.Common
             if (target == null)
                 return new FQAssemblyDictionaryKey(key, assembly, dictionary);
 
-            if (String.IsNullOrEmpty(assembly))
+            if (string.IsNullOrEmpty(assembly))
                 assembly = GetAssembly(target);
 
-            if (String.IsNullOrEmpty(dictionary))
+            if (string.IsNullOrEmpty(dictionary))
                 dictionary = GetDictionary(target);
 
             return new FQAssemblyDictionaryKey(key, assembly, dictionary);
