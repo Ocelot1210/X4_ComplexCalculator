@@ -186,7 +186,7 @@ StorageAssignGroupHeader;{0} = {1:N0}/{2:N0}
 # ------------------------------------------------------
 # Summary
 # ------------------------------------------------------
-WorkForce;Work force = [{0:N0}/{1:N0}]
+Workforce;Workforce = [{0:N0}/{1:N0}]
 NecessaryWareInfo;Necessary ware info
 ModuleInfo;Module info
 ProfitPerHour;Profit per hour = {0:N0} cr

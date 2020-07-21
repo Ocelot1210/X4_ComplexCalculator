@@ -252,7 +252,7 @@
                         <TextBlock>
                             <TextBlock.Text>
                                 <MultiBinding Converter="{StaticResource FormatStringConverter}">
-                                    <lex:BLoc Key="Lang:WorkForce" />
+                                    <lex:BLoc Key="Lang:Workforce" />
                                     <Binding
                                         Mode="OneWay"
                                         Path="Workforce.Actual"

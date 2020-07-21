@@ -186,7 +186,7 @@ StorageAssignGroupHeader;{0} = {1:N0}/{2:N0}
 # ------------------------------------------------------
 # Summary
 # ------------------------------------------------------
-WorkForce;労働力 = [{0:N0}/{1:N0}]
+Workforce;労働力 = [{0:N0}/{1:N0}]
 NecessaryWareInfo;必要ウェア情報
 ModuleInfo;モジュール情報
 ProfitPerHour;1時間あたりの損益 = {0:N0} cr
