@@ -84,7 +84,7 @@
             <x4cmn:MouseHoverEditCellColumn
                 ClipboardContentBinding="{Binding UnitPrice, Mode=OneTime}"
                 Header="{lex:Loc Lang:UnitPrice}"
-                SortMemberPath="{lex:Loc UnitPrice}">
+                SortMemberPath="UnitPrice">
                 <!--  通常表示時のスタイル  -->
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
