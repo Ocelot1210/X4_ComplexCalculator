@@ -7,7 +7,7 @@
     xmlns:local="clr-namespace:X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
-    xmlns:xctk="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+    xmlns:xctk="clr-namespace:Xceed.Wpf.Toolkit;assembly=DotNetProjects.Wpf.Extended.Toolkit"
     Title="{lex:Loc Lang:SelectPlanWindowTitle}"
     Width="400"
     Height="400"

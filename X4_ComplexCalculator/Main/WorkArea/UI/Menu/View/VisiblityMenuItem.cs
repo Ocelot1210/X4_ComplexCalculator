@@ -1,6 +1,6 @@
 ﻿using Prism.Mvvm;
 using System;
-using Xceed.Wpf.AvalonDock.Layout;
+using AvalonDock.Layout;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.Menu.View
 {

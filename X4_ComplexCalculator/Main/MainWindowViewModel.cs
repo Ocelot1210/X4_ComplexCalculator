@@ -18,7 +18,7 @@ using X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport;
 using X4_ComplexCalculator.Main.Menu.Lang;
 using X4_ComplexCalculator.Main.Menu.Layout;
 using X4_ComplexCalculator.Main.WorkArea;
-using Xceed.Wpf.AvalonDock;
+using AvalonDock;
 
 namespace X4_ComplexCalculator.Main
 {
