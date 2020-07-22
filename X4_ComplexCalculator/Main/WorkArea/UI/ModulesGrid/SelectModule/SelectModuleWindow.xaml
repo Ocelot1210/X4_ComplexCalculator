@@ -2,14 +2,14 @@
     x:Class="X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule.SelectModuleWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:avdk="https://github.com/Dirkster99/AvalonDock"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
     xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
-    xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
-    xmlns:xctk="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     x:Name="window"
     Title="{lex:Loc Lang:SelectModuleWindowTitle}"
     Width="800"
@@ -78,15 +78,15 @@
         </StackPanel>
         <!--#endregion-->
 
-        <xcad:DockingManager Grid.Row="1" Grid.ColumnSpan="2">
-            <xcad:LayoutRoot>
-                <xcad:LayoutPanel Orientation="Horizontal">
+        <avdk:DockingManager Grid.Row="1" Grid.ColumnSpan="2">
+            <avdk:LayoutRoot>
+                <avdk:LayoutPanel Orientation="Horizontal">
 
                     <!--  モジュール絞り込み用  -->
-                    <xcad:LayoutDocumentPaneGroup Orientation="Vertical">
-                        <xcad:LayoutDocumentPane>
+                    <avdk:LayoutDocumentPaneGroup Orientation="Vertical">
+                        <avdk:LayoutDocumentPane>
                             <!--  モジュール種別  -->
-                            <xcad:LayoutDocument Title="{lex:Loc Lang:ModuleType}" CanClose="False">
+                            <avdk:LayoutDocument Title="{lex:Loc Lang:ModuleType}" CanClose="False">
                                 <xctk:CheckListBox
                                     DisplayMemberPath="Name"
                                     IsSelectAllActive="True"
@@ -95,12 +95,12 @@
                                     ScrollViewer.VerticalScrollBarVisibility="Visible"
                                     SelectAllContent="{lex:Loc Lang:SelectAll}"
                                     SelectedMemberPath="IsChecked" />
-                            </xcad:LayoutDocument>
-                        </xcad:LayoutDocumentPane>
+                            </avdk:LayoutDocument>
+                        </avdk:LayoutDocumentPane>
 
-                        <xcad:LayoutDocumentPane>
+                        <avdk:LayoutDocumentPane>
                             <!--  所有派閥  -->
-                            <xcad:LayoutDocument Title="{lex:Loc Lang:OwnerFaction}" CanClose="False">
+                            <avdk:LayoutDocument Title="{lex:Loc Lang:OwnerFaction}" CanClose="False">
                                 <xctk:CheckListBox
                                     DisplayMemberPath="Name"
                                     IsSelectAllActive="True"
@@ -109,12 +109,12 @@
                                     ScrollViewer.VerticalScrollBarVisibility="Visible"
                                     SelectAllContent="{lex:Loc Lang:SelectAll}"
                                     SelectedMemberPath="IsChecked" />
-                            </xcad:LayoutDocument>
-                        </xcad:LayoutDocumentPane>
-                    </xcad:LayoutDocumentPaneGroup>
+                            </avdk:LayoutDocument>
+                        </avdk:LayoutDocumentPane>
+                    </avdk:LayoutDocumentPaneGroup>
 
-                    <xcad:LayoutDocumentPane>
-                        <xcad:LayoutDocument Title="{lex:Loc Lang:ModuleName}" CanClose="False">
+                    <avdk:LayoutDocumentPane>
+                        <avdk:LayoutDocument Title="{lex:Loc Lang:ModuleName}" CanClose="False">
                             <DockPanel>
                                 <!--  モジュール名検索  -->
                                 <xctk:WatermarkTextBox
@@ -137,10 +137,10 @@
                                     </ListBox.ItemContainerStyle>
                                 </ListBox>
                             </DockPanel>
-                        </xcad:LayoutDocument>
-                    </xcad:LayoutDocumentPane>
-                </xcad:LayoutPanel>
-            </xcad:LayoutRoot>
-        </xcad:DockingManager>
+                        </avdk:LayoutDocument>
+                    </avdk:LayoutDocumentPane>
+                </avdk:LayoutPanel>
+            </avdk:LayoutRoot>
+        </avdk:DockingManager>
     </Grid>
 </Window>
