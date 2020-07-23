@@ -1,4 +1,7 @@
-﻿using Prism.Commands;
+﻿using AvalonDock;
+using AvalonDock.Layout;
+using AvalonDock.Layout.Serialization;
+using Prism.Commands;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
@@ -13,17 +16,14 @@ using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.Menu.File.Export;
 using X4_ComplexCalculator.Main.Menu.File.Import;
+using X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.Menu.View;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
-using X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary;
 using X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign;
 using X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid;
-using AvalonDock;
-using AvalonDock.Layout;
-using AvalonDock.Layout.Serialization;
 
 namespace X4_ComplexCalculator.Main.WorkArea
 {
@@ -125,26 +125,11 @@ namespace X4_ComplexCalculator.Main.WorkArea
             }
         }
 
-        /// <summary>
-        /// 現在のドッキングマネージャー
-        /// </summary>
-        public DockingManager? CurrentDockingManager
-        {
-            set
-            {
-                if (SetProperty(ref _CurrentDockingManager, value))
-                {
-                    RestoreLayout();
-                }
-            }
-            private get => _CurrentDockingManager;
-        }
-
 
         /// <summary>
         /// アンロード時
         /// </summary>
-        public ICommand OnUnloadedCommand { get; }
+        public ICommand OnLoadedCommand { get; }
 
 
         /// <summary>
@@ -167,7 +152,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <remarks>
         /// レイアウトIDが負の場合、レイアウトは指定されていない事にする
         /// </remarks>
-        public WorkAreaViewModel(long layoutID = -1)
+        public WorkAreaViewModel(long layoutID)
         {
             _LayoutID = layoutID;
 
@@ -188,7 +173,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
 
             Modules.AutoAddModuleCommand = Products.AutoAddModuleCommand;
             _Model              = new WorkAreaModel(moduleModel, productsModel, resourcesModel, storageAssignModel, Settings);
-            OnUnloadedCommand   = new DelegateCommand(OnUnloaded);
+            OnLoadedCommand     = new DelegateCommand<DockingManager>(OnLoaded);
 
             _Model.PropertyChanged += Model_PropertyChanged;
             LocalizeDictionary.Instance.PropertyChanged += Instance_PropertyChanged;
@@ -383,9 +368,13 @@ WHERE
 
 
         /// <summary>
-        /// アンロード時
+        /// ロード時
         /// </summary>
-        private void OnUnloaded() => _Layout = GetCurrentLayout();
+        private void OnLoaded(DockingManager dockingManager)
+        {
+            _CurrentDockingManager = dockingManager;
+            RestoreLayout();
+        }
 
 
         /// <summary>

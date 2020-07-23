@@ -1,5 +1,4 @@
 ﻿using System.Windows.Controls;
-using X4_ComplexCalculator.Common;
 
 namespace X4_ComplexCalculator.Main.WorkArea
 {
