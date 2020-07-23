@@ -141,11 +141,11 @@
 
                                                                 <lex:BLoc Key="Lang:StorageAssignGroupHeader" />
 
-                                                                <Binding Path="Items[0].TransportTypeName" />
+                                                                <Binding Path="Items.CurrentItem.TransportTypeName" />
 
-                                                                <Binding Path="Items[0].CapacityInfo.UsedCapacity" />
+                                                                <Binding Path="Items.CurrentItem.CapacityInfo.UsedCapacity" />
 
-                                                                <Binding Path="Items[0].CapacityInfo.TotalCapacity" />
+                                                                <Binding Path="Items.CurrentItem.CapacityInfo.TotalCapacity" />
 
                                                             </MultiBinding>
                                                         </TextBlock.Text>
