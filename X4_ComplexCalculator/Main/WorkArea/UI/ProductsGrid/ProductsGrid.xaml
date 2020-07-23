@@ -54,14 +54,38 @@
 
         <!--  DataGridのコンテキストメニュー  -->
         <ContextMenu x:Key="ProductsGridContextMenu">
+
+            <!--  展開  -->
             <MenuItem
-                Command="{Binding SelectedExpand, Mode=OneTime}"
-                CommandParameter="{x:Reference productGrid}"
+                Command="{Binding SelectedExpandCommand, Mode=OneTime}"
+                CommandParameter="True"
                 Header="{lex:Loc Lang:Expansion}" />
+
+            <!--  折りたたみ  -->
             <MenuItem
-                Command="{Binding SelectedCollapse, Mode=OneTime}"
-                CommandParameter="{x:Reference productGrid}"
+                Command="{Binding SelectedCollapseCommand, Mode=OneTime}"
+                CommandParameter="False"
                 Header="{lex:Loc Lang:Collapse}" />
+
+            <Separator />
+            <MenuItem
+                Command="{Binding SetNoBuyToSelectedItemCommand, Mode=OneTime}"
+                CommandParameter="False"
+                Header="購入する" />
+            <MenuItem
+                Command="{Binding SetNoBuyToSelectedItemCommand, Mode=OneTime}"
+                CommandParameter="True"
+                Header="購入しない" />
+            <Separator />
+
+            <MenuItem
+                Command="{Binding SetNoSellToSelectedItemCommand, Mode=OneTime}"
+                CommandParameter="False"
+                Header="販売する" />
+            <MenuItem
+                Command="{Binding SetNoSellToSelectedItemCommand, Mode=OneTime}"
+                CommandParameter="True"
+                Header="販売しない" />
         </ContextMenu>
 
         <!--  子要素のListView  -->
