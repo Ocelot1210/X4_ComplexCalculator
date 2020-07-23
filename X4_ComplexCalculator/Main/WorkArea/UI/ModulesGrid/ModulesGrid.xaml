@@ -126,7 +126,7 @@
                                 Text="{Binding Module.Name, Mode=OneTime}">
                                 <TextBlock.InputBindings>
                                     <MouseBinding
-                                        Command="{Binding DataContext.ReplaceModule, Mode=OneTime, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+                                        Command="{Binding DataContext.ReplaceModuleCommand, Mode=OneTime, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
                                         CommandParameter="{Binding .}"
                                         MouseAction="LeftClick" />
                                 </TextBlock.InputBindings>

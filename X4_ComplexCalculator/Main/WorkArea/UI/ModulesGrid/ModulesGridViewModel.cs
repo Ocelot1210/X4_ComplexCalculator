@@ -58,7 +58,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <summary>
         /// モジュール変更
         /// </summary>
-        public ICommand ReplaceModule { get; }
+        public ICommand ReplaceModuleCommand { get; }
 
 
         /// <summary>
@@ -106,13 +106,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         {
             _Model = model;
             ModulesView = (ListCollectionView)CollectionViewSource.GetDefaultView(_Model.Modules);
-            ModulesView.Filter = Filter;
-            AddModuleCommand   = new DelegateCommand(_Model.ShowAddModuleWindow);
-            MergeModuleCommand = new DelegateCommand(_Model.MergeModule);
-            ReplaceModule      = new DelegateCommand<ModulesGridItem>(_Model.ReplaceModule);
-            CopyModules        = new DelegateCommand(CopyModulesCommand);
-            PasteModules       = new DelegateCommand<DataGrid>(PasteModulesCommand);
-            DeleteModules      = new DelegateCommand<DataGrid>(DeleteModulesCommand);
+            ModulesView.Filter      = Filter;
+            AddModuleCommand        = new DelegateCommand(_Model.ShowAddModuleWindow);
+            MergeModuleCommand      = new DelegateCommand(_Model.MergeModule);
+            ReplaceModuleCommand    = new DelegateCommand<ModulesGridItem>(ReplaceModule);
+            CopyModules             = new DelegateCommand(CopyModulesCommand);
+            PasteModules            = new DelegateCommand<DataGrid>(PasteModulesCommand);
+            DeleteModules           = new DelegateCommand<DataGrid>(DeleteModulesCommand);
         }
 
         /// <summary>
@@ -122,6 +122,19 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         {
             _Model.Dispose();
         }
+
+
+        /// <summary>
+        /// モジュールを置換する
+        /// </summary>
+        private void ReplaceModule(ModulesGridItem oldItem)
+        {
+            if (_Model.ReplaceModule(oldItem))
+            {
+                ModulesView.Refresh();
+            }
+        }
+
 
         /// <summary>
         /// 選択中のモジュールをコピー

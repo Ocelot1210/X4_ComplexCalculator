@@ -119,8 +119,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// モジュール変更
         /// </summary>
         /// <param name="oldItem">変更対象モジュール</param>
-        public void ReplaceModule(ModulesGridItem oldItem)
+        public bool ReplaceModule(ModulesGridItem oldItem)
         {
+            var ret = false;
+
             // 置換後のモジュール
             var newModules = new ObservableRangeCollection<ModulesGridItem>();
 
@@ -137,7 +139,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
 
                 // 要素を入れ替える
                 Modules.Replace(oldItem, newItem);
+
+                ret = true;
             }
+
+            return ret;
         }
 
 
