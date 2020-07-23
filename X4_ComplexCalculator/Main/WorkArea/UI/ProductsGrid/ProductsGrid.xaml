@@ -84,7 +84,7 @@
             <MenuItem
                 Command="{Binding SetNoSellToSelectedItemCommand, Mode=OneTime}"
                 CommandParameter="{StaticResource False}"
-                Header="{lex:Loc Lang:Buy}" />
+                Header="{lex:Loc Lang:Sell}" />
 
             <!--  販売しない  -->
             <MenuItem
