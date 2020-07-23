@@ -56,7 +56,7 @@
             </MenuItem>
         </Menu>
 
-        <avdk:DockingManager x:Name="dockingManager" Grid.Row="1">
+        <avdk:DockingManager Grid.Row="1">
 
             <avdk:DockingManager.Resources />
 
