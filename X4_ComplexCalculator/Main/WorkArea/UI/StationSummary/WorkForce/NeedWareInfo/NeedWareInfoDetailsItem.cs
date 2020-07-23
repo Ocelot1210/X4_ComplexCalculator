@@ -14,10 +14,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
         /// </summary>
         private long _NeedAmount;
 
+
         /// <summary>
         /// 合計必要数量
         /// </summary>
         private long _TotalNeedAmount;
+
 
         /// <summary>
         /// 生産数量
@@ -25,10 +27,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
         private long _ProductionAmount;
         #endregion
 
+
+        #region プロパティ
         /// <summary>
         /// 種族
         /// </summary>
         public Race Race { get; }
+
 
         /// <summary>
         /// 労働方式
@@ -63,6 +68,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
             }
         }
 
+
         /// <summary>
         /// 合計必要数量
         /// </summary>
@@ -93,6 +99,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
         /// 差
         /// </summary>
         public long Diff => ProductionAmount - NeedAmount;
+        #endregion
 
 
         /// <summary>

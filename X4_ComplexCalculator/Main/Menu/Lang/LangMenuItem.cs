@@ -5,20 +5,26 @@ using X4_ComplexCalculator.Common;
 
 namespace X4_ComplexCalculator.Main.Menu.Lang
 {
+    /// <summary>
+    /// 言語メニュー1レコード分
+    /// </summary>
     public class LangMenuItem : BindableBase
     {
+        #region メンバ
         /// <summary>
         /// 言語
         /// </summary>
-        private CultureInfo _CultureInfo;
+        private readonly CultureInfo _CultureInfo;
 
 
         /// <summary>
         /// チェックされたか
         /// </summary>
         private bool _IsChecked;
+        #endregion
 
 
+        #region プロパティ
         /// <summary>
         /// チェックされたか
         /// </summary>
@@ -44,6 +50,7 @@ namespace X4_ComplexCalculator.Main.Menu.Lang
         /// 言語名
         /// </summary>
         public string Name => _CultureInfo.DisplayName;
+        #endregion
 
 
         /// <summary>

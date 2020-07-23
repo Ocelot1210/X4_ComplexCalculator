@@ -8,18 +8,22 @@ using LibX4.FileSystem;
 
 namespace LibX4.Lang
 {
+    /// <summary>
+    /// X4の言語フィールド文字列を解決するクラス
+    /// </summary>
     public class LangageResolver
     {
+        #region メンバ
         /// <summary>
         /// 言語ファイル管理用辞書[Key = 言語ファイルパス, Value = 言語xml]
         /// </summary>
-        private Dictionary<string, XDocument> _LangTrees = new Dictionary<string, XDocument>();
+        private readonly Dictionary<string, XDocument> _LangTrees = new Dictionary<string, XDocument>();
 
 
         /// <summary>
         /// 読み込んだ言語一覧(最後の要素が優先)
         /// </summary>
-        private Stack<string> _Langages = new Stack<string>();
+        private readonly Stack<string> _Langages = new Stack<string>();
 
 
         /// <summary>
@@ -39,10 +43,12 @@ namespace LibX4.Lang
         /// </summary>
         private readonly Regex _RemoveCommentRegex = new Regex(@"(?<!\\)\(.*?(?<!\\)\)");
 
+
         /// <summary>
         /// 括弧のエスケープを解除する正規表現
         /// </summary>
         private readonly Regex _UnescapeRegex = new Regex(@"\\(.)");
+        #endregion
 
 
         /// <summary>
@@ -77,15 +83,14 @@ namespace LibX4.Lang
         /// <summary>
         /// 言語フィールドの文字列を言語ファイルを参照して解決する
         /// </summary>
-        /// <param name="template"></param>
-        /// <returns></returns>
+        /// <param name="template">言語フィールド文字列</param>
+        /// <returns>解決結果文字列</returns>
         public string Resolve(string template)
         {
             if (string.IsNullOrEmpty(template))
             {
                 return template;
             }
-
 
             foreach (var langTree in _Langages.Select(x => _LangTrees[x]))
             {
@@ -118,7 +123,7 @@ namespace LibX4.Lang
         /// 言語フィールド解決処理メイン
         /// </summary>
         /// <param name="text">言語フィールド文字列</param>
-        /// <param name="langTree"></param>
+        /// <param name="langTree">翻訳対象言語のXDocument</param>
         /// <returns></returns>
         private (string, bool) ResolveField(string text, XDocument langTree)
         {

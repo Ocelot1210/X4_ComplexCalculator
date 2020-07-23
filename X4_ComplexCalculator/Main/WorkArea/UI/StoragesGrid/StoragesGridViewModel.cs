@@ -13,7 +13,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         /// <summary>
         /// 保管庫一覧表示用DataGridViewのModel
         /// </summary>
-        readonly StoragesGridModel _Model;
+        private readonly StoragesGridModel _Model;
         #endregion
 
 
@@ -33,6 +33,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         {
             _Model = model;
         }
+
 
         /// <summary>
         /// リソースを開放

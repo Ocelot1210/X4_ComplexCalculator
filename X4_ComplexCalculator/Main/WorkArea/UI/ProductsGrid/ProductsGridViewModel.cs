@@ -20,6 +20,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// </summary>
         readonly ProductsGridModel _Model;
 
+
         /// <summary>
         /// 製品価格割合
         /// </summary>
@@ -64,6 +65,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 RaisePropertyChanged();
             }
         }
+
 
         /// <summary>
         /// 選択されたアイテムを展開する
@@ -140,13 +142,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             AutoAddModuleCommand = new DelegateCommand(_Model.AutoAddModule);
         }
 
+
         /// <summary>
         /// リソースを開放
         /// </summary>
-        public void Dispose()
-        {
-            _Model.Dispose();
-        }
+        public void Dispose() => _Model.Dispose();
+
 
         /// <summary>
         /// 選択されたアイテムを展開する
@@ -159,6 +160,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 item.IsExpanded = true;
             }
         }
+
 
         /// <summary>
         /// 選択されたアイテムを折りたたむ

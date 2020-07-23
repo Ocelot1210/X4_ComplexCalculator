@@ -86,19 +86,13 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// 上書き保存
         /// </summary>
-        public void Save()
-        {
-            _WorkAreaManager.ActiveContent?.Save();
-        }
+        public void Save() => _WorkAreaManager.ActiveContent?.Save();
 
 
         /// <summary>
         /// 名前を付けて保存
         /// </summary>
-        public void SaveAs()
-        {
-            _WorkAreaManager.ActiveContent?.SaveAs();
-        }
+        public void SaveAs() => _WorkAreaManager.ActiveContent?.SaveAs();
 
 
         /// <summary>

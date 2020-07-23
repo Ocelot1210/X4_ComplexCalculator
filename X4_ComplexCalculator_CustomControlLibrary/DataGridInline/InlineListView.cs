@@ -20,6 +20,7 @@ namespace CustomControlLibrary.DataGridInline
         ScrollViewer? _ScrollViewer;
         #endregion
 
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -28,8 +29,9 @@ namespace CustomControlLibrary.DataGridInline
             DefaultStyleKeyProperty.OverrideMetadata(typeof(InlineListView), new FrameworkPropertyMetadata(typeof(InlineListView)));
         }
 
+
         /// <summary>
-        /// 
+        /// ビジュアルツリー構築時
         /// </summary>
         public override void OnApplyTemplate()
         {
@@ -38,10 +40,9 @@ namespace CustomControlLibrary.DataGridInline
             // カラムヘッダクリック時のイベントを追加
             AddHandler(System.Windows.Controls.Primitives.ButtonBase.ClickEvent, new RoutedEventHandler(ColumnHeader_Click));
 
+            // マウスホイール動作時のイベントを追加
             PreviewMouseWheel += PreviewMouseWheelEventHandler;
         }
-
-
 
 
         #region カラムヘッダクリック時のソート処理関連
@@ -52,7 +53,7 @@ namespace CustomControlLibrary.DataGridInline
         /// <param name="e"></param>
         private void ColumnHeader_Click(object sender, RoutedEventArgs e)
         {
-            if (!(e.OriginalSource is System.Windows.Controls.GridViewColumnHeader headerClicked))
+            if (!(e.OriginalSource is GridViewColumnHeader headerClicked))
             {
                 return;
             }
@@ -61,7 +62,6 @@ namespace CustomControlLibrary.DataGridInline
             {
                 return;
             }
-
 
             if (string.IsNullOrEmpty(column.SortTargetPropertyName))
             {
@@ -125,12 +125,12 @@ namespace CustomControlLibrary.DataGridInline
             {
                 e.Handled = true;
 
-                var e2 = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta);
-                e2.RoutedEvent = MouseWheelEvent;
+                var e2 = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta) { RoutedEvent = MouseWheelEvent };
 
                 RaiseEvent(e2);
             }
         }
+
 
         /// <summary>
         /// VisualTreeより指定した型の子要素を取得する

@@ -19,6 +19,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
         private static WorkForceNeedWareCalclator? _SingletonInstance;
         #endregion
 
+
         #region メンバ
         /// <summary>
         /// 労働者が必要とするウェア一覧

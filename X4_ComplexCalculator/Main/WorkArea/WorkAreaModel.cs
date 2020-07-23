@@ -190,6 +190,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
             HasChanged = true;
         }
 
+
         /// <summary>
         /// コレクションのプロパティに変更があった場合
         /// </summary>

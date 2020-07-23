@@ -20,15 +20,18 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         private readonly Stopwatch _GCStopWatch = new Stopwatch();
 
+
         /// <summary>
         /// ガーベジコレクション用タイマー
         /// </summary>
         private readonly DispatcherTimer _GCTimer;
 
+
         /// <summary>
         /// レイアウト管理用クラス
         /// </summary>
         private readonly LayoutsManager _LayoutsManager;
+
 
         /// <summary>
         /// ワークエリア一覧
@@ -72,19 +75,13 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// 初期化
         /// </summary>
-        public void Init()
-        {
-            _LayoutsManager.Init();
-        }
+        public void Init() => _LayoutsManager.Init();
 
 
         /// <summary>
         /// レイアウト保存
         /// </summary>
-        public void SaveLayout()
-        {
-            _LayoutsManager.SaveLayout(ActiveContent);
-        }
+        public void SaveLayout() => _LayoutsManager.SaveLayout(ActiveContent);
 
 
         /// <summary>

@@ -5,14 +5,29 @@
     /// </summary>
     public class Common
     {
+        #region プロパティ
+        /// <summary>
+        /// 項目名
+        /// </summary>
         public string Item { get; }
 
-        public int Value { get; }
 
+        /// <summary>
+        /// 値
+        /// </summary>
+        public int Value { get; }
+        #endregion
+
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="item">項目名</param>
+        /// <param name="value">値</param>
         public Common(string item, int value)
         {
-            this.Item = item;
-            this.Value = value;
+            Item = item;
+            Value = value;
         }
     }
 }

@@ -215,6 +215,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// </summary>
         public void Dispose()
         {
+            Model.PropertyChanged     -= Model_PropertyChanged;
             Presets.CollectionChanged -= TurretsViewModel.OnPresetsCollectionChanged;
             Presets.CollectionChanged -= ShieldsViewModel.OnPresetsCollectionChanged;
 
@@ -296,10 +297,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// 閉じるボタンクリック時
         /// </summary>
-        private void CloseWindow()
-        {
-            CloseWindowProperty = true;
-        }
+        private void CloseWindow() => CloseWindowProperty = true;
 
 
         /// <summary>

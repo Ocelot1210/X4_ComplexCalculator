@@ -28,6 +28,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         #endregion
 
 
+        #region プロパティ
         /// <summary>
         /// 装備名
         /// </summary>
@@ -100,7 +101,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// シールドのツールチップ文字列
         /// </summary>
         public string ShieldsToolTip => MakeEquipmentToolTipString(Equipment.Shield);
-
+        #endregion
 
 
         /// <summary>

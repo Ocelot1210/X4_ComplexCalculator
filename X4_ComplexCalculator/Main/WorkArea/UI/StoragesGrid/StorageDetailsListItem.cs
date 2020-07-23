@@ -17,6 +17,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         private long _ModuleCount;
         #endregion
 
+
         #region プロパティ
         /// <summary>
         /// モジュールID
@@ -49,7 +50,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         /// <summary>
         /// 保管庫容量
         /// </summary>
-        public long Capacity { get; private set; }
+        public long Capacity { get; }
 
 
         /// <summary>
@@ -57,6 +58,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         /// </summary>
         public long TotalCapacity => Capacity * ModuleCount;
         #endregion
+
 
         /// <summary>
         /// コンストラクタ
@@ -82,22 +84,14 @@ WHERE
 	Module.ModuleID = '{moduleID}'";
 
             string? moduleName = null;
+            long capacity = 0;
             DBConnection.X4DB.ExecQuery(query, (dr, args) =>
             {
                 moduleName = (string)dr["Name"];
-                Capacity   = (long)dr["Amount"];
+                capacity   = (long)dr["Amount"];
             });
             ModuleName = moduleName ?? throw new ArgumentException("Invalid moduleID.", nameof(moduleID));
-        }
-
-
-        /// <summary>
-        /// モジュールが増えたことにする
-        /// </summary>
-        /// <param name="count">増分量</param>
-        public void Incriment(long count)
-        {
-            ModuleCount += count;
+            Capacity = capacity;
         }
     }
 }

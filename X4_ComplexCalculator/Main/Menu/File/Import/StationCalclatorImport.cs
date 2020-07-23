@@ -17,8 +17,15 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
     /// </summary>
     class StationCalclatorImport : BindableBase, IImport
     {
-        private string _Url = "";
+        #region メンバ
+        /// <summary>
+        /// 入力されたURL
+        /// </summary>
+        private string _InputUrl = "";
+        #endregion
 
+
+        #region プロパティ
         /// <summary>
         /// メニュー表示用タイトル
         /// </summary>
@@ -35,6 +42,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
         /// インポート数
         /// </summary>
         public int Count { get; private set; } = 0;
+        #endregion
 
 
         /// <summary>
@@ -56,7 +64,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
             var ret = 0;
             var onOK = false;
 
-            (onOK, _Url) = SelectStringDialog.ShowDialog("Lang:StationCalclatorImportTitle", "Lang:StationCalclatorImportDescription");
+            (onOK, _InputUrl) = SelectStringDialog.ShowDialog("Lang:StationCalclatorImportTitle", "Lang:StationCalclatorImportDescription");
             if (onOK)
             {
                 ret = 1;
@@ -77,7 +85,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
 
             try
             {
-                var query = _Url.Split('?').Last();
+                var query = _InputUrl.Split('?').Last();
 
                 var paramDict = new Dictionary<string, string>();
 

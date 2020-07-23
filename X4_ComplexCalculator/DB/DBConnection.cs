@@ -25,8 +25,10 @@ namespace X4_ComplexCalculator.DB
         /// トランザクション用コマンド
         /// </summary>
         private SQLiteCommand? _TransCommand;
+        #endregion
 
 
+        #region スタティックメンバ
         /// <summary>
         /// X4DB用
         /// </summary>
@@ -60,6 +62,8 @@ namespace X4_ComplexCalculator.DB
         }
         #endregion
 
+
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -79,6 +83,7 @@ namespace X4_ComplexCalculator.DB
         public void Dispose()
         {
             conn.Dispose();
+            _TransCommand?.Dispose();
         }
 
         /// <summary>
@@ -268,6 +273,7 @@ namespace X4_ComplexCalculator.DB
             return ret;
         }
 
+
         /// <summary>
         /// DBファイルを開く
         /// </summary>
@@ -283,17 +289,24 @@ namespace X4_ComplexCalculator.DB
 
                 if (File.Exists(x4DBPath))
                 {
+                    // X4DBが存在する場合
+
                     X4DB = new DBConnection(x4DBPath);
-                    if (0 < GetDBVersion())
+                    if (X4_DataExporterWPF.Export.CommonExporter.CURRENT_FORMAT_VERSION == GetDBVersion())
                     {
+                        // 想定するDBのフォーマットと実際のフォーマットが同じ場合
                         InitX4DB();
                     }
                     else
                     {
-                        LocalizedMessageBox.Show("Lang:OldFormatMessage", "Lang:Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        // 想定するDBのフォーマットと実際のフォーマットが異なる場合
+                        // DB更新を要求
 
-                        if (!UpdateDB() || GetDBVersion() < 1)
+                        LocalizedMessageBox.Show("Lang:OldFormatMessage", "Lang:Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        if (!UpdateDB() || GetDBVersion() != X4_DataExporterWPF.Export.CommonExporter.CURRENT_FORMAT_VERSION)
                         {
+                            // DB更新を要求してもフォーマットが変わらない場合
+
                             LocalizedMessageBox.Show("Lang:DBUpdateRequestMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error);
                             Environment.Exit(-1);
                         }
@@ -301,8 +314,10 @@ namespace X4_ComplexCalculator.DB
                 }
                 else
                 {
-                    LocalizedMessageBox.Show("Lang:DBExtractionRequestMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);
+                    // X4DBが存在しない場合
 
+                    // X4DBの作成を要求する
+                    LocalizedMessageBox.Show("Lang:DBExtractionRequestMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);
                     if (!UpdateDB())
                     {
                         LocalizedMessageBox.Show("Lang:DBMakeRequestMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -312,16 +327,20 @@ namespace X4_ComplexCalculator.DB
             }
             catch
             {
+                // X4DBを開く際にエラーがあった場合、DB更新を提案する
                 if (LocalizedMessageBox.Show("Lang:DBOpenFailMessage", "Lang:Error", MessageBoxButton.YesNo, MessageBoxImage.Error) == MessageBoxResult.Yes)
                 {
+                    // 提案が受け入れられた場合、DB更新
                     if (!UpdateDB())
                     {
+                        // DB更新失敗
                         LocalizedMessageBox.Show("Lang:DBUpdateRequestMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         Environment.Exit(-1);
                     }
                 }
                 else
                 {
+                    // 提案が受け入れられなかった場合
                     LocalizedMessageBox.Show("Lang:DBUpdateRequestMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     Environment.Exit(-1);
                 }
@@ -389,6 +408,7 @@ namespace X4_ComplexCalculator.DB
             return false;
         }
 
+
         /// <summary>
         /// X4のインストール先フォルダを取得する
         /// </summary>
@@ -409,6 +429,7 @@ namespace X4_ComplexCalculator.DB
             var ret = "";
 
             // 子のレジストリの名前の数だけ処理をする
+            // Steam以外(GOG等)からインストールされる事を考慮してレジストリのキーを決め打ちにしないで全部探す
             foreach (var subKeyName in parent.GetSubKeyNames())
             {
                 // 子のレジストリの情報を取得する

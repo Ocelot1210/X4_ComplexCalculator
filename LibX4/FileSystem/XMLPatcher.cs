@@ -8,16 +8,15 @@ using System.Xml.XPath;
 namespace X4_DataExporterWPF.Common
 {
     /// <summary>
-    /// XML差分用クラス
+    /// XML差分パッチ用クラス
     /// </summary>
     /// <remarks>
-    /// 詳細はRFC5261を参照
+    /// 詳細な仕様は RFC5261 を参照。
+    /// なお、現時点では名前空間のマングリングを伴うパッチ(RFC5261 の A.18)以外は
+    /// 期待する内容と同じ意味になるxmlが作成される。
     /// </remarks>
     public class XMLPatcher
     {
-        private const string BEFORE = "before";
-        private const string AFTER = "after";
-
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -96,9 +95,6 @@ namespace X4_DataExporterWPF.Common
         }
 
 
-
-
-
         /// <summary>
         /// 要素を追加
         /// </summary>
@@ -117,11 +113,11 @@ namespace X4_DataExporterWPF.Common
             {
                 switch (element.Attribute("pos")?.Value ?? "prepend")
                 {
-                    case AFTER:
+                    case "after":
                         (target as XNode)?.AddAfterSelf(element.Nodes());
                         break;
 
-                    case BEFORE:
+                    case "before":
                         (target as XNode)?.AddBeforeSelf(element.Nodes());
                         break;
 

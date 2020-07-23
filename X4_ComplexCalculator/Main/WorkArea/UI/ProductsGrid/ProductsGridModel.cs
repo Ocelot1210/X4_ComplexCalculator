@@ -57,12 +57,14 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         private readonly Dictionary<string, TradeOption> _TradeOptionDict = new Dictionary<string, TradeOption>();
         #endregion
 
+
         #region プロパティ
         /// <summary>
         /// 製品一覧
         /// </summary>
-        public ObservablePropertyChangedCollection<ProductsGridItem> Products { get; private set; }
+        public ObservablePropertyChangedCollection<ProductsGridItem> Products { get; }
         #endregion
+
 
         /// <summary>
         /// コンストラクタ
@@ -93,6 +95,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         {
             switch (e.PropertyName)
             {
+                // 現在労働者数と必要労働者数の割合
                 case nameof(WorkforceManager.Proportion):
                     UpdateWorkerEfficiency();
                     break;
@@ -223,31 +226,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             await Task.CompletedTask;
         }
 
-
-        /// <summary>
-        /// 労働者による生産性を計算
-        /// </summary>
-        /// <returns>生産性</returns>
-        private double CalcWorkerEfficiency()
-        {
-            var ret = 0.0;
-
-            var maxWorkers = _Modules.Sum(x => x.Module.MaxWorkers * x.ModuleCount);
-            var workersCapacity = _Modules.Sum(x => x.Module.WorkersCapacity * x.ModuleCount);
-
-            if (_Settings.IsHeadquarters)
-            {
-                maxWorkers += StationSettingsModel.HQ_WORKERS;
-            }
-
-            // 生産性を0.0以上、1.0以下にする
-            if (0 < workersCapacity)
-            {
-                ret = (maxWorkers < workersCapacity) ? 1.0 : (double)workersCapacity / maxWorkers;
-            }
-
-            return ret;
-        }
 
         /// <summary>
         /// 製品更新
@@ -487,6 +465,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 }
             }
         }
+
 
         /// <summary>
         /// 居住モジュールを集計

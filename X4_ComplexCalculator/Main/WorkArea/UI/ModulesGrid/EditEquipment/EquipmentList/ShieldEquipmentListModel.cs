@@ -9,6 +9,9 @@ using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList
 {
+    /// <summary>
+    /// シールド一覧用Model
+    /// </summary>
     class ShieldEquipmentListModel : EquipmentListModelBase
     {
         #region メンバ

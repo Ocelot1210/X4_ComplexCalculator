@@ -9,6 +9,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
 {
     class SelectLoadoutViewModel : BindableBase
     {
+        #region メンバ
         /// <summary>
         /// Model
         /// </summary>
@@ -25,8 +26,10 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// ダイアログを閉じるか
         /// </summary>
         private bool _CloseDialogProperty;
-        #region プロパティ
+        #endregion
 
+
+        #region プロパティ
         /// <summary>
         /// ダイアログの戻り値
         /// </summary>
@@ -36,6 +39,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
             set => SetProperty(ref _DialogResult, value);
         }
 
+
         /// <summary>
         /// ダイアログを閉じるか
         /// </summary>
@@ -44,6 +48,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
             get => _CloseDialogProperty;
             set => SetProperty(ref _CloseDialogProperty, value);
         }
+
 
         /// <summary>
         /// チェック/全チェック変更時

@@ -27,7 +27,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// 売買オプション
         /// </summary>
-        TradeOption _TradeOption;
+        readonly TradeOption _TradeOption;
         #endregion
 
 

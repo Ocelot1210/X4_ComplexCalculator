@@ -5,20 +5,45 @@
     /// </summary>
     public class WorkUnitResource
     {
+        #region プロパティ
+        /// <summary>
+        /// 労働種別ID
+        /// </summary>
         public string WorkUnitID { get; }
 
+
+        /// <summary>
+        /// 労働方式
+        /// </summary>
         public string Method { get; }
 
+
+        /// <summary>
+        /// 労働に必要なウェアID
+        /// </summary>
         public string WareID { get; }
 
-        public int Amount { get; }
 
+        /// <summary>
+        /// 労働に必要なウェア数量
+        /// </summary>
+        public int Amount { get; }
+        #endregion
+
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="workUnitID"></param>
+        /// <param name="method"></param>
+        /// <param name="wareID"></param>
+        /// <param name="amount"></param>
         public WorkUnitResource(string workUnitID, string method, string wareID, int amount)
         {
-            this.WorkUnitID = workUnitID;
-            this.Method = method;
-            this.WareID = wareID;
-            this.Amount = amount;
+            WorkUnitID = workUnitID;
+            Method = method;
+            WareID = wareID;
+            Amount = amount;
         }
     }
 }

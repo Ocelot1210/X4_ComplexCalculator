@@ -14,8 +14,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         /// <summary>
         /// 保管庫割当用Model
         /// </summary>
-        readonly StorageAssignModel _Model;
+        private readonly StorageAssignModel _Model;
         #endregion
+
 
         #region プロパティ
         /// <summary>
@@ -56,9 +57,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         /// <summary>
         /// リソースを開放
         /// </summary>
-        public void Dispose()
-        {
-            _Model.Dispose();
-        }
+        public void Dispose() => _Model.Dispose();
     }
 }

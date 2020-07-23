@@ -18,6 +18,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         private bool _IsExpanded;
         #endregion
 
+
         #region プロパティ
         /// <summary>
         /// ウェア種別

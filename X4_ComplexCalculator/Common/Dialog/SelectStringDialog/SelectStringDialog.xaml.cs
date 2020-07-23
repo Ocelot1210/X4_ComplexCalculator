@@ -57,9 +57,7 @@ namespace X4_ComplexCalculator.Common.Dialog.SelectStringDialog
             return (onOk, wnd.SelectTextBox.Text);
         }
 
-        private void Window_ContentRendered(object sender, EventArgs e)
-        {
-            SelectTextBox.SelectAll();
-        }
+
+        private void Window_ContentRendered(object sender, EventArgs e) => SelectTextBox.SelectAll();
     }
 }

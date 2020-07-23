@@ -2,6 +2,9 @@
 
 namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
 {
+    /// <summary>
+    /// 保存ファイル読み込みクラスのインスタンス作成用クラス
+    /// </summary>
     static class SaveDataReaderFactory
     {
         /// <summary>

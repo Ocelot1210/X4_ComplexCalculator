@@ -160,7 +160,6 @@ namespace X4_ComplexCalculator.Main.WorkArea
         #endregion
 
 
-
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -224,48 +223,33 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// インポート実行
         /// </summary>
         /// <param name="import"></param>
-        public bool Import(IImport import)
-        {
-            return import.Import(_Model);
-        }
+        public bool Import(IImport import) => import.Import(_Model);
 
 
         /// <summary>
         /// エクスポート実行
         /// </summary>
         /// <param name="import"></param>
-        public bool Export(IExport export)
-        {
-            return export.Export(_Model);
-        }
+        public bool Export(IExport export) => export.Export(_Model);
 
 
         /// <summary>
         /// 上書き保存
         /// </summary>
-        public void Save()
-        {
-            _Model.Save();
-        }
+        public void Save() => _Model.Save();
 
 
         /// <summary>
         /// 名前を付けて保存
         /// </summary>
-        public void SaveAs()
-        {
-            _Model.SaveAs();
-        }
+        public void SaveAs() => _Model.SaveAs();
 
 
         /// <summary>
         /// ファイル読み込み
         /// </summary>
         /// <param name="path">ファイルパス</param>
-        public bool LoadFile(string path, IProgress<int> progress)
-        {
-            return _Model.Load(path, progress);
-        }
+        public bool LoadFile(string path, IProgress<int> progress) => _Model.Load(path, progress);
 
 
         /// <summary>
@@ -277,6 +261,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         {
             var id = 0L;
 
+            // 空いているレイアウトIDを取得する
             var query = @$"
 SELECT
     ifnull(MIN( LayoutID + 1 ), 0) AS LayoutID
@@ -289,6 +274,7 @@ WHERE
             {
                 id = (long)dr["LayoutID"];
             });
+
 
             var param = new SQLiteCommandParameters(3);
             param.Add("layoutID",   System.Data.DbType.Int32,  id);
@@ -399,16 +385,16 @@ WHERE
         /// <summary>
         /// アンロード時
         /// </summary>
-        private void OnUnloaded()
-        {
-            _Layout = GetCurrentLayout();
-        }
+        private void OnUnloaded() => _Layout = GetCurrentLayout();
 
 
         /// <summary>
         /// タイトルを再設定する
         /// </summary>
         /// <param name="stream"></param>
+        /// <remarks>
+        /// ここでタイトルを再設定しないと言語を切り替えてもそれぞれのタブのタイトルが変更されない
+        /// </remarks>
         private byte[] SetTitle(Stream stream)
         {
             var xml = XDocument.Load(stream);
@@ -464,6 +450,7 @@ WHERE
                     break;
             }
         }
+
 
         /// <summary>
         /// リソースを開放

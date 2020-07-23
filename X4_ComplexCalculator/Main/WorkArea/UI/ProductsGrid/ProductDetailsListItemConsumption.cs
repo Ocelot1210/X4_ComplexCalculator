@@ -63,7 +63,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         #endregion
 
 
-
         /// <summary>
         /// コンストラクタ
         /// </summary>

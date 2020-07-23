@@ -61,7 +61,6 @@ namespace X4_ComplexCalculator.Main
         #endregion
 
 
-
         /// <summary>
         /// コンストラクタ
         /// </summary>

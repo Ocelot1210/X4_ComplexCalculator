@@ -5,14 +5,29 @@
     /// </summary>
     public class Size
     {
+        #region プロパティ
+        /// <summary>
+        /// サイズID
+        /// </summary>
         public string SizeID { get; }
 
-        public string Name { get; }
 
+        /// <summary>
+        /// サイズ名
+        /// </summary>
+        public string Name { get; }
+        #endregion
+
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="sizeID">サイズID</param>
+        /// <param name="name">サイズ名</param>
         public Size(string sizeID, string name)
         {
-            this.SizeID = sizeID;
-            this.Name = name;
+            SizeID = sizeID;
+            Name = name;
         }
     }
 }

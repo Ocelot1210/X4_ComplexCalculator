@@ -55,6 +55,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             _Modules.CollectionPropertyChangedAsync += OnModulesPropertyChanged;
         }
 
+
         /// <summary>
         /// リソースを開放
         /// </summary>
@@ -64,6 +65,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             _Modules.CollectionChangedAsync -= OnModulesCollectionChanged;
             _Modules.CollectionPropertyChangedAsync -= OnModulesPropertyChanged;
         }
+
 
         /// <summary>
         /// モジュールのプロパティ変更時
@@ -184,6 +186,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             }
         }
 
+
         /// <summary>
         /// モジュールの建造方式変更時に必要なリソースを更新
         /// </summary>
@@ -218,7 +221,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             Resources.AddRange(addTarget);
             Resources.RemoveAll(x => x.Amount == 0);
         }
-
 
 
         /// <summary>

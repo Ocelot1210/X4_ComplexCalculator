@@ -9,6 +9,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
 {
     class SelectStationViewModel : BindableBase
     {
+        #region メンバ
         /// <summary>
         /// Model
         /// </summary>
@@ -31,6 +32,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
         /// 選択された計画一覧
         /// </summary>
         private readonly List<SaveDataStationItem> _SelectedStationItems;
+        #endregion
 
 
         #region プロパティ

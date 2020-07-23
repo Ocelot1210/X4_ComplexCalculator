@@ -5,6 +5,9 @@ using System.Text.RegularExpressions;
 
 namespace LibX4.FileSystem
 {
+    /// <summary>
+    /// catファイル読み込み用クラス
+    /// </summary>
     class CatFileLoader
     {
         /// <summary>
@@ -12,16 +15,18 @@ namespace LibX4.FileSystem
         /// </summary>
         private readonly Stack<(string catFilePath, string datFilePath)> _NotLoadedPaths;
 
+
         /// <summary>
         /// ロード済みのファイルメタデータ
         /// </summary>
         private readonly Dictionary<string, CatEntry> _LoadedCatEntries
             = new Dictionary<string, CatEntry>();
 
+
         /// <summary>
         /// catファイルのレコード分割用正規表現
         /// </summary>
-        private static readonly Regex _CatFileParser
+        private static readonly Regex _CatFileRecordParser
             = new Regex("^(.+) ([0-9]+) ([0-9]+) ([0-9a-fA-F]+)$", RegexOptions.Compiled);
 
 
@@ -95,6 +100,7 @@ namespace LibX4.FileSystem
             return null;
         }
 
+
         /// <summary>
         /// 次のCatファイルを読み込み、_LoadedCatEntriesに追加する
         /// </summary>
@@ -106,7 +112,7 @@ namespace LibX4.FileSystem
 
             foreach (var line in File.ReadAllLines(catFilePath))
             {
-                var matchs = _CatFileParser.Matches(line.ToLower()).FirstOrDefault()?.Groups;
+                var matchs = _CatFileRecordParser.Matches(line.ToLower()).FirstOrDefault()?.Groups;
                 if (matchs?.Count != 5)
                 {
                     throw new IOException($"{catFilePath} is invalid format.");

@@ -5,17 +5,37 @@
     /// </summary>
     public class ModuleTurret
     {
+        #region プロパティ
+        /// <summary>
+        /// モジュールID
+        /// </summary>
         public string ModuleID { get; }
 
+
+        /// <summary>
+        /// サイズID
+        /// </summary>
         public string SizeID { get; }
 
-        public int Amount { get; }
 
+        /// <summary>
+        /// 装備可能個数
+        /// </summary>
+        public int Amount { get; }
+        #endregion
+
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="moduleID">モジュールID</param>
+        /// <param name="sizeID">サイズID</param>
+        /// <param name="amount">装備可能個数</param>
         public ModuleTurret(string moduleID, string sizeID, int amount)
         {
-            this.ModuleID = moduleID;
-            this.SizeID = sizeID;
-            this.Amount = amount;
+            ModuleID = moduleID;
+            SizeID = sizeID;
+            Amount = amount;
         }
     }
 }

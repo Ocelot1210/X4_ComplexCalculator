@@ -43,6 +43,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         /// </summary>
         public ICollectionView BuildResourceView { get; }
 
+
         /// <summary>
         /// 単価(百分率)
         /// </summary>
@@ -94,6 +95,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             BuildResourceView = new CollectionViewSource { Source = _Model.Resources }.View;
             BuildResourceView.SortDescriptions.Add(new SortDescription("Ware.Name", ListSortDirection.Ascending));
         }
+
 
         /// <summary>
         /// リソースを開放

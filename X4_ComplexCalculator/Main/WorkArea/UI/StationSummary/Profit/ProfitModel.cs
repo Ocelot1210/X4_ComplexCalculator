@@ -63,6 +63,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit
             _Products.CollectionPropertyChanged -= OnProductsPropertyChanged;
         }
 
+
         /// <summary>
         /// 製品が追加/削除された場合
         /// </summary>

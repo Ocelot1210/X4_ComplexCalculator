@@ -184,10 +184,10 @@
             Grid.ColumnSpan="3"
             Margin="5,5,5,5">
             <TabItem Header="{lex:Loc Lang:Turrets}">
-                <eqlst:EquipmentList x:Name="TurretsList" />
+                <eqlst:EquipmentList x:Name="TurretsList" DataContext="{Binding TurretsViewModel, Mode=OneTime}" />
             </TabItem>
             <TabItem Header="{lex:Loc Lang:Shields}">
-                <eqlst:EquipmentList x:Name="ShieldsList" />
+                <eqlst:EquipmentList x:Name="ShieldsList" DataContext="{Binding ShieldsViewModel, Mode=OneTime}" />
             </TabItem>
         </TabControl>
 

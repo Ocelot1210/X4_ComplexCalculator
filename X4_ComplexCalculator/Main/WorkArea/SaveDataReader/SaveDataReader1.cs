@@ -5,7 +5,7 @@ using X4_ComplexCalculator.DB;
 namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
 {
     /// <summary>
-    /// Ver1用セーブファイル読み込み用クラス
+    /// 保存ファイル読み込みクラス(フォーマット1用)
     /// </summary>
     class SaveDataReader1 : SaveDataReader0
     {

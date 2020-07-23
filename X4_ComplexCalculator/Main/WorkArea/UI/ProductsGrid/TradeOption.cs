@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
+﻿namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 {
     /// <summary>
     /// 売買オプション
@@ -13,6 +9,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// 購入しない
         /// </summary>
         public bool NoBuy;
+
 
         /// <summary>
         /// 販売しない

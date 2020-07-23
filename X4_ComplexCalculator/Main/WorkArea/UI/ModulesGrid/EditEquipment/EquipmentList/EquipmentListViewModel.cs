@@ -175,10 +175,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// リソースを開放
         /// </summary>
-        public void Dispose()
-        {
-            _Model.Dispose();
-        }
+        public void Dispose() => _Model.Dispose();
 
 
         /// <summary>
@@ -253,9 +250,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// プリセット保存
         /// </summary>
-        public void SavePreset()
-        {
-            _Model.SavePreset();
-        }
+        public void SavePreset() => _Model.SavePreset();
     }
 }

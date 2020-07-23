@@ -16,10 +16,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         {
             InitializeComponent();
 
-            var vm = new EditEquipmentViewModel(module);
-            DataContext = vm;
-            TurretsList.DataContext = vm.TurretsViewModel;
-            ShieldsList.DataContext = vm.ShieldsViewModel;
+            DataContext = new EditEquipmentViewModel(module);
         }
     }
 }

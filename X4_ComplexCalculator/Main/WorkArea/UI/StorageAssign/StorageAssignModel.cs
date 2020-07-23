@@ -16,7 +16,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
     class StorageAssignModel : IDisposable
     {
         #region メンバ
+        /// <summary>
+        /// 保管庫状態計算用の指定時間
+        /// </summary>
         private long _Hour = 1;
+
 
         /// <summary>
         /// 製品一覧
@@ -42,9 +46,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         private readonly Dictionary<string, long> _AllocBakDict = new Dictionary<string, long>();
         #endregion
 
+
         #region プロパティ
         /// <summary>
-        /// 保管庫割当情報
+        /// 保管庫状態計算用の指定時間
         /// </summary>
         public ObservablePropertyChangedCollection<StorageAssignGridItem> StorageAssignGridItems { get; } = new ObservablePropertyChangedCollection<StorageAssignGridItem>();
 
@@ -95,6 +100,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
                 _CapacityDict[storage.TransportType.TransportTypeID].TotalCapacity = storage.Capacity;
             }
         }
+
 
         /// <summary>
         /// 保管庫のプロパティ変更時

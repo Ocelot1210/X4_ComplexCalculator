@@ -37,6 +37,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
             }
         }
 
+
         /// <summary>
         /// 保管庫使用容量
         /// </summary>

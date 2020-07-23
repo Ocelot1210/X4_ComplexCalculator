@@ -71,7 +71,6 @@ namespace X4_ComplexCalculator.Main
         }
 
 
-
         /// <summary>
         /// DB更新
         /// </summary>
