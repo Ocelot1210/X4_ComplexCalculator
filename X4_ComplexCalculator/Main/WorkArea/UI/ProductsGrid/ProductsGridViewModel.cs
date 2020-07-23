@@ -143,10 +143,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             ProductsView.SortDescriptions.Add(new SortDescription("Ware.WareGroup.Tier", ListSortDirection.Ascending));
             ProductsView.SortDescriptions.Add(new SortDescription("Ware.Name", ListSortDirection.Ascending));
 
-            SetSelectedExpandedCommand = new DelegateCommand<string>(SetSelectedExpanded);
+            SetSelectedExpandedCommand = new DelegateCommand<bool?>(SetSelectedExpanded);
             AutoAddModuleCommand = new DelegateCommand(_Model.AutoAddModule);
-            SetNoBuyToSelectedItemCommand = new DelegateCommand<string>(SetNoBuyToSelectedItem);
-            SetNoSellToSelectedItemCommand = new DelegateCommand<string>(SetNoSellToSelectedItem);
+            SetNoBuyToSelectedItemCommand = new DelegateCommand<bool?>(SetNoBuyToSelectedItem);
+            SetNoSellToSelectedItemCommand = new DelegateCommand<bool?>(SetNoSellToSelectedItem);
         }
 
 
@@ -159,13 +159,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// 選択されたアイテムの展開/折りたたみ状態を設定
         /// </summary>
-        /// <param name="param">"True"か"False"</param>
-        private void SetSelectedExpanded(string param)
+        /// <param name="param">展開するか</param>
+        private void SetSelectedExpanded(bool? param)
         {
-            bool value = bool.Parse(param);
             foreach (var item in _Model.Products.Where(x => x.IsSelected))
             {
-                item.IsExpanded = value;
+                item.IsExpanded = param == true;
             }
         }
 
@@ -173,13 +172,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// 選択されたアイテムの不足ウェア購入オプションを設定
         /// </summary>
-        /// <param name="param">"True"か"False"</param>
-        private void SetNoBuyToSelectedItem(string param)
+        /// <param name="param">購入しないか</param>
+        private void SetNoBuyToSelectedItem(bool? param)
         {
-            bool value = bool.Parse(param);
             foreach (var item in _Model.Products.Where(x => x.IsSelected))
             {
-                item.NoBuy = value;
+                item.NoBuy = param == true;
             }
         }
 
@@ -187,13 +185,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// 選択されたアイテムの余剰ウェア販売オプションを設定
         /// </summary>
-        /// <param name="param">"True"か"False"</param>
-        private void SetNoSellToSelectedItem(string param)
+        /// <param name="param">販売しないか</param>
+        private void SetNoSellToSelectedItem(bool? param)
         {
-            bool value = bool.Parse(param);
             foreach (var item in _Model.Products.Where(x => x.IsSelected))
             {
-                item.NoSell = value;
+                item.NoSell = param == true;
             }
         }
     }

@@ -104,6 +104,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
 
 
         /// <summary>
+        /// 選択されているか
+        /// </summary>
+        public bool IsSelected { get; set; }
+
+
+        /// <summary>
         /// 建造ウェアを購入しない
         /// </summary>
         public bool NoBuy

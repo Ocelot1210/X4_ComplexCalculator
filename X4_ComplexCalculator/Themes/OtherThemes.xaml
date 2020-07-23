@@ -17,4 +17,7 @@
         </Style.Triggers>
     </Style>
 
+    <sys:Boolean x:Key="True">True</sys:Boolean>
+    <sys:Boolean x:Key="False">False</sys:Boolean>
+
 </ResourceDictionary>

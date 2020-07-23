@@ -7,6 +7,7 @@
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
     d:DesignHeight="450"
     d:DesignWidth="800"
     lex:LocalizeDictionary.DefaultProvider="{StaticResource CSVLocalizationProvider}"
@@ -66,9 +67,27 @@
             </ListView.View>
         </DataGridInline:InlineListView>
 
+
+        <!--  DataGridのコンテキストメニュー  -->
+        <ContextMenu x:Key="StoragesContextMenu">
+            <!--  展開  -->
+            <MenuItem
+                Command="{Binding SetSelectedExpandedCommand, Mode=OneTime}"
+                CommandParameter="{StaticResource True}"
+                Header="{lex:Loc Lang:Expansion}" />
+
+            <!--  折りたたみ  -->
+            <MenuItem
+                Command="{Binding SetSelectedExpandedCommand, Mode=OneTime}"
+                CommandParameter="{StaticResource False}"
+                Header="{lex:Loc Lang:Collapse}" />
+        </ContextMenu>
+
     </UserControl.Resources>
 
     <DataGrid
+        x4bhv:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
+        ContextMenu="{StaticResource StoragesContextMenu}"
         IsReadOnly="True"
         ItemsSource="{Binding Path=Storages, UpdateSourceTrigger=PropertyChanged, IsAsync=True}"
         Style="{StaticResource DetailsDataGridStyle}">

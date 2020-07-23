@@ -155,6 +155,8 @@ ProductName;Product name
 AmountPerHour;Amount/h
 NoBuy;No buy
 NoSell;No sell
+Buy;Buy
+Sell;Sell
 
 
 # ------------------------------------------------------

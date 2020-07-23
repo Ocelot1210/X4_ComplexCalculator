@@ -57,35 +57,40 @@
 
             <!--  展開  -->
             <MenuItem
-                Command="{Binding SelectedExpandCommand, Mode=OneTime}"
-                CommandParameter="True"
+                Command="{Binding SetSelectedExpandedCommand, Mode=OneTime}"
+                CommandParameter="{StaticResource True}"
                 Header="{lex:Loc Lang:Expansion}" />
 
             <!--  折りたたみ  -->
             <MenuItem
-                Command="{Binding SelectedCollapseCommand, Mode=OneTime}"
-                CommandParameter="False"
+                Command="{Binding SetSelectedExpandedCommand, Mode=OneTime}"
+                CommandParameter="{StaticResource False}"
                 Header="{lex:Loc Lang:Collapse}" />
 
             <Separator />
+            <!--  購入する  -->
             <MenuItem
                 Command="{Binding SetNoBuyToSelectedItemCommand, Mode=OneTime}"
-                CommandParameter="False"
-                Header="購入する" />
+                CommandParameter="{StaticResource False}"
+                Header="{lex:Loc Lang:Buy}" />
+            <!--  購入しない  -->
             <MenuItem
                 Command="{Binding SetNoBuyToSelectedItemCommand, Mode=OneTime}"
-                CommandParameter="True"
-                Header="購入しない" />
+                CommandParameter="{StaticResource True}"
+                Header="{lex:Loc Lang:NoBuy}" />
             <Separator />
 
+            <!--  販売する  -->
             <MenuItem
                 Command="{Binding SetNoSellToSelectedItemCommand, Mode=OneTime}"
-                CommandParameter="False"
-                Header="販売する" />
+                CommandParameter="{StaticResource False}"
+                Header="{lex:Loc Lang:Buy}" />
+
+            <!--  販売しない  -->
             <MenuItem
                 Command="{Binding SetNoSellToSelectedItemCommand, Mode=OneTime}"
-                CommandParameter="True"
-                Header="販売しない" />
+                CommandParameter="{StaticResource True}"
+                Header="{lex:Loc Lang:NoSell}" />
         </ContextMenu>
 
         <!--  子要素のListView  -->

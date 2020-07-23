@@ -25,15 +25,23 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         /// </summary>
         public TransportType TransportType { get; private set; }
 
+
         /// <summary>
         /// 容量
         /// </summary>
         public long Capacity => Details.Sum(x => x.TotalCapacity);
 
+
         /// <summary>
         /// 詳細情報(関連モジュール等)
         /// </summary>
         public ObservableRangeCollection<StorageDetailsListItem> Details { get; }
+
+
+        /// <summary>
+        /// 選択されているか
+        /// </summary>
+        public bool IsSelected { get; set; }
 
 
         /// <summary>
