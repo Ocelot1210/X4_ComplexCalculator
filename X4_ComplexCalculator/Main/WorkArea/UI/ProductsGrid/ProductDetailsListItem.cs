@@ -113,6 +113,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
             _Efficiencies = _MaxEfficiencies.ToDictionary(x => x.Key, _ => 1.0);
 
+            if (_Efficiencies.ContainsKey("work"))
+            {
+                _Efficiencies["work"] = settings.Workforce.Proportion;
+            }
+
             if (_Efficiencies.ContainsKey("sunlight"))
             {
                 _Efficiencies["sunlight"] = settings.Sunlight;
