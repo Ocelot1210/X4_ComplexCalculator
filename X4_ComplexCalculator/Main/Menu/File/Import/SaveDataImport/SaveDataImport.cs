@@ -28,6 +28,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
         private int _StationIdx = 0;
         #endregion
 
+
         /// <summary>
         /// メニュー表示用タイトル
         /// </summary>

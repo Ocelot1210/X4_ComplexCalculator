@@ -15,6 +15,9 @@ using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWareInf
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary
 {
+    /// <summary>
+    /// ステーション概要用ViewModel
+    /// </summary>
     class StationSummaryViewModel : BindableBase, IDisposable
     {
         #region メンバ
@@ -23,15 +26,18 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary
         /// </summary>
         private readonly WorkForceModuleInfoModel _WorkForceModuleInfoModel;
 
+
         /// <summary>
         /// 必要ウェア用Model
         /// </summary>
         private readonly NeedWareInfoModel _NeedWareInfoModel;
 
+
         /// <summary>
         /// 利益用Model
         /// </summary>
         private readonly ProfitModel _ProfitModel;
+
 
         /// <summary>
         /// 建造コスト用Model
@@ -46,10 +52,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary
         /// </summary>
         public WorkforceManager Workforce { get; }
 
+
         /// <summary>
         /// 労働力関連モジュール情報
         /// </summary>
         public ObservableCollection<WorkForceModuleInfoDetailsItem> WorkforceModuleDetails => _WorkForceModuleInfoModel.WorkForceDetails;
+
 
         /// <summary>
         /// 必要ウェア情報
@@ -63,6 +71,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary
         /// 1時間あたりの損益
         /// </summary>
         public long Profit => _ProfitModel.Profit;
+
 
         /// <summary>
         /// 損益詳細
@@ -172,8 +181,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary
         /// </summary>
         public void Dispose()
         {
-            _ProfitModel.PropertyChanged              -= ProfitModel_PropertyChanged;
-            _BuildingCostModel.PropertyChanged        -= BuildingCostModel_PropertyChanged;
+            _ProfitModel.PropertyChanged       -= ProfitModel_PropertyChanged;
+            _BuildingCostModel.PropertyChanged -= BuildingCostModel_PropertyChanged;
 
             _WorkForceModuleInfoModel.Dispose();
             _NeedWareInfoModel.Dispose();

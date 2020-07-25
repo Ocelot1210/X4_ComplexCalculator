@@ -22,10 +22,13 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
         string _PlanFilePath = "";
         #endregion
 
+
+        #region プロパティ
         /// <summary>
         /// 計画一覧
         /// </summary>
         public ObservableRangeCollection<StationPlanItem> Planes { get; } = new ObservableRangeCollection<StationPlanItem>();
+
 
         /// <summary>
         /// 計画ファイルパス
@@ -35,6 +38,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
             get => _PlanFilePath;
             set => SetProperty(ref _PlanFilePath, value);
         }
+        #endregion
 
 
         /// <summary>

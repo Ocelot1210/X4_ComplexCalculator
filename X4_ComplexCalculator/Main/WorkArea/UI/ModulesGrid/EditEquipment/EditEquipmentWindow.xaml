@@ -169,11 +169,26 @@
                 Content="{lex:Loc Lang:OwnerFaction}"
                 DockPanel.Dock="Top" />
             <xctk:CheckListBox
-                DisplayMemberPath="Faction.Name"
+                DisplayMemberPath="FactionName"
                 IsSelectAllActive="True"
-                ItemsSource="{Binding Factions}"
+                ItemsSource="{Binding FactionsView}"
                 SelectAllContent="{lex:Loc Lang:SelectAll}"
-                SelectedMemberPath="IsChecked" />
+                SelectedMemberPath="IsChecked">
+                <xctk:CheckListBox.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.HeaderTemplate>
+                            <DataTemplate>
+                                <StackPanel Background="Aqua">
+                                    <TextBlock
+                                        FontWeight="Bold"
+                                        Foreground="Black"
+                                        Text="{Binding Items.CurrentItem.RaceName}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </GroupStyle.HeaderTemplate>
+                    </GroupStyle>
+                </xctk:CheckListBox.GroupStyle>
+            </xctk:CheckListBox>
         </DockPanel>
 
 
@@ -184,10 +199,10 @@
             Grid.ColumnSpan="3"
             Margin="5,5,5,5">
             <TabItem Header="{lex:Loc Lang:Turrets}">
-                <eqlst:EquipmentList x:Name="TurretsList" />
+                <eqlst:EquipmentList x:Name="TurretsList" DataContext="{Binding TurretsViewModel, Mode=OneTime}" />
             </TabItem>
             <TabItem Header="{lex:Loc Lang:Shields}">
-                <eqlst:EquipmentList x:Name="ShieldsList" />
+                <eqlst:EquipmentList x:Name="ShieldsList" DataContext="{Binding ShieldsViewModel, Mode=OneTime}" />
             </TabItem>
         </TabControl>
 

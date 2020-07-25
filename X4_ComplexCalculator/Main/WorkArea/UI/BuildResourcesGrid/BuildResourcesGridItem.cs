@@ -14,6 +14,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         /// </summary>
         private long _UnitPrice;
 
+
         /// <summary>
         /// 建造に必要なウェア数量
         /// </summary>
@@ -31,7 +32,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         /// <summary>
         /// 建造に必要なウェア
         /// </summary>
-        public Ware Ware { get; private set; }
+        public Ware Ware { get; }
 
 
         /// <summary>
@@ -101,8 +102,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             }
         }
 
+
         /// <summary>
-        /// 選択されたか
+        /// 選択されているか
         /// </summary>
         public bool IsSelected { get; set; }
 
@@ -137,7 +139,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             UnitPrice = (Ware.MaxPrice + Ware.MinPrice) / 2;
             Amount = amount;
         }
-
 
 
         /// <summary>

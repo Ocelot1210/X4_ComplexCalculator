@@ -1,5 +1,5 @@
 ﻿<Window
-    x:Class="X4_ComplexCalculator.MainWindow"
+    x:Class="X4_ComplexCalculator.Main.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:avdk="https://github.com/Dirkster99/AvalonDock"
@@ -7,6 +7,7 @@
     xmlns:dd="urn:gong-wpf-dragdrop"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
+    xmlns:local="clr-namespace:X4_ComplexCalculator.Main"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:plnArea="clr-namespace:X4_ComplexCalculator.Main.WorkArea"
     xmlns:x4vcvt="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
@@ -20,6 +21,10 @@
     lex:ResxLocalizationProvider.DefaultDictionary="StringResources"
     Style="{StaticResource DefaultWindowBackgroundStyle}"
     mc:Ignorable="d">
+
+    <Window.DataContext>
+        <local:MainWindowViewModel />
+    </Window.DataContext>
 
     <Window.Resources>
         <x4vcvt:ActiveDocumentConverter x:Key="ActiveDocumentConverter" />

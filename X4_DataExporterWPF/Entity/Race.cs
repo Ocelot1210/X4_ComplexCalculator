@@ -5,17 +5,37 @@
     /// </summary>
     public class Race
     {
+        #region プロパティ
+        /// <summary>
+        /// 種族ID
+        /// </summary>
         public string RaceID { get; }
 
+
+        /// <summary>
+        /// 種族名
+        /// </summary>
         public string Name { get; }
 
-        public string ShortName { get; }
 
+        /// <summary>
+        /// 種族略称
+        /// </summary>
+        public string ShortName { get; }
+        #endregion
+
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="raceID">種族ID</param>
+        /// <param name="name">種族名</param>
+        /// <param name="shortName">種族略称</param>
         public Race(string raceID, string name, string shortName)
         {
-            this.RaceID = raceID;
-            this.Name = name;
-            this.ShortName = shortName;
+            RaceID = raceID;
+            Name = name;
+            ShortName = shortName;
         }
     }
 }

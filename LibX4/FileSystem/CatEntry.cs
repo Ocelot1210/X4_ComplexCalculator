@@ -5,6 +5,7 @@
     /// </summary>
     class CatEntry
     {
+        #region メンバ
         /// <summary>
         /// ファイルの実体があるdatファイルパス
         /// </summary>
@@ -27,7 +28,7 @@
         /// datファイル上のオフセット
         /// </summary>
         public readonly long Offset;
-
+        #endregion
 
 
         /// <summary>

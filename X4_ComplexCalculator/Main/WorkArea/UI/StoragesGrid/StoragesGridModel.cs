@@ -263,7 +263,7 @@ WHERE
             if (itm != null)
             {
                 // 既にモジュールが追加されている場合、モジュール数を増やしてレコードがなるべく少なくなるようにする
-                itm.Incriment(moduleCount);
+                itm.ModuleCount += moduleCount;
             }
             else
             {

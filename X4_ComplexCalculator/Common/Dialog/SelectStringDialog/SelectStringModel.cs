@@ -16,15 +16,18 @@ namespace X4_ComplexCalculator.Common.Dialog.SelectStringDialog
         /// </summary>
         private bool _DialogResult;
 
+
         /// <summary>
         /// ダイアログを閉じるか
         /// </summary>
         private bool _CloseDialogProperty;
 
+
         /// <summary>
         /// 入力文字列
         /// </summary>
         private string _InputString = "";
+
 
         /// <summary>
         /// 入力が有効か判定する関数
@@ -108,9 +111,6 @@ namespace X4_ComplexCalculator.Common.Dialog.SelectStringDialog
         /// <summary>
         /// キャンセルボタンクリック時の処理
         /// </summary>
-        private void OnCancelButtonClicked()
-        {
-            CloseDialogProperty = true;
-        }
+        private void OnCancelButtonClicked() => CloseDialogProperty = true;
     }
 }

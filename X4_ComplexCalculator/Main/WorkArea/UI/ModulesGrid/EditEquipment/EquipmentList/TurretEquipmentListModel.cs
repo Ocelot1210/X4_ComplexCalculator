@@ -9,7 +9,7 @@ using X4_ComplexCalculator.DB.X4DB;
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList
 {
     /// <summary>
-    /// タレットの装備を管理
+    /// タレット一覧用Model
     /// </summary>
     class TurretEquipmentListModel : EquipmentListModelBase
     {
@@ -39,6 +39,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         }
         #endregion
 
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -56,6 +57,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
                 _Equipped[size].AddRange(Module.ModuleEquipment.Turret.GetEquipment(size).Take(_MaxAmount[size]));
             }
         }
+
 
         /// <summary>
         /// プリセット一覧変更時

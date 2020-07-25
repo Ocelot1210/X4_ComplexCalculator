@@ -1,4 +1,7 @@
-﻿using Prism.Commands;
+﻿using AvalonDock;
+using AvalonDock.Layout;
+using AvalonDock.Layout.Serialization;
+using Prism.Commands;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
@@ -13,17 +16,14 @@ using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.Menu.File.Export;
 using X4_ComplexCalculator.Main.Menu.File.Import;
+using X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.Menu.View;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
-using X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary;
 using X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign;
 using X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid;
-using AvalonDock;
-using AvalonDock.Layout;
-using AvalonDock.Layout.Serialization;
 
 namespace X4_ComplexCalculator.Main.WorkArea
 {
@@ -125,26 +125,11 @@ namespace X4_ComplexCalculator.Main.WorkArea
             }
         }
 
-        /// <summary>
-        /// 現在のドッキングマネージャー
-        /// </summary>
-        public DockingManager? CurrentDockingManager
-        {
-            set
-            {
-                if (SetProperty(ref _CurrentDockingManager, value))
-                {
-                    RestoreLayout();
-                }
-            }
-            private get => _CurrentDockingManager;
-        }
-
 
         /// <summary>
         /// アンロード時
         /// </summary>
-        public ICommand OnUnloadedCommand { get; }
+        public ICommand OnLoadedCommand { get; }
 
 
         /// <summary>
@@ -160,7 +145,6 @@ namespace X4_ComplexCalculator.Main.WorkArea
         #endregion
 
 
-
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -168,7 +152,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <remarks>
         /// レイアウトIDが負の場合、レイアウトは指定されていない事にする
         /// </remarks>
-        public WorkAreaViewModel(long layoutID = -1)
+        public WorkAreaViewModel(long layoutID)
         {
             _LayoutID = layoutID;
 
@@ -189,7 +173,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
 
             Modules.AutoAddModuleCommand = Products.AutoAddModuleCommand;
             _Model              = new WorkAreaModel(moduleModel, productsModel, resourcesModel, storageAssignModel, Settings);
-            OnUnloadedCommand   = new DelegateCommand(OnUnloaded);
+            OnLoadedCommand     = new DelegateCommand<DockingManager>(OnLoaded);
 
             _Model.PropertyChanged += Model_PropertyChanged;
             LocalizeDictionary.Instance.PropertyChanged += Instance_PropertyChanged;
@@ -224,48 +208,33 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// インポート実行
         /// </summary>
         /// <param name="import"></param>
-        public bool Import(IImport import)
-        {
-            return import.Import(_Model);
-        }
+        public bool Import(IImport import) => import.Import(_Model);
 
 
         /// <summary>
         /// エクスポート実行
         /// </summary>
         /// <param name="import"></param>
-        public bool Export(IExport export)
-        {
-            return export.Export(_Model);
-        }
+        public bool Export(IExport export) => export.Export(_Model);
 
 
         /// <summary>
         /// 上書き保存
         /// </summary>
-        public void Save()
-        {
-            _Model.Save();
-        }
+        public void Save() => _Model.Save();
 
 
         /// <summary>
         /// 名前を付けて保存
         /// </summary>
-        public void SaveAs()
-        {
-            _Model.SaveAs();
-        }
+        public void SaveAs() => _Model.SaveAs();
 
 
         /// <summary>
         /// ファイル読み込み
         /// </summary>
         /// <param name="path">ファイルパス</param>
-        public bool LoadFile(string path, IProgress<int> progress)
-        {
-            return _Model.Load(path, progress);
-        }
+        public bool LoadFile(string path, IProgress<int> progress) => _Model.Load(path, progress);
 
 
         /// <summary>
@@ -277,6 +246,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         {
             var id = 0L;
 
+            // 空いているレイアウトIDを取得する
             var query = @$"
 SELECT
     ifnull(MIN( LayoutID + 1 ), 0) AS LayoutID
@@ -289,6 +259,7 @@ WHERE
             {
                 id = (long)dr["LayoutID"];
             });
+
 
             var param = new SQLiteCommandParameters(3);
             param.Add("layoutID",   System.Data.DbType.Int32,  id);
@@ -397,11 +368,12 @@ WHERE
 
 
         /// <summary>
-        /// アンロード時
+        /// ロード時
         /// </summary>
-        private void OnUnloaded()
+        private void OnLoaded(DockingManager dockingManager)
         {
-            _Layout = GetCurrentLayout();
+            _CurrentDockingManager = dockingManager;
+            RestoreLayout();
         }
 
 
@@ -409,6 +381,9 @@ WHERE
         /// タイトルを再設定する
         /// </summary>
         /// <param name="stream"></param>
+        /// <remarks>
+        /// ここでタイトルを再設定しないと言語を切り替えてもそれぞれのタブのタイトルが変更されない
+        /// </remarks>
         private byte[] SetTitle(Stream stream)
         {
             var xml = XDocument.Load(stream);
@@ -464,6 +439,7 @@ WHERE
                     break;
             }
         }
+
 
         /// <summary>
         /// リソースを開放

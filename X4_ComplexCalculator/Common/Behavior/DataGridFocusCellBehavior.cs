@@ -23,31 +23,29 @@ namespace X4_ComplexCalculator.Common.Behavior
         private static readonly DependencyProperty HasFocusCommandProperty =
             DependencyProperty.RegisterAttached("HasFocusCommand", typeof(bool), typeof(DataGridFocusCellBehavior), new PropertyMetadata(false));
 
+
         /// <summary>
         /// セルフォーカス用コマンド
         /// </summary>
         public static readonly DependencyProperty FocusCommandProperty =
             DependencyProperty.RegisterAttached("FocusCommand", typeof(ICommand), typeof(DataGridFocusCellBehavior), new PropertyMetadata(null, FocusPropertyChanged, CoerceFocusCommand));
 
+
         /// <summary>
         /// セルフォーカス用コマンド取得
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public static ICommand? GetFocusCommand(DependencyObject obj)
-        {
-            return obj.GetValue(FocusCommandProperty) as ICommand;
-        }
+        public static ICommand? GetFocusCommand(DependencyObject obj) => obj.GetValue(FocusCommandProperty) as ICommand;
+
 
         /// <summary>
         /// セルフォーカス用コマンド設定
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="command"></param>
-        public static void SetFocusCommand(DependencyObject obj, ICommand command)
-        {
-            obj.SetValue(FocusCommandProperty, command);
-        }
+        public static void SetFocusCommand(DependencyObject obj, ICommand command) => obj.SetValue(FocusCommandProperty, command);
+
 
         /// <summary>
         /// セルフォーカス用コマンド変更時

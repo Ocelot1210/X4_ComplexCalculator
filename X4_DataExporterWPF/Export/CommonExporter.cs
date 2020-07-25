@@ -8,6 +8,12 @@ namespace X4_DataExporterWPF.Export
     /// </summary>
     public class CommonExporter : IExporter
     {
+        /// <summary>
+        /// 現在のDBフォーマットバージョン
+        /// </summary>
+        public const int CURRENT_FORMAT_VERSION = 1;
+
+
         public void Export(IDbConnection connection)
         {
             //////////////////
@@ -28,7 +34,7 @@ CREATE TABLE IF NOT EXISTS Common
             // データ抽出 //
             ////////////////
             {
-                connection.Execute("INSERT INTO Common (Item, Value) VALUES ('FormatVersion', 1)");
+                connection.Execute($"INSERT INTO Common (Item, Value) VALUES ('FormatVersion', {CURRENT_FORMAT_VERSION})");
             }
         }
     }

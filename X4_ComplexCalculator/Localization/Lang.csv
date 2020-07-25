@@ -121,6 +121,8 @@ Summary;Summary
 BuildResources;Build resources
 Storages;Storages
 StorageAssign;Storage assign
+Buy;Buy
+Sell;Sell
 
 
 # ------------------------------------------------------

@@ -54,14 +54,43 @@
 
         <!--  DataGridのコンテキストメニュー  -->
         <ContextMenu x:Key="ProductsGridContextMenu">
+
+            <!--  展開  -->
             <MenuItem
-                Command="{Binding SelectedExpand, Mode=OneTime}"
-                CommandParameter="{x:Reference productGrid}"
+                Command="{Binding SetSelectedExpandedCommand, Mode=OneTime}"
+                CommandParameter="{StaticResource True}"
                 Header="{lex:Loc Lang:Expansion}" />
+
+            <!--  折りたたみ  -->
             <MenuItem
-                Command="{Binding SelectedCollapse, Mode=OneTime}"
-                CommandParameter="{x:Reference productGrid}"
+                Command="{Binding SetSelectedExpandedCommand, Mode=OneTime}"
+                CommandParameter="{StaticResource False}"
                 Header="{lex:Loc Lang:Collapse}" />
+
+            <Separator />
+            <!--  購入する  -->
+            <MenuItem
+                Command="{Binding SetNoBuyToSelectedItemCommand, Mode=OneTime}"
+                CommandParameter="{StaticResource False}"
+                Header="{lex:Loc Lang:Buy}" />
+            <!--  購入しない  -->
+            <MenuItem
+                Command="{Binding SetNoBuyToSelectedItemCommand, Mode=OneTime}"
+                CommandParameter="{StaticResource True}"
+                Header="{lex:Loc Lang:NoBuy}" />
+            <Separator />
+
+            <!--  販売する  -->
+            <MenuItem
+                Command="{Binding SetNoSellToSelectedItemCommand, Mode=OneTime}"
+                CommandParameter="{StaticResource False}"
+                Header="{lex:Loc Lang:Sell}" />
+
+            <!--  販売しない  -->
+            <MenuItem
+                Command="{Binding SetNoSellToSelectedItemCommand, Mode=OneTime}"
+                CommandParameter="{StaticResource True}"
+                Header="{lex:Loc Lang:NoSell}" />
         </ContextMenu>
 
         <!--  子要素のListView  -->

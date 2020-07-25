@@ -9,6 +9,10 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
     /// </summary>
     public partial class SelectStationDialog : Window
     {
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="planItems">選択計画一覧</param>
         private SelectStationDialog(List<SaveDataStationItem> planItems)
         {
             InitializeComponent();

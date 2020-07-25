@@ -5,6 +5,7 @@
     /// </summary>
     class LangComboboxItem
     {
+        #region プロパティ
         /// <summary>
         /// 言語ID
         /// </summary>
@@ -15,6 +16,7 @@
         /// 言語名
         /// </summary>
         public string Name { get; }
+        #endregion
 
 
         /// <summary>

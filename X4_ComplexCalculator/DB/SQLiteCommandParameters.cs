@@ -22,20 +22,13 @@ namespace X4_ComplexCalculator.DB
         private readonly int ValueCnt;
         #endregion
 
+
         #region プロパティ
         /// <summary>
         /// パラメータ一覧
         /// </summary>
-        public IEnumerable<IEnumerable<SQLiteParameter>> Parameters
-        {
-            get
-            {
-                return _Parameters
-                                .Select((v, i) => ( v, i ))
-                                .GroupBy(x => x.i / ValueCnt)
-                                .Select(g => g.Select(x => x.v));
-            }
-        }
+        public IEnumerable<IEnumerable<SQLiteParameter>> Parameters => 
+            _Parameters.Select((v, i) => (v, i)).GroupBy(x => x.i / ValueCnt).Select(g => g.Select(x => x.v));
         #endregion
 
 
@@ -58,10 +51,10 @@ namespace X4_ComplexCalculator.DB
         /// <param name="value">値</param>
         public void Add(string name, DbType dbType, object value)
         {
-            var param = new SQLiteParameter(name, dbType);
-            param.Value = value;
+            var param = new SQLiteParameter(name, dbType) { Value = value };
             _Parameters.Add(param);
         }
+
 
         /// <summary>
         /// レコードを追加(複数バージョン)

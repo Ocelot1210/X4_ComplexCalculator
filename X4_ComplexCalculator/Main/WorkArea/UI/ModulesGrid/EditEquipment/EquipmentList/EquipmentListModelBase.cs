@@ -10,6 +10,9 @@ using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList
 {
+    /// <summary>
+    /// 装備リストの抽象クラス
+    /// </summary>
     abstract class EquipmentListModelBase
     {
         #region メンバ
@@ -113,10 +116,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// リソースを開放
         /// </summary>
-        public virtual void Dispose()
-        {
-            Factions.CollectionPropertyChanged -= UpdateEquipments;
-        }
+        public virtual void Dispose() => Factions.CollectionPropertyChanged -= UpdateEquipments;
 
 
         /// <summary>

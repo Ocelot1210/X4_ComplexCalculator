@@ -7,6 +7,9 @@ using X4_ComplexCalculator.DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
 {
+    /// <summary>
+    /// SQLite形式の保存ファイル作成クラス
+    /// </summary>
     class SQLiteSaveDataWriter : ISaveDataWriter
     {
         /// <summary>

@@ -20,6 +20,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// </summary>
         readonly ProductsGridModel _Model;
 
+
         /// <summary>
         /// 製品価格割合
         /// </summary>
@@ -65,22 +66,29 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             }
         }
 
-        /// <summary>
-        /// 選択されたアイテムを展開する
-        /// </summary>
-        public ICommand SelectedExpand { get; }
-
 
         /// <summary>
-        /// 選択されたアイテムを折りたたむ
+        /// 選択されたアイテムの展開/折りたたみ状態を設定する
         /// </summary>
-        public ICommand SelectedCollapse { get; }
+        public ICommand SetSelectedExpandedCommand { get; }
 
 
         /// <summary>
         /// モジュール自動追加
         /// </summary>
         public ICommand AutoAddModuleCommand { get; }
+
+
+        /// <summary>
+        /// 選択されたアイテムの不足ウェア購入オプションを設定
+        /// </summary>
+        public ICommand SetNoBuyToSelectedItemCommand { get; }
+
+
+        /// <summary>
+        /// 選択されたアイテムの余剰ウェア販売オプションを設定
+        /// </summary>
+        public ICommand SetNoSellToSelectedItemCommand { get; }
 
 
         /// <summary>
@@ -135,40 +143,54 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             ProductsView.SortDescriptions.Add(new SortDescription("Ware.WareGroup.Tier", ListSortDirection.Ascending));
             ProductsView.SortDescriptions.Add(new SortDescription("Ware.Name", ListSortDirection.Ascending));
 
-            SelectedExpand = new DelegateCommand<DataGrid>(SelectedExpandCommand);
-            SelectedCollapse = new DelegateCommand<DataGrid>(SelectedCollapseCommand);
+            SetSelectedExpandedCommand = new DelegateCommand<bool?>(SetSelectedExpanded);
             AutoAddModuleCommand = new DelegateCommand(_Model.AutoAddModule);
+            SetNoBuyToSelectedItemCommand = new DelegateCommand<bool?>(SetNoBuyToSelectedItem);
+            SetNoSellToSelectedItemCommand = new DelegateCommand<bool?>(SetNoSellToSelectedItem);
         }
+
 
         /// <summary>
         /// リソースを開放
         /// </summary>
-        public void Dispose()
-        {
-            _Model.Dispose();
-        }
+        public void Dispose() => _Model.Dispose();
+
 
         /// <summary>
-        /// 選択されたアイテムを展開する
+        /// 選択されたアイテムの展開/折りたたみ状態を設定
         /// </summary>
-        /// <param name="dataGrid"></param>
-        private void SelectedExpandCommand(DataGrid dataGrid)
+        /// <param name="param">展開するか</param>
+        private void SetSelectedExpanded(bool? param)
         {
-            foreach (ProductsGridItem item in dataGrid.SelectedCells.Select(x => x.Item))
+            foreach (var item in _Model.Products.Where(x => x.IsSelected))
             {
-                item.IsExpanded = true;
+                item.IsExpanded = param == true;
             }
         }
 
+
         /// <summary>
-        /// 選択されたアイテムを折りたたむ
+        /// 選択されたアイテムの不足ウェア購入オプションを設定
         /// </summary>
-        /// <param name="dataGrid"></param>
-        private void SelectedCollapseCommand(DataGrid dataGrid)
+        /// <param name="param">購入しないか</param>
+        private void SetNoBuyToSelectedItem(bool? param)
         {
-            foreach (ProductsGridItem item in dataGrid.SelectedCells.Select(x => x.Item))
+            foreach (var item in _Model.Products.Where(x => x.IsSelected))
             {
-                item.IsExpanded = false;
+                item.NoBuy = param == true;
+            }
+        }
+
+
+        /// <summary>
+        /// 選択されたアイテムの余剰ウェア販売オプションを設定
+        /// </summary>
+        /// <param name="param">販売しないか</param>
+        private void SetNoSellToSelectedItem(bool? param)
+        {
+            foreach (var item in _Model.Products.Where(x => x.IsSelected))
+            {
+                item.NoSell = param == true;
             }
         }
     }

@@ -23,11 +23,25 @@
 
         <x4cmn:BindingProxy x:Key="ProxyNoBuy" Data="{Binding NoBuy, Mode=TwoWay}" />
 
+
+        <!--  DataGridのコンテキストメニュー  -->
+        <ContextMenu x:Key="BuildResourcesContextMenu">
+            <MenuItem
+                Command="{Binding SetNoBuyToSelectedItemCommand, Mode=OneTime}"
+                CommandParameter="{StaticResource False}"
+                Header="{lex:Loc Lang:Buy}" />
+            <MenuItem
+                Command="{Binding SetNoBuyToSelectedItemCommand, Mode=OneTime}"
+                CommandParameter="{StaticResource True}"
+                Header="{lex:Loc Lang:NoBuy}" />
+        </ContextMenu>
+
     </UserControl.Resources>
 
     <DataGrid
         x4bhv:DataGridCurrentCellEditModeBehavior.Enabled="True"
         x4bhv:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
+        ContextMenu="{StaticResource BuildResourcesContextMenu}"
         IsReadOnly="False"
         ItemsSource="{Binding BuildResourceView, Mode=OneTime}"
         RowHeight="25"
@@ -84,7 +98,7 @@
             <x4cmn:MouseHoverEditCellColumn
                 ClipboardContentBinding="{Binding UnitPrice, Mode=OneTime}"
                 Header="{lex:Loc Lang:UnitPrice}"
-                SortMemberPath="{lex:Loc UnitPrice}">
+                SortMemberPath="UnitPrice">
                 <!--  通常表示時のスタイル  -->
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>

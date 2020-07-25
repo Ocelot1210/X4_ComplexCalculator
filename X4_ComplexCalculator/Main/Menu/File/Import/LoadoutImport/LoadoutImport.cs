@@ -15,6 +15,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// </summary>
         public string Title { get; private set; }
 
+
         /// <summary>
         /// Viewより呼ばれるCommand
         /// </summary>
@@ -53,11 +54,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// </summary>
         /// <param name="_"></param>
         /// <returns></returns>
-        public bool Import(IWorkArea _)
-        {
-            // 何もしない
-            return true;
-        }
+        public bool Import(IWorkArea _) => true;    // 何もしない
 
 
         /// <summary>

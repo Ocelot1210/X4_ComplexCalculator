@@ -1,5 +1,8 @@
 ﻿namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
 {
+    /// <summary>
+    /// ファイル保存処理用インターフェイス
+    /// </summary>
     interface ISaveDataWriter
     {
         /// <summary>

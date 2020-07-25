@@ -14,25 +14,30 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// </summary>
         public string Title { get; set; }
 
+
         /// <summary>
         /// モジュール一覧
         /// </summary>
         public ObservableRangeCollection<ModulesGridItem> Modules { get; }
+
 
         /// <summary>
         /// 製品一覧
         /// </summary>
         public ObservableRangeCollection<ProductsGridItem> Products { get; }
 
+
         /// <summary>
         /// 建造リソース一覧
         /// </summary>
         public ObservableRangeCollection<BuildResourcesGridItem> Resources { get; }
 
+
         /// <summary>
         /// 保管庫割当情報
         /// </summary>
         public ObservableRangeCollection<StorageAssignGridItem> StorageAssign { get; }
+
 
         /// <summary>
         /// ステーションの設定

@@ -22,6 +22,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
         /// </summary>
         public string ModuleID { get; }
 
+
         /// <summary>
         /// モジュール名
         /// </summary>

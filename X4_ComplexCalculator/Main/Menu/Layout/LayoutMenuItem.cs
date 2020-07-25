@@ -20,10 +20,12 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
         /// </summary>
         private string _LayoutName = "";
 
+
         /// <summary>
         /// チェック状態
         /// </summary>
         private bool _IsChecked = false;
+
 
         /// <summary>
         /// 削除されたか
@@ -31,11 +33,13 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
         private bool _IsDeleted = false;
         #endregion
 
+
         #region プロパティ
         /// <summary>
         /// レイアウトID
         /// </summary>
         public long LayoutID;
+
 
         /// <summary>
         /// レイアウト名
@@ -45,6 +49,7 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
             get => _LayoutName;
             set => SetProperty(ref _LayoutName, value);
         }
+
 
         /// <summary>
         /// 保存ボタンクリック時
@@ -78,6 +83,7 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
                 }
             }
         }
+
 
         /// <summary>
         /// 削除されたか

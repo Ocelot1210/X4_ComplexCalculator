@@ -1,5 +1,4 @@
 ﻿using Prism.Mvvm;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
@@ -37,6 +36,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         #endregion
 
 
+        #region プロパティ
         /// <summary>
         /// モジュールID
         /// </summary>
@@ -93,6 +93,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 return ret;
             }
         }
+        #endregion
 
 
         /// <summary>
@@ -112,6 +113,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
             _Efficiencies = _MaxEfficiencies.ToDictionary(x => x.Key, _ => 1.0);
 
+            if (_Efficiencies.ContainsKey("work"))
+            {
+                _Efficiencies["work"] = settings.Workforce.Proportion;
+            }
+
             if (_Efficiencies.ContainsKey("sunlight"))
             {
                 _Efficiencies["sunlight"] = settings.Sunlight;
@@ -128,27 +134,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <param name="value">設定値</param>
         public void SetEfficiency(string effectID, double value)
         {
-            switch (effectID)
+            if (_Efficiencies.ContainsKey(effectID))
             {
-                // 労働者による効果の場合
-                case "work":
-                    _Efficiencies["work"] = value;
-                    RaisePropertyChanged(nameof(Amount));
-                    RaisePropertyChanged(nameof(Efficiency));
-                    break;
-
-                // 日光の場合
-                case "sunlight":
-                    if (_Efficiencies.ContainsKey("sunlight"))
-                    {
-                        _Efficiencies["sunlight"] = value;
-                        RaisePropertyChanged(nameof(Amount));
-                        RaisePropertyChanged(nameof(Efficiency));
-                    }
-                    break;
-
-                default:
-                    break;
+                _Efficiencies[effectID] = value;
+                RaisePropertyChanged(nameof(Amount));
+                RaisePropertyChanged(nameof(Efficiency));
             }
         }
     }

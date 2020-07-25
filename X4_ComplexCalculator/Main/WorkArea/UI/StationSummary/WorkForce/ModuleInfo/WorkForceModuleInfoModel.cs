@@ -5,14 +5,15 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
-using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleInfo
 {
+    /// <summary>
+    /// 労働力用モジュール情報用Model
+    /// </summary>
     class WorkForceModuleInfoModel : BindableBase
     {
         #region メンバ

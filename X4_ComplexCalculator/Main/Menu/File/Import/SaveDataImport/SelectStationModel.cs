@@ -24,6 +24,8 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
         string _SaveDataFilePath = "";
         #endregion
 
+
+        #region プロパティ
         /// <summary>
         /// 計画一覧
         /// </summary>
@@ -37,6 +39,8 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
             get => _SaveDataFilePath;
             set => SetProperty(ref _SaveDataFilePath, value);
         }
+        #endregion
+
 
         /// <summary>
         /// コンストラクタ
@@ -45,6 +49,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
         {
 
         }
+
 
         /// <summary>
         /// 初期フォルダを取得する
@@ -112,6 +117,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
             }
         }
 
+
         /// <summary>
         /// 非圧縮形式のファイル読み込み
         /// </summary>
@@ -124,6 +130,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
 
             SaveDataFileReadMain(xmlReader);
         }
+
 
         /// <summary>
         /// 圧縮形式のファイル読み込み

@@ -12,6 +12,9 @@ using X4_DataExporterWPF.Export;
 
 namespace X4_DataExporterWPF.DataExportWindow
 {
+    /// <summary>
+    /// データ抽出処理用Model
+    /// </summary>
     class DataExportModel
     {
         /// <summary>

@@ -17,9 +17,27 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
 
         #region プロパティ
         /// <summary>
-        /// 種族
+        /// 派閥
         /// </summary>
         public Faction Faction { get; }
+
+
+        /// <summary>
+        /// 種族ID
+        /// </summary>
+        public string RaceID => Faction.Race.RaceID;
+
+
+        /// <summary>
+        /// 種族名
+        /// </summary>
+        public string RaceName => Faction.Race.Name;
+
+
+        /// <summary>
+        /// 派閥名
+        /// </summary>
+        public string FactionName => Faction.Name;
 
 
         /// <summary>

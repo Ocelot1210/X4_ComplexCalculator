@@ -17,7 +17,6 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
 
 
         #region プロパティ
-
         /// <summary>
         /// セクター名
         /// </summary>

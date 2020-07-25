@@ -1,7 +1,7 @@
-﻿using GongSolutions.Wpf.DragDrop;
+﻿using AvalonDock;
+using GongSolutions.Wpf.DragDrop;
 using Prism.Commands;
 using Prism.Mvvm;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -10,7 +10,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Main.Menu.File.Export;
 using X4_ComplexCalculator.Main.Menu.File.Import;
 using X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport;
@@ -18,7 +17,6 @@ using X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport;
 using X4_ComplexCalculator.Main.Menu.Lang;
 using X4_ComplexCalculator.Main.Menu.Layout;
 using X4_ComplexCalculator.Main.WorkArea;
-using AvalonDock;
 
 namespace X4_ComplexCalculator.Main
 {
@@ -53,6 +51,7 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         private readonly ImportExporter _ImportExporter;
         #endregion
+
 
         #region プロパティ
         /// <summary>
@@ -241,6 +240,7 @@ namespace X4_ComplexCalculator.Main
 
             yield break;
         }
+
 
         /// <summary>
         /// ドラッグ中

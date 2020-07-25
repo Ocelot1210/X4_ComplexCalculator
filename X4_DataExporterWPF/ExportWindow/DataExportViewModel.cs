@@ -10,6 +10,9 @@ using System.Windows;
 
 namespace X4_DataExporterWPF.DataExportWindow
 {
+    /// <summary>
+    /// データ抽出処理用ViewModel
+    /// </summary>
     class DataExportViewModel : BindableBase
     {
         #region メンバ
@@ -79,7 +82,6 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// </summary>
         public ReactiveCommand<Window> CloseCommand { get; }
         #endregion
-
 
 
         /// <summary>

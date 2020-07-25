@@ -132,7 +132,7 @@
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="{x:Type GroupItem}">
-                                        <Expander Background="Aqua" IsExpanded="{Binding Items[0].IsExpanded}">
+                                        <Expander Background="Aqua" IsExpanded="True">
                                             <Expander.Header>
                                                 <DockPanel>
                                                     <TextBlock Margin="5,0,0,0" FontWeight="Bold">
@@ -141,11 +141,11 @@
 
                                                                 <lex:BLoc Key="Lang:StorageAssignGroupHeader" />
 
-                                                                <Binding Path="Items[0].TransportTypeName" />
+                                                                <Binding Path="Items.CurrentItem.TransportTypeName" />
 
-                                                                <Binding Path="Items[0].CapacityInfo.UsedCapacity" />
+                                                                <Binding Path="Items.CurrentItem.CapacityInfo.UsedCapacity" />
 
-                                                                <Binding Path="Items[0].CapacityInfo.TotalCapacity" />
+                                                                <Binding Path="Items.CurrentItem.CapacityInfo.TotalCapacity" />
 
                                                             </MultiBinding>
                                                         </TextBlock.Text>

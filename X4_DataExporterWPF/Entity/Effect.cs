@@ -5,14 +5,29 @@
     /// </summary>
     public class Effect
     {
+        #region プロパティ
+        /// <summary>
+        /// 効果ID
+        /// </summary>
         public string EffectID { get; }
 
-        public string Name { get; }
 
+        /// <summary>
+        /// 効果名
+        /// </summary>
+        public string Name { get; }
+        #endregion
+
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="effectID">効果ID</param>
+        /// <param name="name">効果名</param>
         public Effect(string effectID, string name)
         {
-            this.EffectID = effectID;
-            this.Name = name;
+            EffectID = effectID;
+            Name = name;
         }
     }
 }

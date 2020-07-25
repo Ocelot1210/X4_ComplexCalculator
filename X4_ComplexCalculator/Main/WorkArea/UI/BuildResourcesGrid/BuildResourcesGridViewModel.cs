@@ -1,8 +1,11 @@
-﻿using Prism.Mvvm;
+﻿using Prism.Commands;
+using Prism.Mvvm;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
 {
@@ -42,6 +45,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         /// 建造に必要なリソース一覧
         /// </summary>
         public ICollectionView BuildResourceView { get; }
+
+
+        /// <summary>
+        /// 選択されたアイテムの建造に必要なウェア購入オプションを設定
+        /// </summary>
+        public ICommand SetNoBuyToSelectedItemCommand { get; }
+
 
         /// <summary>
         /// 単価(百分率)
@@ -93,7 +103,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
 
             BuildResourceView = new CollectionViewSource { Source = _Model.Resources }.View;
             BuildResourceView.SortDescriptions.Add(new SortDescription("Ware.Name", ListSortDirection.Ascending));
+            SetNoBuyToSelectedItemCommand = new DelegateCommand<bool?>(SetNoBuyToSelectedItem);
         }
+
 
         /// <summary>
         /// リソースを開放
@@ -101,6 +113,19 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         public void Dispose()
         {
             _Model.Dispose();
+        }
+
+
+        /// <summary>
+        /// 選択されたアイテムの建造に必要なウェア購入オプションを設定
+        /// </summary>
+        /// <param name="param"></param>
+        private void SetNoBuyToSelectedItem(bool? param)
+        {
+            foreach (var item in _Model.Resources.Where(x => x.IsSelected))
+            {
+                item.NoBuy = param == true;
+            }
         }
     }
 }

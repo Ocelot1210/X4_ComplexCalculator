@@ -28,6 +28,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
         private int _PlanIdx = 0;
         #endregion
 
+
         #region プロパティ
         /// <summary>
         /// メニュー表示用タイトル

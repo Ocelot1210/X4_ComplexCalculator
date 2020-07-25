@@ -28,6 +28,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// </summary>
         public ObservableRangeCollection<LoadoutItem> Loadouts { get; } = new ObservableRangeCollection<LoadoutItem>();
 
+
         /// <summary>
         /// 装備プリセットファイルパス
         /// </summary>
@@ -36,6 +37,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
             get => _LoadoutsFilePath;
             set => SetProperty(ref _LoadoutsFilePath, value);
         }
+
 
         /// <summary>
         /// コンストラクタ
@@ -61,6 +63,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
 
             }
         }
+
 
         /// <summary>
         /// 初期フォルダを取得する
@@ -148,7 +151,6 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
             // 1件以上のインポートに失敗
             LocalizedMessageBox.Show("Lang:PresetImportSucceededMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, succeeded, cnt - succeeded);
         }
-
 
 
         /// <summary>

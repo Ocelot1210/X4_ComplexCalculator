@@ -21,20 +21,15 @@ namespace X4_ComplexCalculator.Common.Behavior
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="value"></param>
-        public static void SetEnabled(DependencyObject obj, bool value)
-        {
-            obj.SetValue(EnabledProperty, value);
-        }
+        public static void SetEnabled(DependencyObject obj, bool value) => obj.SetValue(EnabledProperty, value);
+
 
         /// <summary>
         /// カレントセルを編集モードにするかを取得
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public static bool GetEnabled(DependencyObject obj)
-        {
-            return (bool)obj.GetValue(EnabledProperty);
-        }
+        public static bool GetEnabled(DependencyObject obj) => (bool)obj.GetValue(EnabledProperty);
 
 
         /// <summary>

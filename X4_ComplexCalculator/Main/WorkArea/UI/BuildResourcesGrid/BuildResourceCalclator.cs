@@ -150,7 +150,7 @@ WHERE
         /// <returns>建造に必要なウェアと個数</returns>
         public IEnumerable<(string WareID, long Amount)> CalcResource(string id, string method)
         {
-            var kvp = _BuildResource[id] ?? throw new InvalidOperationException();
+            var kvp = _BuildResource[id];
 
             var b = kvp[method];
             if (!b.Any())

@@ -8,7 +8,7 @@ using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
 {
     /// <summary>
-    /// 基本となる保存ファイル読み込み
+    /// 保存ファイル読み込みクラス(フォーマット0用)
     /// </summary>
     class SaveDataReader0 : ISaveDataReader
     {
@@ -16,6 +16,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
         /// 読み込み対象ファイルパス
         /// </summary>
         public string Path { set; protected get; } = "";
+
 
         /// <summary>
         /// 作業エリア

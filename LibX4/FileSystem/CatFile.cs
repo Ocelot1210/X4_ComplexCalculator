@@ -11,15 +11,18 @@ namespace LibX4.FileSystem
     /// </summary>
     public class CatFile
     {
+        #region メンバ
         /// <summary>
         /// バニラのファイル
         /// </summary>
         private readonly CatFileLoader _VanillaFile;
 
+
         /// <summary>
         /// Modのファイル
         /// </summary>
         private readonly Dictionary<string, CatFileLoader> _ModFiles = new Dictionary<string, CatFileLoader>();
+
 
         /// <summary>
         /// Indexファイル
@@ -31,6 +34,7 @@ namespace LibX4.FileSystem
         /// XML差分適用用ユーティリティクラス
         /// </summary>
         private readonly XMLPatcher _XMLPatcher = new XMLPatcher();
+        #endregion
 
 
         /// <summary>

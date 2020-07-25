@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Localize;
@@ -101,7 +102,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// 種族一覧
         /// </summary>
-        public ObservablePropertyChangedCollection<FactionsListItem> Factions => Model.Factions;
+        public ICollectionView FactionsView { get; }
 
 
         /// <summary>
@@ -190,10 +191,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
             Model.PropertyChanged += Model_PropertyChanged;
             
             // サブViewModel類
-            TurretsViewModel = new EquipmentListViewModel(new TurretEquipmentListModel(module, Factions));
+            TurretsViewModel = new EquipmentListViewModel(new TurretEquipmentListModel(module, Model.Factions));
             Presets.CollectionChanged += TurretsViewModel.OnPresetsCollectionChanged;
             
-            ShieldsViewModel = new EquipmentListViewModel(new ShieldEquipmentListModel(module, Factions));
+            ShieldsViewModel = new EquipmentListViewModel(new ShieldEquipmentListModel(module, Model.Factions));
             Presets.CollectionChanged += ShieldsViewModel.OnPresetsCollectionChanged;
 
             // コマンド類
@@ -207,6 +208,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
 
             // その他初期化
             SelectedSize = EquipmentSizes.FirstOrDefault();
+            FactionsView = CollectionViewSource.GetDefaultView(Model.Factions);
+            FactionsView.SortDescriptions.Clear();
+            FactionsView.SortDescriptions.Add(new SortDescription(nameof(FactionsListItem.RaceName), ListSortDirection.Ascending));
+            FactionsView.SortDescriptions.Add(new SortDescription(nameof(FactionsListItem.FactionName), ListSortDirection.Ascending));
+            FactionsView.GroupDescriptions.Clear();
+            FactionsView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(FactionsListItem.RaceID)));
         }
 
 
@@ -215,6 +222,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// </summary>
         public void Dispose()
         {
+            Model.PropertyChanged     -= Model_PropertyChanged;
             Presets.CollectionChanged -= TurretsViewModel.OnPresetsCollectionChanged;
             Presets.CollectionChanged -= ShieldsViewModel.OnPresetsCollectionChanged;
 
@@ -296,10 +304,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// 閉じるボタンクリック時
         /// </summary>
-        private void CloseWindow()
-        {
-            CloseWindowProperty = true;
-        }
+        private void CloseWindow() => CloseWindowProperty = true;
 
 
         /// <summary>

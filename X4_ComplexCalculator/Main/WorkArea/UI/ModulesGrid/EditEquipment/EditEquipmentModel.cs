@@ -20,7 +20,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// 編集対象モジュール
         /// </summary>
-        private Module _Module;
+        private readonly Module _Module;
 
 
         /// <summary>
@@ -28,6 +28,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// </summary>
         private PresetComboboxItem? _SelectedPreset;
         #endregion
+
 
         #region プロパティ
         /// <summary>

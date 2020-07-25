@@ -24,14 +24,9 @@
     lex:ResxLocalizationProvider.DefaultDictionary="StringResources"
     mc:Ignorable="d">
 
-    <UserControl.Resources>
-        <!--  データ中継用  -->
-        <x4cmn:BindingProxy x:Key="ProxyDockingManager" Data="{Binding CurrentDockingManager, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" />
-    </UserControl.Resources>
-
     <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Unloaded">
-            <i:InvokeCommandAction Command="{Binding OnUnloadedCommand, Mode=OneTime}" CommandParameter="{Binding ElementName=dockingManager}" />
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding OnLoadedCommand, Mode=OneTime}" CommandParameter="{Binding ElementName=dockingManager}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
 

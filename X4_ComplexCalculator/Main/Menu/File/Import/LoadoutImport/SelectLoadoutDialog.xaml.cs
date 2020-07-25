@@ -14,7 +14,6 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         private SelectLoadoutDialog()
         {
             InitializeComponent();
-            DataContext = new SelectLoadoutViewModel();
         }
 
 

@@ -73,15 +73,13 @@ namespace X4_ComplexCalculator.Main
             switch (e.PropertyName)
             {
                 case nameof(LangMenuItem.IsChecked):
+                    if (langMenuItem.IsChecked)
                     {
-                        if (langMenuItem.IsChecked)
+                        foreach (var lang in Languages)
                         {
-                            foreach (var lang in Languages)
+                            if (!ReferenceEquals(lang, langMenuItem))
                             {
-                                if (!ReferenceEquals(lang, langMenuItem))
-                                {
-                                    lang.IsChecked = false;
-                                }
+                                lang.IsChecked = false;
                             }
                         }
                     }

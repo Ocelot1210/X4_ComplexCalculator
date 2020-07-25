@@ -25,6 +25,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
         /// </summary>
         private readonly ObservablePropertyChangedCollection<ModulesGridItem> _Modules;
 
+
         /// <summary>
         /// 製品情報一覧
         /// </summary>

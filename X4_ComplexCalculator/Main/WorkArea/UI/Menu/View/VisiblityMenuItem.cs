@@ -5,7 +5,7 @@ using AvalonDock.Layout;
 namespace X4_ComplexCalculator.Main.WorkArea.UI.Menu.View
 {
     /// <summary>
-    /// 表示状態メニュー1つ分
+    /// 表示状態メニュー1レコード分のクラス
     /// </summary>
     class VisiblityMenuItem : BindableBase
     {
@@ -15,6 +15,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.Menu.View
         /// </summary>
         private LayoutAnchorable _LayoutAnchorable;
 
+
         /// <summary>
         /// 表示状態変更通知をすべきか
         /// </summary>
@@ -22,6 +23,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.Menu.View
         #endregion
 
 
+        #region プロパティ
         /// <summary>
         /// タイトル文字列
         /// </summary>
@@ -46,6 +48,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.Menu.View
                 }
             }
         }
+        #endregion
 
 
         /// <summary>
