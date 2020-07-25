@@ -8,13 +8,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
     /// <summary>
     /// 建造リソース計算用クラス
     /// </summary>
-    class BuildResourceCalclator
+    class BuildResourceCalculator
     {
         #region スタティックメンバ
         /// <summary>
         /// 建造リソース計算用シングルトンインスタンス
         /// </summary>
-        private static BuildResourceCalclator? _SingletonInstance;
+        private static BuildResourceCalculator? _SingletonInstance;
         #endregion
 
 
@@ -30,7 +30,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        private BuildResourceCalclator()
+        private BuildResourceCalculator()
         {
             var resources = new Dictionary<string, Dictionary<string, List<(string, long)>>>();
 
@@ -100,14 +100,14 @@ WHERE
         /// <summary>
         /// 建造リソース計算用クラスのインスタンス
         /// </summary>
-        public static BuildResourceCalclator Instance
+        public static BuildResourceCalculator Instance
         {
             get
             {
                 // 未作成なら作成する
                 if (_SingletonInstance == null)
                 {
-                    _SingletonInstance = new BuildResourceCalclator();
+                    _SingletonInstance = new BuildResourceCalculator();
                 }
 
                 return _SingletonInstance;

@@ -10,13 +10,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
     /// <summary>
     /// 労働者が必要とするウェア計算用クラス
     /// </summary>
-    class WorkForceNeedWareCalclator
+    class WorkForceNeedWareCalculator
     {
         #region スタティックメンバ
         /// <summary>
         /// 労働者が必要とするウェア計算用シングルトンインスタンス
         /// </summary>
-        private static WorkForceNeedWareCalclator? _SingletonInstance;
+        private static WorkForceNeedWareCalculator? _SingletonInstance;
         #endregion
 
 
@@ -32,7 +32,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        private WorkForceNeedWareCalclator()
+        private WorkForceNeedWareCalculator()
         {
             var dict = new Dictionary<string, List<(string, double)>>();
 
@@ -73,13 +73,13 @@ WHERE
         /// <summary>
         /// インスタンスを取得
         /// </summary>
-        public static WorkForceNeedWareCalclator Instance
+        public static WorkForceNeedWareCalculator Instance
         {
             get
             {
                 if (_SingletonInstance == null)
                 {
-                    _SingletonInstance = new WorkForceNeedWareCalclator();
+                    _SingletonInstance = new WorkForceNeedWareCalculator();
                 }
 
                 return _SingletonInstance;

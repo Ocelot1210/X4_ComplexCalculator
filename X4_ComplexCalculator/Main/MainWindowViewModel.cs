@@ -187,7 +187,7 @@ namespace X4_ComplexCalculator.Main
             _ImportExporter = new ImportExporter(_WorkAreaManager);
             Imports = new List<IImport>()
             {
-                new StationCalclatorImport(new DelegateCommand<IImport>(_ImportExporter.Import)),
+                new StationCalculatorImport(new DelegateCommand<IImport>(_ImportExporter.Import)),
                 new StationPlanImport(new DelegateCommand<IImport>(_ImportExporter.Import)),
                 new LoadoutImport(new DelegateCommand<IImport>(_ImportExporter.Import)),
                 //new SaveDataImport(new DelegateCommand<IImport>(_Model.Import))   // 作成中のため未リリース
@@ -195,7 +195,7 @@ namespace X4_ComplexCalculator.Main
 
             Exports = new List<IExport>()
             {
-                new StationCalclatorExport(new DelegateCommand<IExport>(_ImportExporter.Export))
+                new StationCalculatorExport(new DelegateCommand<IExport>(_ImportExporter.Export))
             };
         }
 

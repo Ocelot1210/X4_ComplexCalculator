@@ -13,9 +13,9 @@ using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 namespace X4_ComplexCalculator.Main.Menu.File.Import
 {
     /// <summary>
-    /// Station Calclatorからインポートする
+    /// Station Calculatorからインポートする
     /// </summary>
-    class StationCalclatorImport : BindableBase, IImport
+    class StationCalculatorImport : BindableBase, IImport
     {
         #region メンバ
         /// <summary>
@@ -29,7 +29,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
         /// <summary>
         /// メニュー表示用タイトル
         /// </summary>
-        public string Title => "Station Calclator";
+        public string Title => "Station Calculator";
 
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
         /// コンストラクタ
         /// </summary>
         /// <param name="command">Viewより呼ばれるCommand</param>
-        public StationCalclatorImport(ICommand command)
+        public StationCalculatorImport(ICommand command)
         {
             Command = command;
         }
@@ -64,7 +64,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
             var ret = 0;
             var onOK = false;
 
-            (onOK, _InputUrl) = SelectStringDialog.ShowDialog("Lang:StationCalclatorImportTitle", "Lang:StationCalclatorImportDescription");
+            (onOK, _InputUrl) = SelectStringDialog.ShowDialog("Lang:StationCalculatorImportTitle", "Lang:StationCalculatorImportDescription");
             if (onOK)
             {
                 ret = 1;

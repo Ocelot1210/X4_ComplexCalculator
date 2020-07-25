@@ -47,7 +47,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
         /// <summary>
         /// 必要ウェア計算用
         /// </summary>
-        private readonly WorkForceNeedWareCalclator _Calclator = WorkForceNeedWareCalclator.Instance;
+        private readonly WorkForceNeedWareCalculator _Calculator = WorkForceNeedWareCalculator.Instance;
         #endregion
 
 
@@ -131,7 +131,7 @@ WHERE
 
             // 必要ウェア集計
             Module[] modules = { module.Module };
-            var waresDict = _Calclator.Calc(modules);
+            var waresDict = _Calculator.Calc(modules);
             foreach (var (method, wares) in waresDict)
             {
                 foreach (var (wareID, amount) in wares)
@@ -158,7 +158,7 @@ WHERE
             // 削除予定のウェアを集計
             if (e.OldItems != null)
             {
-                var wares = _Calclator.Calc(e.OldItems.Cast<ModulesGridItem>().Where(x => 0 < x.Module.WorkersCapacity));
+                var wares = _Calculator.Calc(e.OldItems.Cast<ModulesGridItem>().Where(x => 0 < x.Module.WorkersCapacity));
 
                 foreach (var (method, wareArr) in wares)
                 {
@@ -184,7 +184,7 @@ WHERE
             // 追加予定のウェアを集計
             if (e.NewItems != null)
             {
-                var wares = _Calclator.Calc(e.NewItems.Cast<ModulesGridItem>().Where(x => 0 < x.Module.WorkersCapacity));
+                var wares = _Calculator.Calc(e.NewItems.Cast<ModulesGridItem>().Where(x => 0 < x.Module.WorkersCapacity));
 
                 foreach (var (method, wareArr) in wares)
                 {
@@ -213,7 +213,7 @@ WHERE
                 addWares.Clear();
                 NeedWareInfoDetails.Clear();
 
-                var wares = _Calclator.Calc((sender as IEnumerable<ModulesGridItem>).Where(x => 0 < x.Module.WorkersCapacity));
+                var wares = _Calculator.Calc((sender as IEnumerable<ModulesGridItem>).Where(x => 0 < x.Module.WorkersCapacity));
                 foreach (var (method, wareArr) in wares)
                 {
                     if (!addWares.ContainsKey(method))

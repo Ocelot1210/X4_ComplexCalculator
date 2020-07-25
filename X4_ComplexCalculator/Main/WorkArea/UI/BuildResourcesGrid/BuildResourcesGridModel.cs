@@ -31,7 +31,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         /// <summary>
         /// 建造リソース計算用
         /// </summary>
-        private readonly BuildResourceCalclator _Calclator = BuildResourceCalclator.Instance;
+        private readonly BuildResourceCalculator _Calculator = BuildResourceCalculator.Instance;
         #endregion
 
 
@@ -174,7 +174,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
                                    .GroupBy(x => x.ID)
                                    .Select(x => (ID: x.Key, Method: "default", Count: x.LongCount()));
 
-            Dictionary<string, long> resources = _Calclator.CalcResource(modules.Concat(equipments));
+            Dictionary<string, long> resources = _Calculator.CalcResource(modules.Concat(equipments));
 
             foreach (var kvp in resources)
             {
@@ -200,7 +200,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
                 (module.Module.ModuleID, module.SelectedMethod.Method, 1)   // 変更後のため+1
             };
 
-            Dictionary<string, long> resources = _Calclator.CalcResource(modules);
+            Dictionary<string, long> resources = _Calculator.CalcResource(modules);
 
             var addTarget = new List<BuildResourcesGridItem>();
             foreach (var kvp in resources)
@@ -237,7 +237,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             var oldEquipments = prevEquipments.GroupBy(x => x).Select(x => (x.Key, "default", -(long)x.Count()));
 
             // リソース集計
-            Dictionary<string, long> resources = _Calclator.CalcResource(newEquipments.Concat(oldEquipments));
+            Dictionary<string, long> resources = _Calculator.CalcResource(newEquipments.Concat(oldEquipments));
 
             var addTarget = new List<BuildResourcesGridItem>();
             foreach (var kvp in resources)
@@ -333,7 +333,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
                                     .GroupBy(x => x.First().ID)
                                     .Select(x => (ID: x.Key, Method: "default", Count: x.Sum(y => y.Sum(z => z.Count))));
 
-            return _Calclator.CalcResource(moduleList.Concat(equipments));
+            return _Calculator.CalcResource(moduleList.Concat(equipments));
         }
     }
 }

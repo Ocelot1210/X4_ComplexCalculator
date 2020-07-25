@@ -42,7 +42,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// 製品計算機
         /// </summary>
-        private readonly ProductCalclator _ProductCalclator = ProductCalclator.Instance;
+        private readonly ProductCalculator _ProductCalculator = ProductCalculator.Instance;
 
 
         /// <summary>
@@ -159,7 +159,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             while (true)
             {
                 // 追加モジュール一覧
-                var addModules = _ProductCalclator.CalcNeedModules(Products, _Settings);
+                var addModules = _ProductCalculator.CalcNeedModules(Products, _Settings);
 
                 // 追加モジュールが無ければ(不足が無くなれば)終了
                 if (!addModules.Any())
@@ -435,7 +435,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <param name="prodDict"></param>
         private void SumProduct(string moduleID, long count, Dictionary<string, List<IProductDetailsListItem>> prodDict)
         {
-            foreach (var ware in _ProductCalclator.CalcProduction(moduleID))
+            foreach (var ware in _ProductCalculator.CalcProduction(moduleID))
             {
                 // ウェアがなければ追加する
                 if (!prodDict.ContainsKey(ware.WareID))
@@ -476,7 +476,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <param name="prodDict"></param>
         private void SumHabitation(string moduleID, long moduleCount, Dictionary<string, List<IProductDetailsListItem>> prodDict)
         {
-            foreach (var ware in _ProductCalclator.CalcHabitation(moduleID))
+            foreach (var ware in _ProductCalculator.CalcHabitation(moduleID))
             {
                 if (!prodDict.ContainsKey(ware.WareID))
                 {

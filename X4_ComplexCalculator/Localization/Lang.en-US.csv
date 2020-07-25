@@ -33,7 +33,7 @@ DBOpenFailMessage;Failed to open the DB. It may be possible to start it by extra
 # ------------------------------------------------------
 # Main window
 # ------------------------------------------------------
-MainWindowTitle;X4: Complex Calclator
+MainWindowTitle;X4: Complex Calculator
 FaildToLoadFileMessage;Failed to load the file.\r\n\r\n■Reason：\r\n{0}
 FaildToLoadFileMessageTitle;Read failure
 MainWindowClosingConfirmMessage;There are some unsaved items. Do you want to save it?
@@ -80,12 +80,12 @@ Language;Language
 
 
 # ------------------------------------------------------
-# Station Calclator import/export dialog
+# Station Calculator import/export dialog
 # ------------------------------------------------------
-StationCalclatorExportTitle;Export to Station Calclator
-StationCalclatorExportDescription;Please copy the URL.\r\nNote: The following modules are excluded.\r\n・Connection module\r\n・Venture module
-StationCalclatorImportTitle;Importing from Station Calclator
-StationCalclatorImportDescription;Please enter the URL displayed when you click the \r\nShare button at the top of Station Calclator.
+StationCalculatorExportTitle;Export to Station Calculator
+StationCalculatorExportDescription;Please copy the URL.\r\nNote: The following modules are excluded.\r\n・Connection module\r\n・Venture module
+StationCalculatorImportTitle;Importing from Station Calculator
+StationCalculatorImportDescription;Please enter the URL displayed when you click the \r\nShare button at the top of Station Calculator.
 
 
 # ------------------------------------------------------
@@ -121,6 +121,8 @@ Summary;Summary
 BuildResources;Build resources
 Storages;Storages
 StorageAssign;Storage assign
+Buy;Buy
+Sell;Sell
 
 
 # ------------------------------------------------------
@@ -155,8 +157,6 @@ ProductName;Product name
 AmountPerHour;Amount/h
 NoBuy;No buy
 NoSell;No sell
-Buy;Buy
-Sell;Sell
 
 
 # ------------------------------------------------------

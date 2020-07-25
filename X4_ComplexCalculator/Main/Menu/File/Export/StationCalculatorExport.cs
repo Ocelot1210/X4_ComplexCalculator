@@ -8,14 +8,14 @@ using X4_ComplexCalculator.Main.WorkArea;
 namespace X4_ComplexCalculator.Main.Menu.File.Export
 {
     /// <summary>
-    /// StationCalclator向けにステーションの情報をエクスポートする
+    /// StationCalculator向けにステーションの情報をエクスポートする
     /// </summary>
-    class StationCalclatorExport : BindableBase, IExport
+    class StationCalculatorExport : BindableBase, IExport
     {
         /// <summary>
         /// タイトル文字列
         /// </summary>
-        public string Title => "Station Calclator";
+        public string Title => "Station Calculator";
 
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Export
         /// コンストラクタ
         /// </summary>
         /// <param name="command">Viewより呼ばれるCommand</param>
-        public StationCalclatorExport(ICommand command)
+        public StationCalculatorExport(ICommand command)
         {
             Command = command;
         }
@@ -61,7 +61,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Export
                 sb.Length -= 2;
             }
 
-            SelectStringDialog.ShowDialog("Lang:StationCalclatorExportTitle", "Lang:StationCalclatorExportDescription", sb.ToString(), hideCancelButton: true);
+            SelectStringDialog.ShowDialog("Lang:StationCalculatorExportTitle", "Lang:StationCalculatorExportDescription", sb.ToString(), hideCancelButton: true);
 
             return true;
         }

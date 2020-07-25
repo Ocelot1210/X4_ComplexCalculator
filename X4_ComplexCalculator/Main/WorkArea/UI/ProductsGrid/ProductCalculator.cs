@@ -9,13 +9,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
     /// <summary>
     /// 製品計算用クラス
     /// </summary>
-    class ProductCalclator
+    class ProductCalculator
     {
         #region スタティックメンバ
         /// <summary>
         /// 製品計算用シングルトンインスタンス
         /// </summary>
-        private static ProductCalclator? _SingletonInstance;
+        private static ProductCalculator? _SingletonInstance;
         #endregion
 
 
@@ -68,7 +68,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        private ProductCalclator()
+        private ProductCalculator()
         {
             // モジュールが生産するウェア一覧作成を作成
             {
@@ -203,14 +203,14 @@ WHERE
         /// <summary>
         /// 製品計算用クラスのインスタンス
         /// </summary>
-        public static ProductCalclator Instance
+        public static ProductCalculator Instance
         {
             get
             {
                 // 未作成なら作成する
                 if (_SingletonInstance == null)
                 {
-                    _SingletonInstance = new ProductCalclator();
+                    _SingletonInstance = new ProductCalculator();
                 }
 
                 return _SingletonInstance;
