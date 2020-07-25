@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
 {
@@ -87,7 +88,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
         /// <summary>
         /// モジュール所有派閥
         /// </summary>
-        public ObservableCollection<ModulesListItem> ModuleOwners => _Model.ModuleOwners;
+        public ICollectionView ModuleOwnersView { get; }
 
 
         /// <summary>
@@ -149,6 +150,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
             ModulesView.Filter = Filter;
             ModulesView.SortDescriptions.Clear();
             ModulesView.SortDescriptions.Add(new SortDescription(nameof(ModulesListItem.Name), ListSortDirection.Ascending));
+
+            ModuleOwnersView = CollectionViewSource.GetDefaultView(_Model.ModuleOwners);
+            ModuleOwnersView.SortDescriptions.Clear();
+            ModuleOwnersView.SortDescriptions.Add(new SortDescription(nameof(FactionsListItem.RaceName), ListSortDirection.Ascending));
+            ModuleOwnersView.SortDescriptions.Add(new SortDescription(nameof(FactionsListItem.FactionName), ListSortDirection.Ascending));
+            ModuleOwnersView.GroupDescriptions.Clear();
+            ModuleOwnersView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(FactionsListItem.RaceID)));
 
             OKButtonClickedCommand    = new DelegateCommand(OKButtonClicked);
             CloseButtonClickedCommand = new DelegateCommand(CloseWindow);

@@ -101,14 +101,32 @@
                         <avdk:LayoutDocumentPane>
                             <!--  所有派閥  -->
                             <avdk:LayoutDocument Title="{lex:Loc Lang:OwnerFaction}" CanClose="False">
+
+
+
                                 <xctk:CheckListBox
-                                    DisplayMemberPath="Name"
+                                    DisplayMemberPath="FactionName"
                                     IsSelectAllActive="True"
-                                    ItemsSource="{Binding ModuleOwners}"
+                                    ItemsSource="{Binding ModuleOwnersView}"
                                     ScrollViewer.HorizontalScrollBarVisibility="Visible"
                                     ScrollViewer.VerticalScrollBarVisibility="Visible"
                                     SelectAllContent="{lex:Loc Lang:SelectAll}"
-                                    SelectedMemberPath="IsChecked" />
+                                    SelectedMemberPath="IsChecked">
+                                    <xctk:CheckListBox.GroupStyle>
+                                        <GroupStyle>
+                                            <GroupStyle.HeaderTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Background="Aqua">
+                                                        <TextBlock
+                                                            FontWeight="Bold"
+                                                            Foreground="Black"
+                                                            Text="{Binding Items.CurrentItem.RaceName}" />
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </GroupStyle.HeaderTemplate>
+                                        </GroupStyle>
+                                    </xctk:CheckListBox.GroupStyle>
+                                </xctk:CheckListBox>
                             </avdk:LayoutDocument>
                         </avdk:LayoutDocumentPane>
                     </avdk:LayoutDocumentPaneGroup>

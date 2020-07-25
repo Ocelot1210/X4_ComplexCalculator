@@ -4,6 +4,7 @@ using System.Data.SQLite;
 using System.Linq;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
 {
@@ -26,7 +27,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
         /// <summary>
         /// モジュール所有派閥
         /// </summary>
-        public ObservablePropertyChangedCollection<ModulesListItem> ModuleOwners { get; private set; } = new ObservablePropertyChangedCollection<ModulesListItem>();
+        public ObservablePropertyChangedCollection<FactionsListItem> ModuleOwners { get; private set; } = new ObservablePropertyChangedCollection<FactionsListItem>();
 
 
         /// <summary>
@@ -96,13 +97,13 @@ ORDER BY Name", init, "SelectModuleCheckStateTypes");
         /// </summary>
         private void InitModuleOwners()
         {
-            var items = new List<ModulesListItem>();
+            var items = new List<FactionsListItem>();
 
             void init(SQLiteDataReader dr, object[] args)
             {
                 bool isChecked = 0 < DBConnection.CommonDB.ExecQuery($"SELECT * FROM SelectModuleCheckStateModuleOwners WHERE ID = '{dr["FactionID"]}'", (_, __) => { });
 
-                items.Add(new ModulesListItem((string)dr["FactionID"], (string)dr["Name"], isChecked));
+                items.Add(new FactionsListItem((string)dr["FactionID"], isChecked));
             }
 
             DBConnection.X4DB.ExecQuery(@"
@@ -144,7 +145,7 @@ WHERE
 	Module.ModuleID = ModuleOwner.ModuleID AND
     Module.NoBlueprint = 0 AND
     Module.ModuleTypeID   IN ({string.Join(", ", ModuleTypes.Where(x => x.IsChecked).Select(x => $"'{x.ID}'"))}) AND
-	ModuleOwner.FactionID IN ({string.Join(", ", ModuleOwners.Where(x => x.IsChecked).Select(x => $"'{x.ID}'"))})";
+	ModuleOwner.FactionID IN ({string.Join(", ", ModuleOwners.Where(x => x.IsChecked).Select(x => $"'{x.Faction.FactionID}'"))})";
 
             var list = new List<ModulesListItem>();
             DBConnection.X4DB.ExecQuery(query, SetModules, list);
@@ -194,7 +195,7 @@ WHERE
             }
 
             // 派閥一覧のチェック状態保存
-            foreach (var id in ModuleOwners.Where(x => x.IsChecked).Select(x => x.ID))
+            foreach (var id in ModuleOwners.Where(x => x.IsChecked).Select(x => x.Faction.FactionID))
             {
                 DBConnection.CommonDB.ExecQuery($"INSERT INTO SelectModuleCheckStateModuleOwners(ID) VALUES ('{id}')", null);
             }
