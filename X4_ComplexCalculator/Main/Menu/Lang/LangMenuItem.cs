@@ -49,7 +49,7 @@ namespace X4_ComplexCalculator.Main.Menu.Lang
         /// <summary>
         /// 言語名
         /// </summary>
-        public string Name => _CultureInfo.DisplayName;
+        public string Name => _CultureInfo.NativeName;
         #endregion
 
 
