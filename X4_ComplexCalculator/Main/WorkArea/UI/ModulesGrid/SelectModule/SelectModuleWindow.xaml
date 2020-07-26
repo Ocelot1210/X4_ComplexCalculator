@@ -142,6 +142,7 @@
 
                                 <!--  モジュール一覧  -->
                                 <ListBox
+                                    x4bhv:ControlItemDoubleClick.ItemsDoubleClick="True"
                                     DisplayMemberPath="Name"
                                     ItemsSource="{Binding ModulesView}"
                                     ScrollViewer.HorizontalScrollBarVisibility="Visible"
@@ -153,6 +154,9 @@
                                             <Setter Property="IsSelected" Value="{Binding IsChecked}" />
                                         </Style>
                                     </ListBox.ItemContainerStyle>
+                                    <ListBox.InputBindings>
+                                        <MouseBinding Command="{Binding OKButtonClickedCommand, Mode=OneTime}" MouseAction="LeftDoubleClick" />
+                                    </ListBox.InputBindings>
                                 </ListBox>
                             </DockPanel>
                         </avdk:LayoutDocument>
