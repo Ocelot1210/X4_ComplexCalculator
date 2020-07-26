@@ -49,12 +49,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         {
             foreach (Size size in Module.ModuleEquipment.Turret.Sizes)
             {
-                _Equipments.Add(size, new ObservableRangeCollection<Equipment>());
-                _Equipped.Add(size, new ObservableRangeCollection<Equipment>());
+                _Equipments.Add(size, new ObservableRangeCollection<EquipmentListItem>());
+                _Equipped.Add(size, new ObservableRangeCollection<EquipmentListItem>());
                 _MaxAmount.Add(size, Module.ModuleEquipment.Turret.MaxAmount[size]);
 
                 // 前回値復元
-                _Equipped[size].AddRange(Module.ModuleEquipment.Turret.GetEquipment(size).Take(_MaxAmount[size]));
+                var equipments = Module.ModuleEquipment.Turret.GetEquipment(size).Take(_MaxAmount[size]).Select(x => new EquipmentListItem(x));
+                _Equipped[size].AddRange(equipments);
             }
         }
 
@@ -101,7 +102,16 @@ WHERE
                     }
                     foreach (var equipment in Equipped.Values.SelectMany((x) => x))
                     {
-                        var query = $"INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES('{Module.Module.ModuleID}', {item.ID}, '{equipment.EquipmentID}', '{equipment.EquipmentType.EquipmentTypeID}')";
+                        var query = @$"
+INSERT INTO
+    ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType)
+
+VALUES(
+    '{Module.Module.ModuleID}',
+    {item.ID},
+    '{equipment.Equipment.EquipmentID}',
+    '{equipment.Equipment.EquipmentType.EquipmentTypeID}'
+)";
                         DBConnection.CommonDB.ExecQuery(query);
                     }
                 }
@@ -119,7 +129,7 @@ WHERE
                 return;
             }
 
-            var items = new List<Equipment>();
+            var items = new List<EquipmentListItem>();
 
             var selectedFactions = string.Join(", ", SelectedFactions.Select(x => $"'{x.Faction.FactionID}'"));
 
@@ -137,7 +147,7 @@ WHERE
     EquipmentOwner.FactionID IN ({selectedFactions})
 ";
 
-            DBConnection.X4DB.ExecQuery(query, (dr, args) => { items.Add(Equipment.Get((string)dr["EquipmentID"])); });
+            DBConnection.X4DB.ExecQuery(query, (dr, args) => { items.Add(new EquipmentListItem((string)dr["EquipmentID"])); });
 
             Equipments[SelectedSize].Reset(items);
         }
@@ -150,7 +160,7 @@ WHERE
         {
             foreach (var size in _Equipments.Keys)
             {
-                Module.ModuleEquipment.Turret.ResetEquipment(size, Equipped[size]);
+                Module.ModuleEquipment.Turret.ResetEquipment(size, Equipped[size].Select(x => x.Equipment).ToArray());
             }
         }
 
@@ -177,17 +187,17 @@ WHERE
     PresetID      = {SelectedPreset.ID} AND
     EquipmentType = 'turrets'";
 
-            var equipments = new List<Equipment>(_MaxAmount.Values.Count());
+            var equipments = new List<EquipmentListItem>(_MaxAmount.Values.Count());
 
             DBConnection.CommonDB.ExecQuery(query, (dr, args) =>
             {
-                equipments.Add(Equipment.Get((string)dr["EquipmentID"]));
+                equipments.Add(new EquipmentListItem((string)dr["EquipmentID"]));
             });
 
             foreach (var size in Module.ModuleEquipment.Turret.Sizes)
             {
                 _Equipped[size].Clear();
-                _Equipped[size].AddRange(equipments.Where(x => x.Size.Equals(size)));
+                _Equipped[size].AddRange(equipments.Where(x => x.Equipment.Size.Equals(size)));
             }
         }
     }

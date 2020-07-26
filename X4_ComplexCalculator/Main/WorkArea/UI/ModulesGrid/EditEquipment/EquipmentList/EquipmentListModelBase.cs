@@ -37,13 +37,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 装備一覧
         /// </summary>
-        protected Dictionary<Size, ObservableRangeCollection<Equipment>> _Equipments = new Dictionary<Size, ObservableRangeCollection<Equipment>>();
+        protected Dictionary<Size, ObservableRangeCollection<EquipmentListItem>> _Equipments = new Dictionary<Size, ObservableRangeCollection<EquipmentListItem>>();
 
 
         /// <summary>
         /// 装備中の装備
         /// </summary>
-        protected Dictionary<Size, ObservableRangeCollection<Equipment>> _Equipped = new Dictionary<Size, ObservableRangeCollection<Equipment>>();
+        protected Dictionary<Size, ObservableRangeCollection<EquipmentListItem>> _Equipped = new Dictionary<Size, ObservableRangeCollection<EquipmentListItem>>();
 
 
         /// <summary>
@@ -57,13 +57,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 装備一覧
         /// </summary>
-        public IReadOnlyDictionary<Size, ObservableRangeCollection<Equipment>> Equipments => _Equipments;
+        public IReadOnlyDictionary<Size, ObservableRangeCollection<EquipmentListItem>> Equipments => _Equipments;
 
 
         /// <summary>
         /// 装備中
         /// </summary>
-        public IReadOnlyDictionary<Size, ObservableRangeCollection<Equipment>> Equipped => _Equipped;
+        public IReadOnlyDictionary<Size, ObservableRangeCollection<EquipmentListItem>> Equipped => _Equipped;
 
 
         /// <summary>
@@ -144,23 +144,27 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
 
 
         /// <summary>
-        /// 装備を追加
+        /// 選択された装備を追加
         /// </summary>
-        /// <param name="targets">追加対象</param>
-        public void AddEquipments(IEnumerable<Equipment> targets)
+        /// <returns>装備が追加されたか</returns>
+        public bool AddSelectedEquipments()
         {
             if (SelectedSize == null)
             {
                 throw new InvalidOperationException();
             }
 
+            var addItems = Equipments[SelectedSize].Where(x => x.IsSelected);
+
             int addRange = MaxAmount[SelectedSize] - Equipped[SelectedSize].Count;  // 追加可能な個数
 
             // 追加対象が無ければ何もしない
-            if (!targets.Any())
+            if (!addItems.Any())
             {
-                return;
+                return false;
             }
+
+            var added = false;
 
             // 左Shiftキー押下時なら選択アイテムを全追加
             if (Keyboard.IsKeyDown(Key.LeftShift))
@@ -168,10 +172,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
                 while (0 < addRange)
                 {
                     // 追加可能な分だけ追加する
-                    Equipped[SelectedSize].AddRange(targets.Take(addRange));
+                    Equipped[SelectedSize].AddRange(addItems.Take(addRange).Select(x => new EquipmentListItem(x.Equipment)));
 
                     // 再計算
                     addRange = MaxAmount[SelectedSize] - Equipped[SelectedSize].Count;
+
+                    added = true;
                 }
             }
             else
@@ -179,9 +185,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
                 if (0 < addRange)
                 {
                     // 追加可能な分だけ追加する
-                    Equipped[SelectedSize].AddRange(targets.Take(addRange));
+                    Equipped[SelectedSize].AddRange(addItems.Take(addRange).Select(x => new EquipmentListItem(x.Equipment)));
+
+                    added = true;
                 }
             }
+
+            return added;
         }
 
 
@@ -189,31 +199,20 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// 装備を削除
         /// </summary>
         /// <param name="targets">削除対象</param>
-        public void RemoveEquipments(IEnumerable<Equipment> targets)
+        /// <returns>装備が削除されたか</returns>
+        public bool RemoveSelectedEquipments()
         {
             if (SelectedSize == null)
             {
                 throw new InvalidOperationException();
             }
 
-            // 削除対象が無ければ何もしない
-            if (!targets.Any())
-            {
-                return;
-            }
-
-            if (0 < Equipped[SelectedSize].Count)
-            {
-                var tgt = targets.Cast<Equipment>().ToArray();
-                foreach (var equipment in tgt)
-                {
-                    Equipped[SelectedSize].Remove(equipment);
-                }
-            }
-            else
+            if (Equipped[SelectedSize].Count <= 0)
             {
                 throw new IndexOutOfRangeException("これ以上装備を削除できません");
             }
+
+            return 0 < Equipped[SelectedSize].RemoveAll(x => x.IsSelected);
         }
 
 
@@ -231,7 +230,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
             // 選択中のプリセットがあるか？
             if (SelectedPreset != null)
             {
-                var id = Equipped.Values.SelectMany((x) => x).FirstOrDefault()?.EquipmentType.EquipmentTypeID;
+                var id = Equipped.Values.SelectMany((x) => x).FirstOrDefault()?.Equipment.EquipmentType.EquipmentTypeID;
 
                 if (!string.IsNullOrEmpty(id))
                 {
@@ -241,7 +240,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
                     // 装備中のプリセットを追加
                     foreach (var equipment in Equipped.Values.SelectMany((x) => x))
                     {
-                        var query = $"INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES('{Module.Module.ModuleID}', {SelectedPreset.ID}, '{equipment.EquipmentID}', '{equipment.EquipmentType.EquipmentTypeID}')";
+                        var query = $"INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES('{Module.Module.ModuleID}', {SelectedPreset.ID}, '{equipment.Equipment.EquipmentID}', '{equipment.Equipment.EquipmentType.EquipmentTypeID}')";
                         DBConnection.CommonDB.ExecQuery(query);
                     }
                 }

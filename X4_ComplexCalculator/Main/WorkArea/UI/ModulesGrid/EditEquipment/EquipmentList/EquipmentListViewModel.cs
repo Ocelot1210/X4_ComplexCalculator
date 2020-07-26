@@ -47,7 +47,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 装備中の装備
         /// </summary>
-        public ObservableCollection<Equipment>? Equipped => (_Model.SelectedSize != null) ? _Model.Equipped[_Model.SelectedSize] : null;
+        public ObservableCollection<EquipmentListItem>? Equipped => (_Model.SelectedSize != null) ? _Model.Equipped[_Model.SelectedSize] : null;
 
 
         /// <summary>
@@ -167,8 +167,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
                 _EquipmentsViews.Add(pair.Key, item);
             }
 
-            AddButtonClickedCommand = new DelegateCommand<ICollection>(AddButtonClicked);
-            RemoveButtonClickedCommand = new DelegateCommand<ICollection>(DeleteButtonClicked);
+            AddButtonClickedCommand = new DelegateCommand(AddButtonClicked);
+            RemoveButtonClickedCommand = new DelegateCommand(DeleteButtonClicked);
         }
 
 
@@ -193,12 +193,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 追加ボタンクリック時
         /// </summary>
-        /// <param name="selectedEquipment">追加予定装備</param>
-        void AddButtonClicked(ICollection selectedEquipments)
+        void AddButtonClicked()
         {
-            if (selectedEquipments != null)
+            if (_Model.AddSelectedEquipments())
             {
-                _Model.AddEquipments(selectedEquipments.Cast<Equipment>());
+                // 装備が追加された場合
                 Unsaved = true;
                 RaisePropertyChanged(nameof(CanAddEquipment));
                 RaisePropertyChanged(nameof(CanRemoveEquipment));
@@ -210,12 +209,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 削除ボタンクリック時
         /// </summary>
-        /// <param name="selectedEquipments">削除予定装備</param>
-        void DeleteButtonClicked(ICollection selectedEquipments)
+        void DeleteButtonClicked()
         {
-            if (selectedEquipments != null)
+            if (_Model.RemoveSelectedEquipments())
             {
-                _Model.RemoveEquipments(selectedEquipments.Cast<Equipment>().ToArray());
+                // 装備が削除された場合
                 Unsaved = true;
                 RaisePropertyChanged(nameof(CanAddEquipment));
                 RaisePropertyChanged(nameof(CanRemoveEquipment));
@@ -231,7 +229,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <returns></returns>
         private bool Filter(object obj)
         {
-            return obj is Equipment src && (SearchEquipmentName == "" || 0 <= src.Name.IndexOf(SearchEquipmentName, StringComparison.InvariantCultureIgnoreCase));
+            return obj is EquipmentListItem src && (SearchEquipmentName == "" || 0 <= src.Equipment.Name.IndexOf(SearchEquipmentName, StringComparison.InvariantCultureIgnoreCase));
         }
 
 
