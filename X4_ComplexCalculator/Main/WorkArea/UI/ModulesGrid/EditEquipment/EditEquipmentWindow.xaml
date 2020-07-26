@@ -19,9 +19,7 @@
     lex:ResxLocalizationProvider.DefaultAssembly="WPFLocalizationExtension"
     lex:ResxLocalizationProvider.DefaultDictionary="StringResources"
     x4bhv:CloseWindowBehavior.Close="{Binding CloseWindowProperty, Mode=OneWay}"
-    ResizeMode="NoResize"
     Style="{StaticResource DefaultWindowBackgroundStyle}"
-    WindowStyle="ToolWindow"
     mc:Ignorable="d">
 
 
