@@ -73,7 +73,7 @@ LayoutOverwritedMessage;Saved the layout of plan "{0}" as "{1}" overwriting it.
 LayoutOverwriteFailedMessage;Failed to save the layout overwrite.\r\n\r\n■Reason：\r\n{0}
 TabDoesNotSelectedMessage;No tab is selected to save the layout.\r\nSelect the tab you want to save, and run it again.
 DeleteLayoutConfirmMessage;Do you really want to delete the layout "{0}"?
-InvalidLayoutNameMessage;Invalid layout name. Please enter at least one non-white space character.
+InvalidLayoutNameMessage;Invalid layout name. Please enter at least one non-whitespace character.
 
 # Language ---------------------------------------------
 Language;Language
@@ -232,4 +232,4 @@ EditEquipmentWindowCloseConfirmMessage;Do you want to save your changes?
 EditPresetName;Edit preset name
 PresetName;Preset name
 DeletePresetConfirmMessage;Do you really want to remove the preset "{0}"?
-InvalidPresetNameMessage;Invalid preset name. Please enter at least one non-white space character.
+InvalidPresetNameMessage;Invalid preset name. Please enter at least one non-whitespace character.
