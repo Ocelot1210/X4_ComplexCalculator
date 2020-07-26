@@ -8,8 +8,14 @@ namespace LibX4.FileSystem
     /// <summary>
     /// catファイル読み込み用クラス
     /// </summary>
-    class CatFileLoader
+    class CatFileLoader : IFileLoader
     {
+        /// <summary>
+        /// catやModファイルがあるルートディレクトリ
+        /// </summary>
+        public string RootDir { get; }
+
+
         /// <summary>
         /// まだロードされていないCat/Datファイルの絶対パス
         /// </summary>
@@ -36,6 +42,8 @@ namespace LibX4.FileSystem
         /// <param name="dirPath">Cat/Datファイルを探すディレクトリの絶対パス</param>
         public CatFileLoader(string dirPath)
         {
+            RootDir = dirPath;
+
             var archivePaths = Directory.EnumerateFiles(dirPath, "*.cat")
                 // ファイル名にsigを含むCatファイルは除外
                 .Where(p => !Path.GetFileName(p).Contains("sig"))
@@ -60,19 +68,36 @@ namespace LibX4.FileSystem
         public MemoryStream? OpenFile(string filePath)
         {
             var entry = GetCatEntry(filePath);
-            if (entry == null) return null;
+            if (entry != null)
+            {
+                using var fs = new FileStream(
+                    entry.DatFilePath,
+                    FileMode.Open,
+                    FileAccess.Read,
+                    FileShare.Read,
+                    entry.FileSize
+                );
+                var buff = new byte[entry.FileSize];
+                fs.Seek(entry.Offset, SeekOrigin.Begin);
+                fs.Read(buff, 0, buff.Length);
 
-            using var fs = new FileStream(
-                entry.DatFilePath,
-                FileMode.Open,
-                FileAccess.Read,
-                FileShare.Read,
-                entry.FileSize
-            );
-            fs.Seek(entry.Offset, SeekOrigin.Begin);
-            var buff = new byte[entry.FileSize];
-            fs.Read(buff, 0, buff.Length);
-            return new MemoryStream(buff, false);
+                return new MemoryStream(buff, false);
+            }
+            else
+            {
+                var path = Path.Combine(RootDir, filePath);
+                if (!File.Exists(path))
+                {
+                    return null;
+                }
+
+                using var fs = new FileStream(path, FileMode.Open, FileAccess.Read);
+
+                var buff = new byte[fs.Length];
+                fs.Read(buff, 0, buff.Length);
+
+                return new MemoryStream(buff, false);
+            }
         }
 
 

@@ -23,7 +23,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// 言語解決用オブジェクト
         /// </summary>
-        private readonly LangageResolver _Resolver;
+        private readonly LanguageResolver _Resolver;
 
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace X4_DataExporterWPF.Export
         /// </summary>
         /// <param name="catFile">catファイル</param>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public WareGroupExporter(CatFile catFile, LangageResolver resolver)
+        public WareGroupExporter(CatFile catFile, LanguageResolver resolver)
         {
             _WareGroupXml = catFile.OpenXml("libraries/waregroups.xml");
 

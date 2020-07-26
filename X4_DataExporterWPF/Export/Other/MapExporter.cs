@@ -20,7 +20,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// 言語解決用オブジェクト
         /// </summary>
-        private readonly LangageResolver _Resolver;
+        private readonly LanguageResolver _Resolver;
 
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace X4_DataExporterWPF.Export
         /// </summary>
         /// <param name="catFile">catファイル</param>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public MapExporter(CatFile catFile, LangageResolver resolver)
+        public MapExporter(CatFile catFile, LanguageResolver resolver)
         {
             _MapXml = catFile.OpenXml("libraries/mapdefaults.xml");
             _Resolver = resolver;

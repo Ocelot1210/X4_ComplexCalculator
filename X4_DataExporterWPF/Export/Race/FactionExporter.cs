@@ -23,7 +23,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// 言語解決用オブジェクト
         /// </summary>
-        private readonly LangageResolver _Resolver;
+        private readonly LanguageResolver _Resolver;
 
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace X4_DataExporterWPF.Export
         /// </summary>
         /// <param name="catFile">catファイル</param>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public FactionExporter(CatFile catFile, LangageResolver resolver)
+        public FactionExporter(CatFile catFile, LanguageResolver resolver)
         {
             _FactionsXml = catFile.OpenXml("libraries/factions.xml");
 

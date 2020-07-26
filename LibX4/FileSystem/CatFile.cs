@@ -15,13 +15,13 @@ namespace LibX4.FileSystem
         /// <summary>
         /// バニラのファイル
         /// </summary>
-        private readonly CatFileLoader _VanillaFile;
+        private readonly IFileLoader _VanillaFile;
 
 
         /// <summary>
         /// Modのファイル
         /// </summary>
-        private readonly Dictionary<string, CatFileLoader> _ModFiles = new Dictionary<string, CatFileLoader>();
+        private readonly Dictionary<string, IFileLoader> _ModFiles = new Dictionary<string, IFileLoader>();
 
 
         /// <summary>
@@ -74,9 +74,9 @@ namespace LibX4.FileSystem
             }
 
             // バニラのデータに見つからない場合、Modのデータを探しに行く
-            foreach (var catFile in _ModFiles.Values)
+            foreach (var fileLoader in _ModFiles.Values)
             {
-                using var ret = catFile.OpenFile(filePath);
+                using var ret = fileLoader.OpenFile(filePath);
 
                 if (ret != null)
                 {
@@ -109,7 +109,7 @@ namespace LibX4.FileSystem
             }
 
             // Modのxmlを連結
-            foreach (var (modPath, catFile) in _ModFiles)
+            foreach (var (modPath, fileLoader) in _ModFiles)
             {
                 var targetPath = filePath;
 
@@ -119,7 +119,7 @@ namespace LibX4.FileSystem
                     targetPath = targetPath.Substring(modPath.Length + 1);
                 }
 
-                using var ms = catFile.OpenFile(targetPath);
+                using var ms = fileLoader.OpenFile(targetPath);
                 if (ms == null)
                 {
                     continue;
@@ -158,21 +158,51 @@ namespace LibX4.FileSystem
             }
 
             // Modのxmlを連結
-            foreach (var catFile in _ModFiles.Values)
+            foreach (var loader in _ModFiles.Values)
             {
-                using var ms = catFile.OpenFile(filePath);
-                if (ms == null)
-                {
-                    continue;
-                }
+                ConcatModLangFile(loader, "t/0001.xml", ref ret);
+                ConcatModLangFile(loader, filePath, ref ret);
+            }
 
-                if (ret == null)
+            return ret ?? throw new FileNotFoundException(filePath);
+        }
+
+
+        /// <summary>
+        /// Modの言語ファイルを連結
+        /// </summary>
+        /// <param name="stream">ファイルストリーム</param>
+        /// <param name="ret">言語 XDocument</param>
+        private void ConcatModLangFile(IFileLoader loader, string filePath, ref XDocument? ret)
+        {
+            using var ms = loader.OpenFile(filePath);
+
+            // 言語ファイルが無ければ何もしない
+            if (ms == null)
+            {
+                return;
+            }
+
+            // バニラに言語ファイルが無いか？
+            if (ret == null)
+            {
+                // バニラに言語ファイルが無い場合
+                ret = XDocument.Load(ms);
+            }
+            else
+            {
+                // バニラに言語ファイルが有る場合、Modの言語ファイルを連結
+                var src = XDocument.Load(ms);
+
+                // Modの言語ファイルは差分ファイルか？
+                if (src.Root.Name.LocalName == "diff")
                 {
-                    ret = XDocument.Load(ms);
+                    // 差分ファイルの場合、パッチ処理に差分を適用させる
+                    _XMLPatcher.MergeXML(ret, src);
                 }
                 else
                 {
-                    var src = XDocument.Load(ms);
+                    // 差分ファイルでない場合、xmlの内容を連結する
 
                     foreach (var elm in src.XPathSelectElements("language/page"))
                     {
@@ -189,9 +219,8 @@ namespace LibX4.FileSystem
                     }
                 }
             }
-
-            return ret ?? throw new FileNotFoundException(filePath);
         }
+
 
 
         /// <summary>

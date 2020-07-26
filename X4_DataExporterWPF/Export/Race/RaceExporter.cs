@@ -22,7 +22,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// 言語解決用オブジェクト
         /// </summary>
-        private readonly LangageResolver _Resolver;
+        private readonly LanguageResolver _Resolver;
 
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace X4_DataExporterWPF.Export
         /// </summary>
         /// <param name="catFile">catファイル</param>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public RaceExporter(CatFile catFile, LangageResolver resolver)
+        public RaceExporter(CatFile catFile, LanguageResolver resolver)
         {
             _RaceXml = catFile.OpenXml("libraries/races.xml");
 

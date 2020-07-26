@@ -19,7 +19,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// 言語解決用オブジェクト
         /// </summary>
-        private readonly LangageResolver _Resolver;
+        private readonly LanguageResolver _Resolver;
 
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace X4_DataExporterWPF.Export
         /// </summary>
         /// <param name="waresXml">ウェア情報xml</param>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public WareExporter(XDocument waresXml, LangageResolver resolver)
+        public WareExporter(XDocument waresXml, LanguageResolver resolver)
         {
             _WaresXml = waresXml;
             _Resolver = resolver;

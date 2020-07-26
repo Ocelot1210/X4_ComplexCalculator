@@ -1,17 +1,16 @@
-﻿using System;
+﻿using LibX4.FileSystem;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using LibX4.FileSystem;
 
 namespace LibX4.Lang
 {
     /// <summary>
     /// X4の言語フィールド文字列を解決するクラス
     /// </summary>
-    public class LangageResolver
+    public class LanguageResolver
     {
         #region メンバ
         /// <summary>
@@ -55,7 +54,7 @@ namespace LibX4.Lang
         /// コンストラクタ
         /// </summary>
         /// <param name="catFile">catファイルオブジェクト</param>
-        public LangageResolver(CatFile catFile)
+        public LanguageResolver(CatFile catFile)
         {
             _CatFile = catFile;
         }
@@ -67,16 +66,24 @@ namespace LibX4.Lang
         /// <param name="langID">言語ID</param>
         public void LoadLangFile(int langID)
         {
-            var langFilePath = $"t/0001-l{langID,3:D3}.xml";
+            LoadLangFile($"t/0001-l{langID,3:D3}.xml");
+        }
 
+
+        /// <summary>
+        /// 言語ファイル読み込み
+        /// </summary>
+        /// <param name="fileName"></param>
+        public void LoadLangFile(string fileName)
+        {
             // ロード済みなら何もしない
-            if (_LangTrees.ContainsKey(langFilePath))
+            if (_LangTrees.ContainsKey(fileName))
             {
                 return;
             }
 
-            _LangTrees.Add(langFilePath, _CatFile.OpenLangXml(langFilePath));
-            _Langages.Push(langFilePath);
+            _LangTrees.Add(fileName, _CatFile.OpenLangXml(fileName));
+            _Langages.Push(fileName);
         }
 
 

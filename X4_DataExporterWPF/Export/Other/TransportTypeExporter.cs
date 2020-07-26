@@ -13,14 +13,14 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// 言語解決用オブジェクト
         /// </summary>
-        private readonly LangageResolver Resolver;
+        private readonly LanguageResolver Resolver;
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public TransportTypeExporter(LangageResolver resolver)
+        public TransportTypeExporter(LanguageResolver resolver)
         {
             Resolver = resolver;
         }
