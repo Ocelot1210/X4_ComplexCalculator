@@ -6,6 +6,7 @@
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     d:DesignHeight="450"
     d:DesignWidth="800"
@@ -43,7 +44,6 @@
             <TextBlock.Text>
                 <MultiBinding Converter="{StaticResource FormatStringConverter}">
                     <lex:BLoc Key="Lang:Equiped" />
-
                     <Binding
                         Mode="OneWay"
                         Path="EquippedCount"
@@ -70,7 +70,6 @@
                 Height="30"
                 VerticalContentAlignment="Center"
                 Command="{Binding AddButtonClickedCommand}"
-                CommandParameter="{Binding ElementName=EquipmentsListBox, Path=SelectedItems}"
                 Content="➡"
                 FontSize="18"
                 IsEnabled="{Binding CanAddEquipment, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
@@ -82,7 +81,6 @@
                 Height="30"
                 VerticalContentAlignment="Center"
                 Command="{Binding RemoveButtonClickedCommand}"
-                CommandParameter="{Binding ElementName=EquippedListBox, Path=SelectedItems}"
                 Content="⬅"
                 FontSize="18"
                 IsEnabled="{Binding CanRemoveEquipment, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" />
@@ -93,18 +91,40 @@
             x:Name="EquipmentsListBox"
             Grid.Row="1"
             Grid.Column="0"
-            DisplayMemberPath="Name"
+            x4bhv:ControlItemDoubleClick.ItemsDoubleClick="True"
+            DisplayMemberPath="Equipment.Name"
             ItemsSource="{Binding EquipmentsView}"
-            SelectionMode="Extended" />
+            SelectedValue="IsSelected"
+            SelectionMode="Extended">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="IsSelected" Value="{Binding IsSelected}" />
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.InputBindings>
+                <MouseBinding Command="{Binding AddButtonClickedCommand}" MouseAction="LeftDoubleClick" />
+            </ListBox.InputBindings>
+        </ListBox>
 
         <!--  装備中  -->
         <ListBox
             x:Name="EquippedListBox"
             Grid.Row="1"
             Grid.Column="2"
-            DisplayMemberPath="Name"
+            x4bhv:ControlItemDoubleClick.ItemsDoubleClick="True"
+            DisplayMemberPath="Equipment.Name"
             ItemsSource="{Binding Equipped}"
-            SelectionMode="Extended" />
+            SelectionMode="Extended">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="IsSelected" Value="{Binding IsSelected}" />
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.InputBindings>
+                <MouseBinding Command="{Binding RemoveButtonClickedCommand}" MouseAction="LeftDoubleClick" />
+                <KeyBinding Key="Delete" Command="{Binding RemoveButtonClickedCommand}" />
+            </ListBox.InputBindings>
+        </ListBox>
 
     </Grid>
 </UserControl>

@@ -139,7 +139,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         {
             if(MaxAmount[size] < equipments.Count)
             {
-                throw new System.IndexOutOfRangeException("これ以上装備できません。");
+                throw new IndexOutOfRangeException("これ以上装備できません。");
             }
 
             _Equipments[size].Clear();

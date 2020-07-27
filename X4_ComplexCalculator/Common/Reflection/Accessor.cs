@@ -37,7 +37,10 @@ namespace X4_ComplexCalculator.Common.Reflection
         {
             if (value != null)
             {
-                _Setter((TTarget)target, (TProperty)value);
+                if (target is TTarget tgt && value is TProperty val)
+                {
+                    _Setter(tgt, val);
+                }
             }
         }
     }

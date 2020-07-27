@@ -3,6 +3,9 @@ using System.IO;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Common;
+using System.Text.RegularExpressions;
+using X4_DataExporterWPF.Export;
+using System.Linq;
 
 namespace LibX4.FileSystem
 {
@@ -34,8 +37,26 @@ namespace LibX4.FileSystem
         /// XML差分適用用ユーティリティクラス
         /// </summary>
         private readonly XMLPatcher _XMLPatcher = new XMLPatcher();
+
+
+        /// <summary>
+        /// Modのファイルパスを分割する正規表現
+        /// </summary>
+        private readonly Regex _ParseModRegex = new Regex(@"(extensions\/.+?)\/(.+)");
+
+
+        /// <summary>
+        /// Mod情報配列
+        /// </summary>
+        private readonly ModInfo[] _ModInfo;
         #endregion
 
+        #region プロパティ
+        /// <summary>
+        /// Modが導入されているか
+        /// </summary>
+        public bool IsModInstalled => _ModInfo.Any();
+        #endregion
 
         /// <summary>
         /// コンストラクタ
@@ -45,14 +66,25 @@ namespace LibX4.FileSystem
         {
             _VanillaFile = new CatFileLoader(gameRoot);
 
+            var modInfo = new List<ModInfo>();
+
             // Modのフォルダを読み込み
             if (Directory.Exists(Path.Combine(gameRoot, "extensions")))
             {
                 foreach (var path in Directory.GetDirectories(Path.Combine(gameRoot, "extensions")))
                 {
-                    _ModFiles.Add($"extensions/{Path.GetFileName(path)}", new CatFileLoader(path));
+                    var modPath = $"extensions/{Path.GetFileName(path)}".ToLower().Replace('\\', '/');
+
+                    // content.xmlが存在するフォルダのみ読み込む
+                    if (File.Exists(Path.Combine(gameRoot, modPath, "content.xml")))
+                    {
+                        modInfo.Add(new ModInfo(Path.Combine(gameRoot, modPath)));
+                        _ModFiles.Add(modPath, new CatFileLoader(path));
+                    }
                 }
             }
+
+            _ModInfo = modInfo.ToArray();
         }
 
 
@@ -97,7 +129,7 @@ namespace LibX4.FileSystem
         {
             XDocument? ret = null;
 
-            filePath = filePath.Replace('\\', '/');
+            filePath = PathCanonicalize(filePath.Replace('\\', '/'));
 
             // バニラのxmlを読み込み
             {
@@ -111,15 +143,7 @@ namespace LibX4.FileSystem
             // Modのxmlを連結
             foreach (var (modPath, fileLoader) in _ModFiles)
             {
-                var targetPath = filePath;
-
-                // Modフォルダから指定された場合
-                if (targetPath.StartsWith(modPath))
-                {
-                    targetPath = targetPath.Substring(modPath.Length + 1);
-                }
-
-                using var ms = fileLoader.OpenFile(targetPath);
+                using var ms = fileLoader.OpenFile(filePath);
                 if (ms == null)
                 {
                     continue;
@@ -242,6 +266,55 @@ namespace LibX4.FileSystem
             if (path == null) throw new FileNotFoundException();
 
             return OpenXml($"{path}.xml");
+        }
+
+
+        /// <summary>
+        /// Modの情報をダンプする
+        /// </summary>
+        /// <param name="sw">ダンプ先ストリーム</param>
+        public void DumpModInfo(StreamWriter sw)
+        {
+            if (!_ModInfo.Any())
+            {
+                return;
+            }
+
+            sw.WriteLine("ID\tName\tAuthor\tVersion\tDate\tEnabled\tSave");
+
+            foreach (var info in _ModInfo)
+            {
+                sw.WriteLine($"{info.ID}\t{info.Name}\t{info.Author}\t{info.Version}\t{info.Date}\t{info.Enabled}\t{info.Save}");
+            }
+        }
+
+
+        /// <summary>
+        /// Modのファイルパス等を正規化する
+        /// </summary>
+        /// <param name="path">正規化対象ファイルパス</param>
+        /// <returns>正規化後のファイルパス</returns>
+        /// <remarks>
+        /// "extensions/hogeMod/assets/～～～～"
+        /// ↓
+        /// "assets/～～～～"
+        /// </remarks>
+        private string PathCanonicalize(string path)
+        {
+            path = path.ToLower().Replace('\\', '/');
+
+            var matches = _ParseModRegex.Match(path);
+
+            foreach (var (modPath, _) in _ModFiles)
+            {
+                // Modフォルダから指定されたか？
+                if (modPath == matches.Groups[1].Value)
+                {
+                    return path.Substring(modPath.Length + 1);
+                }
+            }
+
+            return path;
         }
     }
 }

@@ -8,9 +8,7 @@
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
-    xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-    x:Name="window"
     Title="{lex:Loc Lang:SelectModuleWindowTitle}"
     Width="800"
     Height="500"
@@ -66,14 +64,12 @@
                 Width="75"
                 Margin="10"
                 Command="{Binding OKButtonClickedCommand, Mode=OneTime}"
-                CommandParameter="{Binding ElementName=window}"
                 Content="{lex:Loc Lang:Select}" />
 
             <Button
                 Width="75"
                 Margin="10"
                 Command="{Binding CloseButtonClickedCommand, Mode=OneTime}"
-                CommandParameter="{Binding ElementName=window}"
                 Content="{lex:Loc Lang:Close}" />
         </StackPanel>
         <!--#endregion-->
@@ -101,9 +97,6 @@
                         <avdk:LayoutDocumentPane>
                             <!--  所有派閥  -->
                             <avdk:LayoutDocument Title="{lex:Loc Lang:OwnerFaction}" CanClose="False">
-
-
-
                                 <xctk:CheckListBox
                                     DisplayMemberPath="FactionName"
                                     IsSelectAllActive="True"
@@ -142,6 +135,7 @@
 
                                 <!--  モジュール一覧  -->
                                 <ListBox
+                                    x4bhv:ControlItemDoubleClick.ItemsDoubleClick="True"
                                     DisplayMemberPath="Name"
                                     ItemsSource="{Binding ModulesView}"
                                     ScrollViewer.HorizontalScrollBarVisibility="Visible"
@@ -153,6 +147,9 @@
                                             <Setter Property="IsSelected" Value="{Binding IsChecked}" />
                                         </Style>
                                     </ListBox.ItemContainerStyle>
+                                    <ListBox.InputBindings>
+                                        <MouseBinding Command="{Binding OKButtonClickedCommand, Mode=OneTime}" MouseAction="LeftDoubleClick" />
+                                    </ListBox.InputBindings>
                                 </ListBox>
                             </DockPanel>
                         </avdk:LayoutDocument>
