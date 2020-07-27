@@ -3,6 +3,7 @@ using System.IO;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Common;
+using System.Text.RegularExpressions;
 
 namespace LibX4.FileSystem
 {
@@ -34,6 +35,12 @@ namespace LibX4.FileSystem
         /// XML差分適用用ユーティリティクラス
         /// </summary>
         private readonly XMLPatcher _XMLPatcher = new XMLPatcher();
+
+
+        /// <summary>
+        /// Modのファイルパスを分割する正規表現
+        /// </summary>
+        private readonly Regex _ParseModRegex = new Regex(@"(extensions\/.+?)\/(.+)");
         #endregion
 
 
@@ -50,7 +57,9 @@ namespace LibX4.FileSystem
             {
                 foreach (var path in Directory.GetDirectories(Path.Combine(gameRoot, "extensions")))
                 {
-                    _ModFiles.Add($"extensions/{Path.GetFileName(path)}", new CatFileLoader(path));
+                    var modPath = $"extensions/{Path.GetFileName(path)}".ToLower().Replace('\\', '/');
+
+                    _ModFiles.Add(modPath, new CatFileLoader(path));
                 }
             }
         }
@@ -97,7 +106,7 @@ namespace LibX4.FileSystem
         {
             XDocument? ret = null;
 
-            filePath = filePath.Replace('\\', '/');
+            filePath = PathCanonicalize(filePath.Replace('\\', '/'));
 
             // バニラのxmlを読み込み
             {
@@ -111,15 +120,7 @@ namespace LibX4.FileSystem
             // Modのxmlを連結
             foreach (var (modPath, fileLoader) in _ModFiles)
             {
-                var targetPath = filePath;
-
-                // Modフォルダから指定された場合
-                if (targetPath.StartsWith(modPath))
-                {
-                    targetPath = targetPath.Substring(modPath.Length + 1);
-                }
-
-                using var ms = fileLoader.OpenFile(targetPath);
+                using var ms = fileLoader.OpenFile(filePath);
                 if (ms == null)
                 {
                     continue;
@@ -242,6 +243,35 @@ namespace LibX4.FileSystem
             if (path == null) throw new FileNotFoundException();
 
             return OpenXml($"{path}.xml");
+        }
+
+
+        /// <summary>
+        /// Modのファイルパス等を正規化する
+        /// </summary>
+        /// <param name="path">正規化対象ファイルパス</param>
+        /// <returns>正規化後のファイルパス</returns>
+        /// <remarks>
+        /// "extensions/hogeMod/assets/～～～～"
+        /// ↓
+        /// "assets/～～～～"
+        /// </remarks>
+        private string PathCanonicalize(string path)
+        {
+            path = path.ToLower().Replace('\\', '/');
+
+            var matches = _ParseModRegex.Match(path);
+
+            foreach (var (modPath, _) in _ModFiles)
+            {
+                // Modフォルダから指定されたか？
+                if (modPath == matches.Groups[1].Value)
+                {
+                    return path.Substring(modPath.Length + 1);
+                }
+            }
+
+            return path;
         }
     }
 }
