@@ -4,6 +4,8 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Common;
 using System.Text.RegularExpressions;
+using X4_DataExporterWPF.Export;
+using System.Linq;
 
 namespace LibX4.FileSystem
 {
@@ -41,8 +43,20 @@ namespace LibX4.FileSystem
         /// Modのファイルパスを分割する正規表現
         /// </summary>
         private readonly Regex _ParseModRegex = new Regex(@"(extensions\/.+?)\/(.+)");
+
+
+        /// <summary>
+        /// Mod情報配列
+        /// </summary>
+        private readonly ModInfo[] _ModInfo;
         #endregion
 
+        #region プロパティ
+        /// <summary>
+        /// Modが導入されているか
+        /// </summary>
+        public bool IsModInstalled => _ModInfo.Any();
+        #endregion
 
         /// <summary>
         /// コンストラクタ
@@ -52,6 +66,8 @@ namespace LibX4.FileSystem
         {
             _VanillaFile = new CatFileLoader(gameRoot);
 
+            var modInfo = new List<ModInfo>();
+
             // Modのフォルダを読み込み
             if (Directory.Exists(Path.Combine(gameRoot, "extensions")))
             {
@@ -59,9 +75,16 @@ namespace LibX4.FileSystem
                 {
                     var modPath = $"extensions/{Path.GetFileName(path)}".ToLower().Replace('\\', '/');
 
-                    _ModFiles.Add(modPath, new CatFileLoader(path));
+                    // content.xmlが存在するフォルダのみ読み込む
+                    if (File.Exists(Path.Combine(gameRoot, modPath, "content.xml")))
+                    {
+                        modInfo.Add(new ModInfo(Path.Combine(gameRoot, modPath)));
+                        _ModFiles.Add(modPath, new CatFileLoader(path));
+                    }
                 }
             }
+
+            _ModInfo = modInfo.ToArray();
         }
 
 
@@ -243,6 +266,26 @@ namespace LibX4.FileSystem
             if (path == null) throw new FileNotFoundException();
 
             return OpenXml($"{path}.xml");
+        }
+
+
+        /// <summary>
+        /// Modの情報をダンプする
+        /// </summary>
+        /// <param name="sw">ダンプ先ストリーム</param>
+        public void DumpModInfo(StreamWriter sw)
+        {
+            if (!_ModInfo.Any())
+            {
+                return;
+            }
+
+            sw.WriteLine("ID\tName\tAuthor\tVersion\tDate\tEnabled\tSave");
+
+            foreach (var info in _ModInfo)
+            {
+                sw.WriteLine($"{info.ID}\t{info.Name}\t{info.Author}\t{info.Version}\t{info.Date}\t{info.Enabled}\t{info.Save}");
+            }
         }
 
 

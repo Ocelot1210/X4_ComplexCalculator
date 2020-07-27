@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
+using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Xml.XPath;
 using LibX4.FileSystem;
@@ -48,18 +50,17 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// <returns>現在数と合計数のタプルのイテレータ</returns>
         public void Export(IProgress<(int currentStep, int maxSteps)> progless, string inDirPath, string outFilePath, LangComboboxItem language)
         {
+            var catFile = new CatFile(inDirPath);
+
             // 抽出に失敗した場合、どこで例外が発生したか知りたいため、Debugビルドではtry-catchを無効化する
 #if !DEBUG
             try
 #endif
             {
-
                 if (File.Exists(outFilePath))
                 {
                     File.Delete(outFilePath);
                 }
-
-                var catFile = new CatFile(inDirPath);
 
                 var consb = new SQLiteConnectionStringBuilder { DataSource = outFilePath };
                 using var conn = new SQLiteConnection(consb.ToString());
@@ -126,7 +127,7 @@ namespace X4_DataExporterWPF.DataExportWindow
                     currentStep++;
                     progless.Report((currentStep, maxSteps));
                 }
-
+                
                 trans.Commit();
 
                 MessageBox.Show("Data export completed.", "X4 DataExporter", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -134,10 +135,62 @@ namespace X4_DataExporterWPF.DataExportWindow
 #if !DEBUG
             catch (Exception e)
             {
-                var msg = $"■Message\r\n{e.Message}\r\n\r\n■StackTrace\r\n{e.StackTrace}";
+                // テンポラリフォルダにクラッシュレポートをダンプする
+                var dumpPath = Path.Combine(Path.GetTempPath(), "X4_ComplexCalculator_CrashReport.txt");
+
+                DumpCrashReport(dumpPath, catFile, e);
+
+                var msg = @$"Sorry, Data export failed.
+Please report the following content to the developer.
+
+1. Selected language.
+2. Crash report file.
+3. Version of X4.";
+
                 MessageBox.Show(msg, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                System.Diagnostics.Process.Start("explorer.exe", $@"/select,""{dumpPath}""");
             }
 #endif
+        }
+
+
+        /// <summary>
+        /// クラッシュレポートをダンプする
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="catFile"></param>
+        /// <param name="e"></param>
+        private void DumpCrashReport(string path, CatFile catFile, Exception e)
+        {
+            using var sw = new StreamWriter(path);
+
+            sw.WriteLine("Sorry, Data export failed.");
+            sw.WriteLine("Please report the following content to the developer.");
+            sw.WriteLine("");
+            sw.WriteLine("1. Selected language.");
+            sw.WriteLine("2. Crash report file. (this file)");
+            sw.WriteLine("3. Version of X4.");
+
+            sw.WriteLine("\r\n");
+
+            sw.WriteLine("----------------------------------------------------------------------");
+            sw.WriteLine("Exception information");
+            sw.WriteLine("----------------------------------------------------------------------");
+            sw.WriteLine($"■ Type :\r\n{e.GetType()}\r\n");
+            sw.WriteLine($"■ Message :\r\n{e.Message}\r\n");
+            sw.WriteLine($"■ StackTrace :\r\n{e.StackTrace}\r\n");
+
+            // Modがインストールされていればその一覧を出力する
+            if (catFile.IsModInstalled)
+            {
+                sw.WriteLine("\r\n\r\n\r\n");
+
+                sw.WriteLine("----------------------------------------------------------------------");
+                sw.WriteLine("Installed mods");
+                sw.WriteLine("----------------------------------------------------------------------");
+                catFile.DumpModInfo(sw);
+            }
         }
     }
 }
