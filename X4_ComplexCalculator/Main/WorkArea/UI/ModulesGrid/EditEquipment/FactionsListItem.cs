@@ -60,7 +60,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         public FactionsListItem(string id, bool isChecked)
         {
             var faction = Faction.Get(id);
-            Faction = faction ?? throw new ArgumentException("${id} is illegal factionID.");
+            Faction = faction ?? throw new ArgumentException("${id} is invalid factionID.");
             IsChecked = isChecked;
         }
     }
