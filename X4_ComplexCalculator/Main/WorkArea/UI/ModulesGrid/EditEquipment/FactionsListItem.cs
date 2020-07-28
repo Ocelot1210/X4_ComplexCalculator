@@ -1,4 +1,5 @@
-﻿using Prism.Mvvm;
+﻿using System;
+using Prism.Mvvm;
 using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
@@ -58,7 +59,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <param name="isChecked">チェック状態</param>
         public FactionsListItem(string id, bool isChecked)
         {
-            Faction = Faction.Get(id);
+            var faction = Faction.Get(id);
+            Faction = faction ?? throw new ArgumentException("${id} is illegal factionID.");
             IsChecked = isChecked;
         }
     }
