@@ -101,7 +101,8 @@ namespace X4_ComplexCalculator.DB.X4DB
                 var moduleOwners = new List<Faction>();
                 DBConnection.X4DB.ExecQuery($"SELECT FactionID FROM ModuleOwner WHERE ModuleID = '{id}'", (dr2, args2) =>
                 {
-                    moduleOwners.Add(Faction.Get((string)dr2["FactionID"]));
+                    var faction = Faction.Get((string)dr2["FactionID"]);
+                    if (faction != null) moduleOwners.Add(faction);
                 });
 
                 var prod = (noBlueprint) ? Array.Empty<ModuleProduction>() : ModuleProduction.Get(id);
