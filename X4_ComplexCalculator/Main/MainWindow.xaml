@@ -157,6 +157,14 @@
                     </Style>
                 </MenuItem.ItemContainerStyle>
             </MenuItem>
+
+            <!--  ヘルプ(H)  -->
+            <MenuItem Header="{lex:Loc Lang:Help}">
+
+                <!--  X4_ComplexCalculator について  -->
+                <MenuItem Command="{Binding VersionInfoCommand, Mode=OneTime}" Header="{lex:Loc Lang:VersionInfo}" />
+
+            </MenuItem>
         </Menu>
 
         <!--  計画エリア  -->

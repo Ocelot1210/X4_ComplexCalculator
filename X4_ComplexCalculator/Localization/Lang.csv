@@ -78,6 +78,12 @@ InvalidLayoutNameMessage;Invalid layout name. Please enter at least one non-whit
 # Language ---------------------------------------------
 Language;Language
 
+# Help(H) ---------------------------------------------
+Help;Help(_H)
+VersionInfo;Version Information
+VersionInfoTitle;X4_ComplexCalculator
+VersionInfoDescription;X4_ComplexCalculator\r\n\r\nVersion: {0}\r\nCommit: {1}\r\n.NET Core: {2}
+
 
 # ------------------------------------------------------
 # Station Calculator import/export dialog

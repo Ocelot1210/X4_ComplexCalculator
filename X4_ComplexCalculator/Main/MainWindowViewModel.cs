@@ -1,7 +1,8 @@
-﻿using AvalonDock;
+using AvalonDock;
 using GongSolutions.Wpf.DragDrop;
 using Prism.Commands;
 using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -10,6 +11,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Main.Menu.File.Export;
 using X4_ComplexCalculator.Main.Menu.File.Import;
 using X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport;
@@ -102,6 +104,12 @@ namespace X4_ComplexCalculator.Main
 
 
         /// <summary>
+        /// バージョン情報
+        /// </summary>
+        public ICommand VersionInfoCommand { get; }
+
+
+        /// <summary>
         /// タブが閉じられる時
         /// </summary>
         public ICommand DocumentClosingCommand { get; }
@@ -181,6 +189,7 @@ namespace X4_ComplexCalculator.Main
             SaveAsCommand                    = new DelegateCommand(_WorkAreaFileIO.SaveAs);
             OpenCommand                      = new DelegateCommand(Open);
             UpdateDBCommand                  = new DelegateCommand(_MainWindowModel.UpdateDB);
+            VersionInfoCommand               = new DelegateCommand(VersionInfo);
             DocumentClosingCommand           = new DelegateCommand<DocumentClosingEventArgs>(DocumentClosing);
             _WorkAreaFileIO.PropertyChanged += Member_PropertyChanged;
 
@@ -309,6 +318,28 @@ namespace X4_ComplexCalculator.Main
             _WorkAreaFileIO.Open();
             RaisePropertyChanged(nameof(ActiveContent));
         }
+
+
+        /// <summary>
+        /// バージョン情報
+        /// </summary>
+        private void VersionInfo()
+        {
+            const string dirty = ThisAssembly.Git.IsDirty ? "+dirty" : "";
+#if DEBUG
+            const string config = " (Debug)";
+#else
+            const string config = " (Release)";
+#endif
+            const string version = ThisAssembly.Git.Tag + dirty + config;
+            const string commit = ThisAssembly.Git.Sha;
+            var dotnetVersion = Environment.Version.ToString();
+
+            LocalizedMessageBox.Show("Lang:VersionInfoDescription", "Lang:VersionInfoTitle",
+                                     icon: MessageBoxImage.Information,
+                                     param: new[] { version, commit, dotnetVersion });
+        }
+        
 
         /// <summary>
         /// ウィンドウがロードされた時
