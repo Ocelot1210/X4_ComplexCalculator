@@ -30,6 +30,7 @@
                             <RowDefinition Height="1*" />
                             <RowDefinition Height="1*" />
                             <RowDefinition Height="1*" />
+                            <RowDefinition Height="1*" />
                         </Grid.RowDefinitions>
 
                         <StackPanel Grid.Row="0" Orientation="Horizontal">
@@ -43,10 +44,16 @@
                         </StackPanel>
                         <Slider
                             Grid.Row="1"
+                            Margin="0,5,0,5"
                             Maximum="{Binding Workforce.Capacity, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                             Minimum="0"
                             TickFrequency="1"
                             Value="{Binding Workforce.Actual, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <CheckBox
+                            Grid.Row="2"
+                            Content="{lex:Loc Lang:AlwaysMaximun}"
+                            IsChecked="{Binding Workforce.AlwaysMaximum}" />
                     </Grid>
 
                 </StackPanel>

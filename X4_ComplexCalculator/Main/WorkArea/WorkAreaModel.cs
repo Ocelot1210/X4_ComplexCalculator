@@ -122,6 +122,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
                         _Resources.Resources.CollectionPropertyChanged -= OnPropertyChanged;
                         _StorageAssign.StorageAssignGridItems.CollectionPropertyChanged -= OnPropertyChanged;
                         Settings.PropertyChanged -= OnPropertyChanged;
+                        Settings.Workforce.PropertyChanged -= OnPropertyChanged;
                     }
                     else
                     {
@@ -132,6 +133,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
                         _Resources.Resources.CollectionPropertyChanged += OnPropertyChanged;
                         _StorageAssign.StorageAssignGridItems.CollectionPropertyChanged += OnPropertyChanged;
                         Settings.PropertyChanged += OnPropertyChanged;
+                        Settings.Workforce.PropertyChanged += OnPropertyChanged;
                     }
                 }
             }
@@ -177,6 +179,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
             _Resources.Resources.CollectionPropertyChanged -= OnPropertyChanged;
             _StorageAssign.StorageAssignGridItems.CollectionPropertyChanged -= OnPropertyChanged;
             Settings.PropertyChanged -= OnPropertyChanged;
+            Settings.Workforce.PropertyChanged -= OnPropertyChanged;
         }
 
 
@@ -206,6 +209,8 @@ namespace X4_ComplexCalculator.Main.WorkArea
                 nameof(StorageAssignGridItem.AllocCount),
                 nameof(StationSettingsModel.IsHeadquarters),
                 nameof(StationSettingsModel.Sunlight),
+                nameof(WorkforceManager.Actual),
+                nameof(WorkforceManager.AlwaysMaximum)
             };
 
             if (0 < Array.IndexOf(names, e.PropertyName))
