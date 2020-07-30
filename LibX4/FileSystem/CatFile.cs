@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -95,25 +95,15 @@ namespace LibX4.FileSystem
         /// <returns>ファイルの内容</returns>
         public MemoryStream OpenFile(string filePath)
         {
-            {
-                using var ret = _VanillaFile.OpenFile(filePath);
-
-                // バニラのデータに見つかればそちらを開く
-                if (ret != null)
-                {
-                    return ret;
-                }
-            }
+            // バニラのデータに見つかればそちらを開く
+            var vanillaFile = _VanillaFile.OpenFile(filePath);
+            if (vanillaFile != null) return vanillaFile;
 
             // バニラのデータに見つからない場合、Modのデータを探しに行く
             foreach (var fileLoader in _ModFiles.Values)
             {
-                using var ret = fileLoader.OpenFile(filePath);
-
-                if (ret != null)
-                {
-                    return ret;
-                }
+                var modFile = fileLoader.OpenFile(filePath);
+                if (modFile != null) return modFile;
             }
 
             throw new FileNotFoundException(nameof(filePath));
