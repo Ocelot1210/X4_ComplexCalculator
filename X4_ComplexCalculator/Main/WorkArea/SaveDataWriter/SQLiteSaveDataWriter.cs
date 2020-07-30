@@ -112,6 +112,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
             conn.ExecQuery($"INSERT INTO StationSettings(Key, Value) VALUES('IsHeadquarters', '{WorkArea.Settings.IsHeadquarters}')");
             conn.ExecQuery($"INSERT INTO StationSettings(Key, Value) VALUES('Sunlight', '{WorkArea.Settings.Sunlight}')");
             conn.ExecQuery($"INSERT INTO StationSettings(Key, Value) VALUES('ActualWorkforce', '{WorkArea.Settings.Workforce.Actual}')");
+            conn.ExecQuery($"INSERT INTO StationSettings(Key, Value) VALUES('AlwaysMaximumWorkforce', '{WorkArea.Settings.Workforce.AlwaysMaximum}')");
 
             // モジュール保存
             var rowCnt = 0;

@@ -76,6 +76,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
         /// <param name="conn"></param>
         protected virtual void RestoreSettings(DBConnection conn)
         {
+            // 本部か
             conn.ExecQuery("SELECT Value FROM StationSettings WHERE Key = 'IsHeadquarters'", (dr, _) =>
             {
                 var value = (string)dr["Value"];
@@ -83,6 +84,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                 _WorkArea.Settings.IsHeadquarters = value == bool.TrueString;
             });
 
+            // 日光
             conn.ExecQuery("SELECT Value FROM StationSettings WHERE Key = 'Sunlight'", (dr, _) =>
             {
                 var value = (string)dr["Value"];
@@ -93,6 +95,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                 }
             });
 
+            // 現在の労働者数
             conn.ExecQuery("SELECT Value FROM StationSettings WHERE Key = 'ActualWorkforce'", (dr, _) =>
             {
                 var value = (string)dr["Value"];
@@ -101,6 +104,14 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                 {
                     _WorkArea.Settings.Workforce.Actual = actualWorkforce;
                 }
+            });
+
+            // (労働者数を)常に最大にするか
+            conn.ExecQuery("SELECT Value FROM StationSettings WHERE key = 'AlwaysMaximumWorkforce'", (dr, _) =>
+            {
+                var value = (string)dr["Value"];
+
+                _WorkArea.Settings.Workforce.AlwaysMaximum = value == bool.TrueString;
             });
         }
 

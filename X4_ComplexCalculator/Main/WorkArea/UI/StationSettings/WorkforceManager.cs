@@ -24,6 +24,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSettings
         /// 収容人数
         /// </summary>
         private long _Capacity = 0;
+
+
+        /// <summary>
+        /// 常に最大にするか
+        /// </summary>
+        private bool _AlwaysMaximum;
         #endregion
 
 
@@ -68,7 +74,14 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSettings
         public long Capacity
         {
             get => _Capacity;
-            set => SetPropertyEx(ref _Capacity, value);
+            set
+            {
+                var isActualChange = value < Actual || Actual < value && AlwaysMaximum;
+                if (SetPropertyEx(ref _Capacity, value) && isActualChange)
+                {
+                    Actual = value;
+                }
+            }
         }
 
 
@@ -85,6 +98,22 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSettings
                 }
 
                 return (double)Actual / Need;
+            }
+        }
+
+
+        /// <summary>
+        /// 常に最大にするか
+        /// </summary>
+        public bool AlwaysMaximum
+        {
+            get => _AlwaysMaximum;
+            set
+            {
+                if (SetProperty(ref _AlwaysMaximum, value) && value)
+                {
+                    Actual = Capacity;
+                }
             }
         }
         #endregion
