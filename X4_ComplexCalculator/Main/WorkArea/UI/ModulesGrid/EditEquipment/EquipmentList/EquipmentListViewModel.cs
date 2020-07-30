@@ -1,13 +1,10 @@
 ﻿using Prism.Commands;
 using Prism.Mvvm;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Linq;
 using System.Windows.Data;
-using System.Windows.Input;
 using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList
@@ -63,18 +60,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
 
 
         /// <summary>
-        /// 装備を追加可能か
-        /// </summary>
-        public bool CanAddEquipment => EquippedCount < MaxAmount;
-
-
-        /// <summary>
-        /// 装備を削除可能か
-        /// </summary>
-        public bool CanRemoveEquipment => 0 < EquippedCount;
-
-
-        /// <summary>
         /// 装備の検索文字列
         /// </summary>
         public string SearchEquipmentName
@@ -99,13 +84,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 追加ボタンクリック時のコマンド
         /// </summary>
-        public ICommand AddButtonClickedCommand { get; }
+        public DelegateCommand AddButtonClickedCommand { get; }
 
 
         /// <summary>
         /// 削除ボタンクリック時のコマンド
         /// </summary>
-        public ICommand RemoveButtonClickedCommand { get; }
+        public DelegateCommand RemoveButtonClickedCommand { get; }
 
 
         /// <summary>
@@ -119,8 +104,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
                 RaisePropertyChanged(nameof(MaxAmount));
                 RaisePropertyChanged(nameof(EquippedCount));
                 RaisePropertyChanged(nameof(Equipped));
-                RaisePropertyChanged(nameof(CanAddEquipment));
-                RaisePropertyChanged(nameof(CanRemoveEquipment));
+                AddButtonClickedCommand.RaiseCanExecuteChanged();
+                RemoveButtonClickedCommand.RaiseCanExecuteChanged();
                 RaisePropertyChanged(nameof(EquipmentsView));
             }
         }
@@ -137,8 +122,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
                 RaisePropertyChanged(nameof(MaxAmount));
                 RaisePropertyChanged(nameof(EquippedCount));
                 RaisePropertyChanged(nameof(Equipped));
-                RaisePropertyChanged(nameof(CanAddEquipment));
-                RaisePropertyChanged(nameof(CanRemoveEquipment));
+                AddButtonClickedCommand.RaiseCanExecuteChanged();
+                RemoveButtonClickedCommand.RaiseCanExecuteChanged();
                 RaisePropertyChanged(nameof(EquipmentsView));
                 Unsaved = true;
             }
@@ -167,8 +152,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
                 _EquipmentsViews.Add(pair.Key, item);
             }
 
-            AddButtonClickedCommand = new DelegateCommand(AddButtonClicked);
-            RemoveButtonClickedCommand = new DelegateCommand(DeleteButtonClicked);
+            AddButtonClickedCommand = new DelegateCommand(AddButtonClicked, () => EquippedCount < MaxAmount);
+            RemoveButtonClickedCommand = new DelegateCommand(DeleteButtonClicked, () => 0 < EquippedCount);
         }
 
 
@@ -199,8 +184,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
             {
                 // 装備が追加された場合
                 Unsaved = true;
-                RaisePropertyChanged(nameof(CanAddEquipment));
-                RaisePropertyChanged(nameof(CanRemoveEquipment));
+                AddButtonClickedCommand.RaiseCanExecuteChanged();
+                RemoveButtonClickedCommand.RaiseCanExecuteChanged();
                 RaisePropertyChanged(nameof(EquippedCount));
             }
         }
@@ -215,8 +200,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
             {
                 // 装備が削除された場合
                 Unsaved = true;
-                RaisePropertyChanged(nameof(CanAddEquipment));
-                RaisePropertyChanged(nameof(CanRemoveEquipment));
+                AddButtonClickedCommand.RaiseCanExecuteChanged();
+                RemoveButtonClickedCommand.RaiseCanExecuteChanged();
                 RaisePropertyChanged(nameof(EquippedCount));
             }
         }

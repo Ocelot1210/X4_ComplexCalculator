@@ -72,7 +72,6 @@
                 Command="{Binding AddButtonClickedCommand}"
                 Content="➡"
                 FontSize="18"
-                IsEnabled="{Binding CanAddEquipment, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                 ToolTip="{lex:Loc Lang:EquipmentAddButtonToolTip}" />
 
             <!--  削除ボタン  -->
@@ -82,8 +81,7 @@
                 VerticalContentAlignment="Center"
                 Command="{Binding RemoveButtonClickedCommand}"
                 Content="⬅"
-                FontSize="18"
-                IsEnabled="{Binding CanRemoveEquipment, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" />
+                FontSize="18" />
         </Grid>
 
         <!--  装備一覧  -->
