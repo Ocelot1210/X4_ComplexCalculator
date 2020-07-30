@@ -1,11 +1,9 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using X4_DataExporterWPF.Common;
-using System.Text.RegularExpressions;
-using X4_DataExporterWPF.Export;
-using System.Linq;
 
 namespace LibX4.FileSystem
 {

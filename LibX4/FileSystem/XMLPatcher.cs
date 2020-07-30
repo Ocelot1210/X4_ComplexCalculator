@@ -5,7 +5,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
-namespace X4_DataExporterWPF.Common
+namespace LibX4.FileSystem
 {
     /// <summary>
     /// XML差分パッチ用クラス
