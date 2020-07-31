@@ -70,7 +70,8 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="factionID">派閥ID</param>
         /// <returns>派閥</returns>
-        public static Faction Get(string factionID) => _Factions[factionID];
+        public static Faction? Get(string factionID)
+            => _Factions.TryGetValue(factionID, out var faction) ? faction : null;
 
 
         /// <summary>

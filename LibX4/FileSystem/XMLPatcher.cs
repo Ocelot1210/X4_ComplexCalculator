@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
-namespace X4_DataExporterWPF.Common
+namespace LibX4.FileSystem
 {
     /// <summary>
     /// XML差分パッチ用クラス
@@ -15,82 +15,77 @@ namespace X4_DataExporterWPF.Common
     /// なお、現時点では名前空間のマングリングを伴うパッチ(RFC5261 の A.18)以外は
     /// 期待する内容と同じ意味になるxmlが作成される。
     /// </remarks>
-    public class XMLPatcher
+    static class XMLPatcher
     {
         /// <summary>
-        /// コンストラクタ
+        /// Xml ファイルに別の Xml ファイルをマージする
         /// </summary>
-        public XMLPatcher()
+        /// <param name="baseXml">ベースとなる XML</param>
+        /// <param name="patchXml">マージする XML</param>
+        public static void MergeXML(this XDocument baseXml, XDocument patchXml)
         {
-
+            if (patchXml.Root.Name.LocalName == "diff") ApplyDiffXml(baseXml, patchXml);
+            else baseXml.Root.Add(patchXml.Root.Elements());
         }
 
 
         /// <summary>
-        /// xmlファイルをマージする
+        /// Xml ファイルに RFC5261 に準拠した diff XML をマージする
         /// </summary>
-        /// <param name="patchedXml">パッチされるxml</param>
-        /// <param name="patchXml">パッチ用xml</param>
-        public void MergeXML(XDocument patchedXml, XDocument patchXml)
+        /// <param name="baseXml">ベースとなる XML</param>
+        /// <param name="diffXml">RFC5261 に準拠した diff XML</param>
+        private static void ApplyDiffXml(XDocument baseXml, XDocument diffXml)
         {
-            if (patchXml.Root.Name.LocalName == "diff")
+            var nsMng = new XmlNamespaceManager(new NameTable());
+
+            foreach (var attr in diffXml.Root.Attributes())
             {
-                var nsTbl = new NameTable();
-                var nsMng = new XmlNamespaceManager(nsTbl);
-
-                foreach (var attr in patchXml.Root.Attributes())
+                // 名前空間の場合
+                if (attr.IsNamespaceDeclaration)
                 {
-                    // 名前空間の場合
-                    if (attr.IsNamespaceDeclaration)
+                    if (attr.Name.LocalName.StartsWith("xmlns"))
                     {
-                        if (attr.Name.LocalName.StartsWith("xmlns"))
-                        {
-                            nsMng.AddNamespace(attr.Name.NamespaceName, attr.Value);
-                        }
-                        else
-                        {
-                            nsMng.AddNamespace(attr.Name.LocalName, attr.Value);
-                        }
+                        nsMng.AddNamespace(attr.Name.NamespaceName, attr.Value);
                     }
-                }
-
-                foreach (var elm in patchXml.Root.Elements())
-                {
-                    var sel = patchedXml.XPathEvaluate(elm.Attribute("sel").Value, nsMng);
-
-                    if (!(sel is IEnumerable enumerable))
+                    else
                     {
-                        continue;
-                    }
-
-                    var targetNode = enumerable.OfType<XObject>().FirstOrDefault();
-                    if (targetNode == null)
-                    {
-                        continue;
-                    }
-
-                    switch (elm.Name.LocalName)
-                    {
-                        case "add":
-                            AddNode(elm, targetNode);
-                            break;
-
-                        case "replace":
-                            Replace(elm, targetNode);
-                            break;
-
-                        case "remove":
-                            Remove(patchedXml, targetNode);
-                            break;
-
-                        default:
-                            break;
+                        nsMng.AddNamespace(attr.Name.LocalName, attr.Value);
                     }
                 }
             }
-            else
+
+            foreach (var elm in diffXml.Root.Elements())
             {
-                patchedXml.Root.Add(patchXml.Root.Elements());
+                var sel = baseXml.XPathEvaluate(elm.Attribute("sel").Value, nsMng);
+
+                if (!(sel is IEnumerable enumerable))
+                {
+                    continue;
+                }
+
+                var targetNode = enumerable.OfType<XObject>().FirstOrDefault();
+                if (targetNode == null)
+                {
+                    continue;
+                }
+
+                switch (elm.Name.LocalName)
+                {
+                    case "add":
+                        AddNode(elm, targetNode);
+                        break;
+
+                    case "replace":
+                        Replace(elm, targetNode);
+                        break;
+
+                    case "remove":
+                        Remove(baseXml, targetNode);
+                        break;
+
+                    default:
+                        break;
+                }
             }
         }
 
@@ -101,7 +96,7 @@ namespace X4_DataExporterWPF.Common
         /// <param name="dst"></param>
         /// <param name="element"></param>
         /// <param name="target"></param>
-        private void AddNode(XElement element, XObject target)
+        private static void AddNode(XElement element, XObject target)
         {
             var type = element.Attribute("type")?.Value;
 
@@ -158,7 +153,7 @@ namespace X4_DataExporterWPF.Common
         /// </summary>
         /// <param name="element"></param>
         /// <param name="target"></param>
-        private void Replace(XElement element, XObject target)
+        private static void Replace(XElement element, XObject target)
         {
             switch (target.NodeType)
             {
@@ -187,7 +182,7 @@ namespace X4_DataExporterWPF.Common
         /// </summary>
         /// <param name="dst"></param>
         /// <param name="element"></param>
-        private void Remove(XDocument dst, XObject target)
+        private static void Remove(XDocument dst, XObject target)
         {
             switch (target.NodeType)
             {
