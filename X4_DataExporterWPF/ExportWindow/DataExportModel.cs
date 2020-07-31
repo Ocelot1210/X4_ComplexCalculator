@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
-using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Xml.XPath;
 using LibX4.FileSystem;
@@ -127,7 +125,7 @@ namespace X4_DataExporterWPF.DataExportWindow
                     currentStep++;
                     progless.Report((currentStep, maxSteps));
                 }
-                
+
                 trans.Commit();
 
                 MessageBox.Show("Data export completed.", "X4 DataExporter", MessageBoxButton.OK, MessageBoxImage.Information);

@@ -1,12 +1,12 @@
-﻿using Microsoft.WindowsAPICodePack.Dialogs;
-using Prism.Mvvm;
-using Reactive.Bindings;
-using Reactive.Bindings.Extensions;
 using System;
 using System.IO;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using Microsoft.WindowsAPICodePack.Dialogs;
+using Prism.Mvvm;
+using Reactive.Bindings;
+using Reactive.Bindings.Extensions;
 
 namespace X4_DataExporterWPF.DataExportWindow
 {
