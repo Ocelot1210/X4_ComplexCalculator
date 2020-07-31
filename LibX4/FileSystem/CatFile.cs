@@ -32,12 +32,6 @@ namespace LibX4.FileSystem
 
 
         /// <summary>
-        /// XML差分適用用ユーティリティクラス
-        /// </summary>
-        private readonly XMLPatcher _XMLPatcher = new XMLPatcher();
-
-
-        /// <summary>
         /// Modのファイルパスを分割する正規表現
         /// </summary>
         private readonly Regex _ParseModRegex = new Regex(@"(extensions\/.+?)\/(.+)");
@@ -143,7 +137,7 @@ namespace LibX4.FileSystem
                 }
                 else
                 {
-                    _XMLPatcher.MergeXML(ret, XDocument.Load(ms));
+                    ret.MergeXML(XDocument.Load(ms));
                 }
             }
 
@@ -210,7 +204,7 @@ namespace LibX4.FileSystem
                 if (src.Root.Name.LocalName == "diff")
                 {
                     // 差分ファイルの場合、パッチ処理に差分を適用させる
-                    _XMLPatcher.MergeXML(ret, src);
+                    ret.MergeXML(src);
                 }
                 else
                 {
