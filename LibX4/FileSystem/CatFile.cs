@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using X4_DataExporterWPF.Common;
-using System.Text.RegularExpressions;
-using X4_DataExporterWPF.Export;
-using System.Linq;
 
 namespace LibX4.FileSystem
 {
@@ -31,12 +29,6 @@ namespace LibX4.FileSystem
         /// Indexファイル
         /// </summary>
         private readonly Dictionary<string, XDocument> _IndexFiles = new Dictionary<string, XDocument>();
-
-
-        /// <summary>
-        /// XML差分適用用ユーティリティクラス
-        /// </summary>
-        private readonly XMLPatcher _XMLPatcher = new XMLPatcher();
 
 
         /// <summary>
@@ -95,25 +87,15 @@ namespace LibX4.FileSystem
         /// <returns>ファイルの内容</returns>
         public MemoryStream OpenFile(string filePath)
         {
-            {
-                using var ret = _VanillaFile.OpenFile(filePath);
-
-                // バニラのデータに見つかればそちらを開く
-                if (ret != null)
-                {
-                    return ret;
-                }
-            }
+            // バニラのデータに見つかればそちらを開く
+            var vanillaFile = _VanillaFile.OpenFile(filePath);
+            if (vanillaFile != null) return vanillaFile;
 
             // バニラのデータに見つからない場合、Modのデータを探しに行く
             foreach (var fileLoader in _ModFiles.Values)
             {
-                using var ret = fileLoader.OpenFile(filePath);
-
-                if (ret != null)
-                {
-                    return ret;
-                }
+                var modFile = fileLoader.OpenFile(filePath);
+                if (modFile != null) return modFile;
             }
 
             throw new FileNotFoundException(nameof(filePath));
@@ -155,7 +137,7 @@ namespace LibX4.FileSystem
                 }
                 else
                 {
-                    _XMLPatcher.MergeXML(ret, XDocument.Load(ms));
+                    ret.MergeXML(XDocument.Load(ms));
                 }
             }
 
@@ -222,7 +204,7 @@ namespace LibX4.FileSystem
                 if (src.Root.Name.LocalName == "diff")
                 {
                     // 差分ファイルの場合、パッチ処理に差分を適用させる
-                    _XMLPatcher.MergeXML(ret, src);
+                    ret.MergeXML(src);
                 }
                 else
                 {

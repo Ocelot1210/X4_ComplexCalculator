@@ -1,7 +1,7 @@
-﻿using System.IO;
+using System.IO;
 using System.Xml.Linq;
 
-namespace X4_DataExporterWPF.Export
+namespace LibX4.FileSystem
 {
 
     /// <summary>

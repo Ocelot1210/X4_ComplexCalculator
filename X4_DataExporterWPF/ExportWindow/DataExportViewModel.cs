@@ -1,12 +1,13 @@
-﻿using Microsoft.WindowsAPICodePack.Dialogs;
-using Prism.Mvvm;
-using Reactive.Bindings;
-using Reactive.Bindings.Extensions;
-using System;
+﻿using System;
 using System.IO;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using Microsoft.WindowsAPICodePack.Dialogs;
+using Prism.Mvvm;
+using Reactive.Bindings;
+using Reactive.Bindings.Extensions;
 
 namespace X4_DataExporterWPF.DataExportWindow
 {
@@ -112,7 +113,7 @@ namespace X4_DataExporterWPF.DataExportWindow
             CloseCommand = new ReactiveCommand<Window>(CanOperation).WithSubscribe(Close);
 
             // 入力元フォルダパスが変更された時、言語一覧を更新する
-            InDirPath.Subscribe(path =>
+            InDirPath.ObserveOn(ThreadPoolScheduler.Instance).Subscribe(path =>
             {
                 Langages.ClearOnScheduler();
                 Langages.AddRangeOnScheduler(_Model.GetLangages(path));
