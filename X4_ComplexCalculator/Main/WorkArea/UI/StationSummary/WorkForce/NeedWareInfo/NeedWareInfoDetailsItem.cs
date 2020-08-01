@@ -105,13 +105,14 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
         /// <summary>
         /// コンストラクタ
         /// </summary>
+        /// <param name="race">種族</param>
         /// <param name="method">労働方式</param>
         /// <param name="wareID">ウェアID</param>
         /// <param name="needAmount">必要数量</param>
         /// <param name="productionAmount">生産数量</param>
-        public NeedWareInfoDetailsItem(string method, string wareID, long needAmount = 0, long productionAmount = 0)
+        public NeedWareInfoDetailsItem(Race race, string method, string wareID, long needAmount = 0, long productionAmount = 0)
         {
-            Race             = (method == "default") ? Race.Get("argon") : Race.Get(method);
+            Race             = race;
             Method           = method;
             WareID           = wareID;
             WareName         = Ware.Get(wareID).Name;
