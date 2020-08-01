@@ -107,11 +107,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             // モジュールを復元
             conn.ExecQuery("SELECT ModuleID, Count FROM Modules ORDER BY Row ASC", (dr, _) =>
             {
-                var mod = new ModulesGridItem((string)dr["ModuleID"], (long)dr["Count"])
+                var module = Module.Get((string)dr["ModuleID"]);
+                if (module != null)
                 {
-                    EditStatus = EditStatus.Unedited
-                };
-                modules.Add(mod);
+                    var mod = new ModulesGridItem(module, null, (long)dr["Count"]) { EditStatus = EditStatus.Unedited };
+                    modules.Add(mod);
+                }
+                
                 progress.Report((int)((double)progressCnt++ / records * maxProgress));
             });
 

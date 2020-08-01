@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
+using System.Reflection;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Enum;
 using X4_ComplexCalculator.DB;
@@ -173,7 +174,12 @@ WHERE
         public void AddSelectedModuleToItemCollection()
         {
             // 選択されているアイテムを追加
-            var items = Modules.Where(x => x.IsChecked).Select(x => new ModulesGridItem(x.ID) { EditStatus = EditStatus.Edited });
+            var items = Modules.Where(x => x.IsChecked)
+                               .Select(x => DB.X4DB.Module.Get(x.ID))
+                               .Where(x => x != null)
+                               .Select(x => x!)
+                               .Select(x => new ModulesGridItem(x) { EditStatus = EditStatus.Edited });
+
             ItemCollection.AddRange(items);
         }
 

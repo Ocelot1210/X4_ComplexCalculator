@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
 using X4_ComplexCalculator.Common.Localize;
+using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
@@ -99,12 +100,13 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
 
 
                 var moduleParser = new Regex(@"\$module-(.*?),count:(.*)");
-                var modules = paramDict["l"].Split(";,").Select(x =>
-                {
-                    var m = moduleParser.Match(x);
+                var modules = paramDict["l"].Split(";,")
+                                            .Select(x => moduleParser.Match(x))
+                                            .Select(x => (Module: Module.Get(x.Groups[1].Value), Count: long.Parse(x.Groups[2].Value)))
+                                            .Where(x => x.Module != null)
+                                            .Select(x => (Module: x.Module!, x.Count))
+                                            .Select(x => new ModulesGridItem(x.Module, null, x.Count));
 
-                    return new ModulesGridItem(m.Groups[1].Value, long.Parse(m.Groups[2].Value));
-                });
                 WorkArea.Modules.AddRange(modules);
 
                 ret = true;

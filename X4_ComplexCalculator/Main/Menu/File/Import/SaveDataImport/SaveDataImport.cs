@@ -155,7 +155,12 @@ WHERE
 
                 DBConnection.X4DB.ExecQuery(query, modParam, (dr, _) =>
                 {
-                    modules.Add(new ModulesGridItem((string)dr["ModuleID"]));
+                    var module = Module.Get((string)dr["ModuleID"]);
+
+                    if (module != null)
+                    {
+                        modules.Add(new ModulesGridItem(module));
+                    }
                 });
             }
 
