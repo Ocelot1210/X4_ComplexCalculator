@@ -6,6 +6,7 @@ using System.Reflection;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Enum;
 using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
@@ -105,7 +106,8 @@ ORDER BY Name", init, "SelectModuleCheckStateTypes");
             {
                 bool isChecked = 0 < DBConnection.CommonDB.ExecQuery($"SELECT * FROM SelectModuleCheckStateModuleOwners WHERE ID = '{dr["FactionID"]}'", (_, __) => { });
 
-                items.Add(new FactionsListItem((string)dr["FactionID"], isChecked));
+                var faction = Faction.Get((string)dr["FactionID"]);
+                if (faction != null) items.Add(new FactionsListItem(faction, isChecked));
             }
 
             DBConnection.X4DB.ExecQuery(@"
