@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Enum;
 using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
@@ -19,15 +20,23 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// </summary>
         private long _UnitPrice;
 
+
         /// <summary>
         /// Expanderが展開されているか
         /// </summary>
         private bool _IsExpanded;
 
+
         /// <summary>
         /// 売買オプション
         /// </summary>
         readonly TradeOption _TradeOption;
+
+
+        /// <summary>
+        /// 編集状態
+        /// </summary>
+        private EditStatus _EditStatus = EditStatus.Unedited;
         #endregion
 
 
@@ -90,6 +99,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
                 RaisePropertyChangedEx(oldUnitPrice, setValue);
                 RaisePropertyChangedEx(oldPrice, Price, nameof(Price));
+                EditStatus = EditStatus.Edited;
             }
         }
 
@@ -141,6 +151,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                     {
                         RaisePropertyChangedEx(oldPrice, Price, nameof(Price));
                     }
+                    EditStatus = EditStatus.Edited;
                 }
             }
         }
@@ -162,8 +173,19 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                     {
                         RaisePropertyChangedEx(oldPrice, Price, nameof(Price));
                     }
+                    EditStatus = EditStatus.Edited;
                 }
             }
+        }
+
+
+        /// <summary>
+        /// 編集状態
+        /// </summary>
+        public EditStatus EditStatus
+        {
+            get => _EditStatus;
+            set => SetProperty(ref _EditStatus, value);
         }
         #endregion
 

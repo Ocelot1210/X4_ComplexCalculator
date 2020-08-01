@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Windows;
+using X4_ComplexCalculator.Common.Enum;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
 
@@ -120,6 +121,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
             {
                 conn.ExecQuery($"INSERT INTO Modules(Row, ModuleID, Count) Values({rowCnt}, '{module.Module.ModuleID}', {module.ModuleCount})");
 
+                if (module.EditStatus == EditStatus.Edited)
+                {
+                    module.EditStatus |= EditStatus.Saved;
+                }
+
                 foreach (var equipment in module.ModuleEquipment.GetAllEquipment())
                 {
                     conn.ExecQuery($"INSERT INTO Equipments(Row, EquipmentID) Values({rowCnt}, '{equipment.EquipmentID}')");
@@ -132,6 +138,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
             // 価格保存
             foreach (var product in WorkArea.Products)
             {
+                if (product.EditStatus == EditStatus.Edited)
+                {
+                    product.EditStatus |= EditStatus.Saved;
+                }
+
                 conn.ExecQuery($"INSERT INTO Products(WareID, Price, NoBuy, NoSell) Values('{product.Ware.WareID}', {product.UnitPrice}, {(product.NoBuy? 1 : 0)}, {(product.NoSell ? 1 : 0)})");
             }
 
@@ -139,12 +150,20 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
             foreach (var resource in WorkArea.Resources)
             {
                 conn.ExecQuery($"INSERT INTO BuildResources(WareID, Price, NoBuy) Values('{resource.Ware.WareID}', {resource.UnitPrice}, {(resource.NoBuy? 1 : 0)})");
+                if (resource.EditStatus == EditStatus.Edited)
+                {
+                    resource.EditStatus |= EditStatus.Saved;
+                }
             }
 
             // 保管庫割当情報保存
             foreach (var assign in WorkArea.StorageAssign)
             {
                 conn.ExecQuery($"INSERT INTO StorageAssign(WareID, AllocCount) Values('{assign.WareID}', {assign.AllocCount})");
+                if (assign.EditStatus == EditStatus.Edited)
+                {
+                    assign.EditStatus |= EditStatus.Saved;
+                }
             }
 
             conn.Commit();

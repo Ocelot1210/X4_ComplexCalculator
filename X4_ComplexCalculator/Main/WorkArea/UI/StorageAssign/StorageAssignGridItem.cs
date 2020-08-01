@@ -1,6 +1,7 @@
 ﻿using Prism.Mvvm;
 using System;
 using System.ComponentModel;
+using X4_ComplexCalculator.Common.Enum;
 using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
@@ -26,6 +27,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         /// 1時間あたりの生産量
         /// </summary>
         private long _ProductPerHour;
+
+
+        /// <summary>
+        /// 編集状態
+        /// </summary>
+        private EditStatus _EditStatus = EditStatus.Unedited;
         #endregion
 
 
@@ -87,6 +94,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
                     RaisePropertyChanged(nameof(AllocCapacity));
                     RaisePropertyChanged(nameof(StorageStatus));
                     CapacityInfo.UsedCapacity += (value - prevCount) * Volume;
+                    EditStatus = EditStatus.Edited;
                 }
             }
         }
@@ -155,6 +163,16 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         /// 指定時間後の個数
         /// </summary>
         public long AfterCount => ProductPerHour * Hour;
+
+
+        /// <summary>
+        /// 編集状態
+        /// </summary>
+        public EditStatus EditStatus
+        {
+            get => _EditStatus;
+            set => SetProperty(ref _EditStatus, value);
+        }
         #endregion
 
 

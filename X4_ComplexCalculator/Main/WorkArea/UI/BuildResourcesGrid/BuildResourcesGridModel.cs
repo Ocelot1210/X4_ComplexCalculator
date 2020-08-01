@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Enum;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
@@ -285,6 +286,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
                     {
                         item.UnitPrice = _UnitPriceBakDict[item.Ware.WareID];
                     }
+                    item.EditStatus = EditStatus.Edited;
                     addTarget.Add(item);
                 }
             }

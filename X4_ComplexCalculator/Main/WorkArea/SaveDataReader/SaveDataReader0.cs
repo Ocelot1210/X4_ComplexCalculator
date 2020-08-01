@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using X4_ComplexCalculator.Common.Enum;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
@@ -106,7 +107,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             // モジュールを復元
             conn.ExecQuery("SELECT ModuleID, Count FROM Modules ORDER BY Row ASC", (dr, _) =>
             {
-                modules.Add(new ModulesGridItem((string)dr["ModuleID"], (long)dr["Count"]));
+                var mod = new ModulesGridItem((string)dr["ModuleID"], (long)dr["Count"])
+                {
+                    EditStatus = EditStatus.Unedited
+                };
+                modules.Add(mod);
                 progress.Report((int)((double)progressCnt++ / records * maxProgress));
             });
 
@@ -137,6 +142,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                 if (itm != null)
                 {
                     itm.UnitPrice = (long)dr["Price"];
+                    itm.EditStatus = EditStatus.Unedited;
                 }
             });
         }
@@ -156,6 +162,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                 if (itm != null)
                 {
                     itm.UnitPrice = (long)dr["Price"];
+                    itm.EditStatus = EditStatus.Unedited;
                 }
             });
         }

@@ -149,6 +149,7 @@
         CellStyle="{StaticResource DataGridCellDefaultStyle}"
         ContextMenu="{StaticResource ProductsGridContextMenu}"
         ItemsSource="{Binding ProductsView, Mode=OneTime}"
+        RowHeaderStyle="{StaticResource EditedItemHighlightRowHeaderStyleWithDetails}"
         RowHeight="25"
         SelectionUnit="Cell"
         Style="{StaticResource DetailsDataGridStyle}">

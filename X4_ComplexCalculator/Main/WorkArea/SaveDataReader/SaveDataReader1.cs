@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using X4_ComplexCalculator.Common.Enum;
 using X4_ComplexCalculator.DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
@@ -81,6 +82,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                 if (itm != null)
                 {
                     itm.AllocCount = (long)dr["AllocCount"];
+                    itm.EditStatus = EditStatus.Unedited;
                 }
             });
         }

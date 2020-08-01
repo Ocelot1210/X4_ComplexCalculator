@@ -44,6 +44,7 @@
         ContextMenu="{StaticResource BuildResourcesContextMenu}"
         IsReadOnly="False"
         ItemsSource="{Binding BuildResourceView, Mode=OneTime}"
+        RowHeaderStyle="{StaticResource EditedItemHighlightRowHeaderStyle}"
         RowHeight="25"
         SelectionUnit="Cell"
         Style="{StaticResource DefaultDataGridStyle}">

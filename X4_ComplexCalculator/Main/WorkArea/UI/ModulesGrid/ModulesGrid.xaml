@@ -86,6 +86,7 @@
             ContextMenu="{StaticResource ModulesGridContextMenu}"
             IsSynchronizedWithCurrentItem="True"
             ItemsSource="{Binding ModulesView, Mode=OneTime}"
+            RowHeaderStyle="{StaticResource EditedItemHighlightRowHeaderStyle}"
             RowHeight="25"
             SelectionUnit="FullRow"
             Style="{StaticResource DefaultDataGridStyle}">
