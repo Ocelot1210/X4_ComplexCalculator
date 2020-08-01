@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
 using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Enum;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
 
@@ -172,7 +173,7 @@ WHERE
         public void AddSelectedModuleToItemCollection()
         {
             // 選択されているアイテムを追加
-            var items = Modules.Where(x => x.IsChecked).Select(x => new ModulesGridItem(x.ID));
+            var items = Modules.Where(x => x.IsChecked).Select(x => new ModulesGridItem(x.ID) { EditStatus = EditStatus.Edited });
             ItemCollection.AddRange(items);
         }
 

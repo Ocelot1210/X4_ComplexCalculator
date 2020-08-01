@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_ComplexCalculator.Common;
+using X4_ComplexCalculator.Common.Enum;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
 
@@ -24,25 +25,34 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         public const long MAX_MODULE_COUNT = 99999;
         #endregion
 
-        #region "メンバ変数"
+
+        #region メンバ
         /// <summary>
         /// モジュール数
         /// </summary>
         private long _ModuleCount = 1;
+
 
         /// <summary>
         /// 選択された建造方式
         /// </summary>
         private ModuleProduction _SelectedMethod;
 
+
         /// <summary>
         /// 選択されているか
         /// </summary>
         private bool _IsSelected;
+
+
+        /// <summary>
+        /// 編集状態
+        /// </summary>
+        private EditStatus _EditStatus = EditStatus.Unedited;
         #endregion
 
 
-        #region "プロパティ
+        #region プロパティ
         /// <summary>
         /// モジュール
         /// </summary>
@@ -82,7 +92,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
                 var setValue = (value < 0) ? 0L :
                                (MAX_MODULE_COUNT < value) ? MAX_MODULE_COUNT : value;
 
-                SetPropertyEx(ref _ModuleCount, setValue);
+                if (SetPropertyEx(ref _ModuleCount, setValue))
+                {
+                    EditStatus = EditStatus.Edited;
+                }
             }
         }
 
@@ -90,6 +103,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// 装備中のタレットの個数
         /// </summary>
         public int TurretsCount => ModuleEquipment.Turret.AllEquipmentsCount;
+
 
         /// <summary>
         /// タレットのツールチップ文字列
@@ -101,6 +115,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// 装備中のシールドの個数
         /// </summary>
         public int ShieldsCount => ModuleEquipment.Shield.AllEquipmentsCount;
+
 
         /// <summary>
         /// シールドのツールチップ文字列
@@ -126,7 +141,23 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         public ModuleProduction SelectedMethod
         {
             get => _SelectedMethod;
-            set => SetPropertyEx(ref _SelectedMethod, value);
+            set
+            {
+                if (SetPropertyEx(ref _SelectedMethod, value))
+                {
+                    EditStatus = EditStatus.Edited;
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// 編集状態
+        /// </summary>
+        public EditStatus EditStatus
+        {
+            get => _EditStatus;
+            set => SetProperty(ref _EditStatus, value);
         }
         #endregion
 
@@ -140,6 +171,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         {
 
         }
+
 
         /// <summary>
         /// コンストラクタ
@@ -325,6 +357,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             if (equipmentChanged)
             {
                 RaisePropertyChangedEx(turretsOld.Concat(shieldsOld), ModuleEquipment.GetAllEquipment().Select(x => x.EquipmentID).ToArray(), nameof(ModuleEquipment));
+                EditStatus = EditStatus.Edited;
             }
         }
 

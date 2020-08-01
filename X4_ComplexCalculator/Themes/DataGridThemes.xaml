@@ -2,7 +2,8 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:X4_ComplexCalculator.Themes"
-    xmlns:x4conv="clr-namespace:X4_ComplexCalculator.Common.ValueConverter">
+    xmlns:x4conv="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
+    xmlns:x4enum="clr-namespace:X4_ComplexCalculator.Common.Enum">
 
 
     <!--  DataGridColumnHeaderの初期設定  -->
@@ -82,10 +83,10 @@
     <!--  RowDetailsを使用するDataGridのRowHeaderのDataTemplate  -->
     <DataTemplate x:Key="DataGridDetailsRowHeaderTemplate">
         <ToggleButton
-            Margin="0"
+            Margin="2,1,2,1"
             Padding="0"
             HorizontalContentAlignment="Center"
-            VerticalContentAlignment="Center"
+            VerticalContentAlignment="Top"
             IsChecked="{Binding Path=DetailsVisibility, RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}}, Converter={StaticResource Visiblity2NullableConverter}}">
             <ToggleButton.Style>
                 <Style TargetType="{x:Type ToggleButton}">
@@ -102,6 +103,41 @@
         </ToggleButton>
     </DataTemplate>
 
+
+
+    <!--  編集された項目を強調するRowHeaderStyle  -->
+    <Style
+        x:Key="EditedItemHighlightRowHeaderStyle"
+        BasedOn="{StaticResource {x:Type DataGridRowHeader}}"
+        TargetType="{x:Type DataGridRowHeader}">
+        <Setter Property="MinWidth" Value="5" />
+        <Setter Property="Padding" Value="2" />
+        <Style.Triggers>
+            <!--  編集された場合、背景色を黄緑にする  -->
+            <DataTrigger Binding="{Binding EditStatus, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="{x:Static x4enum:EditStatus.Edited}">
+                <!--  背景色を黄緑にする  -->
+                <Setter Property="Background" Value="Yellow" />
+            </DataTrigger>
+
+            <!--  編集されて保存された場合、背景色を黄緑にする  -->
+            <DataTrigger Binding="{Binding EditStatus, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="{x:Static x4enum:EditStatus.EditAndSaved}">
+                <!--  背景色を黄緑にする  -->
+                <Setter Property="Background" Value="YellowGreen" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+
+    <!--  編集された項目を強調かつRowDetailsがあるDataGridRowHeaderのスタイル  -->
+    <Style
+        x:Key="EditedItemHighlightRowHeaderStyleWithDetails"
+        BasedOn="{StaticResource EditedItemHighlightRowHeaderStyle}"
+        TargetType="{x:Type DataGridRowHeader}">
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
+
+
     <!--  RowDetailsがあるDataGridのスタイル  -->
     <Style
         x:Key="DetailsDataGridStyle"
@@ -113,5 +149,6 @@
         <Setter Property="RowHeaderTemplate" Value="{StaticResource DataGridDetailsRowHeaderTemplate}" />
         <Setter Property="VirtualizingPanel.ScrollUnit" Value="Pixel" />
     </Style>
+
 
 </ResourceDictionary>

@@ -1,4 +1,5 @@
 ﻿using X4_ComplexCalculator.Common;
+using X4_ComplexCalculator.Common.Enum;
 using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
@@ -25,6 +26,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         /// 建造ウェアを購入しない
         /// </summary>
         private bool _NoBuy;
+
+
+        /// <summary>
+        /// 編集状態
+        /// </summary>
+        private EditStatus _EditStatus = EditStatus.Unedited;
         #endregion
 
 
@@ -99,6 +106,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
                 {
                     RaisePropertyChangedEx(oldPrice, Price, nameof(Price));
                 }
+
+                EditStatus = EditStatus.Edited;
             }
         }
 
@@ -122,8 +131,19 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
                 if (SetProperty(ref _NoBuy, value))
                 {
                     RaisePropertyChangedEx(oldPrice, Price, nameof(Price));
+                    EditStatus = EditStatus.Edited;
                 }
             }
+        }
+
+
+        /// <summary>
+        /// 編集状態
+        /// </summary>
+        public EditStatus EditStatus
+        {
+            get => _EditStatus;
+            set => SetProperty(ref _EditStatus, value);
         }
         #endregion
 

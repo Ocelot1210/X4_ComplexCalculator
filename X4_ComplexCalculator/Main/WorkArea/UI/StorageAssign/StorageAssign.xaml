@@ -120,6 +120,7 @@
             x4bhv:DataGridCurrentCellEditModeBehavior.Enabled="True"
             x4bhv:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
             ItemsSource="{Binding StorageAssignInfo}"
+            RowHeaderStyle="{StaticResource EditedItemHighlightRowHeaderStyle}"
             RowHeight="25"
             SelectionUnit="Cell"
             Style="{StaticResource DefaultDataGridStyle}">

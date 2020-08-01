@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using X4_ComplexCalculator.Common.Enum;
 using X4_ComplexCalculator.DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
@@ -132,6 +133,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                     itm.UnitPrice = (long)dr["Price"];
                     itm.NoBuy     = (long)dr["NoBuy"]  == 1;
                     itm.NoSell    = (long)dr["NoSell"] == 1;
+
+                    itm.EditStatus = EditStatus.Unedited;
                 }
             });
         }
@@ -152,6 +155,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                 {
                     itm.UnitPrice = (long)dr["Price"];
                     itm.NoBuy = (long)dr["NoBuy"] == 1;
+                    itm.EditStatus = EditStatus.Unedited;
                 }
             });
         }

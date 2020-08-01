@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Xml.Linq;
+using X4_ComplexCalculator.Common.Enum;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
 {
@@ -167,7 +168,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
                 var xml = XDocument.Parse(Clipboard.GetText());
 
                 // xmlの内容に問題がないか確認するため、ここでToArray()する
-                var modules = xml.Root.Elements().Select(x => new ModulesGridItem(x)).ToArray();
+                var modules = xml.Root.Elements().Select(x => new ModulesGridItem(x) { EditStatus = EditStatus.Edited }).ToArray();
 
                 _Model.Modules.AddRange(modules);
                 dataGrid.Focus();
