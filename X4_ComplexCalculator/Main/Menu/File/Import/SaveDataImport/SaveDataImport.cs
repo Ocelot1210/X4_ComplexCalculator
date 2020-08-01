@@ -198,6 +198,8 @@ WHERE
                     }
 
                     var equipment = Equipment.Get((string)dr["EquipmentID"]);
+                    if (equipment == null) return;
+
                     var max = (long)dr["Count"];
                     for (var cnt = 0L; cnt < max; cnt++)
                     {

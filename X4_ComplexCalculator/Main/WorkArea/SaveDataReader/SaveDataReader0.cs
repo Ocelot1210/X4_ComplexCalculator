@@ -122,7 +122,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             conn.ExecQuery($"SELECT * FROM Equipments", (dr, _) =>
             {
                 var row = (int)(long)dr["row"];
-                modules[row].AddEquipment(Equipment.Get((string)dr["EquipmentID"]));
+                var eqp = Equipment.Get((string)dr["EquipmentID"]);
+                if (eqp != null)
+                {
+                    modules[row].AddEquipment(eqp);
+                }
                 progress.Report((int)((double)progressCnt++ / records * maxProgress));
             });
 

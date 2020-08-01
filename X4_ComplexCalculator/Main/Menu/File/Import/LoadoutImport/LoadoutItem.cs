@@ -167,7 +167,11 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
 
                     DBConnection.CommonDB.ExecQuery($"SELECT EquipmentID FROM ModulePresetsEquipment WHERE ModuleID = '{module.ModuleID}' AND PresetID = {(long)dr1["PresetID"]}", (dr2, __) =>
                     {
-                        eq.Add(DB.X4DB.Equipment.Get((string)dr2["EquipmentID"]));
+                        var eqp = DB.X4DB.Equipment.Get((string)dr2["EquipmentID"]);
+                        if (eqp != null)
+                        {
+                            eq.Add(eqp);
+                        }
                     });
 
                     Imported |= currentEquipmentIds.SequenceEqual(eq.Select(x => x.EquipmentID).OrderBy(x => x));
@@ -195,7 +199,11 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
                 var max = int.Parse(elm.Attribute("exact")?.Value ?? "1");
                 for (var cnt = 0; cnt < max; cnt++)
                 {
-                    manager.AddEquipment(DB.X4DB.Equipment.Get(id));
+                    var eqp = DB.X4DB.Equipment.Get(id);
+                    if (eqp != null)
+                    {
+                        manager.AddEquipment(eqp);
+                    }
                 }
             }
         }

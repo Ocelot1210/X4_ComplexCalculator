@@ -147,7 +147,14 @@ WHERE
     EquipmentOwner.FactionID IN ({selectedFactions})
 ";
 
-            DBConnection.X4DB.ExecQuery(query, (dr, args) => { items.Add(new EquipmentListItem((string)dr["EquipmentID"])); });
+            DBConnection.X4DB.ExecQuery(query, (dr, _) => 
+            {
+                var eqp = Equipment.Get((string)dr["EquipmentID"]);
+                if (eqp != null)
+                {
+                    items.Add(new EquipmentListItem(eqp));
+                }
+            });
 
             Equipments[SelectedSize].Reset(items);
         }
@@ -191,7 +198,11 @@ WHERE
 
             DBConnection.CommonDB.ExecQuery(query, (dr, args) =>
             {
-                equipments.Add(new EquipmentListItem((string)dr["EquipmentID"]));
+                var eqp = Equipment.Get((string)dr["EquipmentID"]);
+                if (eqp != null)
+                {
+                    equipments.Add(new EquipmentListItem(eqp));
+                }
             });
 
             foreach (var size in Module.ModuleEquipment.Turret.Sizes)
