@@ -74,15 +74,18 @@
         </StackPanel>
         <!--#endregion-->
 
-        <avdk:DockingManager Grid.Row="1" Grid.ColumnSpan="2">
+        <avdk:DockingManager
+            Grid.Row="1"
+            Grid.ColumnSpan="2"
+            Background="White">
             <avdk:LayoutRoot>
                 <avdk:LayoutPanel Orientation="Horizontal">
 
                     <!--  モジュール絞り込み用  -->
-                    <avdk:LayoutDocumentPaneGroup Orientation="Vertical">
-                        <avdk:LayoutDocumentPane>
+                    <avdk:LayoutAnchorablePaneGroup Orientation="Vertical">
+                        <avdk:LayoutAnchorablePane>
                             <!--  モジュール種別  -->
-                            <avdk:LayoutDocument Title="{lex:Loc Lang:ModuleType}" CanClose="False">
+                            <avdk:LayoutAnchorable Title="{lex:Loc Lang:ModuleType}" CanClose="False">
                                 <xctk:CheckListBox
                                     DisplayMemberPath="Name"
                                     IsSelectAllActive="True"
@@ -91,12 +94,12 @@
                                     ScrollViewer.VerticalScrollBarVisibility="Visible"
                                     SelectAllContent="{lex:Loc Lang:SelectAll}"
                                     SelectedMemberPath="IsChecked" />
-                            </avdk:LayoutDocument>
-                        </avdk:LayoutDocumentPane>
+                            </avdk:LayoutAnchorable>
+                        </avdk:LayoutAnchorablePane>
 
-                        <avdk:LayoutDocumentPane>
+                        <avdk:LayoutAnchorablePane>
                             <!--  所有派閥  -->
-                            <avdk:LayoutDocument Title="{lex:Loc Lang:OwnerFaction}" CanClose="False">
+                            <avdk:LayoutAnchorable Title="{lex:Loc Lang:OwnerFaction}" CanClose="False">
                                 <xctk:CheckListBox
                                     DisplayMemberPath="FactionName"
                                     IsSelectAllActive="True"
@@ -120,12 +123,12 @@
                                         </GroupStyle>
                                     </xctk:CheckListBox.GroupStyle>
                                 </xctk:CheckListBox>
-                            </avdk:LayoutDocument>
-                        </avdk:LayoutDocumentPane>
-                    </avdk:LayoutDocumentPaneGroup>
+                            </avdk:LayoutAnchorable>
+                        </avdk:LayoutAnchorablePane>
+                    </avdk:LayoutAnchorablePaneGroup>
 
-                    <avdk:LayoutDocumentPane>
-                        <avdk:LayoutDocument Title="{lex:Loc Lang:ModuleName}" CanClose="False">
+                    <avdk:LayoutAnchorablePane>
+                        <avdk:LayoutAnchorable Title="{lex:Loc Lang:ModuleName}" CanClose="False">
                             <DockPanel>
                                 <!--  モジュール名検索  -->
                                 <xctk:WatermarkTextBox
@@ -152,8 +155,8 @@
                                     </ListBox.InputBindings>
                                 </ListBox>
                             </DockPanel>
-                        </avdk:LayoutDocument>
-                    </avdk:LayoutDocumentPane>
+                        </avdk:LayoutAnchorable>
+                    </avdk:LayoutAnchorablePane>
                 </avdk:LayoutPanel>
             </avdk:LayoutRoot>
         </avdk:DockingManager>
