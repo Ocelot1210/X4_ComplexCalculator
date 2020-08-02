@@ -61,7 +61,10 @@ namespace X4_ComplexCalculator.DB.X4DB
                 var name = (string)dr["Name"];
                 var raceID = (string)dr["RaceID"];
 
-                _Factions.Add(id, new Faction(id, name, Race.Get(raceID)));
+                var race = Race.Get(raceID);
+                if (race == null) return;
+
+                _Factions.Add(id, new Faction(id, name, race));
             });
         }
 

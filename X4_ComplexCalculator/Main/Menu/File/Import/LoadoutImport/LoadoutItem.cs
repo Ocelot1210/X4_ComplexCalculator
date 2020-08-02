@@ -123,7 +123,19 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
                 return null;
             }
 
-            return new LoadoutItem(elm, macro);
+            string moduleID = "";
+            DBConnection.X4DB.ExecQuery($"SELECT ModuleID FROM Module WHERE Macro = '{macro}'", (dr, _) =>
+            {
+                moduleID = (string)dr["ModuleID"];
+            });
+
+            var module = Module.Get(moduleID);
+            if (module == null)
+            {
+                return null;
+            }
+
+            return new LoadoutItem(elm, module);
         }
 
 
@@ -134,18 +146,12 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// </summary>
         /// <param name="elm">装備1つ分</param>
         /// <param name="macro">マクロ名</param>
-        private LoadoutItem(XElement elm, string macro)
+        private LoadoutItem(XElement elm, Module module)
         {
             Name = elm.Attribute("name").Value;
             
-            string moduleID = "";
-            DBConnection.X4DB.ExecQuery($"SELECT ModuleID FROM Module WHERE Macro = '{macro}'", (dr, _) =>
-            {
-                moduleID = (string)dr["ModuleID"];
-            });
-
-            Module = Module.Get(moduleID);
-            Equipment = ModuleEquipment.Get(moduleID);
+            Module = module;
+            Equipment = ModuleEquipment.Get(module.ModuleID);
 
             AddEquipment(elm.XPathSelectElements("groups/shields"), Equipment.Shield);
             AddEquipment(elm.XPathSelectElements("groups/turrets"), Equipment.Turret);
@@ -155,13 +161,17 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
             {
                 var currentEquipmentIds = Equipment.GetAllEquipment().Select(x => x.EquipmentID).OrderBy(x => x).ToArray();
 
-                DBConnection.CommonDB.ExecQuery($"SELECT * FROM ModulePresets WHERE ModuleID = '{moduleID}' AND PresetName = '{Name}'", (dr1, _) =>
+                DBConnection.CommonDB.ExecQuery($"SELECT * FROM ModulePresets WHERE ModuleID = '{module.ModuleID}' AND PresetName = '{Name}'", (dr1, _) =>
                 {
                     var eq = new List<Equipment>();
 
-                    DBConnection.CommonDB.ExecQuery($"SELECT EquipmentID FROM ModulePresetsEquipment WHERE ModuleID = '{moduleID}' AND PresetID = {(long)dr1["PresetID"]}", (dr2, __) =>
+                    DBConnection.CommonDB.ExecQuery($"SELECT EquipmentID FROM ModulePresetsEquipment WHERE ModuleID = '{module.ModuleID}' AND PresetID = {(long)dr1["PresetID"]}", (dr2, __) =>
                     {
-                        eq.Add(DB.X4DB.Equipment.Get((string)dr2["EquipmentID"]));
+                        var eqp = DB.X4DB.Equipment.Get((string)dr2["EquipmentID"]);
+                        if (eqp != null)
+                        {
+                            eq.Add(eqp);
+                        }
                     });
 
                     Imported |= currentEquipmentIds.SequenceEqual(eq.Select(x => x.EquipmentID).OrderBy(x => x));
@@ -189,7 +199,11 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
                 var max = int.Parse(elm.Attribute("exact")?.Value ?? "1");
                 for (var cnt = 0; cnt < max; cnt++)
                 {
-                    manager.AddEquipment(DB.X4DB.Equipment.Get(id));
+                    var eqp = DB.X4DB.Equipment.Get(id);
+                    if (eqp != null)
+                    {
+                        manager.AddEquipment(eqp);
+                    }
                 }
             }
         }

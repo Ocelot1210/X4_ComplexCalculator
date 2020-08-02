@@ -107,7 +107,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
             {
                 bool chkState = 0 < DBConnection.CommonDB.ExecQuery($"SELECT ID FROM SelectModuleEquipmentCheckStateFactions WHERE ID = '{dr["FactionID"]}'", (_, __) => { });
 
-                ((ICollection<FactionsListItem>)args[0]).Add(new FactionsListItem((string)dr["FactionID"], chkState));
+                var faction = Faction.Get((string)dr["FactionID"]);
+                if (faction != null) ((ICollection<FactionsListItem>)args[0]).Add(new FactionsListItem(faction, chkState));
+
             }
 
             var query = $@"

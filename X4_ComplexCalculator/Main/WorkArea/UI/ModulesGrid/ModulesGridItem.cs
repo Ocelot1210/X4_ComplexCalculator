@@ -159,18 +159,19 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             get => _EditStatus;
             set => SetProperty(ref _EditStatus, value);
         }
-        #endregion
 
 
         /// <summary>
-        /// コンストラクタ
+        /// 編集状態
         /// </summary>
-        /// <param name="moduleID">モジュールID</param>
-        /// <param name="moduleCount">モジュール数</param>
-        public ModulesGridItem(string moduleID, long moduleCount = 1) : this(Module.Get(moduleID), null, moduleCount)
+        public EditStatus EditStatus
         {
-
+            get => _EditStatus;
+            set => SetProperty(ref _EditStatus, value);
         }
+        #endregion
+
+
 
 
         /// <summary>
@@ -195,7 +196,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <param name="element">モジュール情報が記載されたxml</param>
         public ModulesGridItem(XElement element)
         {
-            Module = Module.Get(element.Attribute("id").Value);
+            Module = Module.Get(element.Attribute("id").Value) ?? throw new ArgumentException("Invalid XELement.", nameof(element));
             ModuleEquipment = ModuleEquipment.Get(Module.ModuleID);
 
             ModuleCount = long.Parse(element.Attribute("count").Value);
@@ -207,30 +208,15 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             _SelectedMethod = SelectedMethod;
             EditEquipmentCommand = new DelegateCommand(EditEquipment);
 
-            // タレット追加
-            foreach (var turret in element.XPathSelectElement("turrets").Elements())
+            // タレットとシールドを追加
+            string[] types = { "turrets", "shields" };
+            var equipments = types.Select(x => element.XPathSelectElement(x).Elements())
+                                  .SelectMany(x => x.Select(y => Equipment.Get(y.Attribute("id").Value)))
+                                  .Where(x => x != null)
+                                  .Select(x => x!);
+            foreach (var eqp in equipments)
             {
-                try
-                {
-                    AddEquipment(Equipment.Get(turret.Attribute("id").Value));
-                }
-                catch
-                {
-
-                }
-            }
-
-            // シールド追加
-            foreach (var shield in element.XPathSelectElement("shields").Elements())
-            {
-                try
-                {
-                    AddEquipment(Equipment.Get(shield.Attribute("id").Value));
-                }
-                catch
-                {
-
-                }
+                AddEquipment(eqp);
             }
         }
 
@@ -247,37 +233,25 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             ret.Add(new XAttribute("count", ModuleCount));
             ret.Add(new XAttribute("method", SelectedMethod.Method));
 
-            // タレット追加
+            // タレットとシールドをXML化
+            ValueTuple<string, ModuleEquipmentManager>[] managers =
             {
-                var turretsXml = new XElement("turrets");
+                ("turrets", ModuleEquipment.Turret),
+                ("shields", ModuleEquipment.Shield)
+            };
 
-                foreach (var turret in ModuleEquipment.Turret.AllEquipments)
+            foreach (var manager in managers)
+            {
+                var equipmentsXml = new XElement(manager.Item1);
+                foreach (var eqp in manager.Item2.AllEquipments)
                 {
-                    var turXml = new XElement("turret");
-                    turXml.Add(new XAttribute("id", turret.EquipmentID));
-
-                    turretsXml.Add(turXml);
+                    var eqpXml = new XElement(manager.Item1);
+                    eqpXml.Add(new XAttribute("id", eqp.EquipmentID));
+                    equipmentsXml.Add(eqpXml);
                 }
 
-                ret.Add(turretsXml);
+                ret.Add(equipmentsXml);
             }
-
-
-            // シールド追加
-            {
-                var shieldsXml = new XElement("shields");
-
-                foreach (var shield in ModuleEquipment.Shield.AllEquipments)
-                {
-                    var sldXml = new XElement("shield");
-                    sldXml.Add(new XAttribute("id", shield.EquipmentID));
-
-                    shieldsXml.Add(sldXml);
-                }
-
-                ret.Add(shieldsXml);
-            }
-
             return ret;
         }
 
@@ -305,7 +279,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
                     break;
 
                 default:
-                    throw new InvalidOperationException("追加できるのはタレットかシールドのみです。");
+                    throw new ArgumentException($"Invalid equipment type. ({equipment.EquipmentType.EquipmentTypeID})");
             }
         }
 

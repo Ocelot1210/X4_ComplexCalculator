@@ -98,7 +98,7 @@ namespace X4_ComplexCalculator.DB.X4DB
                 var wareGroup = WareGroup.Get((string)dr["WareGroupID"]);
                 var transportType = TransportType.Get((string)dr["TransportTypeID"]);
 
-                _Wares.Add(id, new Ware(id, name, WareGroup.Get((string)dr["WareGroupID"]), TransportType.Get((string)dr["TransportTypeID"]), volume, minPrice, maxPrice));
+                _Wares.Add(id, new Ware(id, name, wareGroup, transportType, volume, minPrice, maxPrice));
             });
         }
 
