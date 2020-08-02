@@ -79,8 +79,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="equipmentID">装備ID</param>
         /// <returns>装備</returns>
-        public static Equipment? Get(string equipmentID) =>
-            _Equipments.TryGetValue(equipmentID, out var equipment) ? equipment : null;
+        public static Equipment Get(string equipmentID) => _Equipments[equipmentID];
 
 
         /// <summary>

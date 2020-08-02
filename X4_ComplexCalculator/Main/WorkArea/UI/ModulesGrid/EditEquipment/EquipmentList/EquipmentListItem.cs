@@ -40,6 +40,17 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// コンストラクタ
         /// </summary>
+        /// <param name="equipmentID">装備品ID</param>
+        public EquipmentListItem(string equipmentID)
+        {
+            Equipment = Equipment.Get(equipmentID);
+            _IsSelected = false;
+        }
+
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
         /// <param name="equipment">装備品</param>
         public EquipmentListItem(Equipment equipment)
         {

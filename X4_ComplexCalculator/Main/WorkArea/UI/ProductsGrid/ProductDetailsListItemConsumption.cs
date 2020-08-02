@@ -1,6 +1,4 @@
 ﻿using Prism.Mvvm;
-using System;
-using System.Reflection;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 {
@@ -78,7 +76,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             ModuleCount = moduleCount;
             _Amount = amount;
 
-            ModuleName = DB.X4DB.Module.Get(moduleID)?.Name ?? throw new ArgumentException($"Invalid module ID. ({moduleID}", nameof(moduleID));
+            ModuleName = DB.X4DB.Module.Get(moduleID).Name;
         }
 
 

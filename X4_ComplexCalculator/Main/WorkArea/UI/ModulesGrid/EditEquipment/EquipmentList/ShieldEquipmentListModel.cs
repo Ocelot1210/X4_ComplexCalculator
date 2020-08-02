@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Data.SQLite;
 using System.Linq;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
@@ -147,14 +148,7 @@ WHERE
     Equipment.EquipmentID IN (SELECT EquipmentResource.EquipmentID FROM EquipmentResource) AND
     EquipmentOwner.FactionID IN ({selectedFactions})";
 
-            DBConnection.X4DB.ExecQuery(query, (dr, _) =>
-            {
-                var eqp = Equipment.Get((string)dr["EquipmentID"]);
-                if (eqp != null)
-                {
-                    items.Add(new EquipmentListItem(eqp));
-                }
-            });
+            DBConnection.X4DB.ExecQuery(query, (SQLiteDataReader dr, object[] args) => { items.Add(new EquipmentListItem((string)dr["EquipmentID"])); });
 
             Equipments[SelectedSize].Reset(items);
         }
@@ -196,13 +190,9 @@ WHERE
 
             var equipments = new List<EquipmentListItem>(_MaxAmount.Values.Count());
 
-            DBConnection.CommonDB.ExecQuery(query, (dr, _) =>
+            DBConnection.CommonDB.ExecQuery(query, (dr, args) =>
             {
-                var eqp = Equipment.Get((string)dr["EquipmentID"]);
-                if (eqp != null)
-                {
-                    equipments.Add(new EquipmentListItem(eqp));
-                }
+                equipments.Add(new EquipmentListItem((string)dr["EquipmentID"]));
             });
 
             foreach (var size in Module.ModuleEquipment.Shield.Sizes)

@@ -55,11 +55,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="faction">派閥</param>
+        /// <param name="id">派閥ID</param>
         /// <param name="isChecked">チェック状態</param>
-        public FactionsListItem(Faction faction, bool isChecked)
+        public FactionsListItem(string id, bool isChecked)
         {
-            Faction = faction;
+            var faction = Faction.Get(id);
+            Faction = faction ?? throw new ArgumentException("${id} is invalid factionID.");
             IsChecked = isChecked;
         }
     }

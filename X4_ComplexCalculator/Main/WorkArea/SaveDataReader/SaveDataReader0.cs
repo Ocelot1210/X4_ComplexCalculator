@@ -107,12 +107,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             // モジュールを復元
             conn.ExecQuery("SELECT ModuleID, Count FROM Modules ORDER BY Row ASC", (dr, _) =>
             {
-                var module = Module.Get((string)dr["ModuleID"]);
-                if (module != null)
+                var mod = new ModulesGridItem((string)dr["ModuleID"], (long)dr["Count"])
                 {
-                    var mod = new ModulesGridItem(module, null, (long)dr["Count"]) { EditStatus = EditStatus.Unedited };
-                    modules.Add(mod);
-                }
+                    EditStatus = EditStatus.Unedited
+                };
+                modules.Add(mod);
                 progress.Report((int)((double)progressCnt++ / records * maxProgress));
             });
 
@@ -121,11 +120,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             conn.ExecQuery($"SELECT * FROM Equipments", (dr, _) =>
             {
                 var row = (int)(long)dr["row"];
-                var eqp = Equipment.Get((string)dr["EquipmentID"]);
-                if (eqp != null)
-                {
-                    modules[row].AddEquipment(eqp);
-                }
+                modules[row].AddEquipment(Equipment.Get((string)dr["EquipmentID"]));
                 progress.Report((int)((double)progressCnt++ / records * maxProgress));
             });
 

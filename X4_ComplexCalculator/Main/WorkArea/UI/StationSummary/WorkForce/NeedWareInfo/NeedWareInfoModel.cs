@@ -256,11 +256,7 @@ WHERE
                     }
                     else
                     {
-                        var race = (method == "default") ? Race.Get("argon") : Race.Get(method);
-                        if (race != null)
-                        {
-                            NeedWareInfoDetails.Add(new NeedWareInfoDetailsItem(race, method, wareID, amount, AggregateTargetProducts[wareID]));
-                        }
+                        NeedWareInfoDetails.Add(new NeedWareInfoDetailsItem(method, wareID, amount, AggregateTargetProducts[wareID]));
                     }
                 }
             }

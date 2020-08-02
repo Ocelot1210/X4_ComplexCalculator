@@ -62,8 +62,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="raceID">種族ID</param>
         /// <returns>種族IDに対応する種族</returns>
-        public static Race? Get(string raceID) =>
-            _Races.TryGetValue(raceID, out var race) ? race : null;
+        public static Race Get(string raceID) => _Races[raceID];
 
 
         /// <summary>

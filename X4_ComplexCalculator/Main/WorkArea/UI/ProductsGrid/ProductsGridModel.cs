@@ -5,7 +5,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using X4_ComplexCalculator.Common;
@@ -174,11 +173,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 addedModules += addModules.Sum(x => x.Count);
 
                 // モジュール一覧に追加対象モジュールを追加
-                _Modules.AddRange(
-                    addModules.Select(x => (Module: DB.X4DB.Module.Get(x.ModuleID), x.Count))
-                              .Where(x => x.Module != null)
-                              .Select(x => (Module: x.Module!, x.Count))
-                              .Select(x => new ModulesGridItem(x.Module, null, x.Count)));
+                _Modules.AddRange(addModules.Select(x => new ModulesGridItem(x.ModuleID, x.Count)));
             }
 
 

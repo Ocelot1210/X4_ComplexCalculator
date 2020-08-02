@@ -155,12 +155,7 @@ WHERE
 
                 DBConnection.X4DB.ExecQuery(query, modParam, (dr, _) =>
                 {
-                    var module = Module.Get((string)dr["ModuleID"]);
-
-                    if (module != null)
-                    {
-                        modules.Add(new ModulesGridItem(module));
-                    }
+                    modules.Add(new ModulesGridItem((string)dr["ModuleID"]));
                 });
             }
 
@@ -198,8 +193,6 @@ WHERE
                     }
 
                     var equipment = Equipment.Get((string)dr["EquipmentID"]);
-                    if (equipment == null) return;
-
                     var max = (long)dr["Count"];
                     for (var cnt = 0L; cnt < max; cnt++)
                     {

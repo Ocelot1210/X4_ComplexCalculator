@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
-using System.Reflection;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Enum;
 using X4_ComplexCalculator.DB;
-using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
@@ -106,8 +104,7 @@ ORDER BY Name", init, "SelectModuleCheckStateTypes");
             {
                 bool isChecked = 0 < DBConnection.CommonDB.ExecQuery($"SELECT * FROM SelectModuleCheckStateModuleOwners WHERE ID = '{dr["FactionID"]}'", (_, __) => { });
 
-                var faction = Faction.Get((string)dr["FactionID"]);
-                if (faction != null) items.Add(new FactionsListItem(faction, isChecked));
+                items.Add(new FactionsListItem((string)dr["FactionID"], isChecked));
             }
 
             DBConnection.X4DB.ExecQuery(@"
@@ -176,12 +173,7 @@ WHERE
         public void AddSelectedModuleToItemCollection()
         {
             // 選択されているアイテムを追加
-            var items = Modules.Where(x => x.IsChecked)
-                               .Select(x => DB.X4DB.Module.Get(x.ID))
-                               .Where(x => x != null)
-                               .Select(x => x!)
-                               .Select(x => new ModulesGridItem(x) { EditStatus = EditStatus.Edited });
-                               
+            var items = Modules.Where(x => x.IsChecked).Select(x => new ModulesGridItem(x.ID) { EditStatus = EditStatus.Edited });
             ItemCollection.AddRange(items);
         }
 
