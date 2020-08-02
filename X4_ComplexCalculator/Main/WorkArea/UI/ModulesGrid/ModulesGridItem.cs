@@ -159,16 +159,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             get => _EditStatus;
             set => SetProperty(ref _EditStatus, value);
         }
-
-
-        /// <summary>
-        /// 編集状態
-        /// </summary>
-        public EditStatus EditStatus
-        {
-            get => _EditStatus;
-            set => SetProperty(ref _EditStatus, value);
-        }
         #endregion
 
 
