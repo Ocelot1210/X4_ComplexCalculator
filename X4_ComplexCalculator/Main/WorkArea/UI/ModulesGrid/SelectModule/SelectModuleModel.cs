@@ -181,7 +181,7 @@ WHERE
                                .Where(x => x != null)
                                .Select(x => x!)
                                .Select(x => new ModulesGridItem(x) { EditStatus = EditStatus.Edited });
-
+                               
             ItemCollection.AddRange(items);
         }
 

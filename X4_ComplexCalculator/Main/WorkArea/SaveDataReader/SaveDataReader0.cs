@@ -113,7 +113,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                     var mod = new ModulesGridItem(module, null, (long)dr["Count"]) { EditStatus = EditStatus.Unedited };
                     modules.Add(mod);
                 }
-                
                 progress.Report((int)((double)progressCnt++ / records * maxProgress));
             });
 
