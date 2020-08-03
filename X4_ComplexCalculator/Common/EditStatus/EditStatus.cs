@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace X4_ComplexCalculator.Common.Enum
+namespace X4_ComplexCalculator.Common.EditStatus
 {
     /// <summary>
     /// 編集状態用列挙体

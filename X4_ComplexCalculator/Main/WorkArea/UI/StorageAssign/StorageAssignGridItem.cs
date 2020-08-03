@@ -1,7 +1,7 @@
 ﻿using Prism.Mvvm;
 using System;
 using System.ComponentModel;
-using X4_ComplexCalculator.Common.Enum;
+using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
@@ -9,7 +9,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
     /// <summary>
     /// 保管庫割当用Gridの1レコード分
     /// </summary>
-    class StorageAssignGridItem : BindableBase, IDisposable
+    class StorageAssignGridItem : BindableBase, IDisposable, IEditable
     {
         #region メンバ
         /// <summary>

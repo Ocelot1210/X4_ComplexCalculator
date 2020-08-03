@@ -7,7 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Xml.Linq;
-using X4_ComplexCalculator.Common.Enum;
+using X4_ComplexCalculator.Common.EditStatus;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
 {

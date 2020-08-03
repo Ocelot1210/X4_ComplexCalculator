@@ -4,7 +4,7 @@ using System.Data.SQLite;
 using System.Linq;
 using System.Reflection;
 using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.Common.Enum;
+using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;

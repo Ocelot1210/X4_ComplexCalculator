@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using X4_ComplexCalculator.Common.Enum;
+using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
@@ -48,6 +48,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
 
                     //保管庫割当情報を読み込み
                     RestoreStorageAssignInfo(conn);
+                    progress.Report(98);
+
+                    // 各要素を未編集状態にする
+                    InitEditStatus();
                     progress.Report(100);
 
                     _WorkArea.Title = System.IO.Path.GetFileNameWithoutExtension(Path);
@@ -82,7 +86,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                 if (itm != null)
                 {
                     itm.AllocCount = (long)dr["AllocCount"];
-                    itm.EditStatus = EditStatus.Unedited;
                 }
             });
         }

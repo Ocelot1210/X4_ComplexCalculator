@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.Common.Enum;
+using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
@@ -12,7 +12,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
     /// <summary>
     /// 製品一覧を表示するDataGridViewの1レコード分用クラス
     /// </summary>
-    public class ProductsGridItem : BindableBaseEx
+    public class ProductsGridItem : BindableBaseEx, IEditable
     {
         #region メンバ
         /// <summary>

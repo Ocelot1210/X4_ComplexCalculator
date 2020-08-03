@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 using System.Windows;
-using X4_ComplexCalculator.Common.Enum;
+using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
 
