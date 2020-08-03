@@ -57,6 +57,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// 売買オプション保存用
         /// </summary>
         private readonly Dictionary<string, TradeOption> _TradeOptionDict = new Dictionary<string, TradeOption>();
+
+
+        /// <summary>
+        /// モジュール自動追加作業用
+        /// </summary>
+        private readonly Dictionary<string, ModulesGridItem> AutoAddModuleWork = new Dictionary<string, ModulesGridItem>();
         #endregion
 
 
@@ -158,9 +164,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             var addedRecords = 0L;              // 追加レコード数
             var addedModules = 0L;              // 追加モジュール数
 
+            AutoAddModuleWork.Clear();
+
             while (true)
             {
-                // 追加モジュール一覧
+                // 追加モジュールIDとモジュール数のペア一覧
                 var addModules = _ProductCalculator.CalcNeedModules(Products, _Settings);
 
                 // 追加モジュールが無ければ(不足が無くなれば)終了
@@ -169,16 +177,38 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                     break;
                 }
 
-                // 追加レコード数とモジュール数を更新
-                addedRecords += addModules.Count;
-                addedModules += addModules.Sum(x => x.Count);
+                var addModulesGridItems = new List<ModulesGridItem>();      // 実際に追加するモジュール一覧
+
+                foreach (var (moduleID, count) in addModules)
+                {
+                    // モジュール自動追加作業用に実際に追加するモジュールが存在するか？
+                    if (AutoAddModuleWork.ContainsKey(moduleID))
+                    {
+                        // モジュール自動追加作業用に実際に追加するモジュールが存在する場合、
+                        // モジュール数を増やしてレコードがなるべく増えないようにする
+                        AutoAddModuleWork[moduleID].ModuleCount += count;
+                    }
+                    else
+                    {
+                        // モジュール自動追加作業用に実際に追加するモジュールが存在しない場合、
+                        // 実際に追加するモジュールと見なす
+                        var module = DB.X4DB.Module.Get(moduleID);
+                        if (module == null) return;
+
+                        var mgi = new ModulesGridItem(module, null, count) { EditStatus = EditStatus.Edited };
+                        addModulesGridItems.Add(mgi);
+                        AutoAddModuleWork.Add(moduleID, mgi);
+
+                        // 追加レコード数更新
+                        addedRecords++;
+                    }
+
+                    // 追加モジュール数更新
+                    addedModules += count;
+                }
 
                 // モジュール一覧に追加対象モジュールを追加
-                _Modules.AddRange(
-                    addModules.Select(x => (Module: DB.X4DB.Module.Get(x.ModuleID), x.Count))
-                              .Where(x => x.Module != null)
-                              .Select(x => (Module: x.Module!, x.Count))
-                              .Select(x => new ModulesGridItem(x.Module, null, x.Count)));
+                _Modules.AddRange(addModulesGridItems);
             }
 
 
@@ -190,6 +220,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             {
                 LocalizedMessageBox.Show("Lang:AddedModulesAutomaticallyMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, addedRecords, addedModules);
             }
+
+            AutoAddModuleWork.Clear();
         }
 
 
