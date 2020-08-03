@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 using System.Windows;
-using X4_ComplexCalculator.Common.Enum;
+using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
 
@@ -54,7 +54,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
 
             var dlg = new SaveFileDialog();
 
-            dlg.Filter = "X4 Station calclator data (*.x4)|*.x4|All Files|*.*";
+            dlg.Filter = "X4 Station calculator data (*.x4)|*.x4|All Files|*.*";
             if (dlg.ShowDialog() == true)
             {
                 SaveFilePath = dlg.FileName;

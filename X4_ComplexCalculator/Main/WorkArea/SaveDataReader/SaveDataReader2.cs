@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using X4_ComplexCalculator.Common.Enum;
+using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
@@ -39,18 +39,22 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
 
                     // 製品価格を復元
                     RestoreProducts(conn);
-                    progress.Report(93);
+                    progress.Report(92);
 
                     // 建造リソースを復元
                     RestoreBuildResource(conn);
-                    progress.Report(96);
+                    progress.Report(94);
 
                     //保管庫割当情報を読み込み
                     RestoreStorageAssignInfo(conn);
+                    progress.Report(96);
 
                     // ステーション設定復元
                     RestoreSettings(conn);
+                    progress.Report(98);
 
+                    // 各要素を未編集状態にする
+                    InitEditStatus();
                     progress.Report(100);
 
                     _WorkArea.Title = System.IO.Path.GetFileNameWithoutExtension(Path);
@@ -133,8 +137,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                     itm.UnitPrice = (long)dr["Price"];
                     itm.NoBuy     = (long)dr["NoBuy"]  == 1;
                     itm.NoSell    = (long)dr["NoSell"] == 1;
-
-                    itm.EditStatus = EditStatus.Unedited;
                 }
             });
         }
@@ -155,7 +157,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                 {
                     itm.UnitPrice = (long)dr["Price"];
                     itm.NoBuy = (long)dr["NoBuy"] == 1;
-                    itm.EditStatus = EditStatus.Unedited;
                 }
             });
         }

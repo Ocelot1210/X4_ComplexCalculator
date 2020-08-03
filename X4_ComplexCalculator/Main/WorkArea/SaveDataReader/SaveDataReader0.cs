@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using X4_ComplexCalculator.Common.Enum;
+using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
@@ -59,6 +59,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
 
                     // 建造リソースを復元
                     RestoreBuildResource(conn);
+                    progress.Report(98);
+
+                    // 各要素を未編集状態にする
+                    InitEditStatus();
                     progress.Report(100);
 
                     _WorkArea.Title = System.IO.Path.GetFileNameWithoutExtension(Path);
@@ -147,7 +151,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                 if (itm != null)
                 {
                     itm.UnitPrice = (long)dr["Price"];
-                    itm.EditStatus = EditStatus.Unedited;
                 }
             });
         }
@@ -167,9 +170,32 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                 if (itm != null)
                 {
                     itm.UnitPrice = (long)dr["Price"];
-                    itm.EditStatus = EditStatus.Unedited;
                 }
             });
+        }
+
+
+
+        /// <summary>
+        /// 編集状態を初期化
+        /// </summary>
+        protected virtual void InitEditStatus()
+        {
+            // 初期化対象
+            IEnumerable<IEditable>[] initTargets = 
+            {
+                _WorkArea.Products,
+                _WorkArea.Resources,
+                _WorkArea.StorageAssign 
+            };
+
+            foreach (var editables in initTargets)
+            {
+                foreach (var editable in editables)
+                {
+                    editable.EditStatus = EditStatus.Unedited;
+                }
+            }
         }
     }
 }

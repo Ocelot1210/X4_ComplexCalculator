@@ -113,7 +113,7 @@ namespace X4_ComplexCalculator.Main
         {
             var dlg = new OpenFileDialog();
 
-            dlg.Filter = "X4: Complex calclator data file(*.x4)|*.x4|All Files|*.*";
+            dlg.Filter = "X4: Complex calculator data file(*.x4)|*.x4|All Files|*.*";
             dlg.Multiselect = true;
             if (dlg.ShowDialog() == true)
             {

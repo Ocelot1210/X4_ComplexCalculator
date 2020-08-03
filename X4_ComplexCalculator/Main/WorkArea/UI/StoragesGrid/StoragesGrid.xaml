@@ -74,13 +74,13 @@
             <MenuItem
                 Command="{Binding SetSelectedExpandedCommand, Mode=OneTime}"
                 CommandParameter="{StaticResource True}"
-                Header="{lex:Loc Lang:Expansion}" />
+                Header="{lex:Loc X4_ComplexCalculator:Lang:Expansion}" />
 
             <!--  折りたたみ  -->
             <MenuItem
                 Command="{Binding SetSelectedExpandedCommand, Mode=OneTime}"
                 CommandParameter="{StaticResource False}"
-                Header="{lex:Loc Lang:Collapse}" />
+                Header="{lex:Loc X4_ComplexCalculator:Lang:Collapse}" />
         </ContextMenu>
 
     </UserControl.Resources>
