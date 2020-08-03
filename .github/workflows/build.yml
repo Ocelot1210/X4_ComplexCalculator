@@ -1,0 +1,34 @@
+name: Build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    if: >
+      github.event_name == 'push' ||
+      github.event.pull_request.head.repo.full_name != github.repository
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup .Net Core 3.1
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build -c Debug --no-restore
+
+      - name: Test
+        run: dotnet test
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: X4_ComplexCalculator-${{ github.sha }}
+          path: X4_ComplexCalculator/bin/Debug/netcoreapp3.1
