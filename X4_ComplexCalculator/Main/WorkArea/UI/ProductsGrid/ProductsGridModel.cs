@@ -48,15 +48,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
 
         /// <summary>
-        /// 単価保存用
+        /// 前回値オプション保存用
         /// </summary>
-        private readonly Dictionary<string, long> _UnitPriceBakDict = new Dictionary<string, long>();
-
-
-        /// <summary>
-        /// 売買オプション保存用
-        /// </summary>
-        private readonly Dictionary<string, TradeOption> _TradeOptionDict = new Dictionary<string, TradeOption>();
+        private readonly Dictionary<string, ProductsGridItem> _OptionsBakDict = new Dictionary<string, ProductsGridItem>();
 
 
         /// <summary>
@@ -284,14 +278,35 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
             if (e.Action == NotifyCollectionChangedAction.Reset)
             {
-                // 単価保存
-                foreach (var delProd in Products)
+                // 前回値保存
+                foreach (var prod in Products)
                 {
-                    _UnitPriceBakDict.Add(delProd.Ware.WareID, delProd.UnitPrice);
+                    _OptionsBakDict.Add(prod.Ware.WareID, prod);
                 }
 
                 Products.Clear();
-                OnModuleAdded(_Modules);
+
+                if (_Modules.Any())
+                {
+                    var products = AggregateProduct(_Modules);
+
+                    // 可能なら前回値復元して製品一覧に追加
+                    var addItems = products.Select
+                    (
+                        x =>
+                        {
+                            if (_OptionsBakDict.TryGetValue(x.Key, out var oldProd))
+                            {
+                                return new ProductsGridItem(x.Key, x.Value, new TradeOption(oldProd.NoBuy, oldProd.NoSell), oldProd.UnitPrice) { EditStatus = oldProd.EditStatus };
+                            }
+
+                            return new ProductsGridItem(x.Key, x.Value, new TradeOption());
+                        }
+                    );
+
+                    Products.AddRange(addItems);
+                    _OptionsBakDict.Clear();
+                }
             }
 
             await Task.CompletedTask;
@@ -367,29 +382,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 else
                 {
                     // ウェアが一覧に無い場合
-
-                    // 売買オプション前回値があれば取得する
-                    if (!_TradeOptionDict.TryGetValue(item.Key, out var option))
-                    {
-                        // 前回値がない場合
-                        option = new TradeOption();
-                        _TradeOptionDict.Add(item.Key, option);
-                    }
-
-                    prod = new ProductsGridItem(item.Key, item.Value, option);
-
-                    // 前回値単価がある場合、復元
-                    if (_UnitPriceBakDict.ContainsKey(prod.Ware.WareID))
-                    {
-                        prod.UnitPrice = _UnitPriceBakDict[prod.Ware.WareID];
-                    }
-                    prod.EditStatus = EditStatus.Edited;
-                    addItems.Add(prod);
+                    addItems.Add(new ProductsGridItem(item.Key, item.Value, new TradeOption()) { EditStatus = EditStatus.Edited });
                 }
             }
-
-            // マージ処理以外で反応しないようにするためクリアする
-            _UnitPriceBakDict.Clear();
 
             Products.AddRange(addItems);
         }
