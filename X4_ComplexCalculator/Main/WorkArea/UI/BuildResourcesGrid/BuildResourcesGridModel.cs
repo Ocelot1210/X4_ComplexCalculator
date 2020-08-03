@@ -24,10 +24,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         /// </summary>
         private readonly ObservablePropertyChangedCollection<ModulesGridItem> _Modules;
 
+
         /// <summary>
-        /// 単価保存用
+        /// 前回値オプション保存用
         /// </summary>
-        private readonly Dictionary<string, long> _UnitPriceBakDict = new Dictionary<string, long>();
+        private readonly Dictionary<string, BuildResourcesGridItem> _OptionsBakDict = new Dictionary<string, BuildResourcesGridItem>();
+
 
         /// <summary>
         /// 建造リソース計算用
@@ -143,14 +145,33 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
 
             if (e.Action == NotifyCollectionChangedAction.Reset)
             {
-                // 単価保存
+                // 前回値保存
                 foreach (var resource in Resources)
                 {
-                    _UnitPriceBakDict.Add(resource.Ware.WareID, resource.UnitPrice);
+                    _OptionsBakDict.Add(resource.Ware.WareID, resource);
                 }
 
                 Resources.Clear();
-                OnModulesAdded(_Modules);
+
+                if (_Modules.Any())
+                {
+                    var resources = AggregateModules(_Modules);
+
+                    // 可能なら前回値復元して製品一覧に追加
+                    var addItems = resources.Select(
+                        x =>
+                        {
+                            if (_OptionsBakDict.TryGetValue(x.Key, out var oldRes))
+                            {
+                                return new BuildResourcesGridItem(x.Key, x.Value, oldRes.UnitPrice) { EditStatus = oldRes.EditStatus };
+                            }
+
+                            return new BuildResourcesGridItem(x.Key, x.Value) { EditStatus = EditStatus.Edited };
+                        });
+
+                    Resources.AddRange(addItems);
+                    _OptionsBakDict.Clear();
+                }
             }
 
             await Task.CompletedTask;
@@ -215,7 +236,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
                 else
                 {
                     // ウェアが一覧にない場合
-                    addTarget.Add(new BuildResourcesGridItem(kvp.Key, kvp.Value * module.ModuleCount));
+                    addTarget.Add(new BuildResourcesGridItem(kvp.Key, kvp.Value * module.ModuleCount) { EditStatus = EditStatus.Edited });
                 }
             }
 
@@ -252,7 +273,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
                 else
                 {
                     // ウェアが一覧にない場合
-                    addTarget.Add(new BuildResourcesGridItem(kvp.Key, kvp.Value * module.ModuleCount));
+                    addTarget.Add(new BuildResourcesGridItem(kvp.Key, kvp.Value * module.ModuleCount) { EditStatus = EditStatus.Edited });
                 }
             }
 
@@ -281,18 +302,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
                 else
                 {
                     // ウェアが一覧にない場合
-                    item = new BuildResourcesGridItem(kvp.Key, kvp.Value);
-                    if (_UnitPriceBakDict.ContainsKey(item.Ware.WareID))
-                    {
-                        item.UnitPrice = _UnitPriceBakDict[item.Ware.WareID];
-                    }
-                    item.EditStatus = EditStatus.Edited;
-                    addTarget.Add(item);
+                    addTarget.Add(new BuildResourcesGridItem(kvp.Key, kvp.Value) { EditStatus = EditStatus.Edited });
                 }
             }
 
-            // マージ処理以外で反応しないようにするためクリアする
-            _UnitPriceBakDict.Clear();
             Resources.AddRange(addTarget);
         }
 
