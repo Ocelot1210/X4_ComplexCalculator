@@ -6,11 +6,20 @@
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.StationSettings"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:x4vcvt="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     d:DesignHeight="450"
     d:DesignWidth="800"
     Background="White"
     mc:Ignorable="d">
+
+    <UserControl.Resources>
+
+        <!--  bool値を反転するValueConverter  -->
+        <x4vcvt:BoolNegativeConverter x:Key="BoolNegativeConverter" />
+
+    </UserControl.Resources>
+
     <ScrollViewer HorizontalScrollBarVisibility="Auto">
         <StackPanel Orientation="Vertical">
 
@@ -38,6 +47,7 @@
                             <xctk:LongUpDown
                                 Width="100"
                                 FormatString="{StaticResource DefaultNumericFormat}"
+                                IsEnabled="{Binding Workforce.AlwaysMaximum, Converter={StaticResource BoolNegativeConverter}}"
                                 Maximum="{Binding Workforce.Capacity, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                 Minimum="0"
                                 Value="{Binding Workforce.Actual, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -45,6 +55,7 @@
                         <Slider
                             Grid.Row="1"
                             Margin="0,5,0,5"
+                            IsEnabled="{Binding Workforce.AlwaysMaximum, Converter={StaticResource BoolNegativeConverter}}"
                             Maximum="{Binding Workforce.Capacity, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                             Minimum="0"
                             TickFrequency="1"
