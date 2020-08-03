@@ -24,21 +24,21 @@
             <!--  コピー  -->
             <MenuItem
                 Command="{Binding CopyModules}"
-                Header="{lex:Loc Lang:Copy}"
+                Header="{lex:Loc X4_ComplexCalculator:Lang:Copy}"
                 InputGestureText="Alt+C" />
 
             <!--  貼り付け  -->
             <MenuItem
                 Command="{Binding PasteModules}"
                 CommandParameter="{x:Reference Name=moduleGrid}"
-                Header="{lex:Loc Lang:Paste}"
+                Header="{lex:Loc X4_ComplexCalculator:Lang:Paste}"
                 InputGestureText="Alt+V" />
 
             <!--  削除  -->
             <MenuItem
                 Command="{Binding DeleteModules}"
                 CommandParameter="{x:Reference Name=moduleGrid}"
-                Header="{lex:Loc Lang:Delete}"
+                Header="{lex:Loc X4_ComplexCalculator:Lang:Delete}"
                 InputGestureText="Delete" />
         </ContextMenu>
 

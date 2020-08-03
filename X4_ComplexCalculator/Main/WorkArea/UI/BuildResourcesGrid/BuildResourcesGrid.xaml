@@ -29,11 +29,11 @@
             <MenuItem
                 Command="{Binding SetNoBuyToSelectedItemCommand, Mode=OneTime}"
                 CommandParameter="{StaticResource False}"
-                Header="{lex:Loc Lang:Buy}" />
+                Header="{lex:Loc X4_ComplexCalculator:Lang:Buy}" />
             <MenuItem
                 Command="{Binding SetNoBuyToSelectedItemCommand, Mode=OneTime}"
                 CommandParameter="{StaticResource True}"
-                Header="{lex:Loc Lang:NoBuy}" />
+                Header="{lex:Loc X4_ComplexCalculator:Lang:NoBuy}" />
         </ContextMenu>
 
     </UserControl.Resources>
@@ -169,12 +169,10 @@
 
                 <!--  ヘッダの内容定義  -->
                 <DataGridTemplateColumn.Header>
-                    <DockPanel>
-                        <CheckBox
-                            Content="{lex:Loc Lang:NoBuy}"
-                            DockPanel.Dock="Left"
-                            IsChecked="{Binding Data, Source={StaticResource ProxyNoBuy}}" />
-                    </DockPanel>
+                    <CheckBox
+                        Content="{lex:Loc X4_ComplexCalculator:Lang:NoBuy}"
+                        DockPanel.Dock="Left"
+                        IsChecked="{Binding Data, Source={StaticResource ProxyNoBuy}}" />
                 </DataGridTemplateColumn.Header>
 
                 <!--  セルの内容定義  -->

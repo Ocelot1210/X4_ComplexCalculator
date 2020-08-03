@@ -59,38 +59,38 @@
             <MenuItem
                 Command="{Binding SetSelectedExpandedCommand, Mode=OneTime}"
                 CommandParameter="{StaticResource True}"
-                Header="{lex:Loc Lang:Expansion}" />
+                Header="{lex:Loc X4_ComplexCalculator:Lang:Expansion}" />
 
             <!--  折りたたみ  -->
             <MenuItem
                 Command="{Binding SetSelectedExpandedCommand, Mode=OneTime}"
                 CommandParameter="{StaticResource False}"
-                Header="{lex:Loc Lang:Collapse}" />
+                Header="{lex:Loc X4_ComplexCalculator:Lang:Collapse}" />
 
             <Separator />
             <!--  購入する  -->
             <MenuItem
                 Command="{Binding SetNoBuyToSelectedItemCommand, Mode=OneTime}"
                 CommandParameter="{StaticResource False}"
-                Header="{lex:Loc Lang:Buy}" />
+                Header="{lex:Loc X4_ComplexCalculator:Lang:Buy}" />
             <!--  購入しない  -->
             <MenuItem
                 Command="{Binding SetNoBuyToSelectedItemCommand, Mode=OneTime}"
                 CommandParameter="{StaticResource True}"
-                Header="{lex:Loc Lang:NoBuy}" />
+                Header="{lex:Loc X4_ComplexCalculator:Lang:NoBuy}" />
             <Separator />
 
             <!--  販売する  -->
             <MenuItem
                 Command="{Binding SetNoSellToSelectedItemCommand, Mode=OneTime}"
                 CommandParameter="{StaticResource False}"
-                Header="{lex:Loc Lang:Sell}" />
+                Header="{lex:Loc X4_ComplexCalculator:Lang:Sell}" />
 
             <!--  販売しない  -->
             <MenuItem
                 Command="{Binding SetNoSellToSelectedItemCommand, Mode=OneTime}"
                 CommandParameter="{StaticResource True}"
-                Header="{lex:Loc Lang:NoSell}" />
+                Header="{lex:Loc X4_ComplexCalculator:Lang:NoSell}" />
         </ContextMenu>
 
         <!--  子要素のListView  -->
@@ -283,12 +283,10 @@
 
                 <!--  ヘッダの内容定義  -->
                 <DataGridTemplateColumn.Header>
-                    <DockPanel>
-                        <CheckBox
-                            Content="{lex:Loc Lang:NoBuy}"
-                            DockPanel.Dock="Left"
-                            IsChecked="{Binding Data, Source={StaticResource ProxyNoBuy}}" />
-                    </DockPanel>
+                    <CheckBox
+                        Content="{lex:Loc X4_ComplexCalculator:Lang:NoBuy}"
+                        DockPanel.Dock="Left"
+                        IsChecked="{Binding Data, Source={StaticResource ProxyNoBuy}}" />
                 </DataGridTemplateColumn.Header>
 
                 <!--  セルの内容定義  -->
@@ -308,12 +306,10 @@
 
                 <!--  ヘッダの内容定義  -->
                 <DataGridTemplateColumn.Header>
-                    <DockPanel>
-                        <CheckBox
-                            Content="{lex:Loc Lang:NoSell}"
-                            DockPanel.Dock="Left"
-                            IsChecked="{Binding Data, Source={StaticResource ProxyNoSell}}" />
-                    </DockPanel>
+                    <CheckBox
+                        Content="{lex:Loc X4_ComplexCalculator:Lang:NoSell}"
+                        DockPanel.Dock="Left"
+                        IsChecked="{Binding Data, Source={StaticResource ProxyNoSell}}" />
                 </DataGridTemplateColumn.Header>
 
                 <!--  セルの内容定義  -->
