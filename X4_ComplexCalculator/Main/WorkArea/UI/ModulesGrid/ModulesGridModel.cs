@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule;
@@ -164,29 +165,32 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
                 return;
             }
 
-            var dict = new Dictionary<int, ModulesGridItem>();
+            var dict = new Dictionary<int, (int idx, ModulesGridItem Module)>();
 
             var prevCnt = Modules.Count;
             var mergedModules = 0L;
 
             foreach (var (module, idx) in Modules.Select((x, idx) => (x, idx)))
             {
-                var hash = module.GetHashCode();
+                var hash = HashCode.Combine(module.Module, module.ModuleEquipment, module.SelectedMethod);
                 if (dict.ContainsKey(hash))
                 {
-                    dict[hash].ModuleCount += module.ModuleCount;
+                    var tmp = dict[hash];
+                    tmp.Module.ModuleCount += module.ModuleCount;
+                    tmp.Module.EditStatus   = EditStatus.Edited;
+
                     mergedModules += module.ModuleCount;
                 }
                 else
                 {
-                    dict.Add(hash, new ModulesGridItem(module.ToXml()));
+                    dict.Add(hash, (idx, new ModulesGridItem(module.ToXml()) { EditStatus = module.EditStatus }));
                 }
             }
 
             // モジュール数に変更があった場合のみ処理
             if (prevCnt != dict.Count)
             {
-                Modules.Reset(dict.OrderBy(x => x.Value.Module.Name).Select(x => x.Value));
+                Modules.Reset(dict.OrderBy(x => x.Value.idx).Select(x => x.Value.Module));
                 LocalizedMessageBox.Show("Lang:MergeModulesMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, mergedModules, prevCnt - dict.Count);
             }
             else

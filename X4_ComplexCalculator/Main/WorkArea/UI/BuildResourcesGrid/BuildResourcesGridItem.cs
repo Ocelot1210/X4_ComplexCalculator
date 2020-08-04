@@ -160,6 +160,21 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             Amount = amount;
         }
 
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="wareID">建造に必要なウェアID</param>
+        /// <param name="amount">建造に必要なウェア数</param>
+        /// <param name="unitPrice">単価</param>
+        public BuildResourcesGridItem(string wareID, long amount, long unitPrice)
+        {
+            Ware = Ware.Get(wareID);
+            UnitPrice = unitPrice;
+            Amount = amount;
+        }
+
+
+
 
         /// <summary>
         /// 百分率ベースで価格を設定する

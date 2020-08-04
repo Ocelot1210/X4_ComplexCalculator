@@ -42,9 +42,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
 
 
         /// <summary>
-        /// 保管庫割当保存用
+        /// 前回値保存用
         /// </summary>
-        private readonly Dictionary<string, long> _AllocBakDict = new Dictionary<string, long>();
+        private readonly Dictionary<string, StorageAssignGridItem> _OptionsBakDict = new Dictionary<string, StorageAssignGridItem>();
         #endregion
 
 
@@ -208,7 +208,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
                 // 前回値保存
                 foreach (var itm in StorageAssignGridItems)
                 {
-                    _AllocBakDict.Add(itm.WareID, itm.AllocCount);
+                    _OptionsBakDict.Add(itm.WareID, itm);
                 }
 
                 StorageAssignGridItems.Clear();
@@ -223,20 +223,21 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         private void OnProductsAdded(IEnumerable<ProductsGridItem> products)
         {
             // 前回値がある場合
-            if (StorageAssignGridItems.Count == 0 && 0 < _AllocBakDict.Count)
+            if (StorageAssignGridItems.Count == 0 && 0 < _OptionsBakDict.Count)
             {
                 StorageAssignGridItems.AddRange(products.Select(prod =>
                 {
-                    var ret = new StorageAssignGridItem(prod.Ware, _CapacityDict[prod.Ware.TransportType.TransportTypeID], prod.Count, Hour);
-                    if (_AllocBakDict.TryGetValue(ret.WareID, out long allocCount))
+                    var ret = new StorageAssignGridItem(prod.Ware, _CapacityDict[prod.Ware.TransportType.TransportTypeID], prod.Count, Hour) { EditStatus = EditStatus.Edited };
+                    if (_OptionsBakDict.TryGetValue(ret.WareID, out var oldAssign))
                     {
-                        ret.AllocCount = allocCount;
+                        ret.AllocCount = oldAssign.AllocCount;
+                        ret.EditStatus = oldAssign.EditStatus;
                     }
-                    ret.EditStatus = EditStatus.Edited;
+                    
                     return ret;
                 }));
 
-                _AllocBakDict.Clear();
+                _OptionsBakDict.Clear();
             }
             else
             {

@@ -207,6 +207,24 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
 
         /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="wareID">ウェアID</param>
+        /// <param name="datails">ウェア詳細(関連モジュール等)</param>
+        /// <param name="tradeOption">売買オプション</param>
+        /// <param name="unitPrice">単価</param>
+        public ProductsGridItem(string wareID, IEnumerable<IProductDetailsListItem> datails, TradeOption tradeOption, long unitPrice)
+        {
+            Ware = Ware.Get(wareID);
+            Details = new ObservableRangeCollection<IProductDetailsListItem>(datails);
+
+            _TradeOption = tradeOption;
+            UnitPrice = unitPrice;
+        }
+
+
+
+        /// <summary>
         /// 詳細情報を追加
         /// </summary>
         /// <param name="details"></param>
