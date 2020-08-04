@@ -1,5 +1,5 @@
+using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Dapper;
@@ -64,14 +64,7 @@ CREATE TABLE IF NOT EXISTS ModuleProduct
             // データ抽出 //
             ////////////////
             {
-                var items = _WaresXml.Root.XPathSelectElements("ware[@tags='module']").Select
-                (
-                    module => GetRecord(module)
-                )
-                .Where
-                (
-                    x => x != null
-                );
+                var items = GetRecords();
 
                 connection.Execute("INSERT INTO ModuleProduct (ModuleID, WareID, Method) VALUES (@ModuleID, @WareID, @Method)", items);
             }
@@ -79,31 +72,26 @@ CREATE TABLE IF NOT EXISTS ModuleProduct
 
 
         /// <summary>
-        /// 1レコード分の情報抽出
+        /// XML から ModuleProduct データを読み出す
         /// </summary>
-        /// <param name="module"></param>
-        /// <returns></returns>
-        private ModuleProduct? GetRecord(XElement module)
+        /// <returns>読み出した ModuleProduct データ</returns>
+        private IEnumerable<ModuleProduct> GetRecords()
         {
-            try
+            foreach (var module in _WaresXml.Root.XPathSelectElements("ware[@tags='module']"))
             {
                 var moduleID = module.Attribute("id").Value;
-                if (string.IsNullOrEmpty(moduleID)) return null;
+                if (string.IsNullOrEmpty(moduleID)) continue;
 
                 var macroName = module.XPathSelectElement("component").Attribute("ref").Value;
                 var macroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
                 var prod = macroXml.Root.XPathSelectElement("macro/properties/production/queue");
 
                 var wareID = prod?.Attribute("ware")?.Value;
-                if (string.IsNullOrEmpty(wareID)) return null;
+                if (string.IsNullOrEmpty(wareID)) continue;
 
                 var method = prod?.Attribute("method")?.Value ?? "default";
 
-                return new ModuleProduct(moduleID, wareID, method);
-            }
-            catch
-            {
-                return null;
+                yield return new ModuleProduct(moduleID, wareID, method);
             }
         }
     }

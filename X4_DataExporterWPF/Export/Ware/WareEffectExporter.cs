@@ -1,5 +1,5 @@
-﻿using System.Data;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.Data;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Dapper;
@@ -56,36 +56,39 @@ CREATE TABLE IF NOT EXISTS WareEffect
             // データ抽出 //
             ////////////////
             {
-                var items = _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'economy')]").SelectMany
-                (
-                    ware => ware.XPathSelectElements("production").SelectMany
-                    (
-                        prod => prod.XPathSelectElements("effects/effect").Select
-                        (
-                            effect =>
-                            {
-                                var wareID = ware.Attribute("id")?.Value;
-                                if (string.IsNullOrEmpty(wareID)) return null;
-
-                                var method = prod.Attribute("method")?.Value;
-                                if (string.IsNullOrEmpty(method)) return null;
-
-                                var effectID = effect.Attribute("type")?.Value;
-                                if (string.IsNullOrEmpty(effectID)) return null;
-
-                                double.TryParse(effect.Attribute("product")?.Value, out var product);
-
-                                return new WareEffect(wareID, method, effectID, product);
-                            }
-                        )
-                    )
-                )
-                .Where
-                (
-                    x => x != null
-                );
+                var items = GetRecords();
 
                 connection.Execute("INSERT INTO WareEffect (WareID, Method, EffectID, Product) VALUES (@WareID, @Method, @EffectID, @Product)", items);
+            }
+        }
+
+
+        /// <summary>
+        /// XML から WareEffect データを読み出す
+        /// </summary>
+        /// <returns>読み出した WareEffect データ</returns>
+        private IEnumerable<WareEffect> GetRecords()
+        {
+            foreach (var ware in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'economy')]"))
+            {
+                var wareID = ware.Attribute("id")?.Value;
+                if (string.IsNullOrEmpty(wareID)) continue;
+
+                foreach (var prod in ware.XPathSelectElements("production"))
+                {
+                    var method = prod.Attribute("method")?.Value;
+                    if (string.IsNullOrEmpty(method)) continue;
+
+                    foreach (var effect in prod.XPathSelectElements("effects/effect"))
+                    {
+                        var effectID = effect.Attribute("type")?.Value;
+                        if (string.IsNullOrEmpty(effectID)) continue;
+
+                        double.TryParse(effect.Attribute("product")?.Value, out var product);
+
+                        yield return new WareEffect(wareID, method, effectID, product);
+                    }
+                }
             }
         }
     }

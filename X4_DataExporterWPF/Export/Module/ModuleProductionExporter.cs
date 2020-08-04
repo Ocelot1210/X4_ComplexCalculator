@@ -1,5 +1,5 @@
-﻿using System.Data;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.Data;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Dapper;
@@ -55,29 +55,33 @@ CREATE TABLE IF NOT EXISTS ModuleProduction
             // データ抽出 //
             ////////////////
             {
-                var items = _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'module')]").SelectMany
-                (
-                    module => module.XPathSelectElements("production").Select
-                    (
-                        prod =>
-                        {
-                            var moduleID = module.Attribute("id")?.Value;
-                            if (string.IsNullOrEmpty(moduleID)) return null;
-
-                            var method = prod.Attribute("method")?.Value;
-                            if (string.IsNullOrEmpty(method)) return null;
-
-                            double time = double.Parse(prod.Attribute("time")?.Value ?? "0.0");
-                            return new ModuleProduction(moduleID, method, time);
-                        })
-                )
-                .Where
-                (
-                    x => x != null
-                );
+                var items = GetRecords();
 
 
                 connection.Execute("INSERT INTO ModuleProduction (ModuleID, Method, Time) VALUES (@ModuleID, @Method, @Time)", items);
+            }
+        }
+
+
+        /// <summary>
+        /// XML から ModuleProduction データを読み出す
+        /// </summary>
+        /// <returns>読み出した ModuleProduction データ</returns>
+        private IEnumerable<ModuleProduction> GetRecords()
+        {
+            foreach (var module in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'module')]"))
+            {
+                var moduleID = module.Attribute("id")?.Value;
+                if (string.IsNullOrEmpty(moduleID)) continue;
+
+                foreach (var prod in module.XPathSelectElements("production"))
+                {
+                    var method = prod.Attribute("method")?.Value;
+                    if (string.IsNullOrEmpty(method)) continue;
+
+                    double time = double.Parse(prod.Attribute("time")?.Value ?? "0.0");
+                    yield return new ModuleProduction(moduleID, method, time);
+                }
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -54,36 +55,33 @@ CREATE TABLE IF NOT EXISTS EquipmentOwner
             // データ抽出 //
             ////////////////
             {
-                var items = _WaresXml.Root.XPathSelectElements("ware[@transport='equipment']").SelectMany
-                (
-                    equipment =>
-                    {
-                        var equipmentID = equipment.Attribute("id")?.Value;
-                        if (string.IsNullOrEmpty(equipmentID)) return null;
-
-                        return equipment.XPathSelectElements("owner")
-                            .Select(owner => owner.Attribute("faction")?.Value)
-                            .Where(factionID => !string.IsNullOrEmpty(factionID))
-                            .Distinct()
-                            .Select(factionID =>
-                            {
-                                if (factionID == null)
-                                {
-                                    return null;
-                                }
-                                else
-                                {
-                                    return new EquipmentOwner(equipmentID, factionID);
-                                }
-                            });
-                    }
-                )
-                .Where
-                (
-                    x => x != null
-                );
+                var items = GetRecords();
 
                 connection.Execute("INSERT INTO EquipmentOwner (EquipmentID, FactionID) VALUES (@EquipmentID, @FactionID)", items);
+            }
+        }
+
+
+        /// <summary>
+        /// XML から EquipmentOwner データを読み出す
+        /// </summary>
+        /// <returns>読み出した EquipmentOwner データ</returns>
+        private IEnumerable<EquipmentOwner> GetRecords()
+        {
+            foreach (var equipment in _WaresXml.Root.XPathSelectElements("ware[@transport='equipment']"))
+            {
+                var equipmentID = equipment.Attribute("id")?.Value;
+                if (string.IsNullOrEmpty(equipmentID)) continue;
+
+                var owners = equipment.XPathSelectElements("owner")
+                    .Select(owner => owner.Attribute("faction")?.Value)
+                    .Where(factionID => !string.IsNullOrEmpty(factionID))
+                    .Distinct();
+                foreach (var factionID in owners)
+                {
+                    if (factionID == null) continue;
+                    yield return new EquipmentOwner(equipmentID, factionID);
+                }
             }
         }
     }

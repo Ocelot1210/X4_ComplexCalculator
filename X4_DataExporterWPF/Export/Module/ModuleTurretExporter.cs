@@ -64,14 +64,7 @@ CREATE TABLE IF NOT EXISTS ModuleTurret
             // データ抽出 //
             ////////////////
             {
-                var items = _WaresXml.Root.XPathSelectElements("ware[@tags='module']").SelectMany
-                (
-                    module => GetRecords(module)
-                )
-                .Where
-                (
-                    x => x != null
-                );
+                var items = GetRecords();
 
 
                 connection.Execute("INSERT INTO ModuleTurret (ModuleID, SizeID, Amount) VALUES (@ModuleID, @SizeID, @Amount)", items);
@@ -80,16 +73,15 @@ CREATE TABLE IF NOT EXISTS ModuleTurret
 
 
         /// <summary>
-        /// 情報抽出
+        /// XML から ModuleTurret データを読み出す
         /// </summary>
-        /// <param name="module"></param>
-        /// <returns></returns>
-        private IEnumerable<ModuleTurret> GetRecords(XElement module)
+        /// <returns>読み出した ModuleTurret データ</returns>
+        private IEnumerable<ModuleTurret> GetRecords()
         {
-            try
+            foreach (var module in _WaresXml.Root.XPathSelectElements("ware[@tags='module']"))
             {
                 var moduleID = module.Attribute("id")?.Value;
-                if (string.IsNullOrEmpty(moduleID)) return Enumerable.Empty<ModuleTurret>();
+                if (string.IsNullOrEmpty(moduleID)) continue;
 
                 var macroName = module.XPathSelectElement("component").Attribute("ref").Value;
                 var macroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
@@ -113,26 +105,15 @@ CREATE TABLE IF NOT EXISTS ModuleTurret
                     var attr = connections.Attribute("tags").Value;
                     var size = sizeDict.Keys.Where(x => attr.Contains(x)).FirstOrDefault();
 
-                    if (string.IsNullOrEmpty(size))
-                    {
-                        continue;
-                    }
+                    if (string.IsNullOrEmpty(size)) continue;
 
                     sizeDict[size]++;
                 }
 
-                return sizeDict.Where
-                (
-                    x => 0 < x.Value
-                )
-                .Select
-                (
-                    x => new ModuleTurret(moduleID, x.Key, x.Value)
-                );
-            }
-            catch
-            {
-                return Enumerable.Empty<ModuleTurret>();
+                foreach (var (sizeID, amount) in sizeDict.Where(x => 0 < x.Value))
+                {
+                    yield return new ModuleTurret(moduleID, sizeID, amount);
+                }
             }
         }
     }

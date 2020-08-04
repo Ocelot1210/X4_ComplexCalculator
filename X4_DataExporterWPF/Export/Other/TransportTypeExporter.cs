@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections.Generic;
+using System.Data;
 using Dapper;
 using LibX4.Lang;
 using X4_DataExporterWPF.Entity;
@@ -49,17 +50,24 @@ CREATE TABLE IF NOT EXISTS TransportType
             // データ抽出 //
             ////////////////
             {
-                // TODO: 可能ならファイルから抽出する
-                TransportType[] items =
-                {
-                    new TransportType("container", Resolver.Resolve("{20205, 100}")),
-                    new TransportType("liquid",    Resolver.Resolve("{20205, 300}")),
-                    new TransportType("solid",     Resolver.Resolve("{20205, 200}"))
-                };
+                var items = GetRecords();
 
                 // レコード追加
                 connection.Execute("INSERT INTO TransportType (TransportTypeID, Name) VALUES (@TransportTypeID, @Name)", items);
             }
+        }
+
+
+        /// <summary>
+        /// XML から TransportType データを読み出す
+        /// </summary>
+        /// <returns>読み出した TransportType データ</returns>
+        private IEnumerable<TransportType> GetRecords()
+        {
+            // TODO: 可能ならファイルから抽出する
+            yield return new TransportType("container", Resolver.Resolve("{20205, 100}"));
+            yield return new TransportType("liquid", Resolver.Resolve("{20205, 300}"));
+            yield return new TransportType("solid", Resolver.Resolve("{20205, 200}"));
         }
     }
 }

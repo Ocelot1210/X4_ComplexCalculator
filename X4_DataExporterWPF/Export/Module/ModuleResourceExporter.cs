@@ -1,5 +1,5 @@
-﻿using System.Data;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.Data;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Dapper;
@@ -56,35 +56,38 @@ CREATE TABLE IF NOT EXISTS ModuleResource
             // データ抽出 //
             ////////////////
             {
-                var items = _WaresXml.Root.XPathSelectElements("ware[@tags='module']").SelectMany
-                (
-                    module => module.XPathSelectElements("production").SelectMany
-                    (
-                        prod => prod.XPathSelectElements("primary/ware").Select
-                        (
-                            ware =>
-                            {
-                                var moduleID = module.Attribute("id")?.Value;
-                                if (string.IsNullOrEmpty(moduleID)) return null;
-
-                                var method = prod.Attribute("method")?.Value;
-                                if (string.IsNullOrEmpty(method)) return null;
-
-                                var wareID = ware.Attribute("ware")?.Value;
-                                if (string.IsNullOrEmpty(wareID)) return null;
-
-                                var amount = int.Parse(ware.Attribute("amount")?.Value ?? "0");
-
-                                return new ModuleResource(moduleID, method, wareID, amount);
-                            })
-                    )
-                )
-                .Where
-                (
-                    x => x != null
-                );
+                var items = GetRecords();
 
                 connection.Execute("INSERT INTO ModuleResource (ModuleID, Method, WareID, Amount) VALUES (@ModuleID, @Method, @WareID, @Amount)", items);
+            }
+        }
+
+
+        /// <summary>
+        /// XML から ModuleResource データを読み出す
+        /// </summary>
+        /// <returns>読み出した ModuleResource データ</returns>
+        private IEnumerable<ModuleResource> GetRecords()
+        {
+            foreach (var module in _WaresXml.Root.XPathSelectElements("ware[@tags='module']"))
+            {
+                var moduleID = module.Attribute("id")?.Value;
+                if (string.IsNullOrEmpty(moduleID)) continue;
+
+                foreach (var prod in module.XPathSelectElements("production"))
+                {
+                    var method = prod.Attribute("method")?.Value;
+                    if (string.IsNullOrEmpty(method)) continue;
+
+                    foreach (var ware in prod.XPathSelectElements("primary/ware"))
+                    {
+                        var wareID = ware.Attribute("ware")?.Value;
+                        if (string.IsNullOrEmpty(wareID)) continue;
+
+                        var amount = int.Parse(ware.Attribute("amount")?.Value ?? "0");
+                        yield return new ModuleResource(moduleID, method, wareID, amount);
+                    }
+                }
             }
         }
     }

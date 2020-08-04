@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Data;
 using Dapper;
 using X4_DataExporterWPF.Entity;
@@ -29,12 +30,22 @@ CREATE TABLE IF NOT EXISTS Effect
             // データ抽出 //
             ////////////////
             {
-                // TODO: 可能ならファイルから抽出する
-                Effect[] items = { new Effect("work", "work") };
+                var items = GetRecords();
 
                 // レコード追加
                 connection.Execute("INSERT INTO Effect (EffectID, Name) VALUES (@EffectID, @Name)", items);
             }
+        }
+
+
+        /// <summary>
+        /// ModuleType データを読み出す
+        /// </summary>
+        /// <returns>EquipmentType データ</returns>
+        private IEnumerable<Effect> GetRecords()
+        {
+            // TODO: 可能ならファイルから抽出する
+            yield return new Effect("work", "work");
         }
     }
 }

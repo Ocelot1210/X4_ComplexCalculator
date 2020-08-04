@@ -1,5 +1,5 @@
-﻿using System.Data;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.Data;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Dapper;
@@ -54,31 +54,34 @@ CREATE TABLE IF NOT EXISTS WorkUnitProduction
             // データ抽出 //
             ////////////////
             {
-                var items = _WaresXml.Root.XPathSelectElements("ware[@transport='workunit']").SelectMany
-                (
-                    workUnit => workUnit.XPathSelectElements("production").Select
-                    (
-                        prod =>
-                        {
-                            var workUnitID = workUnit.Attribute("id")?.Value;
-                            if (string.IsNullOrEmpty(workUnitID)) return null;
-
-                            var time = int.Parse(prod.Attribute("time")?.Value ?? "0");
-                            var amount = int.Parse(prod.Attribute("amount")?.Value ?? "0");
-
-                            var method = prod.Attribute("method")?.Value;
-                            if (string.IsNullOrEmpty(method)) return null;
-
-                            return new WorkUnitProduction(workUnitID, time, amount, method);
-                        }
-                    )
-                )
-                .Where
-                (
-                    x => x != null
-                );
+                var items = GetRecords();
 
                 connection.Execute("INSERT INTO WorkUnitProduction (WorkUnitID, Time, Amount, Method) VALUES (@WorkUnitID, @Time, @Amount, @Method)", items);
+            }
+        }
+
+
+        /// <summary>
+        /// XML から WorkUnitProduction データを読み出す
+        /// </summary>
+        /// <returns>読み出した WorkUnitProduction データ</returns>
+        private IEnumerable<WorkUnitProduction> GetRecords()
+        {
+            foreach (var workUnit in _WaresXml.Root.XPathSelectElements("ware[@transport='workunit']"))
+            {
+                var workUnitID = workUnit.Attribute("id")?.Value;
+                if (string.IsNullOrEmpty(workUnitID)) continue;
+
+                foreach (var prod in workUnit.XPathSelectElements("production"))
+                {
+                    var time = int.Parse(prod.Attribute("time")?.Value ?? "0");
+                    var amount = int.Parse(prod.Attribute("amount")?.Value ?? "0");
+
+                    var method = prod.Attribute("method")?.Value;
+                    if (string.IsNullOrEmpty(method)) continue;
+
+                    yield return new WorkUnitProduction(workUnitID, time, amount, method);
+                }
             }
         }
     }

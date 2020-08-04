@@ -1,5 +1,5 @@
+using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Dapper;
@@ -63,14 +63,7 @@ CREATE TABLE IF NOT EXISTS ModuleStorage
             // データ抽出 //
             ////////////////
             {
-                var items = _WaresXml.Root.XPathSelectElements("ware[@tags='module']").Select
-                (
-                    module => GetRecord(module)
-                )
-                .Where
-                (
-                    x => x != null
-                );
+                var items = GetRecords();
 
                 connection.Execute("INSERT INTO ModuleStorage (ModuleID, TransportTypeID, Amount) VALUES (@ModuleID, @TransportTypeID, @Amount)", items);
             }
@@ -78,16 +71,15 @@ CREATE TABLE IF NOT EXISTS ModuleStorage
 
 
         /// <summary>
-        /// 1レコード分の情報抽出
+        /// XML から ModuleStorage データを読み出す
         /// </summary>
-        /// <param name="module"></param>
-        /// <returns></returns>
-        private ModuleStorage? GetRecord(XElement module)
+        /// <returns>読み出した ModuleStorage データ</returns>
+        private IEnumerable<ModuleStorage> GetRecords()
         {
-            try
+            foreach (var module in _WaresXml.Root.XPathSelectElements("ware[@tags='module']"))
             {
                 var moduleID = module.Attribute("id")?.Value;
-                if (string.IsNullOrEmpty(moduleID)) return null;
+                if (string.IsNullOrEmpty(moduleID)) continue;
 
                 var macroName = module.XPathSelectElement("component").Attribute("ref").Value;
                 var macroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
@@ -97,16 +89,12 @@ CREATE TABLE IF NOT EXISTS ModuleStorage
 
                 // 総合保管庫は飛ばす
                 var transportTypeID = cargo?.Attribute("tags")?.Value;
-                if (string.IsNullOrEmpty(transportTypeID)) return null;
-                if (transportTypeID.Contains(' ') == true) return null;
+                if (string.IsNullOrEmpty(transportTypeID)) continue;
+                if (transportTypeID.Contains(' ') == true) continue;
 
                 var amount = int.Parse(cargo?.Attribute("max")?.Value ?? "");
 
-                return new ModuleStorage(moduleID, transportTypeID, amount);
-            }
-            catch
-            {
-                return null;
+                yield return new ModuleStorage(moduleID, transportTypeID, amount);
             }
         }
     }

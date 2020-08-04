@@ -1,5 +1,5 @@
-﻿using System.Data;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.Data;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Dapper;
@@ -57,35 +57,38 @@ CREATE TABLE IF NOT EXISTS WareResource
             // データ抽出 //
             ////////////////
             {
-                var items = _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'economy')]").SelectMany
-                (
-                    ware => ware.XPathSelectElements("production").SelectMany
-                    (
-                        prod => prod.XPathSelectElements("primary/ware").Select
-                        (
-                            needWare =>
-                            {
-                                var wareID = ware.Attribute("id")?.Value;
-                                if (string.IsNullOrEmpty(wareID)) return null;
-
-                                var method = prod.Attribute("method")?.Value;
-                                if (string.IsNullOrEmpty(method)) return null;
-
-                                var needWareID = needWare.Attribute("ware")?.Value;
-                                if (string.IsNullOrEmpty(needWareID)) return null;
-
-                                var amount = int.Parse(needWare.Attribute("amount")?.Value ?? "0");
-                                return new WareResource(wareID, method, needWareID, amount);
-                            }
-                        )
-                    )
-                )
-                .Where
-                (
-                    x => x != null
-                );
+                var items = GetRecords();
 
                 connection.Execute("INSERT INTO WareResource (WareID, Method, NeedWareID, Amount) VALUES (@WareID, @Method, @NeedWareID, @Amount)", items);
+            }
+        }
+
+
+        /// <summary>
+        /// XML から WareResource データを読み出す
+        /// </summary>
+        /// <returns>読み出した WareResource データ</returns>
+        private IEnumerable<WareResource> GetRecords()
+        {
+            foreach (var ware in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'economy')]"))
+            {
+                var wareID = ware.Attribute("id")?.Value;
+                if (string.IsNullOrEmpty(wareID)) continue;
+
+                foreach (var prod in ware.XPathSelectElements("production"))
+                {
+                    var method = prod.Attribute("method")?.Value;
+                    if (string.IsNullOrEmpty(method)) continue;
+
+                    foreach (var needWare in prod.XPathSelectElements("primary/ware"))
+                    {
+                        var needWareID = needWare.Attribute("ware")?.Value;
+                        if (string.IsNullOrEmpty(needWareID)) continue;
+
+                        var amount = int.Parse(needWare.Attribute("amount")?.Value ?? "0");
+                        yield return new WareResource(wareID, method, needWareID, amount);
+                    }
+                }
             }
         }
     }

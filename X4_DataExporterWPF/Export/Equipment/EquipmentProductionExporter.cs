@@ -1,5 +1,5 @@
+using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Dapper;
@@ -54,27 +54,32 @@ CREATE TABLE IF NOT EXISTS EquipmentProduction
             // データ抽出 //
             ////////////////
             {
-                var items = _WaresXml.Root.XPathSelectElements("ware[@transport='equipment']").SelectMany
-                (
-                    equipment => equipment.XPathSelectElements("production").Select
-                    (
-                        prod =>
-                        {
-                            var equipmentID = equipment.Attribute("id")?.Value;
-                            if (string.IsNullOrEmpty(equipmentID)) return null;
-                            var method = prod.Attribute("method")?.Value;
-                            if (string.IsNullOrEmpty(method)) return null;
-                            var time = double.Parse(prod.Attribute("time")?.Value ?? "0.0");
-                            return new EquipmentProduction(equipmentID, method, time);
-                        }
-                    )
-                )
-                .Where
-                (
-                    x => x != null
-                );
+                var items = GetRecords();
 
                 connection.Execute("INSERT INTO EquipmentProduction (EquipmentID, Method, Time) VALUES (@EquipmentID, @Method, @Time)", items);
+            }
+        }
+
+
+        /// <summary>
+        /// XML から EquipmentProduction データを読み出す
+        /// </summary>
+        /// <returns>読み出した EquipmentProduction データ</returns>
+        private IEnumerable<EquipmentProduction> GetRecords()
+        {
+            foreach (var equipment in _WaresXml.Root.XPathSelectElements("ware[@transport='equipment']"))
+            {
+                var equipmentID = equipment.Attribute("id")?.Value;
+                if (string.IsNullOrEmpty(equipmentID)) continue;
+
+                foreach (var prod in equipment.XPathSelectElements("production"))
+                {
+                    var method = prod.Attribute("method")?.Value;
+                    if (string.IsNullOrEmpty(method)) continue;
+
+                    var time = double.Parse(prod.Attribute("time")?.Value ?? "0.0");
+                    yield return new EquipmentProduction(equipmentID, method, time);
+                }
             }
         }
     }

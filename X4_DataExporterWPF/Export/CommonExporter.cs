@@ -1,5 +1,7 @@
-﻿using System.Data;
+﻿using System.Collections.Generic;
+using System.Data;
 using Dapper;
+using X4_DataExporterWPF.Entity;
 
 namespace X4_DataExporterWPF.Export
 {
@@ -34,8 +36,21 @@ CREATE TABLE IF NOT EXISTS Common
             // データ抽出 //
             ////////////////
             {
-                connection.Execute($"INSERT INTO Common (Item, Value) VALUES ('FormatVersion', {CURRENT_FORMAT_VERSION})");
+                var items = GetRecords();
+
+                connection.Execute($"INSERT INTO Common (Item, Value) VALUES (@Item, @Value)", items);
             }
+        }
+
+
+        /// <summary>
+        /// Common データを返す
+        /// </summary>
+        /// <returns>Common データ</returns>
+        private IEnumerable<Common> GetRecords()
+        {
+            // TODO: 可能ならファイルから抽出する
+            yield return new Common("FormatVersion", CURRENT_FORMAT_VERSION);
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using System.Data;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.Data;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Dapper;
@@ -74,14 +74,7 @@ CREATE TABLE IF NOT EXISTS Module
             // データ抽出 //
             ////////////////
             {
-                var items = _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'module')]").Select
-                (
-                    module => GetRecord(module)
-                )
-                .Where
-                (
-                    x => x != null
-                );
+                var items = GetRecords();
 
                 connection.Execute("INSERT INTO Module (ModuleID, ModuleTypeID, Name, Macro, MaxWorkers, WorkersCapacity, NoBlueprint) VALUES (@ModuleID, @ModuleTypeID, @Name, @Macro, @MaxWorkers, @WorkersCapacity, @NoBlueprint)", items);
             }
@@ -89,23 +82,22 @@ CREATE TABLE IF NOT EXISTS Module
 
 
         /// <summary>
-        /// 1レコード分の情報抽出
+        /// XML から Module データを読み出す
         /// </summary>
-        /// <param name="module"></param>
-        /// <returns></returns>
-        private Module? GetRecord(XElement module)
+        /// <returns>読み出した Module データ</returns>
+        private IEnumerable<Module> GetRecords()
         {
-            try
+            foreach (var module in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'module')]"))
             {
                 var moduleID = module.Attribute("id").Value;
-                if (string.IsNullOrEmpty(moduleID)) return null;
+                if (string.IsNullOrEmpty(moduleID)) continue;
 
                 var macroName = module.XPathSelectElement("component").Attribute("ref").Value;
-                if (string.IsNullOrEmpty(macroName)) return null;
+                if (string.IsNullOrEmpty(macroName)) continue;
 
                 var macroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
                 var moduleTypeID = macroXml.Root.XPathSelectElement("macro").Attribute("class").Value;
-                if (string.IsNullOrEmpty(moduleTypeID)) return null;
+                if (string.IsNullOrEmpty(moduleTypeID)) continue;
 
                 // 従業員数/最大収容人数取得
                 var workForce = macroXml?.Root?.XPathSelectElement("macro/properties/workforce");
@@ -117,11 +109,7 @@ CREATE TABLE IF NOT EXISTS Module
 
                 var noBluePrint = module.Attribute("tags").Value.Contains("noblueprint") ? 1 : 0;
 
-                return new Module(moduleID, moduleTypeID, name, macroName, maxWorkers, capacity, noBluePrint);
-            }
-            catch
-            {
-                return null;
+                yield return new Module(moduleID, moduleTypeID, name, macroName, maxWorkers, capacity, noBluePrint);
             }
         }
     }

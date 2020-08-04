@@ -1,5 +1,5 @@
-﻿using System.Data;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.Data;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Dapper;
@@ -55,36 +55,39 @@ CREATE TABLE IF NOT EXISTS WorkUnitResource
             // データ抽出 //
             ////////////////
             {
-                var items = _WaresXml.Root.XPathSelectElements("ware[@transport='workunit']").SelectMany
-                (
-                    workUnit => workUnit.XPathSelectElements("production").SelectMany
-                    (
-                        prod => prod.XPathSelectElements("primary/ware").Select
-                        (
-                            ware =>
-                            {
-                                var workUnitID = workUnit.Attribute("id")?.Value;
-                                if (string.IsNullOrEmpty(workUnitID)) return null;
-
-                                var method = prod.Attribute("method")?.Value;
-                                if (string.IsNullOrEmpty(method)) return null;
-
-                                var wareID = ware.Attribute("ware")?.Value;
-                                if (string.IsNullOrEmpty(wareID)) return null;
-
-                                var amount = int.Parse(ware.Attribute("amount")?.Value ?? "0");
-
-                                return new WorkUnitResource(workUnitID, method, wareID, amount);
-                            }
-                        )
-                    )
-                )
-                .Where
-                (
-                    x => x != null
-                );
+                var items = GetRecords();
 
                 connection.Execute("INSERT INTO WorkUnitResource (WorkUnitID, Method, WareID, Amount) VALUES (@WorkUnitID, @Method, @WareID, @Amount)", items);
+            }
+        }
+
+
+        /// <summary>
+        /// XML から WorkUnitResource データを読み出す
+        /// </summary>
+        /// <returns>読み出した WorkUnitResource データ</returns>
+        private IEnumerable<WorkUnitResource> GetRecords()
+        {
+            foreach (var workUnit in _WaresXml.Root.XPathSelectElements("ware[@transport='workunit']"))
+            {
+                var workUnitID = workUnit.Attribute("id")?.Value;
+                if (string.IsNullOrEmpty(workUnitID)) continue;
+
+                foreach (var prod in workUnit.XPathSelectElements("production"))
+                {
+                    var method = prod.Attribute("method")?.Value;
+                    if (string.IsNullOrEmpty(method)) continue;
+
+                    foreach (var ware in prod.XPathSelectElements("primary/ware"))
+                    {
+                        var wareID = ware.Attribute("ware")?.Value;
+                        if (string.IsNullOrEmpty(wareID)) continue;
+
+                        var amount = int.Parse(ware.Attribute("amount")?.Value ?? "0");
+
+                        yield return new WorkUnitResource(workUnitID, method, wareID, amount);
+                    }
+                }
             }
         }
     }

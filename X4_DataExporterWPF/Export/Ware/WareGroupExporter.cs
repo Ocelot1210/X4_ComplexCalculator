@@ -1,5 +1,5 @@
-﻿using System.Data;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.Data;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Dapper;
@@ -64,29 +64,32 @@ CREATE TABLE IF NOT EXISTS WareGroup
             // データ抽出 //
             ////////////////
             {
-                var items = _WareGroupXml.Root.XPathSelectElements("group[@tags='tradable']").Select
-                (
-                    x =>
-                    {
-                        var wareGroupID = x.Attribute("id")?.Value;
-                        if (string.IsNullOrEmpty(wareGroupID)) return null;
-
-                        var name = _Resolver.Resolve(x.Attribute("name")?.Value ?? "");
-                        if (string.IsNullOrEmpty(name)) return null;
-
-                        var factoryName = _Resolver.Resolve(x.Attribute("factoryname")?.Value ?? "");
-                        var icon = x.Attribute("icon")?.Value ?? "";
-                        var tier = int.Parse(x.Attribute("tier")?.Value ?? "0");
-
-                        return new WareGroup(wareGroupID, name, factoryName, icon, tier);
-                    }
-                )
-                .Where
-                (
-                    x => x != null
-                );
+                var items = GetRecords();
 
                 connection.Execute("INSERT INTO WareGroup (WareGroupID, Name, FactoryName, Icon, Tier) VALUES (@WareGroupID, @Name, @FactoryName, @Icon, @Tier)", items);
+            }
+        }
+
+
+        /// <summary>
+        /// XML から WareGroup データを読み出す
+        /// </summary>
+        /// <returns>読み出した WareGroup データ</returns>
+        private IEnumerable<WareGroup> GetRecords()
+        {
+            foreach (var wareGroup in _WareGroupXml.Root.XPathSelectElements("group[@tags='tradable']"))
+            {
+                var wareGroupID = wareGroup.Attribute("id")?.Value;
+                if (string.IsNullOrEmpty(wareGroupID)) continue;
+
+                var name = _Resolver.Resolve(wareGroup.Attribute("name")?.Value ?? "");
+                if (string.IsNullOrEmpty(name)) continue;
+
+                var factoryName = _Resolver.Resolve(wareGroup.Attribute("factoryname")?.Value ?? "");
+                var icon = wareGroup.Attribute("icon")?.Value ?? "";
+                var tier = int.Parse(wareGroup.Attribute("tier")?.Value ?? "0");
+
+                yield return new WareGroup(wareGroupID, name, factoryName, icon, tier);
             }
         }
     }
