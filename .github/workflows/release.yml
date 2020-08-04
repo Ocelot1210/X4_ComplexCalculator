@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup .Net Core 3.1
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.x
+
+      - name: Restore dependencies
+        run: dotnet restore -r win-x64
+
+      - name: Build
+        run: dotnet build -c Release -r win-x64 /p:PublishReadyToRun=true --no-restore
+
+      - name: Compress archive
+        run: |
+          New-Item artifacts -ItemType Directory
+          Move-Item X4_ComplexCalculator\bin\Release\netcoreapp3.1\win-x64 artifacts\bin
+          $WshShell = New-Object -comObject WScript.Shell
+          $Shortcut = $WshShell.CreateShortcut("$PWD\artifacts\X4_ComplexCalculator.exe.lnk")
+          $Shortcut.TargetPath = 'explorer'
+          $Shortcut.Arguments = 'bin\X4_ComplexCalculator.exe'
+          $Shortcut.Save()
+          Compress-Archive -Path artifacts/* -DestinationPath X4_ComplexCalculator.zip
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_name: X4_ComplexCalculator.zip
+          asset_path: X4_ComplexCalculator.zip
+          asset_content_type: application/zip
