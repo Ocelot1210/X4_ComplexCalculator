@@ -25,14 +25,15 @@ jobs:
 
       - name: Compress archive
         run: |
-          New-Item artifacts -ItemType Directory
-          Move-Item X4_ComplexCalculator\bin\Release\netcoreapp3.1\win-x64 artifacts\bin
+          New-Item artifacts\X4_ComplexCalculator -ItemType Directory
+          Move-Item X4_ComplexCalculator\bin\Release\netcoreapp3.1\win-x64 artifacts\X4_ComplexCalculator\bin
           $WshShell = New-Object -comObject WScript.Shell
-          $Shortcut = $WshShell.CreateShortcut("$PWD\artifacts\X4_ComplexCalculator.exe.lnk")
+          $Shortcut = $WshShell.CreateShortcut("$PWD\artifacts\X4_ComplexCalculator\X4_ComplexCalculator.exe.lnk")
           $Shortcut.TargetPath = 'explorer'
           $Shortcut.Arguments = 'bin\X4_ComplexCalculator.exe'
+          $Shortcut.IconLocation = 'imageres.dll,11'
           $Shortcut.Save()
-          Compress-Archive -Path artifacts/* -DestinationPath X4_ComplexCalculator.zip
+          Compress-Archive -Path artifacts/X4_ComplexCalculator -DestinationPath X4_ComplexCalculator.zip
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
