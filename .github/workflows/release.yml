@@ -21,7 +21,7 @@ jobs:
         run: dotnet restore -r win-x64
 
       - name: Build
-        run: dotnet build -c Release -r win-x64 /p:PublishReadyToRun=true --no-restore
+        run: dotnet build -c Release -r win-x64 --no-restore
 
       - name: Compress archive
         run: |
