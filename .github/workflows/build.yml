@@ -9,6 +9,10 @@ jobs:
       github.event_name == 'push' ||
       github.event.pull_request.head.repo.full_name != github.repository
 
+    strategy:
+      matrix:
+        Configuration: [Debug, Release]
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -22,7 +26,7 @@ jobs:
         run: dotnet restore
 
       - name: Build
-        run: dotnet build -c Debug --no-restore
+        run: dotnet build -c ${{ matrix.Configuration }} --no-restore
 
       - name: Test
         run: dotnet test
@@ -30,5 +34,5 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v2
         with:
-          name: X4_ComplexCalculator-${{ github.sha }}
-          path: X4_ComplexCalculator/bin/Debug/netcoreapp3.1
+          name: X4_ComplexCalculator-${{ matrix.Configuration }}-${{ github.sha }}
+          path: X4_ComplexCalculator/bin/${{ matrix.Configuration }}/netcoreapp3.1
