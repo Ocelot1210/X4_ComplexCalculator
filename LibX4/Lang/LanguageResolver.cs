@@ -1,9 +1,8 @@
-﻿using LibX4.FileSystem;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using LibX4.FileSystem;
 
 namespace LibX4.Lang
 {
@@ -14,76 +13,44 @@ namespace LibX4.Lang
     {
         #region メンバ
         /// <summary>
-        /// 言語ファイル管理用辞書[Key = 言語ファイルパス, Value = 言語xml]
+        /// 言語ファイルのスタック
         /// </summary>
-        private readonly Dictionary<string, XDocument> _LangTrees = new Dictionary<string, XDocument>();
-
-
-        /// <summary>
-        /// 読み込んだ言語一覧(最後の要素が優先)
-        /// </summary>
-        private readonly Stack<string> _Langages = new Stack<string>();
-
-
-        /// <summary>
-        /// catファイルオブジェクト
-        /// </summary>
-        private readonly CatFile _CatFile;
+        private readonly XDocument[] _LanguagesXml;
 
 
         /// <summary>
         /// メッセージテンプレートからIDを抽出する正規表現
         /// </summary>
-        private readonly Regex _GetIDRegex = new Regex(@"\{\s*(\d+)\s*,\s*(\d+)\s*\}");
+        private static readonly Regex _GetIDRegex = new Regex(@"\{\s*(\d+)\s*,\s*(\d+)\s*\}");
 
 
         /// <summary>
         /// コメント削除用正規表現
         /// </summary>
-        private readonly Regex _RemoveCommentRegex = new Regex(@"(?<!\\)\(.*?(?<!\\)\)");
+        private static readonly Regex _RemoveCommentRegex = new Regex(@"(?<!\\)\(.*?(?<!\\)\)");
 
 
         /// <summary>
         /// 括弧のエスケープを解除する正規表現
         /// </summary>
-        private readonly Regex _UnescapeRegex = new Regex(@"\\(.)");
+        private static readonly Regex _UnescapeRegex = new Regex(@"\\(.)");
         #endregion
 
 
         /// <summary>
-        /// コンストラクタ
+        /// 指定された言語 ID のファイルを読み込み、LanguageResolver インスタンスを初期化する。
+        /// 複数の言語 ID が指定された場合、先に指定された物を優先する。
         /// </summary>
         /// <param name="catFile">catファイルオブジェクト</param>
-        public LanguageResolver(CatFile catFile)
+        /// <param name="languageIds">読み込む言語 ID の配列</param>
+        public LanguageResolver(CatFile catFile, params int[] languageIds)
         {
-            _CatFile = catFile;
-        }
-
-
-        /// <summary>
-        /// 言語ファイル読み込み
-        /// </summary>
-        /// <param name="langID">言語ID</param>
-        public void LoadLangFile(int langID)
-        {
-            LoadLangFile($"t/0001-l{langID,3:D3}.xml");
-        }
-
-
-        /// <summary>
-        /// 言語ファイル読み込み
-        /// </summary>
-        /// <param name="fileName"></param>
-        public void LoadLangFile(string fileName)
-        {
-            // ロード済みなら何もしない
-            if (_LangTrees.ContainsKey(fileName))
-            {
-                return;
-            }
-
-            _LangTrees.Add(fileName, _CatFile.OpenLangXml(fileName));
-            _Langages.Push(fileName);
+            _LanguagesXml = languageIds
+                .Where((x, i) => languageIds.Take(i).All(y => x != y))  // 順序を保証する Distinct
+                .Select(languageId => $"t/0001-l{languageId,3:D3}.xml")
+                .Append("t/0001.xml")
+                .Select(languageFilePath => catFile.OpenXml(languageFilePath))
+                .ToArray();
         }
 
 
@@ -99,7 +66,7 @@ namespace LibX4.Lang
                 return template;
             }
 
-            foreach (var langTree in _Langages.Select(x => _LangTrees[x]))
+            foreach (var langTree in _LanguagesXml)
             {
                 var textOld = "";
                 var textNew = template;
@@ -108,7 +75,7 @@ namespace LibX4.Lang
                 while (textOld != textNew)
                 {
                     textOld = textNew;
-                    var succededTmp = false;
+                    bool succededTmp;
 
                     (textNew, succededTmp) = ResolveField(textNew, langTree);
 
