@@ -1,9 +1,9 @@
-﻿using LibX4.FileSystem;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using LibX4.FileSystem;
 
 namespace LibX4.Lang
 {
@@ -34,19 +34,19 @@ namespace LibX4.Lang
         /// <summary>
         /// メッセージテンプレートからIDを抽出する正規表現
         /// </summary>
-        private readonly Regex _GetIDRegex = new Regex(@"\{\s*(\d+)\s*,\s*(\d+)\s*\}");
+        private static readonly Regex _GetIDRegex = new Regex(@"\{\s*(\d+)\s*,\s*(\d+)\s*\}");
 
 
         /// <summary>
         /// コメント削除用正規表現
         /// </summary>
-        private readonly Regex _RemoveCommentRegex = new Regex(@"(?<!\\)\(.*?(?<!\\)\)");
+        private static readonly Regex _RemoveCommentRegex = new Regex(@"(?<!\\)\(.*?(?<!\\)\)");
 
 
         /// <summary>
         /// 括弧のエスケープを解除する正規表現
         /// </summary>
-        private readonly Regex _UnescapeRegex = new Regex(@"\\(.)");
+        private static readonly Regex _UnescapeRegex = new Regex(@"\\(.)");
         #endregion
 
 
