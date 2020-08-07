@@ -66,12 +66,8 @@ namespace X4_DataExporterWPF.DataExportWindow
 
                 using var trans = conn.BeginTransaction();
 
-                var resolver = new LanguageResolver(catFile);
-
                 // 英語をデフォルトにする
-                resolver.LoadLangFile(44);
-                resolver.LoadLangFile(language.ID);
-
+                var resolver = new LanguageResolver(catFile, language.ID, 44);
 
                 var waresXml = catFile.OpenXml("libraries/wares.xml");
 

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -16,19 +15,7 @@ namespace LibX4.Lang
         /// <summary>
         /// 言語ファイルのスタック
         /// </summary>
-        private readonly Stack<XDocument> _LanguagesXml = new Stack<XDocument>();
-
-
-        /// <summary>
-        /// 読み込み済みの言語ファイル名のコレクション
-        /// </summary>
-        private readonly HashSet<string> _LoadedLanguages = new HashSet<string>();
-
-
-        /// <summary>
-        /// catファイルオブジェクト
-        /// </summary>
-        private readonly CatFile _CatFile;
+        private readonly XDocument[] _LanguagesXml;
 
 
         /// <summary>
@@ -51,39 +38,16 @@ namespace LibX4.Lang
 
 
         /// <summary>
-        /// コンストラクタ
+        /// 指定された言語 ID のファイルを読み込み、LanguageResolver インスタンスを初期化する。
+        /// 複数の言語 ID が指定された場合、先に指定された物を優先する。
         /// </summary>
         /// <param name="catFile">catファイルオブジェクト</param>
-        public LanguageResolver(CatFile catFile)
+        /// <param name="languageIds">読み込む言語 ID の配列</param>
+        public LanguageResolver(CatFile catFile, params int[] languageIds)
         {
-            _CatFile = catFile;
-        }
-
-
-        /// <summary>
-        /// 言語ファイル読み込み
-        /// </summary>
-        /// <param name="langID">言語ID</param>
-        public void LoadLangFile(int langID)
-        {
-            LoadLangFile($"t/0001-l{langID,3:D3}.xml");
-        }
-
-
-        /// <summary>
-        /// 言語ファイル読み込み
-        /// </summary>
-        /// <param name="fileName"></param>
-        public void LoadLangFile(string fileName)
-        {
-            // ロード済みなら何もしない
-            if (_LoadedLanguages.Contains(fileName))
-            {
-                return;
-            }
-
-            _LanguagesXml.Push(_CatFile.OpenLangXml(fileName));
-            _LoadedLanguages.Add(fileName);
+            _LanguagesXml = languageIds
+                .Select(languageId => catFile.OpenLangXml($"t/0001-l{languageId,3:D3}.xml"))
+                .ToArray();
         }
 
 
