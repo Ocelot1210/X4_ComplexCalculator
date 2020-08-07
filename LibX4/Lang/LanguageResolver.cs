@@ -46,7 +46,9 @@ namespace LibX4.Lang
         public LanguageResolver(CatFile catFile, params int[] languageIds)
         {
             _LanguagesXml = languageIds
-                .Select(languageId => catFile.OpenLangXml($"t/0001-l{languageId,3:D3}.xml"))
+                .Select(languageId => $"t/0001-l{languageId,3:D3}.xml")
+                .Append("t/0001.xml")
+                .Select(languageFilePath => catFile.OpenXml(languageFilePath))
                 .ToArray();
         }
 
