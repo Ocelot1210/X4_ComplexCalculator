@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -14,15 +14,15 @@ namespace LibX4.Lang
     {
         #region メンバ
         /// <summary>
-        /// 言語ファイル管理用辞書[Key = 言語ファイルパス, Value = 言語xml]
+        /// 言語ファイルのスタック
         /// </summary>
-        private readonly Dictionary<string, XDocument> _LangTrees = new Dictionary<string, XDocument>();
+        private readonly Stack<XDocument> _LanguagesXml = new Stack<XDocument>();
 
 
         /// <summary>
-        /// 読み込んだ言語一覧(最後の要素が優先)
+        /// 読み込み済みの言語ファイル名のコレクション
         /// </summary>
-        private readonly Stack<string> _Langages = new Stack<string>();
+        private readonly HashSet<string> _LoadedLanguages = new HashSet<string>();
 
 
         /// <summary>
@@ -77,13 +77,13 @@ namespace LibX4.Lang
         public void LoadLangFile(string fileName)
         {
             // ロード済みなら何もしない
-            if (_LangTrees.ContainsKey(fileName))
+            if (_LoadedLanguages.Contains(fileName))
             {
                 return;
             }
 
-            _LangTrees.Add(fileName, _CatFile.OpenLangXml(fileName));
-            _Langages.Push(fileName);
+            _LanguagesXml.Push(_CatFile.OpenLangXml(fileName));
+            _LoadedLanguages.Add(fileName);
         }
 
 
@@ -99,7 +99,7 @@ namespace LibX4.Lang
                 return template;
             }
 
-            foreach (var langTree in _Langages.Select(x => _LangTrees[x]))
+            foreach (var langTree in _LanguagesXml)
             {
                 var textOld = "";
                 var textNew = template;
@@ -108,7 +108,7 @@ namespace LibX4.Lang
                 while (textOld != textNew)
                 {
                     textOld = textNew;
-                    var succededTmp = false;
+                    bool succededTmp;
 
                     (textNew, succededTmp) = ResolveField(textNew, langTree);
 
