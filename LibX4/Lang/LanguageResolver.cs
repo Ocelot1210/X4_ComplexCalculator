@@ -38,6 +38,14 @@ namespace LibX4.Lang
 
 
         /// <summary>
+        /// 指定された言語 XML で LanguageResolver インスタンスを初期化する。
+        /// 複数の言語 XML が指定された場合、先に指定された物を優先する。
+        /// </summary>
+        /// <param name="languageXml">参照する言語 XML</param>
+        internal LanguageResolver(params XDocument[] languageXml) => _LanguagesXml = languageXml;
+
+
+        /// <summary>
         /// 指定された言語 ID のファイルを読み込み、LanguageResolver インスタンスを初期化する。
         /// 複数の言語 ID が指定された場合、先に指定された物を優先する。
         /// </summary>
