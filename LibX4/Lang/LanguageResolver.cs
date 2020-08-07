@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -46,6 +46,7 @@ namespace LibX4.Lang
         public LanguageResolver(CatFile catFile, params int[] languageIds)
         {
             _LanguagesXml = languageIds
+                .Where((x, i) => languageIds.Take(i).All(y => x != y))  // 順序を保証する Distinct
                 .Select(languageId => $"t/0001-l{languageId,3:D3}.xml")
                 .Append("t/0001.xml")
                 .Select(languageFilePath => catFile.OpenXml(languageFilePath))
