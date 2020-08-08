@@ -21,14 +21,14 @@ namespace LibX4.Tests
                 </page>
             </language>
             ".ToXDocument();
-            var langXml2st = @"
+            var langXml2nd = @"
             <language>
                 <page id=""1001"">
                      <t id=""1"">Hull</t>
                 </page>
             </language>
             ".ToXDocument();
-            var resolve = new LanguageResolver(langXml1st, langXml2st).Resolve("{1001,1}");
+            var resolve = new LanguageResolver(langXml1st, langXml2nd).Resolve("{1001,1}");
             Assert.Equal("船体", resolve);
         }
 
