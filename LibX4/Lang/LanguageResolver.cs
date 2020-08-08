@@ -7,31 +7,31 @@ using LibX4.FileSystem;
 namespace LibX4.Lang
 {
     /// <summary>
-    /// X4の言語フィールド文字列を解決するクラス
+    /// X4 の言語フィールド文字列 (例: {1001,2490}) を解決するクラス
     /// </summary>
     public class LanguageResolver
     {
         #region メンバ
         /// <summary>
-        /// 言語ファイルのスタック
+        /// 読み込んだ言語 XML
         /// </summary>
         private readonly XDocument[] _LanguagesXml;
 
 
         /// <summary>
-        /// メッセージテンプレートからIDを抽出する正規表現
+        /// 言語フィールド文字列から pageID, tID を抽出する正規表現
         /// </summary>
         private static readonly Regex _GetIDRegex = new Regex(@"\{\s*(\d+)\s*,\s*(\d+)\s*\}");
 
 
         /// <summary>
-        /// コメント削除用正規表現
+        /// エスケープされていない括弧とその内部を削除する正規表現
         /// </summary>
         private static readonly Regex _RemoveCommentRegex = new Regex(@"(?<!\\)\((?:|.*[^\\])\)");
 
 
         /// <summary>
-        /// 括弧のエスケープを解除する正規表現
+        /// エスケープを解除する正規表現
         /// </summary>
         private static readonly Regex _UnescapeRegex = new Regex(@"\\(.)");
         #endregion
