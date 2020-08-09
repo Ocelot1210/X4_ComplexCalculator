@@ -7,34 +7,42 @@ using LibX4.FileSystem;
 namespace LibX4.Lang
 {
     /// <summary>
-    /// X4の言語フィールド文字列を解決するクラス
+    /// X4 の言語フィールド文字列 (例: {1001,2490}) を解決するクラス
     /// </summary>
     public class LanguageResolver
     {
         #region メンバ
         /// <summary>
-        /// 言語ファイルのスタック
+        /// 読み込んだ言語 XML
         /// </summary>
         private readonly XDocument[] _LanguagesXml;
 
 
         /// <summary>
-        /// メッセージテンプレートからIDを抽出する正規表現
+        /// 言語フィールド文字列から pageID, tID を抽出する正規表現
         /// </summary>
         private static readonly Regex _GetIDRegex = new Regex(@"\{\s*(\d+)\s*,\s*(\d+)\s*\}");
 
 
         /// <summary>
-        /// コメント削除用正規表現
+        /// エスケープされていない括弧とその内部を削除する正規表現
         /// </summary>
-        private static readonly Regex _RemoveCommentRegex = new Regex(@"(?<!\\)\(.*?(?<!\\)\)");
+        private static readonly Regex _RemoveCommentRegex = new Regex(@"(?<!\\)\((?:|.*[^\\])\)");
 
 
         /// <summary>
-        /// 括弧のエスケープを解除する正規表現
+        /// エスケープを解除する正規表現
         /// </summary>
         private static readonly Regex _UnescapeRegex = new Regex(@"\\(.)");
         #endregion
+
+
+        /// <summary>
+        /// 指定された言語 XML で LanguageResolver インスタンスを初期化する。
+        /// 複数の言語 XML が指定された場合、先に指定された物を優先する。
+        /// </summary>
+        /// <param name="languageXml">参照する言語 XML</param>
+        internal LanguageResolver(params XDocument[] languageXml) => _LanguagesXml = languageXml;
 
 
         /// <summary>
@@ -55,66 +63,34 @@ namespace LibX4.Lang
 
 
         /// <summary>
-        /// 言語フィールドの文字列を言語ファイルを参照して解決する
+        /// 言語フィールド文字列 (例: {1001,2490}) を解決する
         /// </summary>
-        /// <param name="template">言語フィールド文字列</param>
-        /// <returns>解決結果文字列</returns>
-        public string Resolve(string template)
+        /// <param name="target">言語フィールド文字列を含む文字列</param>
+        /// <returns>言語フィールド文字列を解決し置き換えた文字列</returns>
+        public string Resolve(string target)
         {
-            if (string.IsNullOrEmpty(template))
+            if (string.IsNullOrEmpty(target)) return target;
+
+            var matchLangField = _GetIDRegex.Match(target);
+            if (matchLangField == null) return target;
+            var pageID = matchLangField.Groups[1].Value;
+            var tID = matchLangField.Groups[2].Value;
+
+            foreach (var languageXml in _LanguagesXml)
             {
-                return template;
-            }
-
-            foreach (var langTree in _LanguagesXml)
-            {
-                var textOld = "";
-                var textNew = template;
-                var succeeded = false;
-
-                while (textOld != textNew)
+                var findT = languageXml.Root
+                    .XPathSelectElement($"./page[@id='{pageID}']/t[@id='{tID}']")
+                    ?.Value;
+                if (findT != null)
                 {
-                    textOld = textNew;
-                    bool succededTmp;
-
-                    (textNew, succededTmp) = ResolveField(textNew, langTree);
-
-                    succeeded |= succededTmp;
-                }
-
-                // 名前解決に成功したか？
-                if (succeeded)
-                {
-                    return _UnescapeRegex.Replace(textNew, @"$1");
+                    var uncommentedT = _RemoveCommentRegex.Replace(findT, "");
+                    var resolvedText = target.Replace(matchLangField.Value, uncommentedT);
+                    var unescapedText = _UnescapeRegex.Replace(resolvedText, "$1");
+                    return Resolve(unescapedText);
                 }
             }
 
-            return template;
-        }
-
-
-        /// <summary>
-        /// 言語フィールド解決処理メイン
-        /// </summary>
-        /// <param name="text">言語フィールド文字列</param>
-        /// <param name="langTree">翻訳対象言語のXDocument</param>
-        /// <returns></returns>
-        private (string, bool) ResolveField(string text, XDocument langTree)
-        {
-            var match = _GetIDRegex.Match(text);
-
-            var pageID = match.Groups[1].Value;
-            var tID = match.Groups[2].Value;
-
-            var nodes = langTree.Root.XPathSelectElements($"./page[@id='{pageID}']/t[@id='{tID}']");
-            if (nodes == null || !nodes.Any())
-            {
-                return (text, false);
-            }
-
-            // コメントアウト削除
-            var ret = _RemoveCommentRegex.Replace(nodes.First().Value, "");
-            return (text.Replace(match.Value, ret), true);
+            return target;
         }
     }
 }
