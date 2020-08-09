@@ -76,7 +76,7 @@ namespace LibX4.Tests
         /// 解決後の文字列に言語フィールド文字列が含まれる場合、含まれなくなるまで再帰的に解決する
         /// </summary>
         [Fact]
-        public void DoubleSolution()
+        public void MultipleRecursion()
         {
             var resolve = new LanguageResolver(@"
             <language>
@@ -97,7 +97,7 @@ namespace LibX4.Tests
         /// 解決後の文字列に言語フィールド文字列が 2 つ以上含まれる場合、全て解決する
         /// </summary>
         [Fact]
-        public void TwoPointResolve()
+        public void MultipleFieldResolve()
         {
             var resolve = new LanguageResolver(@"
             <language>
