@@ -103,11 +103,11 @@ namespace LibX4.FileSystem
 
 
         /// <summary>
-        /// xmlファイルを開く
+        /// XML ファイルの読み込みを試みる
         /// </summary>
-        /// <param name="filePath">ファイルパス</param>
-        /// <returns>xmlオブジェクト</returns>
-        public XDocument OpenXml(string filePath)
+        /// <param name="filePath">開くファイルの相対パス</param>
+        /// <returns>開いた XML 文書、該当ファイルが無かった場合は null</returns>
+        public XDocument? TryOpenXml(string filePath)
         {
             XDocument? ret = null;
 
@@ -141,8 +141,18 @@ namespace LibX4.FileSystem
                 }
             }
 
-            return ret ?? throw new FileNotFoundException(filePath);
+            return ret;
         }
+
+
+        /// <summary>
+        /// XML ファイルを開く
+        /// </summary>
+        /// <param name="filePath">開くファイルの相対パス</param>
+        /// <exception cref="FileNotFoundException">該当ファイルが無い</exception>
+        /// <returns>開いた XML 文書</returns>
+        public XDocument OpenXml(string filePath)
+            => TryOpenXml(filePath) ?? throw new FileNotFoundException(filePath);
 
 
         /// <summary>
