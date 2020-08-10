@@ -53,12 +53,14 @@ namespace LibX4.Lang
         /// <param name="languageIds">読み込む言語 ID の配列</param>
         public LanguageResolver(CatFile catFile, params int[] languageIds)
         {
-            _LanguagesXml = languageIds
+            var languageXmls = languageIds
                 .Where((x, i) => languageIds.Take(i).All(y => x != y))  // 順序を保証する Distinct
-                .Select(languageId => $"t/0001-l{languageId,3:D3}.xml")
-                .Append("t/0001.xml")
-                .Select(languageFilePath => catFile.OpenXml(languageFilePath))
-                .ToArray();
+                .Select(languageId => catFile.OpenXml($"t/0001-l{languageId,3:D3}.xml"));
+
+            var defaultLanguageXml = catFile.TryOpenXml("t/0001.xml");
+            if (defaultLanguageXml != null) languageXmls = languageXmls.Append(defaultLanguageXml);
+
+            _LanguagesXml = languageXmls.ToArray();
         }
 
 
