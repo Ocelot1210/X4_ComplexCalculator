@@ -10,7 +10,7 @@ namespace LibX4.FileSystem
     /// <summary>
     /// catファイル用ユーティリティクラス
     /// </summary>
-    public class CatFile
+    public class CatFile : IIndexResolver
     {
         #region メンバ
         /// <summary>

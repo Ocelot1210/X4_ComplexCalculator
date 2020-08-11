@@ -1,8 +1,7 @@
-﻿using System.Data;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.Data;
 using System.Xml.Linq;
 using Dapper;
-using LibX4.FileSystem;
 using LibX4.Lang;
 using X4_DataExporterWPF.Entity;
 
@@ -22,18 +21,17 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// 言語解決用オブジェクト
         /// </summary>
-        private readonly LanguageResolver _Resolver;
+        private readonly ILanguageResolver _Resolver;
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="catFile">catファイル</param>
+        /// <param name="raceXml">'libraries/races.xml' の XDocument</param>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public RaceExporter(CatFile catFile, LanguageResolver resolver)
+        public RaceExporter(XDocument raceXml, ILanguageResolver resolver)
         {
-            _RaceXml = catFile.OpenXml("libraries/races.xml");
-
+            _RaceXml = raceXml;
             _Resolver = resolver;
         }
 
@@ -62,27 +60,30 @@ CREATE TABLE IF NOT EXISTS Race
             // データ抽出 //
             ////////////////
             {
-                var items = _RaceXml.Root.Elements().Select
-                (
-                    x =>
-                    {
-                        var raceID = x.Attribute("id")?.Value;
-                        if (string.IsNullOrEmpty(raceID)) return null;
-
-                        var name = _Resolver.Resolve(x.Attribute("name")?.Value ?? "");
-                        if (string.IsNullOrEmpty(name)) return null;
-
-                        var shortName = _Resolver.Resolve(x.Attribute("shortname")?.Value ?? "");
-
-                        return new Race(raceID, name, shortName);
-                    }
-                )
-                .Where
-                (
-                    x => x != null
-                );
+                var items = GetRecords();
 
                 connection.Execute("INSERT INTO Race (RaceID, Name, ShortName) VALUES (@RaceID, @Name, @ShortName)", items);
+            }
+        }
+
+
+        /// <summary>
+        /// XML から Race データを読み出す
+        /// </summary>
+        /// <returns>読み出した Race データ</returns>
+        private IEnumerable<Race> GetRecords()
+        {
+            foreach (var race in _RaceXml.Root.Elements())
+            {
+                var raceID = race.Attribute("id")?.Value;
+                if (string.IsNullOrEmpty(raceID)) continue;
+
+                var name = _Resolver.Resolve(race.Attribute("name")?.Value ?? "");
+                if (string.IsNullOrEmpty(name)) continue;
+
+                var shortName = _Resolver.Resolve(race.Attribute("shortname")?.Value ?? "");
+
+                yield return new Race(raceID, name, shortName);
             }
         }
     }

@@ -1,5 +1,5 @@
-﻿using System.Data;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.Data;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Dapper;
@@ -22,7 +22,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// 言語解決用オブジェクト
         /// </summary>
-        private readonly LanguageResolver _Resolver;
+        private readonly ILanguageResolver _Resolver;
 
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace X4_DataExporterWPF.Export
         /// </summary>
         /// <param name="waresXml">ウェア情報xml</param>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public WareProductionExporter(XDocument waresXml, LanguageResolver resolver)
+        public WareProductionExporter(XDocument waresXml, ILanguageResolver resolver)
         {
             _WaresXml = waresXml;
             _Resolver = resolver;
@@ -65,32 +65,35 @@ CREATE TABLE IF NOT EXISTS WareProduction
             // データ抽出 //
             ////////////////
             {
-                var items = _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'economy')]").SelectMany
-                (
-                    ware => ware.XPathSelectElements("production").Select
-                    (
-                        prod =>
-                        {
-                            var wareID = ware.Attribute("id")?.Value;
-                            if (string.IsNullOrEmpty(wareID)) return null;
-
-                            var method = prod.Attribute("method")?.Value;
-                            if (string.IsNullOrEmpty(method)) return null;
-
-                            var name = _Resolver.Resolve(prod.Attribute("name")?.Value ?? "");
-                            var amount = int.Parse(prod.Attribute("amount")?.Value ?? "0");
-                            var time = double.Parse(prod.Attribute("time")?.Value ?? "0.0");
-
-                            return new WareProduction(wareID, method, name, amount, time);
-                        }
-                    )
-                )
-                .Where
-                (
-                    x => x != null
-                );
+                var items = GetRecords();
 
                 connection.Execute("INSERT INTO WareProduction (WareID, Method, Name, Amount, Time) VALUES (@WareID, @Method, @Name, @Amount, @Time)", items);
+            }
+        }
+
+
+        /// <summary>
+        /// XML から WareProduction データを読み出す
+        /// </summary>
+        /// <returns>読み出した WareProduction データ</returns>
+        private IEnumerable<WareProduction> GetRecords()
+        {
+            foreach (var ware in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'economy')]"))
+            {
+                var wareID = ware.Attribute("id")?.Value;
+                if (string.IsNullOrEmpty(wareID)) continue;
+
+                foreach (var prod in ware.XPathSelectElements("production"))
+                {
+                    var method = prod.Attribute("method")?.Value;
+                    if (string.IsNullOrEmpty(method)) continue;
+
+                    var name = _Resolver.Resolve(prod.Attribute("name")?.Value ?? "");
+                    var amount = int.Parse(prod.Attribute("amount")?.Value ?? "0");
+                    var time = double.Parse(prod.Attribute("time")?.Value ?? "0.0");
+
+                    yield return new WareProduction(wareID, method, name, amount, time);
+                }
             }
         }
     }

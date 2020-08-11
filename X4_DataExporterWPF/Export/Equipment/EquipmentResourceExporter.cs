@@ -1,5 +1,5 @@
-﻿using System.Data;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.Data;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Dapper;
@@ -55,33 +55,39 @@ CREATE TABLE IF NOT EXISTS EquipmentResource
             // データ抽出 //
             ////////////////
             {
-                var items = _WaresXml.Root.XPathSelectElements("ware[@transport='equipment']").SelectMany
-                (
-                    equipment => equipment.XPathSelectElements("production").SelectMany
-                    (
-                        prod => prod.XPathSelectElements("primary/ware").Select
-                        (
-                            ware =>
-                            {
-                                var equipmentID = equipment.Attribute("id")?.Value;
-                                if (string.IsNullOrEmpty(equipmentID)) return null;
-                                var method = prod.Attribute("method")?.Value;
-                                if (string.IsNullOrEmpty(method)) return null;
-                                var needWareID = ware.Attribute("ware")?.Value;
-                                if (string.IsNullOrEmpty(needWareID)) return null;
-                                var amount = int.Parse(ware.Attribute("amount").Value ?? "0");
-                                return new EquipmentResource(equipmentID, method, needWareID, amount);
-                            }
-                        )
-                    )
-                )
-                .Where
-                (
-                    x => x != null
-                );
+                var items = GetRecords();
 
 
                 connection.Execute("INSERT INTO EquipmentResource (EquipmentID, Method, NeedWareID, Amount) VALUES (@EquipmentID, @Method, @NeedWareID, @Amount)", items);
+            }
+        }
+
+
+        /// <summary>
+        /// XML から EquipmentResource データを読み出す
+        /// </summary>
+        /// <returns>読み出した EquipmentResource データ</returns>
+        private IEnumerable<EquipmentResource> GetRecords()
+        {
+            foreach (var equipment in _WaresXml.Root.XPathSelectElements("ware[@transport='equipment']"))
+            {
+                var equipmentID = equipment.Attribute("id")?.Value;
+                if (string.IsNullOrEmpty(equipmentID)) continue;
+
+                foreach (var prod in equipment.XPathSelectElements("production"))
+                {
+                    var method = prod.Attribute("method")?.Value;
+                    if (string.IsNullOrEmpty(method)) continue;
+
+                    foreach (var ware in prod.XPathSelectElements("primary/ware"))
+                    {
+                        var needWareID = ware.Attribute("ware")?.Value;
+                        if (string.IsNullOrEmpty(needWareID)) continue;
+
+                        var amount = int.Parse(ware.Attribute("amount").Value ?? "0");
+                        yield return new EquipmentResource(equipmentID, method, needWareID, amount);
+                    }
+                }
             }
         }
     }

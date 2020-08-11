@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Xml.Linq;
@@ -17,7 +18,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// catファイルオブジェクト
         /// </summary>
-        private readonly CatFile _CatFile;
+        private readonly IIndexResolver _CatFile;
 
 
         /// <summary>
@@ -29,7 +30,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// 言語解決用オブジェクト
         /// </summary>
-        private readonly LanguageResolver _Resolver;
+        private readonly ILanguageResolver _Resolver;
 
 
         /// <summary>
@@ -38,7 +39,7 @@ namespace X4_DataExporterWPF.Export
         /// <param name="catFile">catファイルオブジェクト</param>
         /// <param name="waresXml">ウェア情報xml</param>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public EquipmentExporter(CatFile catFile, XDocument waresXml, LanguageResolver resolver)
+        public EquipmentExporter(IIndexResolver catFile, XDocument waresXml, ILanguageResolver resolver)
         {
             _CatFile = catFile;
             _WaresXml = waresXml;
@@ -74,15 +75,7 @@ CREATE TABLE IF NOT EXISTS Equipment
             // データ抽出 //
             ////////////////
             {
-                var items = _WaresXml.Root.XPathSelectElements("ware[@transport='equipment']").Select
-                (
-                    equipment => GetRecord(equipment)
-                )
-                .Where
-                (
-                    x => x != null
-                );
-
+                var items = GetRecords();
 
                 connection.Execute("INSERT INTO Equipment (EquipmentID, MacroName, EquipmentTypeID, SizeID, Name) VALUES (@EquipmentID, @MacroName, @EquipmentTypeID, @SizeID, @Name)", items);
             }
@@ -90,25 +83,32 @@ CREATE TABLE IF NOT EXISTS Equipment
 
 
         /// <summary>
-        /// 1レコード分の情報を抽出する
+        /// XML から Equipment データを読み出す
         /// </summary>
-        /// <param name="equipment"></param>
-        /// <returns></returns>
-        private Equipment? GetRecord(XElement equipment)
+        /// <returns>読み出した Equipment データ</returns>
+        private IEnumerable<Equipment> GetRecords()
         {
-            try
+            foreach (var equipment in _WaresXml.Root.XPathSelectElements("ware[@transport='equipment']"))
             {
                 var equipmentID = equipment.Attribute("id")?.Value;
-                if (string.IsNullOrEmpty(equipmentID)) return null;
+                if (string.IsNullOrEmpty(equipmentID)) continue;
 
                 var macroName = equipment.XPathSelectElement("component").Attribute("ref")?.Value;
-                if (string.IsNullOrEmpty(macroName)) return null;
+                if (string.IsNullOrEmpty(macroName)) continue;
 
                 var equipmentTypeID = equipment.Attribute("group")?.Value;
-                if (string.IsNullOrEmpty(equipmentTypeID)) return null;
+                if (string.IsNullOrEmpty(equipmentTypeID)) continue;
 
                 var macroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
-                var componentXml = _CatFile.OpenIndexXml("index/components.xml", macroXml.Root.XPathSelectElement("macro/component").Attribute("ref").Value);
+                XDocument componentXml;
+                try
+                {
+                    componentXml = _CatFile.OpenIndexXml("index/components.xml", macroXml.Root.XPathSelectElement("macro/component").Attribute("ref").Value);
+                }
+                catch
+                {
+                    continue;
+                }
 
                 // 装備が記載されているタグを取得する
                 var component = componentXml.Root.XPathSelectElement("component/connections/connection[contains(@tags, 'component')]");
@@ -120,16 +120,12 @@ CREATE TABLE IF NOT EXISTS Equipment
                 var tags = component?.Attribute("tags").Value.Split(" ");
                 var sizeID = sizes.Where(x => tags?.Contains(x) == true).FirstOrDefault();
                 // 一致するサイズがなかった場合
-                if (string.IsNullOrEmpty(sizeID)) return null;
+                if (string.IsNullOrEmpty(sizeID)) continue;
 
                 var name = _Resolver.Resolve(equipment.Attribute("name").Value);
                 name = string.IsNullOrEmpty(name) ? macroName : name;
 
-                return new Equipment(equipmentID, macroName, equipmentTypeID, sizeID, name);
-            }
-            catch
-            {
-                return null;
+                yield return new Equipment(equipmentID, macroName, equipmentTypeID, sizeID, name);
             }
         }
     }

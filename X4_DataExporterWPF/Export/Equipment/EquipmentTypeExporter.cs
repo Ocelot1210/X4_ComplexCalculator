@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections.Generic;
+using System.Data;
 using Dapper;
 using LibX4.Lang;
 using X4_DataExporterWPF.Entity;
@@ -13,7 +14,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// 言語解決用オブジェクト
         /// </summary>
-        private readonly LanguageResolver _Resolver;
+        private readonly ILanguageResolver _Resolver;
 
 
         /// <summary>
@@ -49,22 +50,29 @@ CREATE TABLE IF NOT EXISTS EquipmentType
             // データ抽出 //
             ////////////////
             {
-                // TODO: 可能ならファイルから抽出する
-                EquipmentType[] items =
-                {
-                    new EquipmentType("countermeasures", _Resolver.Resolve("{20215, 1701}")),
-                    new EquipmentType("drones",          _Resolver.Resolve("{20215, 1601}")),
-                    new EquipmentType("engines",         _Resolver.Resolve("{20215, 1801}")),
-                    new EquipmentType("missiles",        _Resolver.Resolve("{20215, 1901}")),
-                    new EquipmentType("shields",         _Resolver.Resolve("{20215, 2001}")),
-                    new EquipmentType("software",        _Resolver.Resolve("{20215, 2101}")),
-                    new EquipmentType("thrusters",       _Resolver.Resolve("{20215, 2201}")),
-                    new EquipmentType("turrets",         _Resolver.Resolve("{20215, 2301}")),
-                    new EquipmentType("weapons",         _Resolver.Resolve("{20215, 2401}"))
-                };
+                var items = GetRecords();
 
                 connection.Execute("INSERT INTO EquipmentType (EquipmentTypeID, Name) VALUES (@EquipmentTypeID, @Name)", items);
             }
+        }
+
+
+        /// <summary>
+        /// EquipmentType データを読み出す
+        /// </summary>
+        /// <returns>EquipmentType データ</returns>
+        private IEnumerable<EquipmentType> GetRecords()
+        {
+            // TODO: 可能ならファイルから抽出する
+            yield return new EquipmentType("countermeasures", _Resolver.Resolve("{20215, 1701}"));
+            yield return new EquipmentType("drones", _Resolver.Resolve("{20215, 1601}"));
+            yield return new EquipmentType("engines", _Resolver.Resolve("{20215, 1801}"));
+            yield return new EquipmentType("missiles", _Resolver.Resolve("{20215, 1901}"));
+            yield return new EquipmentType("shields", _Resolver.Resolve("{20215, 2001}"));
+            yield return new EquipmentType("software", _Resolver.Resolve("{20215, 2101}"));
+            yield return new EquipmentType("thrusters", _Resolver.Resolve("{20215, 2201}"));
+            yield return new EquipmentType("turrets", _Resolver.Resolve("{20215, 2301}"));
+            yield return new EquipmentType("weapons", _Resolver.Resolve("{20215, 2401}"));
         }
     }
 }

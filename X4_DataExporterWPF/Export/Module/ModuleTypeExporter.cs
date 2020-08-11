@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections.Generic;
+using System.Data;
 using Dapper;
 using LibX4.Lang;
 using X4_DataExporterWPF.Entity;
@@ -14,7 +15,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// 言語解決用オブジェクト
         /// </summary>
-        private readonly LanguageResolver _Resolver;
+        private readonly ILanguageResolver _Resolver;
 
 
         /// <summary>
@@ -51,21 +52,29 @@ CREATE TABLE IF NOT EXISTS ModuleType
             // データ抽出 //
             ////////////////
             {
-                // TODO:可能ならファイルから抽出する
-                ModuleType[] items = {
-                    new ModuleType("buildmodule",         _Resolver.Resolve("{20104,  69901}")),
-                    new ModuleType("connectionmodule",    _Resolver.Resolve("{20104,  59901}")),
-                    new ModuleType("defencemodule",       _Resolver.Resolve("{20104,  49901}")),
-                    new ModuleType("dockarea",            _Resolver.Resolve("{20104,  70001}")),
-                    new ModuleType("habitation",          _Resolver.Resolve("{20104,  39901}")),
-                    new ModuleType("pier",                _Resolver.Resolve("{20104,  71101}")),
-                    new ModuleType("production",          _Resolver.Resolve("{20104,  19901}")),
-                    new ModuleType("storage",             _Resolver.Resolve("{20104,  29901}")),
-                    new ModuleType("ventureplatform",     _Resolver.Resolve("{20104, 101901}")),
-                };
+                var items = GetRecords();
 
                 connection.Execute("INSERT INTO ModuleType(ModuleTypeID, Name) VALUES (@ModuleTypeID, @Name)", items);
             }
+        }
+
+
+        /// <summary>
+        /// ModuleType データを読み出す
+        /// </summary>
+        /// <returns>EquipmentType データ</returns>
+        private IEnumerable<ModuleType> GetRecords()
+        {
+            // TODO: 可能ならファイルから抽出する
+            yield return new ModuleType("buildmodule", _Resolver.Resolve("{20104,  69901}"));
+            yield return new ModuleType("connectionmodule", _Resolver.Resolve("{20104,  59901}"));
+            yield return new ModuleType("defencemodule", _Resolver.Resolve("{20104,  49901}"));
+            yield return new ModuleType("dockarea", _Resolver.Resolve("{20104,  70001}"));
+            yield return new ModuleType("habitation", _Resolver.Resolve("{20104,  39901}"));
+            yield return new ModuleType("pier", _Resolver.Resolve("{20104,  71101}"));
+            yield return new ModuleType("production", _Resolver.Resolve("{20104,  19901}"));
+            yield return new ModuleType("storage", _Resolver.Resolve("{20104,  29901}"));
+            yield return new ModuleType("ventureplatform", _Resolver.Resolve("{20104, 101901}"));
         }
     }
 }

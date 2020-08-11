@@ -1,9 +1,8 @@
-﻿using System.Data;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.Data;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Dapper;
-using LibX4.FileSystem;
 using LibX4.Lang;
 using X4_DataExporterWPF.Entity;
 
@@ -23,17 +22,17 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// 言語解決用オブジェクト
         /// </summary>
-        private readonly LanguageResolver _Resolver;
+        private readonly ILanguageResolver _Resolver;
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="catFile">catファイル</param>
+        /// <param name="factionsXml">'libraries/factions.xml' の XDocument</param>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public FactionExporter(CatFile catFile, LanguageResolver resolver)
+        public FactionExporter(XDocument factionsXml, ILanguageResolver resolver)
         {
-            _FactionsXml = catFile.OpenXml("libraries/factions.xml");
+            _FactionsXml = factionsXml;
 
             _Resolver = resolver;
         }
@@ -65,28 +64,31 @@ CREATE TABLE IF NOT EXISTS Faction
             // データ抽出 //
             ////////////////
             {
-                var items = _FactionsXml.Root.XPathSelectElements("faction[@name]").Select
-                (
-                    x =>
-                    {
-                        var factionID = x.Attribute("id")?.Value;
-                        if (string.IsNullOrEmpty(factionID)) return null;
-
-                        var name = _Resolver.Resolve(x.Attribute("name")?.Value ?? "");
-                        if (string.IsNullOrEmpty(name)) return null;
-
-                        var raceID = x.Attribute("primaryrace")?.Value ?? "";
-                        var shortName = _Resolver.Resolve(x.Attribute("shortname")?.Value ?? "");
-
-                        return new Faction(factionID, name, raceID, shortName);
-                    }
-                )
-                .Where
-                (
-                    x => x != null
-                );
+                var items = GetRecords();
 
                 connection.Execute("INSERT INTO Faction (FactionID, Name, RaceID, ShortName) VALUES (@FactionID, @Name, @RaceID, @ShortName)", items);
+            }
+        }
+
+
+        /// <summary>
+        /// XML から Faction データを読み出す
+        /// </summary>
+        /// <returns>読み出した Faction データ</returns>
+        private IEnumerable<Faction> GetRecords()
+        {
+            foreach (var faction in _FactionsXml.Root.XPathSelectElements("faction[@name]"))
+            {
+                var factionID = faction.Attribute("id")?.Value;
+                if (string.IsNullOrEmpty(factionID)) continue;
+
+                var name = _Resolver.Resolve(faction.Attribute("name")?.Value ?? "");
+                if (string.IsNullOrEmpty(name)) continue;
+
+                var raceID = faction.Attribute("primaryrace")?.Value ?? "";
+                var shortName = _Resolver.Resolve(faction.Attribute("shortname")?.Value ?? "");
+
+                yield return new Faction(factionID, name, raceID, shortName);
             }
         }
     }

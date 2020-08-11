@@ -1,5 +1,5 @@
-﻿using System.Data;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.Data;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Dapper;
@@ -19,7 +19,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// 言語解決用オブジェクト
         /// </summary>
-        private readonly LanguageResolver _Resolver;
+        private readonly ILanguageResolver _Resolver;
 
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace X4_DataExporterWPF.Export
         /// </summary>
         /// <param name="waresXml">ウェア情報xml</param>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public WareExporter(XDocument waresXml, LanguageResolver resolver)
+        public WareExporter(XDocument waresXml, ILanguageResolver resolver)
         {
             _WaresXml = waresXml;
             _Resolver = resolver;
@@ -66,38 +66,43 @@ CREATE TABLE IF NOT EXISTS Ware
             // データ抽出 //
             ////////////////
             {
-                var items = _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'economy')]").Select
-                (x =>
-                {
-                    var wareID = x.Attribute("id")?.Value;
-                    if (string.IsNullOrEmpty(wareID)) return null;
-
-                    var wareGroupID = x.Attribute("group")?.Value;
-                    if (string.IsNullOrEmpty(wareGroupID)) return null;
-
-                    var transportTypeID = x.Attribute("transport")?.Value;
-                    if (string.IsNullOrEmpty(transportTypeID)) return null;
-
-                    var name = _Resolver.Resolve(x.Attribute("name")?.Value ?? "");
-                    if (string.IsNullOrEmpty(name)) return null;
-
-                    var description = _Resolver.Resolve(x.Attribute("description")?.Value ?? "");
-                    var factoryName = _Resolver.Resolve(x.Attribute("factoryname")?.Value ?? "");
-                    var volume = int.Parse(x.Attribute("volume")?.Value ?? "0");
-
-                    var price = x.Element("price");
-                    var minPrice = int.Parse(price.Attribute("min")?.Value ?? "0");
-                    var avgPrice = int.Parse(price.Attribute("average")?.Value ?? "0");
-                    var maxPrice = int.Parse(price.Attribute("max")?.Value ?? "0");
-
-                    return new Ware(wareID, wareGroupID, transportTypeID, name, description, factoryName, volume, minPrice, avgPrice, maxPrice);
-                })
-                .Where
-                (
-                    x => x != null
-                );
+                var items = GetRecords();
 
                 connection.Execute("INSERT INTO Ware (WareID, WareGroupID, TransportTypeID, Name, Description, FactoryName, Volume, MinPrice, AvgPrice, MaxPrice) VALUES (@WareID, @WareGroupID, @TransportTypeID, @Name, @Description, @FactoryName, @Volume, @MinPrice, @AvgPrice, @MaxPrice)", items);
+            }
+        }
+
+
+        /// <summary>
+        /// XML から Ware データを読み出す
+        /// </summary>
+        /// <returns>読み出した Ware データ</returns>
+        private IEnumerable<Ware> GetRecords()
+        {
+            foreach (var ware in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'economy')]"))
+            {
+                var wareID = ware.Attribute("id")?.Value;
+                if (string.IsNullOrEmpty(wareID)) continue;
+
+                var wareGroupID = ware.Attribute("group")?.Value;
+                if (string.IsNullOrEmpty(wareGroupID)) continue;
+
+                var transportTypeID = ware.Attribute("transport")?.Value;
+                if (string.IsNullOrEmpty(transportTypeID)) continue;
+
+                var name = _Resolver.Resolve(ware.Attribute("name")?.Value ?? "");
+                if (string.IsNullOrEmpty(name)) continue;
+
+                var description = _Resolver.Resolve(ware.Attribute("description")?.Value ?? "");
+                var factoryName = _Resolver.Resolve(ware.Attribute("factoryname")?.Value ?? "");
+                var volume = int.Parse(ware.Attribute("volume")?.Value ?? "0");
+
+                var price = ware.Element("price");
+                var minPrice = int.Parse(price.Attribute("min")?.Value ?? "0");
+                var avgPrice = int.Parse(price.Attribute("average")?.Value ?? "0");
+                var maxPrice = int.Parse(price.Attribute("max")?.Value ?? "0");
+
+                yield return new Ware(wareID, wareGroupID, transportTypeID, name, description, factoryName, volume, minPrice, avgPrice, maxPrice);
             }
         }
     }

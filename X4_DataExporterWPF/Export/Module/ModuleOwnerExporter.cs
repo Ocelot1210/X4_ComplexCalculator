@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -54,37 +55,34 @@ CREATE TABLE IF NOT EXISTS ModuleOwner
             // データ抽出 //
             ////////////////
             {
-                var items = _WaresXml.Root.XPathSelectElements("ware[@tags='module']").SelectMany
-                (
-                    module =>
-                    {
-                        var moduleID = module.Attribute("id")?.Value;
-                        if (string.IsNullOrEmpty(moduleID)) return null;
-
-                        return module.XPathSelectElements("owner")
-                            .Select(owner => owner.Attribute("faction")?.Value)
-                            .Where(factionID => !string.IsNullOrEmpty(factionID))
-                            .Distinct()
-                            .Select(factionID =>
-                            {
-                                if (factionID == null)
-                                {
-                                    return null;
-                                }
-                                else
-                                {
-                                    return new ModuleOwner(moduleID, factionID);
-                                }
-                            });
-                    }
-                )
-                .Where
-                (
-                    x => x != null
-                );
+                var items = GetRecords();
 
 
                 connection.Execute("INSERT INTO ModuleOwner (ModuleID, FactionID) VALUES (@ModuleID, @FactionID)", items);
+            }
+        }
+
+
+        /// <summary>
+        /// XML から ModuleOwner データを読み出す
+        /// </summary>
+        /// <returns>読み出した ModuleOwner データ</returns>
+        internal IEnumerable<ModuleOwner> GetRecords()
+        {
+            foreach (var module in _WaresXml.Root.XPathSelectElements("ware[@tags='module']"))
+            {
+                var moduleID = module.Attribute("id")?.Value;
+                if (string.IsNullOrEmpty(moduleID)) continue;
+
+                var owners = module.XPathSelectElements("owner")
+                    .Select(owner => owner.Attribute("faction")?.Value)
+                    .Where(factionID => !string.IsNullOrEmpty(factionID))
+                    .Distinct();
+                foreach (var factionID in owners)
+                {
+                    if (factionID == null) continue;
+                    yield return new ModuleOwner(moduleID, factionID);
+                }
             }
         }
     }
