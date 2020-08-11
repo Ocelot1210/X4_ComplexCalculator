@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS Module
         /// XML から Module データを読み出す
         /// </summary>
         /// <returns>読み出した Module データ</returns>
-        private IEnumerable<Module> GetRecords()
+        internal IEnumerable<Module> GetRecords()
         {
             foreach (var module in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'module')]"))
             {
