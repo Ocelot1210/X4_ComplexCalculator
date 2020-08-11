@@ -4,6 +4,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using Dapper;
 using LibX4.FileSystem;
+using LibX4.Xml;
 using X4_DataExporterWPF.Entity;
 
 namespace X4_DataExporterWPF.Export
@@ -86,13 +87,14 @@ CREATE TABLE IF NOT EXISTS ModuleStorage
 
                 // 容量が記載されている箇所を抽出
                 var cargo = macroXml.Root.XPathSelectElement("macro/properties/cargo");
+                if (cargo == null) continue;
 
                 // 総合保管庫は飛ばす
-                var transportTypeID = cargo?.Attribute("tags")?.Value;
+                var transportTypeID = cargo.Attribute("tags")?.Value;
                 if (string.IsNullOrEmpty(transportTypeID)) continue;
                 if (transportTypeID.Contains(' ') == true) continue;
 
-                var amount = int.Parse(cargo?.Attribute("max")?.Value ?? "");
+                var amount = cargo.Attribute("max").GetInt();
 
                 yield return new ModuleStorage(moduleID, transportTypeID, amount);
             }

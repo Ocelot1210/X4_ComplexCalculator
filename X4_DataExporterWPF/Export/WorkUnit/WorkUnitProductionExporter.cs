@@ -3,6 +3,7 @@ using System.Data;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Dapper;
+using LibX4.Xml;
 using X4_DataExporterWPF.Entity;
 
 namespace X4_DataExporterWPF.Export
@@ -74,8 +75,8 @@ CREATE TABLE IF NOT EXISTS WorkUnitProduction
 
                 foreach (var prod in workUnit.XPathSelectElements("production"))
                 {
-                    var time = int.Parse(prod.Attribute("time")?.Value ?? "0");
-                    var amount = int.Parse(prod.Attribute("amount")?.Value ?? "0");
+                    var time = prod.Attribute("time").GetInt();
+                    var amount = prod.Attribute("amount").GetInt();
 
                     var method = prod.Attribute("method")?.Value;
                     if (string.IsNullOrEmpty(method)) continue;

@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Data;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Dapper;
 using LibX4.FileSystem;
 using LibX4.Lang;
+using LibX4.Xml;
 using X4_DataExporterWPF.Entity;
 
 namespace X4_DataExporterWPF.Export
@@ -101,8 +102,8 @@ CREATE TABLE IF NOT EXISTS Module
 
                 // 従業員数/最大収容人数取得
                 var workForce = macroXml?.Root?.XPathSelectElement("macro/properties/workforce");
-                var maxWorkers = int.Parse(workForce?.Attribute("max")?.Value ?? "0");
-                var capacity = int.Parse(workForce?.Attribute("capacity")?.Value ?? "0");
+                var maxWorkers = workForce?.Attribute("max")?.GetInt() ?? 0;
+                var capacity = workForce?.Attribute("capacity")?.GetInt() ?? 0;
 
                 var name = _Resolver.Resolve(module.Attribute("name")?.Value ?? "");
                 name = string.IsNullOrEmpty(name) ? macroName : name;

@@ -4,6 +4,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using Dapper;
 using LibX4.Lang;
+using LibX4.Xml;
 using X4_DataExporterWPF.Entity;
 
 namespace X4_DataExporterWPF.Export
@@ -85,7 +86,7 @@ CREATE TABLE IF NOT EXISTS WareGroup
 
                 var factoryName = _Resolver.Resolve(wareGroup.Attribute("factoryname")?.Value ?? "");
                 var icon = wareGroup.Attribute("icon")?.Value ?? "";
-                var tier = int.Parse(wareGroup.Attribute("tier")?.Value ?? "0");
+                var tier = wareGroup.Attribute("tier")?.GetInt() ?? 0;
 
                 yield return new WareGroup(wareGroupID, name, factoryName, icon, tier);
             }

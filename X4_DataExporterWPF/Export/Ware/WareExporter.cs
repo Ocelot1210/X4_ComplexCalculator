@@ -4,6 +4,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using Dapper;
 using LibX4.Lang;
+using LibX4.Xml;
 using X4_DataExporterWPF.Entity;
 
 namespace X4_DataExporterWPF.Export
@@ -95,12 +96,12 @@ CREATE TABLE IF NOT EXISTS Ware
 
                 var description = _Resolver.Resolve(ware.Attribute("description")?.Value ?? "");
                 var factoryName = _Resolver.Resolve(ware.Attribute("factoryname")?.Value ?? "");
-                var volume = int.Parse(ware.Attribute("volume")?.Value ?? "0");
+                var volume = ware.Attribute("volume").GetInt();
 
                 var price = ware.Element("price");
-                var minPrice = int.Parse(price.Attribute("min")?.Value ?? "0");
-                var avgPrice = int.Parse(price.Attribute("average")?.Value ?? "0");
-                var maxPrice = int.Parse(price.Attribute("max")?.Value ?? "0");
+                var minPrice = price.Attribute("min").GetInt();
+                var avgPrice = price.Attribute("average").GetInt();
+                var maxPrice = price.Attribute("max").GetInt();
 
                 yield return new Ware(wareID, wareGroupID, transportTypeID, name, description, factoryName, volume, minPrice, avgPrice, maxPrice);
             }

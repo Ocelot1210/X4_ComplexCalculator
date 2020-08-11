@@ -3,6 +3,7 @@ using System.Data;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Dapper;
+using LibX4.Xml;
 using X4_DataExporterWPF.Entity;
 
 namespace X4_DataExporterWPF.Export
@@ -79,7 +80,7 @@ CREATE TABLE IF NOT EXISTS ModuleProduction
                     var method = prod.Attribute("method")?.Value;
                     if (string.IsNullOrEmpty(method)) continue;
 
-                    double time = double.Parse(prod.Attribute("time")?.Value ?? "0.0");
+                    double time = prod.Attribute("time").GetDouble();
                     yield return new ModuleProduction(moduleID, method, time);
                 }
             }
