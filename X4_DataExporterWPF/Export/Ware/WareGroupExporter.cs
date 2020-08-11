@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS WareGroup
         /// XML から WareGroup データを読み出す
         /// </summary>
         /// <returns>読み出した WareGroup データ</returns>
-        private IEnumerable<WareGroup> GetRecords()
+        internal IEnumerable<WareGroup> GetRecords()
         {
             foreach (var wareGroup in _WareGroupXml.Root.XPathSelectElements("group[@tags='tradable']"))
             {

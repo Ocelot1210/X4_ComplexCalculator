@@ -160,6 +160,34 @@ namespace X4_DataExporterWPF.Tests
 
 
         /// <summary>
+        /// ウェア種別の階級が省略されている場合、0 として扱う。
+        /// </summary>
+        [Fact]
+        public void WareGroupIfOmitTier()
+        {
+            var xml = @"
+                <groups>
+                    <group
+                        id=""gases""
+                        name=""{20215,401}""
+                        factoryname=""{20215,404}""
+                        icon=""be_upgrade_resource""
+                        tags=""tradable"" />
+                </groups>
+            ".ToXDocument();
+            var exporter = new WareGroupExporter(xml, new DummyLanguageResolver());
+
+            Assert.Equal(exporter.GetRecords(), new[] { new WareGroup(
+                wareGroupID: "gases",
+                name: "{20215,401}",
+                factoryName: "{20215,404}",
+                icon: "be_upgrade_resource",
+                tier: 0
+            )});
+        }
+
+
+        /// <summary>
         /// コンストラクタに渡された XML をマクロとして返すダミー CatFile クラス
         /// </summary>
         internal class DummyCat : IIndexResolver
