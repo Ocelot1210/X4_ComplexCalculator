@@ -7,7 +7,7 @@ namespace X4_DataExporterWPF.Tests
     public class ExporterTest
     {
         /// <summary>
-        /// 重複する EquipmentOwner は無視する。
+        /// 重複する EquipmentOwner は無視する
         /// 参照: <a href="https://github.com/Ocelot1210/X4_DataExporterWPF/pull/6">X4_DataExporterWPF#6</a>
         /// </summary>
         [Fact]
@@ -31,7 +31,7 @@ namespace X4_DataExporterWPF.Tests
 
 
         /// <summary>
-        /// 重複する ModuleOwner は無視する。
+        /// 重複する ModuleOwner は無視する
         /// 参照: <a href="https://github.com/Ocelot1210/X4_ComplexCalculator/pull/6">#6</a>
         /// </summary>
         [Fact]
@@ -55,9 +55,10 @@ namespace X4_DataExporterWPF.Tests
 
 
         /// <summary>
-        /// WareEffect#Product のパースに失敗した場合、0.0 として扱い続行する。
+        /// WareEffect#Product の値が double に変換できない場合、0.0 として扱い続行する
         /// 参照: <a href="https://github.com/Ocelot1210/X4_ComplexCalculator/pull/7">#7</a>
         /// </summary>
+        /// <remarks>TODO: 具体的な状況は不明。要調査</remarks>
         [Fact]
         public void WareEffectIfProductParsingFailsContinueAsDefault()
         {
