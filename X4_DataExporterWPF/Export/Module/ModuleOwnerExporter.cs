@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS ModuleOwner
         /// XML から ModuleOwner データを読み出す
         /// </summary>
         /// <returns>読み出した ModuleOwner データ</returns>
-        private IEnumerable<ModuleOwner> GetRecords()
+        internal IEnumerable<ModuleOwner> GetRecords()
         {
             foreach (var module in _WaresXml.Root.XPathSelectElements("ware[@tags='module']"))
             {
