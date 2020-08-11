@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "X4_DataExporterWPF", "X4_Da
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibX4.Tests", "LibX4.Tests\LibX4.Tests.csproj", "{1EEA0D64-A038-4C8C-8E54-2CDEF906A28C}"
 EndProject
+Project("{CCEDDFE8-50C7-4061-ADD0-146D7F7B84CF}") = "X4_DataExporterWPF.Tests", "X4_DataExporterWPF.Tests\X4_DataExporterWPF.Tests.csproj", "{CCEDDFE8-50C7-4061-ADD0-146D7F7B84CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{1EEA0D64-A038-4C8C-8E54-2CDEF906A28C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1EEA0D64-A038-4C8C-8E54-2CDEF906A28C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1EEA0D64-A038-4C8C-8E54-2CDEF906A28C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCEDDFE8-50C7-4061-ADD0-146D7F7B84CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCEDDFE8-50C7-4061-ADD0-146D7F7B84CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCEDDFE8-50C7-4061-ADD0-146D7F7B84CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCEDDFE8-50C7-4061-ADD0-146D7F7B84CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
