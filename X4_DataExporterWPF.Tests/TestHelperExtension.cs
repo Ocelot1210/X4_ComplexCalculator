@@ -3,6 +3,9 @@ using System.Xml.Linq;
 
 namespace X4_DataExporterWPF.Tests
 {
+    /// <summary>
+    /// X4_DataExporterWPF.Tests 用のユーティリティクラス
+    /// </summary>
     internal static class TestHelperExtension
     {
         /// <summary>

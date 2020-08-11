@@ -52,5 +52,34 @@ namespace X4_DataExporterWPF.Tests
                 factionID: "antigone"
             )});
         }
+
+
+        /// <summary>
+        /// WareEffect#Product のパースに失敗した場合、0.0 として扱い続行する。
+        /// 参照: <a href="https://github.com/Ocelot1210/X4_ComplexCalculator/pull/7">#7</a>
+        /// </summary>
+        [Fact]
+        public void WareEffectIfProductParsingFailsContinueAsDefault()
+        {
+            var xml = @"
+                <wares>
+                    <ware id=""advancedcomposites"" tags=""economy"">
+                        <production method=""default"">
+                            <effects>
+                                <effect type=""work"" product=""ILLEGAL"" />
+                            </effects>
+                        </production>
+                    </ware>
+                </wares>
+            ".ToXDocument();
+            var exporter = new WareEffectExporter(xml);
+
+            Assert.Equal(exporter.GetRecords(), new[] { new WareEffect(
+                wareID: "advancedcomposites",
+                method: "default",
+                effectID: "work",
+                product: 0.0
+            )});
+        }
     }
 }

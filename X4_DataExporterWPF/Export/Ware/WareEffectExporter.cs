@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS WareEffect
         /// XML から WareEffect データを読み出す
         /// </summary>
         /// <returns>読み出した WareEffect データ</returns>
-        private IEnumerable<WareEffect> GetRecords()
+        internal IEnumerable<WareEffect> GetRecords()
         {
             foreach (var ware in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'economy')]"))
             {
