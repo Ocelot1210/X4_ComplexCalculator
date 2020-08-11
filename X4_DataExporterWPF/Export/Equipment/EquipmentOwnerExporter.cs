@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS EquipmentOwner
         /// XML から EquipmentOwner データを読み出す
         /// </summary>
         /// <returns>読み出した EquipmentOwner データ</returns>
-        private IEnumerable<EquipmentOwner> GetRecords()
+        internal IEnumerable<EquipmentOwner> GetRecords()
         {
             foreach (var equipment in _WaresXml.Root.XPathSelectElements("ware[@transport='equipment']"))
             {
