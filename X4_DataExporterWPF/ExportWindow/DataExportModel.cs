@@ -69,7 +69,11 @@ namespace X4_DataExporterWPF.DataExportWindow
                 // 英語をデフォルトにする
                 var resolver = new LanguageResolver(catFile, language.ID, 44);
 
+                var factionsXml = catFile.OpenXml("libraries/factions.xml");
+                var raceXml = catFile.OpenXml("libraries/races.xml");
                 var waresXml = catFile.OpenXml("libraries/wares.xml");
+                //var mapXml = catFile.OpenXml("libraries/mapdefaults.xml");
+                var wareGroupXml = catFile.OpenXml("libraries/waregroups.xml");
 
                 IExporter[] exporters =
                 {
@@ -78,12 +82,12 @@ namespace X4_DataExporterWPF.DataExportWindow
                     new EffectExporter(),                               // 追加効果情報
                     new SizeExporter(resolver),                         // サイズ情報
                     new TransportTypeExporter(resolver),                // カーゴ種別情報
-                    new RaceExporter(catFile, resolver),                // 種族情報
-                    new FactionExporter(catFile, resolver),             // 派閥情報
-                    //new MapExporter(catFile, resolver),                 // マップ
+                    new RaceExporter(raceXml, resolver),                // 種族情報
+                    new FactionExporter(factionsXml, resolver),         // 派閥情報
+                    //new MapExporter(mapXml, resolver),                 // マップ
 
                     // ウェア関連
-                    new WareGroupExporter(catFile, resolver),           // ウェア種別情報
+                    new WareGroupExporter(wareGroupXml, resolver),      // ウェア種別情報
                     new WareExporter(waresXml, resolver),               // ウェア情報
                     new WareResourceExporter(waresXml),                 // ウェア生産時に必要な情報
                     new WareProductionExporter(waresXml, resolver),     // ウェア生産に必要な情報

@@ -2,7 +2,6 @@
 using System.Data;
 using System.Xml.Linq;
 using Dapper;
-using LibX4.FileSystem;
 using LibX4.Lang;
 using X4_DataExporterWPF.Entity;
 
@@ -28,12 +27,11 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="catFile">catファイル</param>
+        /// <param name="raceXml">'libraries/races.xml' の XDocument</param>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public RaceExporter(CatFile catFile, LanguageResolver resolver)
+        public RaceExporter(XDocument raceXml, LanguageResolver resolver)
         {
-            _RaceXml = catFile.OpenXml("libraries/races.xml");
-
+            _RaceXml = raceXml;
             _Resolver = resolver;
         }
 

@@ -17,7 +17,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// catファイルオブジェクト
         /// </summary>
-        private readonly CatFile _CatFile;
+        private readonly IIndexResolver _CatFile;
 
         /// <summary>
         /// ウェア情報xml
@@ -30,7 +30,7 @@ namespace X4_DataExporterWPF.Export
         /// </summary>
         /// <param name="catFile">catファイルオブジェクト</param>
         /// <param name="waresXml">ウェア情報xml</param>
-        public ModuleShieldExporter(CatFile catFile, XDocument waresXml)
+        public ModuleShieldExporter(IIndexResolver catFile, XDocument waresXml)
         {
             _CatFile = catFile;
             _WaresXml = waresXml;

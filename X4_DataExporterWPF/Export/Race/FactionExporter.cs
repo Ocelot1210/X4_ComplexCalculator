@@ -3,7 +3,6 @@ using System.Data;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Dapper;
-using LibX4.FileSystem;
 using LibX4.Lang;
 using X4_DataExporterWPF.Entity;
 
@@ -29,11 +28,11 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="catFile">catファイル</param>
+        /// <param name="factionsXml">'libraries/factions.xml' の XDocument</param>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public FactionExporter(CatFile catFile, LanguageResolver resolver)
+        public FactionExporter(XDocument factionsXml, LanguageResolver resolver)
         {
-            _FactionsXml = catFile.OpenXml("libraries/factions.xml");
+            _FactionsXml = factionsXml;
 
             _Resolver = resolver;
         }

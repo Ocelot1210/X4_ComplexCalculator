@@ -3,7 +3,6 @@ using System.Data;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Dapper;
-using LibX4.FileSystem;
 using LibX4.Lang;
 using X4_DataExporterWPF.Entity;
 
@@ -26,11 +25,11 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="catFile">catファイル</param>
+        /// <param name="mapXml">'libraries/mapdefaults.xml' の XDocument</param>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public MapExporter(CatFile catFile, LanguageResolver resolver)
+        public MapExporter(XDocument mapXml, LanguageResolver resolver)
         {
-            _MapXml = catFile.OpenXml("libraries/mapdefaults.xml");
+            _MapXml = mapXml;
             _Resolver = resolver;
         }
 
