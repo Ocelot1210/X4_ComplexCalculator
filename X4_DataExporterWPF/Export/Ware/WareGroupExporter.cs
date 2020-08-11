@@ -22,7 +22,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// 言語解決用オブジェクト
         /// </summary>
-        private readonly LanguageResolver _Resolver;
+        private readonly ILanguageResolver _Resolver;
 
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace X4_DataExporterWPF.Export
         /// </summary>
         /// <param name="wareGroupXml">'libraries/waregroups.xml' の XDocument</param>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public WareGroupExporter(XDocument wareGroupXml, LanguageResolver resolver)
+        public WareGroupExporter(XDocument wareGroupXml, ILanguageResolver resolver)
         {
             _WareGroupXml = wareGroupXml;
             _Resolver = resolver;

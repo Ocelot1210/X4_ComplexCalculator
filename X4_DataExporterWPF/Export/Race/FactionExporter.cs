@@ -22,7 +22,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// 言語解決用オブジェクト
         /// </summary>
-        private readonly LanguageResolver _Resolver;
+        private readonly ILanguageResolver _Resolver;
 
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace X4_DataExporterWPF.Export
         /// </summary>
         /// <param name="factionsXml">'libraries/factions.xml' の XDocument</param>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public FactionExporter(XDocument factionsXml, LanguageResolver resolver)
+        public FactionExporter(XDocument factionsXml, ILanguageResolver resolver)
         {
             _FactionsXml = factionsXml;
 

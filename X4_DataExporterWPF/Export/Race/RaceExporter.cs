@@ -21,7 +21,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// 言語解決用オブジェクト
         /// </summary>
-        private readonly LanguageResolver _Resolver;
+        private readonly ILanguageResolver _Resolver;
 
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace X4_DataExporterWPF.Export
         /// </summary>
         /// <param name="raceXml">'libraries/races.xml' の XDocument</param>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public RaceExporter(XDocument raceXml, LanguageResolver resolver)
+        public RaceExporter(XDocument raceXml, ILanguageResolver resolver)
         {
             _RaceXml = raceXml;
             _Resolver = resolver;

@@ -19,7 +19,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// 言語解決用オブジェクト
         /// </summary>
-        private readonly LanguageResolver _Resolver;
+        private readonly ILanguageResolver _Resolver;
 
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace X4_DataExporterWPF.Export
         /// </summary>
         /// <param name="mapXml">'libraries/mapdefaults.xml' の XDocument</param>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public MapExporter(XDocument mapXml, LanguageResolver resolver)
+        public MapExporter(XDocument mapXml, ILanguageResolver resolver)
         {
             _MapXml = mapXml;
             _Resolver = resolver;

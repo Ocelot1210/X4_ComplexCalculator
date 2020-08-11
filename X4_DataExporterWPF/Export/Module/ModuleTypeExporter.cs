@@ -15,7 +15,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// 言語解決用オブジェクト
         /// </summary>
-        private readonly LanguageResolver _Resolver;
+        private readonly ILanguageResolver _Resolver;
 
 
         /// <summary>
@@ -66,15 +66,15 @@ CREATE TABLE IF NOT EXISTS ModuleType
         private IEnumerable<ModuleType> GetRecords()
         {
             // TODO: 可能ならファイルから抽出する
-            yield return new ModuleType("buildmodule",      _Resolver.Resolve("{20104,  69901}"));
+            yield return new ModuleType("buildmodule", _Resolver.Resolve("{20104,  69901}"));
             yield return new ModuleType("connectionmodule", _Resolver.Resolve("{20104,  59901}"));
-            yield return new ModuleType("defencemodule",    _Resolver.Resolve("{20104,  49901}"));
-            yield return new ModuleType("dockarea",         _Resolver.Resolve("{20104,  70001}"));
-            yield return new ModuleType("habitation",       _Resolver.Resolve("{20104,  39901}"));
-            yield return new ModuleType("pier",             _Resolver.Resolve("{20104,  71101}"));
-            yield return new ModuleType("production",       _Resolver.Resolve("{20104,  19901}"));
-            yield return new ModuleType("storage",          _Resolver.Resolve("{20104,  29901}"));
-            yield return new ModuleType("ventureplatform",  _Resolver.Resolve("{20104, 101901}"));
+            yield return new ModuleType("defencemodule", _Resolver.Resolve("{20104,  49901}"));
+            yield return new ModuleType("dockarea", _Resolver.Resolve("{20104,  70001}"));
+            yield return new ModuleType("habitation", _Resolver.Resolve("{20104,  39901}"));
+            yield return new ModuleType("pier", _Resolver.Resolve("{20104,  71101}"));
+            yield return new ModuleType("production", _Resolver.Resolve("{20104,  19901}"));
+            yield return new ModuleType("storage", _Resolver.Resolve("{20104,  29901}"));
+            yield return new ModuleType("ventureplatform", _Resolver.Resolve("{20104, 101901}"));
         }
     }
 }

@@ -9,7 +9,7 @@ namespace LibX4.Lang
     /// <summary>
     /// X4 の言語フィールド文字列 (例: {1001,2490}) を解決するクラス
     /// </summary>
-    public class LanguageResolver
+    public class LanguageResolver : ILanguageResolver
     {
         #region メンバ
         /// <summary>

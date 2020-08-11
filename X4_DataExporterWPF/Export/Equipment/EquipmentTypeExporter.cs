@@ -14,7 +14,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// 言語解決用オブジェクト
         /// </summary>
-        private readonly LanguageResolver _Resolver;
+        private readonly ILanguageResolver _Resolver;
 
 
         /// <summary>
@@ -64,15 +64,15 @@ CREATE TABLE IF NOT EXISTS EquipmentType
         private IEnumerable<EquipmentType> GetRecords()
         {
             // TODO: 可能ならファイルから抽出する
-            yield return new EquipmentType("countermeasures",   _Resolver.Resolve("{20215, 1701}"));
-            yield return new EquipmentType("drones",            _Resolver.Resolve("{20215, 1601}"));
-            yield return new EquipmentType("engines",           _Resolver.Resolve("{20215, 1801}"));
-            yield return new EquipmentType("missiles",          _Resolver.Resolve("{20215, 1901}"));
-            yield return new EquipmentType("shields",           _Resolver.Resolve("{20215, 2001}"));
-            yield return new EquipmentType("software",          _Resolver.Resolve("{20215, 2101}"));
-            yield return new EquipmentType("thrusters",         _Resolver.Resolve("{20215, 2201}"));
-            yield return new EquipmentType("turrets",           _Resolver.Resolve("{20215, 2301}"));
-            yield return new EquipmentType("weapons",           _Resolver.Resolve("{20215, 2401}"));
+            yield return new EquipmentType("countermeasures", _Resolver.Resolve("{20215, 1701}"));
+            yield return new EquipmentType("drones", _Resolver.Resolve("{20215, 1601}"));
+            yield return new EquipmentType("engines", _Resolver.Resolve("{20215, 1801}"));
+            yield return new EquipmentType("missiles", _Resolver.Resolve("{20215, 1901}"));
+            yield return new EquipmentType("shields", _Resolver.Resolve("{20215, 2001}"));
+            yield return new EquipmentType("software", _Resolver.Resolve("{20215, 2101}"));
+            yield return new EquipmentType("thrusters", _Resolver.Resolve("{20215, 2201}"));
+            yield return new EquipmentType("turrets", _Resolver.Resolve("{20215, 2301}"));
+            yield return new EquipmentType("weapons", _Resolver.Resolve("{20215, 2401}"));
         }
     }
 }
