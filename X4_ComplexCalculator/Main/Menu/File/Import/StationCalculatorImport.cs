@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
+using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea;
@@ -105,9 +106,15 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
                                             .Select(x => (Module: Module.Get(x.Groups[1].Value), Count: long.Parse(x.Groups[2].Value)))
                                             .Where(x => x.Module != null)
                                             .Select(x => (Module: x.Module!, x.Count))
-                                            .Select(x => new ModulesGridItem(x.Module, null, x.Count));
+                                            .Select(x => new ModulesGridItem(x.Module, null, x.Count) { EditStatus = EditStatus.Unedited });
 
                 WorkArea.Modules.AddRange(modules);
+                // 編集状態を全て未編集にする
+                IEnumerable<IEditable>[] editables = { WorkArea.Products, WorkArea.Resources, WorkArea.StorageAssign };
+                foreach (var editable in editables.SelectMany(x => x))
+                {
+                    editable.EditStatus = EditStatus.Unedited;
+                }
 
                 ret = true;
             }

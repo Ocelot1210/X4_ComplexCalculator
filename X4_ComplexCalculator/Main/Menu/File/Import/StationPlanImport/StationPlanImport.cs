@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Input;
 using System.Xml.XPath;
 using WPFLocalizeExtension.Engine;
+using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea;
@@ -222,6 +223,12 @@ WHERE
             // モジュール一覧に追加
             WorkArea.Modules.AddRange(dict.Select(x => x.Value).OrderBy(x => x.Module.Name));
 
+            // 編集状態を全て未編集にする
+            IEnumerable<IEditable>[] editables = { WorkArea.Modules, WorkArea.Products, WorkArea.Resources, WorkArea.StorageAssign };
+            foreach (var editable in editables.SelectMany(x => x))
+            {
+                editable.EditStatus = EditStatus.Unedited;
+            }
 
             WorkArea.Title = planItem.PlanName;
             return true;
