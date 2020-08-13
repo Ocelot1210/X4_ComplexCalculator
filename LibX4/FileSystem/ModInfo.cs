@@ -57,9 +57,11 @@ namespace LibX4.FileSystem
         /// <param name="modDirPath">Modのフォルダパス(絶対パスで指定すること)</param>
         public ModInfo(string modDirPath)
         {
-            // xml version="1.1"のModがまれに存在するため、XML宣言を読み飛ばす
+            
             using var sr = new StreamReader(Path.Combine(modDirPath, "content.xml"));
-            sr.ReadLine();
+
+            // xml宣言を読み飛ばす
+            SkipXmlDefined(sr);
 
             var xml = XDocument.Load(sr);
 
@@ -70,6 +72,61 @@ namespace LibX4.FileSystem
             Date    = xml.Root.Attribute("date")?.Value    ?? "";
             Enabled = xml.Root.Attribute("enabled")?.Value ?? "";
             Save    = xml.Root.Attribute("save")?.Value    ?? "";
+        }
+
+
+        /// <summary>
+        /// xml宣言を読み飛ばす
+        /// </summary>
+        /// <param name="sr">読み飛ばす対象</param>
+        /// <remarks>
+        /// xml version="1.1"のModがまれに存在するため、XML宣言を読み飛ばす
+        /// </remarks>
+        private static void SkipXmlDefined(StreamReader sr)
+        {
+            var isDblQt = false;        // ダブルクォート内か
+            var isSngQt = false;        // シングルクォート内か
+            var endOfXmlDef = false;    // xml宣言を読み飛ばし終えたか
+            do
+            {
+                var chr = sr.Read();
+                if (chr < 0)
+                {
+                    break;
+                }
+
+                switch ((char)chr)
+                {
+                    case '\'':
+                        if (!isDblQt)
+                        {
+                            isSngQt = !isSngQt;
+                        }
+                        break;
+
+                    case '\"':
+                        if (!isSngQt)
+                        {
+                            isDblQt = !isDblQt;
+                        }
+                        break;
+
+                    case '?':
+                        if (!isSngQt && !isDblQt)
+                        {
+                            chr = sr.Read();
+                            if (chr < 0 || (char)chr == '>')
+                            {
+                                endOfXmlDef = true;
+                            }
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            while (!sr.EndOfStream && !endOfXmlDef);
         }
     }
 }
