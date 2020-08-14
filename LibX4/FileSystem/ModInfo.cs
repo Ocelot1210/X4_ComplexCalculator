@@ -1,4 +1,5 @@
 using System.IO;
+using System.Runtime.InteropServices.ComTypes;
 using System.Xml.Linq;
 
 namespace LibX4.FileSystem
@@ -57,12 +58,20 @@ namespace LibX4.FileSystem
         /// <param name="modDirPath">Modのフォルダパス(絶対パスで指定すること)</param>
         public ModInfo(string modDirPath)
         {
-            using var fs = new FileStream(Path.Combine(modDirPath, "content.xml"), FileMode.Open, FileAccess.Read);
+            var contentXmlPatth = Path.Combine(modDirPath, "content.xml");
+
+            // xml宣言の文字数カウント
+            var xmlDefCount = CountXmlDefined(contentXmlPatth);
+
+            using var sr = new StreamReader(contentXmlPatth);
 
             // xml宣言を読み飛ばす
-            SkipXmlDefined(fs);
+            for (var cnt = 0; cnt < xmlDefCount; cnt++)
+            {
+                sr.Read();
+            }
 
-            var xml = XDocument.Load(fs);
+            var xml = XDocument.Load(sr);
 
             ID      = xml.Root.Attribute("id")?.Value      ?? "";
             Name    = xml.Root.Attribute("name")?.Value    ?? "";
@@ -75,17 +84,16 @@ namespace LibX4.FileSystem
 
 
         /// <summary>
-        /// xml宣言を読み飛ばす
+        /// xml宣言の文字数をカウントする
         /// </summary>
-        /// <param name="fs">読み飛ばす対象</param>
-        /// <remarks>
-        /// xml version="1.1"のModがまれに存在するため、XML宣言を読み飛ばす
-        /// </remarks>
-        private static void SkipXmlDefined(FileStream fs)
+        /// <param name="xmlFilePath">カウント対象</param>
+        /// <returns>xml宣言の文字数</returns>
+        private static int CountXmlDefined(string xmlFilePath)
         {
-            var sr = new StreamReader(fs);
+            var ret = 0;
+            using var sr = new StreamReader(xmlFilePath);
 
-            // xml宣言が記載されているか判定し、記載されていなければ何もしないで抜ける
+            // xml宣言が記載されているか判定し、記載されていなければ0を返す
             {
                 char[] buff = new char[5];
 
@@ -93,22 +101,22 @@ namespace LibX4.FileSystem
 
                 if (new string(buff) != "<?xml")
                 {
-                    fs.Position = 0;
-                    return;
+                    return 0;
                 }
-                fs.Position = buff.Length;
+
+                ret += buff.Length;
             }
+
 
             var isDblQt = false;        // ダブルクォート内か
             var isSngQt = false;        // シングルクォート内か
             var endOfXmlDef = false;    // xml宣言を読み飛ばし終えたか
-            var seek = 0;               // シーク量
 
             // xml宣言を読み飛ばす
             do
             {
                 var chr = sr.Read();
-                seek++;
+                ret++;
                 if (chr < 0)
                 {
                     break;
@@ -137,7 +145,7 @@ namespace LibX4.FileSystem
                         if (!isSngQt && !isDblQt)
                         {
                             chr = sr.Read();
-                            seek++;
+                            ret++;
 
                             // xml宣言の終了か？
                             if (chr < 0 || (char)chr == '>')
@@ -153,7 +161,7 @@ namespace LibX4.FileSystem
             }
             while (!sr.EndOfStream && !endOfXmlDef);
 
-            fs.Position += seek;
+            return ret;
         }
     }
 }
