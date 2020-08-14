@@ -57,13 +57,12 @@ namespace LibX4.FileSystem
         /// <param name="modDirPath">Modのフォルダパス(絶対パスで指定すること)</param>
         public ModInfo(string modDirPath)
         {
-            
-            using var sr = new StreamReader(Path.Combine(modDirPath, "content.xml"));
+            using var fs = new FileStream(Path.Combine(modDirPath, "content.xml"), FileMode.Open, FileAccess.Read);
 
             // xml宣言を読み飛ばす
-            SkipXmlDefined(sr);
+            SkipXmlDefined(fs);
 
-            var xml = XDocument.Load(sr);
+            var xml = XDocument.Load(fs);
 
             ID      = xml.Root.Attribute("id")?.Value      ?? "";
             Name    = xml.Root.Attribute("name")?.Value    ?? "";
@@ -78,18 +77,38 @@ namespace LibX4.FileSystem
         /// <summary>
         /// xml宣言を読み飛ばす
         /// </summary>
-        /// <param name="sr">読み飛ばす対象</param>
+        /// <param name="fs">読み飛ばす対象</param>
         /// <remarks>
         /// xml version="1.1"のModがまれに存在するため、XML宣言を読み飛ばす
         /// </remarks>
-        private static void SkipXmlDefined(StreamReader sr)
+        private static void SkipXmlDefined(FileStream fs)
         {
+            var sr = new StreamReader(fs);
+
+            // xml宣言が記載されているか判定し、記載されていなければ何もしないで抜ける
+            {
+                char[] buff = new char[5];
+
+                sr.Read(buff, 0, buff.Length);
+
+                if (new string(buff) != "<?xml")
+                {
+                    fs.Position = 0;
+                    return;
+                }
+                fs.Position = buff.Length;
+            }
+
             var isDblQt = false;        // ダブルクォート内か
             var isSngQt = false;        // シングルクォート内か
             var endOfXmlDef = false;    // xml宣言を読み飛ばし終えたか
+            var seek = 0;               // シーク量
+
+            // xml宣言を読み飛ばす
             do
             {
                 var chr = sr.Read();
+                seek++;
                 if (chr < 0)
                 {
                     break;
@@ -98,6 +117,7 @@ namespace LibX4.FileSystem
                 switch ((char)chr)
                 {
                     case '\'':
+                        // ダブルクォートで囲われていないシングルクォートか？
                         if (!isDblQt)
                         {
                             isSngQt = !isSngQt;
@@ -105,6 +125,7 @@ namespace LibX4.FileSystem
                         break;
 
                     case '\"':
+                        // シングルクォートで囲われていないダブルクォートか？
                         if (!isSngQt)
                         {
                             isDblQt = !isDblQt;
@@ -112,9 +133,13 @@ namespace LibX4.FileSystem
                         break;
 
                     case '?':
+                        // ダブルクォートまたはシングルクォートに囲われていない'?'か？
                         if (!isSngQt && !isDblQt)
                         {
                             chr = sr.Read();
+                            seek++;
+
+                            // xml宣言の終了か？
                             if (chr < 0 || (char)chr == '>')
                             {
                                 endOfXmlDef = true;
@@ -127,6 +152,8 @@ namespace LibX4.FileSystem
                 }
             }
             while (!sr.EndOfStream && !endOfXmlDef);
+
+            fs.Position += seek;
         }
     }
 }
