@@ -59,13 +59,13 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// <summary>
         /// 言語一覧
         /// </summary>
-        public ReactiveCollection<LangComboboxItem> Langages { get; }
+        public ReactiveCollection<LangComboboxItem> Languages { get; }
 
 
         /// <summary>
         /// 選択された言語
         /// </summary>
-        public ReactivePropertySlim<LangComboboxItem?> SelectedLangage { get; }
+        public ReactivePropertySlim<LangComboboxItem?> SelectedLanguage { get; }
 
 
         /// <summary>
@@ -119,8 +119,8 @@ namespace X4_DataExporterWPF.DataExportWindow
                 _ => _InDirPathHasError.Select(isError => isError ? "Error" : null));
             _OutFilePath = outFilePath;
 
-            Langages = new ReactiveCollection<LangComboboxItem>();
-            SelectedLangage = new ReactivePropertySlim<LangComboboxItem?>();
+            Languages = new ReactiveCollection<LangComboboxItem>();
+            SelectedLanguage = new ReactivePropertySlim<LangComboboxItem?>();
 
             MaxSteps = new ReactivePropertySlim<int>(1);
             CurrentStep = new ReactivePropertySlim<int>(0);
@@ -131,7 +131,7 @@ namespace X4_DataExporterWPF.DataExportWindow
             var canExport = new[]{
                 CanOperation,
                 InDirPath.Select(p => !string.IsNullOrEmpty(p)),
-                SelectedLangage.Select(l => l != null),
+                SelectedLanguage.Select(l => l != null),
             }.CombineLatestValuesAreAllTrue();
 
             SelectInDirCommand = new ReactiveCommand(CanOperation).WithSubscribe(SelectInDir);
@@ -143,11 +143,11 @@ namespace X4_DataExporterWPF.DataExportWindow
             {
                 using var _ = _BusyNotifier.ProcessStart();
                 _InDirPathHasError.Value = false;
-                Langages.ClearOnScheduler();
+                Languages.ClearOnScheduler();
 
-                var (success, languages) = _Model.GetLangages(path);
+                var (success, languages) = _Model.GetLanguages(path);
                 _InDirPathHasError.Value = !success;
-                Langages.AddRangeOnScheduler(languages);
+                Languages.AddRangeOnScheduler(languages);
             });
         }
 
@@ -185,7 +185,7 @@ namespace X4_DataExporterWPF.DataExportWindow
             using var _ = _BusyNotifier.ProcessStart();
 
             // 言語が未選択なら何もしない
-            if (SelectedLangage.Value == null)
+            if (SelectedLanguage.Value == null)
             {
                 return;
             }
@@ -199,7 +199,7 @@ namespace X4_DataExporterWPF.DataExportWindow
                 progless,
                 InDirPath.Value,
                 _OutFilePath,
-                SelectedLangage.Value
+                SelectedLanguage.Value
             ));
             CurrentStep.Value = 0;
         }

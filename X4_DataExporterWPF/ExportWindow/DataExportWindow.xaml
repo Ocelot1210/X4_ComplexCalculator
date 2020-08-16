@@ -98,8 +98,8 @@
                     Background="WhiteSmoke"
                     DisplayMemberPath="Name"
                     IsEnabled="{Binding CanOperation.Value, Mode=OneWay}"
-                    ItemsSource="{Binding Langages}"
-                    SelectedItem="{Binding SelectedLangage.Value, Mode=OneWayToSource}" />
+                    ItemsSource="{Binding Languages}"
+                    SelectedItem="{Binding SelectedLanguage.Value, Mode=OneWayToSource}" />
             </Grid>
         </GroupBox>
 
