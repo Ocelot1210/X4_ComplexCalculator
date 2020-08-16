@@ -14,6 +14,19 @@
     SizeToContent="Height"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
+    <Window.Style>
+        <Style TargetType="Window">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsBusy.Value}" Value="false">
+                    <Setter Property="Cursor" Value="Arrow" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsBusy.Value}" Value="true">
+                    <Setter Property="Cursor" Value="Wait" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Style>
+
     <Grid>
 
         <Grid.RowDefinitions>

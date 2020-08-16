@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -8,6 +8,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using Prism.Mvvm;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
+using Reactive.Bindings.Notifiers;
 
 namespace X4_DataExporterWPF.DataExportWindow
 {
@@ -26,6 +27,11 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// 出力先ファイルパス
         /// </summary>
         private readonly string _OutFilePath;
+
+        /// <summary>
+        /// 処理状態管理
+        /// </summary>
+        private readonly BusyNotifier _BusyNotifier = new BusyNotifier();
         #endregion
 
 
@@ -34,6 +40,12 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// 入力元フォルダパス
         /// </summary>
         public ReactivePropertySlim<string> InDirPath { get; }
+
+
+        /// <summary>
+        /// 処理中の場合 true、待機中の場合 false
+        /// </summary>
+        public ReadOnlyReactivePropertySlim<bool> IsBusy { get; }
 
 
         /// <summary>
@@ -90,6 +102,8 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// </summary>
         public DataExportViewModel(string inDirPath, string outFilePath)
         {
+            IsBusy = _BusyNotifier.ToReadOnlyReactivePropertySlim();
+
             InDirPath = new ReactivePropertySlim<string>(inDirPath);
             _OutFilePath = outFilePath;
 
@@ -115,6 +129,7 @@ namespace X4_DataExporterWPF.DataExportWindow
             // 入力元フォルダパスが変更された時、言語一覧を更新する
             InDirPath.ObserveOn(ThreadPoolScheduler.Instance).Subscribe(path =>
             {
+                using var _ = _BusyNotifier.ProcessStart();
                 Langages.ClearOnScheduler();
                 Langages.AddRangeOnScheduler(_Model.GetLangages(path));
             });
@@ -151,6 +166,8 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// </summary>
         private async Task Export()
         {
+            using var _ = _BusyNotifier.ProcessStart();
+
             // 言語が未選択なら何もしない
             if (SelectedLangage.Value == null)
             {
