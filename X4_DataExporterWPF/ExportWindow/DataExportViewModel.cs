@@ -33,7 +33,7 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// <summary>
         /// 入力元フォルダパス
         /// </summary>
-        public ReactiveProperty<string> InDirPath { get; }
+        public ReactivePropertySlim<string> InDirPath { get; }
 
 
         /// <summary>
@@ -45,25 +45,25 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// <summary>
         /// 選択された言語
         /// </summary>
-        public ReactiveProperty<LangComboboxItem?> SelectedLangage { get; }
+        public ReactivePropertySlim<LangComboboxItem?> SelectedLangage { get; }
 
 
         /// <summary>
         /// 進捗最大
         /// </summary>
-        public ReactiveProperty<int> MaxSteps { get; }
+        public ReactivePropertySlim<int> MaxSteps { get; }
 
 
         /// <summary>
         /// 現在の進捗
         /// </summary>
-        public ReactiveProperty<int> CurrentStep { get; }
+        public ReactivePropertySlim<int> CurrentStep { get; }
 
 
         /// <summary>
         /// ユーザが操作可能か
         /// </summary>
-        public ReactiveProperty<bool> CanOperation { get; }
+        public ReactivePropertySlim<bool> CanOperation { get; }
 
 
         /// <summary>
@@ -90,16 +90,16 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// </summary>
         public DataExportViewModel(string inDirPath, string outFilePath)
         {
-            InDirPath = new ReactiveProperty<string>(inDirPath);
+            InDirPath = new ReactivePropertySlim<string>(inDirPath);
             _OutFilePath = outFilePath;
 
             Langages = new ReactiveCollection<LangComboboxItem>();
-            SelectedLangage = new ReactiveProperty<LangComboboxItem?>();
+            SelectedLangage = new ReactivePropertySlim<LangComboboxItem?>();
 
-            MaxSteps = new ReactiveProperty<int>(1);
-            CurrentStep = new ReactiveProperty<int>(0);
+            MaxSteps = new ReactivePropertySlim<int>(1);
+            CurrentStep = new ReactivePropertySlim<int>(0);
 
-            CanOperation = new ReactiveProperty<bool>(true);
+            CanOperation = new ReactivePropertySlim<bool>(true);
 
             // 操作可能かつ入力項目に不備がない場合に true にする
             var canExport = new[]{
