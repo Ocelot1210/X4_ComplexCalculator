@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -104,7 +105,8 @@ namespace X4_DataExporterWPF.DataExportWindow
         {
             IsBusy = _BusyNotifier.ToReadOnlyReactivePropertySlim();
 
-            InDirPath = new ReactivePropertySlim<string>(inDirPath);
+            InDirPath = new ReactivePropertySlim<string>(inDirPath,
+                mode: ReactivePropertyMode.RaiseLatestValueOnSubscribe);
             _OutFilePath = outFilePath;
 
             Langages = new ReactiveCollection<LangComboboxItem>();
@@ -126,7 +128,7 @@ namespace X4_DataExporterWPF.DataExportWindow
             ExportCommand = new AsyncReactiveCommand(canExport, CanOperation).WithSubscribe(Export);
             CloseCommand = new ReactiveCommand<Window>(CanOperation).WithSubscribe(Close);
 
-            // 入力元フォルダパスが変更された時、言語一覧を更新する
+            // 入力元フォルダパスに値が代入された時、言語一覧を更新する
             InDirPath.ObserveOn(ThreadPoolScheduler.Instance).Subscribe(path =>
             {
                 using var _ = _BusyNotifier.ProcessStart();
