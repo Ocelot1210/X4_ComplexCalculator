@@ -20,7 +20,7 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// <summary>
         /// 言語一覧を更新
         /// </summary>
-        public IEnumerable<LangComboboxItem> GetLangages(string inDirPath)
+        public (bool success, IEnumerable<LangComboboxItem> languages) GetLangages(string inDirPath)
         {
             try
             {
@@ -30,11 +30,11 @@ namespace X4_DataExporterWPF.DataExportWindow
                     .Select(x => new LangComboboxItem(int.Parse(x.Attribute("id").Value), x.Attribute("name").Value))
                     .OrderBy(x => x.ID);
 
-                return langages;
+                return (true, langages);
             }
             catch (Exception)
             {
-                return Enumerable.Empty<LangComboboxItem>();
+                return (false, Enumerable.Empty<LangComboboxItem>());
             }
         }
 

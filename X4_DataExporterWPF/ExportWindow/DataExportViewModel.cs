@@ -29,6 +29,13 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// </summary>
         private readonly string _OutFilePath;
 
+
+        /// <summary>
+        /// 現在の入力元フォルダパスから言語一覧を取得できなかった場合 true
+        /// </summary>
+        private readonly ReactivePropertySlim<bool> _InDirPathHasError;
+
+
         /// <summary>
         /// 処理状態管理
         /// </summary>
@@ -40,7 +47,7 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// <summary>
         /// 入力元フォルダパス
         /// </summary>
-        public ReactivePropertySlim<string> InDirPath { get; }
+        public ReactiveProperty<string> InDirPath { get; }
 
 
         /// <summary>
@@ -105,8 +112,11 @@ namespace X4_DataExporterWPF.DataExportWindow
         {
             IsBusy = _BusyNotifier.ToReadOnlyReactivePropertySlim();
 
-            InDirPath = new ReactivePropertySlim<string>(inDirPath,
+            InDirPath = new ReactiveProperty<string>(inDirPath,
                 mode: ReactivePropertyMode.RaiseLatestValueOnSubscribe);
+            _InDirPathHasError = new ReactivePropertySlim<bool>(false);
+            InDirPath.SetValidateNotifyError(
+                _ => _InDirPathHasError.Select(isError => isError ? "Error" : null));
             _OutFilePath = outFilePath;
 
             Langages = new ReactiveCollection<LangComboboxItem>();
@@ -132,8 +142,12 @@ namespace X4_DataExporterWPF.DataExportWindow
             InDirPath.ObserveOn(ThreadPoolScheduler.Instance).Subscribe(path =>
             {
                 using var _ = _BusyNotifier.ProcessStart();
+                _InDirPathHasError.Value = false;
                 Langages.ClearOnScheduler();
-                Langages.AddRangeOnScheduler(_Model.GetLangages(path));
+
+                var (success, languages) = _Model.GetLangages(path);
+                _InDirPathHasError.Value = !success;
+                Langages.AddRangeOnScheduler(languages);
             });
         }
 
