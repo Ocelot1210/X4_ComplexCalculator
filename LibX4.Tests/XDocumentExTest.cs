@@ -1,0 +1,92 @@
+﻿using System.IO;
+using System.Linq;
+using System.Text;
+using LibX4.Xml;
+using Xunit;
+
+namespace LibX4.Tests
+{
+    /// <summary>
+    /// <see cref="XDocumentEx"/> のテストクラス
+    /// </summary>
+    public class XDocumentExTest
+    {
+        /// <summary>
+        /// UTF8 エンコード用
+        /// </summary>
+        private static readonly Encoding UTF8 = new UTF8Encoding(false);
+
+
+        /// <summary>
+        /// UTF8 の BOM
+        /// </summary>
+        private static readonly byte[] BOM = Encoding.UTF8.GetPreamble();
+
+
+        /// <summary>
+        /// UTF8 エンコードした文字列をストリームに変換する
+        /// </summary>
+        /// <param name="source">文字列</param>
+        /// <returns>UTF8 ストリーム</returns>
+        private Stream utf8(string source) => new MemoryStream(UTF8.GetBytes(source));
+
+
+        /// <summary>
+        /// UTF8 (BOM 付き) エンコードした文字列をストリームに変換する
+        /// </summary>
+        /// <param name="source">文字列</param>
+        /// <returns>UTF8 ストリーム</returns>
+        private Stream utf8bom(string source)
+            => new MemoryStream(BOM.Concat(UTF8.GetBytes(source)).ToArray());
+
+
+        /// <summary>
+        /// XML v1.1 が読み込めることを確認する
+        /// </summary>
+        [Fact]
+        public void Xml11CanBeRead()
+        {
+            using var s0 = utf8("<root></root>");
+            XDocumentEx.Load(s0);
+
+            using var s1 = utf8(@"<?xml version=""1.1""?><root></root>");
+            XDocumentEx.Load(s1);
+
+            using var s2 = utf8(@"<?xml version=""1.1"" encoding=""UTF-8""?><root></root>");
+            XDocumentEx.Load(s2);
+
+            using var s3 = utf8(
+                @"<?xml version=""1.1"" encoding=""UTF-8"" standalone=""no""?><root></root>");
+            XDocumentEx.Load(s3);
+
+            using var s4 = utf8(
+                @"<?xml version=""1.1"" encoding=""UTF-8"" standalone=""yes""?><root></root>");
+            XDocumentEx.Load(s4);
+        }
+
+
+        /// <summary>
+        /// BOM 付き UTF8 が読み込めることを確認する
+        /// </summary>
+        [Fact]
+        public void Utf8BomCanBeRead()
+        {
+            using var s0 = utf8bom("<root></root>");
+            XDocumentEx.Load(s0);
+
+            using var s1 = utf8bom(@"<?xml version=""1.1""?><root></root>");
+            XDocumentEx.Load(s1);
+
+            using var s2 = utf8bom(@"<?xml version=""1.1"" encoding=""UTF-8""?><root></root>");
+            XDocumentEx.Load(s2);
+
+            using var s3 = utf8bom(
+                @"<?xml version=""1.1"" encoding=""UTF-8"" standalone=""no""?><root></root>");
+            XDocumentEx.Load(s3);
+
+            using var s4 = utf8bom(
+                @"<?xml version=""1.1"" encoding=""UTF-8"" standalone=""yes""?><root></root>");
+            XDocumentEx.Load(s4);
+        }
+    }
+}
