@@ -20,21 +20,21 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// <summary>
         /// 言語一覧を更新
         /// </summary>
-        public IEnumerable<LangComboboxItem> GetLangages(string inDirPath)
+        public (bool success, IEnumerable<LangComboboxItem> languages) GetLanguages(string inDirPath)
         {
             try
             {
                 var catFiles = new CatFile(inDirPath);
                 var xml = catFiles.OpenXml("libraries/languages.xml");
-                var langages = xml.XPathSelectElements("/languages/language")
+                var languages = xml.XPathSelectElements("/languages/language")
                     .Select(x => new LangComboboxItem(int.Parse(x.Attribute("id").Value), x.Attribute("name").Value))
                     .OrderBy(x => x.ID);
 
-                return langages;
+                return (true, languages);
             }
             catch (Exception)
             {
-                return Enumerable.Empty<LangComboboxItem>();
+                return (false, Enumerable.Empty<LangComboboxItem>());
             }
         }
 
