@@ -1,4 +1,6 @@
+using System;
 using System.IO;
+using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -9,6 +11,12 @@ namespace LibX4.Xml
     /// </summary>
     internal static class XDocumentEx
     {
+        /// <summary>
+        /// XML 宣言の文頭を UTF-8 で表した配列
+        /// </summary>
+        private static readonly byte[] XmlDeclaration = Encoding.UTF8.GetBytes("<?xml");
+
+
         /// <summary>
         /// 絶対パスから XDocument を生成する
         /// </summary>
@@ -29,101 +37,57 @@ namespace LibX4.Xml
         /// <returns>生成した XDocument</returns>
         public static XDocument Load(Stream stream, string? baseUri = null)
         {
-            // xml宣言の文字数カウント
-            var xmlDefCount = CountXmlDefined(stream);
-            stream.Position = 0;
-
-            // xml宣言を読み飛ばす
-            using var streamReader = new StreamReader(stream);
-            for (var cnt = 0; cnt < xmlDefCount; cnt++)
-            {
-                streamReader.Read();
-            }
-
-            using var xmlReader = XmlReader.Create(streamReader, null, baseUri);
+            stream = SkipXmlDeclaration(stream);
+            var xmlReader = XmlReader.Create(stream, null, baseUri);
             return XDocument.Load(xmlReader);
         }
 
 
         /// <summary>
-        /// xml宣言の文字数をカウントする
+        /// ストリームの XML 宣言を読み飛ばす
         /// </summary>
-        /// <param name="stream">カウント対象</param>
-        /// <returns>xml宣言の文字数</returns>
-        private static int CountXmlDefined(Stream stream)
+        /// <param name="stream">XML のストリーム</param>
+        /// <returns>XML 宣言を読み飛ばしたストリーム</returns>
+        private static Stream SkipXmlDeclaration(Stream stream)
         {
-            var ret = 0;
-            var reader = new StreamReader(stream);
+            Span<byte> buff = stackalloc byte[58]; // XML 宣言の全属性を指定した場合の文字数
+            stream.Read(buff);
 
-            // xml宣言が記載されているか判定し、記載されていなければ0を返す
+            // UTF-8 の BOM を読み飛ばす
+            int seek = buff.StartsWith(Encoding.UTF8.Preamble) ? Encoding.UTF8.Preamble.Length : 0;
+
+            // XML 宣言が省略されている場合はそのまま返す
+            if (!buff.Slice(seek).StartsWith(XmlDeclaration))
             {
-                char[] buff = new char[5];
-
-                reader.Read(buff, 0, buff.Length);
-
-                if (new string(buff) != "<?xml")
-                {
-                    return 0;
-                }
-
-                ret += buff.Length;
+                stream.Position = seek;
+                return stream;
             }
 
-
-            var isDblQt = false;        // ダブルクォート内か
-            var isSngQt = false;        // シングルクォート内か
-            var endOfXmlDef = false;    // xml宣言を読み飛ばし終えたか
-
-            // xml宣言を読み飛ばす
-            do
+            // XML 宣言部分を読み飛ばす
+            for (seek += 6; seek < buff.Length; seek++)
             {
-                var chr = reader.Read();
-                ret++;
-                if (chr < 0)
+                switch (buff[seek])
                 {
-                    break;
-                }
-
-                switch ((char)chr)
-                {
-                    case '\'':
-                        // ダブルクォートで囲われていないシングルクォートか？
-                        if (!isDblQt)
-                        {
-                            isSngQt = !isSngQt;
-                        }
+                    case (byte)'v':
+                        seek += 12; // skip 'version="1.x"'
                         break;
 
-                    case '\"':
-                        // シングルクォートで囲われていないダブルクォートか？
-                        if (!isSngQt)
-                        {
-                            isDblQt = !isDblQt;
-                        }
+                    case (byte)'e':
+                        seek += 13; // skip 'encoding="UTF-8"'
                         break;
 
-                    case '?':
-                        // ダブルクォートまたはシングルクォートに囲われていない'?'か？
-                        if (!isSngQt && !isDblQt)
-                        {
-                            chr = reader.Read();
-                            ret++;
-
-                            // xml宣言の終了か？
-                            if (chr < 0 || (char)chr == '>')
-                            {
-                                endOfXmlDef = true;
-                            }
-                        }
+                    case (byte)'s':
+                        seek += 14; // skip 'standalone="no"'
                         break;
 
-                    default:
-                        break;
+                    case (byte)'?':
+                        seek += 2;  // skip '?>'
+                        stream.Position = seek;
+                        return stream;
                 }
             }
-            while (!reader.EndOfStream && !endOfXmlDef);
-
-            return ret;
+            throw new InvalidDataException("XML declaration has unexpected length."
+                + Environment.NewLine + $"Buff: {Encoding.UTF8.GetString(buff)}");
         }
     }
 }
