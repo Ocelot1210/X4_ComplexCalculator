@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using System;
+using System.Xml.Linq;
 
 namespace LibX4.Xml
 {
@@ -15,9 +16,14 @@ namespace LibX4.Xml
         /// <exception cref="XmlFormatException">属性が無い、または無効な値の場合</exception>
         public static double GetDouble(this XAttribute attr)
         {
-            var value = attr?.Value;
-            if (double.TryParse(value, out var result)) return result;
-            throw new XmlFormatException(value);
+            try
+            {
+                return double.Parse(attr?.Value);
+            }
+            catch (SystemException exception)
+            {
+                throw XmlFormatException.CreateFrom(attr, exception);
+            }
         }
 
 
@@ -29,9 +35,14 @@ namespace LibX4.Xml
         /// <exception cref="XmlFormatException">属性が無い、または無効な値の場合</exception>
         public static int GetInt(this XAttribute attr)
         {
-            var value = attr?.Value;
-            if (int.TryParse(value, out var result)) return result;
-            throw new XmlFormatException(value);
+            try
+            {
+                return int.Parse(attr?.Value);
+            }
+            catch (SystemException exception)
+            {
+                throw XmlFormatException.CreateFrom(attr, exception);
+            }
         }
     }
 }
