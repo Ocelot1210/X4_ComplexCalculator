@@ -3,6 +3,7 @@ using System.Data;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Dapper;
+using LibX4.Xml;
 using X4_DataExporterWPF.Entity;
 
 namespace X4_DataExporterWPF.Export
@@ -83,7 +84,7 @@ CREATE TABLE IF NOT EXISTS WorkUnitResource
                         var wareID = ware.Attribute("ware")?.Value;
                         if (string.IsNullOrEmpty(wareID)) continue;
 
-                        var amount = int.Parse(ware.Attribute("amount")?.Value ?? "0");
+                        var amount = ware.Attribute("amount").GetInt();
 
                         yield return new WorkUnitResource(workUnitID, method, wareID, amount);
                     }
