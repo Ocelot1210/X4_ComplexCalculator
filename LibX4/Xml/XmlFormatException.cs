@@ -45,7 +45,7 @@ namespace LibX4.Xml
         {
             var exception = new XmlFormatException("XML format is invalid.", innerException);
             exception.Input = attr?.Value ?? "<null>";
-            exception.Parent = attr?.Parent.ToString() ?? "<null>";
+            exception.Parent = attr?.Parent?.ToString() ?? "<null>";
             return exception;
         }
     }
