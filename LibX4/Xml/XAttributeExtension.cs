@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Xml.Linq;
 
 namespace LibX4.Xml
@@ -18,7 +19,7 @@ namespace LibX4.Xml
         {
             try
             {
-                return double.Parse(attr?.Value);
+                return double.Parse(attr?.Value, CultureInfo.InvariantCulture);
             }
             catch (SystemException exception)
             {
@@ -37,7 +38,7 @@ namespace LibX4.Xml
         {
             try
             {
-                return int.Parse(attr?.Value);
+                return int.Parse(attr?.Value, CultureInfo.InvariantCulture);
             }
             catch (SystemException exception)
             {
