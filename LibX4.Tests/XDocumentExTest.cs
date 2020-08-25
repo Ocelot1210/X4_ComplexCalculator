@@ -20,7 +20,7 @@ namespace LibX4.Tests
         /// <summary>
         /// テスト用の XML 文字列の配列
         /// </summary>
-        public static string[][] TastXmls => new[] {
+        public static string[][] TestXmls => new[] {
             new [] { "<root></root>" },
             new [] { @"<?xml version=""1.1""?><root></root>" },
             new [] { @"<?xml version=""1.1"" encoding=""UTF-8""?><root></root>" },
@@ -34,7 +34,7 @@ namespace LibX4.Tests
         /// </summary>
         /// <param name="source">テスト用の文字列</param>
         [Theory]
-        [MemberData(nameof(TastXmls))]
+        [MemberData(nameof(TestXmls))]
         public void Utf8(string source)
         {
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(source));
@@ -47,7 +47,7 @@ namespace LibX4.Tests
         /// </summary>
         /// <param name="source">テスト用の文字列</param>
         [Theory]
-        [MemberData(nameof(TastXmls))]
+        [MemberData(nameof(TestXmls))]
         public void Utf8WithBom(string source)
         {
             var stream = new MemoryStream(Bom.Concat(Encoding.UTF8.GetBytes(source)).ToArray());
