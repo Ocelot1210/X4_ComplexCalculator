@@ -12,75 +12,46 @@ namespace LibX4.Tests
     public class XDocumentExTest
     {
         /// <summary>
-        /// UTF8 の BOM
+        /// UTF-8 の BOM
         /// </summary>
-        private static readonly byte[] BOM = Encoding.UTF8.GetPreamble();
+        private static readonly byte[] Bom = Encoding.UTF8.GetPreamble();
 
 
         /// <summary>
-        /// UTF8 エンコードした文字列をストリームに変換する
+        /// テスト用の XML 文字列の配列
         /// </summary>
-        /// <param name="source">文字列</param>
-        /// <returns>UTF8 ストリーム</returns>
-        private Stream Utf8(string source) => new MemoryStream(Encoding.UTF8.GetBytes(source));
+        public static string[][] TastXmls => new[] {
+            new [] { "<root></root>" },
+            new [] { @"<?xml version=""1.1""?><root></root>" },
+            new [] { @"<?xml version=""1.1"" encoding=""UTF-8""?><root></root>" },
+            new [] { @"<?xml version=""1.1"" encoding=""UTF-8"" standalone=""no""?><root></root>" },
+            new [] { @"<?xml version=""1.1"" encoding=""UTF-8"" standalone=""yes""?><root></root>" },
+        };
 
 
         /// <summary>
-        /// UTF8 (BOM 付き) エンコードした文字列をストリームに変換する
+        /// UTF-8 エンコードされた XML ストリームから読み込める
         /// </summary>
-        /// <param name="source">文字列</param>
-        /// <returns>UTF8 ストリーム</returns>
-        private Stream Utf8Bom(string source)
-            => new MemoryStream(BOM.Concat(Encoding.UTF8.GetBytes(source)).ToArray());
-
-
-        /// <summary>
-        /// XML v1.1 が読み込めることを確認する
-        /// </summary>
-        [Fact]
-        public void Xml11CanBeRead()
+        /// <param name="source">テスト用の文字列</param>
+        [Theory]
+        [MemberData(nameof(TastXmls))]
+        public void Utf8(string source)
         {
-            using var s0 = Utf8("<root></root>");
-            XDocumentEx.Load(s0);
-
-            using var s1 = Utf8(@"<?xml version=""1.1""?><root></root>");
-            XDocumentEx.Load(s1);
-
-            using var s2 = Utf8(@"<?xml version=""1.1"" encoding=""UTF-8""?><root></root>");
-            XDocumentEx.Load(s2);
-
-            using var s3 = Utf8(
-                @"<?xml version=""1.1"" encoding=""UTF-8"" standalone=""no""?><root></root>");
-            XDocumentEx.Load(s3);
-
-            using var s4 = Utf8(
-                @"<?xml version=""1.1"" encoding=""UTF-8"" standalone=""yes""?><root></root>");
-            XDocumentEx.Load(s4);
+            var stream = new MemoryStream(Encoding.UTF8.GetBytes(source));
+            XDocumentEx.Load(stream);
         }
 
 
         /// <summary>
-        /// BOM 付き UTF8 が読み込めることを確認する
+        /// UTF-8 with BOM エンコードされた XML ストリームから読み込める
         /// </summary>
-        [Fact]
-        public void Utf8BomCanBeRead()
+        /// <param name="source">テスト用の文字列</param>
+        [Theory]
+        [MemberData(nameof(TastXmls))]
+        public void Utf8WithBom(string source)
         {
-            using var s0 = Utf8Bom("<root></root>");
-            XDocumentEx.Load(s0);
-
-            using var s1 = Utf8Bom(@"<?xml version=""1.1""?><root></root>");
-            XDocumentEx.Load(s1);
-
-            using var s2 = Utf8Bom(@"<?xml version=""1.1"" encoding=""UTF-8""?><root></root>");
-            XDocumentEx.Load(s2);
-
-            using var s3 = Utf8Bom(
-                @"<?xml version=""1.1"" encoding=""UTF-8"" standalone=""no""?><root></root>");
-            XDocumentEx.Load(s3);
-
-            using var s4 = Utf8Bom(
-                @"<?xml version=""1.1"" encoding=""UTF-8"" standalone=""yes""?><root></root>");
-            XDocumentEx.Load(s4);
+            var stream = new MemoryStream(Bom.Concat(Encoding.UTF8.GetBytes(source)).ToArray());
+            XDocumentEx.Load(stream);
         }
     }
 }
