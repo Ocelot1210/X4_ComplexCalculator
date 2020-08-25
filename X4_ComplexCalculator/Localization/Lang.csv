@@ -80,6 +80,7 @@ Language;Language
 
 # Help(H) ---------------------------------------------
 Help;Help(_H)
+ReportIssue;Report Issue
 VersionInfo;Version Information
 VersionInfoTitle;X4_ComplexCalculator
 VersionInfoDescription;X4_ComplexCalculator\r\n\r\nVersion: {0}\r\nCommit: {1}\r\n.NET Core: {2}

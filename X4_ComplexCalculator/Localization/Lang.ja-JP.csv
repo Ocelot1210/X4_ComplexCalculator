@@ -80,6 +80,7 @@ Language;言語
 
 # Help(H) ---------------------------------------------
 Help;ヘルプ(_H)
+ReportIssue;問題を報告
 VersionInfo;バージョン情報
 VersionInfoTitle;X4_ComplexCalculator
 VersionInfoDescription;X4_ComplexCalculator\r\n\r\nバージョン: {0}\r\nコミット: {1}\r\n.NET Core: {2}
