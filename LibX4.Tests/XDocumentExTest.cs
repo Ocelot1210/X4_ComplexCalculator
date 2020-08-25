@@ -12,12 +12,6 @@ namespace LibX4.Tests
     public class XDocumentExTest
     {
         /// <summary>
-        /// UTF8 エンコード用
-        /// </summary>
-        private static readonly Encoding UTF8 = new UTF8Encoding(false);
-
-
-        /// <summary>
         /// UTF8 の BOM
         /// </summary>
         private static readonly byte[] BOM = Encoding.UTF8.GetPreamble();
@@ -28,7 +22,7 @@ namespace LibX4.Tests
         /// </summary>
         /// <param name="source">文字列</param>
         /// <returns>UTF8 ストリーム</returns>
-        private Stream Utf8(string source) => new MemoryStream(UTF8.GetBytes(source));
+        private Stream Utf8(string source) => new MemoryStream(Encoding.UTF8.GetBytes(source));
 
 
         /// <summary>
@@ -37,7 +31,7 @@ namespace LibX4.Tests
         /// <param name="source">文字列</param>
         /// <returns>UTF8 ストリーム</returns>
         private Stream Utf8Bom(string source)
-            => new MemoryStream(BOM.Concat(UTF8.GetBytes(source)).ToArray());
+            => new MemoryStream(BOM.Concat(Encoding.UTF8.GetBytes(source)).ToArray());
 
 
         /// <summary>
