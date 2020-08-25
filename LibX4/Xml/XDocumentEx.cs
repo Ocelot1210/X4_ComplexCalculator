@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Text;
-using System.Xml;
 using System.Xml.Linq;
 
 namespace LibX4.Xml
@@ -25,7 +24,7 @@ namespace LibX4.Xml
         public static XDocument Load(string url)
         {
             using var stream = new FileStream(url, FileMode.Open, FileAccess.Read);
-            return Load(stream, url);
+            return Load(stream);
         }
 
 
@@ -33,14 +32,8 @@ namespace LibX4.Xml
         /// ストリームから XDocument を生成する
         /// </summary>
         /// <param name="stream">XML データのストリーム</param>
-        /// <param name="baseUri">XML のベース URL</param>
         /// <returns>生成した XDocument</returns>
-        public static XDocument Load(Stream stream, string? baseUri = null)
-        {
-            stream = SkipXmlDeclaration(stream);
-            var xmlReader = XmlReader.Create(stream, null, baseUri);
-            return XDocument.Load(xmlReader);
-        }
+        public static XDocument Load(Stream stream) => XDocument.Load(SkipXmlDeclaration(stream));
 
 
         /// <summary>
