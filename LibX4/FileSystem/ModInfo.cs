@@ -1,6 +1,5 @@
 using System.IO;
-using System.Runtime.InteropServices.ComTypes;
-using System.Xml.Linq;
+using LibX4.Xml;
 
 namespace LibX4.FileSystem
 {
@@ -59,19 +58,7 @@ namespace LibX4.FileSystem
         public ModInfo(string modDirPath)
         {
             var contentXmlPatth = Path.Combine(modDirPath, "content.xml");
-
-            // xml宣言の文字数カウント
-            var xmlDefCount = CountXmlDefined(contentXmlPatth);
-
-            using var sr = new StreamReader(contentXmlPatth);
-
-            // xml宣言を読み飛ばす
-            for (var cnt = 0; cnt < xmlDefCount; cnt++)
-            {
-                sr.Read();
-            }
-
-            var xml = XDocument.Load(sr);
+            var xml = XDocumentEx.Load(contentXmlPatth);
 
             ID      = xml.Root.Attribute("id")?.Value      ?? "";
             Name    = xml.Root.Attribute("name")?.Value    ?? "";
@@ -80,88 +67,6 @@ namespace LibX4.FileSystem
             Date    = xml.Root.Attribute("date")?.Value    ?? "";
             Enabled = xml.Root.Attribute("enabled")?.Value ?? "";
             Save    = xml.Root.Attribute("save")?.Value    ?? "";
-        }
-
-
-        /// <summary>
-        /// xml宣言の文字数をカウントする
-        /// </summary>
-        /// <param name="xmlFilePath">カウント対象</param>
-        /// <returns>xml宣言の文字数</returns>
-        private static int CountXmlDefined(string xmlFilePath)
-        {
-            var ret = 0;
-            using var sr = new StreamReader(xmlFilePath);
-
-            // xml宣言が記載されているか判定し、記載されていなければ0を返す
-            {
-                char[] buff = new char[5];
-
-                sr.Read(buff, 0, buff.Length);
-
-                if (new string(buff) != "<?xml")
-                {
-                    return 0;
-                }
-
-                ret += buff.Length;
-            }
-
-
-            var isDblQt = false;        // ダブルクォート内か
-            var isSngQt = false;        // シングルクォート内か
-            var endOfXmlDef = false;    // xml宣言を読み飛ばし終えたか
-
-            // xml宣言を読み飛ばす
-            do
-            {
-                var chr = sr.Read();
-                ret++;
-                if (chr < 0)
-                {
-                    break;
-                }
-
-                switch ((char)chr)
-                {
-                    case '\'':
-                        // ダブルクォートで囲われていないシングルクォートか？
-                        if (!isDblQt)
-                        {
-                            isSngQt = !isSngQt;
-                        }
-                        break;
-
-                    case '\"':
-                        // シングルクォートで囲われていないダブルクォートか？
-                        if (!isSngQt)
-                        {
-                            isDblQt = !isDblQt;
-                        }
-                        break;
-
-                    case '?':
-                        // ダブルクォートまたはシングルクォートに囲われていない'?'か？
-                        if (!isSngQt && !isDblQt)
-                        {
-                            chr = sr.Read();
-                            ret++;
-
-                            // xml宣言の終了か？
-                            if (chr < 0 || (char)chr == '>')
-                            {
-                                endOfXmlDef = true;
-                            }
-                        }
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-            while (!sr.EndOfStream && !endOfXmlDef);
-
-            return ret;
         }
     }
 }
