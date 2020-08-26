@@ -157,6 +157,19 @@
                     </Style>
                 </MenuItem.ItemContainerStyle>
             </MenuItem>
+
+            <!--  ヘルプ(H)  -->
+            <MenuItem Header="{lex:Loc Lang:Help}">
+
+                <!--  問題を報告  -->
+                <MenuItem Command="{Binding ReportIssueCommand, Mode=OneTime}" Header="{lex:Loc Lang:ReportIssue}" />
+
+                <Separator />
+
+                <!--  X4_ComplexCalculator について  -->
+                <MenuItem Command="{Binding VersionInfoCommand, Mode=OneTime}" Header="{lex:Loc Lang:VersionInfo}" />
+
+            </MenuItem>
         </Menu>
 
         <!--  計画エリア  -->
