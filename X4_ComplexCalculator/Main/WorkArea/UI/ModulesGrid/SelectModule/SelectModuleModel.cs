@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
+using System.Data;
 using System.Linq;
-using System.Reflection;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
@@ -74,7 +73,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
         {
             var items = new List<ModulesListItem>();
 
-            void init(SQLiteDataReader dr, object[] args)
+            void init(IDataReader dr, object[] _)
             {
                 bool chked = 0 < DBConnection.CommonDB.ExecQuery($"SELECT * FROM SelectModuleCheckStateModuleTypes WHERE ID = '{dr["ModuleTypeID"]}'", (_, __) => { });
                 items.Add(new ModulesListItem((string)dr["ModuleTypeID"], (string)dr["Name"], chked));
@@ -102,7 +101,7 @@ ORDER BY Name", init, "SelectModuleCheckStateTypes");
         {
             var items = new List<FactionsListItem>();
 
-            void init(SQLiteDataReader dr, object[] args)
+            void init(IDataReader dr, object[] _)
             {
                 bool isChecked = 0 < DBConnection.CommonDB.ExecQuery($"SELECT * FROM SelectModuleCheckStateModuleOwners WHERE ID = '{dr["FactionID"]}'", (_, __) => { });
 
@@ -161,9 +160,9 @@ WHERE
         /// <summary>
         /// モジュール一覧用ListViewを初期化する
         /// </summary>
-        /// <param name="SQLiteDataReader">クエリ結果</param>
+        /// <param name="dr">クエリ結果</param>
         /// <param name="args">可変長引数</param>
-        private void SetModules(SQLiteDataReader dr, object[] args)
+        private void SetModules(IDataReader dr, object[] args)
         {
             var list = (List<ModulesListItem>)args[0];
             list.Add(new ModulesListItem((string)dr["ModuleID"], (string)dr["Name"], false));

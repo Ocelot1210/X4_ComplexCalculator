@@ -136,7 +136,7 @@ namespace X4_ComplexCalculator.Main
                 var pathes = _WorkAreaManager.Documents.Where(x => File.Exists(x.SaveFilePath))
                                                        .Select(x => x.SaveFilePath);
 
-                param.AddRange("path", System.Data.DbType.String, pathes);
+                param.Add("path", System.Data.DbType.String, pathes);
 
                 DBConnection.CommonDB.ExecQuery("INSERT INTO OpenedFiles(Path) VALUES(:path)", param);
             }

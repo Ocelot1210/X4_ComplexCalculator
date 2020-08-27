@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Data.SQLite;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using X4_ComplexCalculator.Common;
@@ -222,8 +222,8 @@ WHERE
             var sqlParam = new SQLiteCommandParameters(2);
             foreach (var module in targetModules)
             {
-                sqlParam.Add("moduleID", System.Data.DbType.String, module.ModuleID);
-                sqlParam.Add("count", System.Data.DbType.Int32, module.Count);
+                sqlParam.Add("moduleID", DbType.String, module.ModuleID);
+                sqlParam.Add("count", DbType.Int32, module.Count);
             }
 
             // 容量をタイプ別に集計
@@ -242,7 +242,7 @@ WHERE
         /// <remarks>
         /// args[0] = Dictionary<string, List<StorageDetailsListItem>> : 保管庫情報集計用ディクショナリ
         /// </remarks>
-        private void SumStorage(SQLiteDataReader dr, object[] args)
+        private void SumStorage(IDataReader dr, object[] args)
         {
             var transportTypeID = (string)dr["TransportTypeID"];
 
