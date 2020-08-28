@@ -190,23 +190,19 @@ WHERE
         public void SaveCheckState()
         {
             // 前回値クリア
-            DBConnection.CommonDB.ExecQuery("DELETE FROM SelectModuleCheckStateModuleTypes", null);
-            DBConnection.CommonDB.ExecQuery("DELETE FROM SelectModuleCheckStateModuleOwners", null);
+            DBConnection.CommonDB.ExecQuery("DELETE FROM SelectModuleCheckStateModuleTypes");
+            DBConnection.CommonDB.ExecQuery("DELETE FROM SelectModuleCheckStateModuleOwners");
 
             // トランザクション開始
             DBConnection.CommonDB.BeginTransaction();
 
             // モジュール種別のチェック状態保存
-            foreach (var id in ModuleTypes.Where(x => x.IsChecked).Select(x => x.ID))
-            {
-                DBConnection.CommonDB.ExecQuery($"INSERT INTO SelectModuleCheckStateModuleTypes(ID) VALUES ('{id}')", null);
-            }
+            var moduleTypeIds = ModuleTypes.Where(x => x.IsChecked).Select(x => x.ID);
+            DBConnection.CommonDB.ExecQuery("INSERT INTO SelectModuleCheckStateModuleTypes(ID) VALUES (:moduleTypeIds)", new { moduleTypeIds });
 
             // 派閥一覧のチェック状態保存
-            foreach (var id in ModuleOwners.Where(x => x.IsChecked).Select(x => x.Faction.FactionID))
-            {
-                DBConnection.CommonDB.ExecQuery($"INSERT INTO SelectModuleCheckStateModuleOwners(ID) VALUES ('{id}')", null);
-            }
+            var moduleOwnerIds = ModuleOwners.Where(x => x.IsChecked).Select(x => x.Faction.FactionID);
+            DBConnection.CommonDB.ExecQuery($"INSERT INTO SelectModuleCheckStateModuleOwners(ID) VALUES (:moduleOwnerIds)", new { moduleOwnerIds });
 
             // コミット
             DBConnection.CommonDB.Commit();

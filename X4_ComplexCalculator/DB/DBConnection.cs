@@ -133,13 +133,23 @@ namespace X4_ComplexCalculator.DB
 
 
         /// <summary>
+        /// クエリを実行する
+        /// </summary>
+        /// <param name="query">実行するクエリ</param>
+        /// <param name="param">クエリにバインドするパラメータ</param>
+        /// <returns>クエリの影響を受けた行数</returns>
+        public int ExecQuery(string query, object? param = null)
+            => conn.Execute(query, param, _Transaction);
+
+
+        /// <summary>
         /// クエリを実行
         /// </summary>
         /// <param name="query">クエリ</param>
         /// <param name="callback">実行結果に対する処理</param>
         /// <param name="args">可変長引数</param>
         /// <returns>結果の行数</returns>
-        public int ExecQuery(string query, Action<IDataReader, object[]>? callback = null, params object[] args)
+        public int ExecQuery(string query, Action<IDataReader, object[]> callback, params object[] args)
             => ExecQuery(query, null, callback, args);
 
 
@@ -151,7 +161,7 @@ namespace X4_ComplexCalculator.DB
         /// <param name="callback">実行結果に対する処理</param>
         /// <param name="args">可変長引数</param>
         /// <returns>結果の行数</returns>
-        public int ExecQuery(string query, SQLiteCommandParameters? parameters, Action<IDataReader, object[]>? callback = null, params object[] args)
+        public int ExecQuery(string query, SQLiteCommandParameters? parameters, Action<IDataReader, object[]> callback, params object[] args)
         {
             var param = parameters?.AsDynamicParameters();
 

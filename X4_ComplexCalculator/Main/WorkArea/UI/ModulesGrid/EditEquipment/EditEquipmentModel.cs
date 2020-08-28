@@ -143,16 +143,14 @@ WHERE
         public void SaveCheckState()
         {
             // 前回値クリア
-            DBConnection.CommonDB.ExecQuery("DELETE FROM SelectModuleEquipmentCheckStateFactions", null);
+            DBConnection.CommonDB.ExecQuery("DELETE FROM SelectModuleEquipmentCheckStateFactions");
 
             // トランザクション開始
             DBConnection.CommonDB.BeginTransaction();
 
             // モジュール種別のチェック状態保存
-            foreach (var id in Factions.Where(x => x.IsChecked).Select(x => x.Faction.FactionID))
-            {
-                DBConnection.CommonDB.ExecQuery($"INSERT INTO SelectModuleEquipmentCheckStateFactions(ID) VALUES ('{id}')", null);
-            }
+            var factionIds = Factions.Where(x => x.IsChecked).Select(x => x.Faction.FactionID);
+            DBConnection.CommonDB.ExecQuery($"INSERT INTO SelectModuleEquipmentCheckStateFactions(ID) VALUES (:factionIds)", new { factionIds });
 
             // コミット
             DBConnection.CommonDB.Commit();
@@ -175,11 +173,8 @@ WHERE
             {
                 // 新プリセット名が設定された場合
 
-                var param = new SQLiteCommandParameters(3);
-                param.Add("presetName", DbType.String,  newPresetName);
-                param.Add("moduleID",   DbType.String,  _Module.ModuleID);
-                param.Add("presetID",   DbType.Int64,   SelectedPreset.ID);
-                DBConnection.CommonDB.ExecQuery($"UPDATE ModulePresets Set PresetName = :presetName WHERE ModuleID = :moduleID AND presetID = :presetID", param);
+                var param = new { newPresetName, _Module.ModuleID, presetID = SelectedPreset.ID };
+                DBConnection.CommonDB.ExecQuery("UPDATE ModulePresets Set PresetName = :newPresetName WHERE ModuleID = :moduleID AND presetID = :presetID", param);
 
                 var newPreset = new PresetComboboxItem(SelectedPreset.ID, newPresetName);
                 Presets.Replace(SelectedPreset, newPreset);
