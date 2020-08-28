@@ -1,8 +1,8 @@
-﻿using Prism.Mvvm;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 using System.Xml.XPath;
+using Prism.Mvvm;
 using WPFLocalizeExtension.Engine;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;

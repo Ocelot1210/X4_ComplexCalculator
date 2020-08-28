@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS Map
 
                 var id = dataset.XPathSelectElement("properties/identification");
 
-                var name =_Resolver.Resolve(id.Attribute("name").Value);
+                var name = _Resolver.Resolve(id.Attribute("name").Value);
                 var description = _Resolver.Resolve(id.Attribute("description").Value);
 
                 yield return new Map(macro, name, description);

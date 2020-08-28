@@ -1,7 +1,7 @@
-﻿using Prism.Mvvm;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Windows.Data;
+using Prism.Mvvm;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
 {

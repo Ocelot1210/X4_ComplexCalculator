@@ -27,7 +27,7 @@ namespace X4_ComplexCalculator.DB
         /// <summary>
         /// パラメータ一覧
         /// </summary>
-        public IEnumerable<IEnumerable<SQLiteParameter>> Parameters => 
+        public IEnumerable<IEnumerable<SQLiteParameter>> Parameters =>
             _Parameters.Select((v, i) => (v, i)).GroupBy(x => x.i / ValueCnt).Select(g => g.Select(x => x.v));
         #endregion
 
@@ -64,7 +64,7 @@ namespace X4_ComplexCalculator.DB
         /// <param name="values">値のコレクション</param>
         public void AddRange(string name, DbType dbType, IEnumerable<object> values)
         {
-            foreach(var value in values)
+            foreach (var value in values)
             {
                 Add(name, dbType, value);
             }

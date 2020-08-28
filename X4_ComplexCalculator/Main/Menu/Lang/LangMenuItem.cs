@@ -1,5 +1,5 @@
-﻿using Prism.Mvvm;
-using System.Globalization;
+﻿using System.Globalization;
+using Prism.Mvvm;
 using WPFLocalizeExtension.Engine;
 using X4_ComplexCalculator.Common;
 

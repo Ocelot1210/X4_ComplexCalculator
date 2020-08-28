@@ -1,7 +1,7 @@
-﻿using Prism.Mvvm;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using System.Windows.Input;
+using Prism.Mvvm;
 using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
 using X4_ComplexCalculator.Main.WorkArea;
 

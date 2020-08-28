@@ -1,8 +1,8 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Data.SQLite;
 using System.IO;
 using System.Windows;
+using Microsoft.Win32;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB.X4DB;
@@ -71,7 +71,7 @@ namespace X4_ComplexCalculator.DB
         public DBConnection(string dbPath)
         {
             var consb = new SQLiteConnectionStringBuilder { DataSource = dbPath };
-            
+
             conn = new SQLiteConnection(consb.ToString());
             conn.Open();
         }
@@ -345,7 +345,7 @@ namespace X4_ComplexCalculator.DB
                     Environment.Exit(-1);
                 }
             }
-            
+
             CommonDB = CreatePresetDB(Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? "", conf["AppSettings:CommonDBPath"]));
         }
 
@@ -439,7 +439,7 @@ namespace X4_ComplexCalculator.DB
                     // 取得に失敗したら次のレジストリを見に行く
                     continue;
                 }
-                
+
                 // 表示名を保持しているオブジェクトを取得する
                 object value = child.GetValue("DisplayName");
                 if (value == null)

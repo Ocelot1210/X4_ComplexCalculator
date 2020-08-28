@@ -1,7 +1,7 @@
-﻿using Prism.Mvvm;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Prism.Mvvm;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
@@ -9,7 +9,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
     /// <summary>
     /// 製品一覧DataGridの＋/－で表示するListViewのアイテム(生産品)
     /// </summary>
-    public class ProductDetailsListItem :  BindableBase, IProductDetailsListItem
+    public class ProductDetailsListItem : BindableBase, IProductDetailsListItem
     {
         #region メンバ
         /// <summary>

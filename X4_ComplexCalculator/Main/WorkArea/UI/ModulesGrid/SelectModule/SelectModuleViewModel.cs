@@ -1,12 +1,12 @@
-﻿using Prism.Commands;
-using Prism.Mvvm;
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using Prism.Commands;
+using Prism.Mvvm;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
 

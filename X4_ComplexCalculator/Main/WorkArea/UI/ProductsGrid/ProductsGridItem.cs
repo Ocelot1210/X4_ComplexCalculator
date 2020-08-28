@@ -1,7 +1,7 @@
-﻿using Prism.Mvvm;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Prism.Mvvm;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.EditStatus;
@@ -59,7 +59,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         public long Price
         {
             // ウェアが不足しているが購入しない or ウェアが余っているが販売しない場合、価格を0にする
-            get => (Count< 0 && NoBuy) || (0 < Count && NoSell)? 0 : UnitPrice* Count;
+            get => (Count < 0 && NoBuy) || (0 < Count && NoSell) ? 0 : UnitPrice * Count;
         }
 
 
@@ -75,7 +75,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
 
                 var setValue = value;
-                
+
                 if (setValue < Ware.MinPrice)
                 {
                     // 入力された値が最低価格未満の場合、最低価格を設定する

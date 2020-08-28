@@ -1,6 +1,6 @@
-﻿using Prism.Mvvm;
-using System;
+﻿using System;
 using System.Data.SQLite;
+using Prism.Mvvm;
 using X4_ComplexCalculator.DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid

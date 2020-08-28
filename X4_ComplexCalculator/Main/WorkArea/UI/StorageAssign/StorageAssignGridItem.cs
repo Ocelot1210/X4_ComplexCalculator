@@ -1,6 +1,6 @@
-﻿using Prism.Mvvm;
-using System;
+﻿using System;
 using System.ComponentModel;
+using Prism.Mvvm;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB.X4DB;
 

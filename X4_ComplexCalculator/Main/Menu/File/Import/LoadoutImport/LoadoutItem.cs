@@ -1,10 +1,10 @@
-﻿using Prism.Mvvm;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Prism.Mvvm;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
 
@@ -46,7 +46,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// </summary>
         public ModuleEquipment Equipment { get; }
 
-        
+
         /// <summary>
         /// チェックされたか
         /// </summary>
@@ -149,7 +149,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         private LoadoutItem(XElement elm, Module module)
         {
             Name = elm.Attribute("name").Value;
-            
+
             Module = module;
             Equipment = ModuleEquipment.Get(module.ModuleID);
 

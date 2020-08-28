@@ -58,7 +58,7 @@ namespace X4_ComplexCalculator.DB.X4DB
             {
                 var ret = new List<Equipment>();
 
-                foreach(var itm in _Equipments.Values)
+                foreach (var itm in _Equipments.Values)
                 {
                     ret.AddRange(itm);
                 }
@@ -115,7 +115,7 @@ namespace X4_ComplexCalculator.DB.X4DB
             _MaxAmount  = manager._MaxAmount;
 
             _Equipments = new Dictionary<Size, List<Equipment>>();
-            foreach(var equipment in manager._Equipments)
+            foreach (var equipment in manager._Equipments)
             {
                 _Equipments.Add(equipment.Key, new List<Equipment>(equipment.Value));
             }
@@ -137,7 +137,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <param name="equipments">装備一覧</param>
         public void ResetEquipment(Size size, ICollection<Equipment> equipments)
         {
-            if(MaxAmount[size] < equipments.Count)
+            if (MaxAmount[size] < equipments.Count)
             {
                 throw new IndexOutOfRangeException("これ以上装備できません。");
             }
@@ -174,7 +174,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         public override int GetHashCode()
         {
             var sb = new StringBuilder();
-            
+
             foreach (var equipmentID in _Equipments.SelectMany(x => x.Value.Select(y => y.EquipmentID).OrderBy(x => x)))
             {
                 sb.Append(equipmentID);

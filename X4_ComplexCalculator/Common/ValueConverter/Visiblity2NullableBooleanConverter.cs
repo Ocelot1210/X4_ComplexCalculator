@@ -20,7 +20,7 @@ namespace X4_ComplexCalculator.Common.ValueConverter
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var ret = (value is bool?) ? (((bool?)value) == true) ? Visibility.Visible : Visibility.Collapsed :
-                      (value is bool) ?  (((bool?)value) == true) ? Visibility.Visible : Visibility.Collapsed : Binding.DoNothing;
+                      (value is bool)  ? (((bool?)value) == true) ? Visibility.Visible : Visibility.Collapsed : Binding.DoNothing;
 
             return ret;
         }

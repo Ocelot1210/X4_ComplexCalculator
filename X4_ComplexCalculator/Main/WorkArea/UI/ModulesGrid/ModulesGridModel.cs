@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule;
 

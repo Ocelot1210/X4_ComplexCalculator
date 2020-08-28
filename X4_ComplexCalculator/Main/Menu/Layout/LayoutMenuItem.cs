@@ -1,8 +1,8 @@
-﻿using Prism.Commands;
-using Prism.Mvvm;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Input;
+using Prism.Commands;
+using Prism.Mvvm;
 using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;

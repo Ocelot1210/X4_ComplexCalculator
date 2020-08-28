@@ -1,9 +1,4 @@
-﻿using AvalonDock;
-using AvalonDock.Layout;
-using AvalonDock.Layout.Serialization;
-using Prism.Commands;
-using Prism.Mvvm;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,6 +6,11 @@ using System.Text;
 using System.Windows.Input;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using AvalonDock;
+using AvalonDock.Layout;
+using AvalonDock.Layout.Serialization;
+using Prism.Commands;
+using Prism.Mvvm;
 using WPFLocalizeExtension.Engine;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
@@ -76,7 +76,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// </summary>
         public ProductsGridViewModel Products { get; }
 
-        
+
         /// <summary>
         /// 建造リソース一覧
         /// </summary>

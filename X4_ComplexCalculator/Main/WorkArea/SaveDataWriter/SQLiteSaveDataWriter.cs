@@ -1,7 +1,7 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.IO;
 using System.Windows;
+using Microsoft.Win32;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
@@ -143,13 +143,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
                     product.EditStatus |= EditStatus.Saved;
                 }
 
-                conn.ExecQuery($"INSERT INTO Products(WareID, Price, NoBuy, NoSell) Values('{product.Ware.WareID}', {product.UnitPrice}, {(product.NoBuy? 1 : 0)}, {(product.NoSell ? 1 : 0)})");
+                conn.ExecQuery($"INSERT INTO Products(WareID, Price, NoBuy, NoSell) Values('{product.Ware.WareID}', {product.UnitPrice}, {(product.NoBuy ? 1 : 0)}, {(product.NoSell ? 1 : 0)})");
             }
 
             // 建造リソース保存
             foreach (var resource in WorkArea.Resources)
             {
-                conn.ExecQuery($"INSERT INTO BuildResources(WareID, Price, NoBuy) Values('{resource.Ware.WareID}', {resource.UnitPrice}, {(resource.NoBuy? 1 : 0)})");
+                conn.ExecQuery($"INSERT INTO BuildResources(WareID, Price, NoBuy) Values('{resource.Ware.WareID}', {resource.UnitPrice}, {(resource.NoBuy ? 1 : 0)})");
                 if (resource.EditStatus == EditStatus.Edited)
                 {
                     resource.EditStatus |= EditStatus.Saved;

@@ -1,12 +1,12 @@
-﻿using Prism.Mvvm;
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Data;
+using Prism.Mvvm;
 using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
-using X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit;

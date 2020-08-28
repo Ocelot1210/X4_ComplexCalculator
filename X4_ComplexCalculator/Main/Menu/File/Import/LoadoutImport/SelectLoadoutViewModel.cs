@@ -1,9 +1,9 @@
-﻿using Prism.Commands;
-using Prism.Mvvm;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using Prism.Commands;
+using Prism.Mvvm;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
 {
@@ -108,7 +108,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// </summary>
         public SelectLoadoutViewModel()
         {
-            _Model= new SelectLoadoutModel();
+            _Model = new SelectLoadoutModel();
             ImportButtonClickedCommand = new DelegateCommand(_Model.Import);
             CloseButtonClickedCommand  = new DelegateCommand(CloseButtonClicked);
             SelectSaveDataFileCommand  = new DelegateCommand(_Model.SelectSaveDataFile);

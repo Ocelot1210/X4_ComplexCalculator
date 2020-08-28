@@ -1,6 +1,6 @@
-﻿using Prism.Mvvm;
-using System;
+﻿using System;
 using System.Reflection;
+using Prism.Mvvm;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 {
