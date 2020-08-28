@@ -1,6 +1,6 @@
-﻿using Prism.Mvvm;
-using System;
+﻿using System;
 using AvalonDock.Layout;
+using Prism.Mvvm;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.Menu.View
 {

@@ -1,8 +1,8 @@
-﻿using Prism.Mvvm;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
 using System.Windows;
+using Prism.Mvvm;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
 using X4_ComplexCalculator.Common.Localize;

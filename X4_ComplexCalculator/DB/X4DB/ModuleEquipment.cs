@@ -84,7 +84,7 @@ namespace X4_ComplexCalculator.DB.X4DB
             var ret = _ModuleEquipments[moduleID] ?? throw new ArgumentException();
 
             // 装備不能なモジュールの場合、インスタンスを使い回す
-            return ret.CanEquipped? new ModuleEquipment(ret) : ret;
+            return ret.CanEquipped ? new ModuleEquipment(ret) : ret;
         }
 
 

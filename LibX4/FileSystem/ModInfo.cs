@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using LibX4.Xml;
 
 namespace LibX4.FileSystem

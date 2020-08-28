@@ -117,7 +117,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="moduleID">モジュールID</param>
         /// <returns>モジュール</returns>
-        public static Module? Get(string moduleID) => 
+        public static Module? Get(string moduleID) =>
             _Modules.TryGetValue(moduleID, out var module) ? module : null;
 
 

@@ -1,5 +1,5 @@
-﻿using Prism.Mvvm;
-using System.Windows.Input;
+﻿using System.Windows.Input;
+using Prism.Mvvm;
 using WPFLocalizeExtension.Engine;
 using X4_ComplexCalculator.Main.WorkArea;
 

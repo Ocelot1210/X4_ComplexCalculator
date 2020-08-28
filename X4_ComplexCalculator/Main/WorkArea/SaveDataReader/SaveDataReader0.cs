@@ -182,11 +182,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
         protected virtual void InitEditStatus()
         {
             // 初期化対象
-            IEnumerable<IEditable>[] initTargets = 
+            IEnumerable<IEditable>[] initTargets =
             {
                 _WorkArea.Products,
                 _WorkArea.Resources,
-                _WorkArea.StorageAssign 
+                _WorkArea.StorageAssign,
             };
 
             foreach (var editables in initTargets)

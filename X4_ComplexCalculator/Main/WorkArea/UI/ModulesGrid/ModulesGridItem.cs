@@ -1,11 +1,11 @@
-﻿using Prism.Commands;
-using System;
+﻿using System;
 using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Prism.Commands;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB.X4DB;

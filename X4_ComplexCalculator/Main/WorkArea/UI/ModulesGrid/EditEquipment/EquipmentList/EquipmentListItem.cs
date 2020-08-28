@@ -1,7 +1,7 @@
-﻿using Prism.Mvvm;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Prism.Mvvm;
 using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList

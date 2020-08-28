@@ -233,7 +233,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
                         ret.AllocCount = oldAssign.AllocCount;
                         ret.EditStatus = oldAssign.EditStatus;
                     }
-                    
+
                     return ret;
                 }));
 

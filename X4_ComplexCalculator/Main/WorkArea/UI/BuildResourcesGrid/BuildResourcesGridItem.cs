@@ -61,7 +61,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         /// <summary>
         /// 金額
         /// </summary>
-        public long Price => NoBuy? 0 : Amount * UnitPrice;
+        public long Price => NoBuy ? 0 : Amount * UnitPrice;
 
 
         /// <summary>

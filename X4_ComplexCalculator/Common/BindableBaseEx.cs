@@ -1,6 +1,6 @@
-﻿using Prism.Mvvm;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Prism.Mvvm;
 
 namespace X4_ComplexCalculator.Common
 {

@@ -56,7 +56,7 @@ namespace X4_ComplexCalculator.Common.Localize
             _HookProcDelegate = new Win32.WindowsHookProc(HookCallback);
 
             _hHook = Win32.SetWindowsHookEx(Win32.WH_CBT, _HookProcDelegate, IntPtr.Zero, Win32.GetCurrentThreadId());
-            
+
             var result = MessageBox.Show(_Msg, _Title, button, icon, defaultResult);
 
             UnHook();
@@ -93,7 +93,7 @@ namespace X4_ComplexCalculator.Common.Localize
                     }
                 }
             }
-            
+
             return Win32.CallNextHookEx(hHook, code, wParam, lParam);
         }
 

@@ -26,7 +26,7 @@ namespace X4_ComplexCalculator.Common.Behavior
         public static void SetItemsDoubleClick(ItemsControl element, bool value)
         {
             element.SetValue(ItemsDoubleClickProperty, value);
-            
+
             if (value)
             {
                 element.PreviewMouseDoubleClick += Element_PreviewMouseDoubleClick;
