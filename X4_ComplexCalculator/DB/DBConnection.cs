@@ -143,25 +143,46 @@ namespace X4_ComplexCalculator.DB
 
 
         /// <summary>
-        /// クエリを実行
+        /// クエリを実行する
         /// </summary>
-        /// <param name="query">クエリ</param>
+        /// <param name="query">実行するクエリ</param>
         /// <param name="callback">実行結果に対する処理</param>
-        /// <param name="args">可変長引数</param>
-        /// <returns>結果の行数</returns>
-        public int ExecQuery(string query, Action<IDataReader, object[]> callback, params object[] args)
+        /// <returns>クエリの影響を受けた行数</returns>
+        public int ExecQuery(string query, Action<IDataReader, object?> callback)
+            => ExecQuery(query, null, callback, null);
+
+
+        /// <summary>
+        /// クエリを実行する
+        /// </summary>
+        /// <param name="query">実行するクエリ</param>
+        /// <param name="callback">実行結果に対する処理</param>
+        /// <param name="args">コールバックへ渡す引数</param>
+        /// <returns>クエリの影響を受けた行数</returns>
+        public int ExecQuery<T>(string query, Action<IDataReader, T> callback, T args)
             => ExecQuery(query, null, callback, args);
 
 
         /// <summary>
-        /// クエリを実行
+        /// クエリを実行する
         /// </summary>
-        /// <param name="query">クエリ</param>
+        /// <param name="query">実行するクエリ</param>
         /// <param name="parameters">バインド変数格納用オブジェクト</param>
         /// <param name="callback">実行結果に対する処理</param>
-        /// <param name="args">可変長引数</param>
-        /// <returns>結果の行数</returns>
-        public int ExecQuery(string query, SQLiteCommandParameters? parameters, Action<IDataReader, object[]> callback, params object[] args)
+        /// <returns>クエリの影響を受けた行数</returns>
+        public int ExecQuery(string query, SQLiteCommandParameters? parameters, Action<IDataReader, object?> callback)
+            => ExecQuery(query, parameters, callback, null);
+
+
+        /// <summary>
+        /// クエリを実行する
+        /// </summary>
+        /// <param name="query">実行するクエリ</param>
+        /// <param name="parameters">バインド変数格納用オブジェクト</param>
+        /// <param name="callback">実行結果に対する処理</param>
+        /// <param name="args">コールバックへ渡す引数</param>
+        /// <returns>クエリの影響を受けた行数</returns>
+        public int ExecQuery<T>(string query, SQLiteCommandParameters? parameters, Action<IDataReader, T> callback, T args)
         {
             var param = parameters?.AsDynamicParameters();
 

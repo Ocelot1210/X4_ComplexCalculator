@@ -87,9 +87,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <param name="moduleID"></param>
         private void InitEquipmentSizes(string moduleID)
         {
-            static void AddItem(IDataReader dr, object[] args)
+            static void AddItem(IDataReader dr, List<DB.X4DB.Size> sizes)
             {
-                ((ICollection<DB.X4DB.Size>)args[0]).Add(DB.X4DB.Size.Get((string)dr["SizeID"]));
+                sizes.Add(DB.X4DB.Size.Get((string)dr["SizeID"]));
             }
 
             var sizes = new List<DB.X4DB.Size>();
@@ -103,16 +103,15 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// </summary>
         private void UpdateFactions()
         {
-            static void AddItem(IDataReader dr, object[] args)
+            static void AddItem(IDataReader dr, List<FactionsListItem> items)
             {
                 bool chkState = 0 < DBConnection.CommonDB.ExecQuery($"SELECT ID FROM SelectModuleEquipmentCheckStateFactions WHERE ID = '{dr["FactionID"]}'", (_, __) => { });
 
                 var faction = Faction.Get((string)dr["FactionID"]);
-                if (faction != null) ((ICollection<FactionsListItem>)args[0]).Add(new FactionsListItem(faction, chkState));
-
+                if (faction != null) items.Add(new FactionsListItem(faction, chkState));
             }
 
-            var query = $@"
+            const string query = @"
 SELECT
 	DISTINCT FactionID
 FROM
@@ -124,6 +123,7 @@ WHERE
             DBConnection.X4DB.ExecQuery(query, AddItem, items);
             Factions.AddRange(items);
         }
+
 
         /// <summary>
         /// プリセットを初期化
