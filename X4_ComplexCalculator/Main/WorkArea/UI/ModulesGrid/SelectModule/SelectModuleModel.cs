@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
+using System.Data.SQLite;
 using System.Linq;
+using System.Reflection;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
@@ -73,7 +74,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
         {
             var items = new List<ModulesListItem>();
 
-            void init(IDataReader dr, object? _)
+            void init(SQLiteDataReader dr, object[] args)
             {
                 bool chked = 0 < DBConnection.CommonDB.ExecQuery($"SELECT * FROM SelectModuleCheckStateModuleTypes WHERE ID = '{dr["ModuleTypeID"]}'", (_, __) => { });
                 items.Add(new ModulesListItem((string)dr["ModuleTypeID"], (string)dr["Name"], chked));
@@ -101,7 +102,7 @@ ORDER BY Name", init, "SelectModuleCheckStateTypes");
         {
             var items = new List<FactionsListItem>();
 
-            void init(IDataReader dr, object? _)
+            void init(SQLiteDataReader dr, object[] args)
             {
                 bool isChecked = 0 < DBConnection.CommonDB.ExecQuery($"SELECT * FROM SelectModuleCheckStateModuleOwners WHERE ID = '{dr["FactionID"]}'", (_, __) => { });
 
@@ -160,10 +161,11 @@ WHERE
         /// <summary>
         /// モジュール一覧用ListViewを初期化する
         /// </summary>
-        /// <param name="dr">クエリ結果</param>
-        /// <param name="list">モジュール一覧</param>
-        private void SetModules(IDataReader dr, List<ModulesListItem> list)
+        /// <param name="SQLiteDataReader">クエリ結果</param>
+        /// <param name="args">可変長引数</param>
+        private void SetModules(SQLiteDataReader dr, object[] args)
         {
+            var list = (List<ModulesListItem>)args[0];
             list.Add(new ModulesListItem((string)dr["ModuleID"], (string)dr["Name"], false));
         }
 
@@ -189,19 +191,23 @@ WHERE
         public void SaveCheckState()
         {
             // 前回値クリア
-            DBConnection.CommonDB.ExecQuery("DELETE FROM SelectModuleCheckStateModuleTypes");
-            DBConnection.CommonDB.ExecQuery("DELETE FROM SelectModuleCheckStateModuleOwners");
+            DBConnection.CommonDB.ExecQuery("DELETE FROM SelectModuleCheckStateModuleTypes", null);
+            DBConnection.CommonDB.ExecQuery("DELETE FROM SelectModuleCheckStateModuleOwners", null);
 
             // トランザクション開始
             DBConnection.CommonDB.BeginTransaction();
 
             // モジュール種別のチェック状態保存
-            var moduleTypeIds = ModuleTypes.Where(x => x.IsChecked).Select(x => x.ID);
-            DBConnection.CommonDB.ExecQuery("INSERT INTO SelectModuleCheckStateModuleTypes(ID) VALUES (:moduleTypeIds)", new { moduleTypeIds });
+            foreach (var id in ModuleTypes.Where(x => x.IsChecked).Select(x => x.ID))
+            {
+                DBConnection.CommonDB.ExecQuery($"INSERT INTO SelectModuleCheckStateModuleTypes(ID) VALUES ('{id}')", null);
+            }
 
             // 派閥一覧のチェック状態保存
-            var moduleOwnerIds = ModuleOwners.Where(x => x.IsChecked).Select(x => x.Faction.FactionID);
-            DBConnection.CommonDB.ExecQuery($"INSERT INTO SelectModuleCheckStateModuleOwners(ID) VALUES (:moduleOwnerIds)", new { moduleOwnerIds });
+            foreach (var id in ModuleOwners.Where(x => x.IsChecked).Select(x => x.Faction.FactionID))
+            {
+                DBConnection.CommonDB.ExecQuery($"INSERT INTO SelectModuleCheckStateModuleOwners(ID) VALUES ('{id}')", null);
+            }
 
             // コミット
             DBConnection.CommonDB.Commit();

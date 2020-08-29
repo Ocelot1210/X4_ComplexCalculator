@@ -244,7 +244,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <returns>レイアウトID</returns>
         public long SaveLayout(string layoutName)
         {
-            var layoutID = 0L;
+            var id = 0L;
 
             // 空いているレイアウトIDを取得する
             var query = @$"
@@ -257,15 +257,18 @@ WHERE
 
             DBConnection.CommonDB.ExecQuery(query, (dr, args) =>
             {
-                layoutID = (long)dr["LayoutID"];
+                id = (long)dr["LayoutID"];
             });
 
-            var layout = GetCurrentLayout() ?? throw new InvalidOperationException();
-            var param = new { layoutID, layoutName, layout};
+
+            var param = new SQLiteCommandParameters(3);
+            param.Add("layoutID",   System.Data.DbType.Int32,  id);
+            param.Add("layoutName", System.Data.DbType.String, layoutName);
+            param.Add("layout",     System.Data.DbType.Binary, GetCurrentLayout() ?? throw new InvalidOperationException());
 
             DBConnection.CommonDB.ExecQuery("INSERT INTO WorkAreaLayouts(LayoutID, LayoutName, Layout) VALUES(:layoutID, :layoutName, :layout)", param);
 
-            return layoutID;
+            return id;
         }
 
         /// <summary>
@@ -274,9 +277,10 @@ WHERE
         /// <param name="layoutID">レイアウトID</param>
         public void OverwriteSaveLayout(long layoutID)
         {
-            var layout = GetCurrentLayout() ?? throw new InvalidOperationException();
-            var param = new { layout, layoutID };
-            DBConnection.CommonDB.ExecQuery("UPDATE WorkAreaLayouts SET Layout = :layout WHERE LayoutID = :layoutID", param);
+            var param = new SQLiteCommandParameters(2);
+            param.Add("layout", System.Data.DbType.Binary, GetCurrentLayout() ?? throw new InvalidOperationException());
+            param.Add("LayoutID", System.Data.DbType.Int32, layoutID);
+            DBConnection.CommonDB.ExecQuery($"UPDATE WorkAreaLayouts SET Layout = :layout WHERE LayoutID = :layoutID", param);
         }
 
 

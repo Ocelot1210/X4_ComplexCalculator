@@ -135,8 +135,10 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
             {
                 LayoutName = newLayoutName;
 
-                var param = new { LayoutName , LayoutID };
-                DBConnection.CommonDB.ExecQuery("UPDATE WorkAreaLayouts SET LayoutName = :layoutName WHERE LayoutID = :layoutID", param);
+                var param = new SQLiteCommandParameters(2);
+                param.Add("layoutName", System.Data.DbType.String, LayoutName);
+                param.Add("layoutID", System.Data.DbType.Int32, LayoutID);
+                DBConnection.CommonDB.ExecQuery($"UPDATE WorkAreaLayouts SET LayoutName = :layoutName WHERE LayoutID = :layoutID", param);
             }
         }
 

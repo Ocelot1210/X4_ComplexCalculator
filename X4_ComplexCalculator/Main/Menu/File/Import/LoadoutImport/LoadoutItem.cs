@@ -214,7 +214,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// </summary>
         public bool Import()
         {
-            var presetID = 0L;
+            var id = 0L;
             bool ret = true;
 
             var query = @$"
@@ -228,22 +228,23 @@ WHERE
 
             DBConnection.CommonDB.ExecQuery(query, (dr, _) =>
             {
-                presetID = (long)dr["PresetID"];
+                id = (long)dr["PresetID"];
             });
 
             try
             {
                 DBConnection.CommonDB.BeginTransaction();
-                DBConnection.CommonDB.ExecQuery($"INSERT INTO ModulePresets(ModuleID, PresetID, PresetName) VALUES('{Module.ModuleID}', {presetID}, '{Name}')");
+                DBConnection.CommonDB.ExecQuery($"INSERT INTO ModulePresets(ModuleID, PresetID, PresetName) VALUES('{Module.ModuleID}', {id}, '{Name}')");
 
-                var param = Equipment.GetAllEquipment().Select(eqp => new
+                var param = new SQLiteCommandParameters(4);
+                foreach (var eqp in Equipment.GetAllEquipment())
                 {
-                    Module.ModuleID,
-                    presetID,
-                    eqp.EquipmentID,
-                    eqp.EquipmentType.EquipmentTypeID,
-                });
-                DBConnection.CommonDB.ExecQuery("INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES(:moduleID, :presetID, :equipmentID, :equipmentTypeID)", param);
+                    param.Add("moduleID",      DbType.String, Module.ModuleID);
+                    param.Add("presetID",      DbType.Int32 , id);
+                    param.Add("equipmentID",   DbType.String, eqp.EquipmentID);
+                    param.Add("equipmentType", DbType.String, eqp.EquipmentType.EquipmentTypeID);
+                }
+                DBConnection.CommonDB.ExecQuery($"INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES(:moduleID, :presetID, :equipmentID, :equipmentType)", param);
 
                 DBConnection.CommonDB.Commit();
                 Imported = true;
