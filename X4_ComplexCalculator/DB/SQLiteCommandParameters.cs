@@ -2,6 +2,7 @@
 using System.Data;
 using System.Data.SQLite;
 using System.Linq;
+using Dapper;
 
 namespace X4_ComplexCalculator.DB
 {
@@ -57,17 +58,20 @@ namespace X4_ComplexCalculator.DB
 
 
         /// <summary>
-        /// レコードを追加(複数バージョン)
+        /// Dapper のパラメータに指定できる、DynamicParameters クラスに変換する
         /// </summary>
-        /// <param name="name">バインド変数名</param>
-        /// <param name="dbType">型</param>
-        /// <param name="values">値のコレクション</param>
-        public void AddRange(string name, DbType dbType, IEnumerable<object> values)
+        /// <returns>DynamicParameters に変換されたパラメータ</returns>
+        public DynamicParameters AsDynamicParameters()
         {
-            foreach (var value in values)
+            var param = new DynamicParameters();
+            foreach (var sqlParams in Parameters)
             {
-                Add(name, dbType, value);
+                foreach (var sqlParam in sqlParams)
+                {
+                    param.Add(sqlParam.ParameterName, sqlParam.Value, sqlParam.DbType);
+                }
             }
+            return param;
         }
     }
 }

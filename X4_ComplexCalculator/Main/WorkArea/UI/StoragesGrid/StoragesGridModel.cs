@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Data.SQLite;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using X4_ComplexCalculator.Common;
@@ -206,7 +206,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
                 return modulesDict;
             }
 
-            var query = $@"
+            const string query = @"
 SELECT
     TransportTypeID,
     Amount * :count AS Amount,
@@ -222,8 +222,8 @@ WHERE
             var sqlParam = new SQLiteCommandParameters(2);
             foreach (var module in targetModules)
             {
-                sqlParam.Add("moduleID", System.Data.DbType.String, module.ModuleID);
-                sqlParam.Add("count", System.Data.DbType.Int32, module.Count);
+                sqlParam.Add("moduleID", DbType.String, module.ModuleID);
+                sqlParam.Add("count", DbType.Int32, module.Count);
             }
 
             // 容量をタイプ別に集計
@@ -233,21 +233,14 @@ WHERE
         }
 
 
-
         /// <summary>
         /// 保管庫の容量を集計
         /// </summary>
         /// <param name="dr"></param>
-        /// <param name="args"></param>
-        /// <remarks>
-        /// args[0] = Dictionary<string, List<StorageDetailsListItem>> : 保管庫情報集計用ディクショナリ
-        /// </remarks>
-        private void SumStorage(SQLiteDataReader dr, object[] args)
+        /// <param name="modulesDict">保管庫情報集計用ディクショナリ</param>
+        private void SumStorage(IDataReader dr, Dictionary<string, List<StorageDetailsListItem>> modulesDict)
         {
             var transportTypeID = (string)dr["TransportTypeID"];
-
-            // 関連モジュール集計
-            var modulesDict = (Dictionary<string, List<StorageDetailsListItem>>)args[0];
 
             // このカーゴ種別に対して関連モジュール追加が初回か？
             if (!modulesDict.ContainsKey(transportTypeID))

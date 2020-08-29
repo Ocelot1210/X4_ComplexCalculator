@@ -214,7 +214,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// </summary>
         public bool Import()
         {
-            var id = 0L;
+            var presetID = 0L;
             bool ret = true;
 
             var query = @$"
@@ -228,23 +228,22 @@ WHERE
 
             DBConnection.CommonDB.ExecQuery(query, (dr, _) =>
             {
-                id = (long)dr["PresetID"];
+                presetID = (long)dr["PresetID"];
             });
 
             try
             {
                 DBConnection.CommonDB.BeginTransaction();
-                DBConnection.CommonDB.ExecQuery($"INSERT INTO ModulePresets(ModuleID, PresetID, PresetName) VALUES('{Module.ModuleID}', {id}, '{Name}')");
+                DBConnection.CommonDB.ExecQuery($"INSERT INTO ModulePresets(ModuleID, PresetID, PresetName) VALUES('{Module.ModuleID}', {presetID}, '{Name}')");
 
-                var param = new SQLiteCommandParameters(4);
-                foreach (var eqp in Equipment.GetAllEquipment())
+                var param = Equipment.GetAllEquipment().Select(eqp => new
                 {
-                    param.Add("moduleID",      DbType.String, Module.ModuleID);
-                    param.Add("presetID",      DbType.Int32 , id);
-                    param.Add("equipmentID",   DbType.String, eqp.EquipmentID);
-                    param.Add("equipmentType", DbType.String, eqp.EquipmentType.EquipmentTypeID);
-                }
-                DBConnection.CommonDB.ExecQuery($"INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES(:moduleID, :presetID, :equipmentID, :equipmentType)", param);
+                    Module.ModuleID,
+                    presetID,
+                    eqp.EquipmentID,
+                    eqp.EquipmentType.EquipmentTypeID,
+                });
+                DBConnection.CommonDB.ExecQuery("INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES(:moduleID, :presetID, :equipmentID, :equipmentTypeID)", param);
 
                 DBConnection.CommonDB.Commit();
                 Imported = true;

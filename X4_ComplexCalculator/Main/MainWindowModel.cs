@@ -131,14 +131,10 @@ namespace X4_ComplexCalculator.Main
             // 閉じる場合、開いていたファイル一覧を保存する
             if (!canceled)
             {
-                var param = new SQLiteCommandParameters(1);
-
-                var pathes = _WorkAreaManager.Documents.Where(x => File.Exists(x.SaveFilePath))
+                var path = _WorkAreaManager.Documents.Where(x => File.Exists(x.SaveFilePath))
                                                        .Select(x => x.SaveFilePath);
 
-                param.AddRange("path", System.Data.DbType.String, pathes);
-
-                DBConnection.CommonDB.ExecQuery("INSERT INTO OpenedFiles(Path) VALUES(:path)", param);
+                DBConnection.CommonDB.ExecQuery("INSERT INTO OpenedFiles(Path) VALUES(:path)", path);
             }
 
             return canceled;

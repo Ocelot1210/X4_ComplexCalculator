@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Data;
 using System.Data.SQLite;
 using System.IO;
 using System.Windows;
+using Dapper;
 using Microsoft.Win32;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Localize;
@@ -21,10 +23,11 @@ namespace X4_ComplexCalculator.DB
         /// </summary>
         readonly SQLiteConnection conn;
 
+
         /// <summary>
-        /// トランザクション用コマンド
+        /// 実行中のトランザクション
         /// </summary>
-        private SQLiteCommand? _TransCommand;
+        private SQLiteTransaction? _Transaction;
         #endregion
 
 
@@ -83,7 +86,7 @@ namespace X4_ComplexCalculator.DB
         public void Dispose()
         {
             conn.Dispose();
-            _TransCommand?.Dispose();
+            _Transaction?.Dispose();
         }
 
         /// <summary>
@@ -91,15 +94,11 @@ namespace X4_ComplexCalculator.DB
         /// </summary>
         public void BeginTransaction()
         {
-            if (_TransCommand == null)
-            {
-                _TransCommand = new SQLiteCommand(conn);
-                _TransCommand.Transaction = conn.BeginTransaction();
-            }
-            else
+            if (_Transaction != null)
             {
                 throw new InvalidOperationException("前回のトランザクションが終了せずにトランザクションが開始されました。");
             }
+            _Transaction = conn.BeginTransaction();
         }
 
 
@@ -108,13 +107,13 @@ namespace X4_ComplexCalculator.DB
         /// </summary>
         public void Commit()
         {
-            if (_TransCommand == null)
+            if (_Transaction == null)
             {
                 throw new InvalidOperationException();
             }
-            _TransCommand.Transaction.Commit();
-            _TransCommand.Dispose();
-            _TransCommand = null;
+            _Transaction.Commit();
+            _Transaction.Dispose();
+            _Transaction = null;
         }
 
 
@@ -123,128 +122,79 @@ namespace X4_ComplexCalculator.DB
         /// </summary>
         public void Rollback()
         {
-            if (_TransCommand == null)
+            if (_Transaction == null)
             {
                 throw new InvalidOperationException();
             }
-            _TransCommand.Transaction.Rollback();
-            _TransCommand.Dispose();
-            _TransCommand = null;
+            _Transaction.Rollback();
+            _Transaction.Dispose();
+            _Transaction = null;
         }
 
 
         /// <summary>
-        /// クエリを実行
+        /// クエリを実行する
         /// </summary>
-        /// <param name="query">クエリ</param>
+        /// <param name="query">実行するクエリ</param>
+        /// <param name="param">クエリにバインドするパラメータ</param>
+        /// <returns>クエリの影響を受けた行数</returns>
+        public int ExecQuery(string query, object? param = null)
+            => conn.Execute(query, param, _Transaction);
+
+
+        /// <summary>
+        /// クエリを実行する
+        /// </summary>
+        /// <param name="query">実行するクエリ</param>
         /// <param name="callback">実行結果に対する処理</param>
-        /// <param name="args">可変長引数</param>
-        /// <returns>結果の行数</returns>
-        public int ExecQuery(string query, Action<SQLiteDataReader, object[]>? callback = null, params object[] args)
-        {
-            int ret = 0;
+        /// <returns>クエリの影響を受けた行数</returns>
+        public int ExecQuery(string query, Action<IDataReader, object?> callback)
+            => ExecQuery(query, null, callback, null);
 
-            // トランザクション開始済み？
-            if (_TransCommand != null)
-            {
-                ret = ExecQueryMain(_TransCommand, query, null, callback, args);
-            }
-            else
-            {
-                // クエリ使用準備
-                using (var cmd = new SQLiteCommand(conn))
-                {
-                    ret = ExecQueryMain(cmd, query, null, callback, args);
-                }
-            }
-
-            return ret;
-        }
 
         /// <summary>
-        /// クエリを実行
+        /// クエリを実行する
         /// </summary>
-        /// <param name="query">クエリ</param>
+        /// <param name="query">実行するクエリ</param>
+        /// <param name="callback">実行結果に対する処理</param>
+        /// <param name="args">コールバックへ渡す引数</param>
+        /// <returns>クエリの影響を受けた行数</returns>
+        public int ExecQuery<T>(string query, Action<IDataReader, T> callback, T args)
+            => ExecQuery(query, null, callback, args);
+
+
+        /// <summary>
+        /// クエリを実行する
+        /// </summary>
+        /// <param name="query">実行するクエリ</param>
         /// <param name="parameters">バインド変数格納用オブジェクト</param>
         /// <param name="callback">実行結果に対する処理</param>
-        /// <param name="args">可変長引数</param>
-        /// <returns>結果の行数</returns>
-        public int ExecQuery(string query, SQLiteCommandParameters parameters, Action<SQLiteDataReader, object[]>? callback = null, params object[] args)
-        {
-            int ret = 0;
-
-            // トランザクション開始済み？
-            if (_TransCommand != null)
-            {
-                ret = ExecQueryMain(_TransCommand, query, parameters, callback, args);
-            }
-            else
-            {
-                // クエリ使用準備
-                using var cmd = new SQLiteCommand(conn);
-                ret = ExecQueryMain(cmd, query, parameters, callback, args);
-            }
-
-            return ret;
-        }
-
+        /// <returns>クエリの影響を受けた行数</returns>
+        public int ExecQuery(string query, SQLiteCommandParameters? parameters, Action<IDataReader, object?> callback)
+            => ExecQuery(query, parameters, callback, null);
 
 
         /// <summary>
-        /// クエリを実行メイン
+        /// クエリを実行する
         /// </summary>
-        /// <param name="query">クエリ</param>
+        /// <param name="query">実行するクエリ</param>
         /// <param name="parameters">バインド変数格納用オブジェクト</param>
         /// <param name="callback">実行結果に対する処理</param>
-        /// <param name="args">可変長引数</param>
-        /// <returns>結果の行数</returns>
-        private int ExecQueryMain(SQLiteCommand cmd, string query, SQLiteCommandParameters? parameters, Action<SQLiteDataReader, object[]>? callback, params object[] args)
+        /// <param name="args">コールバックへ渡す引数</param>
+        /// <returns>クエリの影響を受けた行数</returns>
+        public int ExecQuery<T>(string query, SQLiteCommandParameters? parameters, Action<IDataReader, T> callback, T args)
         {
+            var param = parameters?.AsDynamicParameters();
+
+            if (callback == null) return conn.Execute(query, param, _Transaction);
+
+            using var dr = conn.ExecuteReader(query, param, _Transaction);
             int ret = 0;
-
-            // クエリを設定
-            cmd.CommandText = query;
-
-            void ExecMain()
+            while (dr.Read())
             {
-                if (callback == null)
-                {
-                    ret += cmd.ExecuteNonQuery();
-                }
-                else
-                {
-                    using var dr = cmd.ExecuteReader();
-                    if (dr.HasRows)
-                    {
-                        while (dr.Read())
-                        {
-                            callback(dr, args);
-                            ret++;
-                        }
-                    }
-                }
+                callback(dr, args);
+                ret++;
             }
-
-            if (parameters == null)
-            {
-                ExecMain();
-            }
-            else
-            {
-                foreach (var sqlParams in parameters.Parameters)
-                {
-                    cmd.Parameters.Clear();
-
-                    foreach (var sqlParam in sqlParams)
-                    {
-                        cmd.Parameters.Add(sqlParam);
-                    }
-
-                    ExecMain();
-                }
-            }
-
-
             return ret;
         }
 

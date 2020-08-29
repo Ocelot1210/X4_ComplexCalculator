@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Data.SQLite;
+using System.Data;
 using System.Linq;
 using System.Windows;
 using Prism.Mvvm;
@@ -87,9 +87,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <param name="moduleID"></param>
         private void InitEquipmentSizes(string moduleID)
         {
-            static void AddItem(SQLiteDataReader dr, object[] args)
+            static void AddItem(IDataReader dr, List<DB.X4DB.Size> sizes)
             {
-                ((ICollection<DB.X4DB.Size>)args[0]).Add(DB.X4DB.Size.Get((string)dr["SizeID"]));
+                sizes.Add(DB.X4DB.Size.Get((string)dr["SizeID"]));
             }
 
             var sizes = new List<DB.X4DB.Size>();
@@ -103,16 +103,15 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// </summary>
         private void UpdateFactions()
         {
-            static void AddItem(SQLiteDataReader dr, object[] args)
+            static void AddItem(IDataReader dr, List<FactionsListItem> items)
             {
                 bool chkState = 0 < DBConnection.CommonDB.ExecQuery($"SELECT ID FROM SelectModuleEquipmentCheckStateFactions WHERE ID = '{dr["FactionID"]}'", (_, __) => { });
 
                 var faction = Faction.Get((string)dr["FactionID"]);
-                if (faction != null) ((ICollection<FactionsListItem>)args[0]).Add(new FactionsListItem(faction, chkState));
-
+                if (faction != null) items.Add(new FactionsListItem(faction, chkState));
             }
 
-            var query = $@"
+            const string query = @"
 SELECT
 	DISTINCT FactionID
 FROM
@@ -125,12 +124,13 @@ WHERE
             Factions.AddRange(items);
         }
 
+
         /// <summary>
         /// プリセットを初期化
         /// </summary>
         private void InitPreset(string moduleID)
         {
-            DBConnection.CommonDB.ExecQuery($"SELECT DISTINCT PresetID, PresetName FROM ModulePresets WHERE ModuleID = '{moduleID}'", (SQLiteDataReader dr, object[] args) =>
+            DBConnection.CommonDB.ExecQuery($"SELECT DISTINCT PresetID, PresetName FROM ModulePresets WHERE ModuleID = '{moduleID}'", (dr, _) =>
             {
                 Presets.Add(new PresetComboboxItem((long)dr["PresetID"], (string)dr["PresetName"]));
             });
@@ -143,16 +143,14 @@ WHERE
         public void SaveCheckState()
         {
             // 前回値クリア
-            DBConnection.CommonDB.ExecQuery("DELETE FROM SelectModuleEquipmentCheckStateFactions", null);
+            DBConnection.CommonDB.ExecQuery("DELETE FROM SelectModuleEquipmentCheckStateFactions");
 
             // トランザクション開始
             DBConnection.CommonDB.BeginTransaction();
 
             // モジュール種別のチェック状態保存
-            foreach (var id in Factions.Where(x => x.IsChecked).Select(x => x.Faction.FactionID))
-            {
-                DBConnection.CommonDB.ExecQuery($"INSERT INTO SelectModuleEquipmentCheckStateFactions(ID) VALUES ('{id}')", null);
-            }
+            var factionIds = Factions.Where(x => x.IsChecked).Select(x => x.Faction.FactionID);
+            DBConnection.CommonDB.ExecQuery($"INSERT INTO SelectModuleEquipmentCheckStateFactions(ID) VALUES (:factionIds)", new { factionIds });
 
             // コミット
             DBConnection.CommonDB.Commit();
@@ -175,11 +173,8 @@ WHERE
             {
                 // 新プリセット名が設定された場合
 
-                var param = new SQLiteCommandParameters(3);
-                param.Add("presetName", System.Data.DbType.String,  newPresetName);
-                param.Add("moduleID",   System.Data.DbType.String,  _Module.ModuleID);
-                param.Add("presetID",   System.Data.DbType.Int64,   SelectedPreset.ID);
-                DBConnection.CommonDB.ExecQuery($"UPDATE ModulePresets Set PresetName = :presetName WHERE ModuleID = :moduleID AND presetID = :presetID", param);
+                var param = new { newPresetName, _Module.ModuleID, presetID = SelectedPreset.ID };
+                DBConnection.CommonDB.ExecQuery("UPDATE ModulePresets Set PresetName = :newPresetName WHERE ModuleID = :moduleID AND presetID = :presetID", param);
 
                 var newPreset = new PresetComboboxItem(SelectedPreset.ID, newPresetName);
                 Presets.Replace(SelectedPreset, newPreset);
@@ -207,7 +202,7 @@ WHERE
 	ModuleID = '{_Module.ModuleID}' AND
     ( PresetID + 1 ) NOT IN ( SELECT PresetID FROM ModulePresets WHERE ModuleID = '{_Module.ModuleID}')";
 
-                DBConnection.CommonDB.ExecQuery(query, (SQLiteDataReader dr, object[] args) =>
+                DBConnection.CommonDB.ExecQuery(query, (dr, _) =>
                 {
                     id = (long)dr["PresetID"];
                 });
