@@ -5,6 +5,12 @@ using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
 using X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign;
 using X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.BuildResources;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Products;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StorageAssign;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Storages;
 
 namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData
 {
@@ -51,6 +57,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData
         /// <summary>
         /// ステーション設定
         /// </summary>
-        public IStationSettings Settings = new StationSettingsModel();
+        public IStationSettings Settings = new StationSettings.StationSettings();
     }
 }

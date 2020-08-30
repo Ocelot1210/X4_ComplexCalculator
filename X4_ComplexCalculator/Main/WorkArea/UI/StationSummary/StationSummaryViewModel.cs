@@ -5,12 +5,14 @@ using System.Windows.Data;
 using Prism.Mvvm;
 using X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
-using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleInfo;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWareInfo;
-using X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.BuildResources;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Products;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary
 {

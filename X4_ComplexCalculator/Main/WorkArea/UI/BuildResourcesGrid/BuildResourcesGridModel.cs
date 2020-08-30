@@ -10,7 +10,8 @@ using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
-using X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.BuildResources;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
 {

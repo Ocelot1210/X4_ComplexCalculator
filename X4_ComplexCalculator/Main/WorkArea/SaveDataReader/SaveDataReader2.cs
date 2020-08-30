@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Linq;
-using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
-using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
-using X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings;
 
 namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
 {

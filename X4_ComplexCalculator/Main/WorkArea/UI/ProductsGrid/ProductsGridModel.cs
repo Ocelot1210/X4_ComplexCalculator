@@ -5,17 +5,16 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using Prism.Mvvm;
 using X4_ComplexCalculator.Common;
-using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
-using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
-using X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Products;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 {
@@ -127,7 +126,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             switch (e.PropertyName)
             {
                 // 日光
-                case nameof(StationSettingsModel.Sunlight):
+                case nameof(IStationSettings.Sunlight):
                     foreach (var prod in Products)
                     {
                         prod.SetEfficiency("sunlight", _Settings.Sunlight);

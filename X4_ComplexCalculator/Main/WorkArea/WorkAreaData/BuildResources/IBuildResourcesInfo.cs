@@ -1,7 +1,7 @@
 ﻿using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
 
-namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData
+namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData.BuildResources
 {
     /// <summary>
     /// 建造リソース情報用インターフェイス

@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
-using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
 
-namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData
+namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings
 {
     /// <summary>
     /// ステーション設定情報用インターフェイス

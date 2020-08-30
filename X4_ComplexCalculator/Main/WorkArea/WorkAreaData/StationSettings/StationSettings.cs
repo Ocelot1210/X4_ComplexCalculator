@@ -1,13 +1,12 @@
 ﻿using System;
 using Prism.Mvvm;
-using X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
 
-namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSettings
+namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings
 {
     /// <summary>
-    /// ステーション設定用Model
+    /// ステーション設定用クラス
     /// </summary>
-    public class StationSettingsModel : BindableBase, IStationSettings
+    public class StationSettings : BindableBase, IStationSettings
     {
         #region メンバ
         /// <summary>
@@ -62,14 +61,5 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSettings
             }
         }
         #endregion
-
-
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        public StationSettingsModel()
-        {
-
-        }
     }
 }

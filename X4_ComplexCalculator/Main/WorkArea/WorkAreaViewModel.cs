@@ -20,11 +20,10 @@ using X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.Menu.View;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
-using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary;
 using X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign;
 using X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid;
-
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings;
 
 namespace X4_ComplexCalculator.Main.WorkArea
 {
@@ -99,13 +98,13 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <summary>
         /// 概要
         /// </summary>
-        public StationSummaryViewModel Summary { get; }
+        public StationSummaryViewModel Summary { get; } 
 
 
         /// <summary>
         /// 設定
         /// </summary>
-        public StationSettingsModel Settings { get; }
+        public IStationSettings Settings { get; } = new StationSettings();
 
 
         /// <summary>
@@ -157,11 +156,9 @@ namespace X4_ComplexCalculator.Main.WorkArea
         {
             _LayoutID = layoutID;
 
-            Settings = new StationSettingsModel();
-
-            Summary       = new StationSummaryViewModel(_Model.StationData, _Model.StationData, _Model.StationData, _Model.StationData.Settings);
+            Summary       = new StationSummaryViewModel(_Model.StationData, _Model.StationData, _Model.StationData, Settings);
             Modules       = new ModulesGridViewModel(new ModulesGridModel(_Model.StationData));
-            Products      = new ProductsGridViewModel(new ProductsGridModel(_Model.StationData, _Model.StationData, _Model.StationData.Settings));
+            Products      = new ProductsGridViewModel(new ProductsGridModel(_Model.StationData, _Model.StationData, Settings));
             Resources     = new BuildResourcesGridViewModel(new BuildResourcesGridModel(_Model.StationData, _Model.StationData));
             Storages      = new StoragesGridViewModel(new StoragesGridModel(_Model.StationData, _Model.StationData));
             StorageAssign = new StorageAssignViewModel(new StorageAssignModel(_Model.StationData, _Model.StationData, _Model.StationData));
