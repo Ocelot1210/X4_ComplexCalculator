@@ -141,8 +141,9 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
 
             // モジュール追加
             {
-                const string query = "SELECT ModuleID FROM Module WHERE Macro IN :modParam";
-                foreach (var moduleID in DBConnection.X4DB.ExecQuery<string>(query, new { modParam }))
+                const string query = "SELECT ModuleID FROM Module WHERE Macro = :macro";
+                var moduleIds = modParam.SelectMany(macro => DBConnection.X4DB.ExecQuery<string>(query, new { macro }));
+                foreach (var moduleID in moduleIds)
                 {
                     var module = Module.Get(moduleID);
                     if (module != null)
