@@ -122,7 +122,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
         {
             var planEntries = planItem.Plan.XPathSelectElements("entry").ToArray();
 
-            var modParam = planEntries.Select(entry => new { macro = entry.Attribute("macro").Value });
+            var modParam = planEntries.Select(entry => entry.Attribute("macro").Value);
 
             var eqParam = planEntries.SelectMany(entry =>
             {
@@ -141,15 +141,15 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
 
             // モジュール追加
             {
-                const string query = "SELECT ModuleID FROM Module WHERE Macro = :macro";
-                DBConnection.X4DB.ExecQuery(query, modParam, (dr, _) =>
+                const string query = "SELECT ModuleID FROM Module WHERE Macro IN :modParam";
+                foreach (var moduleID in DBConnection.X4DB.ExecQuery<string>(query, new { modParam }))
                 {
-                    var module = Module.Get((string)dr["ModuleID"]);
+                    var module = Module.Get(moduleID);
                     if (module != null)
                     {
                         modules.Add(new ModulesGridItem(module));
                     }
-                });
+                }
             }
 
             // 装備追加
@@ -165,32 +165,33 @@ FROM
 WHERE
     MacroName = :macro";
 
-                DBConnection.X4DB.ExecQuery(query, eqParam, (dr, _) =>
+                var results = eqParam.SelectMany(param => DBConnection.X4DB.ExecQuery<(string, int, long, string)>(query, param));
+                foreach (var (equipmentID, index, count, equipmentTypeID) in results)
                 {
                     ModuleEquipmentManager? mng = null;
 
-                    switch ((string)dr["EquipmentTypeID"])
+                    switch (equipmentTypeID)
                     {
                         case "shields":
-                            mng = modules[(int)(long)dr["Index"] - 1].ModuleEquipment.Shield;
+                            mng = modules[index - 1].ModuleEquipment.Shield;
                             break;
 
                         case "turrets":
-                            mng = modules[(int)(long)dr["Index"] - 1].ModuleEquipment.Turret;
+                            mng = modules[index - 1].ModuleEquipment.Turret;
                             break;
 
                         default:
-                            return;
+                            continue;
                     }
 
-                    var equipment = Equipment.Get((string)dr["EquipmentID"]);
-                    if (equipment == null) return;
-                    var max = (long)dr["Count"];
+                    var equipment = Equipment.Get(equipmentID);
+                    if (equipment == null) continue;
+                    var max = count;
                     for (var cnt = 0L; cnt < max; cnt++)
                     {
                         mng?.AddEquipment(equipment);
                     }
-                });
+                }
             }
 
 

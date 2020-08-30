@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
@@ -140,6 +141,17 @@ namespace X4_ComplexCalculator.DB
         /// <returns>クエリの影響を受けた行数</returns>
         public int ExecQuery(string query, object? param = null)
             => conn.Execute(query, param, _Transaction);
+
+
+        /// <summary>
+        /// クエリを実行するし、結果をマッピングする
+        /// </summary>
+        /// <typeparam name="T">マッピング対象の型</typeparam>
+        /// <param name="query">実行するクエリ</param>
+        /// <param name="param">クエリにバインドするパラメータ</param>
+        /// <returns>クエリ結果をマッピングしたオブジェクトの列挙</returns>
+        public IEnumerable<T> ExecQuery<T>(string query, object? param = null)
+            => conn.Query<T>(query, param, _Transaction);
 
 
         /// <summary>
