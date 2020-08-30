@@ -82,7 +82,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             {
                 var wareID = (string)dr["WareID"];
 
-                var itm = _WorkArea.StorageAssign.Where(x => x.WareID == wareID).FirstOrDefault();
+                var itm = _WorkArea.StationData.StorageAssignInfo.Where(x => x.WareID == wareID).FirstOrDefault();
                 if (itm != null)
                 {
                     itm.AllocCount = (long)dr["AllocCount"];

@@ -3,15 +3,14 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Data;
 using Prism.Mvvm;
-using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
-using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleInfo;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWareInfo;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary
 {
@@ -90,18 +89,18 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary
         /// <summary>
         /// 建造コスト詳細
         /// </summary>
-        public ObservableCollection<BuildResourcesGridItem> BuildingCostDetails => _BuildingCostModel.Resources;
+        public ObservableCollection<BuildResourcesGridItem> BuildingCostDetails => _BuildingCostModel.BuildResources;
         #endregion
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="modules">モジュール一覧</param>
-        /// <param name="products">製品一覧</param>
-        /// <param name="resources">建造に必要なリソース一覧</param>
+        /// <param name="modules">モジュール一覧情報</param>
+        /// <param name="products">製品一覧情報<</param>
+        /// <param name="resources">建造に必要なリソース一覧情報<</param>
         /// <param name="settings">ステーションの設定</param>
-        public StationSummaryViewModel(ObservablePropertyChangedCollection<ModulesGridItem> modules, ObservablePropertyChangedCollection<ProductsGridItem> products, ObservablePropertyChangedCollection<BuildResourcesGridItem> resources, StationSettingsModel settings)
+        public StationSummaryViewModel(IModulesInfo modules, IProductsInfo products, IBuildResourcesInfo resources, IStationSettings settings)
         {
             Workforce = settings.Workforce;
 

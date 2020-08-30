@@ -9,7 +9,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
     /// <summary>
     /// 保管庫一覧表示用DataGridViewの1レコード分
     /// </summary>
-    class StoragesGridItem : BindableBase
+    public class StoragesGridItem : BindableBase
     {
         #region メンバ
         /// <summary>

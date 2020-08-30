@@ -108,9 +108,9 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
                                             .Select(x => (Module: x.Module!, x.Count))
                                             .Select(x => new ModulesGridItem(x.Module, null, x.Count) { EditStatus = EditStatus.Unedited });
 
-                WorkArea.Modules.AddRange(modules);
+                WorkArea.StationData.Modules.AddRange(modules);
                 // 編集状態を全て未編集にする
-                IEnumerable<IEditable>[] editables = { WorkArea.Products, WorkArea.Resources, WorkArea.StorageAssign };
+                IEnumerable<IEditable>[] editables = { WorkArea.StationData.Products, WorkArea.StationData.BuildResources, WorkArea.StationData.StorageAssignInfo };
                 foreach (var editable in editables.SelectMany(x => x))
                 {
                     editable.EditStatus = EditStatus.Unedited;

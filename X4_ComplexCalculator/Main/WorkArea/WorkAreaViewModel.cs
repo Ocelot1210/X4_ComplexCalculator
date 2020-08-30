@@ -25,6 +25,7 @@ using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary;
 using X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign;
 using X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid;
 
+
 namespace X4_ComplexCalculator.Main.WorkArea
 {
     /// <summary>
@@ -36,7 +37,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <summary>
         /// モデル
         /// </summary>
-        private readonly WorkAreaModel _Model;
+        private readonly WorkAreaModel _Model = new WorkAreaModel();
 
 
         /// <summary>
@@ -158,21 +159,14 @@ namespace X4_ComplexCalculator.Main.WorkArea
 
             Settings = new StationSettingsModel();
 
-            var moduleModel     = new ModulesGridModel();
-            var productsModel   = new ProductsGridModel(moduleModel.Modules, Settings);
-            var resourcesModel  = new BuildResourcesGridModel(moduleModel.Modules);
-            var storagesModel   = new StoragesGridModel(moduleModel.Modules);
-
-            Summary       = new StationSummaryViewModel(moduleModel.Modules, productsModel.Products, resourcesModel.Resources, Settings);
-            Modules       = new ModulesGridViewModel(moduleModel);
-            Products      = new ProductsGridViewModel(productsModel);
-            Resources     = new BuildResourcesGridViewModel(resourcesModel);
-            Storages      = new StoragesGridViewModel(storagesModel);
-            var storageAssignModel = new StorageAssignModel(productsModel.Products, storagesModel.Storages);
-            StorageAssign = new StorageAssignViewModel(storageAssignModel);
+            Summary       = new StationSummaryViewModel(_Model.StationData, _Model.StationData, _Model.StationData, _Model.StationData.Settings);
+            Modules       = new ModulesGridViewModel(new ModulesGridModel(_Model.StationData));
+            Products      = new ProductsGridViewModel(new ProductsGridModel(_Model.StationData, _Model.StationData, _Model.StationData.Settings));
+            Resources     = new BuildResourcesGridViewModel(new BuildResourcesGridModel(_Model.StationData, _Model.StationData));
+            Storages      = new StoragesGridViewModel(new StoragesGridModel(_Model.StationData, _Model.StationData));
+            StorageAssign = new StorageAssignViewModel(new StorageAssignModel(_Model.StationData, _Model.StationData, _Model.StationData));
 
             Modules.AutoAddModuleCommand = Products.AutoAddModuleCommand;
-            _Model              = new WorkAreaModel(moduleModel, productsModel, resourcesModel, storageAssignModel, Settings);
             OnLoadedCommand     = new DelegateCommand<DockingManager>(OnLoaded);
 
             _Model.PropertyChanged += Model_PropertyChanged;

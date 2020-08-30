@@ -48,7 +48,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Export
 
             // モジュール情報を追加
             sb.Append("l=@");
-            foreach (var module in WorkArea.Modules.Where(x => x.Module.ModuleType.ModuleTypeID != "connectionmodule" &&
+            foreach (var module in WorkArea.StationData.Modules.Where(x => x.Module.ModuleType.ModuleTypeID != "connectionmodule" &&
                                                                x.Module.ModuleType.ModuleTypeID != "ventureplatform" &&
                                                                x.Module.ModuleID != "module_gen_dock_m_venturer_01"))
             {

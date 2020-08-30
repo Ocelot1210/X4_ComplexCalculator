@@ -165,12 +165,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         {
             try
             {
-                var xml = XDocument.Parse(Clipboard.GetText());
-
-                // xmlの内容に問題がないか確認するため、ここでToArray()する
-                var modules = xml.Root.Elements().Select(x => new ModulesGridItem(x) { EditStatus = EditStatus.Edited }).ToArray();
-
-                _Model.Modules.AddRange(modules);
+                _Model.PasteModules();
                 dataGrid.Focus();
             }
             catch

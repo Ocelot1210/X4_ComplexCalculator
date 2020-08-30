@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
-using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
 {
@@ -24,15 +25,21 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
 
 
         /// <summary>
-        /// 製品一覧
+        /// 製品一覧情報
         /// </summary>
-        private readonly ObservablePropertyChangedCollection<ProductsGridItem> _Products;
+        private readonly IProductsInfo _Products;
 
 
         /// <summary>
-        /// 保管庫一覧
+        /// 保管庫一覧情報
         /// </summary>
-        private readonly ObservablePropertyChangedCollection<StoragesGridItem> _Storages;
+        private readonly IStoragesInfo _Storages;
+
+
+        /// <summary>
+        /// 保管庫割当情報
+        /// </summary>
+        private readonly IStorageAssignInfo _StorageAssignInfo;
 
 
         /// <summary>
@@ -52,7 +59,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         /// <summary>
         /// 保管庫状態計算用の指定時間
         /// </summary>
-        public ObservablePropertyChangedCollection<StorageAssignGridItem> StorageAssignGridItems { get; } = new ObservablePropertyChangedCollection<StorageAssignGridItem>();
+        public ObservableCollection<StorageAssignGridItem> StorageAssignGridItems => _StorageAssignInfo.StorageAssignInfo;
 
 
         /// <summary>
@@ -66,7 +73,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
                 if (_Hour != value)
                 {
                     _Hour = value;
-                    foreach (var item in StorageAssignGridItems)
+                    foreach (var item in _StorageAssignInfo.StorageAssignInfo)
                     {
                         item.Hour = Hour;
                     }
@@ -81,22 +88,26 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         /// </summary>
         /// <param name="products">製品一覧</param>
         /// <param name="storages">保管庫情報</param>
-        public StorageAssignModel(ObservablePropertyChangedCollection<ProductsGridItem> products, ObservablePropertyChangedCollection<StoragesGridItem> storages)
+        /// <param name="storageAssignInfo">保管庫割当情報</param>
+        public StorageAssignModel(IProductsInfo products, IStoragesInfo storages, IStorageAssignInfo storageAssignInfo)
         {
             _Products = products;
-            _Products.CollectionChanged += Products_CollectionChanged;
-            _Products.CollectionPropertyChanged += Products_CollectionPropertyChanged;
+            _Products.Products.CollectionChanged += Products_CollectionChanged;
+            _Products.Products.CollectionPropertyChanged += Products_CollectionPropertyChanged;
 
             _Storages = storages;
-            _Storages.CollectionChanged += Storages_CollectionChanged;
-            _Storages.CollectionPropertyChanged += Storages_CollectionPropertyChanged;
+            _Storages.Storages.CollectionChanged += Storages_CollectionChanged;
+            _Storages.Storages.CollectionPropertyChanged += Storages_CollectionPropertyChanged;
+
+            _StorageAssignInfo = storageAssignInfo;
+
 
             DBConnection.X4DB.ExecQuery("SELECT TransportTypeID FROM TransportType", (dr, args) =>
             {
                 _CapacityDict.Add((string)dr["TransportTypeID"], new StorageCapacityInfo());
             });
 
-            foreach (var storage in _Storages)
+            foreach (var storage in _Storages.Storages)
             {
                 _CapacityDict[storage.TransportType.TransportTypeID].TotalCapacity = storage.Capacity;
             }
@@ -178,7 +189,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
                 return;
             }
 
-            var assign = StorageAssignGridItems.Where(x => x.WareID == product.Ware.WareID).FirstOrDefault();
+            var assign = _StorageAssignInfo.StorageAssignInfo.Where(x => x.WareID == product.Ware.WareID).FirstOrDefault();
             if (assign != null)
             {
                 assign.ProductPerHour = product.Count;
@@ -206,12 +217,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
             if (e.Action == NotifyCollectionChangedAction.Reset)
             {
                 // 前回値保存
-                foreach (var itm in StorageAssignGridItems)
+                foreach (var itm in _StorageAssignInfo.StorageAssignInfo)
                 {
                     _OptionsBakDict.Add(itm.WareID, itm);
                 }
 
-                StorageAssignGridItems.Clear();
+                _StorageAssignInfo.StorageAssignInfo.Clear();
             }
         }
 
@@ -223,9 +234,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         private void OnProductsAdded(IEnumerable<ProductsGridItem> products)
         {
             // 前回値がある場合
-            if (StorageAssignGridItems.Count == 0 && 0 < _OptionsBakDict.Count)
+            if (_StorageAssignInfo.StorageAssignInfo.Count == 0 && 0 < _OptionsBakDict.Count)
             {
-                StorageAssignGridItems.AddRange(products.Select(prod =>
+                _StorageAssignInfo.StorageAssignInfo.AddRange(products.Select(prod =>
                 {
                     var ret = new StorageAssignGridItem(prod.Ware, _CapacityDict[prod.Ware.TransportType.TransportTypeID], prod.Count, Hour) { EditStatus = EditStatus.Edited };
                     if (_OptionsBakDict.TryGetValue(ret.WareID, out var oldAssign))
@@ -241,7 +252,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
             }
             else
             {
-                StorageAssignGridItems.AddRange(products.Select(prod =>
+                _StorageAssignInfo.StorageAssignInfo.AddRange(products.Select(prod =>
                 {
                     return new StorageAssignGridItem(prod.Ware, _CapacityDict[prod.Ware.TransportType.TransportTypeID], prod.Count, Hour) { EditStatus = EditStatus.Edited };
                 }));
@@ -270,7 +281,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
                     releasedCapacity.Add(prod.Ware.TransportType.TransportTypeID, 0);
                 }
 
-                var assign = StorageAssignGridItems.Where(x => x.WareID == prod.Ware.WareID).First();
+                var assign = _StorageAssignInfo.StorageAssignInfo.Where(x => x.WareID == prod.Ware.WareID).First();
 
                 releasedCapacity[assign.TransportTypeID] += assign.AllocCapacity;
                 removeWares.Add(assign.WareID);
@@ -278,7 +289,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
             }
 
             // 削除対象を削除する
-            StorageAssignGridItems.RemoveAll(x => removeWares.Contains(x.WareID));
+            _StorageAssignInfo.StorageAssignInfo.RemoveAll(x => removeWares.Contains(x.WareID));
 
             // 容量開放
             foreach (var kvp in releasedCapacity)
@@ -293,11 +304,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         /// </summary>
         public void Dispose()
         {
-            _Products.CollectionChanged -= Products_CollectionChanged;
-            _Products.CollectionPropertyChanged -= Products_CollectionPropertyChanged;
+            _Products.Products.CollectionChanged -= Products_CollectionChanged;
+            _Products.Products.CollectionPropertyChanged -= Products_CollectionPropertyChanged;
 
-            _Storages.CollectionChanged -= Storages_CollectionChanged;
-            _Storages.CollectionPropertyChanged -= Storages_CollectionPropertyChanged;
+            _Storages.Storages.CollectionChanged -= Storages_CollectionChanged;
+            _Storages.Storages.CollectionPropertyChanged -= Storages_CollectionPropertyChanged;
         }
     }
 }

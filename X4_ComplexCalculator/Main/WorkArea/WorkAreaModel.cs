@@ -10,6 +10,7 @@ using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
 using X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
 
 namespace X4_ComplexCalculator.Main.WorkArea
 {
@@ -26,30 +27,6 @@ namespace X4_ComplexCalculator.Main.WorkArea
 
 
         /// <summary>
-        /// モジュール一覧
-        /// </summary>
-        private readonly ModulesGridModel _Modules;
-
-
-        /// <summary>
-        /// 製品一覧
-        /// </summary>
-        private readonly ProductsGridModel _Products;
-
-
-        /// <summary>
-        /// 建造リソース一覧
-        /// </summary>
-        private readonly BuildResourcesGridModel _Resources;
-
-
-        /// <summary>
-        /// 保管庫割当
-        /// </summary>
-        private readonly StorageAssignModel _StorageAssign;
-
-
-        /// <summary>
         /// 変更されたか
         /// </summary>
         private bool _HasChanged;
@@ -58,7 +35,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <summary>
         /// 保存ファイル書き込み用
         /// </summary>
-        private readonly ISaveDataWriter _SaveDataWriter;
+        private readonly ISaveDataWriter _SaveDataWriter = new SQLiteSaveDataWriter();
         #endregion
 
 
@@ -74,33 +51,9 @@ namespace X4_ComplexCalculator.Main.WorkArea
 
 
         /// <summary>
-        /// モジュール一覧
+        /// 計算機で使用するステーション用データ
         /// </summary>
-        public ObservableRangeCollection<ModulesGridItem> Modules => _Modules.Modules;
-
-
-        /// <summary>
-        /// 製品一覧
-        /// </summary>
-        public ObservableRangeCollection<ProductsGridItem> Products => _Products.Products;
-
-
-        /// <summary>
-        /// 建造リソース一覧
-        /// </summary>
-        public ObservableRangeCollection<BuildResourcesGridItem> Resources => _Resources.Resources;
-
-
-        /// <summary>
-        /// 保管庫割当情報
-        /// </summary>
-        public ObservableRangeCollection<StorageAssignGridItem> StorageAssign => _StorageAssign.StorageAssignGridItems;
-
-
-        /// <summary>
-        /// ステーションの設定
-        /// </summary>
-        public StationSettingsModel Settings { get; }
+        public StationData StationData { get; } = new StationData();
 
 
         /// <summary>
@@ -116,24 +69,24 @@ namespace X4_ComplexCalculator.Main.WorkArea
                     if (value)
                     {
                         // 変更検知イベントを購読解除
-                        _Modules.Modules.CollectionChanged -= OnModulesChanged;
-                        _Modules.Modules.CollectionPropertyChanged -= OnPropertyChanged;
-                        _Products.Products.CollectionPropertyChanged -= OnPropertyChanged;
-                        _Resources.Resources.CollectionPropertyChanged -= OnPropertyChanged;
-                        _StorageAssign.StorageAssignGridItems.CollectionPropertyChanged -= OnPropertyChanged;
-                        Settings.PropertyChanged -= OnPropertyChanged;
-                        Settings.Workforce.PropertyChanged -= OnPropertyChanged;
+                        StationData.Modules.CollectionChanged -= OnModulesChanged;
+                        StationData.Modules.CollectionPropertyChanged -= OnPropertyChanged;
+                        StationData.Products.CollectionPropertyChanged -= OnPropertyChanged;
+                        StationData.BuildResources.CollectionPropertyChanged -= OnPropertyChanged;
+                        StationData.StorageAssignInfo.CollectionPropertyChanged -= OnPropertyChanged;
+                        StationData.Settings.PropertyChanged -= OnPropertyChanged;
+                        StationData.Settings.Workforce.PropertyChanged -= OnPropertyChanged;
                     }
                     else
                     {
                         // 変更検知イベントを購読
-                        _Modules.Modules.CollectionChanged += OnModulesChanged;
-                        _Modules.Modules.CollectionPropertyChanged += OnPropertyChanged;
-                        _Products.Products.CollectionPropertyChanged += OnPropertyChanged;
-                        _Resources.Resources.CollectionPropertyChanged += OnPropertyChanged;
-                        _StorageAssign.StorageAssignGridItems.CollectionPropertyChanged += OnPropertyChanged;
-                        Settings.PropertyChanged += OnPropertyChanged;
-                        Settings.Workforce.PropertyChanged += OnPropertyChanged;
+                        StationData.Modules.CollectionChanged += OnModulesChanged;
+                        StationData.Modules.CollectionPropertyChanged += OnPropertyChanged;
+                        StationData.Products.CollectionPropertyChanged += OnPropertyChanged;
+                        StationData.BuildResources.CollectionPropertyChanged += OnPropertyChanged;
+                        StationData.StorageAssignInfo.CollectionPropertyChanged += OnPropertyChanged;
+                        StationData.Settings.PropertyChanged += OnPropertyChanged;
+                        StationData.Settings.Workforce.PropertyChanged += OnPropertyChanged;
                     }
                 }
             }
@@ -150,20 +103,9 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="modules">モジュール一覧</param>
-        /// <param name="products">製品一覧</param>
-        /// <param name="resources">建造リソース一覧</param>
-        /// <param name="storageAssignModel">保管庫割当</param>
-        public WorkAreaModel(ModulesGridModel modules, ProductsGridModel products, BuildResourcesGridModel resources, StorageAssignModel storageAssignModel, StationSettingsModel settings)
+        public WorkAreaModel()
         {
-            _Modules = modules;
-            _Products = products;
-            _Resources = resources;
-            _StorageAssign = storageAssignModel;
-            Settings = settings;
-
             HasChanged = true;
-            _SaveDataWriter = new SQLiteSaveDataWriter();
         }
 
 
@@ -173,13 +115,13 @@ namespace X4_ComplexCalculator.Main.WorkArea
         public void Dispose()
         {
             // 変更検知イベントを購読解除
-            _Modules.Modules.CollectionChanged -= OnModulesChanged;
-            _Modules.Modules.CollectionPropertyChanged -= OnPropertyChanged;
-            _Products.Products.CollectionPropertyChanged -= OnPropertyChanged;
-            _Resources.Resources.CollectionPropertyChanged -= OnPropertyChanged;
-            _StorageAssign.StorageAssignGridItems.CollectionPropertyChanged -= OnPropertyChanged;
-            Settings.PropertyChanged -= OnPropertyChanged;
-            Settings.Workforce.PropertyChanged -= OnPropertyChanged;
+            StationData.Modules.CollectionChanged -= OnModulesChanged;
+            StationData.Modules.CollectionPropertyChanged -= OnPropertyChanged;
+            StationData.Products.CollectionPropertyChanged -= OnPropertyChanged;
+            StationData.BuildResources.CollectionPropertyChanged -= OnPropertyChanged;
+            StationData.StorageAssignInfo.CollectionPropertyChanged -= OnPropertyChanged;
+            StationData.Settings.PropertyChanged -= OnPropertyChanged;
+            StationData.Settings.Workforce.PropertyChanged -= OnPropertyChanged;
         }
 
 

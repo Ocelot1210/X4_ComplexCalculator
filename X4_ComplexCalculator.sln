@@ -11,9 +11,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibX4", "LibX4\LibX4.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "X4_DataExporterWPF", "X4_DataExporterWPF\X4_DataExporterWPF.csproj", "{B4315308-79F8-4F96-B6D2-F66FF8B001C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibX4.Tests", "LibX4.Tests\LibX4.Tests.csproj", "{1EEA0D64-A038-4C8C-8E54-2CDEF906A28C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibX4.Tests", "LibX4.Tests\LibX4.Tests.csproj", "{1EEA0D64-A038-4C8C-8E54-2CDEF906A28C}"
 EndProject
-Project("{CCEDDFE8-50C7-4061-ADD0-146D7F7B84CF}") = "X4_DataExporterWPF.Tests", "X4_DataExporterWPF.Tests\X4_DataExporterWPF.Tests.csproj", "{CCEDDFE8-50C7-4061-ADD0-146D7F7B84CF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "X4_DataExporterWPF.Tests", "X4_DataExporterWPF.Tests\X4_DataExporterWPF.Tests.csproj", "{CCEDDFE8-50C7-4061-ADD0-146D7F7B84CF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8E5D62F0-53B8-4AB3-8F8B-07A338482BDC}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

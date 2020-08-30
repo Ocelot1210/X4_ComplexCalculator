@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
+using System.Xml.Linq;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
 {
@@ -17,26 +20,38 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// </summary>
         private SelectModuleWindow? _SelectModuleWindow;
 
+
         /// <summary>
         /// モジュール選択ウィンドウがクローズ済みか
         /// </summary>
         private bool _SelectModuleWindowClosed = true;
+
+
+        /// <summary>
+        /// モジュール一覧情報
+        /// </summary>
+        private readonly IModulesInfo _ModulesInfo;
         #endregion
+
 
         #region プロパティ
         /// <summary>
         /// モジュール一覧
         /// </summary>
-        public ObservablePropertyChangedCollection<ModulesGridItem> Modules { get; private set; } = new ObservablePropertyChangedCollection<ModulesGridItem>();
+        public ObservableCollection<ModulesGridItem> Modules => _ModulesInfo.Modules;
         #endregion
+
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public ModulesGridModel()
+        public ModulesGridModel(IModulesInfo modulesInfo)
         {
+            _ModulesInfo = modulesInfo;
             WPFLocalizeExtension.Engine.LocalizeDictionary.Instance.PropertyChanged += LocalizeInstance_PropertyChanged;
         }
+
+
 
         /// <summary>
         /// 言語変更時
@@ -50,7 +65,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
                 // 言語変更時、ツールチップ文字列更新
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    foreach (var module in Modules)
+                    foreach (var module in _ModulesInfo.Modules)
                     {
                         module.UpdateTooltip();
                     }
@@ -58,12 +73,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             }
         }
 
+
         /// <summary>
         /// リソースを開放
         /// </summary>
         public void Dispose()
         {
-            Modules.Clear();
+            _ModulesInfo.Modules.Clear();
 
             // モジュール選択ウィンドウが開いていたら閉じる
             if (!_SelectModuleWindowClosed)
@@ -81,8 +97,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <param name="items">削除対象</param>
         public void DeleteModules(IEnumerable<ModulesGridItem> items)
         {
-            Modules.RemoveRange(items);
+            _ModulesInfo.Modules.RemoveRange(items);
         }
+
 
         /// <summary>
         /// モジュール追加画面を表示
@@ -96,7 +113,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
                     _SelectModuleWindowClosed = true;
                 }
 
-                _SelectModuleWindow = new SelectModuleWindow(Modules);
+                _SelectModuleWindow = new SelectModuleWindow(_ModulesInfo.Modules);
                 _SelectModuleWindow.Closed += OnWindowClosed;
                 _SelectModuleWindow.Show();
             }
@@ -139,7 +156,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
                 newItem.ModuleCount = oldItem.ModuleCount;
 
                 // 要素を入れ替える
-                Modules.Replace(oldItem, newItem);
+                _ModulesInfo.Modules.Replace(oldItem, newItem);
 
                 ret = true;
             }
@@ -149,12 +166,27 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
 
 
         /// <summary>
+        /// クリップボード内にあるモジュール一覧xmlを貼り付ける
+        /// </summary>
+        public void PasteModules()
+        {
+            var clipboardXml = XDocument.Parse(Clipboard.GetText());
+
+            // xmlの内容に問題がないか確認するため、ここでToArray()する
+            var modules = clipboardXml.Root.Elements().Select(x => new ModulesGridItem(x) { EditStatus = EditStatus.Edited }).ToArray();
+
+            _ModulesInfo.Modules.AddRange(modules);
+        }
+
+
+
+        /// <summary>
         /// 同一モジュールをマージ
         /// </summary>
         public void MergeModule()
         {
             // モジュール数が1以下なら何もしない
-            if (Modules.Count <= 1)
+            if (_ModulesInfo.Modules.Count <= 1)
             {
                 return;
             }
@@ -190,7 +222,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             // モジュール数に変更があった場合のみ処理
             if (prevCnt != dict.Count)
             {
-                Modules.Reset(dict.OrderBy(x => x.Value.idx).Select(x => x.Value.Module));
+                _ModulesInfo.Modules.Reset(dict.OrderBy(x => x.Value.idx).Select(x => x.Value.Module));
                 LocalizedMessageBox.Show("Lang:MergeModulesMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, mergedModules, prevCnt - dict.Count);
             }
             else

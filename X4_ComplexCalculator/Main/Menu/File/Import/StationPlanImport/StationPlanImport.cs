@@ -221,10 +221,16 @@ WHERE
             }
 
             // モジュール一覧に追加
-            WorkArea.Modules.AddRange(dict.Select(x => x.Value).OrderBy(x => x.Module.Name));
+            WorkArea.StationData.Modules.AddRange(dict.Select(x => x.Value).OrderBy(x => x.Module.Name));
 
             // 編集状態を全て未編集にする
-            IEnumerable<IEditable>[] editables = { WorkArea.Modules, WorkArea.Products, WorkArea.Resources, WorkArea.StorageAssign };
+            IEnumerable<IEditable>[] editables = 
+            { 
+                WorkArea.StationData.Modules,
+                WorkArea.StationData.Products,
+                WorkArea.StationData.BuildResources,
+                WorkArea.StationData.StorageAssignInfo 
+            };
             foreach (var editable in editables.SelectMany(x => x))
             {
                 editable.EditStatus = EditStatus.Unedited;

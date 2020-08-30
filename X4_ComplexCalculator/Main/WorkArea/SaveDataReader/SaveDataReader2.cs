@@ -2,6 +2,8 @@
 using System.Linq;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
 
 namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
 {
@@ -50,7 +52,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
                     progress.Report(96);
 
                     // ステーション設定復元
-                    RestoreSettings(conn);
+                    RestoreSettings(conn, _WorkArea.StationData.Settings);
                     progress.Report(98);
 
                     // 各要素を未編集状態にする
@@ -79,14 +81,14 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
         /// ステーションの設定を復元
         /// </summary>
         /// <param name="conn"></param>
-        protected virtual void RestoreSettings(DBConnection conn)
+        protected virtual void RestoreSettings(DBConnection conn, IStationSettings settings)
         {
             // 本部か
             conn.ExecQuery("SELECT Value FROM StationSettings WHERE Key = 'IsHeadquarters'", (dr, _) =>
             {
                 var value = (string)dr["Value"];
 
-                _WorkArea.Settings.IsHeadquarters = value == bool.TrueString;
+                settings.IsHeadquarters = value == bool.TrueString;
             });
 
             // 日光
@@ -96,7 +98,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
 
                 if (int.TryParse(value, out var sunLight))
                 {
-                    _WorkArea.Settings.Sunlight = sunLight;
+                    settings.Sunlight = sunLight;
                 }
             });
 
@@ -107,7 +109,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
 
                 if (long.TryParse(value, out var actualWorkforce))
                 {
-                    _WorkArea.Settings.Workforce.Actual = actualWorkforce;
+                    settings.Workforce.Actual = actualWorkforce;
                 }
             });
 
@@ -116,7 +118,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             {
                 var value = (string)dr["Value"];
 
-                _WorkArea.Settings.Workforce.AlwaysMaximum = value == bool.TrueString;
+                settings.Workforce.AlwaysMaximum = value == bool.TrueString;
             });
         }
 
@@ -131,7 +133,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             conn.ExecQuery($"SELECT WareID, Price, NoBuy, NoSell FROM Products", (dr, _) =>
             {
                 var wareID = (string)dr["WareID"];
-                var itm = _WorkArea.Products.Where(x => x.Ware.WareID == wareID).FirstOrDefault();
+                var itm = _WorkArea.StationData.Products.Where(x => x.Ware.WareID == wareID).FirstOrDefault();
                 if (itm != null)
                 {
                     itm.UnitPrice = (long)dr["Price"];
@@ -152,7 +154,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             {
                 var wareID = (string)dr["WareID"];
 
-                var itm = _WorkArea.Resources.Where(x => x.Ware.WareID == wareID).FirstOrDefault();
+                var itm = _WorkArea.StationData.BuildResources.Where(x => x.Ware.WareID == wareID).FirstOrDefault();
                 if (itm != null)
                 {
                     itm.UnitPrice = (long)dr["Price"];

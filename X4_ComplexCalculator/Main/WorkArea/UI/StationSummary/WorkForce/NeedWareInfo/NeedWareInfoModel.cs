@@ -11,6 +11,7 @@ using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWareInfo
 {
@@ -23,13 +24,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
         /// <summary>
         /// モジュール情報一覧
         /// </summary>
-        private readonly ObservablePropertyChangedCollection<ModulesGridItem> _Modules;
+        private readonly IModulesInfo _Modules;
 
 
         /// <summary>
         /// 製品情報一覧
         /// </summary>
-        private readonly ObservablePropertyChangedCollection<ProductsGridItem> _Products;
+        private readonly IProductsInfo _Products;
 
 
         /// <summary>
@@ -62,17 +63,17 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="modules">モジュール一覧</param>
-        /// <param name="products">製品一覧</param>
-        public NeedWareInfoModel(ObservablePropertyChangedCollection<ModulesGridItem> modules, ObservablePropertyChangedCollection<ProductsGridItem> products)
+        /// <param name="modules">モジュール一覧情報</param>
+        /// <param name="products">製品一覧情報</param>
+        public NeedWareInfoModel(IModulesInfo modules, IProductsInfo products)
         {
             _Modules = modules;
-            _Modules.CollectionChanged += Modules_CollectionChanged;
-            _Modules.CollectionPropertyChanged += Modules_CollectionPropertyChanged;
+            _Modules.Modules.CollectionChanged += Modules_CollectionChanged;
+            _Modules.Modules.CollectionPropertyChanged += Modules_CollectionPropertyChanged;
 
             _Products = products;
-            _Products.CollectionChanged += Products_CollectionChanged;
-            _Products.CollectionPropertyChanged += Products_CollectionPropertyChanged;
+            _Products.Products.CollectionChanged += Products_CollectionChanged;
+            _Products.Products.CollectionPropertyChanged += Products_CollectionPropertyChanged;
 
             var query = @"
 SELECT
@@ -97,10 +98,10 @@ WHERE
         /// </summary>
         public void Dispose()
         {
-            _Modules.CollectionChanged -= Modules_CollectionChanged;
-            _Modules.CollectionPropertyChanged -= Modules_CollectionPropertyChanged;
-            _Products.CollectionChanged -= Products_CollectionChanged;
-            _Products.CollectionPropertyChanged -= Products_CollectionPropertyChanged;
+            _Modules.Modules.CollectionChanged -= Modules_CollectionChanged;
+            _Modules.Modules.CollectionPropertyChanged -= Modules_CollectionPropertyChanged;
+            _Products.Products.CollectionChanged -= Products_CollectionChanged;
+            _Products.Products.CollectionPropertyChanged -= Products_CollectionPropertyChanged;
         }
 
 
@@ -269,14 +270,14 @@ WHERE
             if (removeItems.Any())
             {
                 // 居住モジュールの種族(メソッド)一覧
-                var habModuleMethods = _Modules.Where(x => 0 < x.Module.WorkersCapacity)
-                                               .Select(x =>
-                                                {
-                                                    var ret = x.Module.Owners.First().Race.RaceID;
-                                                    return (ret == "argon") ? "default" : ret;
-                                                })
-                                               .Distinct()
-                                               .ToArray();
+                var habModuleMethods = _Modules.Modules.Where(x => 0 < x.Module.WorkersCapacity)
+                                                       .Select(x =>
+                                                        {
+                                                            var ret = x.Module.Owners.First().Race.RaceID;
+                                                            return (ret == "argon") ? "default" : ret;
+                                                        })
+                                                       .Distinct()
+                                                       .ToArray();
 
                 // モジュールがまだあるなら削除対象から除外する
                 removeItems.RemoveAll(x => habModuleMethods.Any(y => x.Method == y));
