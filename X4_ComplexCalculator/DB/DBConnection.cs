@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
@@ -167,25 +167,23 @@ namespace X4_ComplexCalculator.DB
         /// クエリを実行する
         /// </summary>
         /// <param name="query">実行するクエリ</param>
-        /// <param name="parameters">バインド変数格納用オブジェクト</param>
+        /// <param name="param">クエリにバインドするパラメータ</param>
         /// <param name="callback">実行結果に対する処理</param>
         /// <returns>クエリの影響を受けた行数</returns>
-        public int ExecQuery(string query, SQLiteCommandParameters? parameters, Action<IDataReader, object?> callback)
-            => ExecQuery(query, parameters, callback, null);
+        public int ExecQuery(string query, object? param, Action<IDataReader, object?> callback)
+            => ExecQuery(query, param, callback, null);
 
 
         /// <summary>
         /// クエリを実行する
         /// </summary>
         /// <param name="query">実行するクエリ</param>
-        /// <param name="parameters">バインド変数格納用オブジェクト</param>
+        /// <param name="param">クエリにバインドするパラメータ</param>
         /// <param name="callback">実行結果に対する処理</param>
         /// <param name="args">コールバックへ渡す引数</param>
         /// <returns>クエリの影響を受けた行数</returns>
-        public int ExecQuery<T>(string query, SQLiteCommandParameters? parameters, Action<IDataReader, T> callback, T args)
+        public int ExecQuery<T>(string query, object? param, Action<IDataReader, T> callback, T args)
         {
-            var param = parameters?.AsDynamicParameters();
-
             if (callback == null) return conn.Execute(query, param, _Transaction);
 
             using var dr = conn.ExecuteReader(query, param, _Transaction);

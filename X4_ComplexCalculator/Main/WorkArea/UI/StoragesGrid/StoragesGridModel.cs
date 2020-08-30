@@ -219,12 +219,7 @@ FROM
 WHERE
     ModuleID = :moduleID";
 
-            var sqlParam = new SQLiteCommandParameters(2);
-            foreach (var module in targetModules)
-            {
-                sqlParam.Add("moduleID", DbType.String, module.ModuleID);
-                sqlParam.Add("count", DbType.Int32, module.Count);
-            }
+            var sqlParam = targetModules.Select(module => new { module.ModuleID, module.Count });
 
             // 容量をタイプ別に集計
             DBConnection.X4DB.ExecQuery(query, sqlParam, SumStorage, modulesDict);

@@ -120,38 +120,28 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
         /// <returns></returns>
         private bool ImportMain(IWorkArea WorkArea, StationPlanItem planItem)
         {
-            var modParam = new SQLiteCommandParameters(1);
-            var eqParam = new SQLiteCommandParameters(3);
-            var moduleCount = 0;
+            var planEntries = planItem.Plan.XPathSelectElements("entry").ToArray();
 
-            foreach (var module in planItem.Plan.XPathSelectElements("entry"))
+            var modParam = planEntries.Select(entry => new { macro = entry.Attribute("macro").Value });
+
+            var eqParam = planEntries.SelectMany(entry =>
             {
-                var index = int.Parse(module.Attribute("index").Value);
-                modParam.Add("macro", System.Data.DbType.String, module.Attribute("macro").Value);
+                var index = int.Parse(entry.Attribute("index").Value);
+                var equipmets = entry.XPathSelectElements("upgrades/groups/*");
+                return equipmets.Select(equipmet => (index, equipmet));
+            }).Select(args =>
+            {
+                var (index, equipmet) = args;
+                var macro = equipmet.Attribute("macro").Value;
+                var count = int.Parse(equipmet.Attribute("exact")?.Value ?? "1");
+                return new { index, macro, count };
+            });
 
-                foreach (var equipmet in module.XPathSelectElements("upgrades/groups/*"))
-                {
-                    eqParam.Add("index", System.Data.DbType.Int32, index);
-                    eqParam.Add("macro", System.Data.DbType.String, equipmet.Attribute("macro").Value);
-                    eqParam.Add("count", System.Data.DbType.Int32, int.Parse(equipmet.Attribute("exact")?.Value ?? "1"));
-                }
-
-                moduleCount++;
-            }
-
-            var modules = new List<ModulesGridItem>(moduleCount);
+            var modules = new List<ModulesGridItem>(planEntries.Length);
 
             // モジュール追加
             {
-                var query = @"
-SELECT
-    ModuleID
-FROM
-    Module
-WHERE
-    Macro = :macro";
-
-
+                const string query = "SELECT ModuleID FROM Module WHERE Macro = :macro";
                 DBConnection.X4DB.ExecQuery(query, modParam, (dr, _) =>
                 {
                     var module = Module.Get((string)dr["ModuleID"]);
@@ -164,7 +154,7 @@ WHERE
 
             // 装備追加
             {
-                var query = @"
+                const string query = @"
 SELECT
     EquipmentID,
     :index AS 'Index',
