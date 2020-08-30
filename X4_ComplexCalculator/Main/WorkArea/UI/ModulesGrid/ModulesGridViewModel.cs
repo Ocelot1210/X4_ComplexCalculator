@@ -7,7 +7,7 @@ using System.Windows.Input;
 using System.Xml.Linq;
 using Prism.Commands;
 using Prism.Mvvm;
-using X4_ComplexCalculator.Common.EditStatus;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
 {
@@ -102,10 +102,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="model">モデル</param>
-        public ModulesGridViewModel(ModulesGridModel model)
+        /// <param name="stationData">計算機で使用するステーション情報</param>
+        public ModulesGridViewModel(IStationData stationData)
         {
-            _Model = model;
+            _Model = new ModulesGridModel(stationData.ModulesInfo);
             ModulesView = (ListCollectionView)CollectionViewSource.GetDefaultView(_Model.Modules);
             ModulesView.Filter      = Filter;
             AddModuleCommand        = new DelegateCommand(_Model.ShowAddModuleWindow);

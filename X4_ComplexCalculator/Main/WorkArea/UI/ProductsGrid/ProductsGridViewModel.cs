@@ -1,11 +1,11 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
-using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using Prism.Commands;
 using Prism.Mvvm;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 {
@@ -131,10 +131,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="productsGridModel">製品一覧用Model</param>
-        public ProductsGridViewModel(ProductsGridModel productsGridModel)
+        /// <param name="stationData">計算機で使用するステーション情報</param>
+        public ProductsGridViewModel(IStationData stationData)
         {
-            _Model = productsGridModel;
+            _Model = new ProductsGridModel(stationData.ModulesInfo, stationData.ProductsInfo, stationData.Settings);
 
             ProductsView = new CollectionViewSource { Source = _Model.Products }.View;
 

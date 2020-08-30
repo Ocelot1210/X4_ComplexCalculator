@@ -52,7 +52,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <summary>
         /// 計算機で使用するステーション用データ
         /// </summary>
-        public StationData StationData { get; } = new StationData();
+        public IStationData StationData { get; } = new StationData();
 
 
         /// <summary>
@@ -68,22 +68,22 @@ namespace X4_ComplexCalculator.Main.WorkArea
                     if (value)
                     {
                         // 変更検知イベントを購読解除
-                        StationData.Modules.CollectionChanged -= OnModulesChanged;
-                        StationData.Modules.CollectionPropertyChanged -= OnPropertyChanged;
-                        StationData.Products.CollectionPropertyChanged -= OnPropertyChanged;
-                        StationData.BuildResources.CollectionPropertyChanged -= OnPropertyChanged;
-                        StationData.StorageAssignInfo.CollectionPropertyChanged -= OnPropertyChanged;
+                        StationData.ModulesInfo.Modules.CollectionChanged -= OnModulesChanged;
+                        StationData.ModulesInfo.Modules.CollectionPropertyChanged -= OnPropertyChanged;
+                        StationData.ProductsInfo.Products.CollectionPropertyChanged -= OnPropertyChanged;
+                        StationData.BuildResourcesInfo.BuildResources.CollectionPropertyChanged -= OnPropertyChanged;
+                        StationData.StorageAssignInfo.StorageAssign.CollectionPropertyChanged -= OnPropertyChanged;
                         StationData.Settings.PropertyChanged -= OnPropertyChanged;
                         StationData.Settings.Workforce.PropertyChanged -= OnPropertyChanged;
                     }
                     else
                     {
                         // 変更検知イベントを購読
-                        StationData.Modules.CollectionChanged += OnModulesChanged;
-                        StationData.Modules.CollectionPropertyChanged += OnPropertyChanged;
-                        StationData.Products.CollectionPropertyChanged += OnPropertyChanged;
-                        StationData.BuildResources.CollectionPropertyChanged += OnPropertyChanged;
-                        StationData.StorageAssignInfo.CollectionPropertyChanged += OnPropertyChanged;
+                        StationData.ModulesInfo.Modules.CollectionChanged += OnModulesChanged;
+                        StationData.ModulesInfo.Modules.CollectionPropertyChanged += OnPropertyChanged;
+                        StationData.ProductsInfo.Products.CollectionPropertyChanged += OnPropertyChanged;
+                        StationData.BuildResourcesInfo.BuildResources.CollectionPropertyChanged += OnPropertyChanged;
+                        StationData.StorageAssignInfo.StorageAssign.CollectionPropertyChanged += OnPropertyChanged;
                         StationData.Settings.PropertyChanged += OnPropertyChanged;
                         StationData.Settings.Workforce.PropertyChanged += OnPropertyChanged;
                     }
@@ -114,11 +114,11 @@ namespace X4_ComplexCalculator.Main.WorkArea
         public void Dispose()
         {
             // 変更検知イベントを購読解除
-            StationData.Modules.CollectionChanged -= OnModulesChanged;
-            StationData.Modules.CollectionPropertyChanged -= OnPropertyChanged;
-            StationData.Products.CollectionPropertyChanged -= OnPropertyChanged;
-            StationData.BuildResources.CollectionPropertyChanged -= OnPropertyChanged;
-            StationData.StorageAssignInfo.CollectionPropertyChanged -= OnPropertyChanged;
+            StationData.ModulesInfo.Modules.CollectionChanged -= OnModulesChanged;
+            StationData.ModulesInfo.Modules.CollectionPropertyChanged -= OnPropertyChanged;
+            StationData.ProductsInfo.Products.CollectionPropertyChanged -= OnPropertyChanged;
+            StationData.BuildResourcesInfo.BuildResources.CollectionPropertyChanged -= OnPropertyChanged;
+            StationData.StorageAssignInfo.StorageAssign.CollectionPropertyChanged -= OnPropertyChanged;
             StationData.Settings.PropertyChanged -= OnPropertyChanged;
             StationData.Settings.Workforce.PropertyChanged -= OnPropertyChanged;
         }

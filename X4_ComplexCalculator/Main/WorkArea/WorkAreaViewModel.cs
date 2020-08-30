@@ -98,13 +98,13 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <summary>
         /// 概要
         /// </summary>
-        public StationSummaryViewModel Summary { get; } 
+        public StationSummaryViewModel Summary { get; }
 
 
         /// <summary>
         /// 設定
         /// </summary>
-        public IStationSettings Settings { get; } = new StationSettings();
+        public IStationSettings Settings => _Model.StationData.Settings;
 
 
         /// <summary>
@@ -156,12 +156,12 @@ namespace X4_ComplexCalculator.Main.WorkArea
         {
             _LayoutID = layoutID;
 
-            Summary       = new StationSummaryViewModel(_Model.StationData, _Model.StationData, _Model.StationData, Settings);
-            Modules       = new ModulesGridViewModel(new ModulesGridModel(_Model.StationData));
-            Products      = new ProductsGridViewModel(new ProductsGridModel(_Model.StationData, _Model.StationData, Settings));
-            Resources     = new BuildResourcesGridViewModel(new BuildResourcesGridModel(_Model.StationData, _Model.StationData));
-            Storages      = new StoragesGridViewModel(new StoragesGridModel(_Model.StationData, _Model.StationData));
-            StorageAssign = new StorageAssignViewModel(new StorageAssignModel(_Model.StationData, _Model.StationData, _Model.StationData));
+            Summary       = new StationSummaryViewModel(_Model.StationData);
+            Modules       = new ModulesGridViewModel(_Model.StationData);
+            Products      = new ProductsGridViewModel(_Model.StationData);
+            Resources     = new BuildResourcesGridViewModel(_Model.StationData);
+            Storages      = new StoragesGridViewModel(_Model.StationData);
+            StorageAssign = new StorageAssignViewModel(_Model.StationData);
 
             Modules.AutoAddModuleCommand = Products.AutoAddModuleCommand;
             OnLoadedCommand     = new DelegateCommand<DockingManager>(OnLoaded);

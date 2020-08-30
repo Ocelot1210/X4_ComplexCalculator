@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Input;
 using Prism.Commands;
 using Prism.Mvvm;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
 {
@@ -37,10 +38,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="model">保管庫一覧表示用Model</param>
-        public StoragesGridViewModel(StoragesGridModel model)
+        /// <param name="model">計算機で使用するステーション情報</param>
+        public StoragesGridViewModel(IStationData stationData)
         {
-            _Model = model;
+            _Model = new StoragesGridModel(stationData.ModulesInfo, stationData.StoragesInfo);
             SetSelectedExpandedCommand = new DelegateCommand<bool?>(SetSelectedExpanded);
         }
 

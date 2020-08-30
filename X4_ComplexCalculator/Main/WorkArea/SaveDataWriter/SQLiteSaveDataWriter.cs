@@ -117,7 +117,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
 
             // モジュール保存
             var rowCnt = 0;
-            foreach (var module in WorkArea.StationData.Modules)
+            foreach (var module in WorkArea.StationData.ModulesInfo.Modules)
             {
                 conn.ExecQuery($"INSERT INTO Modules(Row, ModuleID, Count) Values({rowCnt}, '{module.Module.ModuleID}', {module.ModuleCount})");
 
@@ -136,7 +136,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
 
 
             // 価格保存
-            foreach (var product in WorkArea.StationData.Products)
+            foreach (var product in WorkArea.StationData.ProductsInfo.Products)
             {
                 if (product.EditStatus == EditStatus.Edited)
                 {
@@ -147,7 +147,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
             }
 
             // 建造リソース保存
-            foreach (var resource in WorkArea.StationData.BuildResources)
+            foreach (var resource in WorkArea.StationData.BuildResourcesInfo.BuildResources)
             {
                 conn.ExecQuery($"INSERT INTO BuildResources(WareID, Price, NoBuy) Values('{resource.Ware.WareID}', {resource.UnitPrice}, {(resource.NoBuy ? 1 : 0)})");
                 if (resource.EditStatus == EditStatus.Edited)
@@ -157,7 +157,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
             }
 
             // 保管庫割当情報保存
-            foreach (var assign in WorkArea.StationData.StorageAssignInfo)
+            foreach (var assign in WorkArea.StationData.StorageAssignInfo.StorageAssign)
             {
                 conn.ExecQuery($"INSERT INTO StorageAssign(WareID, AllocCount) Values('{assign.WareID}', {assign.AllocCount})");
                 if (assign.EditStatus == EditStatus.Edited)

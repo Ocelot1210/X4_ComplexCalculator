@@ -134,7 +134,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             });
 
 
-            _WorkArea.StationData.Modules.Reset(modules);
+            _WorkArea.StationData.ModulesInfo.Modules.Reset(modules);
         }
 
 
@@ -147,7 +147,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             conn.ExecQuery($"SELECT WareID, Price FROM Products", (dr, _) =>
             {
                 var wareID = (string)dr["WareID"];
-                var itm = _WorkArea.StationData.Products.Where(x => x.Ware.WareID == wareID).FirstOrDefault();
+                var itm = _WorkArea.StationData.ProductsInfo.Products.Where(x => x.Ware.WareID == wareID).FirstOrDefault();
                 if (itm != null)
                 {
                     itm.UnitPrice = (long)dr["Price"];
@@ -166,7 +166,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             {
                 var wareID = (string)dr["WareID"];
 
-                var itm = _WorkArea.StationData.BuildResources.Where(x => x.Ware.WareID == wareID).FirstOrDefault();
+                var itm = _WorkArea.StationData.BuildResourcesInfo.BuildResources.Where(x => x.Ware.WareID == wareID).FirstOrDefault();
                 if (itm != null)
                 {
                     itm.UnitPrice = (long)dr["Price"];
@@ -184,9 +184,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             // 初期化対象
             IEnumerable<IEditable>[] initTargets =
             {
-                _WorkArea.StationData.Products,
-                _WorkArea.StationData.BuildResources,
-                _WorkArea.StationData.StorageAssignInfo,
+                _WorkArea.StationData.ProductsInfo.Products,
+                _WorkArea.StationData.BuildResourcesInfo.BuildResources,
+                _WorkArea.StationData.StorageAssignInfo.StorageAssign,
             };
 
             foreach (var editables in initTargets)

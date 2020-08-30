@@ -61,7 +61,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         /// <summary>
         /// 保管庫状態計算用の指定時間
         /// </summary>
-        public ObservableCollection<StorageAssignGridItem> StorageAssignGridItems => _StorageAssignInfo.StorageAssignInfo;
+        public ObservableCollection<StorageAssignGridItem> StorageAssignGridItems => _StorageAssignInfo.StorageAssign;
 
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
                 if (_Hour != value)
                 {
                     _Hour = value;
-                    foreach (var item in _StorageAssignInfo.StorageAssignInfo)
+                    foreach (var item in _StorageAssignInfo.StorageAssign)
                     {
                         item.Hour = Hour;
                     }
@@ -191,7 +191,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
                 return;
             }
 
-            var assign = _StorageAssignInfo.StorageAssignInfo.Where(x => x.WareID == product.Ware.WareID).FirstOrDefault();
+            var assign = _StorageAssignInfo.StorageAssign.Where(x => x.WareID == product.Ware.WareID).FirstOrDefault();
             if (assign != null)
             {
                 assign.ProductPerHour = product.Count;
@@ -219,12 +219,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
             if (e.Action == NotifyCollectionChangedAction.Reset)
             {
                 // 前回値保存
-                foreach (var itm in _StorageAssignInfo.StorageAssignInfo)
+                foreach (var itm in _StorageAssignInfo.StorageAssign)
                 {
                     _OptionsBakDict.Add(itm.WareID, itm);
                 }
 
-                _StorageAssignInfo.StorageAssignInfo.Clear();
+                _StorageAssignInfo.StorageAssign.Clear();
             }
         }
 
@@ -236,9 +236,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         private void OnProductsAdded(IEnumerable<ProductsGridItem> products)
         {
             // 前回値がある場合
-            if (_StorageAssignInfo.StorageAssignInfo.Count == 0 && 0 < _OptionsBakDict.Count)
+            if (_StorageAssignInfo.StorageAssign.Count == 0 && 0 < _OptionsBakDict.Count)
             {
-                _StorageAssignInfo.StorageAssignInfo.AddRange(products.Select(prod =>
+                _StorageAssignInfo.StorageAssign.AddRange(products.Select(prod =>
                 {
                     var ret = new StorageAssignGridItem(prod.Ware, _CapacityDict[prod.Ware.TransportType.TransportTypeID], prod.Count, Hour) { EditStatus = EditStatus.Edited };
                     if (_OptionsBakDict.TryGetValue(ret.WareID, out var oldAssign))
@@ -254,7 +254,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
             }
             else
             {
-                _StorageAssignInfo.StorageAssignInfo.AddRange(products.Select(prod =>
+                _StorageAssignInfo.StorageAssign.AddRange(products.Select(prod =>
                 {
                     return new StorageAssignGridItem(prod.Ware, _CapacityDict[prod.Ware.TransportType.TransportTypeID], prod.Count, Hour) { EditStatus = EditStatus.Edited };
                 }));
@@ -283,7 +283,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
                     releasedCapacity.Add(prod.Ware.TransportType.TransportTypeID, 0);
                 }
 
-                var assign = _StorageAssignInfo.StorageAssignInfo.Where(x => x.WareID == prod.Ware.WareID).First();
+                var assign = _StorageAssignInfo.StorageAssign.Where(x => x.WareID == prod.Ware.WareID).First();
 
                 releasedCapacity[assign.TransportTypeID] += assign.AllocCapacity;
                 removeWares.Add(assign.WareID);
@@ -291,7 +291,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
             }
 
             // 削除対象を削除する
-            _StorageAssignInfo.StorageAssignInfo.RemoveAll(x => removeWares.Contains(x.WareID));
+            _StorageAssignInfo.StorageAssign.RemoveAll(x => removeWares.Contains(x.WareID));
 
             // 容量開放
             foreach (var kvp in releasedCapacity)

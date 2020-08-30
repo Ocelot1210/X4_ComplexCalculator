@@ -6,6 +6,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using Prism.Commands;
 using Prism.Mvvm;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
 {
@@ -96,10 +97,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="moduleGridModel">建造リソース用Model</param>
-        public BuildResourcesGridViewModel(BuildResourcesGridModel resourcesGridModel)
+        /// <param name="stationData">計算機で使用するステーション情報</param>
+        public BuildResourcesGridViewModel(IStationData stationData)
         {
-            _Model = resourcesGridModel;
+            _Model = new BuildResourcesGridModel(stationData.ModulesInfo, stationData.BuildResourcesInfo);
 
             BuildResourceView = new CollectionViewSource { Source = _Model.Resources }.View;
             BuildResourceView.SortDescriptions.Add(new SortDescription("Ware.Name", ListSortDirection.Ascending));

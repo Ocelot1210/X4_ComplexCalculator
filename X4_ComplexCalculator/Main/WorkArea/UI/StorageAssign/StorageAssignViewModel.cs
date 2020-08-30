@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Windows.Data;
 using Prism.Mvvm;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
 {
@@ -39,10 +40,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="model">保管庫割当Model</param>
-        public StorageAssignViewModel(StorageAssignModel model)
+        /// <param name="stationData">計算機で使用するステーション情報</param>
+        public StorageAssignViewModel(IStationData stationData)
         {
-            _Model = model;
+            _Model = new StorageAssignModel(stationData.ProductsInfo, stationData.StoragesInfo, stationData.StorageAssignInfo);
 
             StorageAssignInfo = (ListCollectionView)CollectionViewSource.GetDefaultView(_Model.StorageAssignGridItems);
             StorageAssignInfo.SortDescriptions.Clear();

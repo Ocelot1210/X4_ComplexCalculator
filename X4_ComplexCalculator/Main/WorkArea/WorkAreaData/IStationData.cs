@@ -8,43 +8,43 @@ using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Storages;
 namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData
 {
     /// <summary>
-    /// 計算機で使用するステーション用データ用クラス
+    /// 計算機で使用するステーション用データ
     /// </summary>
-    public class StationData : IStationData
+    public interface IStationData
     {
         /// <summary>
         /// モジュール一覧
         /// </summary>
-        public IModulesInfo ModulesInfo { get; } = new ModulesInfo();
+        IBuildResourcesInfo BuildResourcesInfo { get; }
 
 
         /// <summary>
         /// 製品情報
         /// </summary>
-        public IProductsInfo ProductsInfo { get; } = new ProductsInfo();
+        IModulesInfo ModulesInfo { get; }
 
 
         /// <summary>
         /// 建造リソース情報
         /// </summary>
-        public IBuildResourcesInfo BuildResourcesInfo { get; } = new BuildResourcesInfo();
+        IProductsInfo ProductsInfo { get; }
 
 
         /// <summary>
         /// 保管庫情報
         /// </summary>
-        public IStoragesInfo StoragesInfo { get; } = new StoragesInfo();
+        IStationSettings Settings { get; }
 
 
         /// <summary>
         /// 保管庫割当情報
         /// </summary>
-        public IStorageAssignInfo StorageAssignInfo { get; } = new StorageAssignInfo();
+        IStorageAssignInfo StorageAssignInfo { get; }
 
 
         /// <summary>
         /// ステーション設定
         /// </summary>
-        public IStationSettings Settings { get; } = new StationSettings.StationSettings();
+        IStoragesInfo StoragesInfo { get; }
     }
 }

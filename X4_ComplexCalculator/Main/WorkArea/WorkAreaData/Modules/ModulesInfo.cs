@@ -4,13 +4,14 @@ using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules
 {
     /// <summary>
-    /// モジュール一覧情報用インターフェイス
+    /// モジュール一覧情報用クラス
     /// </summary>
-    public interface IModulesInfo
+    public class ModulesInfo : IModulesInfo
     {
         /// <summary>
-        /// モジュール一覧情報
+        /// モジュール一覧
         /// </summary>
         public ObservablePropertyChangedCollection<ModulesGridItem> Modules { get; }
+            = new ObservablePropertyChangedCollection<ModulesGridItem>();
     }
 }
