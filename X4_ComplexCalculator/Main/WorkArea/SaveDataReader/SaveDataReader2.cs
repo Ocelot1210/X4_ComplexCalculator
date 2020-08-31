@@ -131,7 +131,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             conn.ExecQuery($"SELECT WareID, Price, NoBuy, NoSell FROM Products", (dr, _) =>
             {
                 var wareID = (string)dr["WareID"];
-                var itm = _WorkArea.StationData.ProductsInfo.Products.Where(x => x.Ware.WareID == wareID).FirstOrDefault();
+                var itm = _WorkArea.StationData.ProductsInfo.Products.FirstOrDefault(x => x.Ware.WareID == wareID);
                 if (itm != null)
                 {
                     itm.UnitPrice = (long)dr["Price"];
