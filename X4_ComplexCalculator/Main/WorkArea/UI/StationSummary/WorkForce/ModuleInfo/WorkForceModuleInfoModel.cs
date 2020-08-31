@@ -8,6 +8,8 @@ using Prism.Mvvm;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleInfo
 {
@@ -18,21 +20,21 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
     {
         #region メンバ
         /// <summary>
-        /// モジュール一覧
+        /// モジュール一覧情報
         /// </summary>
-        private readonly ObservablePropertyChangedCollection<ModulesGridItem> _Modules;
+        private readonly IModulesInfo _Modules;
 
 
         /// <summary>
         /// ステーションの設定
         /// </summary>
-        private readonly StationSettingsModel _Settings;
+        private readonly IStationSettings _Settings;
 
 
         /// <summary>
         /// 本部モジュール用データ
         /// </summary>
-        private static readonly WorkForceModuleInfoDetailsItem _HQ = new WorkForceModuleInfoDetailsItem("module_player_prod_hq_01_macro", 1, StationSettingsModel.HQ_WORKERS, 0);
+        private readonly WorkForceModuleInfoDetailsItem _HQ;
         #endregion
 
 
@@ -47,15 +49,17 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="moduleGridModel">モジュール一覧のModel</param>
-        public WorkForceModuleInfoModel(ObservablePropertyChangedCollection<ModulesGridItem> modules, StationSettingsModel settings)
+        /// <param name="modules">モジュール一覧情報</param>
+        /// <param name="settings">ステーションの設定</param>
+        public WorkForceModuleInfoModel(IModulesInfo modules, IStationSettings settings)
         {
             _Modules = modules;
-            _Modules.CollectionChangedAsync += OnModulesChanged;
-            _Modules.CollectionPropertyChangedAsync += OnModulesPropertyChanged;
+            _Modules.Modules.CollectionChangedAsync += OnModulesChanged;
+            _Modules.Modules.CollectionPropertyChangedAsync += OnModulesPropertyChanged;
 
             _Settings = settings;
             _Settings.PropertyChanged += Settings_PropertyChanged;
+            _HQ = new WorkForceModuleInfoDetailsItem("module_player_prod_hq_01_macro", 1, _Settings.HQWorkers, 0);
         }
 
 
@@ -68,16 +72,16 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
         {
             switch (e.PropertyName)
             {
-                case nameof(StationSettingsModel.IsHeadquarters):
+                case nameof(IStationSettings.IsHeadquarters):
                     {
                         if (_Settings.IsHeadquarters)
                         {
-                            _Settings.Workforce.Need += StationSettingsModel.HQ_WORKERS;
+                            _Settings.Workforce.Need += _HQ.MaxWorkers;
                             WorkForceDetails.Add(_HQ);
                         }
                         else
                         {
-                            _Settings.Workforce.Need -= StationSettingsModel.HQ_WORKERS;
+                            _Settings.Workforce.Need -= _HQ.MaxWorkers;
                             WorkForceDetails.Remove(_HQ);
                         }
                     }
@@ -94,8 +98,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
         /// </summary>
         public void Dispose()
         {
-            _Modules.CollectionChangedAsync -= OnModulesChanged;
-            _Modules.CollectionPropertyChangedAsync -= OnModulesPropertyChanged;
+            _Modules.Modules.CollectionChangedAsync -= OnModulesChanged;
+            _Modules.Modules.CollectionPropertyChangedAsync -= OnModulesPropertyChanged;
             _Settings.PropertyChanged -= Settings_PropertyChanged;
             WorkForceDetails.Clear();
         }
@@ -174,7 +178,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
             {
                 WorkForceDetails.Clear();
                 _Settings.Workforce.Clear();
-                OnModuleAdded(_Modules);
+                OnModuleAdded(_Modules.Modules);
             }
 
             await Task.CompletedTask;

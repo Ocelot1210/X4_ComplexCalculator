@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using Prism.Mvvm;
 using X4_ComplexCalculator.Common;
-using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
-using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Products;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 {
@@ -26,13 +27,19 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// モジュール一覧
         /// </summary>
-        private readonly ObservablePropertyChangedCollection<ModulesGridItem> _Modules;
+        private readonly IModulesInfo _Modules;
 
 
         /// <summary>
         /// ステーションの設定
         /// </summary>
-        private readonly StationSettingsModel _Settings;
+        private readonly IStationSettings _Settings;
+
+
+        /// <summary>
+        /// 製品情報
+        /// </summary>
+        private readonly IProductsInfo _Products;
 
 
         /// <summary>
@@ -64,7 +71,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// 製品一覧
         /// </summary>
-        public ObservablePropertyChangedCollection<ProductsGridItem> Products { get; }
+        public ObservableCollection<ProductsGridItem> Products => _Products.Products;
         #endregion
 
 
@@ -73,12 +80,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// </summary>
         /// <param name="modules">モジュール一覧</param>
         /// <param name="settings">ステーションの設定</param>
-        public ProductsGridModel(ObservablePropertyChangedCollection<ModulesGridItem> modules, StationSettingsModel settings)
+        public ProductsGridModel(IModulesInfo modules, IProductsInfo products, IStationSettings settings)
         {
-            Products = new ObservablePropertyChangedCollection<ProductsGridItem>();
+            _Modules = modules;
+            _Products = products;
 
-            modules.CollectionChangedAsync += OnModulesChanged;
-            modules.CollectionPropertyChangedAsync += OnModulePropertyChanged;
+            _Modules.Modules.CollectionChangedAsync += OnModulesChanged;
+            _Modules.Modules.CollectionPropertyChangedAsync += OnModulePropertyChanged;
 
             _Modules = modules;
             _Settings = settings;
@@ -118,7 +126,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             switch (e.PropertyName)
             {
                 // 日光
-                case nameof(StationSettingsModel.Sunlight):
+                case nameof(IStationSettings.Sunlight):
                     foreach (var prod in Products)
                     {
                         prod.SetEfficiency("sunlight", _Settings.Sunlight);
@@ -137,8 +145,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         public void Dispose()
         {
             Products.Clear();
-            _Modules.CollectionChangedAsync -= OnModulesChanged;
-            _Modules.CollectionPropertyChangedAsync -= OnModulePropertyChanged;
+            _Modules.Modules.CollectionChangedAsync -= OnModulesChanged;
+            _Modules.Modules.CollectionPropertyChangedAsync -= OnModulePropertyChanged;
             _Settings.PropertyChanged -= Settings_PropertyChanged;
             _Settings.Workforce.PropertyChanged -= Workforce_PropertyChanged;
         }
@@ -202,7 +210,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 }
 
                 // モジュール一覧に追加対象モジュールを追加
-                _Modules.AddRange(addModulesGridItems);
+                _Modules.Modules.AddRange(addModulesGridItems);
             }
 
 
@@ -286,9 +294,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
                 Products.Clear();
 
-                if (_Modules.Any())
+                if (_Modules.Modules.Any())
                 {
-                    var products = AggregateProduct(_Modules);
+                    var products = AggregateProduct(_Modules.Modules);
 
                     // 可能なら前回値復元して製品一覧に追加
                     var addItems = products.Select
@@ -304,7 +312,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                         }
                     );
 
-                    Products.AddRange(addItems);
+                    _Products.Products.AddRange(addItems);
                     _OptionsBakDict.Clear();
                 }
             }
@@ -386,7 +394,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 }
             }
 
-            Products.AddRange(addItems);
+            _Products.Products.AddRange(addItems);
         }
 
 
@@ -405,7 +413,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 Products.Where(x => x.Ware.WareID == item.Key).FirstOrDefault()?.RemoveDetails(item.Value);
             }
 
-            Products.RemoveAll(x => !x.Details.Any());
+            _Products.Products.RemoveAll(x => !x.Details.Any());
         }
 
 

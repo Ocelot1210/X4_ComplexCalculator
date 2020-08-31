@@ -9,7 +9,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
     /// <summary>
     /// 保管庫割当用Gridの1レコード分
     /// </summary>
-    class StorageAssignGridItem : BindableBase, IDisposable, IEditable
+    public class StorageAssignGridItem : BindableBase, IDisposable, IEditable
     {
         #region メンバ
         /// <summary>

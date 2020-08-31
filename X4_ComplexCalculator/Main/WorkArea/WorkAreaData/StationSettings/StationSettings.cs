@@ -1,12 +1,12 @@
 ﻿using System;
 using Prism.Mvvm;
 
-namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSettings
+namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings
 {
     /// <summary>
-    /// ステーション設定用Model
+    /// ステーション設定用クラス
     /// </summary>
-    public class StationSettingsModel : BindableBase
+    public class StationSettings : BindableBase, IStationSettings
     {
         #region メンバ
         /// <summary>
@@ -36,7 +36,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSettings
         /// <summary>
         /// 本部の必要労働者数
         /// </summary>
-        public const int HQ_WORKERS = 200;
+        public int HQWorkers { get; } = 200;
 
 
         /// <summary>
@@ -61,14 +61,5 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSettings
             }
         }
         #endregion
-
-
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        public StationSettingsModel()
-        {
-
-        }
     }
 }

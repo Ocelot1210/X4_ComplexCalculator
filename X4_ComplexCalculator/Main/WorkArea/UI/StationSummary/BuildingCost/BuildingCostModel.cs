@@ -1,10 +1,11 @@
-﻿using System.Collections.Specialized;
+﻿using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using Prism.Mvvm;
 using X4_ComplexCalculator.Common;
-using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.BuildResources;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost
 {
@@ -15,9 +16,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost
     {
         #region メンバ
         /// <summary>
-        /// 建造に必要なウェア一覧
+        /// 建造リソース情報
         /// </summary>
-        public ObservablePropertyChangedCollection<BuildResourcesGridItem> Resources;
+        private readonly IBuildResourcesInfo _BuildResources;
 
 
         /// <summary>
@@ -28,6 +29,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost
 
 
         #region プロパティ
+        /// <summary>
+        /// 建造リソース一覧
+        /// </summary>
+        public ObservableCollection<BuildResourcesGridItem> BuildResources => _BuildResources.BuildResources;
+
+
         /// <summary>
         /// 建造コスト
         /// </summary>
@@ -50,21 +57,22 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost
         /// コンストラクタ
         /// </summary>
         /// <param name="resources"></param>
-        public BuildingCostModel(ObservablePropertyChangedCollection<BuildResourcesGridItem> resources)
+        public BuildingCostModel(IBuildResourcesInfo resources)
         {
-            Resources = resources;
-            Resources.CollectionChanged += Resources_OnCollectionChanged;
-            Resources.CollectionPropertyChanged += Resources_OnPropertyChanged;
+            _BuildResources = resources;
+            _BuildResources.BuildResources.CollectionChanged += Resources_OnCollectionChanged;
+            _BuildResources.BuildResources.CollectionPropertyChanged += Resources_OnPropertyChanged;
         }
+
 
         /// <summary>
         /// リソースを開放
         /// </summary>
         public void Dispose()
         {
-            Resources.CollectionChanged -= Resources_OnCollectionChanged;
-            Resources.CollectionPropertyChanged -= Resources_OnPropertyChanged;
-            Resources.Clear();
+            _BuildResources.BuildResources.CollectionChanged -= Resources_OnCollectionChanged;
+            _BuildResources.BuildResources.CollectionPropertyChanged -= Resources_OnPropertyChanged;
+            BuildResources.Clear();
         }
 
 
@@ -117,7 +125,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost
 
             if (e.Action == NotifyCollectionChangedAction.Reset)
             {
-                BuildingCost = Resources.Sum(x => x.Price);
+                BuildingCost = BuildResources.Sum(x => x.Price);
             }
         }
     }

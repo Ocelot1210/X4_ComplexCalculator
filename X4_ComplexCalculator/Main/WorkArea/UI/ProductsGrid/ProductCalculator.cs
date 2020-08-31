@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using X4_ComplexCalculator.DB;
-using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 {
@@ -306,7 +306,7 @@ WHERE
         /// </summary>
         /// <param name="products">製品一覧</param>
         /// <param name="settings">ステーションの設定</param>
-        public List<(string ModuleID, long Count)> CalcNeedModules(IReadOnlyList<ProductsGridItem> products, StationSettingsModel settings)
+        public List<(string ModuleID, long Count)> CalcNeedModules(IReadOnlyList<ProductsGridItem> products, IStationSettings settings)
         {
             var addModules = new List<(string ModuleID, long Count)>();             // 追加予定モジュール
             var addModuleProducts = new List<(string WareID, long Count)>();        // 追加予定モジュールの製品一覧

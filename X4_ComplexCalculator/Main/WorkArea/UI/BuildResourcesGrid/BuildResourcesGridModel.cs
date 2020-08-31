@@ -10,6 +10,8 @@ using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.BuildResources;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
 {
@@ -22,7 +24,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         /// <summary>
         /// モジュール一覧
         /// </summary>
-        private readonly ObservablePropertyChangedCollection<ModulesGridItem> _Modules;
+        private readonly IModulesInfo _Modules;
+
+
+        /// <summary>
+        /// 建造リソース情報
+        /// </summary>
+        private readonly IBuildResourcesInfo _BuildResources;
 
 
         /// <summary>
@@ -42,20 +50,22 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         /// <summary>
         /// 建造に必要なリソース
         /// </summary>
-        public ObservablePropertyChangedCollection<BuildResourcesGridItem> Resources { get; private set; }
+        public ObservablePropertyChangedCollection<BuildResourcesGridItem> Resources => _BuildResources.BuildResources;
         #endregion
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="moduleGridModel">モジュール一覧</param>
-        public BuildResourcesGridModel(ObservablePropertyChangedCollection<ModulesGridItem> modules)
+        /// <param name="modules">モジュール一覧情報</param>
+        /// <param name="buildResources">建造リソース情報</param>
+        public BuildResourcesGridModel(IModulesInfo modules, IBuildResourcesInfo buildResources)
         {
-            Resources = new ObservablePropertyChangedCollection<BuildResourcesGridItem>();
             _Modules = modules;
-            _Modules.CollectionChangedAsync += OnModulesCollectionChanged;
-            _Modules.CollectionPropertyChangedAsync += OnModulesPropertyChanged;
+            _BuildResources = buildResources;
+
+            _Modules.Modules.CollectionChangedAsync += OnModulesCollectionChanged;
+            _Modules.Modules.CollectionPropertyChangedAsync += OnModulesPropertyChanged;
         }
 
 
@@ -65,8 +75,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         public void Dispose()
         {
             Resources.Clear();
-            _Modules.CollectionChangedAsync -= OnModulesCollectionChanged;
-            _Modules.CollectionPropertyChangedAsync -= OnModulesPropertyChanged;
+            _Modules.Modules.CollectionChangedAsync -= OnModulesCollectionChanged;
+            _Modules.Modules.CollectionPropertyChangedAsync -= OnModulesPropertyChanged;
         }
 
 
@@ -153,9 +163,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
 
                 Resources.Clear();
 
-                if (_Modules.Any())
+                if (_Modules.Modules.Any())
                 {
-                    var resources = AggregateModules(_Modules);
+                    var resources = AggregateModules(_Modules.Modules);
 
                     // 可能なら前回値復元して製品一覧に追加
                     var addItems = resources.Select(

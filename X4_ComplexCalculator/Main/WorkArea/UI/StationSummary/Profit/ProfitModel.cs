@@ -4,8 +4,8 @@ using System.ComponentModel;
 using System.Linq;
 using Prism.Mvvm;
 using X4_ComplexCalculator.Common;
-using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Products;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit
 {
@@ -15,7 +15,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit
         /// <summary>
         /// 製品一覧
         /// </summary>
-        private readonly ObservablePropertyChangedCollection<ProductsGridItem> _Products;
+        private readonly IProductsInfo _Products;
 
         /// <summary>
         /// 利益
@@ -28,7 +28,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit
         /// <summary>
         /// 利益詳細
         /// </summary>
-        public ObservableCollection<ProductsGridItem> ProfitDetails => _Products;
+        public ObservableCollection<ProductsGridItem> ProfitDetails => _Products.Products;
 
 
         /// <summary>
@@ -46,11 +46,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit
         /// コンストラクタ
         /// </summary>
         /// <param name="products">製品一覧</param>
-        public ProfitModel(ObservablePropertyChangedCollection<ProductsGridItem> products)
+        public ProfitModel(IProductsInfo products)
         {
             _Products = products;
-            _Products.CollectionChanged += OnProductsCollectionChanged;
-            _Products.CollectionPropertyChanged += OnProductsPropertyChanged;
+            _Products.Products.CollectionChanged += OnProductsCollectionChanged;
+            _Products.Products.CollectionPropertyChanged += OnProductsPropertyChanged;
         }
 
 
@@ -59,8 +59,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit
         /// </summary>
         public void Dispose()
         {
-            _Products.CollectionChanged -= OnProductsCollectionChanged;
-            _Products.CollectionPropertyChanged -= OnProductsPropertyChanged;
+            _Products.Products.CollectionChanged -= OnProductsCollectionChanged;
+            _Products.Products.CollectionPropertyChanged -= OnProductsPropertyChanged;
         }
 
 
@@ -87,7 +87,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit
             // リセットされた場合
             if (e.Action == NotifyCollectionChangedAction.Reset)
             {
-                Profit = _Products.Sum(x => x.Price);
+                Profit = _Products.Products.Sum(x => x.Price);
             }
         }
 

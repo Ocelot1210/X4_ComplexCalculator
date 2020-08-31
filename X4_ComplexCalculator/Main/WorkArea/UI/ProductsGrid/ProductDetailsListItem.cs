@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Prism.Mvvm;
-using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 {
@@ -105,7 +105,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <param name="efficiency">効率</param>
         /// <param name="amount">製品数</param>
         /// <param name="settings">ステーションの設定</param>
-        public ProductDetailsListItem(string moduleID, long moduleCount, Dictionary<string, double> efficiency, long amount, StationSettingsModel settings)
+        public ProductDetailsListItem(string moduleID, long moduleCount, Dictionary<string, double> efficiency, long amount, IStationSettings settings)
         {
             ModuleID = moduleID;
             ModuleCount = moduleCount;

@@ -8,7 +8,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
     /// <summary>
     /// ドロップダウンで表示するListViewのアイテム(保管庫用)
     /// </summary>
-    class StorageDetailsListItem : BindableBase
+    public class StorageDetailsListItem : BindableBase
     {
         #region メンバ
         /// <summary>

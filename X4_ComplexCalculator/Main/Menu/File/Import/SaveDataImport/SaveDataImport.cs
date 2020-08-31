@@ -228,7 +228,7 @@ WHERE
 
             // モジュール一覧に追加
             var range = dict.Select(x => (x.Value)).OrderBy(x => x.Item1).Select(x => new ModulesGridItem(x.Item2, x.Item3, x.Item4));
-            WorkArea.Modules.AddRange(range);
+            WorkArea.StationData.ModulesInfo.Modules.AddRange(range);
         }
 
 
@@ -244,7 +244,7 @@ WHERE
             foreach (var ware in saveData.XElement.XPathSelectElements("/economylog/*[not(self::cargo)]"))
             {
                 var wareID = ware.Attribute("ware").Value;
-                var prod = WorkArea.Products.Where(x => x.Ware.WareID == wareID).FirstOrDefault();
+                var prod = WorkArea.StationData.ProductsInfo.Products.FirstOrDefault(x => x.Ware.WareID == wareID);
                 if (prod != null)
                 {
                     prod.UnitPrice = long.Parse(ware.Attribute("price").Value);
@@ -264,7 +264,7 @@ WHERE
             {
                 var wareID = ware.Attribute("ware").Value;
 
-                var storage = WorkArea.StorageAssign.Where(x => x.WareID == wareID).FirstOrDefault();
+                var storage = WorkArea.StationData.StorageAssignInfo.StorageAssign.FirstOrDefault(x => x.WareID == wareID);
                 if (storage != null)
                 {
                     var amount = long.Parse(ware.Attribute("amount").Value);

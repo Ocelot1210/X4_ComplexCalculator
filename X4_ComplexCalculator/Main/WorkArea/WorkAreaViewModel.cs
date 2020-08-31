@@ -20,10 +20,10 @@ using X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.Menu.View;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
-using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary;
 using X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign;
 using X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings;
 
 namespace X4_ComplexCalculator.Main.WorkArea
 {
@@ -36,7 +36,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <summary>
         /// モデル
         /// </summary>
-        private readonly WorkAreaModel _Model;
+        private readonly WorkAreaModel _Model = new WorkAreaModel();
 
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <summary>
         /// 設定
         /// </summary>
-        public StationSettingsModel Settings { get; }
+        public IStationSettings Settings => _Model.StationData.Settings;
 
 
         /// <summary>
@@ -156,23 +156,14 @@ namespace X4_ComplexCalculator.Main.WorkArea
         {
             _LayoutID = layoutID;
 
-            Settings = new StationSettingsModel();
-
-            var moduleModel     = new ModulesGridModel();
-            var productsModel   = new ProductsGridModel(moduleModel.Modules, Settings);
-            var resourcesModel  = new BuildResourcesGridModel(moduleModel.Modules);
-            var storagesModel   = new StoragesGridModel(moduleModel.Modules);
-
-            Summary       = new StationSummaryViewModel(moduleModel.Modules, productsModel.Products, resourcesModel.Resources, Settings);
-            Modules       = new ModulesGridViewModel(moduleModel);
-            Products      = new ProductsGridViewModel(productsModel);
-            Resources     = new BuildResourcesGridViewModel(resourcesModel);
-            Storages      = new StoragesGridViewModel(storagesModel);
-            var storageAssignModel = new StorageAssignModel(productsModel.Products, storagesModel.Storages);
-            StorageAssign = new StorageAssignViewModel(storageAssignModel);
+            Summary       = new StationSummaryViewModel(_Model.StationData);
+            Modules       = new ModulesGridViewModel(_Model.StationData);
+            Products      = new ProductsGridViewModel(_Model.StationData);
+            Resources     = new BuildResourcesGridViewModel(_Model.StationData);
+            Storages      = new StoragesGridViewModel(_Model.StationData);
+            StorageAssign = new StorageAssignViewModel(_Model.StationData);
 
             Modules.AutoAddModuleCommand = Products.AutoAddModuleCommand;
-            _Model              = new WorkAreaModel(moduleModel, productsModel, resourcesModel, storageAssignModel, Settings);
             OnLoadedCommand     = new DelegateCommand<DockingManager>(OnLoaded);
 
             _Model.PropertyChanged += Model_PropertyChanged;

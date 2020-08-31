@@ -5,7 +5,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
     /// <summary>
     /// 保管庫容量情報
     /// </summary>
-    class StorageCapacityInfo : BindableBase
+    public class StorageCapacityInfo : BindableBase
     {
         #region メンバ
         /// <summary>

@@ -3,15 +3,17 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Data;
 using Prism.Mvvm;
-using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
-using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
-using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleInfo;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWareInfo;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.BuildResources;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Products;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary
 {
@@ -90,28 +92,25 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary
         /// <summary>
         /// 建造コスト詳細
         /// </summary>
-        public ObservableCollection<BuildResourcesGridItem> BuildingCostDetails => _BuildingCostModel.Resources;
+        public ObservableCollection<BuildResourcesGridItem> BuildingCostDetails => _BuildingCostModel.BuildResources;
         #endregion
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="modules">モジュール一覧</param>
-        /// <param name="products">製品一覧</param>
-        /// <param name="resources">建造に必要なリソース一覧</param>
-        /// <param name="settings">ステーションの設定</param>
-        public StationSummaryViewModel(ObservablePropertyChangedCollection<ModulesGridItem> modules, ObservablePropertyChangedCollection<ProductsGridItem> products, ObservablePropertyChangedCollection<BuildResourcesGridItem> resources, StationSettingsModel settings)
+        /// <param name="stationData">計算機で使用するステーション情報</param>
+        public StationSummaryViewModel(IStationData stationData)
         {
-            Workforce = settings.Workforce;
+            Workforce = stationData.Settings.Workforce;
 
             // 労働力関係初期化
             {
-                _WorkForceModuleInfoModel = new WorkForceModuleInfoModel(modules, settings);
+                _WorkForceModuleInfoModel = new WorkForceModuleInfoModel(stationData.ModulesInfo, stationData.Settings);
             }
 
             {
-                _NeedWareInfoModel = new NeedWareInfoModel(modules, products);
+                _NeedWareInfoModel = new NeedWareInfoModel(stationData.ModulesInfo, stationData.ProductsInfo);
 
                 WorkforceNeedWareCollectionView = (ListCollectionView)CollectionViewSource.GetDefaultView(_NeedWareInfoModel.NeedWareInfoDetails);
                 WorkforceNeedWareCollectionView.SortDescriptions.Clear();
@@ -125,14 +124,14 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary
 
             // 損益関係初期化
             {
-                _ProfitModel = new ProfitModel(products);
+                _ProfitModel = new ProfitModel(stationData.ProductsInfo);
                 _ProfitModel.PropertyChanged += ProfitModel_PropertyChanged;
             }
 
 
             // 建造コスト関係初期化
             {
-                _BuildingCostModel = new BuildingCostModel(resources);
+                _BuildingCostModel = new BuildingCostModel(stationData.BuildResourcesInfo);
                 _BuildingCostModel.PropertyChanged += BuildingCostModel_PropertyChanged;
             }
         }

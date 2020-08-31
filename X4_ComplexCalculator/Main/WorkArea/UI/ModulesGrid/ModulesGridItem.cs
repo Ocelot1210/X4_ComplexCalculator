@@ -186,7 +186,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <param name="element">モジュール情報が記載されたxml</param>
         public ModulesGridItem(XElement element)
         {
-            Module = Module.Get(element.Attribute("id").Value) ?? throw new ArgumentException("Invalid XELement.", nameof(element));
+            Module = Module.Get(element.Attribute("id").Value) ?? throw new ArgumentException("Invalid XElement.", nameof(element));
             ModuleEquipment = ModuleEquipment.Get(Module.ModuleID);
 
             ModuleCount = long.Parse(element.Attribute("count").Value);

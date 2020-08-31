@@ -1,6 +1,6 @@
 ﻿using X4_ComplexCalculator.Common;
 
-namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSettings
+namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings
 {
     /// <summary>
     /// 労働者数を管理するクラス

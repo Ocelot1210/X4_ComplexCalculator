@@ -1,9 +1,4 @@
-﻿using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
-using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
-using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
-using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
-using X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign;
+﻿using X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
 
 namespace X4_ComplexCalculator.Main.WorkArea
 {
@@ -16,32 +11,8 @@ namespace X4_ComplexCalculator.Main.WorkArea
 
 
         /// <summary>
-        /// モジュール一覧
+        /// 計算機で使用するステーション用データ
         /// </summary>
-        public ObservableRangeCollection<ModulesGridItem> Modules { get; }
-
-
-        /// <summary>
-        /// 製品一覧
-        /// </summary>
-        public ObservableRangeCollection<ProductsGridItem> Products { get; }
-
-
-        /// <summary>
-        /// 建造リソース一覧
-        /// </summary>
-        public ObservableRangeCollection<BuildResourcesGridItem> Resources { get; }
-
-
-        /// <summary>
-        /// 保管庫割当情報
-        /// </summary>
-        public ObservableRangeCollection<StorageAssignGridItem> StorageAssign { get; }
-
-
-        /// <summary>
-        /// ステーションの設定
-        /// </summary>
-        public StationSettingsModel Settings { get; }
+        public IStationData StationData { get; }
     }
 }
