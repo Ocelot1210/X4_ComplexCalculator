@@ -264,7 +264,7 @@ WHERE
             {
                 var wareID = ware.Attribute("ware").Value;
 
-                var storage = WorkArea.StationData.StorageAssignInfo.StorageAssign.Where(x => x.WareID == wareID).FirstOrDefault();
+                var storage = WorkArea.StationData.StorageAssignInfo.StorageAssign.FirstOrDefault(x => x.WareID == wareID);
                 if (storage != null)
                 {
                     var amount = long.Parse(ware.Attribute("amount").Value);
