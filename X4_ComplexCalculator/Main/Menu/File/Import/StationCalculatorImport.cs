@@ -110,7 +110,12 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
 
                 WorkArea.StationData.ModulesInfo.Modules.AddRange(modules);
                 // 編集状態を全て未編集にする
-                IEnumerable<IEditable>[] editables = { WorkArea.StationData.ProductsInfo.Products, WorkArea.StationData.BuildResourcesInfo.BuildResources, WorkArea.StationData.StorageAssignInfo.StorageAssign };
+                IEnumerable<IEditable>[] editables =
+                {
+                    WorkArea.StationData.ProductsInfo.Products,
+                    WorkArea.StationData.BuildResourcesInfo.BuildResources,
+                    WorkArea.StationData.StorageAssignInfo.StorageAssign,
+                };
                 foreach (var editable in editables.SelectMany(x => x))
                 {
                     editable.EditStatus = EditStatus.Unedited;
