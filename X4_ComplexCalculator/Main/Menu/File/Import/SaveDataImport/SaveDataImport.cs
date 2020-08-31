@@ -244,7 +244,7 @@ WHERE
             foreach (var ware in saveData.XElement.XPathSelectElements("/economylog/*[not(self::cargo)]"))
             {
                 var wareID = ware.Attribute("ware").Value;
-                var prod = WorkArea.StationData.ProductsInfo.Products.Where(x => x.Ware.WareID == wareID).FirstOrDefault();
+                var prod = WorkArea.StationData.ProductsInfo.Products.FirstOrDefault(x => x.Ware.WareID == wareID);
                 if (prod != null)
                 {
                     prod.UnitPrice = long.Parse(ware.Attribute("price").Value);
