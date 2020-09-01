@@ -33,12 +33,6 @@ namespace X4_ComplexCalculator.DB
         /// X4DB用
         /// </summary>
         private static DBConnection? _X4DB;
-
-
-        /// <summary>
-        /// プリセット/その他用DB
-        /// </summary>
-        private static DBConnection? _CommonDB;
         #endregion
 
 
@@ -50,15 +44,6 @@ namespace X4_ComplexCalculator.DB
         {
             get => _X4DB ?? throw new InvalidOperationException();
             private set => _X4DB = value;
-        }
-
-        /// <summary>
-        /// プリセット/その他用DB
-        /// </summary>
-        public static DBConnection CommonDB
-        {
-            get => _CommonDB ?? throw new InvalidOperationException();
-            private set => _CommonDB = value;
         }
         #endregion
 
@@ -250,31 +235,6 @@ namespace X4_ComplexCalculator.DB
 
 
         /// <summary>
-        /// 共通設定用DBオープン
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        private static DBConnection CreatePresetDB(string path)
-        {
-            DBConnection ret;
-
-            // 共通設定用DBオープン
-            ret = new DBConnection(path);
-
-            // テーブルがなければ作る
-            ret.ExecQuery("CREATE TABLE IF NOT EXISTS SelectModuleCheckStateModuleTypes(ID TEXT NOT NULL)");
-            ret.ExecQuery("CREATE TABLE IF NOT EXISTS SelectModuleCheckStateModuleOwners(ID TEXT NOT NULL)");
-            ret.ExecQuery("CREATE TABLE IF NOT EXISTS SelectModuleEquipmentCheckStateFactions(ID TEXT NOT NULL)");
-            ret.ExecQuery("CREATE TABLE IF NOT EXISTS ModulePresets(ModuleID TEXT NOT NULL, PresetID INTEGER NOT NULL, PresetName TEXT NOT NULL)");
-            ret.ExecQuery("CREATE TABLE IF NOT EXISTS ModulePresetsEquipment(ModuleID TEXT NOT NULL, PresetID INTEGER NOT NULL, EquipmentID TEXT NOT NULL, EquipmentType TEXT NOT NULL)");
-            ret.ExecQuery("CREATE TABLE IF NOT EXISTS WorkAreaLayouts(LayoutID INTEGER NOT NULL, LayoutName TEXT NOT NULL, IsChecked INTEGER DEFAULT 0, Layout BLOB NOT NULL)");
-            ret.ExecQuery("CREATE TABLE IF NOT EXISTS OpenedFiles(Path TEXT NOT NULL)");
-
-            return ret;
-        }
-
-
-        /// <summary>
         /// DBファイルを開く
         /// </summary>
         public static void Open()
@@ -345,8 +305,6 @@ namespace X4_ComplexCalculator.DB
                     Environment.Exit(-1);
                 }
             }
-
-            CommonDB = CreatePresetDB(Path.Combine(AppDomain.CurrentDomain.BaseDirectory ?? "", conf["AppSettings:CommonDBPath"]));
         }
 
 

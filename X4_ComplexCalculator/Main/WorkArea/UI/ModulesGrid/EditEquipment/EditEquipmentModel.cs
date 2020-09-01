@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
 using System.Windows;
@@ -105,7 +105,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         {
             static void AddItem(SQLiteDataReader dr, object[] args)
             {
-                bool chkState = 0 < DBConnection.CommonDB.ExecQuery($"SELECT ID FROM SelectModuleEquipmentCheckStateFactions WHERE ID = '{dr["FactionID"]}'", (_, __) => { });
+                bool chkState = 0 < SettingDatabase.Instance.ExecQuery($"SELECT ID FROM SelectModuleEquipmentCheckStateFactions WHERE ID = '{dr["FactionID"]}'", (_, __) => { });
 
                 var faction = Faction.Get((string)dr["FactionID"]);
                 if (faction != null) ((ICollection<FactionsListItem>)args[0]).Add(new FactionsListItem(faction, chkState));
@@ -130,7 +130,7 @@ WHERE
         /// </summary>
         private void InitPreset(string moduleID)
         {
-            DBConnection.CommonDB.ExecQuery($"SELECT DISTINCT PresetID, PresetName FROM ModulePresets WHERE ModuleID = '{moduleID}'", (SQLiteDataReader dr, object[] args) =>
+            SettingDatabase.Instance.ExecQuery($"SELECT DISTINCT PresetID, PresetName FROM ModulePresets WHERE ModuleID = '{moduleID}'", (SQLiteDataReader dr, object[] args) =>
             {
                 Presets.Add(new PresetComboboxItem((long)dr["PresetID"], (string)dr["PresetName"]));
             });
@@ -143,19 +143,19 @@ WHERE
         public void SaveCheckState()
         {
             // 前回値クリア
-            DBConnection.CommonDB.ExecQuery("DELETE FROM SelectModuleEquipmentCheckStateFactions", null);
+            SettingDatabase.Instance.ExecQuery("DELETE FROM SelectModuleEquipmentCheckStateFactions", null);
 
             // トランザクション開始
-            DBConnection.CommonDB.BeginTransaction();
+            SettingDatabase.Instance.BeginTransaction();
 
             // モジュール種別のチェック状態保存
             foreach (var id in Factions.Where(x => x.IsChecked).Select(x => x.Faction.FactionID))
             {
-                DBConnection.CommonDB.ExecQuery($"INSERT INTO SelectModuleEquipmentCheckStateFactions(ID) VALUES ('{id}')", null);
+                SettingDatabase.Instance.ExecQuery($"INSERT INTO SelectModuleEquipmentCheckStateFactions(ID) VALUES ('{id}')", null);
             }
 
             // コミット
-            DBConnection.CommonDB.Commit();
+            SettingDatabase.Instance.Commit();
         }
 
 
@@ -179,7 +179,7 @@ WHERE
                 param.Add("presetName", System.Data.DbType.String,  newPresetName);
                 param.Add("moduleID",   System.Data.DbType.String,  _Module.ModuleID);
                 param.Add("presetID",   System.Data.DbType.Int64,   SelectedPreset.ID);
-                DBConnection.CommonDB.ExecQuery($"UPDATE ModulePresets Set PresetName = :presetName WHERE ModuleID = :moduleID AND presetID = :presetID", param);
+                SettingDatabase.Instance.ExecQuery($"UPDATE ModulePresets Set PresetName = :presetName WHERE ModuleID = :moduleID AND presetID = :presetID", param);
 
                 var newPreset = new PresetComboboxItem(SelectedPreset.ID, newPresetName);
                 Presets.Replace(SelectedPreset, newPreset);
@@ -207,17 +207,17 @@ WHERE
 	ModuleID = '{_Module.ModuleID}' AND
     ( PresetID + 1 ) NOT IN ( SELECT PresetID FROM ModulePresets WHERE ModuleID = '{_Module.ModuleID}')";
 
-                DBConnection.CommonDB.ExecQuery(query, (SQLiteDataReader dr, object[] args) =>
+                SettingDatabase.Instance.ExecQuery(query, (SQLiteDataReader dr, object[] args) =>
                 {
                     id = (long)dr["PresetID"];
                 });
 
                 var item = new PresetComboboxItem(id, presetName);
 
-                DBConnection.CommonDB.BeginTransaction();
-                DBConnection.CommonDB.ExecQuery($"INSERT INTO ModulePresets(ModuleID, PresetID, PresetName) VALUES('{_Module.ModuleID}', {item.ID}, '{item.Name}')");
+                SettingDatabase.Instance.BeginTransaction();
+                SettingDatabase.Instance.ExecQuery($"INSERT INTO ModulePresets(ModuleID, PresetID, PresetName) VALUES('{_Module.ModuleID}', {item.ID}, '{item.Name}')");
                 Presets.Add(item);
-                DBConnection.CommonDB.Commit();
+                SettingDatabase.Instance.Commit();
 
                 SelectedPreset = item;
             }
@@ -236,10 +236,10 @@ WHERE
             var result = LocalizedMessageBox.Show("Lang:DeletePresetConfirmMessage", "Lang:Error", MessageBoxButton.YesNo, MessageBoxImage.Exclamation, MessageBoxResult.No, SelectedPreset.Name);
             if (result == MessageBoxResult.Yes)
             {
-                DBConnection.CommonDB.BeginTransaction();
-                DBConnection.CommonDB.ExecQuery($"DELETE FROM ModulePresets WHERE ModuleID = '{_Module.ModuleID}' AND PresetID = {SelectedPreset.ID}");
+                SettingDatabase.Instance.BeginTransaction();
+                SettingDatabase.Instance.ExecQuery($"DELETE FROM ModulePresets WHERE ModuleID = '{_Module.ModuleID}' AND PresetID = {SelectedPreset.ID}");
                 Presets.Remove(SelectedPreset);
-                DBConnection.CommonDB.Commit();
+                SettingDatabase.Instance.Commit();
 
                 SelectedPreset = Presets.FirstOrDefault();
             }

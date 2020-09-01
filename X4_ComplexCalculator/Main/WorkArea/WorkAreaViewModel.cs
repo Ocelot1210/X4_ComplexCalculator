@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -246,7 +246,7 @@ FROM
 WHERE
     ( LayoutID + 1 ) NOT IN ( SELECT LayoutID FROM WorkAreaLayouts)";
 
-            DBConnection.CommonDB.ExecQuery(query, (dr, args) =>
+            SettingDatabase.Instance.ExecQuery(query, (dr, args) =>
             {
                 id = (long)dr["LayoutID"];
             });
@@ -257,7 +257,7 @@ WHERE
             param.Add("layoutName", System.Data.DbType.String, layoutName);
             param.Add("layout",     System.Data.DbType.Binary, GetCurrentLayout() ?? throw new InvalidOperationException());
 
-            DBConnection.CommonDB.ExecQuery("INSERT INTO WorkAreaLayouts(LayoutID, LayoutName, Layout) VALUES(:layoutID, :layoutName, :layout)", param);
+            SettingDatabase.Instance.ExecQuery("INSERT INTO WorkAreaLayouts(LayoutID, LayoutName, Layout) VALUES(:layoutID, :layoutName, :layout)", param);
 
             return id;
         }
@@ -271,7 +271,7 @@ WHERE
             var param = new SQLiteCommandParameters(2);
             param.Add("layout", System.Data.DbType.Binary, GetCurrentLayout() ?? throw new InvalidOperationException());
             param.Add("LayoutID", System.Data.DbType.Int32, layoutID);
-            DBConnection.CommonDB.ExecQuery($"UPDATE WorkAreaLayouts SET Layout = :layout WHERE LayoutID = :layoutID", param);
+            SettingDatabase.Instance.ExecQuery($"UPDATE WorkAreaLayouts SET Layout = :layout WHERE LayoutID = :layoutID", param);
         }
 
 
@@ -281,7 +281,7 @@ WHERE
         /// <param name="layoutID"></param>
         public void SetLayout(long layoutID)
         {
-            DBConnection.CommonDB.ExecQuery($"SELECT Layout FROM WorkAreaLayouts WHERE LayoutID = {layoutID}", (dr, args) =>
+            SettingDatabase.Instance.ExecQuery($"SELECT Layout FROM WorkAreaLayouts WHERE LayoutID = {layoutID}", (dr, args) =>
             {
                 _Layout = (byte[])dr["Layout"];
             });

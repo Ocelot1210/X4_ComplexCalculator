@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -161,11 +161,11 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
             {
                 var currentEquipmentIds = Equipment.GetAllEquipment().Select(x => x.EquipmentID).OrderBy(x => x).ToArray();
 
-                DBConnection.CommonDB.ExecQuery($"SELECT * FROM ModulePresets WHERE ModuleID = '{module.ModuleID}' AND PresetName = '{Name}'", (dr1, _) =>
+                SettingDatabase.Instance.ExecQuery($"SELECT * FROM ModulePresets WHERE ModuleID = '{module.ModuleID}' AND PresetName = '{Name}'", (dr1, _) =>
                 {
                     var eq = new List<Equipment>();
 
-                    DBConnection.CommonDB.ExecQuery($"SELECT EquipmentID FROM ModulePresetsEquipment WHERE ModuleID = '{module.ModuleID}' AND PresetID = {(long)dr1["PresetID"]}", (dr2, __) =>
+                    SettingDatabase.Instance.ExecQuery($"SELECT EquipmentID FROM ModulePresetsEquipment WHERE ModuleID = '{module.ModuleID}' AND PresetID = {(long)dr1["PresetID"]}", (dr2, __) =>
                     {
                         var eqp = DB.X4DB.Equipment.Get((string)dr2["EquipmentID"]);
                         if (eqp != null)
@@ -226,15 +226,15 @@ WHERE
 	ModuleID = '{Module.ModuleID}' AND
     ( PresetID + 1 ) NOT IN ( SELECT PresetID FROM ModulePresets WHERE ModuleID = '{Module.ModuleID}')";
 
-            DBConnection.CommonDB.ExecQuery(query, (dr, _) =>
+            SettingDatabase.Instance.ExecQuery(query, (dr, _) =>
             {
                 id = (long)dr["PresetID"];
             });
 
             try
             {
-                DBConnection.CommonDB.BeginTransaction();
-                DBConnection.CommonDB.ExecQuery($"INSERT INTO ModulePresets(ModuleID, PresetID, PresetName) VALUES('{Module.ModuleID}', {id}, '{Name}')");
+                SettingDatabase.Instance.BeginTransaction();
+                SettingDatabase.Instance.ExecQuery($"INSERT INTO ModulePresets(ModuleID, PresetID, PresetName) VALUES('{Module.ModuleID}', {id}, '{Name}')");
 
                 var param = new SQLiteCommandParameters(4);
                 foreach (var eqp in Equipment.GetAllEquipment())
@@ -244,14 +244,14 @@ WHERE
                     param.Add("equipmentID",   DbType.String, eqp.EquipmentID);
                     param.Add("equipmentType", DbType.String, eqp.EquipmentType.EquipmentTypeID);
                 }
-                DBConnection.CommonDB.ExecQuery($"INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES(:moduleID, :presetID, :equipmentID, :equipmentType)", param);
+                SettingDatabase.Instance.ExecQuery($"INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES(:moduleID, :presetID, :equipmentID, :equipmentType)", param);
 
-                DBConnection.CommonDB.Commit();
+                SettingDatabase.Instance.Commit();
                 Imported = true;
             }
             catch
             {
-                DBConnection.CommonDB.Rollback();
+                SettingDatabase.Instance.Rollback();
                 ret = false;
             }
 

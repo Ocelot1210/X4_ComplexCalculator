@@ -235,13 +235,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
                 if (!string.IsNullOrEmpty(id))
                 {
                     // 前回値削除
-                    DBConnection.CommonDB.ExecQuery($"DELETE FROM ModulePresetsEquipment WHERE ModuleID = '{Module.Module.ModuleID}' AND PresetID = {SelectedPreset.ID} AND EquipmentType = '{id}'");
+                    SettingDatabase.Instance.ExecQuery($"DELETE FROM ModulePresetsEquipment WHERE ModuleID = '{Module.Module.ModuleID}' AND PresetID = {SelectedPreset.ID} AND EquipmentType = '{id}'");
 
                     // 装備中のプリセットを追加
                     foreach (var equipment in Equipped.Values.SelectMany((x) => x))
                     {
                         var query = $"INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES('{Module.Module.ModuleID}', {SelectedPreset.ID}, '{equipment.Equipment.EquipmentID}', '{equipment.Equipment.EquipmentType.EquipmentTypeID}')";
-                        DBConnection.CommonDB.ExecQuery(query);
+                        SettingDatabase.Instance.ExecQuery(query);
                     }
                 }
             }

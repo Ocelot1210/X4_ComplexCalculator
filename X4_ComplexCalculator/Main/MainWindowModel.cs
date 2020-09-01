@@ -44,12 +44,13 @@ namespace X4_ComplexCalculator.Main
         {
             // DB接続開始
             DBConnection.Open();
+            SettingDatabase.Open();
 
             var pathes = new List<string>();
 
             var vmList = new List<WorkAreaViewModel>();
 
-            DBConnection.CommonDB.ExecQuery("SELECT * FROM OpenedFiles", (dr, _) =>
+            SettingDatabase.Instance.ExecQuery("SELECT * FROM OpenedFiles", (dr, _) =>
             {
                 var path = (string)dr["Path"];
                 if (File.Exists(path))
@@ -59,7 +60,7 @@ namespace X4_ComplexCalculator.Main
             });
 
             // 開いているファイルテーブルを初期化
-            DBConnection.CommonDB.ExecQuery("DELETE FROM OpenedFiles");
+            SettingDatabase.Instance.ExecQuery("DELETE FROM OpenedFiles");
 
             _WorkAreFileIO.OpenFiles(pathes);
 
@@ -138,7 +139,7 @@ namespace X4_ComplexCalculator.Main
 
                 param.AddRange("path", System.Data.DbType.String, pathes);
 
-                DBConnection.CommonDB.ExecQuery("INSERT INTO OpenedFiles(Path) VALUES(:path)", param);
+                SettingDatabase.Instance.ExecQuery("INSERT INTO OpenedFiles(Path) VALUES(:path)", param);
             }
 
             return canceled;
