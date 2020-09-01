@@ -263,10 +263,15 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         private void OnModuleEquipmentChanged(ModulesGridItem module, IEnumerable<string> prevEquipments)
         {
             // 新しい装備一覧
-            var newEquipments = module.ModuleEquipment.GetAllEquipment().GroupBy(x => x.EquipmentID).Select(x => (x.Key, "default", (long)x.Count()));
+            var newEquipments = module.ModuleEquipment.GetAllEquipment()
+                                                      .GroupBy(x => x.EquipmentID)
+                                                      .Select(x => (x.Key, "default", (long)x.Count()))
+                                                      .Where(x => 0 < x.Item3);
 
             // 古い装備一覧
-            var oldEquipments = prevEquipments.GroupBy(x => x).Select(x => (x.Key, "default", -(long)x.Count()));
+            var oldEquipments = prevEquipments.GroupBy(x => x)
+                                              .Select(x => (x.Key, "default", -(long)x.Count()))
+                                              .Where(x => 0 < x.Item3);
 
             // リソース集計
             Dictionary<string, long> resources = _Calculator.CalcResource(newEquipments.Concat(oldEquipments));
@@ -352,11 +357,20 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             var moduleList = modules.Select(x => (x.Module.ModuleID, x.SelectedMethod.Method, x.ModuleCount));
 
             // モジュールの装備一覧(装備IDごとに集計)
-            var equipments = modules.Where(x => x.ModuleEquipment.CanEquipped)
-                                    .Select(x => x.ModuleEquipment.GetAllEquipment().Select(y => (ID: y.EquipmentID, Count: x.ModuleCount)))
-                                    .Where(x => x.Any())
-                                    .GroupBy(x => x.First().ID)
-                                    .Select(x => (ID: x.Key, Method: "default", Count: x.Sum(y => y.Sum(z => z.Count))));
+            var equipments = modules.Where(x => x.ModuleEquipment.CanEquipped &&
+                                                x.ModuleEquipment.GetAllEquipment().Any())
+                                    .SelectMany
+                                    (
+                                        x => x.ModuleEquipment.GetAllEquipment().Select
+                                        (
+                                            y => (ID: y.EquipmentID, Count: x.ModuleCount)
+                                        )
+                                    )
+                                    .GroupBy(x => x.ID)
+                                    .Select
+                                    (
+                                        x => (ID: x.Key, Method: "default", Count: x.Sum(y => y.Count))
+                                    );
 
             return _Calculator.CalcResource(moduleList.Concat(equipments));
         }
