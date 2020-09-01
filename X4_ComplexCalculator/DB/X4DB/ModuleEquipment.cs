@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -66,7 +66,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         {
             _ModuleEquipments.Clear();
 
-            DBConnection.X4DB.ExecQuery($"SELECT ModuleID FROM Module", (dr, args) =>
+            X4Database.Instance.ExecQuery($"SELECT ModuleID FROM Module", (dr, args) =>
             {
                 var id = (string)dr["ModuleID"];
                 _ModuleEquipments.Add(id, new ModuleEquipment(id));

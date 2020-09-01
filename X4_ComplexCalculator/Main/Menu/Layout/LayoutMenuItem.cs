@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows;
 using System.Windows.Input;
 using Prism.Commands;
@@ -79,7 +79,7 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
             {
                 if (SetProperty(ref _IsChecked, value))
                 {
-                    DBConnection.CommonDB.ExecQuery($"UPDATE WorkAreaLayouts SET IsChecked = {(IsChecked ? 1 : 0)} WHERE LayoutID = {LayoutID}");
+                    SettingDatabase.Instance.ExecQuery($"UPDATE WorkAreaLayouts SET IsChecked = {(IsChecked ? 1 : 0)} WHERE LayoutID = {LayoutID}");
                 }
             }
         }
@@ -138,7 +138,7 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
                 var param = new SQLiteCommandParameters(2);
                 param.Add("layoutName", System.Data.DbType.String, LayoutName);
                 param.Add("layoutID", System.Data.DbType.Int32, LayoutID);
-                DBConnection.CommonDB.ExecQuery($"UPDATE WorkAreaLayouts SET LayoutName = :layoutName WHERE LayoutID = :layoutID", param);
+                SettingDatabase.Instance.ExecQuery($"UPDATE WorkAreaLayouts SET LayoutName = :layoutName WHERE LayoutID = :layoutID", param);
             }
         }
 
@@ -152,7 +152,7 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
 
             if (result == MessageBoxResult.Yes)
             {
-                DBConnection.CommonDB.ExecQuery($"DELETE FROM WorkAreaLayouts WHERE LayoutID = {LayoutID}");
+                SettingDatabase.Instance.ExecQuery($"DELETE FROM WorkAreaLayouts WHERE LayoutID = {LayoutID}");
                 IsDeleted = true;
             }
         }

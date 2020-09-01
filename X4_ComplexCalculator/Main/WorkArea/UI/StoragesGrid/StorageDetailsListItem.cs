@@ -85,7 +85,7 @@ WHERE
 
             string? moduleName = null;
             long capacity = 0;
-            DBConnection.X4DB.ExecQuery(query, (dr, args) =>
+            X4Database.Instance.ExecQuery(query, (dr, args) =>
             {
                 moduleName = (string)dr["Name"];
                 capacity   = (long)dr["Amount"];

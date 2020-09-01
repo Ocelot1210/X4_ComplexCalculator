@@ -88,7 +88,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         public static void Init()
         {
             _Wares.Clear();
-            DBConnection.X4DB.ExecQuery($"SELECT * FROM Ware", (dr, args) =>
+            X4Database.Instance.ExecQuery($"SELECT * FROM Ware", (dr, args) =>
             {
                 var id = (string)dr["WareID"];
                 var name = (string)dr["Name"];

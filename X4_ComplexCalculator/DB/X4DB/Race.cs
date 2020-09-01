@@ -47,7 +47,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         public static void Init()
         {
             _Races.Clear();
-            DBConnection.X4DB.ExecQuery("SELECT RaceID, Name FROM Race", (dr, args) =>
+            X4Database.Instance.ExecQuery("SELECT RaceID, Name FROM Race", (dr, args) =>
             {
                 var id = (string)dr["RaceID"];
                 var name = (string)dr["Name"];

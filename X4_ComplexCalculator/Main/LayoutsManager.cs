@@ -79,7 +79,7 @@ namespace X4_ComplexCalculator.Main
         {
             // レイアウト一覧読み込み
             var layouts = new List<LayoutMenuItem>();
-            DBConnection.CommonDB.ExecQuery("SELECT LayoutID, LayoutName, IsChecked FROM WorkAreaLayouts", (dr, args) =>
+            SettingDatabase.Instance.ExecQuery("SELECT LayoutID, LayoutName, IsChecked FROM WorkAreaLayouts", (dr, args) =>
             {
                 layouts.Add(new LayoutMenuItem((long)dr["LayoutID"], (string)dr["LayoutName"], (long)dr["IsChecked"] == 1));
             });
@@ -106,15 +106,15 @@ namespace X4_ComplexCalculator.Main
                 {
                     try
                     {
-                        DBConnection.CommonDB.BeginTransaction();
+                        SettingDatabase.Instance.BeginTransaction();
                         var layoutID = vm.SaveLayout(layoutName);
-                        DBConnection.CommonDB.Commit();
+                        SettingDatabase.Instance.Commit();
 
                         Layouts.Add(new LayoutMenuItem(layoutID, layoutName, false));
                     }
                     catch (Exception ex)
                     {
-                        DBConnection.CommonDB.Rollback();
+                        SettingDatabase.Instance.Rollback();
                         LocalizedMessageBox.Show("Lang:LayoutSaveFailedMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, ex.Message);
                     }
 
@@ -176,15 +176,15 @@ namespace X4_ComplexCalculator.Main
                     {
                         try
                         {
-                            DBConnection.CommonDB.BeginTransaction();
+                            SettingDatabase.Instance.BeginTransaction();
                             _WorkAreaManager.ActiveContent.OverwriteSaveLayout(menuItem.LayoutID);
-                            DBConnection.CommonDB.Commit();
+                            SettingDatabase.Instance.Commit();
 
                             LocalizedMessageBox.Show("Lang:LayoutOverwritedMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, _WorkAreaManager.ActiveContent.Title, menuItem.LayoutName);
                         }
                         catch (Exception ex)
                         {
-                            DBConnection.CommonDB.Rollback();
+                            SettingDatabase.Instance.Rollback();
                             LocalizedMessageBox.Show("Lang:LayoutOverwriteFailedMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, ex.Message);
                         }
                     }

@@ -56,7 +56,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         public static void Init()
         {
             _WareGroups.Clear();
-            DBConnection.X4DB.ExecQuery($"SELECT WareGroupID, Name, Tier FROM WareGroup", (dr, args) =>
+            X4Database.Instance.ExecQuery($"SELECT WareGroupID, Name, Tier FROM WareGroup", (dr, args) =>
             {
                 var id = (string)dr["WareGroupID"];
                 var name = (string)dr["Name"];

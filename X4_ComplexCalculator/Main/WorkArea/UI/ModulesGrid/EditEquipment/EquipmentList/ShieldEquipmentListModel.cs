@@ -85,7 +85,7 @@ WHERE
     ModuleID = '{Module.Module.ModuleID}' AND
     PresetID = {item.ID} AND
     EquipmentType = 'shields'";
-                    DBConnection.CommonDB.ExecQuery(query);
+                    SettingDatabase.Instance.ExecQuery(query);
                 }
             }
 
@@ -113,7 +113,7 @@ VALUES(
     '{equipment.Equipment.EquipmentID}',
     '{equipment.Equipment.EquipmentType.EquipmentTypeID}'
 )";
-                        DBConnection.CommonDB.ExecQuery(query);
+                        SettingDatabase.Instance.ExecQuery(query);
                     }
                 }
             }
@@ -147,7 +147,7 @@ WHERE
     Equipment.EquipmentID IN (SELECT EquipmentResource.EquipmentID FROM EquipmentResource) AND
     EquipmentOwner.FactionID IN ({selectedFactions})";
 
-            DBConnection.X4DB.ExecQuery(query, (dr, _) =>
+            X4Database.Instance.ExecQuery(query, (dr, _) =>
             {
                 var eqp = Equipment.Get((string)dr["EquipmentID"]);
                 if (eqp != null)
@@ -196,7 +196,7 @@ WHERE
 
             var equipments = new List<EquipmentListItem>(_MaxAmount.Values.Count());
 
-            DBConnection.CommonDB.ExecQuery(query, (dr, _) =>
+            SettingDatabase.Instance.ExecQuery(query, (dr, _) =>
             {
                 var eqp = Equipment.Get((string)dr["EquipmentID"]);
                 if (eqp != null)

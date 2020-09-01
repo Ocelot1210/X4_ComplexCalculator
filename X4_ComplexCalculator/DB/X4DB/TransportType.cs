@@ -48,7 +48,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         public static void Init()
         {
             _TransportTypes.Clear();
-            DBConnection.X4DB.ExecQuery($"SELECT TransportTypeID, Name FROM TransportType", (dr, args) =>
+            X4Database.Instance.ExecQuery($"SELECT TransportTypeID, Name FROM TransportType", (dr, args) =>
             {
                 var id = (string)dr["TransportTypeID"];
                 var name = (string)dr["Name"];

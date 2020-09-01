@@ -104,7 +104,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
             _StorageAssignInfo = storageAssignInfo;
 
 
-            DBConnection.X4DB.ExecQuery("SELECT TransportTypeID FROM TransportType", (dr, args) =>
+            X4Database.Instance.ExecQuery("SELECT TransportTypeID FROM TransportType", (dr, args) =>
             {
                 _CapacityDict.Add((string)dr["TransportTypeID"], new StorageCapacityInfo());
             });

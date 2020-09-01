@@ -152,7 +152,7 @@ WHERE
     Macro = :macro";
 
 
-                DBConnection.X4DB.ExecQuery(query, modParam, (dr, _) =>
+                X4Database.Instance.ExecQuery(query, modParam, (dr, _) =>
                 {
                     var module = Module.Get((string)dr["ModuleID"]);
                     if (module != null)
@@ -175,7 +175,7 @@ FROM
 WHERE
     MacroName = :macro";
 
-                DBConnection.X4DB.ExecQuery(query, eqParam, (dr, _) =>
+                X4Database.Instance.ExecQuery(query, eqParam, (dr, _) =>
                 {
                     ModuleEquipmentManager? mng = null;
 

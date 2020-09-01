@@ -237,7 +237,7 @@ WHERE
             }
 
             // 容量をタイプ別に集計
-            DBConnection.X4DB.ExecQuery(query, sqlParam, SumStorage, modulesDict);
+            X4Database.Instance.ExecQuery(query, sqlParam, SumStorage, modulesDict);
 
             return modulesDict;
         }

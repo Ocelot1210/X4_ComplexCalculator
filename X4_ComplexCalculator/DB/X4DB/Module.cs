@@ -89,7 +89,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         public static void Init()
         {
             _Modules.Clear();
-            DBConnection.X4DB.ExecQuery("SELECT ModuleID, ModuleTypeID, Name, MaxWorkers, WorkersCapacity, NoBlueprint FROM Module", (dr, args) =>
+            X4Database.Instance.ExecQuery("SELECT ModuleID, ModuleTypeID, Name, MaxWorkers, WorkersCapacity, NoBlueprint FROM Module", (dr, args) =>
             {
                 var id = (string)dr["ModuleID"];
                 var name = (string)dr["Name"];
@@ -99,7 +99,7 @@ namespace X4_ComplexCalculator.DB.X4DB
                 var noBlueprint = (long)dr["NoBlueprint"] == 1;
 
                 var moduleOwners = new List<Faction>();
-                DBConnection.X4DB.ExecQuery($"SELECT FactionID FROM ModuleOwner WHERE ModuleID = '{id}'", (dr2, args2) =>
+                X4Database.Instance.ExecQuery($"SELECT FactionID FROM ModuleOwner WHERE ModuleID = '{id}'", (dr2, args2) =>
                 {
                     var faction = Faction.Get((string)dr2["FactionID"]);
                     if (faction != null) moduleOwners.Add(faction);
