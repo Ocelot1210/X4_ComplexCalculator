@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -197,7 +197,7 @@ namespace X4_ComplexCalculator.Main
             OpenCommand                      = new DelegateCommand(Open);
             UpdateDBCommand                  = new DelegateCommand(_MainWindowModel.UpdateDB);
             ReportIssueCommand               = new DelegateCommand(ReportIssue);
-            VersionInfoCommand               = new DelegateCommand(VersionInfo);
+            VersionInfoCommand               = new DelegateCommand(ShowVersionInfo);
             DocumentClosingCommand           = new DelegateCommand<DocumentClosingEventArgs>(DocumentClosing);
             _WorkAreaFileIO.PropertyChanged += Member_PropertyChanged;
 
@@ -341,15 +341,9 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// バージョン情報
         /// </summary>
-        private void VersionInfo()
+        private void ShowVersionInfo()
         {
-            const string dirty = ThisAssembly.Git.IsDirty ? "+dirty" : "";
-#if DEBUG
-            const string config = " (Debug)";
-#else
-            const string config = " (Release)";
-#endif
-            const string version = ThisAssembly.Git.Tag + dirty + config;
+            const string version = VersionInfo.DetailVersion;
             const string commit = ThisAssembly.Git.Sha;
             var dotnetVersion = Environment.Version.ToString();
 
