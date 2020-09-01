@@ -44,7 +44,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         public static void Init()
         {
             _Sizes.Clear();
-            DBConnection.X4DB.ExecQuery("SELECT SizeID, Name FROM Size", (dr, args) =>
+            X4Database.Instance.ExecQuery("SELECT SizeID, Name FROM Size", (dr, args) =>
             {
                 var id = (string)dr["SizeID"];
                 var name = (string)dr["Name"];

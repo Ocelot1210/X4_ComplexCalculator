@@ -147,7 +147,7 @@ WHERE
     Equipment.EquipmentID IN (SELECT EquipmentResource.EquipmentID FROM EquipmentResource) AND
     EquipmentOwner.FactionID IN ({selectedFactions})";
 
-            DBConnection.X4DB.ExecQuery(query, (dr, _) =>
+            X4Database.Instance.ExecQuery(query, (dr, _) =>
             {
                 var eqp = Equipment.Get((string)dr["EquipmentID"]);
                 if (eqp != null)

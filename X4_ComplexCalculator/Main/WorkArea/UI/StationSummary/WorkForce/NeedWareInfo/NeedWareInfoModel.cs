@@ -87,7 +87,7 @@ WHERE
 	WorkUnitID = 'workunit_busy'";
 
             // 集計対象ウェアを取得
-            DBConnection.X4DB.ExecQuery(query, (dr, _) =>
+            X4Database.Instance.ExecQuery(query, (dr, _) =>
             {
                 AggregateTargetProducts.Add((string)dr["WareID"], 0);
             });

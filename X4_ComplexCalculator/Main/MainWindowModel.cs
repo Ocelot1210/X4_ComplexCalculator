@@ -43,7 +43,7 @@ namespace X4_ComplexCalculator.Main
         public void Init()
         {
             // DB接続開始
-            DBConnection.Open();
+            X4Database.Open();
             SettingDatabase.Open();
 
             var pathes = new List<string>();
@@ -81,7 +81,7 @@ namespace X4_ComplexCalculator.Main
 
             if (result == MessageBoxResult.Yes)
             {
-                if (DBConnection.UpdateDB())
+                if (X4Database.UpdateDB())
                 {
                     // DB更新成功
                     LocalizedMessageBox.Show("Lang:DBUpdateRestartRequestMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);

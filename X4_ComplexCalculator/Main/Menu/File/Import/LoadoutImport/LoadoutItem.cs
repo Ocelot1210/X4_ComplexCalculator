@@ -113,7 +113,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         {
             string macro = "";
 
-            DBConnection.X4DB.ExecQuery($"SELECT Macro FROM Module WHERE Macro = '{elm.Attribute("macro").Value}'", (dr, _) =>
+            X4Database.Instance.ExecQuery($"SELECT Macro FROM Module WHERE Macro = '{elm.Attribute("macro").Value}'", (dr, _) =>
             {
                 macro = (string)dr["Macro"];
             });
@@ -124,7 +124,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
             }
 
             string moduleID = "";
-            DBConnection.X4DB.ExecQuery($"SELECT ModuleID FROM Module WHERE Macro = '{macro}'", (dr, _) =>
+            X4Database.Instance.ExecQuery($"SELECT ModuleID FROM Module WHERE Macro = '{macro}'", (dr, _) =>
             {
                 moduleID = (string)dr["ModuleID"];
             });
@@ -191,7 +191,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
             {
                 var id = "";
 
-                DBConnection.X4DB.ExecQuery($"SELECT EquipmentID FROM Equipment WHERE MacroName = '{elm.Attribute("macro").Value}'", (dr, _) =>
+                X4Database.Instance.ExecQuery($"SELECT EquipmentID FROM Equipment WHERE MacroName = '{elm.Attribute("macro").Value}'", (dr, _) =>
                 {
                     id = (string)dr["EquipmentID"];
                 });

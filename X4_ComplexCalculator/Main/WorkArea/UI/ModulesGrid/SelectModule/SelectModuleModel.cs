@@ -79,7 +79,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
                 items.Add(new ModulesListItem((string)dr["ModuleTypeID"], (string)dr["Name"], chked));
             }
 
-            DBConnection.X4DB.ExecQuery(@"
+            X4Database.Instance.ExecQuery(@"
 SELECT
     ModuleTypeID,
     Name
@@ -109,7 +109,7 @@ ORDER BY Name", init, "SelectModuleCheckStateTypes");
                 if (faction != null) items.Add(new FactionsListItem(faction, isChecked));
             }
 
-            DBConnection.X4DB.ExecQuery(@"
+            X4Database.Instance.ExecQuery(@"
 SELECT
     FactionID,
     Name
@@ -151,7 +151,7 @@ WHERE
 	ModuleOwner.FactionID IN ({string.Join(", ", ModuleOwners.Where(x => x.IsChecked).Select(x => $"'{x.Faction.FactionID}'"))})";
 
             var list = new List<ModulesListItem>();
-            DBConnection.X4DB.ExecQuery(query, SetModules, list);
+            X4Database.Instance.ExecQuery(query, SetModules, list);
             Modules.Reset(list);
         }
 

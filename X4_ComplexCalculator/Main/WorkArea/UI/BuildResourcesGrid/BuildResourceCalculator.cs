@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using X4_ComplexCalculator.DB;
@@ -36,7 +36,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
 
             // モジュールの生産に必要なリソース一覧を取得
             {
-                DBConnection.X4DB.ExecQuery("SELECT ModuleID, Method, WareID, Amount FROM ModuleResource", (dr, _) =>
+                X4Database.Instance.ExecQuery("SELECT ModuleID, Method, WareID, Amount FROM ModuleResource", (dr, _) =>
                 {
                     var id = (string)dr["ModuleID"];
                     if (!resources.ContainsKey(id))
@@ -73,7 +73,7 @@ WHERE
     Equipment.EquipmentID = EquipmentResource.EquipmentID AND
     Equipment.EquipmentTypeID IN ('turrets', 'shields')";
 
-                DBConnection.X4DB.ExecQuery(query, (dr, _) =>
+                X4Database.Instance.ExecQuery(query, (dr, _) =>
                 {
                     var id = (string)dr["EquipmentID"];
                     if (!resources.ContainsKey(id))

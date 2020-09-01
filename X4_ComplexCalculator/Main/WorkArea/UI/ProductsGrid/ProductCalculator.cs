@@ -74,7 +74,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             {
                 var dict = new Dictionary<string, (string, string)>();
 
-                DBConnection.X4DB.ExecQuery("SELECT * FROM ModuleProduct", (dr, _) =>
+                X4Database.Instance.ExecQuery("SELECT * FROM ModuleProduct", (dr, _) =>
                 {
                     dict.Add((string)dr["ModuleID"], ((string)dr["WareID"], (string)dr["Method"]));
                 });
@@ -86,7 +86,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             {
                 var dict = new Dictionary<string, List<Tuple<string, string, double>>>();
 
-                DBConnection.X4DB.ExecQuery("SELECT * FROM WareEffect", (dr, _) =>
+                X4Database.Instance.ExecQuery("SELECT * FROM WareEffect", (dr, _) =>
                 {
                     var wareID = (string)dr["WareID"];
                     if (!dict.ContainsKey(wareID))
@@ -105,7 +105,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             {
                 var dict = new Dictionary<string, List<Tuple<string, long, double>>>();
 
-                DBConnection.X4DB.ExecQuery("SELECT * FROM WareProduction", (dr, _) =>
+                X4Database.Instance.ExecQuery("SELECT * FROM WareProduction", (dr, _) =>
                 {
                     var wareID = (string)dr["WareID"];
                     if (!dict.ContainsKey(wareID))
@@ -124,7 +124,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             {
                 var dict = new Dictionary<string, List<Tuple<string, string, long>>>();
 
-                DBConnection.X4DB.ExecQuery("SELECT * FROM WareResource", (dr, _) =>
+                X4Database.Instance.ExecQuery("SELECT * FROM WareResource", (dr, _) =>
                 {
                     var wareID = (string)dr["WareID"];
                     if (!dict.ContainsKey(wareID))
@@ -155,7 +155,7 @@ WHERE
 	WorkUnitProduction.WorkUnitID = 'workunit_busy' AND
 	WorkUnitProduction.Method = WorkUnitResource.Method";
 
-                DBConnection.X4DB.ExecQuery(query, (dr, _) =>
+                X4Database.Instance.ExecQuery(query, (dr, _) =>
                 {
                     var method = (string)dr["Method"];
                     if (!dict.ContainsKey(method))
@@ -190,7 +190,7 @@ WHERE
 	Module.ModuleTypeID = 'habitation'";
 
                 var dict = new Dictionary<string, (string, long)>();
-                DBConnection.X4DB.ExecQuery(query, (dr, _) =>
+                X4Database.Instance.ExecQuery(query, (dr, _) =>
                 {
                     dict.Add((string)dr["ModuleID"], ((string)dr["RaceID"], (long)dr["WorkersCapacity"]));
                 });

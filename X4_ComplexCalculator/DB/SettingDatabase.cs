@@ -37,7 +37,7 @@ namespace X4_ComplexCalculator.DB
         /// 設定データベースを開く
         /// </summary>
         /// <returns>設定データベース</returns>
-        public new static void Open()
+        public static void Open()
         {
             if (_Instance != null) return;
 

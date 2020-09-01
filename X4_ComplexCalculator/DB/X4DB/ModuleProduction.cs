@@ -46,7 +46,7 @@ namespace X4_ComplexCalculator.DB.X4DB
             _ModuleProductions.Clear();
 
             var dict = new Dictionary<string, List<ModuleProduction>>();
-            DBConnection.X4DB.ExecQuery($"SELECT ModuleID, Method, Time FROM ModuleProduction", (dr, _) =>
+            X4Database.Instance.ExecQuery($"SELECT ModuleID, Method, Time FROM ModuleProduction", (dr, _) =>
             {
                 var id = (string)dr["ModuleID"];
                 if (!dict.ContainsKey(id))

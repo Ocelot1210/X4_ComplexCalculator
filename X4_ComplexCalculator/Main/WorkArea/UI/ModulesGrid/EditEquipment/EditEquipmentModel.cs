@@ -93,7 +93,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
             }
 
             var sizes = new List<DB.X4DB.Size>();
-            DBConnection.X4DB.ExecQuery($"SELECT DISTINCT ModuleShield.SizeID FROM ModuleShield, ModuleTurret WHERE ModuleShield.ModuleID = ModuleTurret.ModuleID AND ModuleShield.ModuleID = '{moduleID}'", AddItem, sizes);
+            X4Database.Instance.ExecQuery($"SELECT DISTINCT ModuleShield.SizeID FROM ModuleShield, ModuleTurret WHERE ModuleShield.ModuleID = ModuleTurret.ModuleID AND ModuleShield.ModuleID = '{moduleID}'", AddItem, sizes);
             EquipmentSizes.AddRange(sizes);
         }
 
@@ -121,7 +121,7 @@ WHERE
 	EquipmentID IN (SELECT EquipmentID FROM Equipment WHERE (EquipmentTypeID IN ('turrets', 'shields')))";
 
             var items = new List<FactionsListItem>();
-            DBConnection.X4DB.ExecQuery(query, AddItem, items);
+            X4Database.Instance.ExecQuery(query, AddItem, items);
             Factions.AddRange(items);
         }
 

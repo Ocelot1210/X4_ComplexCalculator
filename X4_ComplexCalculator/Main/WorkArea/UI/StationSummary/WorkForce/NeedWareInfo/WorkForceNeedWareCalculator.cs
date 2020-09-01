@@ -51,7 +51,7 @@ WHERE
 	WorkUnitResource.WorkUnitID = WorkUnitProduction.WorkUnitID AND
 	WorkUnitResource.Method     = WorkUnitProduction.Method";
 
-            DBConnection.X4DB.ExecQuery(query, (dr, _) =>
+            X4Database.Instance.ExecQuery(query, (dr, _) =>
             {
                 var method = (string)dr["Method"];
                 var wareID = (string)dr["WareID"];

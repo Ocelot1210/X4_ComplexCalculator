@@ -46,7 +46,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         public static void Init()
         {
             _EquipmentTypes.Clear();
-            DBConnection.X4DB.ExecQuery($"SELECT EquipmentTypeID, Name FROM EquipmentType", (dr, args) =>
+            X4Database.Instance.ExecQuery($"SELECT EquipmentTypeID, Name FROM EquipmentType", (dr, args) =>
             {
                 var id = (string)dr["EquipmentTypeID"];
                 var name = (string)dr["Name"];

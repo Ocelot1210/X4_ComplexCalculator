@@ -55,7 +55,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         public static void Init()
         {
             _Factions.Clear();
-            DBConnection.X4DB.ExecQuery("SELECT FactionID, Name, RaceID FROM Faction", (dr, args) =>
+            X4Database.Instance.ExecQuery("SELECT FactionID, Name, RaceID FROM Faction", (dr, args) =>
             {
                 var id = (string)dr["FactionID"];
                 var name = (string)dr["Name"];
