@@ -438,8 +438,13 @@ namespace X4_ComplexCalculator.Main
             e.Cancel = _MainWindowModel.WindowClosing();
             if (!e.Cancel)
             {
-                // 更新のダウンロード中の場合、完了するまで同期的に待機
-                _ApplicationUpdater.UpdateIfCompleteDownload().GetAwaiter().GetResult();
+                if (_ApplicationUpdater.FinishedDownload) _ApplicationUpdater.Update();
+                else if (_ApplicationUpdater.NowDownloading)
+                {
+                    var dialog = new UpdateDownloadProglessDialog();
+                    dialog.DataContext = new UpdateDownloadProgressViewModel(_ApplicationUpdater);
+                    dialog.Show();
+                }
             }
         }
 

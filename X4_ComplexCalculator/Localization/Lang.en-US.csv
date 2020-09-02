@@ -18,6 +18,7 @@ SearchByEnteringText;Search by entering text
 Confirmation;Confirmation
 Warning;Warning
 Error;Error
+Cancel;Cancel
 
 
 # ------------------------------------------------------
@@ -85,6 +86,7 @@ CheckUpdate;Check Update...
 CheckUpdateNoUpdateDescription;X4_ComplexCalculator v{0} is up to date.
 CheckUpdateHasUpdateDescription;X4_ComplexCalculator v{0} can be update to v{1}.\r\nDo you want to update now?
 CheckUpdateStartDownloadDescription;Downloading the update. It will be installed when you quit.
+CheckUpdateNowDownloading;Downloading the update...
 VersionInfo;Version Information
 VersionInfoTitle;X4_ComplexCalculator
 VersionInfoDescription;X4_ComplexCalculator\r\n\r\nVersion: {0}\r\nCommit: {1}\r\n.NET Core: {2}

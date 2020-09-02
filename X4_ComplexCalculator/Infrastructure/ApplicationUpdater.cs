@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 using System.Threading.Tasks;
 using Onova;
 using Onova.Services;
+using Reactive.Bindings;
 
 namespace X4_ComplexCalculator.Infrastructure
 {
@@ -54,6 +57,19 @@ namespace X4_ComplexCalculator.Infrastructure
         /// ダウンロードが完了している場合
         /// </summary>
         private Task? _DownloadTask;
+
+
+        /// <summary>
+        /// ダウンロードの進捗
+        /// </summary>
+        private ReactivePropertySlim<double> _DownloadProgress
+            = new ReactivePropertySlim<double>();
+
+
+        /// <summary>
+        /// キャンセルトークン
+        /// </summary>
+        private CancellationTokenSource _Cancellation = new CancellationTokenSource();
         #endregion
 
 
@@ -62,6 +78,18 @@ namespace X4_ComplexCalculator.Infrastructure
         /// 更新をダウンロード中の場合は true
         /// </summary>
         public bool NowDownloading => _DownloadTask != null;
+
+
+        /// <summary>
+        /// 更新のダウンロードが正常終了した場合 true
+        /// </summary>
+        public bool FinishedDownload => _DownloadTask?.IsCompletedSuccessfully ?? false;
+
+
+        /// <summary>
+        /// ダウンロードの進捗
+        /// </summary>
+        public IReadOnlyReactiveProperty<double> DownloadProgress => _DownloadProgress;
         #endregion
 
 
@@ -86,20 +114,36 @@ namespace X4_ComplexCalculator.Infrastructure
         public void StartDownloadByBackground()
         {
             var version = _LastVersion ?? throw new InvalidOperationException();
-            _DownloadTask = _Manager.PrepareUpdateAsync(version);
+            var progless = new Progress<double>(progress => _DownloadProgress.Value = progress);
+            _DownloadTask = _Manager.PrepareUpdateAsync(version, progless, _Cancellation.Token);
         }
+
+
+        /// <summary>
+        /// ダウンロードをキャンセルする
+        /// </summary>
+        public void CancelDownload() => _Cancellation.Cancel();
 
 
         /// <summary>
         /// ダウンロードが終わり次第、アップデートの適用とアプリケーションの再起動を行う。
         /// ダウンロードしていない場合は何もしない
         /// </summary>
-        public async ValueTask UpdateIfCompleteDownload()
+        public async ValueTask UpdateAfterDownloading()
         {
             if (_DownloadTask == null) return;
-
-            var version = _LastVersion ?? throw new InvalidOperationException();
             await _DownloadTask.ConfigureAwait(false);
+            Update();
+        }
+
+
+        /// <summary>
+        /// アップデートの適用とアプリケーションの再起動を行う
+        /// </summary>
+        [DoesNotReturn]
+        public void Update()
+        {
+            var version = _LastVersion ?? throw new InvalidOperationException();
             _Manager.LaunchUpdater(version, restart: false);
             Environment.Exit(0);
         }

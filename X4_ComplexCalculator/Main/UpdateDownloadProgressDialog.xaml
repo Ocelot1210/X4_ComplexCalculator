@@ -1,0 +1,45 @@
+﻿<Window
+    x:Class="X4_ComplexCalculator.Main.UpdateDownloadProglessDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:lex="http://wpflocalizeextension.codeplex.com"
+    xmlns:local="clr-namespace:X4_ComplexCalculator.Main"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="{lex:Loc Lang:MainWindowTitle}"
+    Width="420"
+    Height="Auto"
+    d:DataContext="{d:DesignInstance local:UpdateDownloadProgressViewModel}"
+    Cursor="AppStarting"
+    ResizeMode="NoResize"
+    SizeToContent="Height"
+    mc:Ignorable="d">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding CancelCommand, Mode=OneTime}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <StackPanel Margin="10">
+        <Label Margin="3" Content="{lex:Loc Lang:CheckUpdateNowDownloading}" />
+        <ProgressBar
+            Height="18"
+            Margin="3"
+            Maximum="1"
+            Minimum="0"
+            Value="{Binding DownloadProgress.Value, Mode=OneWay}" />
+        <Button
+            MinWidth="80"
+            Margin="3"
+            HorizontalAlignment="Right"
+            Command="{Binding CancelCommand, Mode=OneTime}"
+            CommandParameter="{Binding ElementName=Window}"
+            Content="{lex:Loc Lang:Cancel}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="Click">
+                    <i:CallMethodAction MethodName="Close" TargetObject="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </Button>
+    </StackPanel>
+</Window>
