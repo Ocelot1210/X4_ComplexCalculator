@@ -145,7 +145,7 @@
     <DataGrid
         x:Name="productGrid"
         x4bhv:DataGridCurrentCellEditModeBehavior.Enabled="True"
-        x4bhv:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
+        x4bhv:VirtualizedDataGridSelectBehavior.VirtualizedSelectionEnabled="True"
         CellStyle="{StaticResource DataGridCellDefaultStyle}"
         ContextMenu="{StaticResource ProductsGridContextMenu}"
         ItemsSource="{Binding ProductsView, Mode=OneTime}"

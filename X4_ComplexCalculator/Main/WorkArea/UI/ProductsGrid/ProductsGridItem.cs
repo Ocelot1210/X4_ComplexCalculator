@@ -12,7 +12,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
     /// <summary>
     /// 製品一覧を表示するDataGridViewの1レコード分用クラス
     /// </summary>
-    public class ProductsGridItem : BindableBaseEx, IEditable
+    public class ProductsGridItem : BindableBaseEx, IEditable, ISelectable
     {
         #region メンバ
         /// <summary>

@@ -81,7 +81,7 @@
             Name="moduleGrid"
             x4bhv:DataGridCurrentCellEditModeBehavior.Enabled="True"
             x4bhv:DataGridFocusCellBehavior.FocusCommand="{Binding CellFocusCommand, Mode=OneWayToSource}"
-            x4bhv:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
+            x4bhv:VirtualizedDataGridSelectBehavior.VirtualizedSelectionEnabled="True"
             CellStyle="{StaticResource DataGridCellDefaultStyle}"
             ContextMenu="{StaticResource ModulesGridContextMenu}"
             IsSynchronizedWithCurrentItem="True"

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
-using X4_ComplexCalculator.Common.Reflection;
 
 namespace X4_ComplexCalculator.Common.Behavior
 {
@@ -14,25 +13,27 @@ namespace X4_ComplexCalculator.Common.Behavior
     public class VirtualizedDataGridSelectBehavior
     {
         /// <summary>
-        /// 選択状態を設定するメンバ名
+        /// 添付ビヘイビアの有効/無効を設定するメンバ名
         /// </summary>
-        public static DependencyProperty MemberNameProperty =
-            DependencyProperty.RegisterAttached("MemberName", typeof(string), typeof(VirtualizedDataGridSelectBehavior), new PropertyMetadata(MemberNameProppertyChanged));
+        public static DependencyProperty EnabledProperty =
+            DependencyProperty.RegisterAttached("VirtualizedSelectionEnabled", typeof(bool), typeof(VirtualizedDataGridSelectBehavior), new PropertyMetadata(VirtualizedSelectionEnabledProppertyChanged));
+
 
         /// <summary>
-        /// 選択状態を設定するメンバ名を設定
+        /// 添付ビヘイビアの有効/無効状態を取得する
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="value"></param>
-        public static void SetMemberName(DependencyObject obj, string value) => obj.SetValue(MemberNameProperty, value);
+        public static void SetVirtualizedSelectionEnabled(DependencyObject obj, bool value) => obj.SetValue(EnabledProperty, value);
 
 
         /// <summary>
-        /// 選択状態を設定するメンバ名を取得
+        /// 添付ビヘイビアの有効/無効状態を設定する
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public static string GetMemberName(DependencyObject obj) => (string)obj.GetValue(MemberNameProperty);
+        public static bool GetVirtualizedSelectionEnabled(DependencyObject obj) => (bool)obj.GetValue(EnabledProperty);
+
 
 
         /// <summary>
@@ -40,21 +41,23 @@ namespace X4_ComplexCalculator.Common.Behavior
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="e"></param>
-        private static void MemberNameProppertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
+        private static void VirtualizedSelectionEnabledProppertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
             if (!(obj is DataGrid dg))
             {
                 return;
             }
 
-            // 選択状態変更時のイベントハンドラの登録/解除
-            if (e.NewValue != null)
+            // 添付ビヘイビア有効化？
+            if (GetVirtualizedSelectionEnabled(obj))
             {
+                // 有効化の場合、選択状態変更時のイベントハンドラの登録
                 dg.SelectionChanged += SelectedItemsChanged;
                 dg.SelectedCellsChanged += SelectedCellsChanged;
             }
             else
             {
+                // 無効化の場合、選択状態変更時のイベントハンドラの登録解除
                 dg.SelectionChanged -= SelectedItemsChanged;
                 dg.SelectedCellsChanged -= SelectedCellsChanged;
             }
@@ -80,36 +83,24 @@ namespace X4_ComplexCalculator.Common.Behavior
                 // → 解除しないとdelキーを押した時に意図しない要素が削除される
                 if (0 < e.RemovedCells.Count)
                 {
-                    var items = e.RemovedCells.Select(x => x.Item).Distinct();
-                    var accessor = items.First().GetType().GetProperty(GetMemberName((DependencyObject)sender))?.ToAccessor();
-
-                    if (accessor != null)
-                    {
-                        SetSelectedStatus(items, accessor, false);
-                    }
+                    SetSelectedStatus(e.RemovedCells.Select(x => x.Item), false);
                 }
                 return;
             }
 
             using (Dispatcher.CurrentDispatcher.DisableProcessing())
             {
-                var pinfo = ((0 < e.AddedCells.Count) ? e.AddedCells[0].Item : e.RemovedCells[0].Item).GetType().GetProperty(GetMemberName((DependencyObject)sender));
-                var accessor = pinfo?.ToAccessor();
+                SetSelectedStatus(e.AddedCells.Select(x => x.Item), true);
 
-                if (accessor != null)
+                // 1行分解除された項目がある場合
+                var allRemovedItems = GetUnselectedItems(dataGrid.Columns.Count - 1, e.RemovedCells);
+                if (allRemovedItems.Any())
                 {
-                    SetSelectedStatus(e.AddedCells.Select(x => x.Item).Distinct(), accessor, true);
-
-                    // 1行分解除された項目がある場合
-                    var allRemovedItems = GetUnselectedItems(dataGrid.Columns.Count - 1, e.RemovedCells);
-                    if (allRemovedItems.Any())
-                    {
-                        SetSelectedStatus(allRemovedItems, accessor, false);
-                    }
-                    else
-                    {
-                        SetSelectedStatus(e.RemovedCells.Select(x => x.Item).Distinct(), accessor, false);
-                    }
+                    SetSelectedStatus(allRemovedItems, false);
+                }
+                else
+                {
+                    SetSelectedStatus(e.RemovedCells.Select(x => x.Item), false);
                 }
             }
         }
@@ -124,7 +115,7 @@ namespace X4_ComplexCalculator.Common.Behavior
         private static IEnumerable<object> GetUnselectedItems(int columns, IEnumerable<DataGridCellInfo> cell)
         {
             object? currentItem = null;         // セルの親オブジェクト
-            var clmCnt = 0;                    // 列数カウンタ
+            var clmCnt = 0;                     // 列数カウンタ
 
             foreach (var item in cell.Select(x => x.Item))
             {
@@ -166,16 +157,8 @@ namespace X4_ComplexCalculator.Common.Behavior
 
             using (Dispatcher.CurrentDispatcher.DisableProcessing())
             {
-                var itm = ((0 < e.AddedItems.Count) ? e.AddedItems[0] : e.RemovedItems[0]);
-                if (itm != null)
-                {
-                    var accessor = itm.GetType().GetProperty(GetMemberName((DependencyObject)sender))?.ToAccessor();
-                    if (accessor != null)
-                    {
-                        SetSelectedStatus(e.AddedItems, accessor, true);
-                        SetSelectedStatus(e.RemovedItems, accessor, false);
-                    }
-                }
+                SetSelectedStatus(e.AddedItems, true);
+                SetSelectedStatus(e.RemovedItems, false);
             }
         }
 
@@ -184,16 +167,12 @@ namespace X4_ComplexCalculator.Common.Behavior
         /// 選択状態を設定
         /// </summary>
         /// <param name="items">設定対象</param>
-        /// <param name="accessor">プロパティへのアクセサー</param>
-        /// <param name="value">設定値</param>
-        static void SetSelectedStatus(IEnumerable items, IAccessor accessor, object value)
+        /// <param name="isSelected">設定値(選択されたか)</param>
+        private static void SetSelectedStatus(IEnumerable items, bool isSelected)
         {
-            foreach (var item in items)
+            foreach (var item in items.OfType<ISelectable>())
             {
-                if (item != null)
-                {
-                    accessor.SetValue(item, value);
-                }
+                item.IsSelected = isSelected;
             }
         }
     }

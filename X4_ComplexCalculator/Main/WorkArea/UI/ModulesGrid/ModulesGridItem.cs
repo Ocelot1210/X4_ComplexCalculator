@@ -16,7 +16,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
     /// <summary>
     /// ModuleクラスをDataGrid表示用クラス
     /// </summary>
-    public class ModulesGridItem : BindableBaseEx, IEditable
+    public class ModulesGridItem : BindableBaseEx, IEditable, ISelectable
     {
         #region スタティックメンバ
         /// <summary>
