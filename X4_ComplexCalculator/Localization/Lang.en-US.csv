@@ -81,6 +81,10 @@ Language;Language
 # Help(H) ---------------------------------------------
 Help;Help(_H)
 ReportIssue;Report Issue
+CheckUpdate;Check Update...
+CheckUpdateNoUpdateDescription;X4_ComplexCalculator v{0} is up to date.
+CheckUpdateHasUpdateDescription;X4_ComplexCalculator v{0} can be update to v{1}.\r\nDo you want to update now?
+CheckUpdateStartDownloadDescription;Downloading the update. It will be installed when you quit.
 VersionInfo;Version Information
 VersionInfoTitle;X4_ComplexCalculator
 VersionInfoDescription;X4_ComplexCalculator\r\n\r\nVersion: {0}\r\nCommit: {1}\r\n.NET Core: {2}

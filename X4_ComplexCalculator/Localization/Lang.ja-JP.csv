@@ -81,6 +81,10 @@ Language;言語
 # Help(H) ---------------------------------------------
 Help;ヘルプ(_H)
 ReportIssue;問題を報告
+CheckUpdate;更新を確認...
+CheckUpdateNoUpdateDescription;X4_ComplexCalculator v{0} は最新です。
+CheckUpdateHasUpdateDescription;X4_ComplexCalculator v{0} は v{1} へ更新できます。\r\n更新しますか？
+CheckUpdateStartDownloadDescription;ダウンロード中です。終了後に適用されます。
 VersionInfo;バージョン情報
 VersionInfoTitle;X4_ComplexCalculator
 VersionInfoDescription;X4_ComplexCalculator\r\n\r\nバージョン: {0}\r\nコミット: {1}\r\n.NET Core: {2}

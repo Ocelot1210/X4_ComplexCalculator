@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -13,6 +13,7 @@ using Prism.Commands;
 using Prism.Mvvm;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Localize;
+using X4_ComplexCalculator.Infrastructure;
 using X4_ComplexCalculator.Main.Menu.File.Export;
 using X4_ComplexCalculator.Main.Menu.File.Import;
 using X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport;
@@ -53,6 +54,12 @@ namespace X4_ComplexCalculator.Main
         /// インポート/エクスポート処理用
         /// </summary>
         private readonly ImportExporter _ImportExporter;
+
+
+        /// <summary>
+        /// アップデート機能
+        /// </summary>
+        private readonly ApplicationUpdater _ApplicationUpdater = new ApplicationUpdater();
         #endregion
 
 
@@ -108,6 +115,12 @@ namespace X4_ComplexCalculator.Main
         /// 問題を報告
         /// </summary>
         public ICommand ReportIssueCommand { get; }
+
+
+        /// <summary>
+        /// 更新を確認...
+        /// </summary>
+        public ICommand CheckUpdateCommand { get; }
 
 
         /// <summary>
@@ -197,6 +210,7 @@ namespace X4_ComplexCalculator.Main
             OpenCommand                      = new DelegateCommand(Open);
             UpdateDBCommand                  = new DelegateCommand(_MainWindowModel.UpdateDB);
             ReportIssueCommand               = new DelegateCommand(ReportIssue);
+            CheckUpdateCommand               = new DelegateCommand(() => CheckUpdate(isUserOperation: true));
             VersionInfoCommand               = new DelegateCommand(ShowVersionInfo);
             DocumentClosingCommand           = new DelegateCommand<DocumentClosingEventArgs>(DocumentClosing);
             _WorkAreaFileIO.PropertyChanged += Member_PropertyChanged;
@@ -339,6 +353,45 @@ namespace X4_ComplexCalculator.Main
 
 
         /// <summary>
+        /// 更新を確認...
+        /// </summary>
+        private async void CheckUpdate(bool isUserOperation = false)
+        {
+            if (_ApplicationUpdater.NowDownloading && isUserOperation)
+            {
+                LocalizedMessageBox.Show("Lang:CheckUpdateStartDownloadDescription",
+                                         "Lang:CheckUpdate");
+                return;
+            }
+
+            var latestVersion = await _ApplicationUpdater.CheckUpdate();
+            if (latestVersion == null)
+            {
+                if (isUserOperation)
+                {
+                    LocalizedMessageBox.Show("Lang:CheckUpdateNoUpdateDescription",
+                                             "Lang:CheckUpdate",
+                                             param: new[] { VersionInfo.BaseVersion });
+                }
+                return;
+            }
+
+            var result = LocalizedMessageBox.Show("Lang:CheckUpdateHasUpdateDescription",
+                                                  "Lang:CheckUpdate",
+                                                  button: MessageBoxButton.YesNo,
+                                                  param: new[] {
+                                                      VersionInfo.BaseVersion,
+                                                      latestVersion,
+                                                  });
+            if (result != MessageBoxResult.Yes) return;
+
+            _ApplicationUpdater.StartDownloadByBackground();
+            LocalizedMessageBox.Show("Lang:CheckUpdateStartDownloadDescription",
+                                     "Lang:CheckUpdate");
+        }
+
+
+        /// <summary>
         /// バージョン情報
         /// </summary>
         private void ShowVersionInfo()
@@ -365,6 +418,7 @@ namespace X4_ComplexCalculator.Main
                 // DB接続開始
                 _MainWindowModel.Init();
                 _WorkAreaManager.Init();
+                CheckUpdate();
             }
 #if _DEBUG
             catch (Exception e)
@@ -382,6 +436,11 @@ namespace X4_ComplexCalculator.Main
         private void WindowClosing(CancelEventArgs e)
         {
             e.Cancel = _MainWindowModel.WindowClosing();
+            if (!e.Cancel)
+            {
+                // 更新のダウンロード中の場合、完了するまで同期的に待機
+                _ApplicationUpdater.UpdateIfCompleteDownload().GetAwaiter().GetResult();
+            }
         }
 
         /// <summary>

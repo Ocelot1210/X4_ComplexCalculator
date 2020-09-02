@@ -166,6 +166,11 @@
 
                 <Separator />
 
+                <!--  更新を確認...  -->
+                <MenuItem Command="{Binding CheckUpdateCommand, Mode=OneTime}" Header="{lex:Loc Lang:CheckUpdate}" />
+
+                <Separator />
+
                 <!--  X4_ComplexCalculator について  -->
                 <MenuItem Command="{Binding VersionInfoCommand, Mode=OneTime}" Header="{lex:Loc Lang:VersionInfo}" />
 
