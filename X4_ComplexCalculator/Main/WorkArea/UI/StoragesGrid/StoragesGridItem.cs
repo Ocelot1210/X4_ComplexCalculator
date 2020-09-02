@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Prism.Mvvm;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB.X4DB;
 
@@ -9,7 +10,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
     /// <summary>
     /// 保管庫一覧表示用DataGridViewの1レコード分
     /// </summary>
-    public class StoragesGridItem : BindableBase
+    public class StoragesGridItem : BindableBase, ISelectable
     {
         #region メンバ
         /// <summary>

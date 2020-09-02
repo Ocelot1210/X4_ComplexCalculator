@@ -40,7 +40,7 @@
 
     <DataGrid
         x4bhv:DataGridCurrentCellEditModeBehavior.Enabled="True"
-        x4bhv:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
+        x4bhv:VirtualizedDataGridSelectBehavior.VirtualizedSelectionEnabled="True"
         ContextMenu="{StaticResource BuildResourcesContextMenu}"
         IsReadOnly="False"
         ItemsSource="{Binding BuildResourceView, Mode=OneTime}"

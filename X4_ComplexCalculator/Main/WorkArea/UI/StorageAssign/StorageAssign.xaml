@@ -118,7 +118,6 @@
             Grid.Row="1"
             Grid.ColumnSpan="2"
             x4bhv:DataGridCurrentCellEditModeBehavior.Enabled="True"
-            x4bhv:VirtualizedDataGridSelectBehavior.MemberName="IsSelected"
             ItemsSource="{Binding StorageAssignInfo}"
             RowHeaderStyle="{StaticResource EditedItemHighlightRowHeaderStyle}"
             RowHeight="25"

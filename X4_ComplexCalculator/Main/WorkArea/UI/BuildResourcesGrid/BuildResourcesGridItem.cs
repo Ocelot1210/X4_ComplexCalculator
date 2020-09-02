@@ -7,7 +7,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
     /// <summary>
     /// 建造に必要なウェアを表示するDataGridViewの1レコード分のクラス
     /// </summary>
-    public class BuildResourcesGridItem : BindableBaseEx, IEditable
+    public class BuildResourcesGridItem : BindableBaseEx, IEditable, ISelectable
     {
         #region メンバ
         /// <summary>
