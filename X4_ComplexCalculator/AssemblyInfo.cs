@@ -28,7 +28,7 @@ namespace X4_ComplexCalculator
         /// バージョン名
         /// ex: 1.4.1
         /// </summary>
-        public const string BaseVersion = ThisAssembly.Git.BaseVersion.Major + "."
+        internal const string BaseVersion = ThisAssembly.Git.BaseVersion.Major + "."
             + ThisAssembly.Git.BaseVersion.Minor + "." + ThisAssembly.Git.BaseVersion.Patch;
 
 
@@ -36,7 +36,9 @@ namespace X4_ComplexCalculator
         /// より詳細なバージョン名
         /// ex: v1.4.1-4-g306b97d+dirty (Debug)
         /// </summary>
-        public const string DetailVersion = ThisAssembly.Git.Tag + Dirty + " (" + Config + ")";
+        internal const string DetailVersion = ThisAssembly.Git.Tag == ""
+            ? "Unknown version" + " (" + Config + ")"
+            : ThisAssembly.Git.Tag + Dirty + " (" + Config + ")";
 
 
         /// <summary>
