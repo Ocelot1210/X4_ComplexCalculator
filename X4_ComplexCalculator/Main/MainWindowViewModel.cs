@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Windows;
 using System.Windows.Input;
 using AvalonDock;
@@ -357,20 +358,39 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         private async void CheckUpdate(bool isUserOperation = false)
         {
-            if (_ApplicationUpdater.NowDownloading && isUserOperation)
+            if (_ApplicationUpdater.FinishedDownload && isUserOperation)
+            {
+                LocalizedMessageBox.Show("Lang:CheckUpdateFinishedDownloadDescription",
+                                         "Lang:CheckUpdate", icon: MessageBoxImage.Information);
+                return;
+            }
+            else if (_ApplicationUpdater.NowDownloading && isUserOperation)
             {
                 LocalizedMessageBox.Show("Lang:CheckUpdateStartDownloadDescription",
-                                         "Lang:CheckUpdate");
+                                         "Lang:CheckUpdate", icon: MessageBoxImage.Information);
                 return;
             }
 
-            var latestVersion = await _ApplicationUpdater.CheckUpdate();
+            string? latestVersion;
+            try
+            {
+                latestVersion = await _ApplicationUpdater.CheckUpdate();
+            }
+            catch (HttpRequestException)
+            {
+                if (isUserOperation)
+                {
+                    LocalizedMessageBox.Show("Lang:CheckUpdateFailedDescription",
+                                             "Lang:CheckUpdate", icon: MessageBoxImage.Error);
+                }
+                return;
+            }
             if (latestVersion == null)
             {
                 if (isUserOperation)
                 {
                     LocalizedMessageBox.Show("Lang:CheckUpdateNoUpdateDescription",
-                                             "Lang:CheckUpdate",
+                                             "Lang:CheckUpdate", icon: MessageBoxImage.Information,
                                              param: new[] { VersionInfo.BaseVersion });
                 }
                 return;
@@ -379,6 +399,7 @@ namespace X4_ComplexCalculator.Main
             var result = LocalizedMessageBox.Show("Lang:CheckUpdateHasUpdateDescription",
                                                   "Lang:CheckUpdate",
                                                   button: MessageBoxButton.YesNo,
+                                                  icon: MessageBoxImage.Question,
                                                   param: new[] {
                                                       VersionInfo.BaseVersion,
                                                       latestVersion,
@@ -387,7 +408,7 @@ namespace X4_ComplexCalculator.Main
 
             _ApplicationUpdater.StartDownloadByBackground();
             LocalizedMessageBox.Show("Lang:CheckUpdateStartDownloadDescription",
-                                     "Lang:CheckUpdate");
+                                     "Lang:CheckUpdate", icon: MessageBoxImage.Information);
         }
 
 
