@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -6,12 +6,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using AvalonDock;
 using GongSolutions.Wpf.DragDrop;
 using Prism.Commands;
 using Prism.Mvvm;
+using Reactive.Bindings;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Infrastructure;
@@ -121,7 +123,7 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// 更新を確認...
         /// </summary>
-        public ICommand CheckUpdateCommand { get; }
+        public AsyncReactiveCommand<bool> CheckUpdateCommand { get; }
 
 
         /// <summary>
@@ -211,7 +213,7 @@ namespace X4_ComplexCalculator.Main
             OpenCommand                      = new DelegateCommand(Open);
             UpdateDBCommand                  = new DelegateCommand(_MainWindowModel.UpdateDB);
             ReportIssueCommand               = new DelegateCommand(ReportIssue);
-            CheckUpdateCommand               = new DelegateCommand(() => CheckUpdate(isUserOperation: true));
+            CheckUpdateCommand               = new AsyncReactiveCommand<bool>().WithSubscribe(CheckUpdate);
             VersionInfoCommand               = new DelegateCommand(ShowVersionInfo);
             DocumentClosingCommand           = new DelegateCommand<DocumentClosingEventArgs>(DocumentClosing);
             _WorkAreaFileIO.PropertyChanged += Member_PropertyChanged;
@@ -356,7 +358,7 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// 更新を確認...
         /// </summary>
-        private async void CheckUpdate(bool isUserOperation = false)
+        private async Task CheckUpdate(bool isUserOperation = false)
         {
             if (_ApplicationUpdater.FinishedDownload && isUserOperation)
             {
@@ -439,7 +441,7 @@ namespace X4_ComplexCalculator.Main
                 // DB接続開始
                 _MainWindowModel.Init();
                 _WorkAreaManager.Init();
-                CheckUpdate();
+                CheckUpdateCommand.Execute(false);
             }
 #if _DEBUG
             catch (Exception e)
