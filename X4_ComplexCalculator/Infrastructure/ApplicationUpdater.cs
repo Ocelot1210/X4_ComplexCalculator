@@ -97,7 +97,7 @@ namespace X4_ComplexCalculator.Infrastructure
         /// アップデーターを初期化する
         /// </summary>
         public ApplicationUpdater()
-            => _Manager = new UpdateManager(_Resolver, new ZipPackageExtractor());
+            => _Manager = new UpdateManager(_Resolver, new ZipExcerptPackageExtractor());
 
 
         /// <summary>
