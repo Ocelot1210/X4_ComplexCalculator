@@ -18,6 +18,7 @@ SearchByEnteringText;Search by entering text
 Confirmation;Confirmation
 Warning;Warning
 Error;Error
+Cancel;Cancel
 
 
 # ------------------------------------------------------
@@ -81,6 +82,13 @@ Language;Language
 # Help(H) ---------------------------------------------
 Help;Help(_H)
 ReportIssue;Report Issue
+CheckUpdate;Check Update...
+CheckUpdateNoUpdateDescription;X4_ComplexCalculator v{0} is up to date.
+CheckUpdateHasUpdateDescription;X4_ComplexCalculator v{0} can be update to v{1}.\r\nDo you want to update now?
+CheckUpdateFailedDescription;Failed to check for updates.\r\nPlease try again later.
+CheckUpdateStartDownloadDescription;Downloading the update file.\r\nThe update is applied after the application is quit.
+CheckUpdateFinishedDownloadDescription;Download of the update file has been finished.\r\nThe update is applied after the application is quit.
+CheckUpdateNowDownloading;Downloading the update...
 VersionInfo;Version Information
 VersionInfoTitle;X4_ComplexCalculator
 VersionInfoDescription;X4_ComplexCalculator\r\n\r\nVersion: {0}\r\nCommit: {1}\r\n.NET Core: {2}

@@ -5,14 +5,18 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using AvalonDock;
 using GongSolutions.Wpf.DragDrop;
 using Prism.Commands;
 using Prism.Mvvm;
+using Reactive.Bindings;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Localize;
+using X4_ComplexCalculator.Infrastructure;
 using X4_ComplexCalculator.Main.Menu.File.Export;
 using X4_ComplexCalculator.Main.Menu.File.Import;
 using X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport;
@@ -53,6 +57,12 @@ namespace X4_ComplexCalculator.Main
         /// インポート/エクスポート処理用
         /// </summary>
         private readonly ImportExporter _ImportExporter;
+
+
+        /// <summary>
+        /// アップデート機能
+        /// </summary>
+        private readonly ApplicationUpdater _ApplicationUpdater = new ApplicationUpdater();
         #endregion
 
 
@@ -108,6 +118,12 @@ namespace X4_ComplexCalculator.Main
         /// 問題を報告
         /// </summary>
         public ICommand ReportIssueCommand { get; }
+
+
+        /// <summary>
+        /// 更新を確認...
+        /// </summary>
+        public AsyncReactiveCommand<bool> CheckUpdateCommand { get; }
 
 
         /// <summary>
@@ -197,7 +213,8 @@ namespace X4_ComplexCalculator.Main
             OpenCommand                      = new DelegateCommand(Open);
             UpdateDBCommand                  = new DelegateCommand(_MainWindowModel.UpdateDB);
             ReportIssueCommand               = new DelegateCommand(ReportIssue);
-            VersionInfoCommand               = new DelegateCommand(VersionInfo);
+            CheckUpdateCommand               = new AsyncReactiveCommand<bool>().WithSubscribe(CheckUpdate);
+            VersionInfoCommand               = new DelegateCommand(ShowVersionInfo);
             DocumentClosingCommand           = new DelegateCommand<DocumentClosingEventArgs>(DocumentClosing);
             _WorkAreaFileIO.PropertyChanged += Member_PropertyChanged;
 
@@ -339,17 +356,70 @@ namespace X4_ComplexCalculator.Main
 
 
         /// <summary>
+        /// 更新を確認...
+        /// </summary>
+        private async Task CheckUpdate(bool isUserOperation = false)
+        {
+            if (_ApplicationUpdater.FinishedDownload && isUserOperation)
+            {
+                LocalizedMessageBox.Show("Lang:CheckUpdateFinishedDownloadDescription",
+                                         "Lang:CheckUpdate", icon: MessageBoxImage.Information);
+                return;
+            }
+            else if (_ApplicationUpdater.NowDownloading && isUserOperation)
+            {
+                LocalizedMessageBox.Show("Lang:CheckUpdateStartDownloadDescription",
+                                         "Lang:CheckUpdate", icon: MessageBoxImage.Information);
+                return;
+            }
+
+            string? latestVersion;
+            try
+            {
+                latestVersion = await _ApplicationUpdater.CheckUpdate();
+            }
+            catch (HttpRequestException)
+            {
+                if (isUserOperation)
+                {
+                    LocalizedMessageBox.Show("Lang:CheckUpdateFailedDescription",
+                                             "Lang:CheckUpdate", icon: MessageBoxImage.Error);
+                }
+                return;
+            }
+            if (latestVersion == null)
+            {
+                if (isUserOperation)
+                {
+                    LocalizedMessageBox.Show("Lang:CheckUpdateNoUpdateDescription",
+                                             "Lang:CheckUpdate", icon: MessageBoxImage.Information,
+                                             param: new[] { VersionInfo.BaseVersion });
+                }
+                return;
+            }
+
+            var result = LocalizedMessageBox.Show("Lang:CheckUpdateHasUpdateDescription",
+                                                  "Lang:CheckUpdate",
+                                                  button: MessageBoxButton.YesNo,
+                                                  icon: MessageBoxImage.Question,
+                                                  param: new[] {
+                                                      VersionInfo.BaseVersion,
+                                                      latestVersion,
+                                                  });
+            if (result != MessageBoxResult.Yes) return;
+
+            _ApplicationUpdater.StartDownloadByBackground();
+            LocalizedMessageBox.Show("Lang:CheckUpdateStartDownloadDescription",
+                                     "Lang:CheckUpdate", icon: MessageBoxImage.Information);
+        }
+
+
+        /// <summary>
         /// バージョン情報
         /// </summary>
-        private void VersionInfo()
+        private void ShowVersionInfo()
         {
-            const string dirty = ThisAssembly.Git.IsDirty ? "+dirty" : "";
-#if DEBUG
-            const string config = " (Debug)";
-#else
-            const string config = " (Release)";
-#endif
-            const string version = ThisAssembly.Git.Tag + dirty + config;
+            const string version = VersionInfo.DetailVersion;
             const string commit = ThisAssembly.Git.Sha;
             var dotnetVersion = Environment.Version.ToString();
 
@@ -371,6 +441,7 @@ namespace X4_ComplexCalculator.Main
                 // DB接続開始
                 _MainWindowModel.Init();
                 _WorkAreaManager.Init();
+                CheckUpdateCommand.Execute(false);
             }
 #if _DEBUG
             catch (Exception e)
@@ -388,6 +459,16 @@ namespace X4_ComplexCalculator.Main
         private void WindowClosing(CancelEventArgs e)
         {
             e.Cancel = _MainWindowModel.WindowClosing();
+            if (!e.Cancel)
+            {
+                if (_ApplicationUpdater.FinishedDownload) _ApplicationUpdater.Update();
+                else if (_ApplicationUpdater.NowDownloading)
+                {
+                    var dialog = new UpdateDownloadProglessDialog();
+                    dialog.DataContext = new UpdateDownloadProgressViewModel(_ApplicationUpdater);
+                    dialog.Show();
+                }
+            }
         }
 
         /// <summary>

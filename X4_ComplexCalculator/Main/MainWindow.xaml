@@ -10,6 +10,7 @@
     xmlns:local="clr-namespace:X4_ComplexCalculator.Main"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:plnArea="clr-namespace:X4_ComplexCalculator.Main.WorkArea"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:x4vcvt="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     Title="{lex:Loc Lang:MainWindowTitle}"
@@ -163,6 +164,15 @@
 
                 <!--  問題を報告  -->
                 <MenuItem Command="{Binding ReportIssueCommand, Mode=OneTime}" Header="{lex:Loc Lang:ReportIssue}" />
+
+                <Separator />
+
+                <!--  更新を確認...  -->
+                <MenuItem Command="{Binding CheckUpdateCommand, Mode=OneTime}" Header="{lex:Loc Lang:CheckUpdate}">
+                    <MenuItem.CommandParameter>
+                        <sys:Boolean>true</sys:Boolean>
+                    </MenuItem.CommandParameter>
+                </MenuItem>
 
                 <Separator />
 

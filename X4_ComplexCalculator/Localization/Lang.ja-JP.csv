@@ -18,6 +18,7 @@ SearchByEnteringText;テキストを入力して検索
 Confirmation;確認
 Warning;警告
 Error;エラー
+Cancel;キャンセル
 
 
 # ------------------------------------------------------
@@ -81,6 +82,13 @@ Language;言語
 # Help(H) ---------------------------------------------
 Help;ヘルプ(_H)
 ReportIssue;問題を報告
+CheckUpdate;更新を確認...
+CheckUpdateNoUpdateDescription;X4_ComplexCalculator v{0} は最新です。
+CheckUpdateHasUpdateDescription;X4_ComplexCalculator v{0} は v{1} へ更新できます。\r\n更新しますか？
+CheckUpdateFailedDescription;更新の確認に失敗しました。\r\n時間をおいて再試行して下さい。
+CheckUpdateStartDownloadDescription;更新ファイルのダウンロード中です。\r\nアプリケーションの終了後に更新が適用されます。
+CheckUpdateFinishedDownloadDescription;更新ファイルのダウンロードが完了しました。アプリケーションの終了後に更新が適用されます。
+CheckUpdateNowDownloading;ダウンロード中...
 VersionInfo;バージョン情報
 VersionInfoTitle;X4_ComplexCalculator
 VersionInfoDescription;X4_ComplexCalculator\r\n\r\nバージョン: {0}\r\nコミット: {1}\r\n.NET Core: {2}
