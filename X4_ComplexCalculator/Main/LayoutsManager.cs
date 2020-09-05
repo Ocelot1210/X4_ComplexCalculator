@@ -93,19 +93,16 @@ namespace X4_ComplexCalculator.Main
         public void Init()
         {
             // レイアウト一覧読み込み
-            var layouts = new List<LayoutMenuItem>();
             SettingDatabase.Instance.ExecQuery("SELECT LayoutID, LayoutName, IsChecked FROM WorkAreaLayouts", (dr, args) =>
             {
-                layouts.Add(new LayoutMenuItem((long)dr["LayoutID"], (string)dr["LayoutName"], (long)dr["IsChecked"] == 1));
+                Layouts.Add(new LayoutMenuItem((long)dr["LayoutID"], (string)dr["LayoutName"], (long)dr["IsChecked"] == 1));
             });
 
-            var checkedLayout = layouts.Where(x => x.IsChecked).FirstOrDefault();
+            var checkedLayout = Layouts.FirstOrDefault(x => x.IsChecked);
             if (checkedLayout != null)
             {
                 ActiveLayout = checkedLayout;
             }
-
-            Layouts.AddRange(layouts);
         }
 
 
@@ -149,21 +146,20 @@ namespace X4_ComplexCalculator.Main
         /// <param name="menuItem">上書きするレイアウト</param>
         public void OverwritedSaveLayout(LayoutMenuItem menuItem)
         {
-            if (_WorkAreaManager.ActiveContent != null)
-            {
-                try
-                {
-                    SettingDatabase.Instance.BeginTransaction();
-                    _WorkAreaManager.ActiveContent.OverwriteSaveLayout(menuItem.LayoutID);
-                    SettingDatabase.Instance.Commit();
+            if (_WorkAreaManager.ActiveContent == null) return;
 
-                    LocalizedMessageBox.Show("Lang:LayoutOverwritedMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, _WorkAreaManager.ActiveContent.Title, menuItem.LayoutName);
-                }
-                catch (Exception ex)
-                {
-                    SettingDatabase.Instance.Rollback();
-                    LocalizedMessageBox.Show("Lang:LayoutOverwriteFailedMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, ex.Message);
-                }
+            try
+            {
+                SettingDatabase.Instance.BeginTransaction();
+                _WorkAreaManager.ActiveContent.OverwriteSaveLayout(menuItem.LayoutID);
+                SettingDatabase.Instance.Commit();
+
+                LocalizedMessageBox.Show("Lang:LayoutOverwritedMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, _WorkAreaManager.ActiveContent.Title, menuItem.LayoutName);
+            }
+            catch (Exception ex)
+            {
+                SettingDatabase.Instance.Rollback();
+                LocalizedMessageBox.Show("Lang:LayoutOverwriteFailedMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, ex.Message);
             }
         }
 
