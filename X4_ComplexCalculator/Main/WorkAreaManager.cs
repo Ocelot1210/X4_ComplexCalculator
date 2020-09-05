@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Threading;
 using X4_ComplexCalculator.Common.Collection;
@@ -12,7 +14,7 @@ namespace X4_ComplexCalculator.Main
     /// <summary>
     /// 作業エリア管理用
     /// </summary>
-    class WorkAreaManager
+    class WorkAreaManager : IDisposable
     {
         #region メンバ
         /// <summary>
@@ -50,13 +52,13 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// レイアウト一覧
         /// </summary>
-        public ObservablePropertyChangedCollection<LayoutMenuItem> Layouts => _LayoutsManager.Layouts;
+        public ObservableCollection<LayoutMenuItem> Layouts => _LayoutsManager.Layouts;
 
 
         /// <summary>
         /// 現在のレイアウトID
         /// </summary>
-        public long ActiveLayoutID => _LayoutsManager.ActiveLayout?.LayoutID ?? -1;
+        public long ActiveLayoutID => _LayoutsManager.ActiveLayout.Value?.LayoutID ?? -1;
         #endregion
 
 
@@ -69,6 +71,18 @@ namespace X4_ComplexCalculator.Main
 
             _GCTimer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, new EventHandler(GarvageCollect), Application.Current.Dispatcher);
             _GCTimer.Stop();
+
+            // 現在のレイアウトが変更された場合、開いているドキュメントすべてに適用する
+            _LayoutsManager.ActiveLayout
+                .Where(layout => layout != null)
+                .Select(layout => layout?.LayoutID ?? throw new InvalidOperationException())
+                .Subscribe(layoutID =>
+                {
+                    foreach (var document in Documents)
+                    {
+                        document.SetLayout(layoutID);
+                    }
+                });
         }
 
 
@@ -168,5 +182,9 @@ namespace X4_ComplexCalculator.Main
             }
             _GCStopWatch.Start();
         }
+
+
+        /// <inheritdoc />
+        public void Dispose() => _LayoutsManager.Dispose();
     }
 }
