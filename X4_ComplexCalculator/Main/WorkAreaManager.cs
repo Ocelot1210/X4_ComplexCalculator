@@ -12,7 +12,7 @@ namespace X4_ComplexCalculator.Main
     /// <summary>
     /// 作業エリア管理用
     /// </summary>
-    class WorkAreaManager
+    class WorkAreaManager : IDisposable
     {
         #region メンバ
         /// <summary>
@@ -168,5 +168,9 @@ namespace X4_ComplexCalculator.Main
             }
             _GCStopWatch.Start();
         }
+
+
+        /// <inheritdoc />
+        public void Dispose() => _LayoutsManager.Dispose();
     }
 }

@@ -468,6 +468,7 @@ namespace X4_ComplexCalculator.Main
                     dialog.DataContext = new UpdateDownloadProgressViewModel(_ApplicationUpdater);
                     dialog.Show();
                 }
+                _WorkAreaManager.Dispose();
             }
         }
 

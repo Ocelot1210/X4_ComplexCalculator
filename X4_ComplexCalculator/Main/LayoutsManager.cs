@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Windows;
+using Reactive.Bindings.Extensions;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
 using X4_ComplexCalculator.Common.Localize;
@@ -14,7 +17,7 @@ namespace X4_ComplexCalculator.Main
     /// <summary>
     /// レイアウト管理用クラス
     /// </summary>
-    class LayoutsManager
+    class LayoutsManager : IDisposable
     {
         #region メンバ
         /// <summary>
@@ -27,6 +30,12 @@ namespace X4_ComplexCalculator.Main
         /// 作業エリア管理用
         /// </summary>
         private readonly WorkAreaManager _WorkAreaManager;
+
+
+        /// <summary>
+        /// Dispose が必要なオブジェクトのコレクション
+        /// </summary>
+        private readonly CompositeDisposable _Disposables = new CompositeDisposable();
         #endregion
 
 
@@ -69,6 +78,12 @@ namespace X4_ComplexCalculator.Main
         {
             _WorkAreaManager = workAreaManager;
             Layouts.CollectionPropertyChanged += Layouts_CollectionPropertyChanged;
+
+            // レイアウト一覧の上書きボタンをトリガーにレイアウト上書き保存を実行
+            Layouts.ObserveElementObservableProperty(x => x.SaveButtonClickedCommand)
+                .Select(x => x.Instance)
+                .Subscribe(OverwritedSaveLayout)
+                .AddTo(_Disposables);
         }
 
 
@@ -129,6 +144,31 @@ namespace X4_ComplexCalculator.Main
 
 
         /// <summary>
+        /// レイアウト上書き保存
+        /// </summary>
+        /// <param name="menuItem">上書きするレイアウト</param>
+        public void OverwritedSaveLayout(LayoutMenuItem menuItem)
+        {
+            if (_WorkAreaManager.ActiveContent != null)
+            {
+                try
+                {
+                    SettingDatabase.Instance.BeginTransaction();
+                    _WorkAreaManager.ActiveContent.OverwriteSaveLayout(menuItem.LayoutID);
+                    SettingDatabase.Instance.Commit();
+
+                    LocalizedMessageBox.Show("Lang:LayoutOverwritedMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, _WorkAreaManager.ActiveContent.Title, menuItem.LayoutName);
+                }
+                catch (Exception ex)
+                {
+                    SettingDatabase.Instance.Rollback();
+                    LocalizedMessageBox.Show("Lang:LayoutOverwriteFailedMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, ex.Message);
+                }
+            }
+        }
+
+
+        /// <summary>
         /// レイアウト一覧のプロパティ変更時
         /// </summary>
         /// <param name="sender"></param>
@@ -170,29 +210,13 @@ namespace X4_ComplexCalculator.Main
                     }
                     break;
 
-                // レイアウト上書き保存
-                case nameof(LayoutMenuItem.SaveButtonClickedCommand):
-                    if (_WorkAreaManager.ActiveContent != null)
-                    {
-                        try
-                        {
-                            SettingDatabase.Instance.BeginTransaction();
-                            _WorkAreaManager.ActiveContent.OverwriteSaveLayout(menuItem.LayoutID);
-                            SettingDatabase.Instance.Commit();
-
-                            LocalizedMessageBox.Show("Lang:LayoutOverwritedMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, _WorkAreaManager.ActiveContent.Title, menuItem.LayoutName);
-                        }
-                        catch (Exception ex)
-                        {
-                            SettingDatabase.Instance.Rollback();
-                            LocalizedMessageBox.Show("Lang:LayoutOverwriteFailedMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, ex.Message);
-                        }
-                    }
-                    break;
-
                 default:
                     break;
             }
         }
+
+
+        /// <inheritdoc />
+        public void Dispose() => _Disposables.Dispose();
     }
 }

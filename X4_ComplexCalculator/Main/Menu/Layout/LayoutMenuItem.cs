@@ -1,8 +1,9 @@
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Input;
 using Prism.Commands;
 using Prism.Mvvm;
+using Reactive.Bindings;
 using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
@@ -54,7 +55,7 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
         /// <summary>
         /// 保存ボタンクリック時
         /// </summary>
-        public ICommand SaveButtonClickedCommand { get; }
+        public ReactiveCommand SaveButtonClickedCommand { get; }
 
 
         /// <summary>
@@ -107,21 +108,9 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
             LayoutID = layoutID;
             LayoutName = layoutName;
             IsChecked = isChecked;
-            SaveButtonClickedCommand   = new DelegateCommand(SaveLayout);
+            SaveButtonClickedCommand   = new ReactiveCommand();
             EditButtonClickedCommand   = new DelegateCommand(EditLayoutName);
             DeleteButtonClickedCommand = new DelegateCommand(DeleteLayout);
-        }
-
-
-        /// <summary>
-        /// レイアウトを上書き保存
-        /// </summary>
-        private void SaveLayout()
-        {
-            // このクラス内では現在のレイアウトが分からないのでPropertyChangedイベントを発火させて
-            // MainWindowModelにてレイアウトを上書きする
-            // → 何かいい方法が思いついたら直す
-            RaisePropertyChanged(nameof(SaveButtonClickedCommand));
         }
 
 
