@@ -81,9 +81,13 @@ namespace X4_ComplexCalculator.Main
                 .Subscribe(DeleteLayout)
                 .AddTo(_Disposables);
 
+            // プリセットが選択、または解除された場合、DB に状態を保存する
+            var changeChecked = Layouts.ObserveElementObservableProperty(x => x.IsChecked);
+            changeChecked.Select(x => x.Instance)
+                .Subscribe(x => SettingDatabase.Instance.ExecQuery($"UPDATE WorkAreaLayouts SET IsChecked = {(x.IsChecked.Value ? 1 : 0)} WHERE LayoutID = {x.LayoutID}"));
+
             // プリセットが選択された場合、他のチェックを全部外す
-            Layouts.ObserveElementObservableProperty(x => x.IsChecked)
-                .Where(x => x.Value)
+            changeChecked.Where(x => x.Value)
                 .Select(x => x.Instance)
                 .Subscribe(ExclusiveChecked);
         }
