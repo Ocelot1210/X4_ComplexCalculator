@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.DirectoryServices.Protocols;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Threading;
@@ -117,6 +118,7 @@ namespace X4_ComplexCalculator.Main
                     // 保存する場合
                     case MessageBoxResult.Yes:
                         vm.Save();
+                        canceled = vm.HasChanged;       // 保存したはずなのに変更点がある(保存キャンセルされた等)場合、閉じないようにする
                         break;
 
                     // 保存せずに閉じる場合
