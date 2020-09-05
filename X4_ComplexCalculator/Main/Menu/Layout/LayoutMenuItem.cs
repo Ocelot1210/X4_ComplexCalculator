@@ -1,5 +1,4 @@
-﻿using System;
-using Prism.Mvvm;
+﻿using Prism.Mvvm;
 using Reactive.Bindings;
 
 namespace X4_ComplexCalculator.Main.Menu.Layout
@@ -7,7 +6,7 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
     /// <summary>
     /// レイアウト一覧の1レコード分
     /// </summary>
-    public class LayoutMenuItem : BindableBase, IComparable
+    public class LayoutMenuItem : BindableBase
     {
         #region プロパティ
         /// <summary>
@@ -58,28 +57,6 @@ namespace X4_ComplexCalculator.Main.Menu.Layout
             LayoutID = layoutID;
             LayoutName = new ReactivePropertySlim<string>(layoutName);
             IsChecked = new ReactivePropertySlim<bool>(isChecked);
-        }
-
-
-        /// <summary>
-        /// 比較
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public int CompareTo(object? obj)
-        {
-            if (obj == null)
-            {
-                return 1;
-            }
-
-            if (!(obj is LayoutMenuItem item))
-            {
-                throw new InvalidOperationException();
-            }
-
-            return (item.LayoutID < LayoutID) ?  1 :
-                   (item.LayoutID > LayoutID) ? -1 : 0;
         }
     }
 }
