@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
+using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
-using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
@@ -23,7 +23,8 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// 現在のレイアウト
         /// </summary>
-        private LayoutMenuItem? _ActiveLayout;
+        private readonly ReactivePropertySlim<LayoutMenuItem?> _ActiveLayout
+            = new ReactivePropertySlim<LayoutMenuItem?>();
 
 
         /// <summary>
@@ -43,30 +44,14 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// レイアウト一覧
         /// </summary>
-        public ObservablePropertyChangedCollection<LayoutMenuItem> Layouts { get; } = new ObservablePropertyChangedCollection<LayoutMenuItem>();
+        public ObservableCollection<LayoutMenuItem> Layouts { get; }
+            = new ObservableCollection<LayoutMenuItem>();
 
 
         /// <summary>
         /// 現在のレイアウト
         /// </summary>
-        public LayoutMenuItem? ActiveLayout
-        {
-            get => _ActiveLayout;
-            private set
-            {
-                if (_ActiveLayout != value)
-                {
-                    _ActiveLayout = value;
-                    if (_ActiveLayout != null)
-                    {
-                        foreach (var document in _WorkAreaManager.Documents)
-                        {
-                            document.SetLayout(_ActiveLayout.LayoutID);
-                        }
-                    }
-                }
-            }
-        }
+        public IReadOnlyReactiveProperty<LayoutMenuItem?> ActiveLayout => _ActiveLayout;
         #endregion
 
 
@@ -77,13 +62,30 @@ namespace X4_ComplexCalculator.Main
         public LayoutsManager(WorkAreaManager workAreaManager)
         {
             _WorkAreaManager = workAreaManager;
-            Layouts.CollectionPropertyChanged += Layouts_CollectionPropertyChanged;
 
             // レイアウト一覧の上書きボタンをトリガーにレイアウト上書き保存を実行
             Layouts.ObserveElementObservableProperty(x => x.SaveButtonClickedCommand)
                 .Select(x => x.Instance)
                 .Subscribe(OverwritedSaveLayout)
                 .AddTo(_Disposables);
+
+            // レイアウト一覧の変更ボタンをトリガーにレイアウト名変更を実行
+            Layouts.ObserveElementObservableProperty(x => x.EditButtonClickedCommand)
+                .Select(x => x.Instance)
+                .Subscribe(EditLayoutName)
+                .AddTo(_Disposables);
+
+            // レイアウト一覧の削除ボタンをトリガーにレイアウト削除を実行
+            Layouts.ObserveElementObservableProperty(x => x.DeleteButtonClickedCommand)
+                .Select(x => x.Instance)
+                .Subscribe(DeleteLayout)
+                .AddTo(_Disposables);
+
+            // プリセットが選択された場合、他のチェックを全部外す
+            Layouts.ObserveElementObservableProperty(x => x.IsChecked)
+                .Where(x => x.Value)
+                .Select(x => x.Instance)
+                .Subscribe(ExclusiveChecked);
         }
 
 
@@ -98,10 +100,10 @@ namespace X4_ComplexCalculator.Main
                 Layouts.Add(new LayoutMenuItem((long)dr["LayoutID"], (string)dr["LayoutName"], (long)dr["IsChecked"] == 1));
             });
 
-            var checkedLayout = Layouts.FirstOrDefault(x => x.IsChecked);
+            var checkedLayout = Layouts.FirstOrDefault(x => x.IsChecked.Value);
             if (checkedLayout != null)
             {
-                ActiveLayout = checkedLayout;
+                _ActiveLayout.Value = checkedLayout;
             }
         }
 
@@ -113,7 +115,7 @@ namespace X4_ComplexCalculator.Main
         {
             if (vm != null)
             {
-                var (onOK, layoutName) = SelectStringDialog.ShowDialog("Lang:EditLayoutName", "Lang:LayoutName", "", LayoutMenuItem.IsValidLayoutName);
+                var (onOK, layoutName) = SelectStringDialog.ShowDialog("Lang:EditLayoutName", "Lang:LayoutName", "", IsValidLayoutName);
                 if (onOK)
                 {
                     try
@@ -165,49 +167,72 @@ namespace X4_ComplexCalculator.Main
 
 
         /// <summary>
-        /// レイアウト一覧のプロパティ変更時
+        /// レイアウト名変更
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Layouts_CollectionPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void EditLayoutName(LayoutMenuItem menuItem)
         {
-            if (!(sender is LayoutMenuItem menuItem))
+            var (onOK, newLayoutName) = SelectStringDialog.ShowDialog("Lang:EditLayoutName", "Lang:LayoutName", menuItem.LayoutName.Value, IsValidLayoutName);
+            if (onOK && menuItem.LayoutName.Value != newLayoutName)
             {
-                return;
+                menuItem.LayoutName.Value = newLayoutName;
+
+                var param = new SQLiteCommandParameters(2);
+                param.Add("layoutName", System.Data.DbType.String, menuItem.LayoutName.Value);
+                param.Add("layoutID", System.Data.DbType.Int32, menuItem.LayoutID);
+                SettingDatabase.Instance.ExecQuery($"UPDATE WorkAreaLayouts SET LayoutName = :layoutName WHERE LayoutID = :layoutID", param);
+            }
+        }
+
+
+        /// <summary>
+        /// レイアウト削除
+        /// </summary>
+        private void DeleteLayout(LayoutMenuItem menuItem)
+        {
+            var result = LocalizedMessageBox.Show("Lang:DeleteLayoutConfirmMessage", "Lang:Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No, menuItem.LayoutName);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                SettingDatabase.Instance.ExecQuery($"DELETE FROM WorkAreaLayouts WHERE LayoutID = {menuItem.LayoutID}");
+                Layouts.Remove(menuItem);
+                _ActiveLayout.Value = null;
+            }
+        }
+
+
+        /// <summary>
+        /// レイアウト名が有効か判定
+        /// </summary>
+        /// <param name="layoutName">レイアウト名</param>
+        /// <returns>レイアウト名が有効か</returns>
+        public static bool IsValidLayoutName(string layoutName)
+        {
+            var ret = true;
+
+            if (string.IsNullOrWhiteSpace(layoutName))
+            {
+                LocalizedMessageBox.Show("Lang:InvalidLayoutNameMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ret = false;
             }
 
+            return ret;
+        }
 
-            switch (e.PropertyName)
+
+        /// <summary>
+        /// プリセットが選択された場合、他のチェックを全部外す
+        /// </summary>
+        /// <param name="menuItem">選択されたプリセット</param>
+        private void ExclusiveChecked(LayoutMenuItem menuItem)
+        {
+            if (menuItem.IsChecked.Value)
             {
-                // チェック状態
-                case nameof(LayoutMenuItem.IsChecked):
-                    if (menuItem.IsChecked)
-                    {
-                        // プリセットが選択された場合、他のチェックを全部外す
-                        foreach (var layout in Layouts.Where(x => x != menuItem))
-                        {
-                            layout.IsChecked = false;
-                        }
+                foreach (var layout in Layouts.Where(x => x != menuItem))
+                {
+                    layout.IsChecked.Value = false;
+                }
 
-                        ActiveLayout = menuItem;
-                    }
-                    else
-                    {
-                        ActiveLayout = null;
-                    }
-                    break;
-
-                // 削除されたか
-                case nameof(LayoutMenuItem.IsDeleted):
-                    if (menuItem.IsDeleted)
-                    {
-                        Layouts.Remove(menuItem);
-                        ActiveLayout = null;
-                    }
-                    break;
-
-                default:
-                    break;
+                _ActiveLayout.Value = menuItem;
             }
         }
 
