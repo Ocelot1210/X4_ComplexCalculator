@@ -105,7 +105,12 @@ namespace X4_ComplexCalculator.Infrastructure
         /// </summary>
         /// <returns>更新がある場合はバージョン名、ない場合は null</returns>
         public async ValueTask<string?> CheckUpdate()
-            => (_LastVersion = (await _Manager.CheckForUpdatesAsync()).LastVersion)?.ToString();
+        {
+            var result = await _Manager.CheckForUpdatesAsync();
+            return result.CanUpdate && result.LastVersion != null
+                ? (_LastVersion = result.LastVersion).ToString()
+                : null;
+        }
 
 
         /// <summary>
