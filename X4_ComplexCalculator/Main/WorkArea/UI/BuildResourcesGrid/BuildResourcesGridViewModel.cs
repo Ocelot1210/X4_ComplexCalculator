@@ -13,7 +13,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
     /// <summary>
     /// 建造に必要なリソースを表示するDataGridView用ViewModel
     /// </summary>
-    class BuildResourcesGridViewModel : BindableBase, IDisposable
+    public class BuildResourcesGridViewModel : BindableBase, IDisposable
     {
         #region メンバ
         /// <summary>

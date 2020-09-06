@@ -7,7 +7,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.Menu.View
     /// <summary>
     /// 表示状態メニュー1レコード分のクラス
     /// </summary>
-    class VisiblityMenuItem : BindableBase
+    public class VisiblityMenuItem : BindableBase
     {
         #region メンバ
         /// <summary>

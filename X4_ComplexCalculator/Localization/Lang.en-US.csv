@@ -62,6 +62,12 @@ DBUpdateConfirmationMessage;Do you want to display the DB update screen? \r\nPle
 DBUpdateRestartRequestMessage;Please restart the application to apply the DB update.
 DBUpdateFailureMessage;Failed to update the DB, \r\nplease check if the DB file is accessible and try again.
 
+# Window(W) --------------------------------------------
+Window;Window(_W)
+
+# Empire overview --------------------------------------
+EmpireOverview;Empire overview
+
 # Layout(L) --------------------------------------------
 Layout;Layout(_L)
 SaveLayout;Save layout

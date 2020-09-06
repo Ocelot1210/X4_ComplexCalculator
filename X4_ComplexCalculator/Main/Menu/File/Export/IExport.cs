@@ -3,7 +3,7 @@ using X4_ComplexCalculator.Main.WorkArea;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Export
 {
-    interface IExport
+    public interface IExport
     {
         /// <summary>
         /// メニュー表示用タイトル

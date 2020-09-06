@@ -20,7 +20,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary
     /// <summary>
     /// ステーション概要用ViewModel
     /// </summary>
-    class StationSummaryViewModel : BindableBase, IDisposable
+    public class StationSummaryViewModel : BindableBase, IDisposable
     {
         #region メンバ
         /// <summary>

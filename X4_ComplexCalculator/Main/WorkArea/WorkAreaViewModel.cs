@@ -30,7 +30,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
     /// <summary>
     /// 作業エリア用ViewModel
     /// </summary>
-    class WorkAreaViewModel : BindableBase, IDisposable
+    public class WorkAreaViewModel : BindableBase, IDisposable
     {
         #region メンバ
         /// <summary>

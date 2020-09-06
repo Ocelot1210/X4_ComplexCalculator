@@ -11,7 +11,7 @@ using X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
 {
-    class ModulesGridViewModel : BindableBase, IDisposable
+    public class ModulesGridViewModel : BindableBase, IDisposable
     {
         #region メンバ
         /// <summary>
