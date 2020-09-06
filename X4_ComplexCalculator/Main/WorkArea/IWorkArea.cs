@@ -2,7 +2,7 @@
 
 namespace X4_ComplexCalculator.Main.WorkArea
 {
-    interface IWorkArea
+    public interface IWorkArea
     {
         /// <summary>
         /// タイトル文字列

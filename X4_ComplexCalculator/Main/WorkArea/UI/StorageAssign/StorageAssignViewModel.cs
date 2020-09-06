@@ -9,7 +9,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
     /// <summary>
     /// 保管庫割当用ViewModel
     /// </summary>
-    class StorageAssignViewModel : BindableBase, IDisposable
+    public class StorageAssignViewModel : BindableBase, IDisposable
     {
         #region メンバ
         /// <summary>

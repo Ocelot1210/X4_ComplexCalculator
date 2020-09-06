@@ -2,12 +2,12 @@
 using AvalonDock.Layout;
 using Prism.Mvvm;
 
-namespace X4_ComplexCalculator.Main.WorkArea.UI.Menu.View
+namespace X4_ComplexCalculator.Main.WorkArea.UI.Menu.Tab
 {
     /// <summary>
     /// 表示状態メニュー1レコード分のクラス
     /// </summary>
-    class VisiblityMenuItem : BindableBase
+    public class VisiblityMenuItem : BindableBase
     {
         #region メンバ
         /// <summary>

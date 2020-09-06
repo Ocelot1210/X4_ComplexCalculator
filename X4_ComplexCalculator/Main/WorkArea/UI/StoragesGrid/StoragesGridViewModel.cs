@@ -11,7 +11,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
     /// <summary>
     /// 保管庫一覧表示用DataGridViewのViewModel
     /// </summary>
-    class StoragesGridViewModel : BindableBase, IDisposable
+    public class StoragesGridViewModel : BindableBase, IDisposable
     {
         #region メンバ
         /// <summary>

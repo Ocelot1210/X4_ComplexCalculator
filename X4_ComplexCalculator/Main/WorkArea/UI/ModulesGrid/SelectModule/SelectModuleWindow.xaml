@@ -85,7 +85,10 @@
                     <avdk:LayoutAnchorablePaneGroup Orientation="Vertical">
                         <avdk:LayoutAnchorablePane>
                             <!--  モジュール種別  -->
-                            <avdk:LayoutAnchorable Title="{lex:Loc Lang:ModuleType}" CanClose="False">
+                            <avdk:LayoutAnchorable
+                                Title="{lex:Loc Lang:ModuleType}"
+                                CanClose="False"
+                                CanHide="False">
                                 <xctk:CheckListBox
                                     DisplayMemberPath="Name"
                                     IsSelectAllActive="True"
@@ -99,7 +102,10 @@
 
                         <avdk:LayoutAnchorablePane>
                             <!--  所有派閥  -->
-                            <avdk:LayoutAnchorable Title="{lex:Loc Lang:OwnerFaction}" CanClose="False">
+                            <avdk:LayoutAnchorable
+                                Title="{lex:Loc Lang:OwnerFaction}"
+                                CanClose="False"
+                                CanHide="False">
                                 <xctk:CheckListBox
                                     DisplayMemberPath="FactionName"
                                     IsSelectAllActive="True"
@@ -128,7 +134,10 @@
                     </avdk:LayoutAnchorablePaneGroup>
 
                     <avdk:LayoutAnchorablePane>
-                        <avdk:LayoutAnchorable Title="{lex:Loc Lang:ModuleName}" CanClose="False">
+                        <avdk:LayoutAnchorable
+                            Title="{lex:Loc Lang:ModuleName}"
+                            CanClose="False"
+                            CanHide="False">
                             <DockPanel>
                                 <!--  モジュール名検索  -->
                                 <xctk:WatermarkTextBox

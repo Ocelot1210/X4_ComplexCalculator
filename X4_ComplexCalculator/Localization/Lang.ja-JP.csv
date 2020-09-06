@@ -62,6 +62,12 @@ DBUpdateConfirmationMessage;DB更新画面を表示しますか？\r\n※ 画面
 DBUpdateRestartRequestMessage;DBの更新を適用するためには本アプリケーションの再起動を行ってください。
 DBUpdateFailureMessage;DBの更新に失敗しました。\r\nDBファイルにアクセス可能か確認後、再度実行してください。
 
+# View(W) ----------------------------------------------
+View;表示(_V)
+
+# Empire overview --------------------------------------
+EmpireOverview;帝国の概要
+
 # Layout(L) --------------------------------------------
 Layout;レイアウト(_L)
 SaveLayout;レイアウト保存
@@ -129,7 +135,7 @@ PresetImported;インポート済み
 # ------------------------------------------------------
 # Plan
 # ------------------------------------------------------
-View;表示(_V)
+Tab;タブ
 ModuleList;モジュール
 Products;製品
 Summary;概要

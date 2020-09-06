@@ -151,4 +151,21 @@
     </Style>
 
 
+    <!--  赤字強調用スタイル(セルが非選択中のみ発動)  -->
+    <Style
+        x:Key="LossEmphasisStyle"
+        BasedOn="{StaticResource RightAlignedDataGridCell}"
+        TargetType="DataGridCell">
+        <Style.Triggers>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="False" />
+                    <Condition Binding="{Binding Count, Converter={StaticResource IsLessThanConverter}, ConverterParameter=0}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Background" Value="LightPink" />
+                <Setter Property="FontWeight" Value="Bold" />
+            </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
+
 </ResourceDictionary>

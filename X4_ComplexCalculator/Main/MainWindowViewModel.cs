@@ -23,6 +23,7 @@ using X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport;
 using X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport;
 using X4_ComplexCalculator.Main.Menu.Lang;
 using X4_ComplexCalculator.Main.Menu.Layout;
+using X4_ComplexCalculator.Main.Menu.View.EmpireOverview;
 using X4_ComplexCalculator.Main.WorkArea;
 
 namespace X4_ComplexCalculator.Main
@@ -38,25 +39,35 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         private readonly MainWindowModel _MainWindowModel;
 
+
         /// <summary>
         /// 言語一覧管理用
         /// </summary>
         private readonly LanguagesManager _LangMgr = new LanguagesManager();
+
 
         /// <summary>
         /// 作業エリア管理用
         /// </summary>
         private readonly WorkAreaManager _WorkAreaManager = new WorkAreaManager();
 
+
         /// <summary>
         /// 作業エリアファイル読み書き用
         /// </summary>
         private readonly WorkAreaFileIO _WorkAreaFileIO;
 
+
         /// <summary>
         /// インポート/エクスポート処理用
         /// </summary>
         private readonly ImportExporter _ImportExporter;
+
+
+        /// <summary>
+        /// 帝国の概要ウィンドウ
+        /// </summary>
+        private Window? _EmpireOverviewWindow;
 
 
         /// <summary>
@@ -106,6 +117,12 @@ namespace X4_ComplexCalculator.Main
         /// 開く
         /// </summary>
         public ICommand OpenCommand { get; }
+
+
+        /// <summary>
+        /// 帝国の概要ウィンドウを開く
+        /// </summary>
+        public ICommand OpenEmpireOverviewWindowCommand { get; }
 
 
         /// <summary>
@@ -216,6 +233,7 @@ namespace X4_ComplexCalculator.Main
             CheckUpdateCommand               = new AsyncReactiveCommand<bool>().WithSubscribe(CheckUpdate);
             VersionInfoCommand               = new DelegateCommand(ShowVersionInfo);
             DocumentClosingCommand           = new DelegateCommand<DocumentClosingEventArgs>(DocumentClosing);
+            OpenEmpireOverviewWindowCommand  = new DelegateCommand(OpenEmpireOverviewWindow);
             _WorkAreaFileIO.PropertyChanged += Member_PropertyChanged;
 
             _ImportExporter = new ImportExporter(_WorkAreaManager);
@@ -461,6 +479,8 @@ namespace X4_ComplexCalculator.Main
             e.Cancel = _MainWindowModel.WindowClosing();
             if (!e.Cancel)
             {
+                _EmpireOverviewWindow?.Close();
+
                 if (_ApplicationUpdater.FinishedDownload) _ApplicationUpdater.Update();
                 else if (_ApplicationUpdater.NowDownloading)
                 {
@@ -482,6 +502,22 @@ namespace X4_ComplexCalculator.Main
             {
                 e.Cancel = _WorkAreaManager.DocumentClosing(WorkArea);
             }
+        }
+
+
+        /// <summary>
+        /// 帝国の概要ウィンドウを開く
+        /// </summary>
+        private void OpenEmpireOverviewWindow()
+        {
+            if (_EmpireOverviewWindow == null)
+            {
+                _EmpireOverviewWindow = new EmpireOverviewWindow(Documents);
+                _EmpireOverviewWindow.Closed += (obj, e) => { _EmpireOverviewWindow = null; };
+                _EmpireOverviewWindow.Show();
+            }
+
+            _EmpireOverviewWindow.Activate();
         }
     }
 }

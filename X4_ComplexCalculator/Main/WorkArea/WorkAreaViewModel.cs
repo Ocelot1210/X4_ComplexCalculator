@@ -17,7 +17,7 @@ using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.Menu.File.Export;
 using X4_ComplexCalculator.Main.Menu.File.Import;
 using X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
-using X4_ComplexCalculator.Main.WorkArea.UI.Menu.View;
+using X4_ComplexCalculator.Main.WorkArea.UI.Menu.Tab;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary;
@@ -30,7 +30,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
     /// <summary>
     /// 作業エリア用ViewModel
     /// </summary>
-    class WorkAreaViewModel : BindableBase, IDisposable
+    public class WorkAreaViewModel : BindableBase, IDisposable
     {
         #region メンバ
         /// <summary>
