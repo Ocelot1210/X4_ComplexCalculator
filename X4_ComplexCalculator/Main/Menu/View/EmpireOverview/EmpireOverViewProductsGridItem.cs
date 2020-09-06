@@ -1,7 +1,7 @@
 ﻿using Prism.Mvvm;
 using X4_ComplexCalculator.DB.X4DB;
 
-namespace X4_ComplexCalculator.Main.Menu.Window.EmpireOverview
+namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
 {
     /// <summary>
     /// 帝国の概要の製品一覧DataGridの1レコード分

@@ -39,8 +39,8 @@
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0">
-            <!--  表示(V)  -->
-            <MenuItem Header="{lex:Loc Lang:View}" ItemsSource="{Binding VisiblityMenuItems}">
+            <!--  タブ  -->
+            <MenuItem Header="{lex:Loc Lang:Tab}" ItemsSource="{Binding VisiblityMenuItems}">
                 <MenuItem.ItemContainerStyle>
                     <Style TargetType="{x:Type MenuItem}">
                         <Setter Property="MenuItem.Header" Value="{Binding Title, Mode=OneTime}" />

@@ -1,12 +1,13 @@
 ﻿using System.Collections.ObjectModel;
 using X4_ComplexCalculator.Main.WorkArea;
+using System.Windows;
 
-namespace X4_ComplexCalculator.Main.Menu.Window.EmpireOverview
+namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
 {
     /// <summary>
     /// EmpireOverviewWindow.xaml の相互作用ロジック
     /// </summary>
-    public partial class EmpireOverviewWindow : System.Windows.Window
+    public partial class EmpireOverviewWindow : Window
     {
         /// <summary>
         /// コンストラクタ

@@ -1,6 +1,5 @@
 ﻿using Prism.Common;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -11,7 +10,7 @@ using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.WorkArea;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
 
-namespace X4_ComplexCalculator.Main.Menu.Window.EmpireOverview
+namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
 {
     /// <summary>
     /// 帝国の概要用Model

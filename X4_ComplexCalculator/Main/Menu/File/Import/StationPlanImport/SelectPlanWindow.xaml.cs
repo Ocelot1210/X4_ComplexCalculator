@@ -7,7 +7,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
     /// <summary>
     /// SelectPlanWindow.xaml の相互作用ロジック
     /// </summary>
-    public partial class SelectPlanDialog : System.Windows.Window
+    public partial class SelectPlanDialog : Window
     {
         /// <summary>
         /// コンストラクタ
@@ -28,7 +28,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
         {
             var wnd = new SelectPlanDialog(planItems);
 
-            wnd.Owner = Application.Current.Windows.OfType<System.Windows.Window>().FirstOrDefault(x => x.IsActive) ?? Application.Current.MainWindow;
+            wnd.Owner = Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive) ?? Application.Current.MainWindow;
 
             return wnd.ShowDialog() == true;
         }

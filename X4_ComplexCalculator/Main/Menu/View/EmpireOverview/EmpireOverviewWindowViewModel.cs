@@ -9,7 +9,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using X4_ComplexCalculator.Main.WorkArea;
 
-namespace X4_ComplexCalculator.Main.Menu.Window.EmpireOverview
+namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
 {
     /// <summary>
     /// 帝国の概要用ViewModel
