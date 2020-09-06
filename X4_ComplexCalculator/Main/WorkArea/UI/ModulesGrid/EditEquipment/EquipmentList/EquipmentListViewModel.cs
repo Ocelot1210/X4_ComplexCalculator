@@ -30,7 +30,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 装備一覧表示用
         /// </summary>
-        private readonly Dictionary<Size, ListCollectionView> _EquipmentsViews = new Dictionary<Size, ListCollectionView>();
+        private readonly Dictionary<X4Size, ListCollectionView> _EquipmentsViews = new Dictionary<X4Size, ListCollectionView>();
         #endregion
 
 
@@ -96,7 +96,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 選択中の装備サイズ
         /// </summary>
-        public Size SelectedSize
+        public X4Size SelectedSize
         {
             set
             {

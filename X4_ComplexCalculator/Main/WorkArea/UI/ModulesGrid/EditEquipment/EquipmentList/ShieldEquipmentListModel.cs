@@ -47,7 +47,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <param name="factions">種族一覧</param>
         public ShieldEquipmentListModel(ModulesGridItem module, ObservablePropertyChangedCollection<FactionsListItem> factions) : base(module, factions)
         {
-            foreach (Size size in Module.ModuleEquipment.Shield.Sizes)
+            foreach (X4Size size in Module.ModuleEquipment.Shield.Sizes)
             {
                 _Equipments.Add(size, new ObservableRangeCollection<EquipmentListItem>());
                 _Equipped.Add(size, new ObservableRangeCollection<EquipmentListItem>());

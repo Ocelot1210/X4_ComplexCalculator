@@ -229,7 +229,7 @@ namespace X4_ComplexCalculator.DB
         /// </summary>
         private static void InitX4DB()
         {
-            X4DB.Size.Init();
+            X4Size.Init();
             ModuleType.Init();
             Race.Init();
             Faction.Init();
