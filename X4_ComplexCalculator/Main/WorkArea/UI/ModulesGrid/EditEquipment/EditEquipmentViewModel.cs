@@ -7,8 +7,8 @@ using System.Windows.Data;
 using System.Windows.Input;
 using Prism.Commands;
 using Prism.Mvvm;
-using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Localize;
+using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
@@ -33,7 +33,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// 選択中の装備サイズ
         /// </summary>
-        private DB.X4DB.Size? _SelectedSize;
+        private X4Size? _SelectedSize;
         #endregion
 
 
@@ -70,13 +70,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// 装備サイズ一覧
         /// </summary>
-        public ObservableCollection<DB.X4DB.Size> EquipmentSizes => Model.EquipmentSizes;
+        public ObservableCollection<X4Size> EquipmentSizes => Model.EquipmentSizes;
 
 
         /// <summary>
         /// 選択中の装備サイズ
         /// </summary>
-        public DB.X4DB.Size? SelectedSize
+        public X4Size? SelectedSize
         {
             get
             {

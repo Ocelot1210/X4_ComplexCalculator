@@ -14,19 +14,19 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// 装備品
         /// </summary>
-        private readonly Dictionary<Size, List<Equipment>> _Equipments = new Dictionary<Size, List<Equipment>>();
+        private readonly Dictionary<X4Size, List<Equipment>> _Equipments = new Dictionary<X4Size, List<Equipment>>();
 
 
         /// <summary>
         /// 装備可能な数
         /// </summary>
-        private readonly Dictionary<Size, int> _MaxAmount;
+        private readonly Dictionary<X4Size, int> _MaxAmount;
 
 
         /// <summary>
         /// サイズ一覧
         /// </summary>
-        private readonly List<Size> _Sizes = new List<Size>();
+        private readonly List<X4Size> _Sizes = new List<X4Size>();
         #endregion
 
 
@@ -34,13 +34,13 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// 装備可能な数
         /// </summary>
-        public IReadOnlyDictionary<Size, int> MaxAmount => _MaxAmount;
+        public IReadOnlyDictionary<X4Size, int> MaxAmount => _MaxAmount;
 
 
         /// <summary>
         /// サイズ一覧
         /// </summary>
-        public IReadOnlyList<Size> Sizes => _Sizes;
+        public IReadOnlyList<X4Size> Sizes => _Sizes;
 
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         public ModuleEquipmentManager(string moduleID, string equipmentType)
         {
             CanEquipped = false;
-            _MaxAmount = new Dictionary<Size, int>();
+            _MaxAmount = new Dictionary<X4Size, int>();
 
             if (string.IsNullOrEmpty(equipmentType))
             {
@@ -94,7 +94,7 @@ namespace X4_ComplexCalculator.DB.X4DB
 
             X4Database.Instance.ExecQuery(query, (dr, args) =>
             {
-                var size = Size.Get((string)dr["SizeID"]);
+                var size = X4Size.Get((string)dr["SizeID"]);
                 _Sizes.Add(size);
                 var maxAmount = (int)(long)dr["Amount"];
                 _MaxAmount.Add(size, maxAmount);
@@ -114,7 +114,7 @@ namespace X4_ComplexCalculator.DB.X4DB
             _Sizes      = manager._Sizes;
             _MaxAmount  = manager._MaxAmount;
 
-            _Equipments = new Dictionary<Size, List<Equipment>>();
+            _Equipments = new Dictionary<X4Size, List<Equipment>>();
             foreach (var equipment in manager._Equipments)
             {
                 _Equipments.Add(equipment.Key, new List<Equipment>(equipment.Value));
@@ -127,7 +127,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="size">サイズ</param>
         /// <returns>装備一覧</returns>
-        public IReadOnlyList<Equipment> GetEquipment(Size size) => _Equipments[size];
+        public IReadOnlyList<Equipment> GetEquipment(X4Size size) => _Equipments[size];
 
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="size">サイズ</param>
         /// <param name="equipments">装備一覧</param>
-        public void ResetEquipment(Size size, ICollection<Equipment> equipments)
+        public void ResetEquipment(X4Size size, ICollection<Equipment> equipments)
         {
             if (MaxAmount[size] < equipments.Count)
             {

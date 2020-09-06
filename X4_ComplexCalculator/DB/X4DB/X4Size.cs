@@ -6,24 +6,28 @@ namespace X4_ComplexCalculator.DB.X4DB
     /// <summary>
     /// サイズ管理用クラス
     /// </summary>
-    public class Size
+    public class X4Size
     {
         #region スタティックメンバ
         /// <summary>
         /// サイズ一覧
         /// </summary>
-        private readonly static Dictionary<string, Size> _Sizes = new Dictionary<string, Size>();
+        private readonly static Dictionary<string, X4Size> _Sizes = new Dictionary<string, X4Size>();
         #endregion
 
+
+        #region プロパティ
         /// <summary>
         /// サイズID
         /// </summary>
         public string SizeID { get; }
 
+
         /// <summary>
         /// サイズ名
         /// </summary>
         public string Name { get; }
+        #endregion
 
 
         /// <summary>
@@ -31,7 +35,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="sizeID">サイズID</param>
         /// <param name="name">サイズ名</param>
-        private Size(string sizeID, string name)
+        private X4Size(string sizeID, string name)
         {
             SizeID = sizeID;
             Name = name;
@@ -49,7 +53,7 @@ namespace X4_ComplexCalculator.DB.X4DB
                 var id = (string)dr["SizeID"];
                 var name = (string)dr["Name"];
 
-                _Sizes.Add(id, new Size(id, name));
+                _Sizes.Add(id, new X4Size(id, name));
             });
         }
 
@@ -59,7 +63,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="sizeID">サイズID</param>
         /// <returns>サイズ</returns>
-        public static Size Get(string sizeID) => _Sizes[sizeID];
+        public static X4Size Get(string sizeID) => _Sizes[sizeID];
 
 
         /// <summary>
@@ -67,7 +71,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="obj">比較対象</param>
         /// <returns></returns>
-        public override bool Equals(object? obj) => obj is Size tgt && tgt.SizeID == SizeID;
+        public override bool Equals(object? obj) => obj is X4Size tgt && tgt.SizeID == SizeID;
 
 
         /// <summary>

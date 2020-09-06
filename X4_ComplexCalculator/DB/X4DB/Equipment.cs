@@ -31,7 +31,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// 装備の大きさ
         /// </summary>
-        public Size Size { get; }
+        public X4Size Size { get; }
 
         /// <summary>
         /// 装備名称
@@ -47,7 +47,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <param name="name"></param>
         /// <param name="equipmentType"></param>
         /// <param name="size"></param>
-        private Equipment(string equipmentID, string name, EquipmentType equipmentType, Size size)
+        private Equipment(string equipmentID, string name, EquipmentType equipmentType, X4Size size)
         {
             EquipmentID = equipmentID;
             Name = name;
@@ -69,7 +69,7 @@ namespace X4_ComplexCalculator.DB.X4DB
                 var size = (string)dr["SizeID"];
                 var name = (string)dr["Name"];
 
-                _Equipments.Add(id, new Equipment(id, name, EquipmentType.Get(type), Size.Get(size)));
+                _Equipments.Add(id, new Equipment(id, name, EquipmentType.Get(type), X4Size.Get(size)));
             });
         }
 

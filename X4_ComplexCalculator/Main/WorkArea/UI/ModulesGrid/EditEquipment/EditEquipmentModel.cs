@@ -34,7 +34,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// 装備サイズ一覧
         /// </summary>
-        public ObservableRangeCollection<DB.X4DB.Size> EquipmentSizes { get; private set; } = new ObservableRangeCollection<DB.X4DB.Size>();
+        public ObservableRangeCollection<X4Size> EquipmentSizes { get; private set; } = new ObservableRangeCollection<X4Size>();
 
 
         /// <summary>
@@ -89,10 +89,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         {
             static void AddItem(SQLiteDataReader dr, object[] args)
             {
-                ((ICollection<DB.X4DB.Size>)args[0]).Add(DB.X4DB.Size.Get((string)dr["SizeID"]));
+                ((ICollection<X4Size>)args[0]).Add(X4Size.Get((string)dr["SizeID"]));
             }
 
-            var sizes = new List<DB.X4DB.Size>();
+            var sizes = new List<X4Size>();
             X4Database.Instance.ExecQuery($"SELECT DISTINCT ModuleShield.SizeID FROM ModuleShield, ModuleTurret WHERE ModuleShield.ModuleID = ModuleTurret.ModuleID AND ModuleShield.ModuleID = '{moduleID}'", AddItem, sizes);
             EquipmentSizes.AddRange(sizes);
         }
