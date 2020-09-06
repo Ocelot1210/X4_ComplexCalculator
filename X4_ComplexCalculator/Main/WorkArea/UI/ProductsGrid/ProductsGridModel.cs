@@ -289,7 +289,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 // 前回値保存
                 foreach (var prod in Products)
                 {
-                    _OptionsBakDict.Add(prod.Ware.WareID, prod);
+                    if (!_OptionsBakDict.TryAdd(prod.Ware.WareID, prod))
+                    {
+                        _OptionsBakDict[prod.Ware.WareID] = prod;
+                    }
                 }
 
                 Products.Clear();

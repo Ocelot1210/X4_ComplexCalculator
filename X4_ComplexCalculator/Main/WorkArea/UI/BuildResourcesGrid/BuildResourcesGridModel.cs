@@ -158,7 +158,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
                 // 前回値保存
                 foreach (var resource in Resources)
                 {
-                    _OptionsBakDict.Add(resource.Ware.WareID, resource);
+                    if (!_OptionsBakDict.TryAdd(resource.Ware.WareID, resource))
+                    {
+                        _OptionsBakDict[resource.Ware.WareID] = resource;
+                    }
                 }
 
                 Resources.Clear();
