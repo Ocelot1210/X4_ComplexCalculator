@@ -99,9 +99,9 @@ namespace X4_ComplexCalculator.Main
         public void Init()
         {
             // レイアウト一覧読み込み
-            SettingDatabase.Instance.ExecQuery("SELECT LayoutID, LayoutName, IsChecked FROM WorkAreaLayouts", (dr, args) =>
+            SettingDatabase.Instance.ExecQuery("SELECT LayoutID, LayoutName, IsChecked FROM WorkAreaLayouts", (dr, _) =>
             {
-                Layouts.Add(new LayoutMenuItem((long)dr["LayoutID"], (string)dr["LayoutName"], (long)dr["IsChecked"] == 1));
+                Layouts.Add(new LayoutMenuItem((long)dr["LayoutID"], (string)dr["LayoutName"], (bool)dr["IsChecked"]));
             });
 
             var checkedLayout = Layouts.FirstOrDefault(x => x.IsChecked.Value);

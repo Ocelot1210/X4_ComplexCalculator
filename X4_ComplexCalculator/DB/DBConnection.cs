@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SQLite;
 using System.Linq;
+using Dapper;
 
 namespace X4_ComplexCalculator.DB
 {
@@ -48,6 +50,25 @@ namespace X4_ComplexCalculator.DB
 
 
         /// <summary>
+        /// 指定の関数を同一トランザクションとして処理する
+        /// </summary>
+        public void BeginTransaction(Action<DBConnection> action)
+        {
+            BeginTransaction();
+            try
+            {
+                action(this);
+                Commit();
+            }
+            catch
+            {
+                Rollback();
+                throw;
+            }
+        }
+
+
+        /// <summary>
         /// トランザクション開始
         /// </summary>
         public void BeginTransaction()
@@ -88,6 +109,27 @@ namespace X4_ComplexCalculator.DB
             _Transaction.Dispose();
             _Transaction = null;
         }
+
+
+        /// <summary>
+        /// クエリを実行する
+        /// </summary>
+        /// <param name="sql">実行するクエリ</param>
+        /// <param name="param">クエリに埋め込むパラメータ</param>
+        /// <returns>マッピング済みのクエリ実行結果</returns>
+        public int Execute(string sql, object? param = null)
+            => _Connection.Execute(sql, param, _Transaction);
+
+
+        /// <summary>
+        /// クエリを実行し、結果が 1 行の場合のみ指定の型にマッピングする
+        /// </summary>
+        /// <typeparam name="T">クエリ実行結果のマッピング先</typeparam>
+        /// <param name="sql">実行するクエリ</param>
+        /// <param name="param">クエリに埋め込むパラメータ</param>
+        /// <returns>マッピング済みのクエリ実行結果</returns>
+        public T QuerySingle<T>(string sql, object? param = null)
+            => _Connection.QuerySingle<T>(sql, param, _Transaction);
 
 
         /// <summary>
