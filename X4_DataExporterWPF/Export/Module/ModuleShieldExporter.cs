@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS ModuleShield
         /// <returns>読み出した ModuleShield データ</returns>
         private IEnumerable<ModuleShield> GetRecords()
         {
-            foreach (var module in _WaresXml.Root.XPathSelectElements("ware[@tags='module']"))
+            foreach (var module in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'module')]"))
             {
                 var moduleID = module.Attribute("id")?.Value;
                 if (string.IsNullOrEmpty(moduleID)) continue;
