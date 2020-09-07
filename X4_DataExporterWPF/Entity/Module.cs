@@ -48,7 +48,7 @@ namespace X4_DataExporterWPF.Entity
         /// <summary>
         /// 設計図有無
         /// </summary>
-        public int NoBlueprint { get; }
+        public bool NoBlueprint { get; }
         #endregion
 
 
@@ -63,7 +63,7 @@ namespace X4_DataExporterWPF.Entity
         /// <param name="workersCapacity">収容可能な労働者数</param>
         /// <param name="noBluePrint">設計図有無</param>
         public Module(string moduleID, string moduleTypeID, string name, string macro,
-                      int maxWorkers, int workersCapacity, int noBluePrint)
+                      int maxWorkers, int workersCapacity, bool noBluePrint)
         {
             ModuleID = moduleID;
             ModuleTypeID = moduleTypeID;

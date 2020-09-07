@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS Module
     Macro           TEXT    NOT NULL,
     MaxWorkers      INTEGER NOT NULL,
     WorkersCapacity INTEGER NOT NULL,
-    NoBlueprint     INTEGER NOT NULL,
+    NoBlueprint     BOOLEAN NOT NULL,
     FOREIGN KEY (ModuleTypeID)  REFERENCES ModuleType(ModuleTypeID)
 ) WITHOUT ROWID");
             }
@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS Module
                 var name = _Resolver.Resolve(module.Attribute("name")?.Value ?? "");
                 name = string.IsNullOrEmpty(name) ? macroName : name;
 
-                var noBluePrint = module.Attribute("tags").Value.Contains("noblueprint") ? 1 : 0;
+                var noBluePrint = module.Attribute("tags").Value.Contains("noblueprint");
 
                 yield return new Module(moduleID, moduleTypeID, name, macroName, maxWorkers, capacity, noBluePrint);
             }

@@ -96,7 +96,14 @@ namespace X4_ComplexCalculator.DB.X4DB
                 var moduleType = ModuleType.Get((string)dr["ModuleTypeID"]);
                 var maxWorkers = (long)dr["MaxWorkers"];
                 var workersCapacity = (long)dr["WorkersCapacity"];
-                var noBlueprint = (long)dr["NoBlueprint"] == 1;
+
+                // 旧バージョンでは NoBlueprint が long なため、bool に変換する
+                var noBlueprint = dr["NoBlueprint"] switch
+                {
+                    bool b => b,
+                    long l => l == 1,
+                    _ => throw new NotImplementedException(),
+                };
 
                 var moduleOwners = new List<Faction>();
                 X4Database.Instance.ExecQuery($"SELECT FactionID FROM ModuleOwner WHERE ModuleID = '{id}'", (dr2, args2) =>
