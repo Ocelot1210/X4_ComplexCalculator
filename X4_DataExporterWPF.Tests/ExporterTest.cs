@@ -64,7 +64,7 @@ namespace X4_DataExporterWPF.Tests
                 macro: "hab_arg_l_01_macro",
                 maxWorkers: 0,
                 workersCapacity: 1000,
-                noBluePrint: 0
+                noBluePrint: false
             )});
         }
 
@@ -100,7 +100,7 @@ namespace X4_DataExporterWPF.Tests
                 macro: "prod_arg_foodrations_macro",
                 maxWorkers: 90,
                 workersCapacity: 0,
-                noBluePrint: 0
+                noBluePrint: false
             )});
         }
 
