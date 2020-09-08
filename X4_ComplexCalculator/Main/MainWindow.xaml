@@ -162,7 +162,7 @@
                     <Style TargetType="{x:Type MenuItem}">
                         <Setter Property="MenuItem.Header" Value="{Binding CultureInfo.NativeName, Mode=OneTime}" />
                         <Setter Property="MenuItem.IsChecked" Value="{Binding IsChecked.Value, Mode=TwoWay}" />
-                        <Setter Property="MenuItem.IsCheckable" Value="True" />
+                        <Setter Property="MenuItem.IsCheckable" Value="{Binding IsCheckable.Value, Mode=OneWay}" />
                     </Style>
                 </MenuItem.ItemContainerStyle>
             </MenuItem>
