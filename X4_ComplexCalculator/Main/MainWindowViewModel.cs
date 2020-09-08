@@ -14,7 +14,6 @@ using GongSolutions.Wpf.DragDrop;
 using Prism.Commands;
 using Prism.Mvvm;
 using Reactive.Bindings;
-using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Infrastructure;
 using X4_ComplexCalculator.Main.Menu.File.Export;
@@ -192,7 +191,7 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// 言語一覧
         /// </summary>
-        public ObservableRangeCollection<LangMenuItem> Languages => _LangMgr.Languages;
+        public IReadOnlyList<LangMenuItem> Languages => _LangMgr.Languages;
 
 
         /// <summary>

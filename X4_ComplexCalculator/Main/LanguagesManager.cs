@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reactive.Linq;
 using WPFLocalizeExtension.Engine;
 using X4_ComplexCalculator.Common;
-using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Main.Menu.Lang;
 
@@ -12,12 +13,22 @@ namespace X4_ComplexCalculator.Main
     /// <summary>
     /// 言語一覧管理用クラス
     /// </summary>
-    class LanguagesManager
+    internal class LanguagesManager : IDisposable
     {
+        #region フィールド
+        /// <summary>
+        /// 購読解除用
+        /// </summary>
+        private readonly IDisposable _Disposables;
+        #endregion
+
+
+        #region プロパティ
         /// <summary>
         /// 言語一覧
         /// </summary>
-        public ObservablePropertyChangedCollection<LangMenuItem> Languages = new ObservablePropertyChangedCollection<LangMenuItem>();
+        public IReadOnlyList<LangMenuItem> Languages { get; }
+        #endregion
 
 
         /// <summary>
@@ -47,47 +58,42 @@ namespace X4_ComplexCalculator.Main
                     LocalizeDictionary.Instance.Culture = CultureInfo.CurrentUICulture;
                 }
             }
-            catch (ArgumentException e) when (e is ArgumentNullException || e is CultureNotFoundException)
+            catch (CultureNotFoundException)
             {
                 // 無効な言語が指定されている場合はシステムのロケールを設定
                 LocalizeDictionary.Instance.Culture = CultureInfo.CurrentUICulture;
             }
 
-            Languages.AddRange(LocalizeDictionary.Instance.DefaultProvider.AvailableCultures.Where(x => !string.IsNullOrEmpty(x.Name)).Select(x => new LangMenuItem(x)));
-            Languages.CollectionPropertyChanged += Languages_CollectionPropertyChanged;
+            Languages = LocalizeDictionary.Instance.DefaultProvider.AvailableCultures
+                .Where(x => !string.IsNullOrEmpty(x.Name))
+                .Select(x => new LangMenuItem(x, LocalizeDictionary.Instance.Culture.Name == x.Name))
+                .ToArray();
+
+            // 他の言語が選択された時、設定言語の変更を実行
+            _Disposables = Languages
+                .Select(x => x.IsChecked.Where(v => v).Select(_ => x.CultureInfo))
+                .Merge()
+                .Subscribe(ApplyLanguageChange);
         }
 
 
         /// <summary>
-        /// 言語一覧のプロパティ変更時
+        /// 設定言語の変更
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Languages_CollectionPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        /// <param name="cultureInfo">変更後の言語</param>
+        private void ApplyLanguageChange(CultureInfo cultureInfo)
         {
-            if (!(sender is LangMenuItem langMenuItem))
-            {
-                return;
-            }
+            LocalizeDictionary.Instance.Culture = cultureInfo;
+            Configuration.SetValue("AppSettings.Language", cultureInfo.Name);
 
-            switch (e.PropertyName)
+            foreach (var lang in Languages.Where(x => x.CultureInfo != cultureInfo))
             {
-                case nameof(LangMenuItem.IsChecked):
-                    if (langMenuItem.IsChecked)
-                    {
-                        foreach (var lang in Languages)
-                        {
-                            if (!ReferenceEquals(lang, langMenuItem))
-                            {
-                                lang.IsChecked = false;
-                            }
-                        }
-                    }
-                    break;
-
-                default:
-                    break;
+                lang.IsChecked.Value = false;
             }
         }
+
+
+        /// <inheritdoc />
+        public void Dispose() => _Disposables.Dispose();
     }
 }

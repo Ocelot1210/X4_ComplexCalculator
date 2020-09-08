@@ -156,12 +156,12 @@
 
             <MenuItem
                 Header="{lex:Loc Lang:Language}"
-                ItemsSource="{Binding Languages}"
+                ItemsSource="{Binding Languages, Mode=OneTime}"
                 ToolBar.OverflowMode="Always">
                 <MenuItem.ItemContainerStyle>
                     <Style TargetType="{x:Type MenuItem}">
-                        <Setter Property="MenuItem.Header" Value="{Binding Name}" />
-                        <Setter Property="MenuItem.IsChecked" Value="{Binding IsChecked, Mode=TwoWay}" />
+                        <Setter Property="MenuItem.Header" Value="{Binding CultureInfo.NativeName, Mode=OneTime}" />
+                        <Setter Property="MenuItem.IsChecked" Value="{Binding IsChecked.Value, Mode=TwoWay}" />
                         <Setter Property="MenuItem.IsCheckable" Value="True" />
                     </Style>
                 </MenuItem.ItemContainerStyle>
