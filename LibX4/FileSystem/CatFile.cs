@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -16,7 +17,8 @@ namespace LibX4.FileSystem
         /// <summary>
         /// Modのファイルパスを分割する正規表現
         /// </summary>
-        private static readonly Regex _ParseModRegex = new Regex(@"(extensions\/.+?)\/(.+)");
+        private static readonly Regex _ParseModRegex
+            = new Regex(@"(extensions\/.+?)\/(.+)", RegexOptions.IgnoreCase);
         #endregion
 
 
@@ -30,7 +32,8 @@ namespace LibX4.FileSystem
         /// <summary>
         /// 読み込み済み MOD
         /// </summary>
-        private readonly HashSet<string> _LoadedMods = new HashSet<string>();
+        private readonly HashSet<string> _LoadedMods 
+            = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
 
         /// <summary>
@@ -74,7 +77,7 @@ namespace LibX4.FileSystem
                 // content.xmlが存在するフォルダのみ読み込む
                 if (!File.Exists(Path.Combine(path, "content.xml"))) continue;
 
-                var modPath = $"extensions/{Path.GetFileName(path)}".ToLower().Replace('\\', '/');
+                var modPath = $"extensions/{Path.GetFileName(path)}".Replace('\\', '/');
 
                 fileLoader.Add(new CatFileLoader(path));
                 modInfos.Add(new ModInfo(path));
@@ -104,7 +107,7 @@ namespace LibX4.FileSystem
         /// <returns>開いた XML 文書、該当ファイルが無かった場合は null</returns>
         public XDocument? TryOpenXml(string filePath)
         {
-            filePath = PathCanonicalize(filePath.Replace('\\', '/'));
+            filePath = PathCanonicalize(filePath);
 
             XDocument? ret = null;
             foreach (var fileLoader in _FileLoaders)
@@ -193,7 +196,7 @@ namespace LibX4.FileSystem
         /// </remarks>
         private string PathCanonicalize(string path)
         {
-            path = path.ToLower().Replace('\\', '/');
+            path = path.Replace('\\', '/');
 
             var modPath = _ParseModRegex.Match(path).Groups[1].Value;
 

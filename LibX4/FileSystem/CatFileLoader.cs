@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -26,7 +27,7 @@ namespace LibX4.FileSystem
         /// ロード済みのファイルメタデータ
         /// </summary>
         private readonly Dictionary<string, CatEntry> _LoadedCatEntries
-            = new Dictionary<string, CatEntry>();
+            = new Dictionary<string, CatEntry>(StringComparer.OrdinalIgnoreCase);
 
 
         /// <summary>
@@ -109,7 +110,6 @@ namespace LibX4.FileSystem
         /// <returns>見つかったファイルのメタデータ、該当ファイルが無かった場合はnull</returns>
         private CatEntry? GetCatEntry(string searchFilePath)
         {
-            searchFilePath = searchFilePath.ToLower();
             if (_LoadedCatEntries.TryGetValue(searchFilePath, out var entry)) return entry;
 
             while (_NotLoadedPaths.Any())
@@ -137,7 +137,7 @@ namespace LibX4.FileSystem
 
             foreach (var line in File.ReadAllLines(catFilePath))
             {
-                var matchs = _CatFileRecordParser.Matches(line.ToLower()).FirstOrDefault()?.Groups;
+                var matchs = _CatFileRecordParser.Matches(line).FirstOrDefault()?.Groups;
                 if (matchs?.Count != 5)
                 {
                     throw new IOException($"{catFilePath} is invalid format.");
