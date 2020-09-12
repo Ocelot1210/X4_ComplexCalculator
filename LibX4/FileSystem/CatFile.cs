@@ -12,6 +12,14 @@ namespace LibX4.FileSystem
     /// </summary>
     public class CatFile : IIndexResolver
     {
+        #region スタティックメンバ
+        /// <summary>
+        /// Modのファイルパスを分割する正規表現
+        /// </summary>
+        private static readonly Regex _ParseModRegex = new Regex(@"(extensions\/.+?)\/(.+)");
+        #endregion
+
+
         #region メンバ
         /// <summary>
         /// バニラのファイル
@@ -29,12 +37,6 @@ namespace LibX4.FileSystem
         /// Indexファイル
         /// </summary>
         private readonly Dictionary<string, XDocument> _IndexFiles = new Dictionary<string, XDocument>();
-
-
-        /// <summary>
-        /// Modのファイルパスを分割する正規表現
-        /// </summary>
-        private readonly Regex _ParseModRegex = new Regex(@"(extensions\/.+?)\/(.+)");
 
 
         /// <summary>
