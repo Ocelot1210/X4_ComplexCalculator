@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -12,42 +13,53 @@ namespace LibX4.FileSystem
     /// </summary>
     public class CatFile : IIndexResolver
     {
-        #region メンバ
-        /// <summary>
-        /// バニラのファイル
-        /// </summary>
-        private readonly IFileLoader _VanillaFile;
-
-
-        /// <summary>
-        /// Modのファイル
-        /// </summary>
-        private readonly Dictionary<string, IFileLoader> _ModFiles = new Dictionary<string, IFileLoader>();
-
-
-        /// <summary>
-        /// Indexファイル
-        /// </summary>
-        private readonly Dictionary<string, XDocument> _IndexFiles = new Dictionary<string, XDocument>();
-
-
+        #region スタティックメンバ
         /// <summary>
         /// Modのファイルパスを分割する正規表現
         /// </summary>
-        private readonly Regex _ParseModRegex = new Regex(@"(extensions\/.+?)\/(.+)");
+        private static readonly Regex _ParseModRegex
+            = new Regex(@"(extensions\/.+?)\/(.+)", RegexOptions.IgnoreCase);
+        #endregion
+
+
+        #region メンバ
+        /// <summary>
+        /// ファイル
+        /// </summary>
+        private readonly IReadOnlyList<IFileLoader> _FileLoaders;
+
+
+        /// <summary>
+        /// 読み込み済み MOD
+        /// </summary>
+        private readonly HashSet<string> _LoadedMods
+            = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+
+        /// <summary>
+        /// 読み込み済み Index ファイル名
+        /// </summary>
+        private readonly HashSet<string> _LoadedIndex = new HashSet<string>();
+
+
+        /// <summary>
+        /// 読み込み済み Index の内容
+        /// </summary>
+        private readonly Dictionary<string, string> _Index
+            = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
 
         /// <summary>
         /// Mod情報配列
         /// </summary>
-        private readonly ModInfo[] _ModInfo;
+        private readonly IReadOnlyList<ModInfo> _ModInfo;
         #endregion
 
         #region プロパティ
         /// <summary>
         /// Modが導入されているか
         /// </summary>
-        public bool IsModInstalled => _ModInfo.Any();
+        public bool IsModInstalled => 0 < _LoadedMods.Count;
         #endregion
 
         /// <summary>
@@ -56,27 +68,31 @@ namespace LibX4.FileSystem
         /// <param name="gameRoot">X4インストール先ディレクトリパス</param>
         public CatFile(string gameRoot)
         {
-            _VanillaFile = new CatFileLoader(gameRoot);
+            var entensionsPath = Path.Combine(gameRoot, "extensions");
 
-            var modInfo = new List<ModInfo>();
+            var modPaths = Directory.Exists(entensionsPath)
+                ? Directory.GetDirectories(entensionsPath)
+                : new string[0];
 
-            // Modのフォルダを読み込み
-            if (Directory.Exists(Path.Combine(gameRoot, "extensions")))
+            var fileLoader = new List<CatFileLoader>(modPaths.Length + 1);
+            var modInfos = new List<ModInfo>(modPaths.Length);
+
+            fileLoader.Add(new CatFileLoader(gameRoot));
+
+            foreach (var path in modPaths)
             {
-                foreach (var path in Directory.GetDirectories(Path.Combine(gameRoot, "extensions")))
-                {
-                    var modPath = $"extensions/{Path.GetFileName(path)}".ToLower().Replace('\\', '/');
+                // content.xmlが存在するフォルダのみ読み込む
+                if (!File.Exists(Path.Combine(path, "content.xml"))) continue;
 
-                    // content.xmlが存在するフォルダのみ読み込む
-                    if (File.Exists(Path.Combine(gameRoot, modPath, "content.xml")))
-                    {
-                        modInfo.Add(new ModInfo(Path.Combine(gameRoot, modPath)));
-                        _ModFiles.Add(modPath, new CatFileLoader(path));
-                    }
-                }
+                var modPath = $"extensions/{Path.GetFileName(path)}".Replace('\\', '/');
+
+                fileLoader.Add(new CatFileLoader(path));
+                modInfos.Add(new ModInfo(path));
+                _LoadedMods.Add(modPath);
             }
 
-            _ModInfo = modInfo.ToArray();
+            _FileLoaders = fileLoader;
+            _ModInfo = modInfos;
         }
 
 
@@ -86,20 +102,9 @@ namespace LibX4.FileSystem
         /// <param name="filePath">ファイルパス</param>
         /// <returns>ファイルの内容</returns>
         public MemoryStream OpenFile(string filePath)
-        {
-            // バニラのデータに見つかればそちらを開く
-            var vanillaFile = _VanillaFile.OpenFile(filePath);
-            if (vanillaFile != null) return vanillaFile;
-
-            // バニラのデータに見つからない場合、Modのデータを探しに行く
-            foreach (var fileLoader in _ModFiles.Values)
-            {
-                var modFile = fileLoader.OpenFile(filePath);
-                if (modFile != null) return modFile;
-            }
-
-            throw new FileNotFoundException(nameof(filePath));
-        }
+            => _FileLoaders
+                .Select(fileLoader => fileLoader.OpenFile(filePath))
+                .FirstOrDefault() ?? throw new FileNotFoundException(nameof(filePath));
 
 
         /// <summary>
@@ -109,21 +114,10 @@ namespace LibX4.FileSystem
         /// <returns>開いた XML 文書、該当ファイルが無かった場合は null</returns>
         public XDocument? TryOpenXml(string filePath)
         {
+            filePath = PathCanonicalize(filePath);
+
             XDocument? ret = null;
-
-            filePath = PathCanonicalize(filePath.Replace('\\', '/'));
-
-            // バニラのxmlを読み込み
-            {
-                using var ms = _VanillaFile.OpenFile(filePath);
-                if (ms != null)
-                {
-                    ret = XDocument.Load(ms);
-                }
-            }
-
-            // Modのxmlを連結
-            foreach (var (modPath, fileLoader) in _ModFiles)
+            foreach (var fileLoader in _FileLoaders)
             {
                 using var ms = fileLoader.OpenFile(filePath);
                 if (ms == null)
@@ -164,12 +158,18 @@ namespace LibX4.FileSystem
         /// <returns>解決結果先のファイル</returns>
         public XDocument OpenIndexXml(string indexFilePath, string name)
         {
-            if (!_IndexFiles.ContainsKey(indexFilePath))
+            if (!_LoadedIndex.Contains(indexFilePath))
             {
-                _IndexFiles.Add(indexFilePath, OpenXml(indexFilePath));
+                foreach (var entry in OpenXml(indexFilePath).XPathSelectElements("/index/entry"))
+                {
+                    var entryName = entry.Attribute("name").Value;
+                    var entryValue = entry.Attribute("value").Value.Replace(@"\\", @"\");
+                    if (!_Index.TryAdd(entryName, entryValue)) _Index[entryName] = entryValue;
+                }
+                _LoadedIndex.Add(indexFilePath);
             }
 
-            var path = _IndexFiles[indexFilePath].XPathSelectElement($"/index/entry[@name='{name}']")?.Attribute("value").Value;
+            var path = _Index.GetValueOrDefault(name) ?? throw new FileNotFoundException();
 
             if (path == null) throw new FileNotFoundException();
 
@@ -183,7 +183,7 @@ namespace LibX4.FileSystem
         /// <param name="sw">ダンプ先ストリーム</param>
         public void DumpModInfo(StreamWriter sw)
         {
-            if (!_ModInfo.Any())
+            if (!IsModInstalled)
             {
                 return;
             }
@@ -209,20 +209,13 @@ namespace LibX4.FileSystem
         /// </remarks>
         private string PathCanonicalize(string path)
         {
-            path = path.ToLower().Replace('\\', '/');
+            path = path.Replace('\\', '/');
 
-            var matches = _ParseModRegex.Match(path);
+            var modPath = _ParseModRegex.Match(path).Groups[1].Value;
 
-            foreach (var (modPath, _) in _ModFiles)
-            {
-                // Modフォルダから指定されたか？
-                if (modPath == matches.Groups[1].Value)
-                {
-                    return path.Substring(modPath.Length + 1);
-                }
-            }
-
-            return path;
+            return _LoadedMods.Contains(modPath)
+                ? path.Substring(modPath.Length + 1)
+                : path;
         }
     }
 }
