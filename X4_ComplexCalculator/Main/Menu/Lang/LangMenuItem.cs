@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
+using System.Reactive.Linq;
 using Prism.Mvvm;
-using WPFLocalizeExtension.Engine;
-using X4_ComplexCalculator.Common;
+using Reactive.Bindings;
 
 namespace X4_ComplexCalculator.Main.Menu.Lang
 {
@@ -10,46 +10,23 @@ namespace X4_ComplexCalculator.Main.Menu.Lang
     /// </summary>
     public class LangMenuItem : BindableBase
     {
-        #region メンバ
+        #region プロパティ
         /// <summary>
         /// 言語
         /// </summary>
-        private readonly CultureInfo _CultureInfo;
+        public CultureInfo CultureInfo { get; }
 
 
         /// <summary>
         /// チェックされたか
         /// </summary>
-        private bool _IsChecked;
-        #endregion
-
-
-        #region プロパティ
-        /// <summary>
-        /// チェックされたか
-        /// </summary>
-        public bool IsChecked
-        {
-            get => _IsChecked;
-            set
-            {
-                if (SetProperty(ref _IsChecked, value))
-                {
-                    if (IsChecked)
-                    {
-                        LocalizeDictionary.Instance.Culture = _CultureInfo;
-
-                        Configuration.SetValue("AppSettings.Language", _CultureInfo.Name);
-                    }
-                }
-            }
-        }
+        public ReactivePropertySlim<bool> IsChecked { get; }
 
 
         /// <summary>
-        /// 言語名
+        /// チェックを外すことはできない
         /// </summary>
-        public string Name => _CultureInfo.NativeName;
+        public ReadOnlyReactivePropertySlim<bool> IsCheckable { get; }
         #endregion
 
 
@@ -57,14 +34,11 @@ namespace X4_ComplexCalculator.Main.Menu.Lang
         /// コンストラクタ
         /// </summary>
         /// <param name="cultureInfo">言語情報</param>
-        public LangMenuItem(CultureInfo cultureInfo)
+        public LangMenuItem(CultureInfo cultureInfo, bool isChecked)
         {
-            _CultureInfo = cultureInfo;
-
-            if (cultureInfo.Name == LocalizeDictionary.CurrentCulture.Name)
-            {
-                IsChecked = true;
-            }
+            CultureInfo = cultureInfo;
+            IsChecked = new ReactivePropertySlim<bool>(isChecked);
+            IsCheckable = IsChecked.Select(x => !x).ToReadOnlyReactivePropertySlim();
         }
     }
 }
