@@ -32,14 +32,21 @@ namespace LibX4.FileSystem
         /// <summary>
         /// 読み込み済み MOD
         /// </summary>
-        private readonly HashSet<string> _LoadedMods 
+        private readonly HashSet<string> _LoadedMods
             = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
 
         /// <summary>
-        /// Indexファイル
+        /// 読み込み済み Index ファイル名
         /// </summary>
-        private readonly Dictionary<string, XDocument> _IndexFiles = new Dictionary<string, XDocument>();
+        private readonly HashSet<string> _LoadedIndex = new HashSet<string>();
+
+
+        /// <summary>
+        /// 読み込み済み Index の内容
+        /// </summary>
+        private readonly Dictionary<string, string> _Index
+            = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
 
         /// <summary>
@@ -151,12 +158,18 @@ namespace LibX4.FileSystem
         /// <returns>解決結果先のファイル</returns>
         public XDocument OpenIndexXml(string indexFilePath, string name)
         {
-            if (!_IndexFiles.ContainsKey(indexFilePath))
+            if (!_LoadedIndex.Contains(indexFilePath))
             {
-                _IndexFiles.Add(indexFilePath, OpenXml(indexFilePath));
+                foreach (var entry in OpenXml(indexFilePath).XPathSelectElements("/index/entry"))
+                {
+                    var entryName = entry.Attribute("name").Value;
+                    var entryValue = entry.Attribute("value").Value.Replace(@"\\", @"\");
+                    if (!_Index.TryAdd(entryName, entryValue)) _Index[entryName] = entryValue;
+                }
+                _LoadedIndex.Add(indexFilePath);
             }
 
-            var path = _IndexFiles[indexFilePath].XPathSelectElement($"/index/entry[@name='{name}']")?.Attribute("value").Value;
+            var path = _Index.GetValueOrDefault(name) ?? throw new FileNotFoundException();
 
             if (path == null) throw new FileNotFoundException();
 
