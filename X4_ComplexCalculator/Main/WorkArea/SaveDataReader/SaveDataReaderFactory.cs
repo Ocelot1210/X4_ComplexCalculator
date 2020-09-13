@@ -38,7 +38,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
         {
             using var conn = new DBConnection(path);
 
-            const string sql1 = "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'Common'";
+            const string sql1 = "SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = 'Common'";
             var tableExists = conn.QuerySingle<bool>(sql1);
             if (!tableExists) return 0;
 
