@@ -11,7 +11,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
     /// <summary>
     /// 保存ファイル読み込みクラス(フォーマット0用)
     /// </summary>
-    class SaveDataReader0 : ISaveDataReader
+    internal class SaveDataReader0 : ISaveDataReader
     {
         /// <summary>
         /// 読み込み対象ファイルパス
@@ -41,98 +41,84 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
         /// <returns>成功したか</returns>
         public virtual bool Load(IProgress<int> progress)
         {
-            var ret = false;
+            using var conn = new DBConnection(Path);
 
-            using (var conn = new DBConnection(Path))
+            try
             {
-                try
-                {
-                    conn.BeginTransaction();
+                conn.BeginTransaction();
 
-                    // モジュール復元
-                    RestoreModules(conn, progress, 90);
-                    progress.Report(90);
+                // モジュール復元
+                RestoreModules(conn, progress, 90);
+                progress.Report(90);
 
-                    // 製品価格を復元
-                    RestoreProducts(conn);
-                    progress.Report(95);
+                // 製品価格を復元
+                RestoreProducts(conn);
+                progress.Report(95);
 
-                    // 建造リソースを復元
-                    RestoreBuildResource(conn);
-                    progress.Report(98);
+                // 建造リソースを復元
+                RestoreBuildResource(conn);
+                progress.Report(98);
 
-                    // 各要素を未編集状態にする
-                    InitEditStatus();
-                    progress.Report(100);
+                // 各要素を未編集状態にする
+                InitEditStatus();
+                progress.Report(100);
 
-                    _WorkArea.Title = System.IO.Path.GetFileNameWithoutExtension(Path);
+                _WorkArea.Title = System.IO.Path.GetFileNameWithoutExtension(Path);
 
-                    ret = true;
-                }
-                catch
-                {
-
-                }
-                finally
-                {
-                    conn.Rollback();
-                }
+                return true;
             }
-
-            return ret;
+            catch
+            {
+                return false;
+            }
+            finally
+            {
+                conn.Rollback();
+            }
         }
+
 
         /// <summary>
         /// モジュールを復元
         /// </summary>
         /// <param name="conn">DB接続情報</param>
+        /// <param name="progress">進捗</param>
         /// <param name="maxProgress">進捗最大</param>
         protected virtual void RestoreModules(DBConnection conn, IProgress<int> progress, int maxProgress)
         {
-            var records = 0;
-            var moduleCnt = 0;
-
             // レコード数取得
-            conn.ExecQuery("SELECT count(*) AS Count from Modules", (dr, _) =>
-            {
-                moduleCnt = (int)(long)dr[0];
-            });
-
-            records += moduleCnt;
-            conn.ExecQuery("SELECT count(*) AS Count from Equipments", (dr, _) =>
-            {
-                records += (int)(long)dr[0];
-            });
+            var moduleCnt = conn.QuerySingle<int>("SELECT count(*) AS Count from Modules");
+            var equipmentCnt = conn.QuerySingle<int>("SELECT count(*) AS Count from Equipments");
+            var records = moduleCnt + equipmentCnt;
 
 
             var modules = new List<ModulesGridItem>(moduleCnt);
             var progressCnt = 1;
 
             // モジュールを復元
-            conn.ExecQuery("SELECT ModuleID, Count FROM Modules ORDER BY Row ASC", (dr, _) =>
+            const string sql1 = "SELECT ModuleID, Count FROM Modules ORDER BY Row ASC";
+            foreach (var (moduleID, count) in conn.Query<(string, long)>(sql1))
             {
-                var module = Module.Get((string)dr["ModuleID"]);
+                var module = Module.Get(moduleID);
                 if (module != null)
                 {
-                    var mod = new ModulesGridItem(module, null, (long)dr["Count"]) { EditStatus = EditStatus.Unedited };
+                    var mod = new ModulesGridItem(module, null, count) { EditStatus = EditStatus.Unedited };
                     modules.Add(mod);
                 }
                 progress.Report((int)((double)progressCnt++ / records * maxProgress));
-            });
-
+            }
 
             // モジュールの装備を復元
-            conn.ExecQuery($"SELECT * FROM Equipments", (dr, _) =>
+            const string sql2 = "SELECT Row, EquipmentID FROM Equipments";
+            foreach (var (row, equipmentID) in conn.Query<(int, string)>(sql2))
             {
-                var row = (int)(long)dr["row"];
-                var eqp = Equipment.Get((string)dr["EquipmentID"]);
+                var eqp = Equipment.Get(equipmentID);
                 if (eqp != null)
                 {
                     modules[row].AddEquipment(eqp);
                 }
                 progress.Report((int)((double)progressCnt++ / records * maxProgress));
-            });
-
+            }
 
             _WorkArea.StationData.ModulesInfo.Modules.Reset(modules);
         }
@@ -141,37 +127,36 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
         /// <summary>
         /// 製品価格を復元
         /// </summary>
-        /// <param name="conn"></param>
+        /// <param name="conn">DB接続情報</param>
         protected virtual void RestoreProducts(DBConnection conn)
         {
-            conn.ExecQuery($"SELECT WareID, Price FROM Products", (dr, _) =>
+            const string sql = "SELECT WareID, Price FROM Products";
+            foreach (var (wareID, price) in conn.Query<(string, long)>(sql))
             {
-                var wareID = (string)dr["WareID"];
-                var itm = _WorkArea.StationData.ProductsInfo.Products.Where(x => x.Ware.WareID == wareID).FirstOrDefault();
+                var itm = _WorkArea.StationData.ProductsInfo.Products.FirstOrDefault(x => x.Ware.WareID == wareID);
                 if (itm != null)
                 {
-                    itm.UnitPrice = (long)dr["Price"];
+                    itm.UnitPrice = price;
                 }
-            });
+            }
         }
 
 
         /// <summary>
         /// 建造リソースを復元
         /// </summary>
-        /// <param name="conn"></param>
+        /// <param name="conn">DB接続情報</param>
         protected virtual void RestoreBuildResource(DBConnection conn)
         {
-            conn.ExecQuery($"SELECT WareID, Price FROM BuildResources", (dr, _) =>
+            const string sql = "SELECT WareID, Price FROM BuildResources";
+            foreach (var (wareID, price) in conn.Query<(string, long)>(sql))
             {
-                var wareID = (string)dr["WareID"];
-
-                var itm = _WorkArea.StationData.BuildResourcesInfo.BuildResources.Where(x => x.Ware.WareID == wareID).FirstOrDefault();
+                var itm = _WorkArea.StationData.BuildResourcesInfo.BuildResources.FirstOrDefault(x => x.Ware.WareID == wareID);
                 if (itm != null)
                 {
-                    itm.UnitPrice = (long)dr["Price"];
+                    itm.UnitPrice = price;
                 }
-            });
+            }
         }
 
 

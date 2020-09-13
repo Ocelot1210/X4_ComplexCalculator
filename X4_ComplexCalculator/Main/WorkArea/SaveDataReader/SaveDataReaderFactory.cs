@@ -5,39 +5,28 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
     /// <summary>
     /// 保存ファイル読み込みクラスのインスタンス作成用クラス
     /// </summary>
-    static class SaveDataReaderFactory
+    internal static class SaveDataReaderFactory
     {
         /// <summary>
         /// インスタンス作成
         /// </summary>
         /// <param name="path">読み込み対象ファイルパス</param>
         /// <param name="WorkArea">作業エリア</param>
-        /// <returns></returns>
+        /// <returns>保存ファイル読み込みクラスのインスタンス</returns>
         public static ISaveDataReader CreateSaveDataReader(string path, IWorkArea WorkArea)
         {
             var version = GetVersion(path);
-            ISaveDataReader ret;
-
-            switch (version)
+            ISaveDataReader ret = version switch
             {
-                case 1:
-                    ret = new SaveDataReader1(WorkArea);
-                    break;
-
-                case 2:
-                    ret = new SaveDataReader2(WorkArea);
-                    break;
-
-                default:
-                    ret = new SaveDataReader0(WorkArea);
-                    break;
-            }
+                0 => new SaveDataReader0(WorkArea),
+                1 => new SaveDataReader1(WorkArea),
+                _ => new SaveDataReader2(WorkArea),
+            };
 
             ret.Path = path;
 
             return ret;
         }
-
 
 
         /// <summary>
@@ -47,27 +36,14 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
         /// <returns>バージョン</returns>
         private static int GetVersion(string path)
         {
-            var ret = 0;
-            var tableExists = false;
+            using var conn = new DBConnection(path);
 
-            {
-                using var conn = new DBConnection(path);
-                conn.ExecQuery("SELECT count(*) AS Count FROM sqlite_master WHERE type = 'table' AND name = 'Common'", (dr, _) =>
-                {
-                    tableExists = 0L < (long)dr["Count"];
-                });
-            }
+            const string sql1 = "SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = 'Common'";
+            var tableExists = conn.QuerySingle<bool>(sql1);
+            if (!tableExists) return 0;
 
-            if (tableExists)
-            {
-                using var conn = new DBConnection(path);
-                conn.ExecQuery("SELECT Value FROM Common WHERE Item = 'FormatVersion'", (dr, _) =>
-                {
-                    ret = (int)(long)dr["Value"];
-                });
-            }
-
-            return ret;
+            const string sql2 = "SELECT Value FROM Common WHERE Item = 'FormatVersion'";
+            return conn.QuerySingle<int>(sql2);
         }
     }
 }

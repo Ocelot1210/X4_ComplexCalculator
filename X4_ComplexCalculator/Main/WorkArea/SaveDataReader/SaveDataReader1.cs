@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
@@ -8,7 +7,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
     /// <summary>
     /// 保存ファイル読み込みクラス(フォーマット1用)
     /// </summary>
-    class SaveDataReader1 : SaveDataReader0
+    internal class SaveDataReader1 : SaveDataReader0
     {
         /// <summary>
         /// コンストラクタ
@@ -26,49 +25,44 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
         /// <returns>成功したか</returns>
         public override bool Load(IProgress<int> progress)
         {
-            var ret = false;
+            using var conn = new DBConnection(Path);
 
-            using (var conn = new DBConnection(Path))
+            try
             {
-                try
-                {
-                    conn.BeginTransaction();
+                conn.BeginTransaction();
 
-                    // モジュール復元
-                    RestoreModules(conn, progress, 90);
-                    progress.Report(90);
+                // モジュール復元
+                RestoreModules(conn, progress, 90);
+                progress.Report(90);
 
-                    // 製品価格を復元
-                    RestoreProducts(conn);
-                    progress.Report(93);
+                // 製品価格を復元
+                RestoreProducts(conn);
+                progress.Report(93);
 
-                    // 建造リソースを復元
-                    RestoreBuildResource(conn);
-                    progress.Report(96);
+                // 建造リソースを復元
+                RestoreBuildResource(conn);
+                progress.Report(96);
 
-                    //保管庫割当情報を読み込み
-                    RestoreStorageAssignInfo(conn);
-                    progress.Report(98);
+                //保管庫割当情報を読み込み
+                RestoreStorageAssignInfo(conn);
+                progress.Report(98);
 
-                    // 各要素を未編集状態にする
-                    InitEditStatus();
-                    progress.Report(100);
+                // 各要素を未編集状態にする
+                InitEditStatus();
+                progress.Report(100);
 
-                    _WorkArea.Title = System.IO.Path.GetFileNameWithoutExtension(Path);
+                _WorkArea.Title = System.IO.Path.GetFileNameWithoutExtension(Path);
 
-                    ret = true;
-                }
-                catch
-                {
-
-                }
-                finally
-                {
-                    conn.Rollback();
-                }
+                return true;
             }
-
-            return ret;
+            catch
+            {
+                return false;
+            }
+            finally
+            {
+                conn.Rollback();
+            }
         }
 
 
@@ -78,16 +72,15 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
         /// <param name="conn"></param>
         protected virtual void RestoreStorageAssignInfo(DBConnection conn)
         {
-            conn.ExecQuery($"SELECT WareID, AllocCount FROM StorageAssign", (dr, _) =>
+            const string sql = "SELECT WareID, AllocCount FROM StorageAssign";
+            foreach (var (wareID, allocCount) in conn.Query<(string, long)>(sql))
             {
-                var wareID = (string)dr["WareID"];
-
-                var itm = _WorkArea.StationData.StorageAssignInfo.StorageAssign.Where(x => x.WareID == wareID).FirstOrDefault();
+                var itm = _WorkArea.StationData.StorageAssignInfo.StorageAssign.FirstOrDefault(x => x.WareID == wareID);
                 if (itm != null)
                 {
-                    itm.AllocCount = (long)dr["AllocCount"];
+                    itm.AllocCount = allocCount;
                 }
-            });
+            }
         }
     }
 }
