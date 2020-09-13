@@ -121,6 +121,17 @@ namespace X4_ComplexCalculator.DB
 
 
         /// <summary>
+        /// クエリを実行し、結果を指定の型にマッピングする
+        /// </summary>
+        /// <typeparam name="T">クエリ実行結果のマッピング先</typeparam>
+        /// <param name="sql">実行するクエリ</param>
+        /// <param name="param">クエリに埋め込むパラメータ</param>
+        /// <returns>マッピング済みのクエリ実行結果</returns>
+        public IEnumerable<T> Query<T>(string sql, object? param = null)
+            => _Connection.Query<T>(sql, param);
+
+
+        /// <summary>
         /// クエリを実行し、結果が 1 行の場合のみ指定の型にマッピングする
         /// </summary>
         /// <typeparam name="T">クエリ実行結果のマッピング先</typeparam>

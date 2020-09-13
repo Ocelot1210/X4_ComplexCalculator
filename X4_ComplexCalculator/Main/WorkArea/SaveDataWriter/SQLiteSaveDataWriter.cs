@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Data;
 using System.IO;
+using System.Linq;
 using System.Windows;
+using Dapper;
 using Microsoft.Win32;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
 {
@@ -50,8 +54,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
         /// <param name="WorkArea">作業エリア</param>
         public bool SaveAs(IWorkArea WorkArea)
         {
-            var ret = false;
-
             var dlg = new SaveFileDialog();
 
             dlg.Filter = "X4 Station calculator data (*.x4)|*.x4|All Files|*.*";
@@ -63,7 +65,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
                 {
                     SaveMain(WorkArea);
                     WorkArea.Title = Path.GetFileNameWithoutExtension(SaveFilePath);
-                    ret = true;
+                    return true;
                 }
                 catch (Exception e)
                 {
@@ -72,7 +74,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
             }
 
 
-            return ret;
+            return false;
         }
 
 
@@ -90,52 +92,49 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
             conn.BeginTransaction();
 
             // 保存用テーブル初期化
-            conn.ExecQuery("DROP TABLE IF EXISTS Common");
-            conn.ExecQuery("DROP TABLE IF EXISTS Modules");
-            conn.ExecQuery("DROP TABLE IF EXISTS Equipments");
-            conn.ExecQuery("DROP TABLE IF EXISTS Products");
-            conn.ExecQuery("DROP TABLE IF EXISTS BuildResources");
-            conn.ExecQuery("DROP TABLE IF EXISTS StorageAssign");
-            conn.ExecQuery("DROP TABLE IF EXISTS StationSettings");
-            conn.ExecQuery("CREATE TABLE Common(Item TEXT, Value INTEGER)");
-            conn.ExecQuery("CREATE TABLE Modules(Row INTEGER, ModuleID TEXT, Count INTEGER)");
-            conn.ExecQuery("CREATE TABLE Equipments(Row INTEGER, EquipmentID TEXT)");
-            conn.ExecQuery("CREATE TABLE Products(WareID TEXT, Price INTEGER, NoBuy INTEGER, NoSell INTEGER)");
-            conn.ExecQuery("CREATE TABLE BuildResources(WareID TEXT, Price INTEGER, NoBuy INTEGER)");
-            conn.ExecQuery("CREATE TABLE StorageAssign(WareID TEXT, AllocCount INTEGER)");
-            conn.ExecQuery("CREATE TABLE StationSettings(Key TEXT, Value TEXT)");
+            conn.Execute("DROP TABLE IF EXISTS Common");
+            conn.Execute("DROP TABLE IF EXISTS Modules");
+            conn.Execute("DROP TABLE IF EXISTS Equipments");
+            conn.Execute("DROP TABLE IF EXISTS Products");
+            conn.Execute("DROP TABLE IF EXISTS BuildResources");
+            conn.Execute("DROP TABLE IF EXISTS StorageAssign");
+            conn.Execute("DROP TABLE IF EXISTS StationSettings");
+            conn.Execute("CREATE TABLE Common(Item TEXT, Value INTEGER)");
+            conn.Execute("CREATE TABLE Modules(Row INTEGER, ModuleID TEXT, Count INTEGER)");
+            conn.Execute("CREATE TABLE Equipments(Row INTEGER, EquipmentID TEXT)");
+            conn.Execute("CREATE TABLE Products(WareID TEXT, Price INTEGER, NoBuy INTEGER, NoSell INTEGER)");
+            conn.Execute("CREATE TABLE BuildResources(WareID TEXT, Price INTEGER, NoBuy INTEGER)");
+            conn.Execute("CREATE TABLE StorageAssign(WareID TEXT, AllocCount INTEGER)");
+            conn.Execute("CREATE TABLE StationSettings(Key TEXT, Value TEXT)");
 
 
             // ファイルフォーマットのバージョン保存
-            conn.ExecQuery($"INSERT INTO Common(Item, Value) VALUES('FormatVersion', 2)");
+            conn.Execute("INSERT INTO Common(Item, Value) VALUES('FormatVersion', 2)");
 
             // ステーションの設定保存
-            conn.ExecQuery($"INSERT INTO StationSettings(Key, Value) VALUES('IsHeadquarters', '{WorkArea.StationData.Settings.IsHeadquarters}')");
-            conn.ExecQuery($"INSERT INTO StationSettings(Key, Value) VALUES('Sunlight', '{WorkArea.StationData.Settings.Sunlight}')");
-            conn.ExecQuery($"INSERT INTO StationSettings(Key, Value) VALUES('ActualWorkforce', '{WorkArea.StationData.Settings.Workforce.Actual}')");
-            conn.ExecQuery($"INSERT INTO StationSettings(Key, Value) VALUES('AlwaysMaximumWorkforce', '{WorkArea.StationData.Settings.Workforce.AlwaysMaximum}')");
+            conn.Execute("INSERT INTO StationSettings(Key, Value) VALUES('IsHeadquarters', :IsHeadquarters)", WorkArea.StationData.Settings);
+            conn.Execute("INSERT INTO StationSettings(Key, Value) VALUES('Sunlight', :Sunlight)", WorkArea.StationData.Settings);
+            conn.Execute("INSERT INTO StationSettings(Key, Value) VALUES('ActualWorkforce', :Actual)", WorkArea.StationData.Settings.Workforce);
+            conn.Execute("INSERT INTO StationSettings(Key, Value) VALUES('AlwaysMaximumWorkforce', :AlwaysMaximum)", WorkArea.StationData.Settings.Workforce);
 
             // モジュール保存
-            var rowCnt = 0;
-            foreach (var module in WorkArea.StationData.ModulesInfo.Modules)
+            foreach (var (module, i) in WorkArea.StationData.ModulesInfo.Modules.Select((module, i) => (module, i)))
             {
-                conn.ExecQuery($"INSERT INTO Modules(Row, ModuleID, Count) Values({rowCnt}, '{module.Module.ModuleID}', {module.ModuleCount})");
+                const string sql1 = "INSERT INTO Modules(Row, ModuleID, Count) Values(:i, :ModuleID, :ModuleCount)";
+                conn.Execute(sql1, new { i, module.Module.ModuleID, module.ModuleCount });
 
                 if (module.EditStatus == EditStatus.Edited)
                 {
                     module.EditStatus |= EditStatus.Saved;
                 }
 
-                foreach (var equipment in module.ModuleEquipment.GetAllEquipment())
-                {
-                    conn.ExecQuery($"INSERT INTO Equipments(Row, EquipmentID) Values({rowCnt}, '{equipment.EquipmentID}')");
-                }
-
-                rowCnt++;
+                const string sql2 = "INSERT INTO Equipments(Row, EquipmentID) Values(:i, :EquipmentID)";
+                var param2 = module.ModuleEquipment.GetAllEquipment().Select(e => new { i, e.EquipmentID });
+                conn.Execute(sql2, param2);
             }
 
-
             // 価格保存
+            SqlMapper.AddTypeHandler(new WareTypeHandler());
             foreach (var product in WorkArea.StationData.ProductsInfo.Products)
             {
                 if (product.EditStatus == EditStatus.Edited)
@@ -143,13 +142,16 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
                     product.EditStatus |= EditStatus.Saved;
                 }
 
-                conn.ExecQuery($"INSERT INTO Products(WareID, Price, NoBuy, NoSell) Values('{product.Ware.WareID}', {product.UnitPrice}, {(product.NoBuy ? 1 : 0)}, {(product.NoSell ? 1 : 0)})");
+                const string sql = "INSERT INTO Products(WareID, Price, NoBuy, NoSell) Values(:Ware, :UnitPrice, :NoBuy, :NoSell)";
+                conn.Execute(sql, product);
             }
 
             // 建造リソース保存
             foreach (var resource in WorkArea.StationData.BuildResourcesInfo.BuildResources)
             {
-                conn.ExecQuery($"INSERT INTO BuildResources(WareID, Price, NoBuy) Values('{resource.Ware.WareID}', {resource.UnitPrice}, {(resource.NoBuy ? 1 : 0)})");
+                const string sql = "INSERT INTO BuildResources(WareID, Price, NoBuy) Values(:Ware, :UnitPrice, :NoBuy)";
+                conn.Execute(sql, resource);
+
                 if (resource.EditStatus == EditStatus.Edited)
                 {
                     resource.EditStatus |= EditStatus.Saved;
@@ -159,7 +161,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
             // 保管庫割当情報保存
             foreach (var assign in WorkArea.StationData.StorageAssignInfo.StorageAssign)
             {
-                conn.ExecQuery($"INSERT INTO StorageAssign(WareID, AllocCount) Values('{assign.WareID}', {assign.AllocCount})");
+                const string sql = "INSERT INTO StorageAssign(WareID, AllocCount) Values(:WareID, :AllocCount)";
+                conn.Execute(sql, assign);
+
                 if (assign.EditStatus == EditStatus.Edited)
                 {
                     assign.EditStatus |= EditStatus.Saved;
@@ -167,6 +171,24 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
             }
 
             conn.Commit();
+        }
+
+
+        /// <summary>
+        /// Dappar が Ware を WareID に変換するためのクラス
+        /// </summary>
+        private class WareTypeHandler : SqlMapper.TypeHandler<Ware>
+        {
+            /// <inheritdoc />
+            public override Ware Parse(object value) => throw new NotImplementedException();
+
+
+            /// <inheritdoc />
+            public override void SetValue(IDbDataParameter parameter, Ware value)
+            {
+                parameter.DbType = DbType.String;
+                parameter.Value = value.WareID;
+            }
         }
     }
 }
