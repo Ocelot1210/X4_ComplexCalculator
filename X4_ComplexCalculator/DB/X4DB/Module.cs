@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Linq;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
@@ -29,6 +29,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         public ModuleType ModuleType { get; }
 
+
         /// <summary>
         /// モジュール名称
         /// </summary>
@@ -50,13 +51,13 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// 建造方式
         /// </summary>
-        public ModuleProduction[] ModuleProductions { get; }
+        public IReadOnlyList<ModuleProduction> ModuleProductions { get; }
 
 
         /// <summary>
         /// 所有派閥
         /// </summary>
-        public Faction[] Owners { get; }
+        public IReadOnlyList<Faction> Owners { get; }
         #endregion
 
 
@@ -70,7 +71,9 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <param name="workersCapacity">従業員収容人数</param>
         /// <param name="buildMethods">建造方式</param>
         /// <param name="owners">所有派閥</param>
-        private Module(string moduleID, string name, ModuleType moduleType, long maxWorkers, long workersCapacity, ModuleProduction[] buildMethods, Faction[] owners)
+        private Module(string moduleID, string name, ModuleType moduleType,
+                       long maxWorkers, long workersCapacity,
+                       ModuleProduction[] buildMethods, Faction[] owners)
         {
             ModuleID = moduleID;
             Name = name;
@@ -89,33 +92,27 @@ namespace X4_ComplexCalculator.DB.X4DB
         public static void Init()
         {
             _Modules.Clear();
-            X4Database.Instance.ExecQuery("SELECT ModuleID, ModuleTypeID, Name, MaxWorkers, WorkersCapacity, NoBlueprint FROM Module", (dr, args) =>
+
+            const string sql1 = "SELECT ModuleID, ModuleTypeID, Name, MaxWorkers, WorkersCapacity, NoBlueprint FROM Module";
+            foreach (var record in X4Database.Instance.Query<ModuleTable>(sql1))
             {
-                var id = (string)dr["ModuleID"];
-                var name = (string)dr["Name"];
-                var moduleType = ModuleType.Get((string)dr["ModuleTypeID"]);
-                var maxWorkers = (long)dr["MaxWorkers"];
-                var workersCapacity = (long)dr["WorkersCapacity"];
+                var moduleType = ModuleType.Get(record.ModuleTypeID);
 
-                // 旧バージョンでは NoBlueprint が long なため、bool に変換する
-                var noBlueprint = dr["NoBlueprint"] switch
-                {
-                    bool b => b,
-                    long l => l == 1,
-                    _ => throw new NotImplementedException(),
-                };
+                const string sql2 = "SELECT FactionID FROM ModuleOwner WHERE ModuleID = :ModuleID";
+                var owners = X4Database.Instance.Query<string>(sql2, record)
+                    .Select<string, Faction>(Faction.Get!)
+                    .Where(x => x != null)
+                    .ToArray();
 
-                var moduleOwners = new List<Faction>();
-                X4Database.Instance.ExecQuery($"SELECT FactionID FROM ModuleOwner WHERE ModuleID = '{id}'", (dr2, args2) =>
-                {
-                    var faction = Faction.Get((string)dr2["FactionID"]);
-                    if (faction != null) moduleOwners.Add(faction);
-                });
+                var buildMethods = record.NoBlueprint
+                    ? Array.Empty<ModuleProduction>()
+                    : ModuleProduction.Get(record.ModuleID);
 
-                var prod = (noBlueprint) ? Array.Empty<ModuleProduction>() : ModuleProduction.Get(id);
-
-                _Modules.Add(id, new Module(id, name, moduleType, maxWorkers, workersCapacity, prod, moduleOwners.ToArray()));
-            });
+                var module = new Module(record.ModuleID, record.Name, moduleType,
+                                        record.MaxWorkers, record.WorkersCapacity,
+                                        buildMethods, owners);
+                _Modules.Add(record.ModuleID, module);
+            }
         }
 
 
@@ -157,5 +154,39 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <returns>ハッシュ値</returns>
         public override int GetHashCode() => HashCode.Combine(ModuleID);
+
+
+        /// <summary>
+        /// X4 データベース内の Module テーブルのレコードを表す構造体
+        /// </summary>
+        public struct ModuleTable
+        {
+            public string ModuleID { get; }
+            public string ModuleTypeID { get; }
+            public string Name { get; }
+            public long MaxWorkers { get; }
+            public long WorkersCapacity { get; }
+            public bool NoBlueprint { get; }
+
+            public ModuleTable(string moduleID, string moduleTypeID, string name,
+                               long maxWorkers, long workersCapacity, bool noBlueprint)
+            {
+                ModuleID = moduleID;
+                Name = name;
+                ModuleTypeID = moduleTypeID;
+                MaxWorkers = maxWorkers;
+                WorkersCapacity = workersCapacity;
+                NoBlueprint = noBlueprint;
+            }
+
+            // TODO: 旧データベース用のコンストラクタ。
+            //       X4 データベースフォーマット v1 のサポートを打ち切る場合削除すること。
+            public ModuleTable(string moduleID, string moduleTypeID, string name,
+                               long maxWorkers, long workersCapacity, long noBlueprint)
+                : this(moduleID, moduleTypeID, name, maxWorkers, workersCapacity, noBlueprint == 1)
+            {
+
+            }
+        }
     }
 }
