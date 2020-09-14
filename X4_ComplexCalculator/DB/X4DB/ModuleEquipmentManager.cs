@@ -15,18 +15,6 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// 装備品
         /// </summary>
         private readonly Dictionary<X4Size, List<Equipment>> _Equipments = new Dictionary<X4Size, List<Equipment>>();
-
-
-        /// <summary>
-        /// 装備可能な数
-        /// </summary>
-        private readonly Dictionary<X4Size, int> _MaxAmount;
-
-
-        /// <summary>
-        /// サイズ一覧
-        /// </summary>
-        private readonly List<X4Size> _Sizes = new List<X4Size>();
         #endregion
 
 
@@ -34,38 +22,26 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// 装備可能な数
         /// </summary>
-        public IReadOnlyDictionary<X4Size, int> MaxAmount => _MaxAmount;
+        public IReadOnlyDictionary<X4Size, int> MaxAmount
+            => _Equipments.ToDictionary(p => p.Key, p => p.Value.Capacity);
 
 
         /// <summary>
         /// サイズ一覧
         /// </summary>
-        public IReadOnlyList<X4Size> Sizes => _Sizes;
+        public IEnumerable<X4Size> Sizes => _Equipments.Keys;
 
 
         /// <summary>
         /// 装備を持てるか
         /// </summary>
-        public bool CanEquipped { private set; get; }
+        public bool CanEquipped => 0 < _Equipments.Count;
 
 
         /// <summary>
         /// 全装備を取得
         /// </summary>
-        public List<Equipment> AllEquipments
-        {
-            get
-            {
-                var ret = new List<Equipment>();
-
-                foreach (var itm in _Equipments.Values)
-                {
-                    ret.AddRange(itm);
-                }
-
-                return ret;
-            }
-        }
+        public IEnumerable<Equipment> AllEquipments => _Equipments.Values.SelectMany(x => x);
 
 
         /// <summary>
@@ -82,9 +58,6 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <param name="equipmentType">装備種別("Turret"か"Shield"のどちらか")</param>
         public ModuleEquipmentManager(string moduleID, string equipmentType)
         {
-            CanEquipped = false;
-            _MaxAmount = new Dictionary<X4Size, int>();
-
             if (string.IsNullOrEmpty(equipmentType))
             {
                 throw new ArgumentException("Invalid equipment type.", nameof(equipmentType));
@@ -95,11 +68,8 @@ namespace X4_ComplexCalculator.DB.X4DB
             X4Database.Instance.ExecQuery(query, (dr, args) =>
             {
                 var size = X4Size.Get((string)dr["SizeID"]);
-                _Sizes.Add(size);
                 var maxAmount = (int)(long)dr["Amount"];
-                _MaxAmount.Add(size, maxAmount);
                 _Equipments.Add(size, new List<Equipment>(maxAmount));
-                CanEquipped = true;
             });
         }
 
@@ -110,15 +80,8 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <param name="manager"></param>
         public ModuleEquipmentManager(ModuleEquipmentManager manager)
         {
-            CanEquipped = manager.CanEquipped;
-            _Sizes      = manager._Sizes;
-            _MaxAmount  = manager._MaxAmount;
-
-            _Equipments = new Dictionary<X4Size, List<Equipment>>();
-            foreach (var equipment in manager._Equipments)
-            {
-                _Equipments.Add(equipment.Key, new List<Equipment>(equipment.Value));
-            }
+            _Equipments = manager._Equipments
+                .ToDictionary(p => p.Key, p => new List<Equipment>(p.Value));
         }
 
 
@@ -137,7 +100,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <param name="equipments">装備一覧</param>
         public void ResetEquipment(X4Size size, ICollection<Equipment> equipments)
         {
-            if (MaxAmount[size] < equipments.Count)
+            if (_Equipments[size].Capacity < equipments.Count)
             {
                 throw new IndexOutOfRangeException("これ以上装備できません。");
             }
@@ -152,7 +115,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <param name="equipment">追加対象</param>
         public void AddEquipment(Equipment equipment)
         {
-            if (_Equipments[equipment.Size].Count < MaxAmount[equipment.Size])
+            if (_Equipments[equipment.Size].Count < _Equipments[equipment.Size].Capacity)
             {
                 _Equipments[equipment.Size].Add(equipment);
             }
