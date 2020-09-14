@@ -174,7 +174,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             Module = module;
             ModuleCount = moduleCount;
             EditEquipmentCommand = new DelegateCommand(EditEquipment);
-            ModuleEquipment = ModuleEquipment.Get(Module.ModuleID);
+            ModuleEquipment = new ModuleEquipment(module);
 
             _SelectedMethod = selectedMethod ?? Module.ModuleProductions[0];
         }
@@ -187,7 +187,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         public ModulesGridItem(XElement element)
         {
             Module = Module.Get(element.Attribute("id").Value) ?? throw new ArgumentException("Invalid XElement.", nameof(element));
-            ModuleEquipment = ModuleEquipment.Get(Module.ModuleID);
+            ModuleEquipment = new ModuleEquipment(Module);
 
             ModuleCount = long.Parse(element.Attribute("count").Value);
             SelectedMethod = Module.ModuleProductions.Where(x => x.Method == element.Attribute("method").Value).FirstOrDefault();

@@ -58,6 +58,18 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// 所有派閥
         /// </summary>
         public IReadOnlyList<Faction> Owners { get; }
+
+
+        /// <summary>
+        /// 装備可能なタレットの数
+        /// </summary>
+        public IReadOnlyDictionary<X4Size, int> TurretCapacity { get; }
+
+
+        /// <summary>
+        /// 装備可能なシールドの数
+        /// </summary>
+        public IReadOnlyDictionary<X4Size, int> ShieldCapacity { get; }
         #endregion
 
 
@@ -71,9 +83,13 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <param name="workersCapacity">従業員収容人数</param>
         /// <param name="buildMethods">建造方式</param>
         /// <param name="owners">所有派閥</param>
+        /// <param name="turretCapacity">装備可能なタレットの数</param>
+        /// <param name="shieldCapacity">装備可能なシールドの数</param>
         private Module(string moduleID, string name, ModuleType moduleType,
                        long maxWorkers, long workersCapacity,
-                       ModuleProduction[] buildMethods, Faction[] owners)
+                       ModuleProduction[] buildMethods, Faction[] owners,
+                       Dictionary<X4Size, int> turretCapacity,
+                       Dictionary<X4Size, int> shieldCapacity)
         {
             ModuleID = moduleID;
             Name = name;
@@ -82,6 +98,8 @@ namespace X4_ComplexCalculator.DB.X4DB
             WorkersCapacity = workersCapacity;
             Owners = owners;
             ModuleProductions = buildMethods;
+            TurretCapacity = turretCapacity;
+            ShieldCapacity = shieldCapacity;
         }
 
 
@@ -108,9 +126,19 @@ namespace X4_ComplexCalculator.DB.X4DB
                     ? Array.Empty<ModuleProduction>()
                     : ModuleProduction.Get(record.ModuleID);
 
+                const string sql3 = "SELECT SizeID, Amount FROM ModuleTurret WHERE ModuleID = :ModuleID";
+                var turretCapacity = X4Database.Instance
+                    .Query<(string sizeID, int amount)>(sql3, record)
+                    .ToDictionary(t => X4Size.Get(t.sizeID), t => t.amount);
+
+                const string sql4 = "SELECT SizeID, Amount FROM ModuleShield WHERE ModuleID = :ModuleID";
+                var shieldCapacity = X4Database.Instance
+                    .Query<(string sizeID, int amount)>(sql4, record)
+                    .ToDictionary(t => X4Size.Get(t.sizeID), t => t.amount);
+
                 var module = new Module(record.ModuleID, record.Name, moduleType,
                                         record.MaxWorkers, record.WorkersCapacity,
-                                        buildMethods, owners);
+                                        buildMethods, owners, turretCapacity, shieldCapacity);
                 _Modules.Add(record.ModuleID, module);
             }
         }

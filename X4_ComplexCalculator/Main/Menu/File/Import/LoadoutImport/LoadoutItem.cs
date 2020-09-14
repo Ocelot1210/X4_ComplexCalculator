@@ -151,7 +151,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
             Name = elm.Attribute("name").Value;
 
             Module = module;
-            Equipment = ModuleEquipment.Get(module.ModuleID);
+            Equipment = new ModuleEquipment(module);
 
             AddEquipment(elm.XPathSelectElements("groups/shields"), Equipment.Shield);
             AddEquipment(elm.XPathSelectElements("groups/turrets"), Equipment.Turret);
@@ -239,9 +239,9 @@ WHERE
                 var param = new SQLiteCommandParameters(4);
                 foreach (var eqp in Equipment.GetAllEquipment())
                 {
-                    param.Add("moduleID",      DbType.String, Module.ModuleID);
-                    param.Add("presetID",      DbType.Int32 , id);
-                    param.Add("equipmentID",   DbType.String, eqp.EquipmentID);
+                    param.Add("moduleID", DbType.String, Module.ModuleID);
+                    param.Add("presetID", DbType.Int32, id);
+                    param.Add("equipmentID", DbType.String, eqp.EquipmentID);
                     param.Add("equipmentType", DbType.String, eqp.EquipmentType.EquipmentTypeID);
                 }
                 SettingDatabase.Instance.ExecQuery($"INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES(:moduleID, :presetID, :equipmentID, :equipmentType)", param);

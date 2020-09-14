@@ -54,35 +54,9 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="moduleID">モジュールID</param>
-        /// <param name="equipmentType">装備種別("Turret"か"Shield"のどちらか")</param>
-        public ModuleEquipmentManager(string moduleID, string equipmentType)
-        {
-            if (string.IsNullOrEmpty(equipmentType))
-            {
-                throw new ArgumentException("Invalid equipment type.", nameof(equipmentType));
-            }
-
-            var query = $@"SELECT SizeID, Amount FROM Module{equipmentType} WHERE ModuleID = '{moduleID}'";
-
-            X4Database.Instance.ExecQuery(query, (dr, args) =>
-            {
-                var size = X4Size.Get((string)dr["SizeID"]);
-                var maxAmount = (int)(long)dr["Amount"];
-                _Equipments.Add(size, new List<Equipment>(maxAmount));
-            });
-        }
-
-
-        /// <summary>
-        /// コピーコンストラクタ
-        /// </summary>
-        /// <param name="manager"></param>
-        public ModuleEquipmentManager(ModuleEquipmentManager manager)
-        {
-            _Equipments = manager._Equipments
-                .ToDictionary(p => p.Key, p => new List<Equipment>(p.Value));
-        }
+        /// <param name="capacity">装備可能な装備の数</param>
+        public ModuleEquipmentManager(IReadOnlyDictionary<X4Size, int> capacity)
+            => _Equipments = capacity.ToDictionary(p => p.Key, p => new List<Equipment>(p.Value));
 
 
         /// <summary>
