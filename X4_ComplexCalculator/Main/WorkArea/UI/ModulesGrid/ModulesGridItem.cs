@@ -9,6 +9,7 @@ using Prism.Commands;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.Entity;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
@@ -224,7 +225,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             ret.Add(new XAttribute("method", SelectedMethod.Method));
 
             // タレットとシールドをXML化
-            ValueTuple<string, ModuleEquipmentManager>[] managers =
+            ValueTuple<string, ModuleEquipmentCollection>[] managers =
             {
                 ("turrets", ModuleEquipment.Turret),
                 ("shields", ModuleEquipment.Shield)
@@ -329,7 +330,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// 装備のツールチップ文字列を作成
         /// </summary>
         /// <returns></returns>
-        private string MakeEquipmentToolTipString(ModuleEquipmentManager equipmentManager)
+        private string MakeEquipmentToolTipString(ModuleEquipmentCollection equipmentManager)
         {
             var sb = new StringBuilder();
 

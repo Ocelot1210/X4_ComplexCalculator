@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using X4_ComplexCalculator.DB.X4DB;
 
-namespace X4_ComplexCalculator.DB.X4DB
+namespace X4_ComplexCalculator.Entity
 {
     /// <summary>
     /// モジュールの装備品管理用クラス
     /// </summary>
-    public class ModuleEquipmentManager
+    public class ModuleEquipmentCollection
     {
         #region メンバ
         /// <summary>
@@ -55,7 +56,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// コンストラクタ
         /// </summary>
         /// <param name="capacity">装備可能な装備の数</param>
-        public ModuleEquipmentManager(IReadOnlyDictionary<X4Size, int> capacity)
+        public ModuleEquipmentCollection(IReadOnlyDictionary<X4Size, int> capacity)
             => _Equipments = capacity.ToDictionary(p => p.Key, p => new List<Equipment>(p.Value));
 
 
@@ -101,7 +102,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="obj">比較対象</param>
         /// <returns></returns>
-        public override bool Equals(object? obj) => obj is ModuleEquipmentManager tgt && _Equipments.Equals(tgt._Equipments);
+        public override bool Equals(object? obj) => obj is ModuleEquipmentCollection tgt && _Equipments.Equals(tgt._Equipments);
 
 
         /// <summary>

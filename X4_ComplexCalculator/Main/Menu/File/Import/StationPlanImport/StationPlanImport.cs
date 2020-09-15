@@ -7,6 +7,7 @@ using WPFLocalizeExtension.Engine;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.Entity;
 using X4_ComplexCalculator.Main.WorkArea;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
@@ -177,7 +178,7 @@ WHERE
 
                 X4Database.Instance.ExecQuery(query, eqParam, (dr, _) =>
                 {
-                    ModuleEquipmentManager? mng = null;
+                    ModuleEquipmentCollection? mng = null;
 
                     switch ((string)dr["EquipmentTypeID"])
                     {

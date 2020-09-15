@@ -7,6 +7,7 @@ using System.Xml.XPath;
 using Prism.Mvvm;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.Entity;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
 {
@@ -185,7 +186,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// </summary>
         /// <param name="elements"></param>
         /// <param name="manager"></param>
-        private void AddEquipment(IEnumerable<XElement> elements, ModuleEquipmentManager manager)
+        private void AddEquipment(IEnumerable<XElement> elements, ModuleEquipmentCollection manager)
         {
             foreach (var elm in elements)
             {
@@ -263,7 +264,7 @@ WHERE
         /// 装備のツールチップ文字列を作成
         /// </summary>
         /// <returns></returns>
-        private string MakeEquipmentToolTipString(ModuleEquipmentManager equipmentManager)
+        private string MakeEquipmentToolTipString(ModuleEquipmentCollection equipmentManager)
         {
             var sb = new StringBuilder();
 

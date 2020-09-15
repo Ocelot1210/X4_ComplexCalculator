@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using X4_ComplexCalculator.DB.X4DB;
 
-namespace X4_ComplexCalculator.DB.X4DB
+namespace X4_ComplexCalculator.Entity
 {
     /// <summary>
     /// モジュールの装備管理用クラス
@@ -13,13 +14,13 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// タレット情報
         /// </summary>
-        public ModuleEquipmentManager Turret { get; }
+        public ModuleEquipmentCollection Turret { get; }
 
 
         /// <summary>
         /// シールド情報
         /// </summary>
-        public ModuleEquipmentManager Shield { get; }
+        public ModuleEquipmentCollection Shield { get; }
 
 
         /// <summary>
@@ -35,8 +36,8 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <param name="module">モジュール</param>
         public ModuleEquipment(Module module)
         {
-            Turret = new ModuleEquipmentManager(module.TurretCapacity);
-            Shield = new ModuleEquipmentManager(module.ShieldCapacity);
+            Turret = new ModuleEquipmentCollection(module.TurretCapacity);
+            Shield = new ModuleEquipmentCollection(module.ShieldCapacity);
         }
 
 
@@ -55,8 +56,8 @@ namespace X4_ComplexCalculator.DB.X4DB
         public override bool Equals(object? obj)
         {
             return obj is ModuleEquipment equipment &&
-                   EqualityComparer<ModuleEquipmentManager>.Default.Equals(Turret, equipment.Turret) &&
-                   EqualityComparer<ModuleEquipmentManager>.Default.Equals(Shield, equipment.Shield);
+                   EqualityComparer<ModuleEquipmentCollection>.Default.Equals(Turret, equipment.Turret) &&
+                   EqualityComparer<ModuleEquipmentCollection>.Default.Equals(Shield, equipment.Shield);
         }
 
 
