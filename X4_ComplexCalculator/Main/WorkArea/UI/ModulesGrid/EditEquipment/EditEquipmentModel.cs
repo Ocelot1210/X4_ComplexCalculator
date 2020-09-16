@@ -140,23 +140,15 @@ WHERE
         /// <summary>
         /// チェック状態を保存
         /// </summary>
-        public void SaveCheckState()
+        public void SaveCheckState() => SettingDatabase.Instance.BeginTransaction(db =>
         {
             // 前回値クリア
-            SettingDatabase.Instance.ExecQuery("DELETE FROM SelectModuleEquipmentCheckStateFactions", null);
-
-            // トランザクション開始
-            SettingDatabase.Instance.BeginTransaction();
+            db.Execute("DELETE FROM SelectModuleEquipmentCheckStateFactions");
 
             // モジュール種別のチェック状態保存
-            foreach (var id in Factions.Where(x => x.IsChecked).Select(x => x.Faction.FactionID))
-            {
-                SettingDatabase.Instance.ExecQuery($"INSERT INTO SelectModuleEquipmentCheckStateFactions(ID) VALUES ('{id}')", null);
-            }
-
-            // コミット
-            SettingDatabase.Instance.Commit();
-        }
+            var checkedFactions = Factions.Where(x => x.IsChecked).Select(x => x.Faction);
+            db.Execute("INSERT INTO SelectModuleEquipmentCheckStateFactions(ID) VALUES (:FactionID)", checkedFactions);
+        });
 
 
         /// <summary>
@@ -176,9 +168,9 @@ WHERE
                 // 新プリセット名が設定された場合
 
                 var param = new SQLiteCommandParameters(3);
-                param.Add("presetName", System.Data.DbType.String,  newPresetName);
-                param.Add("moduleID",   System.Data.DbType.String,  _Module.ModuleID);
-                param.Add("presetID",   System.Data.DbType.Int64,   SelectedPreset.ID);
+                param.Add("presetName", System.Data.DbType.String, newPresetName);
+                param.Add("moduleID", System.Data.DbType.String, _Module.ModuleID);
+                param.Add("presetID", System.Data.DbType.Int64, SelectedPreset.ID);
                 SettingDatabase.Instance.ExecQuery($"UPDATE ModulePresets Set PresetName = :presetName WHERE ModuleID = :moduleID AND presetID = :presetID", param);
 
                 var newPreset = new PresetComboboxItem(SelectedPreset.ID, newPresetName);

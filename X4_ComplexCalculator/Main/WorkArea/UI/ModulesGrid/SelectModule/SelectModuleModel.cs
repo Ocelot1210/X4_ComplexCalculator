@@ -187,29 +187,19 @@ WHERE
         /// <summary>
         /// チェック状態を保存する
         /// </summary>
-        public void SaveCheckState()
+        public void SaveCheckState() => SettingDatabase.Instance.BeginTransaction(db =>
         {
             // 前回値クリア
-            SettingDatabase.Instance.ExecQuery("DELETE FROM SelectModuleCheckStateModuleTypes", null);
-            SettingDatabase.Instance.ExecQuery("DELETE FROM SelectModuleCheckStateModuleOwners", null);
-
-            // トランザクション開始
-            SettingDatabase.Instance.BeginTransaction();
+            db.Execute("DELETE FROM SelectModuleCheckStateModuleTypes");
+            db.Execute("DELETE FROM SelectModuleCheckStateModuleOwners");
 
             // モジュール種別のチェック状態保存
-            foreach (var id in ModuleTypes.Where(x => x.IsChecked).Select(x => x.ID))
-            {
-                SettingDatabase.Instance.ExecQuery($"INSERT INTO SelectModuleCheckStateModuleTypes(ID) VALUES ('{id}')", null);
-            }
+            var checkedTypes = ModuleTypes.Where(x => x.IsChecked);
+            db.Execute("INSERT INTO SelectModuleCheckStateModuleTypes(ID) VALUES (:ID)", checkedTypes);
 
             // 派閥一覧のチェック状態保存
-            foreach (var id in ModuleOwners.Where(x => x.IsChecked).Select(x => x.Faction.FactionID))
-            {
-                SettingDatabase.Instance.ExecQuery($"INSERT INTO SelectModuleCheckStateModuleOwners(ID) VALUES ('{id}')", null);
-            }
-
-            // コミット
-            SettingDatabase.Instance.Commit();
-        }
+            var checkedFactions = ModuleOwners.Where(x => x.IsChecked).Select(x => x.Faction);
+            db.Execute("INSERT INTO SelectModuleCheckStateModuleOwners(ID) VALUES (:FactionID)", checkedFactions);
+        });
     }
 }

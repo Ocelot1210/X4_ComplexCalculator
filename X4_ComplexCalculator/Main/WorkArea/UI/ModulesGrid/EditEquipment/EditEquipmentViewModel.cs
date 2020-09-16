@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -284,7 +285,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
             // ウィンドウを閉じる場合、チェック状態を保存
             if (!e.Cancel)
             {
-                Model.SaveCheckState();
+                Task.Run(Model.SaveCheckState);
                 Dispose();
             }
         }
