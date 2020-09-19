@@ -178,16 +178,16 @@ WHERE
 
                 X4Database.Instance.ExecQuery(query, eqParam, (dr, _) =>
                 {
-                    ModuleEquipmentCollection? mng = null;
+                    ModuleEquipmentCollection? equipments = null;
 
                     switch ((string)dr["EquipmentTypeID"])
                     {
                         case "shields":
-                            mng = modules[(int)(long)dr["Index"] - 1].ModuleEquipment.Shield;
+                            equipments = modules[(int)(long)dr["Index"] - 1].ModuleEquipment.Shield;
                             break;
 
                         case "turrets":
-                            mng = modules[(int)(long)dr["Index"] - 1].ModuleEquipment.Turret;
+                            equipments = modules[(int)(long)dr["Index"] - 1].ModuleEquipment.Turret;
                             break;
 
                         default:
@@ -199,7 +199,7 @@ WHERE
                     var max = (long)dr["Count"];
                     for (var cnt = 0L; cnt < max; cnt++)
                     {
-                        mng?.AddEquipment(equipment);
+                        equipments?.AddEquipment(equipment);
                     }
                 });
             }

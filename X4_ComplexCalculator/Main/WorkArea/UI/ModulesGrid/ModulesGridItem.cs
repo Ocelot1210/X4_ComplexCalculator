@@ -225,13 +225,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             ret.Add(new XAttribute("method", SelectedMethod.Method));
 
             // タレットとシールドをXML化
-            ValueTuple<string, ModuleEquipmentCollection>[] managers =
+            ValueTuple<string, ModuleEquipmentCollection>[] collections =
             {
                 ("turrets", ModuleEquipment.Turret),
                 ("shields", ModuleEquipment.Shield)
             };
 
-            foreach (var manager in managers)
+            foreach (var manager in collections)
             {
                 var equipmentsXml = new XElement(manager.Item1);
                 foreach (var eqp in manager.Item2.AllEquipments)
@@ -330,15 +330,15 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// 装備のツールチップ文字列を作成
         /// </summary>
         /// <returns></returns>
-        private string MakeEquipmentToolTipString(ModuleEquipmentCollection equipmentManager)
+        private string MakeEquipmentToolTipString(ModuleEquipmentCollection equipmentCollections)
         {
             var sb = new StringBuilder();
 
-            foreach (var size in equipmentManager.Sizes)
+            foreach (var size in equipmentCollections.Sizes)
             {
                 var cnt = 1;
 
-                foreach (var eq in equipmentManager.GetEquipment(size))
+                foreach (var eq in equipmentCollections.GetEquipment(size))
                 {
                     if (cnt == 1)
                     {
