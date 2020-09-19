@@ -9,6 +9,7 @@ using Prism.Commands;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.Entity;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
@@ -174,7 +175,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             Module = module;
             ModuleCount = moduleCount;
             EditEquipmentCommand = new DelegateCommand(EditEquipment);
-            ModuleEquipment = ModuleEquipment.Get(Module.ModuleID);
+            ModuleEquipment = new ModuleEquipment(module);
 
             _SelectedMethod = selectedMethod ?? Module.ModuleProductions[0];
         }
@@ -187,7 +188,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         public ModulesGridItem(XElement element)
         {
             Module = Module.Get(element.Attribute("id").Value) ?? throw new ArgumentException("Invalid XElement.", nameof(element));
-            ModuleEquipment = ModuleEquipment.Get(Module.ModuleID);
+            ModuleEquipment = new ModuleEquipment(Module);
 
             ModuleCount = long.Parse(element.Attribute("count").Value);
             SelectedMethod = Module.ModuleProductions.Where(x => x.Method == element.Attribute("method").Value).FirstOrDefault();
@@ -224,13 +225,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             ret.Add(new XAttribute("method", SelectedMethod.Method));
 
             // タレットとシールドをXML化
-            ValueTuple<string, ModuleEquipmentManager>[] managers =
+            ValueTuple<string, ModuleEquipmentCollection>[] collections =
             {
                 ("turrets", ModuleEquipment.Turret),
                 ("shields", ModuleEquipment.Shield)
             };
 
-            foreach (var manager in managers)
+            foreach (var manager in collections)
             {
                 var equipmentsXml = new XElement(manager.Item1);
                 foreach (var eqp in manager.Item2.AllEquipments)
@@ -329,15 +330,15 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// 装備のツールチップ文字列を作成
         /// </summary>
         /// <returns></returns>
-        private string MakeEquipmentToolTipString(ModuleEquipmentManager equipmentManager)
+        private string MakeEquipmentToolTipString(ModuleEquipmentCollection equipmentCollections)
         {
             var sb = new StringBuilder();
 
-            foreach (var size in equipmentManager.Sizes)
+            foreach (var size in equipmentCollections.Sizes)
             {
                 var cnt = 1;
 
-                foreach (var eq in equipmentManager.GetEquipment(size))
+                foreach (var eq in equipmentCollections.GetEquipment(size))
                 {
                     if (cnt == 1)
                     {

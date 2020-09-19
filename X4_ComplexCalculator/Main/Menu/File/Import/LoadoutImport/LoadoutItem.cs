@@ -7,6 +7,7 @@ using System.Xml.XPath;
 using Prism.Mvvm;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.Entity;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
 {
@@ -151,7 +152,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
             Name = elm.Attribute("name").Value;
 
             Module = module;
-            Equipment = ModuleEquipment.Get(module.ModuleID);
+            Equipment = new ModuleEquipment(module);
 
             AddEquipment(elm.XPathSelectElements("groups/shields"), Equipment.Shield);
             AddEquipment(elm.XPathSelectElements("groups/turrets"), Equipment.Turret);
@@ -185,7 +186,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// </summary>
         /// <param name="elements"></param>
         /// <param name="manager"></param>
-        private void AddEquipment(IEnumerable<XElement> elements, ModuleEquipmentManager manager)
+        private void AddEquipment(IEnumerable<XElement> elements, ModuleEquipmentCollection manager)
         {
             foreach (var elm in elements)
             {
@@ -239,9 +240,9 @@ WHERE
                 var param = new SQLiteCommandParameters(4);
                 foreach (var eqp in Equipment.GetAllEquipment())
                 {
-                    param.Add("moduleID",      DbType.String, Module.ModuleID);
-                    param.Add("presetID",      DbType.Int32 , id);
-                    param.Add("equipmentID",   DbType.String, eqp.EquipmentID);
+                    param.Add("moduleID", DbType.String, Module.ModuleID);
+                    param.Add("presetID", DbType.Int32, id);
+                    param.Add("equipmentID", DbType.String, eqp.EquipmentID);
                     param.Add("equipmentType", DbType.String, eqp.EquipmentType.EquipmentTypeID);
                 }
                 SettingDatabase.Instance.ExecQuery($"INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES(:moduleID, :presetID, :equipmentID, :equipmentType)", param);
@@ -263,7 +264,7 @@ WHERE
         /// 装備のツールチップ文字列を作成
         /// </summary>
         /// <returns></returns>
-        private string MakeEquipmentToolTipString(ModuleEquipmentManager equipmentManager)
+        private string MakeEquipmentToolTipString(ModuleEquipmentCollection equipmentManager)
         {
             var sb = new StringBuilder();
 

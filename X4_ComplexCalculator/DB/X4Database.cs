@@ -240,7 +240,6 @@ namespace X4_ComplexCalculator.DB
             Ware.Init();
             ModuleType.Init();
             ModuleProduction.Init();
-            ModuleEquipment.Init();
             Module.Init();
         }
     }
