@@ -50,9 +50,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             get => _Amount;
             set
             {
+                var oldPrice = Price;
                 if (SetProperty(ref _Amount, value))
                 {
-                    RaisePropertyChanged(nameof(Price));
+                    RaisePropertyChangedEx(oldPrice, Price, nameof(Price));
                 }
             }
         }
