@@ -206,15 +206,6 @@ namespace X4_ComplexCalculator.DB.X4DB
                 WorkersCapacity = workersCapacity;
                 NoBlueprint = noBlueprint;
             }
-
-            // TODO: 旧データベース用のコンストラクタ。
-            //       X4 データベースフォーマット v1 のサポートを打ち切る場合削除すること。
-            public ModuleTable(string moduleID, string moduleTypeID, string name,
-                               long maxWorkers, long workersCapacity, long noBlueprint)
-                : this(moduleID, moduleTypeID, name, maxWorkers, workersCapacity, noBlueprint == 1)
-            {
-
-            }
         }
     }
 }
