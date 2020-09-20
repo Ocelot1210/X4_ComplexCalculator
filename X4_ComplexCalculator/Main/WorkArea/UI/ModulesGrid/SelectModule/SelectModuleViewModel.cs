@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -183,7 +184,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
         /// <param name="e"></param>
         public void WindowClosing(CancelEventArgs _)
         {
-            _Model.SaveCheckState();
+            Task.Run(_Model.SaveCheckState);
             _Model.Dispose();
 
             if (Application.Current.MainWindow != null)
