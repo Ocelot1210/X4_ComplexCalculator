@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Prism.Mvvm;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
-using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings;
 
@@ -42,7 +41,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
         /// <summary>
         /// 労働力の詳細情報
         /// </summary>
-        public ObservableRangeCollection<WorkForceModuleInfoDetailsItem> WorkForceDetails { get; private set; } = new ObservableRangeCollection<WorkForceModuleInfoDetailsItem>();
+        public ObservableRangeCollection<WorkForceModuleInfoDetailsItem> WorkForceDetails { get; } = new ObservableRangeCollection<WorkForceModuleInfoDetailsItem>();
         #endregion
 
 

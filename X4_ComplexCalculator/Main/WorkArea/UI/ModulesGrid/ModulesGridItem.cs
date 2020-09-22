@@ -57,13 +57,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <summary>
         /// モジュール
         /// </summary>
-        public Module Module { get; private set; }
+        public Module Module { get; }
 
 
         /// <summary>
         /// 装備情報
         /// </summary>
-        public ModuleEquipment ModuleEquipment { get; private set; }
+        public ModuleEquipment ModuleEquipment { get; }
 
 
         /// <summary>

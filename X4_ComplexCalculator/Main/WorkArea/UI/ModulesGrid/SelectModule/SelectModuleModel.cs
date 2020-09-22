@@ -23,19 +23,19 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
         /// <summary>
         /// モジュール種別
         /// </summary>
-        public ObservablePropertyChangedCollection<ModulesListItem> ModuleTypes { get; private set; } = new ObservablePropertyChangedCollection<ModulesListItem>();
+        public ObservablePropertyChangedCollection<ModulesListItem> ModuleTypes { get; } = new ObservablePropertyChangedCollection<ModulesListItem>();
 
 
         /// <summary>
         /// モジュール所有派閥
         /// </summary>
-        public ObservablePropertyChangedCollection<FactionsListItem> ModuleOwners { get; private set; } = new ObservablePropertyChangedCollection<FactionsListItem>();
+        public ObservablePropertyChangedCollection<FactionsListItem> ModuleOwners { get; } = new ObservablePropertyChangedCollection<FactionsListItem>();
 
 
         /// <summary>
         /// モジュール一覧
         /// </summary>
-        public ObservablePropertyChangedCollection<ModulesListItem> Modules { get; private set; } = new ObservablePropertyChangedCollection<ModulesListItem>();
+        public ObservablePropertyChangedCollection<ModulesListItem> Modules { get; } = new ObservablePropertyChangedCollection<ModulesListItem>();
         #endregion
 
 

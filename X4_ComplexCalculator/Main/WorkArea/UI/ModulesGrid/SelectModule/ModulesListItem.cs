@@ -16,13 +16,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
         /// <summary>
         /// モジュールID
         /// </summary>
-        public string ID { get; private set; }
+        public string ID { get; }
 
 
         /// <summary>
         /// 表示名称
         /// </summary>
-        public string Name { get; private set; }
+        public string Name { get; }
 
 
         /// <summary>
