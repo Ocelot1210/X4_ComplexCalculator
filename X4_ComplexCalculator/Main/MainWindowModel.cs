@@ -104,7 +104,7 @@ namespace X4_ComplexCalculator.Main
             var canceled = false;
 
             // 未保存の内容が存在するか？
-            if (_WorkAreaManager.Documents.Where(x => x.HasChanged).Any())
+            if (_WorkAreaManager.Documents.Any(x => x.HasChanged))
             {
                 var result = LocalizedMessageBox.Show("Lang:MainWindowClosingConfirmMessage", "Lang:Confirmation", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 

@@ -366,7 +366,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             foreach (var item in prodDict)
             {
                 // 変更対象のウェアを検索
-                Products.Where(x => x.Ware.WareID == item.Key).FirstOrDefault()?.SetDetails(item.Value, prevModuleCount);
+                Products.FirstOrDefault(x => x.Ware.WareID == item.Key)?.SetDetails(item.Value, prevModuleCount);
             }
         }
 
@@ -384,7 +384,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             foreach (var item in prodDict)
             {
                 // すでにウェアが存在するか検索
-                var prod = Products.Where(x => x.Ware.WareID == item.Key).FirstOrDefault();
+                var prod = Products.FirstOrDefault(x => x.Ware.WareID == item.Key);
                 if (prod != null)
                 {
                     // ウェアが一覧にある場合
@@ -413,7 +413,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             foreach (var item in prodDict)
             {
                 // 一致するウェアの詳細情報を削除
-                Products.Where(x => x.Ware.WareID == item.Key).FirstOrDefault()?.RemoveDetails(item.Value);
+                Products.FirstOrDefault(x => x.Ware.WareID == item.Key)?.RemoveDetails(item.Value);
             }
 
             _Products.Products.RemoveAll(x => !x.Details.Any());
@@ -490,7 +490,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
 
                 var detailsList = prodDict[ware.WareID];
-                var details = detailsList.Where(x => x.ModuleID == moduleID).FirstOrDefault();
+                var details = detailsList.FirstOrDefault(x => x.ModuleID == moduleID);
 
                 // モジュールが既に追加されている場合、モジュール数を増やしてレコードが少なくなるようにする
                 if (details != null)
@@ -529,7 +529,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 }
 
                 var detailsList = prodDict[ware.WareID];
-                var details = detailsList.Where(x => x.ModuleID == moduleID).FirstOrDefault();
+                var details = detailsList.FirstOrDefault(x => x.ModuleID == moduleID);
                 if (details != null)
                 {
                     details.ModuleCount += moduleCount;

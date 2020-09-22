@@ -138,7 +138,7 @@ WHERE
             {
                 foreach (var (wareID, amount) in wares)
                 {
-                    var item = NeedWareInfoDetails.Where(x => x.Method == method && x.WareID == wareID).First();
+                    var item = NeedWareInfoDetails.First(x => x.Method == method && x.WareID == wareID);
                     item.NeedAmount += (ev.NewValue - ev.OldValue) * amount;
                 }
             }
@@ -244,7 +244,7 @@ WHERE
             {
                 foreach (var (wareID, amount) in wareArr)
                 {
-                    var item = NeedWareInfoDetails.Where(x => x.Method == method && x.WareID == wareID).FirstOrDefault();
+                    var item = NeedWareInfoDetails.FirstOrDefault(x => x.Method == method && x.WareID == wareID);
 
                     if (item != null)
                     {
@@ -365,7 +365,7 @@ WHERE
                     var amount = prod.Details.Where(x => 0 < x.Amount).Sum(x => x.Amount);
                     AggregateTargetProducts[prod.Ware.WareID] = amount;
 
-                    var ware = NeedWareInfoDetails.Where(x => x.WareID == prod.Ware.WareID).FirstOrDefault();
+                    var ware = NeedWareInfoDetails.FirstOrDefault(x => x.WareID == prod.Ware.WareID);
                     if (ware != null)
                     {
                         ware.ProductionAmount = amount;

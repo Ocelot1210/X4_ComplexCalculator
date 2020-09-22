@@ -213,7 +213,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
 
             foreach (var kvp in resources)
             {
-                var itm = Resources.Where(x => x.Ware.WareID == kvp.Key).FirstOrDefault();
+                var itm = Resources.FirstOrDefault(x => x.Ware.WareID == kvp.Key);
                 if (itm != null)
                 {
                     itm.Amount += kvp.Value * (module.ModuleCount - prevModuleCount);
@@ -240,7 +240,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             var addTarget = new List<BuildResourcesGridItem>();
             foreach (var kvp in resources)
             {
-                var item = Resources.Where(x => x.Ware.WareID == kvp.Key).FirstOrDefault();
+                var item = Resources.FirstOrDefault(x => x.Ware.WareID == kvp.Key);
                 if (item != null)
                 {
                     // 既にウェアが一覧にある場合
@@ -282,7 +282,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             var addTarget = new List<BuildResourcesGridItem>();
             foreach (var kvp in resources)
             {
-                var item = Resources.Where(x => x.Ware.WareID == kvp.Key).FirstOrDefault();
+                var item = Resources.FirstOrDefault(x => x.Ware.WareID == kvp.Key);
                 if (item != null)
                 {
                     // 既にウェアが一覧にある場合
@@ -311,7 +311,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             var addTarget = new List<BuildResourcesGridItem>();
             foreach (var kvp in resourcesDict)
             {
-                var item = Resources.Where(x => x.Ware.WareID == kvp.Key).FirstOrDefault();
+                var item = Resources.FirstOrDefault(x => x.Ware.WareID == kvp.Key);
                 if (item != null)
                 {
                     // 既にウェアが一覧にある場合
@@ -338,7 +338,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
 
             foreach (var kvp in resourcesDict)
             {
-                var itm = Resources.Where(x => x.Ware.WareID == kvp.Key).FirstOrDefault();
+                var itm = Resources.FirstOrDefault(x => x.Ware.WareID == kvp.Key);
                 if (itm != null)
                 {
                     itm.Amount -= kvp.Value;

@@ -194,7 +194,7 @@ WHERE
     PresetID      = {SelectedPreset.ID} AND
     EquipmentType = 'turrets'";
 
-            var equipments = new List<EquipmentListItem>(_MaxAmount.Values.Count());
+            var equipments = new List<EquipmentListItem>(_MaxAmount.Values.Count);
 
             SettingDatabase.Instance.ExecQuery(query, (dr, args) =>
             {

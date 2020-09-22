@@ -191,7 +191,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
                 return;
             }
 
-            var assign = _StorageAssignInfo.StorageAssign.Where(x => x.WareID == product.Ware.WareID).FirstOrDefault();
+            var assign = _StorageAssignInfo.StorageAssign.FirstOrDefault(x => x.WareID == product.Ware.WareID);
             if (assign != null)
             {
                 assign.ProductPerHour = product.Count;
@@ -283,7 +283,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
                     releasedCapacity.Add(prod.Ware.TransportType.TransportTypeID, 0);
                 }
 
-                var assign = _StorageAssignInfo.StorageAssign.Where(x => x.WareID == prod.Ware.WareID).First();
+                var assign = _StorageAssignInfo.StorageAssign.First(x => x.WareID == prod.Ware.WareID);
 
                 releasedCapacity[assign.TransportTypeID] += assign.AllocCapacity;
                 removeWares.Add(assign.WareID);

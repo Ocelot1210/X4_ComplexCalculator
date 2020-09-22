@@ -139,7 +139,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
             foreach (var kvp in storageModules)
             {
                 // 一致するレコードを探す
-                var itm = Storages.Where(x => x.TransportType.TransportTypeID == kvp.Key).FirstOrDefault();
+                var itm = Storages.FirstOrDefault(x => x.TransportType.TransportTypeID == kvp.Key);
                 if (itm != null)
                 {
                     // 既にレコードがある場合
@@ -166,7 +166,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
             foreach (var kvp in storageModules)
             {
                 // 一致するレコードを探す
-                var itm = Storages.Where(x => x.TransportType.TransportTypeID == kvp.Key).FirstOrDefault();
+                var itm = Storages.FirstOrDefault(x => x.TransportType.TransportTypeID == kvp.Key);
                 if (itm != null)
                 {
                     itm.RemoveDetails(kvp.Value);
@@ -192,7 +192,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
             foreach (var kvp in storageModules)
             {
                 // 変更対象のウェアを検索
-                Storages.Where(x => x.TransportType.TransportTypeID == kvp.Key).FirstOrDefault()?.SetDetails(kvp.Value, prevModuleCount);
+                Storages.FirstOrDefault(x => x.TransportType.TransportTypeID == kvp.Key)?.SetDetails(kvp.Value, prevModuleCount);
             }
         }
 
@@ -269,7 +269,7 @@ WHERE
             var moduleCount = (long)dr["Count"];
 
             // このカーゴ種別に対し、既にモジュールが追加されているか？
-            var itm = modulesDict[transportTypeID].Where(x => x.ModuleID == moduleID).FirstOrDefault();
+            var itm = modulesDict[transportTypeID].FirstOrDefault(x => x.ModuleID == moduleID);
             if (itm != null)
             {
                 // 既にモジュールが追加されている場合、モジュール数を増やしてレコードがなるべく少なくなるようにする

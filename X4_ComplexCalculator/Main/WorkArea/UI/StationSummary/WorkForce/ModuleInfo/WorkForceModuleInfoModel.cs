@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Prism.Mvvm;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
-using X4_ComplexCalculator.Main.WorkArea.UI.StationSettings;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings;
 
@@ -130,7 +129,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
             if (0 < module.Module.MaxWorkers)
             {
                 // 変更があったモジュールのレコードを検索
-                var itm = WorkForceDetails.Where(x => x.ModuleID == module.Module.ModuleID).First();
+                var itm = WorkForceDetails.First(x => x.ModuleID == module.Module.ModuleID);
 
                 // 必要労働力を更新
                 _Settings.Workforce.Need = _Settings.Workforce.Need - Math.Abs(itm.TotalWorkforce) + module.Module.MaxWorkers * module.ModuleCount;
@@ -144,7 +143,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
             if (0 < module.Module.WorkersCapacity)
             {
                 // 変更があったモジュールのレコードを検索
-                var itm = WorkForceDetails.Where(x => x.ModuleID == module.Module.ModuleID).First();
+                var itm = WorkForceDetails.First(x => x.ModuleID == module.Module.ModuleID);
 
                 // 現在の労働者数を更新
                 _Settings.Workforce.Capacity = _Settings.Workforce.Capacity - Math.Abs(itm.TotalWorkforce) + module.Module.WorkersCapacity * module.ModuleCount;
@@ -202,7 +201,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
             var addItems = new List<WorkForceModuleInfoDetailsItem>();
             foreach (var d in details)
             {
-                var itm = WorkForceDetails.Where(x => x.ModuleID == d.Module.ModuleID).FirstOrDefault();
+                var itm = WorkForceDetails.FirstOrDefault(x => x.ModuleID == d.Module.ModuleID);
                 if (itm != null)
                 {
                     if (0 < itm.WorkForce)
@@ -253,7 +252,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
 
             foreach (var d in details)
             {
-                var itm = WorkForceDetails.Where(x => x.ModuleID == d.Module.ModuleID).FirstOrDefault();
+                var itm = WorkForceDetails.FirstOrDefault(x => x.ModuleID == d.Module.ModuleID);
                 if (itm != null)
                 {
                     if (0 < itm.WorkForce)

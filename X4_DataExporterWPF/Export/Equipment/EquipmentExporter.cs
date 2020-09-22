@@ -118,7 +118,7 @@ CREATE TABLE IF NOT EXISTS Equipment
 
                 // 一致するサイズを探す
                 var tags = component?.Attribute("tags").Value.Split(" ");
-                var sizeID = sizes.Where(x => tags?.Contains(x) == true).FirstOrDefault();
+                var sizeID = sizes.FirstOrDefault(x => tags?.Contains(x) == true);
                 // 一致するサイズがなかった場合
                 if (string.IsNullOrEmpty(sizeID)) continue;
 

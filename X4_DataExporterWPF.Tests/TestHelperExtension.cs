@@ -20,8 +20,7 @@ namespace X4_DataExporterWPF.Tests
             if (string.IsNullOrWhiteSpace(lines.Last())) lines.RemoveAt(lines.Count - 1);
             var indent = lines
                 .Where(l => !string.IsNullOrWhiteSpace(l))
-                .Select(l => l.TakeWhile(c => char.IsWhiteSpace(c)).Count())
-                .Min();
+                .Min(l => l.TakeWhile(char.IsWhiteSpace).Count());
             return string.Join("\n", lines.Select(l => l.Substring(indent)));
         }
 

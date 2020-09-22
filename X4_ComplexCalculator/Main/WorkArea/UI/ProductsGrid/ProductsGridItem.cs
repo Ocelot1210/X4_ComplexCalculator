@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Prism.Mvvm;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.EditStatus;
@@ -237,7 +235,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
             foreach (var item in details)
             {
-                var tmp = Details.Where(x => x.ModuleID == item.ModuleID).FirstOrDefault();
+                var tmp = Details.FirstOrDefault(x => x.ModuleID == item.ModuleID);
                 if (tmp != null)
                 {
                     // 既にモジュールがある場合
@@ -280,7 +278,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             foreach (var item in details)
             {
                 // 更新対象のモジュールを検索
-                var tmp = Details.Where(x => x.ModuleID == item.ModuleID).FirstOrDefault();
+                var tmp = Details.FirstOrDefault(x => x.ModuleID == item.ModuleID);
                 if (tmp != null)
                 {
                     tmp.ModuleCount += (item.ModuleCount - prevModuleCount);
@@ -316,7 +314,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
             foreach (var item in details)
             {
-                var tmp = Details.Where(x => x.ModuleID == item.ModuleID).FirstOrDefault();
+                var tmp = Details.FirstOrDefault(x => x.ModuleID == item.ModuleID);
                 if (tmp != null)
                 {
                     // 既にモジュールがある場合
