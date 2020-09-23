@@ -233,8 +233,8 @@ WHERE
             var wareProdArr = _WareProduction[prodWareID];
 
             // ウェア生産に必要な時間
-            var wareProd = wareProdArr.Where(x => x.Item1 == prodMethod).FirstOrDefault() ??
-                           wareProdArr.Where(x => x.Item1 == "default").FirstOrDefault();
+            var wareProd = wareProdArr.FirstOrDefault(x => x.Item1 == prodMethod) ??
+                           wareProdArr.FirstOrDefault(x => x.Item1 == "default");
 
             {
                 // ウェア生産時の追加効果一覧
@@ -315,7 +315,7 @@ WHERE
             foreach (var prod in products.Where(x => 0 < x.Ware.WareGroup.Tier).OrderBy(x => x.Ware.WareGroup.Tier))
             {
                 // 追加予定のモジュールも含めた製造ウェア数
-                var totalCount = prod.Count + addModuleProducts.Where(x => x.WareID == prod.Ware.WareID).FirstOrDefault().Count;
+                var totalCount = prod.Count + addModuleProducts.FirstOrDefault(x => x.WareID == prod.Ware.WareID).Count;
 
                 // 不足していない or 計算除外ウェアの場合、何もしない
                 if (0 <= totalCount || excludeWares.Contains(prod.Ware.WareID))
@@ -324,10 +324,10 @@ WHERE
                 }
 
                 // 不足しているウェアを製造するモジュールを検索
-                var module = _ModuleProduct.Where(x => x.Value.WareID == prod.Ware.WareID && x.Value.Method == "default").FirstOrDefault();
+                var module = _ModuleProduct.FirstOrDefault(x => x.Value.WareID == prod.Ware.WareID && x.Value.Method == "default");
                 if (module.Key == null)
                 {
-                    module = _ModuleProduct.Where(x => x.Value.WareID == prod.Ware.WareID).FirstOrDefault();
+                    module = _ModuleProduct.FirstOrDefault(x => x.Value.WareID == prod.Ware.WareID);
                 }
 
                 // モジュールが製造するウェア数を計算

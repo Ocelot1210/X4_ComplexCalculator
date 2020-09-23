@@ -78,7 +78,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
 
             foreach (var item in details)
             {
-                var tmp = Details.Where(x => x.ModuleID == item.ModuleID).FirstOrDefault();
+                var tmp = Details.FirstOrDefault(x => x.ModuleID == item.ModuleID);
                 if (tmp != null)
                 {
                     // 既にモジュールがある場合
@@ -105,7 +105,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         {
             foreach (var item in details)
             {
-                var tmp = Details.Where(x => x.ModuleID == item.ModuleID).FirstOrDefault();
+                var tmp = Details.FirstOrDefault(x => x.ModuleID == item.ModuleID);
                 if (tmp != null)
                 {
                     tmp.ModuleCount -= item.ModuleCount;
@@ -127,7 +127,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         {
             foreach (var item in details)
             {
-                var tmp = Details.Where(x => x.ModuleID == item.ModuleID).FirstOrDefault();
+                var tmp = Details.FirstOrDefault(x => x.ModuleID == item.ModuleID);
                 if (tmp != null)
                 {
                     tmp.ModuleCount += item.ModuleCount - prevModuleCount;

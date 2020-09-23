@@ -1,4 +1,3 @@
-﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
@@ -57,7 +56,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         {
             get
             {
-                var @checked = Loadouts.Where(x => x.IsChecked).Count();
+                var @checked = Loadouts.Count(x => x.IsChecked);
 
                 return (@checked == 0) ? false :
                        (@checked == Loadouts.Count) ? (bool?)true : null;

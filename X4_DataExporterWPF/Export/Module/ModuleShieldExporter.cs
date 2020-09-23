@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS ModuleShield
                 {
                     // シールドのサイズを取得
                     var attr = connections.Attribute("tags").Value;
-                    var size = sizeDict.Keys.Where(x => attr.Contains(x)).FirstOrDefault();
+                    var size = sizeDict.Keys.FirstOrDefault(x => attr.Contains(x));
 
                     if (string.IsNullOrEmpty(size)) continue;
 

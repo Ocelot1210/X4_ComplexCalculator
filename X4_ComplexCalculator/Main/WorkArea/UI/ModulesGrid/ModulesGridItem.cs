@@ -133,7 +133,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <summary>
         /// 建造方式を表示すべきか
         /// </summary>
-        public Visibility SelectedMethodVisiblity => (2 <= Module.ModuleProductions.Count()) ? Visibility.Visible : Visibility.Hidden;
+        public Visibility SelectedMethodVisiblity => (2 <= Module.ModuleProductions.Count) ? Visibility.Visible : Visibility.Hidden;
 
 
         /// <summary>
@@ -191,7 +191,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             ModuleEquipment = new ModuleEquipment(Module);
 
             ModuleCount = long.Parse(element.Attribute("count").Value);
-            SelectedMethod = Module.ModuleProductions.Where(x => x.Method == element.Attribute("method").Value).FirstOrDefault();
+            SelectedMethod = Module.ModuleProductions.FirstOrDefault(x => x.Method == element.Attribute("method").Value);
             if (SelectedMethod == null)
             {
                 SelectedMethod = Module.ModuleProductions.First();
