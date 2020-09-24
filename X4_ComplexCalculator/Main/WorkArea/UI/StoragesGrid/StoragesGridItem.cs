@@ -24,7 +24,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         /// <summary>
         /// ウェア種別
         /// </summary>
-        public TransportType TransportType { get; private set; }
+        public TransportType TransportType { get; }
 
 
         /// <summary>

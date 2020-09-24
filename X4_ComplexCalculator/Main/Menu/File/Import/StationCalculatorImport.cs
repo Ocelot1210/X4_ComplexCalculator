@@ -43,7 +43,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
         /// <summary>
         /// インポート数
         /// </summary>
-        public int Count { get; private set; } = 0;
+        public int Count { get; } = 0;
         #endregion
 
 
