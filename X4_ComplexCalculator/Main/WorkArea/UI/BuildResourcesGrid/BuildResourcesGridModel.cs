@@ -268,13 +268,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             // 新しい装備一覧
             var newEquipments = module.ModuleEquipment.GetAllEquipment()
                                                       .GroupBy(x => x.EquipmentID)
-                                                      .Select(x => (x.Key, "default", (long)x.Count()))
-                                                      .Where(x => 0 < x.Item3);
+                                                      .Select(x => (x.Key, "default", (long)x.Count()));
 
             // 古い装備一覧
             var oldEquipments = prevEquipments.GroupBy(x => x)
-                                              .Select(x => (x.Key, "default", -(long)x.Count()))
-                                              .Where(x => 0 < x.Item3);
+                                              .Select(x => (x.Key, "default", -(long)x.Count()));
 
             // リソース集計
             Dictionary<string, long> resources = _Calculator.CalcResource(newEquipments.Concat(oldEquipments));
