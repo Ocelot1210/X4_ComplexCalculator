@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
@@ -75,7 +75,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
 
             void init(SQLiteDataReader dr, object[] args)
             {
-                bool chked = 0 < SettingDatabase.Instance.ExecQuery($"SELECT * FROM SelectModuleCheckStateModuleTypes WHERE ID = '{dr["ModuleTypeID"]}'", (_, __) => { });
+                bool chked = 0 < SettingDatabase.Instance.ExecQuery($"SELECT * FROM SelectModuleCheckStateModuleTypes WHERE ID = '{dr["ModuleTypeID"]}'", (_, _) => { });
                 items.Add(new ModulesListItem((string)dr["ModuleTypeID"], (string)dr["Name"], chked));
             }
 
@@ -103,7 +103,7 @@ ORDER BY Name", init, "SelectModuleCheckStateTypes");
 
             void init(SQLiteDataReader dr, object[] args)
             {
-                bool isChecked = 0 < SettingDatabase.Instance.ExecQuery($"SELECT * FROM SelectModuleCheckStateModuleOwners WHERE ID = '{dr["FactionID"]}'", (_, __) => { });
+                bool isChecked = 0 < SettingDatabase.Instance.ExecQuery($"SELECT * FROM SelectModuleCheckStateModuleOwners WHERE ID = '{dr["FactionID"]}'", (_, _) => { });
 
                 var faction = Faction.Get((string)dr["FactionID"]);
                 if (faction != null) items.Add(new FactionsListItem(faction, isChecked));

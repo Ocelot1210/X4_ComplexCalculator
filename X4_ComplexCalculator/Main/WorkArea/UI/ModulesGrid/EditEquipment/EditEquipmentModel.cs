@@ -105,7 +105,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         {
             static void AddItem(SQLiteDataReader dr, object[] args)
             {
-                bool chkState = 0 < SettingDatabase.Instance.ExecQuery($"SELECT ID FROM SelectModuleEquipmentCheckStateFactions WHERE ID = '{dr["FactionID"]}'", (_, __) => { });
+                bool chkState = 0 < SettingDatabase.Instance.ExecQuery($"SELECT ID FROM SelectModuleEquipmentCheckStateFactions WHERE ID = '{dr["FactionID"]}'", (_, _) => { });
 
                 var faction = Faction.Get((string)dr["FactionID"]);
                 if (faction != null) ((ICollection<FactionsListItem>)args[0]).Add(new FactionsListItem(faction, chkState));
@@ -199,7 +199,7 @@ WHERE
 	ModuleID = '{_Module.ModuleID}' AND
     ( PresetID + 1 ) NOT IN ( SELECT PresetID FROM ModulePresets WHERE ModuleID = '{_Module.ModuleID}')";
 
-                SettingDatabase.Instance.ExecQuery(query, (SQLiteDataReader dr, object[] args) =>
+                SettingDatabase.Instance.ExecQuery(query, (dr, _) =>
                 {
                     id = (long)dr["PresetID"];
                 });
