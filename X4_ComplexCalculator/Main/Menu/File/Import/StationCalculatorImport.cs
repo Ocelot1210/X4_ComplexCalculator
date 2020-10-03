@@ -31,7 +31,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
         /// <summary>
         /// メニュー表示用タイトル
         /// </summary>
-        public string Title => "Station Calculator";
+        public string Title => "Lang:StationCalculator";
 
 
         /// <summary>
@@ -51,10 +51,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
         /// コンストラクタ
         /// </summary>
         /// <param name="command">Viewより呼ばれるCommand</param>
-        public StationCalculatorImport(ICommand command)
-        {
-            Command = command;
-        }
+        public StationCalculatorImport(ICommand command) => Command = command;
 
 
         /// <summary>

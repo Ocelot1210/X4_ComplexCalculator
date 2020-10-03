@@ -1,6 +1,5 @@
 ﻿using System.Windows.Input;
 using Prism.Mvvm;
-using WPFLocalizeExtension.Engine;
 using X4_ComplexCalculator.Main.WorkArea;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
@@ -13,7 +12,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// <summary>
         /// メニュー表示用タイトル
         /// </summary>
-        public string Title { get; private set; }
+        public string Title => "Lang:LoadoutImportTitle";
 
 
         /// <summary>
@@ -26,27 +25,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// コンストラクタ
         /// </summary>
         /// <param name="command">Viewより呼ばれるCommand</param>
-        public LoadoutImport(ICommand command)
-        {
-            Command = command;
-            Title = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:LoadoutImportTitle", null, null);
-            LocalizeDictionary.Instance.PropertyChanged += Instance_PropertyChanged;
-        }
-
-
-        /// <summary>
-        /// 選択言語変更時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Instance_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(LocalizeDictionary.Instance.Culture))
-            {
-                Title = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:LoadoutImportTitle", null, null);
-                RaisePropertyChanged(nameof(Title));
-            }
-        }
+        public LoadoutImport(ICommand command) => Command = command;
 
 
         /// <summary>
