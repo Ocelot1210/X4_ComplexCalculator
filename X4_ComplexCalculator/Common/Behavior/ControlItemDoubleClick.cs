@@ -1,7 +1,7 @@
 ﻿using System.Linq;
-using System.ServiceModel.Channels;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace X4_ComplexCalculator.Common.Behavior

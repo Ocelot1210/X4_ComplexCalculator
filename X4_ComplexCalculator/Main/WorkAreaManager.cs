@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.DirectoryServices.Protocols;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Threading;
