@@ -8,7 +8,7 @@ namespace X4_ComplexCalculator.Entity
     /// <summary>
     /// モジュールの装備管理用クラス
     /// </summary>
-    public class ModuleEquipment
+    public class ModuleEquipment : IEquatable<ModuleEquipment>
     {
         #region プロパティ
         /// <summary>
@@ -24,6 +24,13 @@ namespace X4_ComplexCalculator.Entity
 
 
         /// <summary>
+        /// 装備中の全てのタレット・シールドを列挙
+        /// </summary>
+        public IEnumerable<Equipment> AllEquipments
+            => Turret.AllEquipments.Concat(Shield.AllEquipments);
+
+
+        /// <summary>
         /// 装備を持っているか
         /// </summary>
         public bool CanEquipped => Turret.CanEquipped | Shield.CanEquipped;
@@ -36,35 +43,39 @@ namespace X4_ComplexCalculator.Entity
         /// <param name="module">モジュール</param>
         public ModuleEquipment(Module module)
         {
-            Turret = new ModuleEquipmentCollection(module.TurretCapacity);
-            Shield = new ModuleEquipmentCollection(module.ShieldCapacity);
+            Turret = new ModuleEquipmentCollection("turrets", module.TurretCapacity);
+            Shield = new ModuleEquipmentCollection("shields", module.ShieldCapacity);
         }
 
 
         /// <summary>
-        /// 全装備を列挙する
+        /// 引数の装備品を装備する
         /// </summary>
-        /// <returns></returns>
-        public IEnumerable<Equipment> GetAllEquipment() => Turret.AllEquipments.Concat(Shield.AllEquipments);
-
-
-        /// <summary>
-        /// オブジェクトが同一か判定
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public override bool Equals(object? obj)
+        /// <param name="equipment">装備する装備品</param>
+        public void AddEquipment(Equipment equipment, long count = 1)
         {
-            return obj is ModuleEquipment equipment &&
-                   EqualityComparer<ModuleEquipmentCollection>.Default.Equals(Turret, equipment.Turret) &&
-                   EqualityComparer<ModuleEquipmentCollection>.Default.Equals(Shield, equipment.Shield);
+            if (!CanEquipped) return;
+            var equipmentTypeID = equipment.EquipmentType.EquipmentTypeID;
+            var collection = equipmentTypeID switch
+            {
+                "turrets" => Turret,
+                "shields" => Shield,
+                _ => throw new ArgumentException($"Invalid equipment type. ({equipmentTypeID})"),
+            };
+            for (var i = 0L; i < count; i++) collection.AddEquipment(equipment);
         }
 
 
-        /// <summary>
-        /// ハッシュ値を取得
-        /// </summary>
-        /// <returns>ハッシュ値</returns>
+        /// <inheritdoc />
+        public bool Equals(ModuleEquipment? other)
+            => Turret.Equals(other?.Turret) && Shield.Equals(other.Shield);
+
+
+        /// <inheritdoc />
+        public override bool Equals(object? obj) => obj is ModuleEquipment other && Equals(other);
+
+
+        /// <inheritdoc />
         public override int GetHashCode() => HashCode.Combine(Turret, Shield);
     }
 }

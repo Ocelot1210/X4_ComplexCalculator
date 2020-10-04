@@ -5,7 +5,6 @@ using System.Windows.Input;
 using System.Xml.XPath;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
-using X4_ComplexCalculator.Entity;
 using X4_ComplexCalculator.Main.WorkArea;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
@@ -172,8 +171,7 @@ WHERE
 SELECT
     EquipmentID,
     :index AS 'Index',
-    :count AS Count,
-    EquipmentTypeID
+    :count AS Count
 FROM
     Equipment
 WHERE
@@ -181,31 +179,14 @@ WHERE
 
                 X4Database.Instance.ExecQuery(query, eqParam, (dr, _) =>
                 {
-                    ModuleEquipmentCollection? equipments = null;
-
-                    switch ((string)dr["EquipmentTypeID"])
-                    {
-                        case "shields":
-                            equipments = modules[(int)(long)dr["Index"] - 1].ModuleEquipment.Shield;
-                            break;
-
-                        case "turrets":
-                            equipments = modules[(int)(long)dr["Index"] - 1].ModuleEquipment.Turret;
-                            break;
-
-                        default:
-                            return;
-
-                    }
+                    var index = (int)(long)dr["Index"] - 1;
+                    var moduleEquipment = modules[index].ModuleEquipment;
 
                     var equipment = Equipment.Get((string)dr["EquipmentID"]);
                     if (equipment == null) return;
 
-                    var max = (long)dr["Count"];
-                    for (var cnt = 0L; cnt < max; cnt++)
-                    {
-                        equipments?.AddEquipment(equipment);
-                    }
+                    var count = (long)dr["Count"];
+                    moduleEquipment.AddEquipment(equipment, count);
                 });
             }
 

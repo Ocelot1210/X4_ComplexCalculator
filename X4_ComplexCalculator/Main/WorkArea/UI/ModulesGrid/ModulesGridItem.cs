@@ -4,7 +4,6 @@ using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using System.Xml.Linq;
-using System.Xml.XPath;
 using Prism.Commands;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.EditStatus;
@@ -200,14 +199,14 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             EditEquipmentCommand = new DelegateCommand(EditEquipment);
 
             // タレットとシールドを追加
-            string[] types = { "turrets", "shields" };
-            var equipments = types.Select(x => element.XPathSelectElement(x).Elements())
-                                  .SelectMany(x => x.Select(y => Equipment.Get(y.Attribute("id").Value)))
-                                  .Where(x => x != null)
-                                  .Select(x => x!);
-            foreach (var eqp in equipments)
+            var turrets = element.Element("turrets").Elements("turret");
+            var shields = element.Element("shields").Elements("shield");
+            var equipments = turrets.Concat(shields)
+                .Select(elem => Equipment.Get(elem.Attribute("id").Value))
+                .Where(e => e != null);
+            foreach (var equipment in equipments)
             {
-                AddEquipment(eqp);
+                AddEquipment(equipment!);
             }
         }
 
@@ -225,24 +224,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             ret.Add(new XAttribute("method", SelectedMethod.Method));
 
             // タレットとシールドをXML化
-            ValueTuple<string, ModuleEquipmentCollection>[] collections =
-            {
-                ("turrets", ModuleEquipment.Turret),
-                ("shields", ModuleEquipment.Shield)
-            };
+            ret.Add(ModuleEquipment.Turret.Serialize());
+            ret.Add(ModuleEquipment.Shield.Serialize());
 
-            foreach (var manager in collections)
-            {
-                var equipmentsXml = new XElement(manager.Item1);
-                foreach (var eqp in manager.Item2.AllEquipments)
-                {
-                    var eqpXml = new XElement(manager.Item1);
-                    eqpXml.Add(new XAttribute("id", eqp.EquipmentID));
-                    equipmentsXml.Add(eqpXml);
-                }
-
-                ret.Add(equipmentsXml);
-            }
             return ret;
         }
 
@@ -251,29 +235,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// 装備を追加
         /// </summary>
         /// <param name="equipment">追加したい装備</param>
-        public void AddEquipment(Equipment equipment)
-        {
-            // 装備できないモジュールの場合、何もしない
-            if (!ModuleEquipment.CanEquipped)
-            {
-                return;
-            }
-
-            switch (equipment.EquipmentType.EquipmentTypeID)
-            {
-                case "turrets":
-                    ModuleEquipment.Turret.AddEquipment(equipment);
-                    break;
-
-                case "shields":
-                    ModuleEquipment.Shield.AddEquipment(equipment);
-                    break;
-
-                default:
-                    throw new ArgumentException($"Invalid equipment type. ({equipment.EquipmentType.EquipmentTypeID})");
-            }
-        }
-
+        public void AddEquipment(Equipment equipment) => ModuleEquipment.AddEquipment(equipment);
 
 
         /// <summary>
@@ -321,7 +283,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
 
             if (equipmentChanged)
             {
-                RaisePropertyChangedEx(turretsOld.Concat(shieldsOld), ModuleEquipment.GetAllEquipment().Select(x => x.EquipmentID).ToArray(), nameof(ModuleEquipment));
+                RaisePropertyChangedEx(turretsOld.Concat(shieldsOld), ModuleEquipment.AllEquipments.Select(x => x.EquipmentID).ToArray(), nameof(ModuleEquipment));
                 EditStatus = EditStatus.Edited;
             }
         }

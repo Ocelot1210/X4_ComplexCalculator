@@ -205,7 +205,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
 
             // モジュールの建造に必要なリソースを集計
             // モジュールの装備一覧(装備IDごとに集計)
-            var equipments = module.ModuleEquipment.GetAllEquipment().Select(x => (ID: x.EquipmentID, Count: 1))
+            var equipments = module.ModuleEquipment.AllEquipments.Select(x => (ID: x.EquipmentID, Count: 1))
                                    .GroupBy(x => x.ID)
                                    .Select(x => (ID: x.Key, Method: "default", Count: x.LongCount()));
 
@@ -266,7 +266,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         private void OnModuleEquipmentChanged(ModulesGridItem module, IEnumerable<string> prevEquipments)
         {
             // 新しい装備一覧
-            var newEquipments = module.ModuleEquipment.GetAllEquipment()
+            var newEquipments = module.ModuleEquipment.AllEquipments
                                                       .GroupBy(x => x.EquipmentID)
                                                       .Select(x => (x.Key, "default", (long)x.Count()));
 
@@ -359,10 +359,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
 
             // モジュールの装備一覧(装備IDごとに集計)
             var equipments = modules.Where(x => x.ModuleEquipment.CanEquipped &&
-                                                x.ModuleEquipment.GetAllEquipment().Any())
+                                                x.ModuleEquipment.AllEquipments.Any())
                                     .SelectMany
                                     (
-                                        x => x.ModuleEquipment.GetAllEquipment().Select
+                                        x => x.ModuleEquipment.AllEquipments.Select
                                         (
                                             y => (ID: y.EquipmentID, Count: x.ModuleCount)
                                         )
