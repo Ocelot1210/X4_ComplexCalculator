@@ -8,7 +8,7 @@ namespace X4_ComplexCalculator.Entity
     /// <summary>
     /// モジュールの装備管理用クラス
     /// </summary>
-    public class ModuleEquipment
+    public class ModuleEquipment : IEquatable<ModuleEquipment>
     {
         #region プロパティ
         /// <summary>
@@ -66,23 +66,16 @@ namespace X4_ComplexCalculator.Entity
         }
 
 
-        /// <summary>
-        /// オブジェクトが同一か判定
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public override bool Equals(object? obj)
-        {
-            return obj is ModuleEquipment equipment &&
-                   EqualityComparer<ModuleEquipmentCollection>.Default.Equals(Turret, equipment.Turret) &&
-                   EqualityComparer<ModuleEquipmentCollection>.Default.Equals(Shield, equipment.Shield);
-        }
+        /// <inheritdoc />
+        public bool Equals(ModuleEquipment? other)
+            => Turret.Equals(other?.Turret) && Shield.Equals(other.Shield);
 
 
-        /// <summary>
-        /// ハッシュ値を取得
-        /// </summary>
-        /// <returns>ハッシュ値</returns>
+        /// <inheritdoc />
+        public override bool Equals(object? obj) => obj is ModuleEquipment other && Equals(other);
+
+
+        /// <inheritdoc />
         public override int GetHashCode() => HashCode.Combine(Turret, Shield);
     }
 }

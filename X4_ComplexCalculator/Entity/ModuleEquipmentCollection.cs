@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Xml.Linq;
 using X4_ComplexCalculator.DB.X4DB;
 
@@ -10,7 +9,7 @@ namespace X4_ComplexCalculator.Entity
     /// <summary>
     /// モジュールの装備品管理用クラス
     /// </summary>
-    public class ModuleEquipmentCollection
+    public class ModuleEquipmentCollection : IEquatable<ModuleEquipmentCollection>
     {
         #region メンバ
         /// <summary>
@@ -121,30 +120,27 @@ namespace X4_ComplexCalculator.Entity
         }
 
 
-        /// <summary>
-        /// 比較
-        /// </summary>
-        /// <param name="obj">比較対象</param>
-        /// <returns></returns>
-        public override bool Equals(object? obj) => obj is ModuleEquipmentCollection tgt && _Equipments.Equals(tgt._Equipments);
+        /// <inheritdoc />
+        public bool Equals(ModuleEquipmentCollection? other)
+            => _Equipments.Equals(other?._Equipments);
 
 
-        /// <summary>
-        /// ハッシュ値を取得
-        /// </summary>
-        /// <returns>ハッシュ値</returns>
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+            => obj is ModuleEquipmentCollection other && Equals(other);
+
+
+        /// <inheritdoc />
         public override int GetHashCode()
         {
-            var sb = new StringBuilder();
+            var hash = new HashCode();
 
             foreach (var equipmentID in _Equipments.SelectMany(x => x.Value.Select(y => y.EquipmentID).OrderBy(x => x)))
             {
-                sb.Append(equipmentID);
+                hash.Add(equipmentID);
             }
 
-            var ret = sb.ToString().GetHashCode();
-
-            return ret;
+            return hash.ToHashCode();
         }
     }
 }
