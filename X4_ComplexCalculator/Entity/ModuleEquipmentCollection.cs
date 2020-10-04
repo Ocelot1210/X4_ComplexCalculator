@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Entity
@@ -12,6 +13,12 @@ namespace X4_ComplexCalculator.Entity
     public class ModuleEquipmentCollection
     {
         #region メンバ
+        /// <summary>
+        /// 管理する装備の種類
+        /// </summary>
+        private readonly string _Type;
+
+
         /// <summary>
         /// 装備品
         /// </summary>
@@ -55,9 +62,13 @@ namespace X4_ComplexCalculator.Entity
         /// <summary>
         /// コンストラクタ
         /// </summary>
+        /// <param name="type">管理する装備の種類</param>
         /// <param name="capacity">装備可能な装備の数</param>
-        public ModuleEquipmentCollection(IReadOnlyDictionary<X4Size, int> capacity)
-            => _Equipments = capacity.ToDictionary(p => p.Key, p => new List<Equipment>(p.Value));
+        public ModuleEquipmentCollection(string type, IReadOnlyDictionary<X4Size, int> capacity)
+        {
+            _Type = type;
+            _Equipments = capacity.ToDictionary(p => p.Key, p => new List<Equipment>(p.Value));
+        }
 
 
         /// <summary>
@@ -94,6 +105,19 @@ namespace X4_ComplexCalculator.Entity
             {
                 _Equipments[equipment.Size].Add(equipment);
             }
+        }
+
+
+        /// <summary>
+        /// XML にシリアライズする
+        /// </summary>
+        /// <returns>インスタンスの現在の状態を表す XElement</returns>
+        public XElement Serialize()
+        {
+            var elementName = _Type[..^1];
+            var equipments = AllEquipments
+                .Select(e => new XElement(elementName, new XAttribute("id", e.EquipmentID)));
+            return new XElement(_Type, equipments);
         }
 
 

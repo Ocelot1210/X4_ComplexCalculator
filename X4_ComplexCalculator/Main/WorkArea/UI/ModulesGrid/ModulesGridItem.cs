@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -200,14 +201,14 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             EditEquipmentCommand = new DelegateCommand(EditEquipment);
 
             // タレットとシールドを追加
-            string[] types = { "turrets", "shields" };
-            var equipments = types.Select(x => element.XPathSelectElement(x).Elements())
-                                  .SelectMany(x => x.Select(y => Equipment.Get(y.Attribute("id").Value)))
-                                  .Where(x => x != null)
-                                  .Select(x => x!);
-            foreach (var eqp in equipments)
+            const string equipmentsXPath = "(//turrets/turret|//shields/shield)/@id";
+            var equipments = ((IEnumerable)element.XPathEvaluate(equipmentsXPath))
+                .Cast<XAttribute>()
+                .Select(attr => Equipment.Get(attr.Value))
+                .Where(e => e != null);
+            foreach (var equipment in equipments)
             {
-                AddEquipment(eqp);
+                AddEquipment(equipment!);
             }
         }
 
@@ -225,24 +226,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             ret.Add(new XAttribute("method", SelectedMethod.Method));
 
             // タレットとシールドをXML化
-            ValueTuple<string, ModuleEquipmentCollection>[] collections =
-            {
-                ("turrets", ModuleEquipment.Turret),
-                ("shields", ModuleEquipment.Shield)
-            };
+            ret.Add(ModuleEquipment.Turret.Serialize());
+            ret.Add(ModuleEquipment.Shield.Serialize());
 
-            foreach (var manager in collections)
-            {
-                var equipmentsXml = new XElement(manager.Item1);
-                foreach (var eqp in manager.Item2.AllEquipments)
-                {
-                    var eqpXml = new XElement(manager.Item1);
-                    eqpXml.Add(new XAttribute("id", eqp.EquipmentID));
-                    equipmentsXml.Add(eqpXml);
-                }
-
-                ret.Add(equipmentsXml);
-            }
             return ret;
         }
 

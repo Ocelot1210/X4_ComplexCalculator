@@ -43,8 +43,8 @@ namespace X4_ComplexCalculator.Entity
         /// <param name="module">モジュール</param>
         public ModuleEquipment(Module module)
         {
-            Turret = new ModuleEquipmentCollection(module.TurretCapacity);
-            Shield = new ModuleEquipmentCollection(module.ShieldCapacity);
+            Turret = new ModuleEquipmentCollection("turrets", module.TurretCapacity);
+            Shield = new ModuleEquipmentCollection("shields", module.ShieldCapacity);
         }
 
 
