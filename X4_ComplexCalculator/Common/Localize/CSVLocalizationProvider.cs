@@ -16,7 +16,6 @@ using System.Linq;
 using System.Management;
 using System.Text;
 using System.Windows;
-using WPFLocalizeExtension.Deprecated.Providers;
 using WPFLocalizeExtension.Engine;
 using WPFLocalizeExtension.Providers;
 
