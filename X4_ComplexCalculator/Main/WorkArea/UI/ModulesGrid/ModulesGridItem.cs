@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using System.Xml.Linq;
-using System.Xml.XPath;
 using Prism.Commands;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.EditStatus;
@@ -201,10 +199,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             EditEquipmentCommand = new DelegateCommand(EditEquipment);
 
             // タレットとシールドを追加
-            const string equipmentsXPath = "(//turrets/turret|//shields/shield)/@id";
-            var equipments = ((IEnumerable)element.XPathEvaluate(equipmentsXPath))
-                .Cast<XAttribute>()
-                .Select(attr => Equipment.Get(attr.Value))
+            var turrets = element.Element("turrets").Elements("turret");
+            var shields = element.Element("shields").Elements("shield");
+            var equipments = turrets.Concat(shields)
+                .Select(elem => Equipment.Get(elem.Attribute("id").Value))
                 .Where(e => e != null);
             foreach (var equipment in equipments)
             {
