@@ -281,10 +281,8 @@ WHERE
         /// <param name="layoutID"></param>
         public void SetLayout(long layoutID)
         {
-            SettingDatabase.Instance.ExecQuery($"SELECT Layout FROM WorkAreaLayouts WHERE LayoutID = {layoutID}", (dr, args) =>
-            {
-                _Layout = (byte[])dr["Layout"];
-            });
+            _LayoutID = layoutID;
+            _Layout = SettingDatabase.Instance.QuerySingle<byte[]>("SELECT Layout FROM WorkAreaLayouts WHERE LayoutID = :layoutID", new { layoutID });
 
             if (_Layout != null && _CurrentDockingManager != null)
             {
