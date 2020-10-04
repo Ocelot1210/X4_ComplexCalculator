@@ -15,7 +15,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Export
         /// <summary>
         /// タイトル文字列
         /// </summary>
-        public string Title => "Station Calculator";
+        public string Title => "Lang:StationCalculator";
 
 
         /// <summary>

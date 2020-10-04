@@ -3,7 +3,6 @@ using System.Linq;
 using System.Windows.Input;
 using System.Xml.XPath;
 using Prism.Mvvm;
-using WPFLocalizeExtension.Engine;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
@@ -35,7 +34,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
         /// <summary>
         /// メニュー表示用タイトル
         /// </summary>
-        public string Title { get; private set; }
+        public string Title => "Lang:ExistingPlan";
 
 
         /// <summary>
@@ -49,27 +48,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
         /// コンストラクタ
         /// </summary>
         /// <param name="command">Viewより呼ばれるCommand</param>
-        public StationPlanImport(ICommand command)
-        {
-            Command = command;
-            Title = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:ExistingPlan", null, null);
-            LocalizeDictionary.Instance.PropertyChanged += Instance_PropertyChanged;
-        }
-
-
-        /// <summary>
-        /// 選択言語変更時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Instance_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(LocalizeDictionary.Instance.Culture))
-            {
-                Title = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:ExistingPlan", null, null);
-                RaisePropertyChanged(nameof(Title));
-            }
-        }
+        public StationPlanImport(ICommand command) => Command = command;
 
 
         /// <summary>

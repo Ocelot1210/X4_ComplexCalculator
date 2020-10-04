@@ -94,7 +94,17 @@
                     ItemsSource="{Binding Imports}">
                     <MenuItem.ItemContainerStyle>
                         <Style TargetType="{x:Type MenuItem}">
-                            <Setter Property="MenuItem.Header" Value="{Binding Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <Setter Property="MenuItem.Header">
+                                <Setter.Value>
+                                    <MultiBinding Converter="{lex:TranslateConverter}" Mode="OneWay">
+                                        <Binding Mode="OneTime" Path="Title" />
+                                        <Binding
+                                            Mode="OneWay"
+                                            Path="Culture"
+                                            Source="{x:Static lex:LocalizeDictionary.Instance}" />
+                                    </MultiBinding>
+                                </Setter.Value>
+                            </Setter>
                             <Setter Property="Command" Value="{Binding Command, Mode=OneTime}" />
                             <Setter Property="CommandParameter" Value="{Binding ., Mode=OneTime}" />
                         </Style>
@@ -108,7 +118,18 @@
                     ItemsSource="{Binding Exports}">
                     <MenuItem.ItemContainerStyle>
                         <Style TargetType="{x:Type MenuItem}">
-                            <Setter Property="MenuItem.Header" Value="{Binding Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <Setter Property="MenuItem.Header">
+                                <Setter.Value>
+                                    <MultiBinding Converter="{lex:TranslateConverter}" Mode="OneWay">
+                                        <Binding Mode="OneTime" Path="Title" />
+                                        <Binding
+                                            Mode="OneWay"
+                                            Path="Culture"
+                                            Source="{x:Static lex:LocalizeDictionary.Instance}" />
+                                    </MultiBinding>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="MenuItem.Header" Value="{Binding Title, Mode=OneWay, Converter={lex:TranslateConverter}}" />
                             <Setter Property="Command" Value="{Binding Command, Mode=OneTime}" />
                             <Setter Property="CommandParameter" Value="{Binding ., Mode=OneTime}" />
                         </Style>

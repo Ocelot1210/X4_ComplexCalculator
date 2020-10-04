@@ -56,6 +56,7 @@ SaveAs;Save as
 Open;Open
 Import;Import
 ExistingPlan;Existing plan
+StationCalculator;Station Calculator
 Export;Export
 UpdateDB;Update DB
 DBUpdateConfirmationMessage;Do you want to display the DB update screen? \r\nPlease wait for a moment until the screen starts.
