@@ -160,7 +160,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
 
             // 同一の内容がプリセット一覧に無ければインポート可能にする
             {
-                var currentEquipmentIds = Equipment.GetAllEquipment().Select(x => x.EquipmentID).OrderBy(x => x).ToArray();
+                var currentEquipmentIds = Equipment.AllEquipments.Select(x => x.EquipmentID).OrderBy(x => x).ToArray();
 
                 SettingDatabase.Instance.ExecQuery($"SELECT * FROM ModulePresets WHERE ModuleID = '{module.ModuleID}' AND PresetName = '{Name}'", (dr1, _) =>
                 {
@@ -238,7 +238,7 @@ WHERE
                 SettingDatabase.Instance.ExecQuery($"INSERT INTO ModulePresets(ModuleID, PresetID, PresetName) VALUES('{Module.ModuleID}', {id}, '{Name}')");
 
                 var param = new SQLiteCommandParameters(4);
-                foreach (var eqp in Equipment.GetAllEquipment())
+                foreach (var eqp in Equipment.AllEquipments)
                 {
                     param.Add("moduleID", DbType.String, Module.ModuleID);
                     param.Add("presetID", DbType.Int32, id);

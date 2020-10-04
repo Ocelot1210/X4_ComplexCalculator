@@ -24,6 +24,13 @@ namespace X4_ComplexCalculator.Entity
 
 
         /// <summary>
+        /// 装備中の全てのタレット・シールドを列挙
+        /// </summary>
+        public IEnumerable<Equipment> AllEquipments
+            => Turret.AllEquipments.Concat(Shield.AllEquipments);
+
+
+        /// <summary>
         /// 装備を持っているか
         /// </summary>
         public bool CanEquipped => Turret.CanEquipped | Shield.CanEquipped;
@@ -39,13 +46,6 @@ namespace X4_ComplexCalculator.Entity
             Turret = new ModuleEquipmentCollection(module.TurretCapacity);
             Shield = new ModuleEquipmentCollection(module.ShieldCapacity);
         }
-
-
-        /// <summary>
-        /// 全装備を列挙する
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<Equipment> GetAllEquipment() => Turret.AllEquipments.Concat(Shield.AllEquipments);
 
 
         /// <summary>

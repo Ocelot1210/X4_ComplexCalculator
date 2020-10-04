@@ -321,7 +321,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
 
             if (equipmentChanged)
             {
-                RaisePropertyChangedEx(turretsOld.Concat(shieldsOld), ModuleEquipment.GetAllEquipment().Select(x => x.EquipmentID).ToArray(), nameof(ModuleEquipment));
+                RaisePropertyChangedEx(turretsOld.Concat(shieldsOld), ModuleEquipment.AllEquipments.Select(x => x.EquipmentID).ToArray(), nameof(ModuleEquipment));
                 EditStatus = EditStatus.Edited;
             }
         }

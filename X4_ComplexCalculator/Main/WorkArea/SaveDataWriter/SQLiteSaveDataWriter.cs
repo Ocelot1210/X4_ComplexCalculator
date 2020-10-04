@@ -129,7 +129,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
                 }
 
                 const string sql2 = "INSERT INTO Equipments(Row, EquipmentID) Values(:i, :EquipmentID)";
-                var param2 = module.ModuleEquipment.GetAllEquipment().Select(e => new { i, e.EquipmentID });
+                var param2 = module.ModuleEquipment.AllEquipments.Select(e => new { i, e.EquipmentID });
                 conn.Execute(sql2, param2);
             }
 
