@@ -251,29 +251,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// 装備を追加
         /// </summary>
         /// <param name="equipment">追加したい装備</param>
-        public void AddEquipment(Equipment equipment)
-        {
-            // 装備できないモジュールの場合、何もしない
-            if (!ModuleEquipment.CanEquipped)
-            {
-                return;
-            }
-
-            switch (equipment.EquipmentType.EquipmentTypeID)
-            {
-                case "turrets":
-                    ModuleEquipment.Turret.AddEquipment(equipment);
-                    break;
-
-                case "shields":
-                    ModuleEquipment.Shield.AddEquipment(equipment);
-                    break;
-
-                default:
-                    throw new ArgumentException($"Invalid equipment type. ({equipment.EquipmentType.EquipmentTypeID})");
-            }
-        }
-
+        public void AddEquipment(Equipment equipment) => ModuleEquipment.AddEquipment(equipment);
 
 
         /// <summary>

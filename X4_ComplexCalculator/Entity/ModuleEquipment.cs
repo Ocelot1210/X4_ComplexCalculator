@@ -49,6 +49,24 @@ namespace X4_ComplexCalculator.Entity
 
 
         /// <summary>
+        /// 引数の装備品を装備する
+        /// </summary>
+        /// <param name="equipment">装備する装備品</param>
+        public void AddEquipment(Equipment equipment, long count = 1)
+        {
+            if (!CanEquipped) return;
+            var equipmentTypeID = equipment.EquipmentType.EquipmentTypeID;
+            var collection = equipmentTypeID switch
+            {
+                "turrets" => Turret,
+                "shields" => Shield,
+                _ => throw new ArgumentException($"Invalid equipment type. ({equipmentTypeID})"),
+            };
+            for (var i = 0L; i < count; i++) collection.AddEquipment(equipment);
+        }
+
+
+        /// <summary>
         /// オブジェクトが同一か判定
         /// </summary>
         /// <param name="obj"></param>
