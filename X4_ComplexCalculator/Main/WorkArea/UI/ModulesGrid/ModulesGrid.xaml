@@ -40,6 +40,22 @@
                 CommandParameter="{x:Reference Name=moduleGrid}"
                 Header="{lex:Loc X4_ComplexCalculator:Lang:Delete}"
                 InputGestureText="Delete" />
+
+            <Separator />
+
+            <!--  選択  -->
+            <MenuItem Command="{Binding ModulesReorder.SelectModulesCommand, Mode=OneTime}" Header="{lex:Loc X4_ComplexCalculator:Lang:Select}" />
+
+            <!--  選択解除  -->
+            <MenuItem Command="{Binding ModulesReorder.ClearSelectionCommand, Mode=OneTime}" Header="{lex:Loc X4_ComplexCalculator:Lang:ClearSelection}" />
+
+            <!--  選択項目を上に移動  -->
+            <MenuItem Command="{Binding ModulesReorder.MoveUpTheSelectionCommand, Mode=OneTime}" Header="{lex:Loc X4_ComplexCalculator:Lang:MoveUpTheSelection}" />
+
+            <!--  選択項目を下に移動  -->
+            <MenuItem Command="{Binding ModulesReorder.MoveDownTheSelectionCommand, Mode=OneTime}" Header="{lex:Loc X4_ComplexCalculator:Lang:MoveDownTheSelection}" />
+
+
         </ContextMenu>
 
 
@@ -88,6 +104,7 @@
             ItemsSource="{Binding ModulesView, Mode=OneTime}"
             RowHeaderStyle="{StaticResource EditedItemHighlightRowHeaderStyle}"
             RowHeight="25"
+            RowStyle="{StaticResource ReorderbleDataGridRowStyle}"
             SelectionUnit="FullRow"
             Style="{StaticResource DefaultDataGridStyle}">
 

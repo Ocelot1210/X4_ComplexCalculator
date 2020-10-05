@@ -153,6 +153,9 @@ Sell;Sell
 Copy;Copy
 Paste;Paste
 Delete;Delete
+ClearSelection;Clear selection
+MoveUpTheSelection;Move up the selection
+MoveDownTheSelection;Move down the selection
 Add;Add
 AutoAdd;Auto add
 Merge;Merge

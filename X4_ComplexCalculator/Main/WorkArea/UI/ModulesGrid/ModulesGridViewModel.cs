@@ -49,6 +49,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             }
         }
 
+        /// <summary>
+        /// モジュール並び替え用インスタンス
+        /// </summary>
+        public ModulesReorder ModulesReorder { get; }
+
 
         /// <summary>
         /// モジュール追加ボタンクリック
@@ -106,15 +111,17 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         public ModulesGridViewModel(IStationData stationData)
         {
             _Model = new ModulesGridModel(stationData.ModulesInfo);
+            ModulesReorder = new ModulesReorder(stationData.ModulesInfo);
             ModulesView = (ListCollectionView)CollectionViewSource.GetDefaultView(_Model.Modules);
-            ModulesView.Filter      = Filter;
-            AddModuleCommand        = new DelegateCommand(_Model.ShowAddModuleWindow);
-            MergeModuleCommand      = new DelegateCommand(_Model.MergeModule);
-            ReplaceModuleCommand    = new DelegateCommand<ModulesGridItem>(ReplaceModule);
-            CopyModules             = new DelegateCommand(CopyModulesCommand);
-            PasteModules            = new DelegateCommand<DataGrid>(PasteModulesCommand);
-            DeleteModules           = new DelegateCommand<DataGrid>(DeleteModulesCommand);
+            ModulesView.Filter   = Filter;
+            AddModuleCommand     = new DelegateCommand(_Model.ShowAddModuleWindow);
+            MergeModuleCommand   = new DelegateCommand(_Model.MergeModule);
+            ReplaceModuleCommand = new DelegateCommand<ModulesGridItem>(ReplaceModule);
+            CopyModules          = new DelegateCommand(CopyModulesCommand);
+            PasteModules         = new DelegateCommand<DataGrid>(PasteModulesCommand);
+            DeleteModules        = new DelegateCommand<DataGrid>(DeleteModulesCommand);
         }
+
 
         /// <summary>
         /// リソースを開放

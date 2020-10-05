@@ -38,7 +38,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <summary>
         /// モジュール一覧
         /// </summary>
-        public ObservableCollection<ModulesGridItem> Modules => _ModulesInfo.Modules;
+        public ObservableRangeCollection<ModulesGridItem> Modules => _ModulesInfo.Modules;
         #endregion
 
 
