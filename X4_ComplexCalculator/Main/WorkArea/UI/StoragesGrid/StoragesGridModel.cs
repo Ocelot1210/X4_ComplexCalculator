@@ -43,7 +43,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="moduleGridModel">モジュール一覧</param>
+        /// <param name="modules">モジュール一覧</param>
+        /// <param name="storages">保管庫一覧</param>
         public StoragesGridModel(IModulesInfo modules, IStoragesInfo storages)
         {
             _Modules = modules;

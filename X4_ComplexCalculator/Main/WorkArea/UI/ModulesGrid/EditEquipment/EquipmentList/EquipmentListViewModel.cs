@@ -166,8 +166,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 装備を保存
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         public void SaveEquipment()
         {
             _Model.SaveEquipment();

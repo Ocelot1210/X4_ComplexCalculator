@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
@@ -108,7 +108,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="planItems"></param>
+        /// <param name="stationItems"></param>
         public SelectStationViewModel(List<SaveDataStationItem> stationItems)
         {
             _Model = new SelectStationModel();

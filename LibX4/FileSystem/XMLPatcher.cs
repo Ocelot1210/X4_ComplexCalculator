@@ -93,7 +93,6 @@ namespace LibX4.FileSystem
         /// <summary>
         /// 要素を追加
         /// </summary>
-        /// <param name="dst"></param>
         /// <param name="element"></param>
         /// <param name="target"></param>
         private static void AddNode(XElement element, XObject target)
@@ -181,7 +180,7 @@ namespace LibX4.FileSystem
         /// 要素を削除
         /// </summary>
         /// <param name="dst"></param>
-        /// <param name="element"></param>
+        /// <param name="target"></param>
         private static void Remove(XDocument dst, XObject target)
         {
             switch (target.NodeType)

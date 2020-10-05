@@ -146,7 +146,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// コンストラクタ
         /// </summary>
         /// <param name="elm">装備1つ分</param>
-        /// <param name="macro">マクロ名</param>
+        /// <param name="module">モジュール</param>
         private LoadoutItem(XElement elm, Module module)
         {
             Name = elm.Attribute("name").Value;

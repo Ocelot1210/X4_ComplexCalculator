@@ -36,7 +36,7 @@ namespace X4_ComplexCalculator.Common.Collection
     /// <summary>
     /// メンバの変更もCollectionChangedとして検知するObservableCollection
     /// </summary>
-    /// <typeparam name="T">INotifyPropertyChangedを実装したクラス</typeparam>
+    /// <typeparam name="INotifyPropertyChanged">INotifyPropertyChangedを実装したクラス</typeparam>
     public class ObservablePropertyChangedCollection<INotifyPropertyChanged> : ObservableRangeCollection<INotifyPropertyChanged>
     {
         #region イベント

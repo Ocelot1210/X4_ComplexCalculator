@@ -12,7 +12,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="selectedItems">選択計画一覧</param>
+        /// <param name="planItems">選択計画一覧</param>
         private SelectPlanDialog(List<StationPlanItem> planItems)
         {
             InitializeComponent();
@@ -23,7 +23,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
         /// <summary>
         /// ダイアログ表示
         /// </summary>
-        /// <param name="selectedItems">選択計画一覧</param>
+        /// <param name="planItems">選択計画一覧</param>
         public static bool ShowDialog(List<StationPlanItem> planItems)
         {
             var wnd = new SelectPlanDialog(planItems);

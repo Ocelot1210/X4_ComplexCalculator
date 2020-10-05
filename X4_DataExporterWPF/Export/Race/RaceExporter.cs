@@ -39,7 +39,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// データ抽出
         /// </summary>
-        /// <param name="cmd"></param>
+        /// <param name="connection"></param>
         public void Export(IDbConnection connection)
         {
             //////////////////

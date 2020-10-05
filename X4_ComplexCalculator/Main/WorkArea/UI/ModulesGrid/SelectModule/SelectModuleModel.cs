@@ -160,7 +160,7 @@ WHERE
         /// <summary>
         /// モジュール一覧用ListViewを初期化する
         /// </summary>
-        /// <param name="SQLiteDataReader">クエリ結果</param>
+        /// <param name="dr">クエリ結果</param>
         /// <param name="args">可変長引数</param>
         private void SetModules(SQLiteDataReader dr, object[] args)
         {

@@ -23,7 +23,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
         /// <summary>
         /// ダイアログ表示
         /// </summary>
-        /// <param name="selectedItems">選択計画一覧</param>
+        /// <param name="stationItems">選択計画一覧</param>
         public static bool ShowDialog(List<SaveDataStationItem> stationItems)
         {
             var wnd = new SelectStationDialog(stationItems);

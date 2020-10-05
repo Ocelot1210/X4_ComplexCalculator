@@ -81,7 +81,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        /// <returns></returns>
         private void Resources_OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (!(sender is BuildResourcesGridItem))
@@ -110,7 +109,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        /// <returns></returns>
         private void Resources_OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems != null)

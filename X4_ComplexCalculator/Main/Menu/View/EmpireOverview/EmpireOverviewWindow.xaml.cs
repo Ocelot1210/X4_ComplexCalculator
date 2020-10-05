@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
-using X4_ComplexCalculator.Main.WorkArea;
 using System.Windows;
+using X4_ComplexCalculator.Main.WorkArea;
 
 namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
 {
@@ -12,7 +12,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="model">帝国の概要用Model</param>
+        /// <param name="workAreas">帝国の概要用Model</param>
         public EmpireOverviewWindow(ObservableCollection<WorkAreaViewModel> workAreas)
         {
             InitializeComponent();

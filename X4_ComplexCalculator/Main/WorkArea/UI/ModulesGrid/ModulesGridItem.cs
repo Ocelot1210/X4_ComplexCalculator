@@ -167,7 +167,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="moduleID">モジュール</param>
+        /// <param name="module">モジュール</param>
+        /// <param name="selectedMethod">選択中の建造方式</param>
         /// <param name="moduleCount">モジュール数</param>
         public ModulesGridItem(Module module, ModuleProduction? selectedMethod = null, long moduleCount = 1)
         {

@@ -517,7 +517,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// </summary>
         /// <param name="moduleID"></param>
         /// <param name="moduleCount">モジュール数</param>
-        /// <param name="workers"></param>
         /// <param name="prodDict"></param>
         private void SumHabitation(string moduleID, long moduleCount, Dictionary<string, List<IProductDetailsListItem>> prodDict)
         {
