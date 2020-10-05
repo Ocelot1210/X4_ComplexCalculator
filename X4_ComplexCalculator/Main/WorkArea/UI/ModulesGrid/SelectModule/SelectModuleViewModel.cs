@@ -139,7 +139,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
         /// コンストラクタ
         /// </summary>
         /// <param name="modules">選択結果格納先</param>
-        /// <param name="isReplaceMode">置換モードか(falseで複数選択許可)</param>
+        /// <param name="prevModuleName"></param>
         public SelectModuleViewModel(ObservableRangeCollection<ModulesGridItem> modules, string prevModuleName = "")
         {
             _Model = new SelectModuleModel(modules);
@@ -181,7 +181,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
         /// <summary>
         /// ウィンドウが閉じられる時のイベント
         /// </summary>
-        /// <param name="e"></param>
         public void WindowClosing(CancelEventArgs _)
         {
             Task.Run(_Model.SaveCheckState);

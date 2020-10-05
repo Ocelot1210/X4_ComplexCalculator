@@ -22,7 +22,6 @@ namespace X4_DataExporterWPF.Export
         /// コンストラクタ
         /// </summary>
         /// <param name="waresXml">ウェア情報xml</param>
-        /// <param name="resolver">言語解決用オブジェクト</param>
         public WareEffectExporter(XDocument waresXml)
         {
             _WaresXml = waresXml;
@@ -31,7 +30,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// 抽出処理
         /// </summary>
-        /// <param name="cmd"></param>
+        /// <param name="connection"></param>
         public void Export(IDbConnection connection)
         {
             //////////////////

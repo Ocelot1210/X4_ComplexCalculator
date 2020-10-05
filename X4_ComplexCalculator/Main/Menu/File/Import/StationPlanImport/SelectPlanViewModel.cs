@@ -1,8 +1,6 @@
-﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Windows.Input;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -90,7 +88,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="selectedItems">選択計画一覧</param>
+        /// <param name="planItems">選択計画一覧</param>
         public SelectPlanViewModel(List<StationPlanItem> planItems)
         {
             _Model = new SelectPlanModel();

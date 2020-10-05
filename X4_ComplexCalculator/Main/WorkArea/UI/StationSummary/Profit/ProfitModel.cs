@@ -69,7 +69,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        /// <returns></returns>
         private void OnProductsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             // 製品が削除された場合
@@ -97,7 +96,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        /// <returns></returns>
         private void OnProductsPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)

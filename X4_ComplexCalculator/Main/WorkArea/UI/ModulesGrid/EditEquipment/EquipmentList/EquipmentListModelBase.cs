@@ -104,7 +104,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// </summary>
         /// <param name="module">編集対象モジュール</param>
         /// <param name="factions">種族一覧</param>
-        /// <param name="presetsCollectionChanged">プリセット変更時のイベントハンドラー</param>
         public EquipmentListModelBase(ModulesGridItem module, ObservablePropertyChangedCollection<FactionsListItem> factions)
         {
             Module = module;
@@ -198,7 +197,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 装備を削除
         /// </summary>
-        /// <param name="targets">削除対象</param>
         /// <returns>装備が削除されたか</returns>
         public bool RemoveSelectedEquipments()
         {

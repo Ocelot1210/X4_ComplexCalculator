@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using Prism.Mvvm;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
@@ -70,7 +69,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// </summary>
         /// <param name="moduleID">モジュールID</param>
         /// <param name="moduleCount">モジュール数</param>
-        /// <param name="efficiency">効率</param>
         /// <param name="amount">製品数</param>
         public ProductDetailsListItemConsumption(string moduleID, long moduleCount, long amount)
         {

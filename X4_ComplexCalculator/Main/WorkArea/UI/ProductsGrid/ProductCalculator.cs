@@ -222,7 +222,6 @@ WHERE
         /// 製品と必要ウェアを計算
         /// </summary>
         /// <param name="moduleID">モジュールID</param>
-        /// <param name="settings">ステーションの設定</param>
         /// <returns>製品と必要ウェア</returns>
         public IEnumerable<(string WareID, long Amount, Dictionary<string, double>? Efficiency)> CalcProduction(string moduleID)
         {
@@ -278,7 +277,6 @@ WHERE
         /// 労働者に必要なウェアを計算
         /// </summary>
         /// <param name="moduleID">モジュールID</param>
-        /// <param name="count">モジュール数</param>
         /// <returns>労働者に必要なウェア</returns>
         public IEnumerable<(string WareID, long Amount)> CalcHabitation(string moduleID)
         {

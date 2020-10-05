@@ -1,10 +1,10 @@
-﻿using Prism.Common;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using Prism.Common;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.WorkArea;
@@ -36,7 +36,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
         /// <summary>
         /// 製品一覧
         /// </summary>
-        public ObservableRangeCollection<EmpireOverViewProductsGridItem> Products { get; } 
+        public ObservableRangeCollection<EmpireOverViewProductsGridItem> Products { get; }
             = new ObservableRangeCollection<EmpireOverViewProductsGridItem>();
         #endregion
 
@@ -215,7 +215,8 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
         /// <summary>
         /// 製品が追加された場合
         /// </summary>
-        /// <param name="removedItems"></param>
+        /// <param name="parent"></param>
+        /// <param name="addedItems"></param>
         private void OnProductsAdded(IList<ProductsGridItem> parent, IEnumerable<ProductsGridItem> addedItems)
         {
             var addTarget = new List<EmpireOverViewProductsGridItem>();     // 追加対象

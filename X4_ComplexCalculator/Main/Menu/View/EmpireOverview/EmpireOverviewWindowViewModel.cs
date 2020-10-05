@@ -1,12 +1,9 @@
-﻿using Prism.Commands;
-using Prism.Mvvm;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Text;
 using System.Windows.Data;
 using System.Windows.Input;
+using Prism.Commands;
+using Prism.Mvvm;
 using X4_ComplexCalculator.Main.WorkArea;
 
 namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
@@ -41,7 +38,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="model">帝国の概要用Model</param>
+        /// <param name="workAreas">帝国の概要用Model</param>
         public EmpireOverviewWindowViewModel(ObservableCollection<WorkAreaViewModel> workAreas)
         {
             _Model = new EmpireOverviewWindowModel(workAreas);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -140,7 +140,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <summary>
         /// 選択中のモジュールをコピー
         /// </summary>
-        /// <param name="dataGrid"></param>
         private void CopyModulesCommand()
         {
             var xml = new XElement("modules");

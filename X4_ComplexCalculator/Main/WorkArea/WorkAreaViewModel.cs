@@ -205,7 +205,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <summary>
         /// エクスポート実行
         /// </summary>
-        /// <param name="import"></param>
+        /// <param name="export"></param>
         public bool Export(IExport export) => export.Export(_Model);
 
 
@@ -304,7 +304,7 @@ WHERE
         /// <summary>
         /// 現在のレイアウトを取得
         /// </summary>
-        /// <returns></returns>
+        /// <returns>現在のレイアウトを表す UTF-8 XML</returns>
         private byte[]? GetCurrentLayout()
         {
             if (_CurrentDockingManager == null)

@@ -38,7 +38,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="model">計算機で使用するステーション情報</param>
+        /// <param name="stationData">計算機で使用するステーション情報</param>
         public StoragesGridViewModel(IStationData stationData)
         {
             _Model = new StoragesGridModel(stationData.ModulesInfo, stationData.StoragesInfo);
