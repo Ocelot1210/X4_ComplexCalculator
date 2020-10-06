@@ -154,6 +154,7 @@ Delete;削除
 ClearSelection;選択解除
 MoveUpTheSelection;選択項目を上に移動
 MoveDownTheSelection;選択項目を下に移動
+ResetSortOrder;ソート順を初期化
 Add;追加
 AutoAdd;自動追加
 Merge;マージ

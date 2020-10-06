@@ -27,52 +27,92 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
 
 
         /// <summary>
-        /// 入れ替え可能か
+        /// 選択されたか
         /// </summary>
-        private bool _CanReorder;
+        private bool _HasSelected;
+
+
+        /// <summary>
+        /// ソート済み列数
+        /// </summary>
+        private int _SortedColumnCount;
         #endregion
 
 
         #region プロパティ
         /// <summary>
-        /// モジュール選択コマンド
+        /// モジュール選択
         /// </summary>
-        public ICommand SelectModulesCommand { get; }
+        public DelegateCommand SelectModulesCommand { get; }
 
 
         /// <summary>
-        /// モジュール選択解除コマンド
+        /// モジュール選択解除
         /// </summary>
-        public ICommand ClearSelectionCommand { get; }
+        public DelegateCommand ClearSelectionCommand { get; }
 
 
         /// <summary>
-        /// 選択項目を上に移動するコマンド
+        /// 選択項目を上に移動する
         /// </summary>
         public DelegateCommand MoveUpTheSelectionCommand { get; }
 
 
         /// <summary>
-        /// 選択項目を下に移動するコマンド
+        /// 選択項目を下に移動する
         /// </summary>
         public DelegateCommand MoveDownTheSelectionCommand { get; }
 
 
         /// <summary>
-        /// 入れ替え可能か
+        /// 選択されたか
         /// </summary>
-        private bool CanReorder
+        private bool HasSelected
         {
-            get => _CanReorder;
+            get => _HasSelected;
             set
             {
-                if (SetProperty(ref _CanReorder, value))
+                if (SetProperty(ref _HasSelected, value))
                 {
                     MoveUpTheSelectionCommand.RaiseCanExecuteChanged();
                     MoveDownTheSelectionCommand.RaiseCanExecuteChanged();
                 }
             }
         }
+
+
+        /// <summary>
+        /// ソート済み列数
+        /// </summary>
+        public int SortedColumnCount
+        {
+            get => _SortedColumnCount;
+            set
+            {
+                var prevCanSelect = CanSelect;
+                if (SetProperty(ref _SortedColumnCount, value))
+                {
+                    // 選択可能状態が変更された場合
+                    if (prevCanSelect != CanSelect)
+                    {
+                        SelectModulesCommand.RaiseCanExecuteChanged();
+                        ClearSelectionCommand.RaiseCanExecuteChanged();
+
+                        // 選択可能→選択不能になった場合、選択解除する
+                        if (!CanSelect)
+                        {
+                            ClearSelection();
+                        }
+                    }
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// 選択可能か
+        /// </summary>
+        private bool CanSelect => 0 == SortedColumnCount;
         #endregion
 
 
@@ -83,10 +123,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         public ModulesReorder(IModulesInfo modulesInfo)
         {
             _ModulesInfo = modulesInfo;
-            SelectModulesCommand        = new DelegateCommand(SelectModules);
-            ClearSelectionCommand       = new DelegateCommand(ClearSelection);
-            MoveUpTheSelectionCommand   = new DelegateCommand(MoveUpTheSelection, () => CanReorder);
-            MoveDownTheSelectionCommand = new DelegateCommand(MoveDownTheSelection, () => CanReorder);
+            SelectModulesCommand        = new DelegateCommand(SelectModules, () => CanSelect);
+            ClearSelectionCommand       = new DelegateCommand(ClearSelection, () => CanSelect);
+            MoveUpTheSelectionCommand   = new DelegateCommand(MoveUpTheSelection, () => CanSelect && HasSelected);
+            MoveDownTheSelectionCommand = new DelegateCommand(MoveDownTheSelection, () => CanSelect && HasSelected);
         }
 
 
@@ -107,7 +147,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
                 }
             }
 
-            CanReorder = 0 < _Selection;
+            HasSelected = 0 < _Selection;
         }
 
 
@@ -122,7 +162,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             }
 
             _Selection = 0;
-            CanReorder = false;
+            HasSelected = false;
         }
 
 
@@ -165,7 +205,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         private int GetInsertIndex()
         {
             // 移動不能なら何もしない
-            if (!CanReorder)
+            if (!HasSelected)
             {
                 return -1;
             }
@@ -225,7 +265,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             }
 
             _Selection = 0;
-            CanReorder = false;
+            HasSelected = false;
         }
     }
 }
