@@ -1,10 +1,10 @@
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using System.Windows;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Prism.Mvvm;
 using Reactive.Bindings;
@@ -101,7 +101,7 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// <summary>
         /// ウィンドウを閉じる
         /// </summary>
-        public ReactiveCommand<Window> CloseCommand { get; }
+        public ReactiveCommand<CancelEventArgs> ClosingCommand { get; }
         #endregion
 
 
@@ -136,7 +136,7 @@ namespace X4_DataExporterWPF.DataExportWindow
 
             SelectInDirCommand = new ReactiveCommand(CanOperation).WithSubscribe(SelectInDir);
             ExportCommand = new AsyncReactiveCommand(canExport, CanOperation).WithSubscribe(Export);
-            CloseCommand = new ReactiveCommand<Window>(CanOperation).WithSubscribe(Close);
+            ClosingCommand = new ReactiveCommand<CancelEventArgs>().WithSubscribe(Closing);
 
             // 入力元フォルダパスに値が代入された時、言語一覧を更新する
             InDirPath.ObserveOn(ThreadPoolScheduler.Instance).Subscribe(path =>
@@ -208,7 +208,7 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// <summary>
         /// ウィンドウを閉じる
         /// </summary>
-        /// <param name="window"></param>
-        private void Close(Window window) => window.Close();
+        /// <param name="e"></param>
+        private void Closing(CancelEventArgs e) => e.Cancel = _BusyNotifier.IsBusy;
     }
 }
