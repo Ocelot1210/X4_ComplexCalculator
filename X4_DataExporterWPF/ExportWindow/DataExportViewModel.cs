@@ -1,10 +1,10 @@
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using System.Windows;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Prism.Mvvm;
 using Reactive.Bindings;
@@ -51,12 +51,6 @@ namespace X4_DataExporterWPF.DataExportWindow
 
 
         /// <summary>
-        /// 処理中の場合 true、待機中の場合 false
-        /// </summary>
-        public ReadOnlyReactivePropertySlim<bool> IsBusy { get; }
-
-
-        /// <summary>
         /// 言語一覧
         /// </summary>
         public ReactiveCollection<LangComboboxItem> Languages { get; }
@@ -83,7 +77,7 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// <summary>
         /// ユーザが操作可能か
         /// </summary>
-        public ReactivePropertySlim<bool> CanOperation { get; }
+        public ReadOnlyReactivePropertySlim<bool> CanOperation { get; }
 
 
         /// <summary>
@@ -101,7 +95,7 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// <summary>
         /// ウィンドウを閉じる
         /// </summary>
-        public ReactiveCommand<Window> CloseCommand { get; }
+        public ReactiveCommand<CancelEventArgs> ClosingCommand { get; }
         #endregion
 
 
@@ -110,8 +104,6 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// </summary>
         public DataExportViewModel(string inDirPath, string outFilePath)
         {
-            IsBusy = _BusyNotifier.ToReadOnlyReactivePropertySlim();
-
             InDirPath = new ReactiveProperty<string>(inDirPath,
                 mode: ReactivePropertyMode.RaiseLatestValueOnSubscribe);
             _UnableToGetLanguages = new ReactivePropertySlim<bool>(false);
@@ -125,7 +117,7 @@ namespace X4_DataExporterWPF.DataExportWindow
             MaxSteps = new ReactivePropertySlim<int>(1);
             CurrentStep = new ReactivePropertySlim<int>(0);
 
-            CanOperation = new ReactivePropertySlim<bool>(true);
+            CanOperation = _BusyNotifier.Inverse().ToReadOnlyReactivePropertySlim();
 
             // 操作可能かつ入力項目に不備がない場合に true にする
             var canExport = new[]{
@@ -135,8 +127,8 @@ namespace X4_DataExporterWPF.DataExportWindow
             }.CombineLatestValuesAreAllTrue();
 
             SelectInDirCommand = new ReactiveCommand(CanOperation).WithSubscribe(SelectInDir);
-            ExportCommand = new AsyncReactiveCommand(canExport, CanOperation).WithSubscribe(Export);
-            CloseCommand = new ReactiveCommand<Window>(CanOperation).WithSubscribe(Close);
+            ExportCommand = new AsyncReactiveCommand(canExport).WithSubscribe(Export);
+            ClosingCommand = new ReactiveCommand<CancelEventArgs>().WithSubscribe(Closing);
 
             // 入力元フォルダパスに値が代入された時、言語一覧を更新する
             InDirPath.ObserveOn(ThreadPoolScheduler.Instance).Subscribe(path =>
@@ -208,7 +200,7 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// <summary>
         /// ウィンドウを閉じる
         /// </summary>
-        /// <param name="window"></param>
-        private void Close(Window window) => window.Close();
+        /// <param name="e"></param>
+        private void Closing(CancelEventArgs e) => e.Cancel = _BusyNotifier.IsBusy;
     }
 }
