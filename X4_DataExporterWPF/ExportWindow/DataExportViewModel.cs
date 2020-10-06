@@ -51,12 +51,6 @@ namespace X4_DataExporterWPF.DataExportWindow
 
 
         /// <summary>
-        /// 処理中の場合 true、待機中の場合 false
-        /// </summary>
-        public ReadOnlyReactivePropertySlim<bool> IsBusy { get; }
-
-
-        /// <summary>
         /// 言語一覧
         /// </summary>
         public ReactiveCollection<LangComboboxItem> Languages { get; }
@@ -83,7 +77,7 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// <summary>
         /// ユーザが操作可能か
         /// </summary>
-        public ReactivePropertySlim<bool> CanOperation { get; }
+        public ReadOnlyReactivePropertySlim<bool> CanOperation { get; }
 
 
         /// <summary>
@@ -110,8 +104,6 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// </summary>
         public DataExportViewModel(string inDirPath, string outFilePath)
         {
-            IsBusy = _BusyNotifier.ToReadOnlyReactivePropertySlim();
-
             InDirPath = new ReactiveProperty<string>(inDirPath,
                 mode: ReactivePropertyMode.RaiseLatestValueOnSubscribe);
             _UnableToGetLanguages = new ReactivePropertySlim<bool>(false);
@@ -125,7 +117,7 @@ namespace X4_DataExporterWPF.DataExportWindow
             MaxSteps = new ReactivePropertySlim<int>(1);
             CurrentStep = new ReactivePropertySlim<int>(0);
 
-            CanOperation = new ReactivePropertySlim<bool>(true);
+            CanOperation = _BusyNotifier.Inverse().ToReadOnlyReactivePropertySlim();
 
             // 操作可能かつ入力項目に不備がない場合に true にする
             var canExport = new[]{
@@ -135,7 +127,7 @@ namespace X4_DataExporterWPF.DataExportWindow
             }.CombineLatestValuesAreAllTrue();
 
             SelectInDirCommand = new ReactiveCommand(CanOperation).WithSubscribe(SelectInDir);
-            ExportCommand = new AsyncReactiveCommand(canExport, CanOperation).WithSubscribe(Export);
+            ExportCommand = new AsyncReactiveCommand(canExport).WithSubscribe(Export);
             ClosingCommand = new ReactiveCommand<CancelEventArgs>().WithSubscribe(Closing);
 
             // 入力元フォルダパスに値が代入された時、言語一覧を更新する
