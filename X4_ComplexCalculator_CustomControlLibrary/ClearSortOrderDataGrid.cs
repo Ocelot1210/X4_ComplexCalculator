@@ -23,7 +23,7 @@ namespace X4_ComplexCalculator_CustomControlLibrary
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public ClearSortOrderDataGrid()
+        static ClearSortOrderDataGrid()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ClearSortOrderDataGrid), new FrameworkPropertyMetadata(typeof(ClearSortOrderDataGrid)));
         }
