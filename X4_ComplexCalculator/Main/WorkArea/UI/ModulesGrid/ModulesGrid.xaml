@@ -8,6 +8,7 @@
     xmlns:local="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
+    xmlns:x4ccrtl="clr-namespace:X4_ComplexCalculator_CustomControlLibrary;assembly=X4_ComplexCalculator_CustomControlLibrary"
     xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     x:Name="root"
@@ -99,7 +100,7 @@
         </DockPanel>
 
         <!--  モジュール表示用DataGrid  -->
-        <DataGrid
+        <x4ccrtl:ClearSortOrderDataGrid
             Name="moduleGrid"
             x4bhv:DataGridCurrentCellEditModeBehavior.Enabled="True"
             x4bhv:DataGridFocusCellBehavior.FocusCommand="{Binding ContextMenu.CellFocusCommand, Mode=OneWayToSource}"
@@ -310,6 +311,6 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
-        </DataGrid>
+        </x4ccrtl:ClearSortOrderDataGrid>
     </DockPanel>
 </UserControl>
