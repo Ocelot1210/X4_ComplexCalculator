@@ -38,7 +38,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <summary>
         /// モジュール一覧
         /// </summary>
-        public ObservableCollection<ModulesGridItem> Modules => _ModulesInfo.Modules;
+        public ObservableRangeCollection<ModulesGridItem> Modules => _ModulesInfo.Modules;
         #endregion
 
 
@@ -50,7 +50,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             _ModulesInfo = modulesInfo;
             WPFLocalizeExtension.Engine.LocalizeDictionary.Instance.PropertyChanged += LocalizeInstance_PropertyChanged;
         }
-
 
 
         /// <summary>
@@ -88,16 +87,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             }
 
             WPFLocalizeExtension.Engine.LocalizeDictionary.Instance.PropertyChanged -= LocalizeInstance_PropertyChanged;
-        }
-
-
-        /// <summary>
-        /// モジュール一括削除
-        /// </summary>
-        /// <param name="items">削除対象</param>
-        public void DeleteModules(IEnumerable<ModulesGridItem> items)
-        {
-            _ModulesInfo.Modules.RemoveRange(items);
         }
 
 
@@ -163,21 +152,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
 
             return ret;
         }
-
-
-        /// <summary>
-        /// クリップボード内にあるモジュール一覧xmlを貼り付ける
-        /// </summary>
-        public void PasteModules()
-        {
-            var clipboardXml = XDocument.Parse(Clipboard.GetText());
-
-            // xmlの内容に問題がないか確認するため、ここでToArray()する
-            var modules = clipboardXml.Root.Elements().Select(x => new ModulesGridItem(x) { EditStatus = EditStatus.Edited }).ToArray();
-
-            _ModulesInfo.Modules.AddRange(modules);
-        }
-
 
 
         /// <summary>

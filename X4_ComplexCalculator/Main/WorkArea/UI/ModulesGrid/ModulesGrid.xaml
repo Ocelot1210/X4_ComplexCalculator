@@ -3,10 +3,12 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
+    xmlns:x4ccrtl="clr-namespace:X4_ComplexCalculator_CustomControlLibrary;assembly=X4_ComplexCalculator_CustomControlLibrary"
     xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     x:Name="root"
@@ -21,25 +23,46 @@
 
         <!--  モジュール一覧右クリック時のコンテキストメニュー  -->
         <ContextMenu x:Key="ModulesGridContextMenu">
+
             <!--  コピー  -->
             <MenuItem
-                Command="{Binding CopyModules}"
+                Command="{Binding ContextMenu.CopyModulesCommand, Mode=OneTime}"
                 Header="{lex:Loc X4_ComplexCalculator:Lang:Copy}"
                 InputGestureText="Alt+C" />
 
             <!--  貼り付け  -->
             <MenuItem
-                Command="{Binding PasteModules}"
+                Command="{Binding ContextMenu.PasteModulesCommand, Mode=OneTime}"
                 CommandParameter="{x:Reference Name=moduleGrid}"
                 Header="{lex:Loc X4_ComplexCalculator:Lang:Paste}"
                 InputGestureText="Alt+V" />
 
             <!--  削除  -->
             <MenuItem
-                Command="{Binding DeleteModules}"
+                Command="{Binding ContextMenu.DeleteModulesCommand, Mode=OneTime}"
                 CommandParameter="{x:Reference Name=moduleGrid}"
                 Header="{lex:Loc X4_ComplexCalculator:Lang:Delete}"
                 InputGestureText="Delete" />
+
+            <Separator />
+
+            <!--  選択  -->
+            <MenuItem Command="{Binding ContextMenu.SelectModulesCommand, Mode=OneTime}" Header="{lex:Loc X4_ComplexCalculator:Lang:Select}" />
+
+            <!--  選択解除  -->
+            <MenuItem Command="{Binding ContextMenu.ClearSelectionCommand, Mode=OneTime}" Header="{lex:Loc X4_ComplexCalculator:Lang:ClearSelection}" />
+
+            <!--  選択項目を上に移動  -->
+            <MenuItem Command="{Binding ContextMenu.MoveUpTheSelectionCommand, Mode=OneTime}" Header="{lex:Loc X4_ComplexCalculator:Lang:MoveUpTheSelection}" />
+
+            <!--  選択項目を下に移動  -->
+            <MenuItem Command="{Binding ContextMenu.MoveDownTheSelectionCommand, Mode=OneTime}" Header="{lex:Loc X4_ComplexCalculator:Lang:MoveDownTheSelection}" />
+
+            <Separator />
+
+            <!--  ソート順を初期化  -->
+            <MenuItem Command="{Binding ContextMenu.ResetSortOrderCommand, Mode=OneTime}" Header="{lex:Loc X4_ComplexCalculator:Lang:ResetSortOrder}" />
+
         </ContextMenu>
 
 
@@ -53,21 +76,21 @@
             <!--  モジュール追加ボタン  -->
             <Button
                 MinWidth="65"
-                Command="{Binding AddModuleCommand}"
+                Command="{Binding AddModuleCommand, Mode=OneTime}"
                 Content="{lex:Loc Lang:Add}"
                 DockPanel.Dock="Right" />
 
             <!--  モジュール自動追加ボタン  -->
             <Button
                 MinWidth="65"
-                Command="{Binding AutoAddModuleCommand}"
+                Command="{Binding AutoAddModuleCommand, Mode=OneTime}"
                 Content="{lex:Loc Lang:AutoAdd}"
                 DockPanel.Dock="Right" />
 
             <!--  モジュールマージボタン  -->
             <Button
                 MinWidth="65"
-                Command="{Binding MergeModuleCommand}"
+                Command="{Binding MergeModuleCommand, Mode=OneTime}"
                 Content="{lex:Loc Lang:Merge}"
                 DockPanel.Dock="Right" />
 
@@ -77,10 +100,10 @@
         </DockPanel>
 
         <!--  モジュール表示用DataGrid  -->
-        <DataGrid
+        <x4ccrtl:ClearSortOrderDataGrid
             Name="moduleGrid"
             x4bhv:DataGridCurrentCellEditModeBehavior.Enabled="True"
-            x4bhv:DataGridFocusCellBehavior.FocusCommand="{Binding CellFocusCommand, Mode=OneWayToSource}"
+            x4bhv:DataGridFocusCellBehavior.FocusCommand="{Binding ContextMenu.CellFocusCommand, Mode=OneWayToSource}"
             x4bhv:VirtualizedDataGridSelectBehavior.VirtualizedSelectionEnabled="True"
             CellStyle="{StaticResource DataGridCellDefaultStyle}"
             ContextMenu="{StaticResource ModulesGridContextMenu}"
@@ -88,23 +111,24 @@
             ItemsSource="{Binding ModulesView, Mode=OneTime}"
             RowHeaderStyle="{StaticResource EditedItemHighlightRowHeaderStyle}"
             RowHeight="25"
+            RowStyle="{StaticResource ReorderbleDataGridRowStyle}"
             SelectionUnit="FullRow"
             Style="{StaticResource DefaultDataGridStyle}">
 
             <!--  キーボードショートカット  -->
             <DataGrid.InputBindings>
                 <!--  コピー  -->
-                <KeyBinding Command="{Binding CopyModules}" Gesture="Alt+C" />
+                <KeyBinding Command="{Binding ContextMenu.CopyModulesCommand, Mode=OneTime}" Gesture="Alt+C" />
 
                 <!--  貼り付け  -->
                 <KeyBinding
-                    Command="{Binding PasteModules}"
+                    Command="{Binding ContextMenu.PasteModulesCommand, Mode=OneTime}"
                     CommandParameter="{x:Reference Name=moduleGrid}"
                     Gesture="Alt+V" />
 
                 <!--  削除  -->
                 <KeyBinding
-                    Command="{Binding DeleteModules}"
+                    Command="{Binding ContextMenu.DeleteModulesCommand, Mode=OneTime}"
                     CommandParameter="{x:Reference Name=moduleGrid}"
                     Gesture="Delete" />
 
@@ -287,6 +311,6 @@
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
-        </DataGrid>
+        </x4ccrtl:ClearSortOrderDataGrid>
     </DockPanel>
 </UserControl>

@@ -16,7 +16,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
     /// <summary>
     /// ModuleクラスをDataGrid表示用クラス
     /// </summary>
-    public class ModulesGridItem : BindableBaseEx, IEditable, ISelectable
+    public class ModulesGridItem : BindableBaseEx, IEditable, ISelectable, IReorderble
     {
         #region スタティックメンバ
         /// <summary>
@@ -49,6 +49,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// 編集状態
         /// </summary>
         private EditStatus _EditStatus = EditStatus.Unedited;
+
+
+        /// <summary>
+        /// 順番入れ替え対象か
+        /// </summary>
+        private bool _IsReorderTarget;
         #endregion
 
 
@@ -158,6 +164,16 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         {
             get => _EditStatus;
             set => SetProperty(ref _EditStatus, value);
+        }
+
+
+        /// <summary>
+        /// 順番入れ替え対象か
+        /// </summary>
+        public bool IsReorderTarget
+        {
+            get => _IsReorderTarget;
+            set => SetProperty(ref _IsReorderTarget, value);
         }
         #endregion
 

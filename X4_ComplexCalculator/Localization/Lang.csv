@@ -134,12 +134,6 @@ PresetImported;Imported.
 
 
 # ------------------------------------------------------
-# Empire overview
-# ------------------------------------------------------
-
-
-
-# ------------------------------------------------------
 # Plan
 # ------------------------------------------------------
 Tab;Tab
@@ -149,8 +143,6 @@ Summary;Summary
 BuildResources;Build resources
 Storages;Storages
 StorageAssign;Storage assign
-Buy;Buy
-Sell;Sell
 
 
 # ------------------------------------------------------
@@ -159,6 +151,10 @@ Sell;Sell
 Copy;Copy
 Paste;Paste
 Delete;Delete
+ClearSelection;Clear selection
+MoveUpTheSelection;Move up the selection
+MoveDownTheSelection;Move down the selection
+ResetSortOrder;Reset sort order
 Add;Add
 AutoAdd;Auto add
 Merge;Merge
@@ -185,6 +181,8 @@ ProductName;Product name
 AmountPerHour;Amount/h
 NoBuy;No buy
 NoSell;No sell
+Buy;Buy
+Sell;Sell
 
 
 # ------------------------------------------------------

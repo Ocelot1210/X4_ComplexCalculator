@@ -90,7 +90,7 @@
                                 <TextBlock
                                     FontWeight="Bold"
                                     Foreground="Black"
-                                    Text="{Binding Items[0].Race.Name}" />
+                                    Text="{Binding Items.CurrentItem.Race.Name}" />
                             </StackPanel>
                         </DataTemplate>
                     </GroupStyle.HeaderTemplate>

@@ -36,6 +36,16 @@
     </Style>
 
 
+    <!--  入れ替え可能なDataGridのRowStyle  -->
+    <Style x:Key="ReorderbleDataGridRowStyle" TargetType="{x:Type DataGridRow}">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsReorderTarget, Mode=OneWay}" Value="True">
+                <Setter Property="Background" Value="LightGoldenrodYellow" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+
     <!--  DataGridの初期設定  -->
     <Style x:Key="DefaultDataGridStyle" TargetType="{x:Type DataGrid}">
         <Setter Property="AutoGenerateColumns" Value="False" />
