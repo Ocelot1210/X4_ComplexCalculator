@@ -2,6 +2,7 @@
 using Prism.Mvvm;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Data;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
@@ -18,6 +19,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// モジュール一覧情報
         /// </summary>
         private readonly IModulesInfo _ModulesInfo;
+
+
+        /// <summary>
+        /// モジュール一覧(表示用)
+        /// </summary>
+        private readonly ListCollectionView _CollectionView;
 
 
         /// <summary>
@@ -89,30 +96,19 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             get => _SortedColumnCount;
             set
             {
-                var prevCanSelect = CanSelect;
                 if (SetProperty(ref _SortedColumnCount, value))
                 {
-                    // 選択可能状態が変更された場合
-                    if (prevCanSelect != CanSelect)
-                    {
-                        SelectModulesCommand.RaiseCanExecuteChanged();
-                        ClearSelectionCommand.RaiseCanExecuteChanged();
-
-                        // 選択可能→選択不能になった場合、選択解除する
-                        if (!CanSelect)
-                        {
-                            ClearSelection();
-                        }
-                    }
+                    MoveUpTheSelectionCommand.RaiseCanExecuteChanged();
+                    MoveDownTheSelectionCommand.RaiseCanExecuteChanged();
                 }
             }
         }
 
 
         /// <summary>
-        /// 選択可能か
+        /// 移動可能か(選択済みかつ、ソートされていない)
         /// </summary>
-        private bool CanSelect => 0 == SortedColumnCount;
+        private bool CanMode => HasSelected && 0 == SortedColumnCount;
         #endregion
 
 
@@ -120,13 +116,14 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// コンストラクタ
         /// </summary>
         /// <param name="modulesInfo">モジュール一覧情報</param>
-        public ModulesReorder(IModulesInfo modulesInfo)
+        public ModulesReorder(IModulesInfo modulesInfo, ListCollectionView listCollectionView)
         {
             _ModulesInfo = modulesInfo;
-            SelectModulesCommand        = new DelegateCommand(SelectModules, () => CanSelect);
-            ClearSelectionCommand       = new DelegateCommand(ClearSelection, () => CanSelect);
-            MoveUpTheSelectionCommand   = new DelegateCommand(MoveUpTheSelection, () => CanSelect && HasSelected);
-            MoveDownTheSelectionCommand = new DelegateCommand(MoveDownTheSelection, () => CanSelect && HasSelected);
+            _CollectionView = listCollectionView;
+            SelectModulesCommand        = new DelegateCommand(SelectModules);
+            ClearSelectionCommand       = new DelegateCommand(ClearSelection);
+            MoveUpTheSelectionCommand   = new DelegateCommand(MoveUpTheSelection, () => CanMode);
+            MoveDownTheSelectionCommand = new DelegateCommand(MoveDownTheSelection, () => CanMode);
         }
 
 
@@ -136,17 +133,35 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// </summary>
         private void SelectModules()
         {
-            _Selection = 0;
+            var modules = Enumerable.Empty<ModulesGridItem>();
+            var added = 0;
 
-            foreach (var item in _ModulesInfo.Modules)
+            // 選択追加モードか？(Ctrlキーが押されているか？)
+            bool isAddMode = (Keyboard.GetKeyStates(Key.LeftCtrl) & KeyStates.Down)  == KeyStates.Down ||
+                             (Keyboard.GetKeyStates(Key.RightCtrl) & KeyStates.Down) == KeyStates.Down;
+
+            // 選択追加モードか？
+            if (isAddMode)
+            {
+                // 選択追加モードの場合、ソート対象の項目に加え、現在選択している項目を追加する
+                modules = _CollectionView.OfType<ModulesGridItem>().Where(x => !x.IsReorderTarget);
+            }
+            else
+            {
+                // 選択追加モードでない場合、現在選択されているもののみソート対象にする
+                modules = _CollectionView.OfType<ModulesGridItem>();
+            }
+
+            foreach (var item in modules)
             {
                 item.IsReorderTarget = item.IsSelected;
                 if (item.IsReorderTarget)
                 {
-                    _Selection++;
+                    added++;
                 }
             }
 
+            _Selection = isAddMode ? (_Selection + added) : added;
             HasSelected = 0 < _Selection;
         }
 

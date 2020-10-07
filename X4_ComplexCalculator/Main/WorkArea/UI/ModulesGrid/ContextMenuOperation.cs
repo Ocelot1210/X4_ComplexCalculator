@@ -107,7 +107,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         {
             _ModulesInfo    = modulesInfo;
             _CollectionView = listCollectionView;
-            _ModuleReorder  = new ModulesReorder(modulesInfo);
+            _ModuleReorder  = new ModulesReorder(modulesInfo, listCollectionView);
             
             ((INotifyCollectionChanged)_CollectionView.SortDescriptions).CollectionChanged += ContextMenuOperation_CollectionChanged;
 
