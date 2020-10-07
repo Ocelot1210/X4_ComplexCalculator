@@ -134,7 +134,11 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
                             return;
                         }
 
-                        Products.First(x => x.Ware.WareID == product.Ware.WareID).Count += ev.NewValue - ev.OldValue;
+                        var prod = Products.FirstOrDefault(x => x.Ware.WareID == product.Ware.WareID);
+                        if (prod != null)
+                        {
+                            prod.Count += ev.NewValue - ev.OldValue;
+                        }
                     }
                     break;
 
@@ -203,7 +207,12 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
             // 削除された製品の生産/消費量を減算する
             foreach (var removedItem in removedItems)
             {
-                Products.First(x => x.Ware.WareID == removedItem.Ware.WareID).Count -= removedItem.Count;
+                var prod = Products.FirstOrDefault(x => x.Ware.WareID == removedItem.Ware.WareID);
+                if (prod != null)
+                {
+                    prod.Count -= removedItem.Count;
+                }
+                
                 prodBak.Remove(removedItem);
             }
 
