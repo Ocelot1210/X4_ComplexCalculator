@@ -438,11 +438,12 @@ namespace X4_ComplexCalculator.Main
         {
             const string version = VersionInfo.DetailVersion;
             const string commit = ThisAssembly.Git.Sha;
+            const string date = ThisAssembly.Git.CommitDate;
             var dotnetVersion = Environment.Version.ToString();
 
             LocalizedMessageBox.Show("Lang:VersionInfoDescription", "Lang:VersionInfoTitle",
                                      icon: MessageBoxImage.Information,
-                                     param: new[] { version, commit, dotnetVersion });
+                                     param: new[] { version, commit, date, dotnetVersion });
         }
 
 

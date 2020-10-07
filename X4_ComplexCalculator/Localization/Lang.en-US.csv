@@ -98,7 +98,7 @@ CheckUpdateFinishedDownloadDescription;Download of the update file has been fini
 CheckUpdateNowDownloading;Downloading the update...
 VersionInfo;Version Information
 VersionInfoTitle;X4_ComplexCalculator
-VersionInfoDescription;X4_ComplexCalculator\r\n\r\nVersion: {0}\r\nCommit: {1}\r\n.NET Core: {2}
+VersionInfoDescription;X4_ComplexCalculator\r\n\r\nVersion: {0}\r\nCommit: {1}\r\nDate: {2}\r\n.NET Core: {3}
 
 
 # ------------------------------------------------------

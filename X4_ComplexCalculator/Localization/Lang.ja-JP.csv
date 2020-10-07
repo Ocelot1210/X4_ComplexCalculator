@@ -98,7 +98,7 @@ CheckUpdateFinishedDownloadDescription;更新ファイルのダウンロード�
 CheckUpdateNowDownloading;ダウンロード中...
 VersionInfo;バージョン情報
 VersionInfoTitle;X4_ComplexCalculator
-VersionInfoDescription;X4_ComplexCalculator\r\n\r\nバージョン: {0}\r\nコミット: {1}\r\n.NET Core: {2}
+VersionInfoDescription;X4_ComplexCalculator\r\n\r\nバージョン: {0}\r\nコミット: {1}\r\n日付: {2}\r\n.NET Core: {3}
 
 
 # ------------------------------------------------------
