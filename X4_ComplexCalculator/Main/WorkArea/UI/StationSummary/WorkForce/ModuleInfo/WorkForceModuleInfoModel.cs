@@ -178,6 +178,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
                 WorkForceDetails.Clear();
                 _Settings.Workforce.Clear();
                 OnModuleAdded(_Modules.Modules);
+
+                // 本部なら本部モジュールを追加
+                if (_Settings.IsHeadquarters)
+                {
+                    _Settings.Workforce.Need += _HQ.MaxWorkers;
+                    WorkForceDetails.Add(_HQ);
+                }
             }
 
             await Task.CompletedTask;
