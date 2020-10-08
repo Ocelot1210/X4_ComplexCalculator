@@ -33,11 +33,10 @@
             Margin="3"
             HorizontalAlignment="Right"
             Command="{Binding CancelCommand, Mode=OneTime}"
-            CommandParameter="{Binding ElementName=Window}"
             Content="{lex:Loc Lang:Cancel}">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="Click">
-                    <i:CallMethodAction MethodName="Close" TargetObject="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" />
+                    <i:CallMethodAction MethodName="Close" TargetObject="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Mode=OneTime}" />
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </Button>

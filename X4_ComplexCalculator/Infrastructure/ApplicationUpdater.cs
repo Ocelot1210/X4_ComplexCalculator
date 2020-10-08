@@ -62,14 +62,14 @@ namespace X4_ComplexCalculator.Infrastructure
         /// <summary>
         /// ダウンロードの進捗
         /// </summary>
-        private ReactivePropertySlim<double> _DownloadProgress
+        private readonly ReactivePropertySlim<double> _DownloadProgress
             = new ReactivePropertySlim<double>();
 
 
         /// <summary>
         /// キャンセルトークン
         /// </summary>
-        private CancellationTokenSource _Cancellation = new CancellationTokenSource();
+        private readonly CancellationTokenSource _Cancellation = new CancellationTokenSource();
         #endregion
 
 

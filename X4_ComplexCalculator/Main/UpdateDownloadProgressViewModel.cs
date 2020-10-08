@@ -9,12 +9,15 @@ namespace X4_ComplexCalculator.Main
     /// </summary>
     public class UpdateDownloadProgressViewModel : BindableBase
     {
+        #region メンバ
         /// <summary>
         /// アップデート機能
         /// </summary>
         private readonly ApplicationUpdater _ApplicationUpdater;
+        #endregion
 
 
+        #region プロパティ
         /// <summary>
         /// ダウンロード状況
         /// </summary>
@@ -26,6 +29,7 @@ namespace X4_ComplexCalculator.Main
         /// キャンセルコマンド
         /// </summary>
         public ReactiveCommand CancelCommand { get; }
+        #endregion
 
 
         /// <summary>
@@ -45,9 +49,6 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// ダウンロードをキャンセルする
         /// </summary>
-        private void Cancel()
-        {
-            _ApplicationUpdater.CancelDownload();
-        }
+        private void Cancel() => _ApplicationUpdater.CancelDownload();
     }
 }

@@ -150,7 +150,7 @@ namespace X4_ComplexCalculator.Main
         /// レイアウト上書き保存
         /// </summary>
         /// <param name="menuItem">上書きするレイアウト</param>
-        public void OverwritedSaveLayout(LayoutMenuItem menuItem)
+        private void OverwritedSaveLayout(LayoutMenuItem menuItem)
         {
             if (_WorkAreaManager.ActiveContent == null) return;
 
@@ -209,7 +209,7 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         /// <param name="layoutName">レイアウト名</param>
         /// <returns>レイアウト名が有効か</returns>
-        public static bool IsValidLayoutName(string layoutName)
+        private static bool IsValidLayoutName(string layoutName)
         {
             var ret = true;
 
