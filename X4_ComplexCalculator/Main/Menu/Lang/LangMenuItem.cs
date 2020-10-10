@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
-using System.Reactive.Linq;
 using Prism.Mvvm;
 using Reactive.Bindings;
+using Reactive.Bindings.Extensions;
 
 namespace X4_ComplexCalculator.Main.Menu.Lang
 {
@@ -38,7 +38,7 @@ namespace X4_ComplexCalculator.Main.Menu.Lang
         {
             CultureInfo = cultureInfo;
             IsChecked = new ReactivePropertySlim<bool>(isChecked);
-            IsCheckable = IsChecked.Select(x => !x).ToReadOnlyReactivePropertySlim();
+            IsCheckable = IsChecked.Inverse().ToReadOnlyReactivePropertySlim();
         }
     }
 }

@@ -187,7 +187,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// X4 データベース内の Module テーブルのレコードを表す構造体
         /// </summary>
-        public struct ModuleTable
+        private readonly struct ModuleTable
         {
             public string ModuleID { get; }
             public string ModuleTypeID { get; }

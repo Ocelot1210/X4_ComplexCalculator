@@ -129,7 +129,6 @@
                                     </MultiBinding>
                                 </Setter.Value>
                             </Setter>
-                            <Setter Property="MenuItem.Header" Value="{Binding Title, Mode=OneWay, Converter={lex:TranslateConverter}}" />
                             <Setter Property="Command" Value="{Binding Command, Mode=OneTime}" />
                             <Setter Property="CommandParameter" Value="{Binding ., Mode=OneTime}" />
                         </Style>
@@ -154,7 +153,7 @@
 
             </MenuItem>
 
-
+            <!--  レイアウト(L)  -->
             <MenuItem Header="{lex:Loc Lang:Layout}">
                 <!--  レイアウト保存  -->
                 <MenuItem Command="{Binding SaveLayout, Mode=OneTime}" Header="{lex:Loc Lang:SaveLayout}" />
@@ -175,6 +174,7 @@
                 </MenuItem>
             </MenuItem>
 
+            <!--  言語  -->
             <MenuItem
                 Header="{lex:Loc Lang:Language}"
                 ItemsSource="{Binding Languages, Mode=OneTime}"
