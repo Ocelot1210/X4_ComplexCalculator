@@ -8,6 +8,7 @@
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
+    xmlns:x4ccrtl="clr-namespace:X4_ComplexCalculator_CustomControlLibrary;assembly=X4_ComplexCalculator_CustomControlLibrary"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     Title="{lex:Loc Lang:SelectModuleWindowTitle}"
     Width="800"
@@ -140,7 +141,7 @@
                             CanHide="False">
                             <DockPanel>
                                 <!--  モジュール名検索  -->
-                                <xctk:WatermarkTextBox
+                                <x4ccrtl:ClearableWaterMarkTextBox
                                     DockPanel.Dock="Top"
                                     Text="{Binding SearchModuleName, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"
                                     Watermark="{lex:Loc Lang:SearchByEnteringText}" />

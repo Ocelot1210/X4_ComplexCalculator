@@ -30,9 +30,7 @@ namespace CustomControlLibrary.DataGridInline
         }
 
 
-        /// <summary>
-        /// ビジュアルツリー構築時
-        /// </summary>
+        /// <inheritdoc/>
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();

@@ -3,6 +3,14 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:X4_ComplexCalculator_CustomControlLibrary">
 
-    <Style BasedOn="{StaticResource {x:Type DataGrid}}" TargetType="{x:Type local:ClearSortOrderDataGrid}" />
+    <ResourceDictionary.MergedDictionaries>
+
+        <ResourceDictionary Source="/X4_ComplexCalculator_CustomControlLibrary;component/ClearableWaterMarkTextBox/Generic.xaml" />
+
+        <ResourceDictionary Source="/X4_ComplexCalculator_CustomControlLibrary;component/ClearSortOrderDataGrid/Generic.xaml" />
+
+        <ResourceDictionary Source="/X4_ComplexCalculator_CustomControlLibrary;component/CrossButton/Generic.xaml" />
+
+    </ResourceDictionary.MergedDictionaries>
 
 </ResourceDictionary>
