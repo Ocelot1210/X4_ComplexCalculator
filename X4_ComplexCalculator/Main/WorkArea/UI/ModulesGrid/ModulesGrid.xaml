@@ -95,8 +95,7 @@
                 DockPanel.Dock="Right" />
 
             <!--  検索ボックス  -->
-            <xctk:WatermarkTextBox Text="{Binding SearchModuleName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Watermark="{lex:Loc Lang:SearchByEnteringText}" />
-
+            <x4ccrtl:ClearableWaterMarkTextBox Text="{Binding SearchModuleName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Watermark="{lex:Loc Lang:SearchByEnteringText}" />
         </DockPanel>
 
         <!--  モジュール表示用DataGrid  -->
