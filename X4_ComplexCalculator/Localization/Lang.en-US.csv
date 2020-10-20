@@ -1,4 +1,4 @@
-# ------------------------------------------------------
+﻿# ------------------------------------------------------
 # Common
 # ------------------------------------------------------
 WareName;Ware name
@@ -255,6 +255,10 @@ ModuleType;Module type
 EditEquipmentWindowTitle;Edit equipment window
 EquipmentSize;Equipment size
 Preset;Preset
+PresetRemoveButtonToolTip;Delete Loadout
+PresetAddButtonToolTip;Save as New
+PresetEditButtonToolTip;Rename Loadout
+PresetSaveButtonToolTip;Overwrite Loadout
 List;List
 Equiped;Equiped = [{0}/{1}]
 EquipmentAddButtonToolTip;You can add a selection at once by clicking while holding down the left Shift key.

@@ -1,4 +1,4 @@
-# ------------------------------------------------------
+﻿# ------------------------------------------------------
 # Common
 # ------------------------------------------------------
 WareName;ウェア名
@@ -255,6 +255,10 @@ ModuleType;モジュール種別
 EditEquipmentWindowTitle;兵装編集画面
 EquipmentSize;装備サイズ
 Preset;プリセット
+PresetRemoveButtonToolTip;削除
+PresetAddButtonToolTip;新規セーブ
+PresetEditButtonToolTip;名前を変更
+PresetSaveButtonToolTip;兵装を上書き
 List;一覧
 Equiped;装備中 = [{0}/{1}]
 EquipmentAddButtonToolTip;左Shiftキーを押しながらクリックで選択項目を一気に追加できます
