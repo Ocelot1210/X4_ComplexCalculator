@@ -1,4 +1,4 @@
-﻿# ------------------------------------------------------
+# ------------------------------------------------------
 # Common
 # ------------------------------------------------------
 WareName;Ware name
@@ -73,6 +73,9 @@ EmpireOverview;Empire overview
 Layout;Layout(_L)
 SaveLayout;Save layout
 LayoutList;Layout list
+LayoutSaveButtonToolTip;Overwrite Layout
+LayoutEditButtonToolTip;Rename Layout
+LayoutRemoveButtonToolTip;Delete Layout
 EditLayoutName;Edit layout name
 LayoutName;Layout name
 LayoutSavedMessage;Saved the layout of plan "{0}" as "{1}".
