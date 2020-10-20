@@ -93,25 +93,29 @@
                     Width="20"
                     Command="{Binding RemovePresetCommand, Mode=OneTime}"
                     Content="🗑️"
-                    DockPanel.Dock="Right" />
+                    DockPanel.Dock="Right"
+                    ToolTip="{lex:Loc Lang:PresetRemoveButtonToolTip}" />
 
                 <Button
                     Width="20"
                     Command="{Binding AddPresetCommand, Mode=OneTime}"
                     Content="➕"
-                    DockPanel.Dock="Right" />
+                    DockPanel.Dock="Right"
+                    ToolTip="{lex:Loc Lang:PresetAddButtonToolTip}" />
 
                 <Button
                     Width="20"
                     Command="{Binding EditPresetCommand, Mode=OneTime}"
                     Content="✏"
-                    DockPanel.Dock="Right" />
+                    DockPanel.Dock="Right"
+                    ToolTip="{lex:Loc Lang:PresetEditButtonToolTip}" />
 
                 <Button
                     Width="20"
                     Command="{Binding SavePresetCommand, Mode=OneTime}"
                     Content="💾"
-                    DockPanel.Dock="Right" />
+                    DockPanel.Dock="Right"
+                    ToolTip="{lex:Loc Lang:PresetSaveButtonToolTip}" />
 
                 <ComboBox
                     x:Name="presetCombobox"
