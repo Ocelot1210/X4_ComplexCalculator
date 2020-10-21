@@ -106,7 +106,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async Task OnModulesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private async Task OnModulesChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems != null)
             {

@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS ModuleProduct
         {
             foreach (var module in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'module')]"))
             {
-                var moduleID = module.Attribute("id").Value;
+                var moduleID = module.Attribute("id")?.Value;
                 if (string.IsNullOrEmpty(moduleID)) continue;
 
                 var macroName = module.XPathSelectElement("component").Attribute("ref").Value;
@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS ModuleProduct
                 var wareID = prod?.Attribute("wares")?.Value;
                 if (string.IsNullOrEmpty(wareID)) continue;
 
-                var method = prod.XPathSelectElement("queue")?.Attribute("method")?.Value ?? "default";
+                var method = prod?.XPathSelectElement("queue")?.Attribute("method")?.Value ?? "default";
 
                 yield return new ModuleProduct(moduleID, wareID, method);
             }

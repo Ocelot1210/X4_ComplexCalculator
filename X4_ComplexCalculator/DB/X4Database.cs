@@ -206,7 +206,7 @@ namespace X4_ComplexCalculator.DB
                 }
 
                 // 表示名を保持しているオブジェクトを取得する
-                object value = child.GetValue("DisplayName");
+                var value = child.GetValue("DisplayName");
                 if (value == null)
                 {
                     // 取得に失敗したら次のレジストリを見に行く

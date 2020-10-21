@@ -139,7 +139,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public abstract void OnPresetsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e);
+        public abstract void OnPresetsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e);
 
 
         /// <summary>

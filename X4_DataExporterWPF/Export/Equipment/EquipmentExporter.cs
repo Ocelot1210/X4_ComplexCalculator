@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS Equipment
                 var equipmentID = equipment.Attribute("id")?.Value;
                 if (string.IsNullOrEmpty(equipmentID)) continue;
 
-                var macroName = equipment.XPathSelectElement("component").Attribute("ref")?.Value;
+                var macroName = equipment.XPathSelectElement("component")?.Attribute("ref")?.Value;
                 if (string.IsNullOrEmpty(macroName)) continue;
 
                 var equipmentTypeID = equipment.Attribute("group")?.Value;
@@ -117,7 +117,7 @@ CREATE TABLE IF NOT EXISTS Equipment
                 string[] sizes = { "extrasmall", "small", "medium", "large", "extralarge" };
 
                 // 一致するサイズを探す
-                var tags = component?.Attribute("tags").Value.Split(" ");
+                var tags = component?.Attribute("tags")?.Value.Split(" ");
                 var sizeID = sizes.FirstOrDefault(x => tags?.Contains(x) == true);
                 // 一致するサイズがなかった場合
                 if (string.IsNullOrEmpty(sizeID)) continue;

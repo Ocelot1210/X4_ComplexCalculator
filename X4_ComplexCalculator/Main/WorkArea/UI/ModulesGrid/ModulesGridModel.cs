@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
-using System.Xml.Linq;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.Common.Localize;
@@ -57,7 +55,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void LocalizeInstance_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void LocalizeInstance_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(WPFLocalizeExtension.Engine.LocalizeDictionary.Instance.Culture))
             {

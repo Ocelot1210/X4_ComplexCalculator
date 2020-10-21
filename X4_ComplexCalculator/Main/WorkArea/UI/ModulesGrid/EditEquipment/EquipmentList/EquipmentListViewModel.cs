@@ -221,7 +221,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void OnPresetsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        public void OnPresetsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             _Model.OnPresetsCollectionChanged(sender, e);
             Unsaved = true;

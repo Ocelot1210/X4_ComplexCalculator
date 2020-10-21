@@ -146,7 +146,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Storages_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void Storages_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems != null)
             {
@@ -204,7 +204,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Products_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void Products_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems != null)
             {

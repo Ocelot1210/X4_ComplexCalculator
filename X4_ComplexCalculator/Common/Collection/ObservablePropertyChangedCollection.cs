@@ -14,7 +14,7 @@ namespace X4_ComplexCalculator.Common.Collection
     /// <param name="sender"></param>
     /// <param name="e"></param>
     /// <returns></returns>
-    public delegate Task NotifyCollectionChangedEventAsync(object sender, NotifyCollectionChangedEventArgs e);
+    public delegate Task NotifyCollectionChangedEventAsync(object? sender, NotifyCollectionChangedEventArgs e);
 
     /// <summary>
     /// プロパティ変更時のイベント(非同期)
@@ -81,7 +81,7 @@ namespace X4_ComplexCalculator.Common.Collection
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void CollectionChangedEvent(object sender, NotifyCollectionChangedEventArgs e)
+        private void CollectionChangedEvent(object? sender, NotifyCollectionChangedEventArgs e)
         {
             // 非同期版イベントが購読されていなければ何もしない
             if (CollectionChangedAsync == null)

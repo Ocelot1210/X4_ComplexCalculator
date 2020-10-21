@@ -109,7 +109,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Resources_OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void Resources_OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems != null)
             {

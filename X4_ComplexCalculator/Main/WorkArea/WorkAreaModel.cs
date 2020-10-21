@@ -129,7 +129,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnModulesChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void OnModulesChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             HasChanged = true;
         }
@@ -140,7 +140,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             string[] names =
             {

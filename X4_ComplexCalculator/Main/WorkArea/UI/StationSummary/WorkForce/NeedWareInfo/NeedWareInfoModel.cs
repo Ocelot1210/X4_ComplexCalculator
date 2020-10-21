@@ -153,7 +153,7 @@ WHERE
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Modules_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void Modules_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             var addWares = new Dictionary<string, Dictionary<string, long>>();
 
@@ -348,7 +348,7 @@ WHERE
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Products_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void Products_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             System.Collections.IList[] items = { e.NewItems, e.OldItems };
 

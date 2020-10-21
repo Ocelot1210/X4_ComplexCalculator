@@ -78,7 +78,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void WorkAreas_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void WorkAreas_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.OldItems != null)
             {
@@ -153,7 +153,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Products_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void Products_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (!(sender is ObservableCollection<ProductsGridItem> products))
             {
@@ -212,7 +212,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
                 {
                     prod.Count -= removedItem.Count;
                 }
-                
+
                 prodBak.Remove(removedItem);
             }
 

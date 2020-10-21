@@ -65,7 +65,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public override void OnPresetsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        public override void OnPresetsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Replace ||
                 e.Action == NotifyCollectionChangedAction.Remove)

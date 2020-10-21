@@ -108,7 +108,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             _ModulesInfo    = modulesInfo;
             _CollectionView = listCollectionView;
             _ModuleReorder  = new ModulesReorder(modulesInfo, listCollectionView);
-            
+
             ((INotifyCollectionChanged)_CollectionView.SortDescriptions).CollectionChanged += ContextMenuOperation_CollectionChanged;
 
             CopyModulesCommand    = new DelegateCommand(CopyModules);
@@ -133,7 +133,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ContextMenuOperation_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void ContextMenuOperation_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             // 未ソートの場合のみ入れ替え可能にする
             _ModuleReorder.SortedColumnCount = _CollectionView.SortDescriptions.Count;
@@ -213,7 +213,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             var items = CollectionViewSource.GetDefaultView(_CollectionView)
                                             .Cast<ModulesGridItem>()
                                             .Where(x => x.IsSelected);
-            
+
             _ModulesInfo.Modules.RemoveRange(items);
 
             // 削除後に全部の選択状態を外さないと余計なものまで選択される
