@@ -60,13 +60,13 @@ namespace LibX4.FileSystem
             var contentXmlPatth = Path.Combine(modDirPath, "content.xml");
             var xml = XDocumentEx.Load(contentXmlPatth);
 
-            ID      = xml.Root.Attribute("id")?.Value      ?? "";
-            Name    = xml.Root.Attribute("name")?.Value    ?? "";
-            Author  = xml.Root.Attribute("author")?.Value  ?? "";
-            Version = xml.Root.Attribute("version")?.Value ?? "";
-            Date    = xml.Root.Attribute("date")?.Value    ?? "";
-            Enabled = xml.Root.Attribute("enabled")?.Value ?? "";
-            Save    = xml.Root.Attribute("save")?.Value    ?? "";
+            ID      = xml.Root?.Attribute("id")?.Value      ?? "";
+            Name    = xml.Root?.Attribute("name")?.Value    ?? "";
+            Author  = xml.Root?.Attribute("author")?.Value  ?? "";
+            Version = xml.Root?.Attribute("version")?.Value ?? "";
+            Date    = xml.Root?.Attribute("date")?.Value    ?? "";
+            Enabled = xml.Root?.Attribute("enabled")?.Value ?? "";
+            Save    = xml.Root?.Attribute("save")?.Value    ?? "";
         }
     }
 }

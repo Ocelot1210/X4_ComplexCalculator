@@ -207,11 +207,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             ModuleEquipment = new ModuleEquipment(Module);
 
             ModuleCount = long.Parse(element.Attribute("count").Value);
-            SelectedMethod = Module.ModuleProductions.FirstOrDefault(x => x.Method == element.Attribute("method").Value);
-            if (SelectedMethod == null)
-            {
-                SelectedMethod = Module.ModuleProductions.First();
-            }
+            SelectedMethod = Module.ModuleProductions.FirstOrDefault(x => x.Method == element.Attribute("method")?.Value)
+                ?? Module.ModuleProductions.First();
             _SelectedMethod = SelectedMethod;
             EditEquipmentCommand = new DelegateCommand(EditEquipment);
 

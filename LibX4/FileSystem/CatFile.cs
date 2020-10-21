@@ -162,8 +162,10 @@ namespace LibX4.FileSystem
             {
                 foreach (var entry in OpenXml(indexFilePath).XPathSelectElements("/index/entry"))
                 {
-                    var entryName = entry.Attribute("name").Value;
-                    var entryValue = entry.Attribute("value").Value.Replace(@"\\", @"\");
+                    var entryName = entry.Attribute("name")?.Value;
+                    if (entryName == null) continue;
+                    var entryValue = entry.Attribute("value")?.Value.Replace(@"\\", @"\");
+                    if (entryValue == null) continue;
                     if (!_Index.TryAdd(entryName, entryValue)) _Index[entryName] = entryValue;
                 }
                 _LoadedIndex.Add(indexFilePath);
