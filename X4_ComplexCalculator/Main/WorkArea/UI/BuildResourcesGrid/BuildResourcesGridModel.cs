@@ -141,7 +141,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async Task OnModulesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private async Task OnModulesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems != null)
             {

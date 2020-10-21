@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -176,7 +176,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Instance_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void Instance_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(LocalizeDictionary.Instance.Culture) && _CurrentDockingManager != null)
             {
@@ -411,7 +411,7 @@ WHERE
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void Model_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {

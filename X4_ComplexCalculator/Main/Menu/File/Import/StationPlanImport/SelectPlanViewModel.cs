@@ -106,7 +106,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void Model_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {
