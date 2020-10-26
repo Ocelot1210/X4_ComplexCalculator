@@ -143,6 +143,7 @@
                 <DataGridTemplateColumn.Header>
                     <DockPanel>
                         <Slider
+                            Width="100"
                             DockPanel.Dock="Left"
                             Maximum="100"
                             Minimum="0"
@@ -155,6 +156,8 @@
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
                         <Slider
+                            Width="100"
+                            Margin="1,0,0,0"
                             VerticalContentAlignment="Center"
                             Maximum="{Binding Ware.MaxPrice}"
                             Minimum="{Binding Ware.MinPrice}"

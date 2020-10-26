@@ -1,4 +1,4 @@
-﻿<UserControl
+<UserControl
     x:Class="X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid.ProductsGrid"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -239,6 +239,7 @@
                 <DataGridTemplateColumn.Header>
                     <DockPanel>
                         <Slider
+                            Width="100"
                             DockPanel.Dock="Left"
                             Maximum="100"
                             Minimum="1"
@@ -251,6 +252,8 @@
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
                         <Slider
+                            Width="100"
+                            Margin="1,0,0,0"
                             VerticalContentAlignment="Center"
                             Maximum="{Binding Ware.MaxPrice}"
                             Minimum="{Binding Ware.MinPrice}"
