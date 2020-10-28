@@ -1,4 +1,4 @@
-<UserControl
+﻿<UserControl
     x:Class="X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid.ProductsGrid"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -242,7 +242,7 @@
                             Width="100"
                             DockPanel.Dock="Left"
                             Maximum="100"
-                            Minimum="1"
+                            Minimum="0"
                             TickFrequency="1"
                             Value="{Binding Data, Source={StaticResource ProxyUnitPricePercent}, Converter={StaticResource SliderValueConverter}, ConverterParameter=50.0}" />
                     </DockPanel>
