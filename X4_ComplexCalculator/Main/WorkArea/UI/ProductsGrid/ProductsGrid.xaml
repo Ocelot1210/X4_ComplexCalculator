@@ -225,7 +225,7 @@
 
 
             <!--  単価(スライダー)  -->
-            <DataGridTemplateColumn MinWidth="100">
+            <DataGridTemplateColumn CanUserResize="False">
                 <!--  ヘッダのスタイル定義  -->
                 <DataGridTemplateColumn.HeaderStyle>
                     <Style TargetType="DataGridColumnHeader">
