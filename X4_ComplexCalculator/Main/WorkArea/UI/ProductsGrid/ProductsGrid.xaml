@@ -225,33 +225,30 @@
 
 
             <!--  単価(スライダー)  -->
-            <DataGridTemplateColumn MinWidth="100">
+            <DataGridTemplateColumn CanUserResize="False">
                 <!--  ヘッダのスタイル定義  -->
                 <DataGridTemplateColumn.HeaderStyle>
                     <Style TargetType="DataGridColumnHeader">
-                        <Setter Property="HorizontalAlignment" Value="Stretch" />
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                         <Setter Property="Padding" Value="0" />
                     </Style>
                 </DataGridTemplateColumn.HeaderStyle>
 
                 <!--  ヘッダの内容定義  -->
                 <DataGridTemplateColumn.Header>
-                    <DockPanel>
-                        <Slider
-                            DockPanel.Dock="Left"
-                            Maximum="100"
-                            Minimum="1"
-                            TickFrequency="1"
-                            Value="{Binding Data, Source={StaticResource ProxyUnitPricePercent}, Converter={StaticResource SliderValueConverter}, ConverterParameter=50.0}" />
-                    </DockPanel>
+                    <Slider
+                        Width="100"
+                        Maximum="100"
+                        Minimum="0"
+                        TickFrequency="1"
+                        Value="{Binding Data, Source={StaticResource ProxyUnitPricePercent}, Converter={StaticResource SliderValueConverter}, ConverterParameter=50.0}" />
                 </DataGridTemplateColumn.Header>
 
                 <!--  セルの内容定義  -->
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
                         <Slider
-                            VerticalContentAlignment="Center"
+                            Width="100"
+                            Margin="1,2,0,0"
                             Maximum="{Binding Ware.MaxPrice}"
                             Minimum="{Binding Ware.MinPrice}"
                             Value="{Binding UnitPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
