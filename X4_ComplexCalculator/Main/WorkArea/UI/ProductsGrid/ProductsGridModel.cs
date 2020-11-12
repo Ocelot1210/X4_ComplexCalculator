@@ -57,13 +57,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// 前回値オプション保存用
         /// </summary>
-        private readonly Dictionary<string, ProductsGridItem> _OptionsBakDict = new Dictionary<string, ProductsGridItem>();
+        private readonly Dictionary<string, ProductsGridItem> _OptionsBakDict = new();
 
 
         /// <summary>
         /// モジュール自動追加作業用
         /// </summary>
-        private readonly Dictionary<string, ModulesGridItem> AutoAddModuleWork = new Dictionary<string, ModulesGridItem>();
+        private readonly Dictionary<string, ModulesGridItem> AutoAddModuleWork = new();
         #endregion
 
 

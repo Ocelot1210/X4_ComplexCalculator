@@ -12,7 +12,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// 装備種別一覧
         /// </summary>
-        private readonly static Dictionary<string, EquipmentType> _EquipmentTypes = new Dictionary<string, EquipmentType>();
+        private readonly static Dictionary<string, EquipmentType> _EquipmentTypes = new();
         #endregion
 
         #region プロパティ

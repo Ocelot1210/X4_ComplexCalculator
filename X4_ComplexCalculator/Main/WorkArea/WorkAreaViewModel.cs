@@ -36,7 +36,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <summary>
         /// モデル
         /// </summary>
-        private readonly WorkAreaModel _Model = new WorkAreaModel();
+        private readonly WorkAreaModel _Model = new();
 
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <summary>
         /// 表示/非表示用メニューアイテム一覧
         /// </summary>
-        public ObservableRangeCollection<VisiblityMenuItem> VisiblityMenuItems { get; } = new ObservableRangeCollection<VisiblityMenuItem>();
+        public ObservableRangeCollection<VisiblityMenuItem> VisiblityMenuItems { get; } = new();
 
 
         /// <summary>

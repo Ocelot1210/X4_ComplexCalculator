@@ -13,7 +13,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// ウェア種別一覧
         /// </summary>
-        private static readonly Dictionary<string, WareGroup> _WareGroups = new Dictionary<string, WareGroup>();
+        private static readonly Dictionary<string, WareGroup> _WareGroups = new();
         #endregion
 
         #region プロパティ

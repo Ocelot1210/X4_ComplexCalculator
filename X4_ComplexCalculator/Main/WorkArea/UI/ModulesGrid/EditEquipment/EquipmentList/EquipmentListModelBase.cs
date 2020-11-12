@@ -37,19 +37,19 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 装備一覧
         /// </summary>
-        protected Dictionary<X4Size, ObservableRangeCollection<EquipmentListItem>> _Equipments = new Dictionary<X4Size, ObservableRangeCollection<EquipmentListItem>>();
+        protected Dictionary<X4Size, ObservableRangeCollection<EquipmentListItem>> _Equipments = new();
 
 
         /// <summary>
         /// 装備中の装備
         /// </summary>
-        protected Dictionary<X4Size, ObservableRangeCollection<EquipmentListItem>> _Equipped = new Dictionary<X4Size, ObservableRangeCollection<EquipmentListItem>>();
+        protected Dictionary<X4Size, ObservableRangeCollection<EquipmentListItem>> _Equipped = new();
 
 
         /// <summary>
         /// 装備可能な個数
         /// </summary>
-        protected Dictionary<X4Size, int> _MaxAmount = new Dictionary<X4Size, int>();
+        protected Dictionary<X4Size, int> _MaxAmount = new();
         #endregion
 
 

@@ -13,7 +13,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// モジュール一覧
         /// </summary>
-        private readonly static Dictionary<string, Module> _Modules = new Dictionary<string, Module>();
+        private readonly static Dictionary<string, Module> _Modules = new();
         #endregion
 
 

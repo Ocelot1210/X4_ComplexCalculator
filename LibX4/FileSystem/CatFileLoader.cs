@@ -27,14 +27,14 @@ namespace LibX4.FileSystem
         /// ロード済みのファイルメタデータ
         /// </summary>
         private readonly Dictionary<string, CatEntry> _LoadedCatEntries
-            = new Dictionary<string, CatEntry>(StringComparer.OrdinalIgnoreCase);
+            = new(StringComparer.OrdinalIgnoreCase);
 
 
         /// <summary>
         /// catファイルのレコード分割用正規表現
         /// </summary>
         private static readonly Regex _CatFileRecordParser
-            = new Regex("^(.+) ([0-9]+) ([0-9]+) ([0-9a-fA-F]+)$", RegexOptions.Compiled);
+            = new("^(.+) ([0-9]+) ([0-9]+) ([0-9a-fA-F]+)$", RegexOptions.Compiled);
 
 
         /// <summary>

@@ -23,8 +23,7 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// 現在のレイアウト
         /// </summary>
-        private readonly ReactivePropertySlim<LayoutMenuItem?> _ActiveLayout
-            = new ReactivePropertySlim<LayoutMenuItem?>();
+        private readonly ReactivePropertySlim<LayoutMenuItem?> _ActiveLayout = new();
 
 
         /// <summary>
@@ -36,7 +35,7 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// Dispose が必要なオブジェクトのコレクション
         /// </summary>
-        private readonly CompositeDisposable _Disposables = new CompositeDisposable();
+        private readonly CompositeDisposable _Disposables = new();
         #endregion
 
 
@@ -44,8 +43,7 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// レイアウト一覧
         /// </summary>
-        public ObservableCollection<LayoutMenuItem> Layouts { get; }
-            = new ObservableCollection<LayoutMenuItem>();
+        public ObservableCollection<LayoutMenuItem> Layouts { get; } = new();
 
 
         /// <summary>

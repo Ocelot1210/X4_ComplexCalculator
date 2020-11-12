@@ -47,13 +47,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         /// <summary>
         /// 保管庫容量情報
         /// </summary>
-        private readonly Dictionary<string, StorageCapacityInfo> _CapacityDict = new Dictionary<string, StorageCapacityInfo>();
+        private readonly Dictionary<string, StorageCapacityInfo> _CapacityDict = new();
 
 
         /// <summary>
         /// 前回値保存用
         /// </summary>
-        private readonly Dictionary<string, StorageAssignGridItem> _OptionsBakDict = new Dictionary<string, StorageAssignGridItem>();
+        private readonly Dictionary<string, StorageAssignGridItem> _OptionsBakDict = new();
         #endregion
 
 

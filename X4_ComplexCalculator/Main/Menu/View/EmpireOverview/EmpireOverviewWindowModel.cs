@@ -27,8 +27,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
         /// <summary>
         /// 製品記憶用ディクショナリ
         /// </summary>
-        private readonly ListDictionary<IList<ProductsGridItem>, ProductsGridItem> _ProductsBak
-            = new ListDictionary<IList<ProductsGridItem>, ProductsGridItem>();
+        private readonly ListDictionary<IList<ProductsGridItem>, ProductsGridItem> _ProductsBak = new();
         #endregion
 
 

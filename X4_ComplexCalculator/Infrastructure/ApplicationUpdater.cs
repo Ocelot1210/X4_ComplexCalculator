@@ -35,8 +35,7 @@ namespace X4_ComplexCalculator.Infrastructure
         /// <summary>
         /// Onova で更新情報を GitHub リリースから取得するリゾルバ
         /// </summary>
-        private static readonly GithubPackageResolver _Resolver
-            = new GithubPackageResolver(_RepoOwner, _RepoName, _AssetName);
+        private static readonly GithubPackageResolver _Resolver = new(_RepoOwner, _RepoName, _AssetName);
         #endregion
 
 
@@ -62,14 +61,13 @@ namespace X4_ComplexCalculator.Infrastructure
         /// <summary>
         /// ダウンロードの進捗
         /// </summary>
-        private readonly ReactivePropertySlim<double> _DownloadProgress
-            = new ReactivePropertySlim<double>();
+        private readonly ReactivePropertySlim<double> _DownloadProgress = new();
 
 
         /// <summary>
         /// キャンセルトークン
         /// </summary>
-        private readonly CancellationTokenSource _Cancellation = new CancellationTokenSource();
+        private readonly CancellationTokenSource _Cancellation = new();
         #endregion
 
 

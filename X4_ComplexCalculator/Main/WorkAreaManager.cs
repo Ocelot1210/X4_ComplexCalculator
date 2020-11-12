@@ -20,7 +20,7 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// ガーベジコレクション用ストップウォッチ
         /// </summary>
-        private readonly Stopwatch _GCStopWatch = new Stopwatch();
+        private readonly Stopwatch _GCStopWatch = new();
 
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// ワークエリア一覧
         /// </summary>
-        public ObservableRangeCollection<WorkAreaViewModel> Documents = new ObservableRangeCollection<WorkAreaViewModel>();
+        public ObservableRangeCollection<WorkAreaViewModel> Documents = new();
         #endregion
 
 

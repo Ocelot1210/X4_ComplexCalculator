@@ -20,7 +20,7 @@ namespace X4_ComplexCalculator.Common
         /// <summary>
         /// 実行間隔計測用ストップウォッチ
         /// </summary>
-        readonly Stopwatch _Stopwatch = new Stopwatch();
+        readonly Stopwatch _Stopwatch = new();
 
         /// <summary>
         /// DoEventsが呼ばれた回数
@@ -30,7 +30,8 @@ namespace X4_ComplexCalculator.Common
         /// <summary>
         /// コールバック処理
         /// </summary>
-        DispatcherOperationCallback _DispatcherOperationCallback = new DispatcherOperationCallback(obj => { ((DispatcherFrame)obj).Continue = false; return null; });
+        DispatcherOperationCallback _DispatcherOperationCallback
+            = new(obj => { ((DispatcherFrame)obj).Continue = false; return null; });
 
         /// <summary>
         /// コンストラクタ

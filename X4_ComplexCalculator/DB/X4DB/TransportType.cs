@@ -13,7 +13,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// カーゴタイプ一覧
         /// </summary>
-        private readonly static Dictionary<string, TransportType> _TransportTypes = new Dictionary<string, TransportType>();
+        private readonly static Dictionary<string, TransportType> _TransportTypes = new();
         #endregion
 
         #region プロパティ

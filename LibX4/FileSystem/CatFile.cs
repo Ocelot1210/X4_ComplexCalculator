@@ -18,7 +18,7 @@ namespace LibX4.FileSystem
         /// Modのファイルパスを分割する正規表現
         /// </summary>
         private static readonly Regex _ParseModRegex
-            = new Regex(@"(extensions\/.+?)\/(.+)", RegexOptions.IgnoreCase);
+            = new(@"(extensions\/.+?)\/(.+)", RegexOptions.IgnoreCase);
         #endregion
 
 
@@ -32,21 +32,19 @@ namespace LibX4.FileSystem
         /// <summary>
         /// 読み込み済み MOD
         /// </summary>
-        private readonly HashSet<string> _LoadedMods
-            = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> _LoadedMods = new(StringComparer.OrdinalIgnoreCase);
 
 
         /// <summary>
         /// 読み込み済み Index ファイル名
         /// </summary>
-        private readonly HashSet<string> _LoadedIndex = new HashSet<string>();
+        private readonly HashSet<string> _LoadedIndex = new();
 
 
         /// <summary>
         /// 読み込み済み Index の内容
         /// </summary>
-        private readonly Dictionary<string, string> _Index
-            = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, string> _Index = new(StringComparer.OrdinalIgnoreCase);
 
 
         /// <summary>

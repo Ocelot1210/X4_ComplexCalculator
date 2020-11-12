@@ -20,7 +20,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
         /// <summary>
         /// インポート対象計画一覧
         /// </summary>
-        private List<StationPlanItem> _PlanItems = new List<StationPlanItem>();
+        private List<StationPlanItem> _PlanItems = new();
 
         /// <summary>
         /// インポート対象計画要素番号

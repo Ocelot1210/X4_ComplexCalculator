@@ -34,19 +34,19 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// 装備サイズ一覧
         /// </summary>
-        public ObservableRangeCollection<X4Size> EquipmentSizes { get; } = new ObservableRangeCollection<X4Size>();
+        public ObservableRangeCollection<X4Size> EquipmentSizes { get; } = new();
 
 
         /// <summary>
         /// 種族一覧
         /// </summary>
-        public ObservablePropertyChangedCollection<FactionsListItem> Factions { get; } = new ObservablePropertyChangedCollection<FactionsListItem>();
+        public ObservablePropertyChangedCollection<FactionsListItem> Factions { get; } = new();
 
 
         /// <summary>
         /// プリセット名
         /// </summary>
-        public ObservableRangeCollection<PresetComboboxItem> Presets { get; } = new ObservableRangeCollection<PresetComboboxItem>();
+        public ObservableRangeCollection<PresetComboboxItem> Presets { get; } = new();
 
 
         /// <summary>

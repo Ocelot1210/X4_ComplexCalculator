@@ -43,7 +43,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
         /// 
         /// イベントの発火順番が前後する事を考慮したいため、集計対象のウェアの情報をここに格納しておく
         /// </remarks>
-        private readonly Dictionary<string, long> AggregateTargetProducts = new Dictionary<string, long>();
+        private readonly Dictionary<string, long> AggregateTargetProducts = new();
 
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
         /// <summary>
         /// 必要ウェア情報詳細
         /// </summary>
-        public ObservableRangeCollection<NeedWareInfoDetailsItem> NeedWareInfoDetails { get; } = new ObservableRangeCollection<NeedWareInfoDetailsItem>();
+        public ObservableRangeCollection<NeedWareInfoDetailsItem> NeedWareInfoDetails { get; } = new();
         #endregion
 
 
