@@ -58,7 +58,7 @@ namespace LibX4.FileSystem
             {
                 var sel = baseXml.XPathEvaluate(elm.Attribute("sel").Value, nsMng);
 
-                if (!(sel is IEnumerable enumerable))
+                if (sel is not IEnumerable enumerable)
                 {
                     continue;
                 }

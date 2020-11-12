@@ -123,7 +123,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         /// <param name="e"></param>
         private void Storages_CollectionPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (!(sender is StoragesGridItem storage))
+            if (sender is not StoragesGridItem storage)
             {
                 return;
             }
@@ -186,7 +186,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
                 return;
             }
 
-            if (!(sender is ProductsGridItem product))
+            if (sender is not ProductsGridItem product)
             {
                 return;
             }

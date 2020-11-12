@@ -51,7 +51,7 @@ namespace X4_ComplexCalculator_CustomControlLibrary
                     }
 
                     collection.CollectionChanged += SortDescription_CollectionChanged;
-                    
+
                     _SortDescriptions = collection;
                     clearPrevValueNeeded = false;
                 }
@@ -73,7 +73,7 @@ namespace X4_ComplexCalculator_CustomControlLibrary
         /// <param name="e"></param>
         private void SortDescription_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (!(sender is SortDescriptionCollection collection))
+            if (sender is not SortDescriptionCollection collection)
             {
                 return;
             }

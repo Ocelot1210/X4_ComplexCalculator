@@ -43,7 +43,7 @@ namespace X4_ComplexCalculator.Common.Behavior
         /// <param name="e"></param>
         private static void VirtualizedSelectionEnabledProppertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
-            if (!(obj is DataGrid dg))
+            if (obj is not DataGrid dg)
             {
                 return;
             }
@@ -71,7 +71,7 @@ namespace X4_ComplexCalculator.Common.Behavior
         /// <param name="e"></param>
         private static void SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
         {
-            if (!(sender is DataGrid dataGrid))
+            if (sender is not DataGrid dataGrid)
             {
                 return;
             }
@@ -144,7 +144,7 @@ namespace X4_ComplexCalculator.Common.Behavior
         /// <param name="e"></param>
         private static void SelectedItemsChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (!(sender is DataGrid dataGrid))
+            if (sender is not DataGrid dataGrid)
             {
                 return;
             }

@@ -63,7 +63,7 @@ namespace X4_ComplexCalculator.Common.Behavior
         /// <param name="e"></param>
         public static void OnCloseChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
-            if (!(obj is Window wnd))
+            if (obj is not Window wnd)
             {
                 wnd = Window.GetWindow(obj);
             }

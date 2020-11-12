@@ -242,7 +242,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 return;
             }
 
-            if (!(sender is ModulesGridItem module))
+            if (sender is not ModulesGridItem module)
             {
                 await Task.CompletedTask;
                 return;
@@ -255,7 +255,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 module.Module.ModuleType.ModuleTypeID == "habitation"
                 )
             {
-                if (!(e is PropertyChangedExtendedEventArgs<long> ev))
+                if (e is not PropertyChangedExtendedEventArgs<long> ev)
                 {
                     return;
                 }

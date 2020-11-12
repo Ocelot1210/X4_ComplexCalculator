@@ -160,7 +160,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <returns></returns>
         public int CompareTo(object? obj)
         {
-            if (!(obj is Module tgt))
+            if (obj is not Module tgt)
             {
                 return 1;
             }

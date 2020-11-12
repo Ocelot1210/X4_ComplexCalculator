@@ -114,7 +114,7 @@ WHERE
         private void Modules_CollectionPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             // ModulesGridItemでなければ何もしない
-            if (!(sender is ModulesGridItem module))
+            if (sender is not ModulesGridItem module)
             {
                 return;
             }
@@ -126,7 +126,7 @@ WHERE
             }
 
             // PropertyChangedExtendedEventArgsでない or モジュール数変更以外なら何もしない
-            if (!(e is PropertyChangedExtendedEventArgs<long> ev) || e.PropertyName != nameof(ModulesGridItem.ModuleCount))
+            if (e is not PropertyChangedExtendedEventArgs<long> ev || e.PropertyName != nameof(ModulesGridItem.ModuleCount))
             {
                 return;
             }
@@ -321,7 +321,7 @@ WHERE
             }
 
             // キャストに失敗したら何もしない
-            if (!(sender is ProductsGridItem product))
+            if (sender is not ProductsGridItem product)
             {
                 return;
             }

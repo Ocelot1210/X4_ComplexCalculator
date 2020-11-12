@@ -88,7 +88,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         /// <returns></returns>
         private async Task OnModulesPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (!(sender is ModulesGridItem module))
+            if (sender is not ModulesGridItem module)
             {
                 await Task.CompletedTask;
                 return;
