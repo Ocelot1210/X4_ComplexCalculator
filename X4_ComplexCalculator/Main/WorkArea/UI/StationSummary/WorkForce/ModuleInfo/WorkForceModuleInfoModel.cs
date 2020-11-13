@@ -41,7 +41,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
         /// <summary>
         /// 労働力の詳細情報
         /// </summary>
-        public ObservableRangeCollection<WorkForceModuleInfoDetailsItem> WorkForceDetails { get; } = new ObservableRangeCollection<WorkForceModuleInfoDetailsItem>();
+        public ObservableRangeCollection<WorkForceModuleInfoDetailsItem> WorkForceDetails { get; } = new();
         #endregion
 
 
@@ -119,7 +119,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
                 return;
             }
 
-            if (!(sender is ModulesGridItem module))
+            if (sender is not ModulesGridItem module)
             {
                 await Task.CompletedTask;
                 return;

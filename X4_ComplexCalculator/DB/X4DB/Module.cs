@@ -13,7 +13,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// モジュール一覧
         /// </summary>
-        private readonly static Dictionary<string, Module> _Modules = new Dictionary<string, Module>();
+        private readonly static Dictionary<string, Module> _Modules = new();
         #endregion
 
 
@@ -160,7 +160,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <returns></returns>
         public int CompareTo(object? obj)
         {
-            if (!(obj is Module tgt))
+            if (obj is not Module tgt)
             {
                 return 1;
             }

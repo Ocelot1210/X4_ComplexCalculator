@@ -22,7 +22,7 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// <summary>
         /// モデル
         /// </summary>
-        private readonly DataExportModel _Model = new DataExportModel();
+        private readonly DataExportModel _Model = new();
 
         /// <summary>
         /// 出力先ファイルパス
@@ -39,7 +39,7 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// <summary>
         /// 処理状態管理
         /// </summary>
-        private readonly BusyNotifier _BusyNotifier = new BusyNotifier();
+        private readonly BusyNotifier _BusyNotifier = new();
         #endregion
 
 

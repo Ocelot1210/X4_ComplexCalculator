@@ -11,7 +11,7 @@ namespace X4_ComplexCalculator.Common.ValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (!(parameter is string param))
+            if (parameter is not string param)
             {
                 throw new ArgumentException($"paran ${parameter} must be string.", nameof(parameter));
             }

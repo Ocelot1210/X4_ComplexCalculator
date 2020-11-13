@@ -19,7 +19,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
         /// <summary>
         /// インポート対象ステーション一覧
         /// </summary>
-        private readonly List<SaveDataStationItem> Stations = new List<SaveDataStationItem>();
+        private readonly List<SaveDataStationItem> Stations = new();
 
 
         /// <summary>

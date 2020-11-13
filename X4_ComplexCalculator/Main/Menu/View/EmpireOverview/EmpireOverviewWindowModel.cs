@@ -27,8 +27,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
         /// <summary>
         /// 製品記憶用ディクショナリ
         /// </summary>
-        private readonly ListDictionary<IList<ProductsGridItem>, ProductsGridItem> _ProductsBak
-            = new ListDictionary<IList<ProductsGridItem>, ProductsGridItem>();
+        private readonly ListDictionary<IList<ProductsGridItem>, ProductsGridItem> _ProductsBak = new();
         #endregion
 
 
@@ -120,7 +119,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
         /// <param name="e"></param>
         private void Products_CollectionPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (!(sender is ProductsGridItem product))
+            if (sender is not ProductsGridItem product)
             {
                 return;
             }
@@ -129,7 +128,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
             {
                 case nameof(ProductsGridItem.Count):
                     {
-                        if (!(e is PropertyChangedExtendedEventArgs<long> ev))
+                        if (e is not PropertyChangedExtendedEventArgs<long> ev)
                         {
                             return;
                         }
@@ -155,7 +154,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
         /// <param name="e"></param>
         private void Products_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            if (!(sender is ObservableCollection<ProductsGridItem> products))
+            if (sender is not ObservableCollection<ProductsGridItem> products)
             {
                 return;
             }

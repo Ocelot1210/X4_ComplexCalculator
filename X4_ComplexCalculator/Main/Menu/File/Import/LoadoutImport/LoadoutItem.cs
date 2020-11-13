@@ -166,7 +166,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
                 {
                     var eq = new List<Equipment>();
 
-                    SettingDatabase.Instance.ExecQuery($"SELECT EquipmentID FROM ModulePresetsEquipment WHERE ModuleID = '{module.ModuleID}' AND PresetID = {(long)dr1["PresetID"]}", (dr2, __) =>
+                    SettingDatabase.Instance.ExecQuery($"SELECT EquipmentID FROM ModulePresetsEquipment WHERE ModuleID = '{module.ModuleID}' AND PresetID = {(long)dr1["PresetID"]}", (dr2, _) =>
                     {
                         var eqp = DB.X4DB.Equipment.Get((string)dr2["EquipmentID"]);
                         if (eqp != null)

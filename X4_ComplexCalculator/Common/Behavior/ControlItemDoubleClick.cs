@@ -57,7 +57,7 @@ namespace X4_ComplexCalculator.Common.Behavior
         /// <param name="e"></param>
         private static void Element_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (!(sender is ItemsControl control))
+            if (sender is not ItemsControl control)
             {
                 return;
             }

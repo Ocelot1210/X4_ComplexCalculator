@@ -21,7 +21,7 @@ namespace X4_ComplexCalculator.Entity
         /// <summary>
         /// 装備品
         /// </summary>
-        private readonly Dictionary<X4Size, List<Equipment>> _Equipments = new Dictionary<X4Size, List<Equipment>>();
+        private readonly Dictionary<X4Size, List<Equipment>> _Equipments = new();
         #endregion
 
 

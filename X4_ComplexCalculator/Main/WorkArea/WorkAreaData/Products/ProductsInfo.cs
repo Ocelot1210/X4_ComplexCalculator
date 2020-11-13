@@ -12,6 +12,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Products
         /// 製品一覧情報
         /// </summary>
         public ObservablePropertyChangedCollection<ProductsGridItem> Products { get; }
-            = new ObservablePropertyChangedCollection<ProductsGridItem>();
+            = new();
     }
 }

@@ -12,7 +12,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// 種族一覧
         /// </summary>
-        private readonly static Dictionary<string, Race> _Races = new Dictionary<string, Race>();
+        private readonly static Dictionary<string, Race> _Races = new();
         #endregion
 
         #region プロパティ

@@ -80,7 +80,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
             }
 
 
-            if (!(sender is ModulesGridItem module))
+            if (sender is not ModulesGridItem module)
             {
                 await Task.CompletedTask;
                 return;
@@ -89,7 +89,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
             // 保管モジュールの場合のみ更新
             if (module.Module.ModuleType.ModuleTypeID == "storage")
             {
-                if (!(e is PropertyChangedExtendedEventArgs<long> ev))
+                if (e is not PropertyChangedExtendedEventArgs<long> ev)
                 {
                     await Task.CompletedTask;
                     return;

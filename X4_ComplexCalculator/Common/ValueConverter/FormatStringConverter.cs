@@ -9,7 +9,7 @@ namespace X4_ComplexCalculator.Common.ValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (values.Length < 1 || !(values[0] is string key))
+            if (values.Length < 1 || values[0] is not string key)
             {
                 throw new ArgumentException("The first parameter must be language key.", nameof(values));
             }

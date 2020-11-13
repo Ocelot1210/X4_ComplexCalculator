@@ -12,7 +12,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// 派閥一覧
         /// </summary>
-        private readonly static Dictionary<string, Faction> _Factions = new Dictionary<string, Faction>();
+        private readonly static Dictionary<string, Faction> _Factions = new();
         #endregion
 
         #region プロパティ

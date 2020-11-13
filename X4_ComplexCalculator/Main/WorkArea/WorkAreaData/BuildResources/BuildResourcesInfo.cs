@@ -11,7 +11,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData.BuildResources
         /// <summary>
         /// 建造リソース情報
         /// </summary>
-        public ObservablePropertyChangedCollection<BuildResourcesGridItem> BuildResources { get; }
-            = new ObservablePropertyChangedCollection<BuildResourcesGridItem>();
+        public ObservablePropertyChangedCollection<BuildResourcesGridItem> BuildResources { get; } = new();
     }
 }

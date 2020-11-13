@@ -21,19 +21,19 @@ namespace LibX4.Lang
         /// <summary>
         /// 言語フィールド文字列から pageID, tID を抽出する正規表現
         /// </summary>
-        private static readonly Regex _GetIDRegex = new Regex(@"\{\s*(\d+)\s*,\s*(\d+)\s*\}");
+        private static readonly Regex _GetIDRegex = new(@"\{\s*(\d+)\s*,\s*(\d+)\s*\}");
 
 
         /// <summary>
         /// エスケープされていない括弧とその内部を削除する正規表現
         /// </summary>
-        private static readonly Regex _RemoveCommentRegex = new Regex(@"(?<!\\)\((?:|.*[^\\])\)");
+        private static readonly Regex _RemoveCommentRegex = new(@"(?<!\\)\((?:|.*[^\\])\)");
 
 
         /// <summary>
         /// エスケープを解除する正規表現
         /// </summary>
-        private static readonly Regex _UnescapeRegex = new Regex(@"\\(.)");
+        private static readonly Regex _UnescapeRegex = new(@"\\(.)");
         #endregion
 
 

@@ -12,7 +12,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// モジュール種別一覧
         /// </summary>
-        static readonly Dictionary<string, ModuleType> _ModuleTypes = new Dictionary<string, ModuleType>();
+        static readonly Dictionary<string, ModuleType> _ModuleTypes = new();
         #endregion
 
         #region プロパティ

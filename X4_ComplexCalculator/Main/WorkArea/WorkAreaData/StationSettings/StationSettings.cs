@@ -42,7 +42,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings
         /// <summary>
         /// 労働者
         /// </summary>
-        public WorkforceManager Workforce { get; } = new WorkforceManager();
+        public WorkforceManager Workforce { get; } = new();
 
 
         /// <summary>

@@ -11,7 +11,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules
         /// <summary>
         /// モジュール一覧
         /// </summary>
-        public ObservablePropertyChangedCollection<ModulesGridItem> Modules { get; }
-            = new ObservablePropertyChangedCollection<ModulesGridItem>();
+        public ObservablePropertyChangedCollection<ModulesGridItem> Modules { get; } = new();
     }
 }

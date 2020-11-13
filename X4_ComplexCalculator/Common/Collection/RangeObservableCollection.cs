@@ -118,7 +118,7 @@ namespace System.Collections.ObjectModel
             }
             else
             {
-                if (!(collection is List<T> list))
+                if (collection is not List<T> list)
                 {
                     list = new List<T>(collection);
                 }
@@ -167,7 +167,7 @@ namespace System.Collections.ObjectModel
 
             OnEssentialPropertiesChanged();
 
-            if (!(collection is IList list))
+            if (collection is not IList list)
                 list = new List<T>(collection);
 
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, index));
@@ -439,7 +439,7 @@ namespace System.Collections.ObjectModel
                 return;
             }
 
-            if (!(collection is IList<T> list))
+            if (collection is not IList<T> list)
                 list = new List<T>(collection);
 
             using (BlockReentrancy())

@@ -36,7 +36,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         /// <summary>
         /// 前回値オプション保存用
         /// </summary>
-        private readonly Dictionary<string, BuildResourcesGridItem> _OptionsBakDict = new Dictionary<string, BuildResourcesGridItem>();
+        private readonly Dictionary<string, BuildResourcesGridItem> _OptionsBakDict = new();
 
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         /// <returns></returns>
         private async Task OnModulesPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (!(sender is ModulesGridItem module))
+            if (sender is not ModulesGridItem module)
             {
                 await Task.CompletedTask;
                 return;

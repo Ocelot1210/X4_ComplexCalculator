@@ -51,12 +51,12 @@ namespace CustomControlLibrary.DataGridInline
         /// <param name="e"></param>
         private void ColumnHeader_Click(object sender, RoutedEventArgs e)
         {
-            if (!(e.OriginalSource is GridViewColumnHeader headerClicked))
+            if (e.OriginalSource is not GridViewColumnHeader headerClicked)
             {
                 return;
             }
 
-            if (!(headerClicked.Column is InlineGridViewColumn column))
+            if (headerClicked.Column is not InlineGridViewColumn column)
             {
                 return;
             }

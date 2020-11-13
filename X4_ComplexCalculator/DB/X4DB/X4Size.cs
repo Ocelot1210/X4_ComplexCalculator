@@ -12,7 +12,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// サイズ一覧
         /// </summary>
-        private readonly static Dictionary<string, X4Size> _Sizes = new Dictionary<string, X4Size>();
+        private readonly static Dictionary<string, X4Size> _Sizes = new();
         #endregion
 
 

@@ -42,13 +42,13 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// 言語一覧管理用
         /// </summary>
-        private readonly LanguagesManager _LangMgr = new LanguagesManager();
+        private readonly LanguagesManager _LangMgr = new();
 
 
         /// <summary>
         /// 作業エリア管理用
         /// </summary>
-        private readonly WorkAreaManager _WorkAreaManager = new WorkAreaManager();
+        private readonly WorkAreaManager _WorkAreaManager = new();
 
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace X4_ComplexCalculator.Main
         /// <summary>
         /// アップデート機能
         /// </summary>
-        private readonly ApplicationUpdater _ApplicationUpdater = new ApplicationUpdater();
+        private readonly ApplicationUpdater _ApplicationUpdater = new();
         #endregion
 
 

@@ -13,7 +13,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// ウェア一覧
         /// </summary>
-        private readonly static Dictionary<string, Ware> _Wares = new Dictionary<string, Ware>();
+        private readonly static Dictionary<string, Ware> _Wares = new();
         #endregion
 
 

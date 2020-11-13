@@ -39,7 +39,7 @@ namespace X4_ComplexCalculator.Common.Behavior
         /// <param name="e"></param>
         private static void EnabledProppertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
-            if (!(obj is DataGrid dg))
+            if (obj is not DataGrid dg)
             {
                 return;
             }
@@ -63,7 +63,7 @@ namespace X4_ComplexCalculator.Common.Behavior
         /// <param name="e"></param>
         private static void DataGrid_CurrentCellChanged(object? sender, EventArgs e)
         {
-            if (!(sender is DataGrid dg) || dg.CurrentCell == null || dg.CurrentCell.Column == null)
+            if (sender is not DataGrid dg || dg.CurrentCell == null || dg.CurrentCell.Column == null)
             {
                 return;
             }

@@ -43,7 +43,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
         /// 
         /// イベントの発火順番が前後する事を考慮したいため、集計対象のウェアの情報をここに格納しておく
         /// </remarks>
-        private readonly Dictionary<string, long> AggregateTargetProducts = new Dictionary<string, long>();
+        private readonly Dictionary<string, long> AggregateTargetProducts = new();
 
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
         /// <summary>
         /// 必要ウェア情報詳細
         /// </summary>
-        public ObservableRangeCollection<NeedWareInfoDetailsItem> NeedWareInfoDetails { get; } = new ObservableRangeCollection<NeedWareInfoDetailsItem>();
+        public ObservableRangeCollection<NeedWareInfoDetailsItem> NeedWareInfoDetails { get; } = new();
         #endregion
 
 
@@ -114,7 +114,7 @@ WHERE
         private void Modules_CollectionPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             // ModulesGridItemでなければ何もしない
-            if (!(sender is ModulesGridItem module))
+            if (sender is not ModulesGridItem module)
             {
                 return;
             }
@@ -126,7 +126,7 @@ WHERE
             }
 
             // PropertyChangedExtendedEventArgsでない or モジュール数変更以外なら何もしない
-            if (!(e is PropertyChangedExtendedEventArgs<long> ev) || e.PropertyName != nameof(ModulesGridItem.ModuleCount))
+            if (e is not PropertyChangedExtendedEventArgs<long> ev || e.PropertyName != nameof(ModulesGridItem.ModuleCount))
             {
                 return;
             }
@@ -321,7 +321,7 @@ WHERE
             }
 
             // キャストに失敗したら何もしない
-            if (!(sender is ProductsGridItem product))
+            if (sender is not ProductsGridItem product)
             {
                 return;
             }
