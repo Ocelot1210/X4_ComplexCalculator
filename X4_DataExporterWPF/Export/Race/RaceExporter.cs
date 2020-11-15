@@ -51,7 +51,8 @@ CREATE TABLE IF NOT EXISTS Race
 (
     RaceID      TEXT    NOT NULL PRIMARY KEY,
     Name        TEXT    NOT NULL,
-    ShortName   TEXT    NOT NULL
+    ShortName   TEXT    NOT NULL,
+    Description TEXT    NOT NULL
 ) WITHOUT ROWID");
             }
 
@@ -62,7 +63,7 @@ CREATE TABLE IF NOT EXISTS Race
             {
                 var items = GetRecords();
 
-                connection.Execute("INSERT INTO Race (RaceID, Name, ShortName) VALUES (@RaceID, @Name, @ShortName)", items);
+                connection.Execute("INSERT INTO Race (RaceID, Name, ShortName, Description) VALUES (@RaceID, @Name, @ShortName, @Description)", items);
             }
         }
 
@@ -82,8 +83,10 @@ CREATE TABLE IF NOT EXISTS Race
                 if (string.IsNullOrEmpty(name)) continue;
 
                 var shortName = _Resolver.Resolve(race.Attribute("shortname")?.Value ?? "");
+                
+                var description = _Resolver.Resolve(race.Attribute("description")?.Value ?? "");
 
-                yield return new Race(raceID, name, shortName);
+                yield return new Race(raceID, name, shortName, description);
             }
         }
     }

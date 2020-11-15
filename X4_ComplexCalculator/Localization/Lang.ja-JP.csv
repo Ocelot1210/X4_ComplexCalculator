@@ -267,3 +267,15 @@ EditPresetName;プリセット名編集
 PresetName;プリセット名
 DeletePresetConfirmMessage;プリセット「{0}」を本当に削除しますか？
 InvalidPresetNameMessage;プリセット名が無効です。\r\n空白文字以外の文字を1文字以上入力して下さい。
+
+
+# ------------------------------------------------------
+# DB Viewer
+# ------------------------------------------------------
+DBViewer;DBビュワー
+# Races
+Races;種族
+RaceID;種族ID
+RaceName;種族名
+ShortName;略称
+Description;説明文

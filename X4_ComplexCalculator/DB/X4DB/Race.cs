@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace X4_ComplexCalculator.DB.X4DB
@@ -15,6 +16,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         private readonly static Dictionary<string, Race> _Races = new();
         #endregion
 
+
         #region プロパティ
         /// <summary>
         /// 種族ID
@@ -26,6 +28,18 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// 種族名
         /// </summary>
         public string Name { get; }
+
+
+        /// <summary>
+        /// 略称
+        /// </summary>
+        public string ShortName { get; }
+
+
+        /// <summary>
+        /// 説明文
+        /// </summary>
+        public string Description { get; }
         #endregion
 
 
@@ -34,10 +48,14 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="raceID">種族ID</param>
         /// <param name="name">種族名</param>
-        private Race(string raceID, string name)
+        /// <param name="shortName">略称</param>
+        /// <param name="description">説明文</param>
+        private Race(string raceID, string name, string shortName, string description)
         {
             RaceID = raceID;
             Name = name;
+            ShortName = shortName;
+            Description = description;
         }
 
 
@@ -47,13 +65,16 @@ namespace X4_ComplexCalculator.DB.X4DB
         public static void Init()
         {
             _Races.Clear();
-            X4Database.Instance.ExecQuery("SELECT RaceID, Name FROM Race", (dr, args) =>
+            X4Database.Instance.ExecQuery("SELECT * FROM Race", (dr, args) =>
             {
                 var id = (string)dr["RaceID"];
                 var name = (string)dr["Name"];
+                var shortName = (string)dr["ShortName"];
+                var description = (string)dr["Description"];
 
-                _Races.Add(id, new Race(id, name));
+                _Races.Add(id, new Race(id, name, shortName, description));
             });
+            var values = _Races.Values;
         }
 
 
@@ -64,6 +85,12 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <returns>種族IDに対応する種族</returns>
         public static Race? Get(string raceID) =>
             _Races.TryGetValue(raceID, out var race) ? race : null;
+
+        /// <summary>
+        /// 全種族を取得
+        /// </summary>
+        public static IEnumerable<Race> GetAll() =>
+            _Races.Select(x => x.Value);
 
 
         /// <summary>

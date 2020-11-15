@@ -149,7 +149,10 @@
             <!--  表示(V)  -->
             <MenuItem Header="{lex:Loc Lang:View}">
                 <!--  帝国の概要  -->
-                <MenuItem Command="{Binding OpenEmpireOverviewWindowCommand}" Header="{lex:Loc Lang:EmpireOverview}" />
+                <MenuItem Command="{Binding OpenEmpireOverviewWindowCommand, Mode=OneTime}" Header="{lex:Loc Lang:EmpireOverview}" />
+
+                <!--  DBビュワー  -->
+                <MenuItem Command="{Binding OpenDBViewerWindowCommand, Mode=OneTime}" Header="{lex:Loc Lang:DBViewer}" />
 
             </MenuItem>
 
