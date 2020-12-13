@@ -18,44 +18,28 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Suppor
     [ContentProperty("OverriddenDisplayEntries")]
     public class EnumDisplayer : IValueConverter
     {
-        private Type _Type;
-        private IDictionary? _DisplayValues;
-        private IDictionary? _RreverseValues;
+        private Type type;
+        private IDictionary displayValues;
+        private IDictionary reverseValues;
+        private List<EnumDisplayEntry> overriddenDisplayEntries;
 
-
-        private List<EnumDisplayEntry> _OverriddenDisplayEntries = new();
-        public List<EnumDisplayEntry> OverriddenDisplayEntries
+        public EnumDisplayer()
         {
-            get
-            {
-                if (_OverriddenDisplayEntries == null)
-                {
-                    _OverriddenDisplayEntries = new List<EnumDisplayEntry>();
-                }
-                return _OverriddenDisplayEntries;
-            }
         }
-
 
         public EnumDisplayer(Type type)
         {
-            if (!type.IsEnum)
-            {
-                throw new ArgumentException("parameter is not an Enumermated type", "value");
-            }
-            _Type = type;
+            this.Type = type;
         }
 
         public Type Type
         {
-            get { return _Type; }
+            get { return type; }
             set
             {
                 if (!value.IsEnum)
-                {
                     throw new ArgumentException("parameter is not an Enumermated type", "value");
-                }
-                _Type = value;
+                this.type = value;
             }
         }
 
@@ -63,94 +47,87 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Suppor
         {
             get
             {
-                Type displayValuesType = typeof(Dictionary<,>).GetGenericTypeDefinition().MakeGenericType(_Type, typeof(string));
+                Type displayValuesType = typeof(Dictionary<,>).GetGenericTypeDefinition().MakeGenericType(type, typeof(string));
+                this.displayValues = (IDictionary)Activator.CreateInstance(displayValuesType);
 
-                _DisplayValues = (IDictionary?)Activator.CreateInstance(displayValuesType);
+                this.reverseValues =
+                   (IDictionary)Activator.CreateInstance(typeof(Dictionary<,>)
+                            .GetGenericTypeDefinition()
+                            .MakeGenericType(typeof(string), type));
 
-                _RreverseValues = (IDictionary?)Activator.CreateInstance(typeof(Dictionary<,>)
-                                                         .GetGenericTypeDefinition()
-                                                         .MakeGenericType(typeof(string), _Type));
-
-                var fields = _Type.GetFields(BindingFlags.Public | BindingFlags.Static);
+                var fields = type.GetFields(BindingFlags.Public | BindingFlags.Static);
                 foreach (var field in fields)
                 {
                     DisplayStringAttribute[] a = (DisplayStringAttribute[])
                                                 field.GetCustomAttributes(typeof(DisplayStringAttribute), false);
 
-                    string? displayString = GetDisplayStringValue(a);
-                    object enumValue = field.GetValue(null)!;
+                    string displayString = GetDisplayStringValue(a);
+                    object enumValue = field.GetValue(null);
 
                     if (displayString == null)
                     {
                         displayString = GetBackupDisplayStringValue(enumValue);
                     }
-
                     if (displayString != null)
                     {
-                        _DisplayValues?.Add(enumValue, displayString);
-                        _RreverseValues?.Add(displayString, enumValue);
+                        displayValues.Add(enumValue, displayString);
+                        reverseValues.Add(displayString, enumValue);
                     }
                 }
-
-                return new List<string>((IEnumerable<string>)_DisplayValues?.Values!).AsReadOnly();
+                return new List<string>((IEnumerable<string>)displayValues.Values).AsReadOnly();
             }
         }
 
-        private string? GetDisplayStringValue(DisplayStringAttribute[] attr)
+        private string GetDisplayStringValue(DisplayStringAttribute[] a)
         {
-            if (attr == null || attr.Length == 0)
-            {
-                return null;
-            }
-
-            DisplayStringAttribute dsa = attr[0];
+            if (a == null || a.Length == 0) return null;
+            DisplayStringAttribute dsa = a[0];
             if (!string.IsNullOrEmpty(dsa.ResourceKey))
             {
-                return new ResourceManager(_Type).GetString(dsa.ResourceKey);
+                ResourceManager rm = new ResourceManager(type);
+                return rm.GetString(dsa.ResourceKey);
             }
-
             return dsa.Value;
         }
 
-        private string? GetBackupDisplayStringValue(object enumValue)
+        private string GetBackupDisplayStringValue(object enumValue)
         {
-            if (_OverriddenDisplayEntries != null && _OverriddenDisplayEntries.Count > 0)
+            if (overriddenDisplayEntries?.Count > 0)
             {
-                var foundEntry = _OverriddenDisplayEntries.Find(entry =>
+                EnumDisplayEntry foundEntry = overriddenDisplayEntries.Find(delegate(EnumDisplayEntry entry)
                 {
-                    var e = Enum.Parse(_Type, entry.EnumValue);
+                    object e = Enum.Parse(type, entry.EnumValue);
                     return enumValue.Equals(e);
                 });
-
                 if (foundEntry != null)
                 {
-                    if (foundEntry.ExcludeFromDisplay)
-                    {
-                        return null;
-                    }
+                    if (foundEntry.ExcludeFromDisplay) return null;
                     return foundEntry.DisplayString;
                 }
             }
-
-            return Enum.GetName(_Type, enumValue);
+            return Enum.GetName(type, enumValue);
         }
 
-
-        object? IValueConverter.Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public List<EnumDisplayEntry> OverriddenDisplayEntries
         {
-            return _DisplayValues?[value];
+            get
+            {
+                if (overriddenDisplayEntries == null)
+                    overriddenDisplayEntries = new List<EnumDisplayEntry>();
+                return overriddenDisplayEntries;
+            }
         }
 
-        object? IValueConverter.ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return _RreverseValues?[value];
-        }
+
+        object IValueConverter.Convert(object value, Type targetType, object parameter, CultureInfo culture) => displayValues[value];
+
+        object IValueConverter.ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => reverseValues[value];
     }
 
     public class EnumDisplayEntry
     {
-        public string EnumValue { get; set; } = "";
-        public string DisplayString { get; set; } = "";
+        public string EnumValue { get; set; }
+        public string DisplayString { get; set; }
         public bool ExcludeFromDisplay { get; set; }
     }
 }

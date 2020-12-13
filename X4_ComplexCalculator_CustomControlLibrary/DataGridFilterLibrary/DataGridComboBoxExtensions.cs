@@ -1,4 +1,8 @@
-﻿using System.Windows;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary
@@ -9,12 +13,12 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary
             DependencyProperty.RegisterAttached("IsTextFilter",
                 typeof(bool), typeof(DataGridComboBoxColumn));
 
-        public static bool GetIsTextFilter(DependencyObject target)
-            => (bool)target.GetValue(IsTextFilterProperty);
+        public static bool GetIsTextFilter(DependencyObject target) => (bool)target.GetValue(IsTextFilterProperty);
 
         public static void SetIsTextFilter(DependencyObject target, bool value)
-            => target.SetValue(IsTextFilterProperty, value);
-
+        {
+            target.SetValue(IsTextFilterProperty, value);
+        }
 
         /// <summary>
         ///  if true ComboBox.IsEditable is true and ComboBox.IsReadOnly is false
@@ -22,12 +26,14 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary
         ///  ComboBox.IsEditable is false and ComboBox.IsReadOnly is true
         /// </summary>
         public static DependencyProperty UserCanEnterTextProperty =
-            DependencyProperty.RegisterAttached("UserCanEnterText", typeof(bool), typeof(DataGridComboBoxColumn));
+            DependencyProperty.RegisterAttached("UserCanEnterText",
+                typeof(bool), typeof(DataGridComboBoxColumn));
 
-        public static bool GetUserCanEnterText(DependencyObject target)
-            => (bool)target.GetValue(UserCanEnterTextProperty);
+        public static bool GetUserCanEnterText(DependencyObject target) => (bool)target.GetValue(UserCanEnterTextProperty);
 
         public static void SetUserCanEnterText(DependencyObject target, bool value)
-            => target.SetValue(UserCanEnterTextProperty, value);
+        {
+            target.SetValue(UserCanEnterTextProperty, value);
+        }
     }
 }

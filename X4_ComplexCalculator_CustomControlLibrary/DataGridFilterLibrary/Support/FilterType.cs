@@ -1,4 +1,9 @@
-﻿namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Support
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Support
 {
     /// <summary>
     /// Corresponds to the FilterCurrentData templates (DataTemplate) 

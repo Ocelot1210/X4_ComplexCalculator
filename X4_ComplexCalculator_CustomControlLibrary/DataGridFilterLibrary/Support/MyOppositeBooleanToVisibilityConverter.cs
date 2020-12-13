@@ -1,7 +1,9 @@
 ﻿using System;
-using System.Globalization;
-using System.Windows;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Windows.Data;
+using System.Globalization;
 
 namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Support
 {
@@ -11,19 +13,19 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Suppor
         {
             if (!(bool)value)
             {
-                return Visibility.Visible;
+                return System.Windows.Visibility.Visible;
             }
             else
             {
-                return Visibility.Collapsed;
+                return System.Windows.Visibility.Collapsed;
             }
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var visibility = (Visibility)value;
+            System.Windows.Visibility visibility = (System.Windows.Visibility)value;
 
-            return visibility == Visibility.Visible ? true : false;
+            return visibility == System.Windows.Visibility.Visible ? true : false;
         }
     }
 }

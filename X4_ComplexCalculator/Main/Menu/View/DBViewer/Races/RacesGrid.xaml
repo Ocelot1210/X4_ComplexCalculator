@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:dgfilter="clr-namespace:X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary;assembly=X4_ComplexCalculator_CustomControlLibrary"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:X4_ComplexCalculator.Main.Menu.View.DBViewer.Races"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -18,6 +19,11 @@
     </UserControl.DataContext>
     <Grid>
         <DataGrid
+            dgfilter:DataGridExtensions.IsClearButtonVisible="False"
+            dgfilter:DataGridExtensions.IsFilterVisible="True"
+            dgfilter:DataGridExtensions.UseBackgroundWorkerForFiltering="True"
+            ColumnHeaderStyle="{StaticResource {ComponentResourceKey TypeInTargetAssembly={x:Type dgfilter:DataGridHeaderFilterControl},
+                                                                     ResourceId=DataGridHeaderFilterControlStyle}}"
             HorizontalScrollBarVisibility="Visible"
             IsReadOnly="True"
             ItemsSource="{Binding RacesView, Mode=OneTime}"
@@ -27,13 +33,22 @@
 
             <DataGrid.Columns>
                 <!--  種族ID  -->
-                <DataGridTextColumn Binding="{Binding RaceID, Mode=OneTime}" Header="{lex:Loc Lang:RaceID}" />
+                <DataGridTextColumn
+                    dgfilter:DataGridColumnExtensions.IsCaseSensitiveSearch="True"
+                    Binding="{Binding RaceID, Mode=OneTime}"
+                    Header="{lex:Loc Lang:RaceID}" />
 
                 <!--  種族名  -->
-                <DataGridTextColumn Binding="{Binding Name, Mode=OneTime}" Header="{lex:Loc Lang:RaceName}" />
+                <DataGridTextColumn
+                    dgfilter:DataGridColumnExtensions.IsCaseSensitiveSearch="True"
+                    Binding="{Binding Name, Mode=OneTime}"
+                    Header="{lex:Loc Lang:RaceName}" />
 
                 <!--  種族略称  -->
-                <DataGridTextColumn Binding="{Binding ShortName, Mode=OneTime}" Header="{lex:Loc Lang:ShortName}" />
+                <DataGridTextColumn
+                    dgfilter:DataGridColumnExtensions.IsCaseSensitiveSearch="True"
+                    Binding="{Binding ShortName, Mode=OneTime}"
+                    Header="{lex:Loc Lang:ShortName}" />
 
                 <!--  説明文  -->
                 <DataGridTextColumn

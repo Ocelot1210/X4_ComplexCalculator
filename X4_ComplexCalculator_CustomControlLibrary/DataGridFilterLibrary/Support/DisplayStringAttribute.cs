@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Support
 {
@@ -8,13 +11,14 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Suppor
     [AttributeUsage(AttributeTargets.Field)]
     public sealed class DisplayStringAttribute : Attribute
     {
-        public string Value { get; } = "";
+        private readonly string value;
+        public string Value => value;
 
-        public string ResourceKey { get; set; } = "";
+        public string ResourceKey { get; set; }
 
         public DisplayStringAttribute(string v)
         {
-            Value = v;
+            this.value = v;
         }
 
         public DisplayStringAttribute()

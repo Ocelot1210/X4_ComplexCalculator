@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.ComponentModel;
-
 
 namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Support
 {
@@ -10,7 +12,7 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Suppor
         #region Metadata
 
         public FilterType Type { get; set; }
-        public string ValuePropertyBindingPath { get; set; }
+        public String ValuePropertyBindingPath { get; set; }
         public Type ValuePropertyType { get; set; }
         public bool IsTypeInitialized { get; set; }
         public bool IsCaseSensitiveSearch { get; set; }
@@ -22,37 +24,42 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Suppor
         #endregion
 
         #region Filter Change Notification
-        public event EventHandler<EventArgs>? FilterChangedEvent;
-        private bool _IsClearData;
+        public event EventHandler<EventArgs> FilterChangedEvent;
+        private bool isClearData;
 
         private void OnFilterChangedEvent()
         {
-            var temp = FilterChangedEvent;
+            EventHandler<EventArgs> temp = FilterChangedEvent;
 
             if (temp != null)
             {
-                bool filterChanged;
+                bool filterChanged = false;
+
                 switch (Type)
                 {
                     case FilterType.Numeric:
                     case FilterType.DateTime:
-                        filterChanged = (Operator != FilterOperator.Undefined || QueryString != String.Empty);
+
+                        filterChanged = Operator != FilterOperator.Undefined || QueryString != String.Empty;
                         break;
 
                     case FilterType.NumericBetween:
                     case FilterType.DateTimeBetween:
-                        _Operator = FilterOperator.Between;
+
+                        _operator = FilterOperator.Between;
                         filterChanged = true;
                         break;
 
                     case FilterType.Text:
-                        _Operator = FilterOperator.Like;
+
+                        _operator = FilterOperator.Like;
                         filterChanged = true;
                         break;
 
                     case FilterType.List:
                     case FilterType.Boolean:
-                        _Operator = FilterOperator.Equals;
+
+                        _operator = FilterOperator.Equals;
                         filterChanged = true;
                         break;
 
@@ -61,100 +68,92 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Suppor
                         break;
                 }
 
-                if (filterChanged && !_IsClearData)
-                {
-                    temp(this, EventArgs.Empty);
-                }
+                if (filterChanged && !isClearData) temp(this, EventArgs.Empty);
             }
         }
         #endregion
-
-
         public void ClearData()
         {
-            _IsClearData = true;
+            isClearData = true;
 
-            Operator = FilterOperator.Undefined;
-            QueryString = "";
-            QueryStringTo = "";
+            Operator           = FilterOperator.Undefined;
+            if (QueryString   != String.Empty) QueryString = null;
+            if (QueryStringTo != String.Empty) QueryStringTo = null;
 
-            _IsClearData = false;
+            isClearData = false;
         }
 
-
-        private FilterOperator _Operator = FilterOperator.Undefined;
+        private FilterOperator _operator;
         public FilterOperator Operator
         {
-            get => _Operator;
+            get { return _operator; }
             set
             {
-                if (_Operator != value)
+                if(_operator != value)
                 {
-                    _Operator = value;
+                    _operator = value;
                     NotifyPropertyChanged(nameof(Operator));
                     OnFilterChangedEvent();
                 }
             }
         }
 
-        private string _QueryString = "";
+        private string queryString;
         public string QueryString
         {
-            get => _QueryString;
+            get { return queryString; }
             set
             {
-                var val = (value is null) ? "" : value;
-                if (val != value)
+                if (queryString != value)
                 {
-                    _QueryString = val;
+                    queryString = value ?? String.Empty;
+
                     NotifyPropertyChanged(nameof(QueryString));
                     OnFilterChangedEvent();
                 }
             }
         }
 
-
-        private string _QueryStringTo = "";
-        public string? QueryStringTo
+        private string queryStringTo;
+        public string QueryStringTo
         {
-            get => _QueryStringTo;
+            get { return queryStringTo; }
             set
             {
-                var val = (value is null) ? "" : value;
-                if (val != value)
+                if (queryStringTo != value)
                 {
-                    _QueryStringTo = val;
+                    queryStringTo = value ?? String.Empty;
+
                     NotifyPropertyChanged(nameof(QueryStringTo));
                     OnFilterChangedEvent();
                 }
             }
         }
 
-
         public FilterData(
-            FilterOperator @operator,
-            FilterType type,
-            string valuePropertyBindingPath,
-            Type valuePropertyType,
-            string queryString,
-            string queryStringTo,
-            bool isTypeInitialized,
-            bool isCaseSensitiveSearch
+            FilterOperator Operator,
+            FilterType Type,
+            String ValuePropertyBindingPath,
+            Type ValuePropertyType,
+            String QueryString,
+            String QueryStringTo,
+            bool IsTypeInitialized,
+            bool IsCaseSensitiveSearch
             )
         {
-            Operator = @operator;
-            Type = type;
-            ValuePropertyBindingPath = valuePropertyBindingPath;
-            ValuePropertyType = valuePropertyType;
-            QueryString   = queryString;
-            QueryStringTo = queryStringTo;
+            this.Operator = Operator;
+            this.Type = Type;
+            this.ValuePropertyBindingPath = ValuePropertyBindingPath;
+            this.ValuePropertyType = ValuePropertyType;
+            this.QueryString   = QueryString;
+            this.QueryStringTo = QueryStringTo;
 
-            IsTypeInitialized = isTypeInitialized;
-            IsCaseSensitiveSearch = isCaseSensitiveSearch;
+            this.IsTypeInitialized    = IsTypeInitialized;
+            this.IsCaseSensitiveSearch = IsCaseSensitiveSearch;
         }
 
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        public event PropertyChangedEventHandler? PropertyChanged;
         public void NotifyPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

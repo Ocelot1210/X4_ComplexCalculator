@@ -1,6 +1,9 @@
 ﻿using System;
-using System.Globalization;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Windows.Data;
+using System.Globalization;
 
 namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Support
 {

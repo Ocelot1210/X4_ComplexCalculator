@@ -1,35 +1,46 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Windows.Data;
-using System.Globalization;
 
 namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Support
 {
     public class DatePickerToQueryStringConverter : IValueConverter
     {
-        public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (string.IsNullOrEmpty(value?.ToString()))
-            {
-                return null;
-            }
+        #region IValueConverter Members
 
-            if (DateTime.TryParse(
-                value.ToString(),
-                culture.DateTimeFormat,
-                DateTimeStyles.None,
-                out DateTime dateTime))
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            object convertedValue;
+
+            if (value?.ToString() == String.Empty)
             {
-                return dateTime;
+                convertedValue = null;
             }
             else
             {
-                return null;
+                DateTime dateTime;
+
+                if (DateTime.TryParse(
+                    value.ToString(),
+                    culture.DateTimeFormat,
+                    System.Globalization.DateTimeStyles.None,
+                    out dateTime))
+                {
+                    convertedValue = dateTime;
+                }
+                else
+                {
+                    convertedValue = null;
+                }
             }
+
+            return convertedValue;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            return value;
-        }
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) => value;
+
+        #endregion
     }
 }

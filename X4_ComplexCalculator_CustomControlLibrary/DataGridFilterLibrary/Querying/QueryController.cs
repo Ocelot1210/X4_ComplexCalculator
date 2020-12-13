@@ -1,92 +1,84 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Linq.Dynamic;
-using System.Windows.Data;
-using System.Windows.Threading;
-using System.Collections.Specialized;
+using System.Text;
 using X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Support;
-
+using System.Collections;
+using System.Windows.Data;
+using System.ComponentModel;
+using System.Threading;
+using System.Diagnostics;
+using System.Windows.Threading;
 
 namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Querying
 {
     public class QueryController
     {
-        private readonly object _LockObject = new();
-
-
-        private readonly Dictionary<string, FilterData> _FiltersForColumns = new();
-
-
-        private Query _Query = new();
-
-
         public FilterData ColumnFilterData { get; set; }
-
         public IEnumerable ItemsSource { get; set; }
 
+        private readonly Dictionary<string, FilterData> filtersForColumns;
+        private Query query;
 
         public Dispatcher CallingThreadDispatcher { get; set; }
-
-
         public bool UseBackgroundWorker { get; set; }
+        private readonly object lockObject;
 
-
-        public QueryController(FilterData columnFilterData, IEnumerable itemsSource, Dispatcher callingThreadDispatcher, bool useBackGroundWorker)
+        public QueryController()
         {
-            ColumnFilterData = columnFilterData;
-            ItemsSource = itemsSource;
-            CallingThreadDispatcher = callingThreadDispatcher;
-            UseBackgroundWorker = useBackGroundWorker;
+            lockObject = new object();
+
+            filtersForColumns = new Dictionary<string, FilterData>();
+            query = new Query();
         }
 
+        public void DoQuery()
+        {
+            DoQuery(false);
+        }
 
-        public void DoQuery(bool force = false)
+        public void DoQuery(bool force)
         {
             ColumnFilterData.IsSearchPerformed = false;
 
-            if (!_FiltersForColumns.ContainsKey(ColumnFilterData.ValuePropertyBindingPath))
+            if (!filtersForColumns.ContainsKey(ColumnFilterData.ValuePropertyBindingPath))
             {
-                _FiltersForColumns.Add(ColumnFilterData.ValuePropertyBindingPath, ColumnFilterData);
+                filtersForColumns.Add(ColumnFilterData.ValuePropertyBindingPath, ColumnFilterData);
             }
             else
             {
-                _FiltersForColumns[ColumnFilterData.ValuePropertyBindingPath] = ColumnFilterData;
+                filtersForColumns[ColumnFilterData.ValuePropertyBindingPath] = ColumnFilterData;
             }
 
-            if (IsRefresh)
+            if (isRefresh)
             {
-                if (_FiltersForColumns.ElementAt(_FiltersForColumns.Count - 1).Value.ValuePropertyBindingPath
+                if (filtersForColumns.ElementAt(filtersForColumns.Count - 1).Value.ValuePropertyBindingPath
                     == ColumnFilterData.ValuePropertyBindingPath)
                 {
-                    RunFiltering(force);
+                    runFiltering(force);
                 }
             }
-            else if (FilteringNeeded)
+            else if (filteringNeeded)
             {
-                RunFiltering(force);
+                runFiltering(force);
             }
 
             ColumnFilterData.IsSearchPerformed = true;
             ColumnFilterData.IsRefresh = false;
         }
 
-        public bool IsCurentControlFirstControl
-        {
-            get => _FiltersForColumns.Count > 0 && 
-                        _FiltersForColumns.ElementAt(0).Value.ValuePropertyBindingPath == ColumnFilterData.ValuePropertyBindingPath;
-        }
+        public bool IsCurentControlFirstControl => filtersForColumns.Count > 0
+    ? filtersForColumns.ElementAt(0).Value.ValuePropertyBindingPath == ColumnFilterData.ValuePropertyBindingPath : false;
 
         public void ClearFilter()
         {
-            int count = _FiltersForColumns.Count;
-
-            for(int i = 0; i < count; i++)
+            int count = filtersForColumns.Count;
+            for (int i = 0; i < count; i++)
             {
-                _FiltersForColumns.ElementAt(i).Value.ClearData();
+                FilterData data = filtersForColumns.ElementAt(i).Value;
+
+                data.ClearData();
             }
 
             DoQuery();
@@ -94,76 +86,68 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Queryi
 
         #region Internal
 
-        private bool IsRefresh
-        {
-            get => _FiltersForColumns.Any(x => x.Value.IsRefresh);
-        }
+        private bool isRefresh => (from f in filtersForColumns where f.Value.IsRefresh select f).Any();
 
-        private bool FilteringNeeded
-        {
-            get => _FiltersForColumns.Count(x => !x.Value.IsSearchPerformed) == 1;
-        }
+        private bool filteringNeeded => (from f in filtersForColumns where !f.Value.IsSearchPerformed select f).Count() == 1;
 
-        private void RunFiltering(bool force)
+        private void runFiltering(bool force)
         {
             bool filterChanged;
 
-            CreateFilterExpressionsAndFilteredCollection(out filterChanged, force);
+            createFilterExpressionsAndFilteredCollection(out filterChanged, force);
 
             if (filterChanged || force)
             {
                 OnFilteringStarted(this, EventArgs.Empty);
 
-                ApplayFilter();
+                applayFilter();
             }
         }
 
-        private void CreateFilterExpressionsAndFilteredCollection(out bool filterChanged, bool force)
+        private void createFilterExpressionsAndFilteredCollection(out bool filterChanged, bool force)
         {
-            var queryCreator = new QueryCreator(_FiltersForColumns);
+            QueryCreator queryCreator = new QueryCreator(filtersForColumns);
 
-            queryCreator.CreateFilter(ref _Query);
+            queryCreator.CreateFilter(ref query);
 
-            filterChanged = (_Query.IsQueryChanged || (_Query.FilterString != "" && IsRefresh));
+            filterChanged = query.IsQueryChanged || (query.FilterString != String.Empty && isRefresh);
 
-            if ((force && _Query.FilterString != "") || 
-                (_Query.FilterString != "" && filterChanged))
+            if ((force && query.FilterString != String.Empty) || (query.FilterString != String.Empty && filterChanged))
             {
-                var collection = ItemsSource;
+                IEnumerable collection = ItemsSource as IEnumerable;
 
-                if (ItemsSource is ListCollectionView col)
+                if (ItemsSource is ListCollectionView)
                 {
-                    collection = col.SourceCollection;
+                    collection = (ItemsSource as ListCollectionView).SourceCollection as IEnumerable;
                 }
 
-
-                if (ItemsSource is INotifyCollectionChanged observable)
+                var observable = ItemsSource as System.Collections.Specialized.INotifyCollectionChanged;
+                if (observable != null)
                 {
-                    observable.CollectionChanged -= new NotifyCollectionChangedEventHandler(Observable_CollectionChanged);
-                    observable.CollectionChanged += new NotifyCollectionChangedEventHandler(Observable_CollectionChanged);
+                    observable.CollectionChanged -= new System.Collections.Specialized.NotifyCollectionChangedEventHandler(observable_CollectionChanged);
+                    observable.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(observable_CollectionChanged);
                 }
 
-                #region Debug
-#if DEBUG
-                System.Diagnostics.Debug.WriteLine("QUERY STATEMENT: " + _Query.FilterString);
+//                #region Debug
+//#if DEBUG
+//                System.Diagnostics.Debug.WriteLine("QUERY STATEMENT: " + query.FilterString);
 
-                string debugParameters = String.Empty;
-                _Query.QueryParameters.ForEach(p =>
+//                string debugParameters = String.Empty;
+//                query.QueryParameters.ForEach(p =>
+//                {
+//                    if (debugParameters.Length > 0) debugParameters += ",";
+//                    debugParameters += p.ToString();
+//                });
+
+//                System.Diagnostics.Debug.WriteLine("QUERY PARAMETRS: " + debugParameters);
+//#endif
+//                #endregion
+
+                if (query.FilterString != String.Empty)
                 {
-                    if (debugParameters.Length > 0) debugParameters += ",";
-                    debugParameters += p?.ToString();
-                });
+                    var result = collection.AsQueryable().Where(query.FilterString, query.QueryParameters.ToArray<object>());
 
-                System.Diagnostics.Debug.WriteLine("QUERY PARAMETRS: " + debugParameters);
-                #endif
-                #endregion
-
-
-                if (_Query.FilterString != "")
-                {
-                    var result = collection.AsQueryable().Where(_Query.FilterString, _Query.QueryParameters.ToArray<object?>());
-
-                    filteredCollection = result.OfType<object?>().ToList();
+                    filteredCollection = result.Cast<object>().ToList();
                 }
             }
             else
@@ -171,62 +155,83 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Queryi
                 filteredCollection = null;
             }
 
-            _Query.StoreLastUsedValues();
+            query.StoreLastUsedValues();
         }
 
-        private void Observable_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-            => DoQuery(true);
-
+        private void observable_CollectionChanged(
+            object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            DoQuery(true);
+        }
 
         #region Internal Filtering
 
-        private IList? filteredCollection;
-        HashSet<object> filteredCollectionHashSet = new();
+        private IList filteredCollection;
+        private HashSet<object> filteredCollectionHashSet;
 
-        void ApplayFilter()
+        private void CommitEdit(ICollectionView view)
         {
-            ICollectionView view = CollectionViewSource.GetDefaultView(ItemsSource);
-
-            if (filteredCollection != null)
+            if (view is IEditableCollectionView)
             {
-                ExecuteFilterAction(() =>
-                {
-                    filteredCollectionHashSet = InitLookupDictionary(filteredCollection);
- 
-                    view.Filter = new Predicate<object>(itemPassesFilter);
+                IEditableCollectionView editableView = view as IEditableCollectionView;
 
-                    OnFilteringFinished(this, EventArgs.Empty);
-                });
-            }
-            else
-            {
-                ExecuteFilterAction(() =>
+                if (editableView.IsAddingNew || editableView.IsEditingItem)
                 {
-                    if (view.Filter != null)
-                    {
-                        view.Filter = null;
-                    }
-
-                    OnFilteringFinished(this, EventArgs.Empty);
-                });
+                    editableView.CommitEdit();
+                    editableView.CommitEdit();
+                }
             }
         }
 
-        private void ExecuteFilterAction(Action action)
+        private void applayFilter()
+        {
+            ICollectionView view = CollectionViewSource.GetDefaultView(ItemsSource);
+
+            CommitEdit(view);
+            if (filteredCollection != null)
+            {
+                executeFilterAction(
+                    new Action(() =>
+                    {
+                        filteredCollectionHashSet = initLookupDictionary(filteredCollection);
+
+                        view.Filter = new Predicate<object>(itemPassesFilter);
+
+                        OnFilteringFinished(this, EventArgs.Empty);
+                    })
+                );
+            }
+            else
+            {
+                executeFilterAction(
+                    new Action(() =>
+                    {
+                        if (view.Filter != null)
+                        {
+                            view.Filter = null;
+                        }
+
+                        OnFilteringFinished(this, EventArgs.Empty);
+                    })
+                );
+            }
+        }
+
+        private void executeFilterAction(Action action)
         {
             if (UseBackgroundWorker)
             {
-                var worker = new BackgroundWorker();
+                BackgroundWorker worker = new BackgroundWorker();
 
-                worker.DoWork += delegate(object sender, DoWorkEventArgs e)
+                worker.DoWork += (object sender, DoWorkEventArgs e) =>
                 {
-                    lock (_LockObject)
+                    lock (lockObject)
                     {
-                        ExecuteActionUsingDispatcher(action);
+                        executeActionUsingDispatcher(action);
                     }
                 };
 
-                worker.RunWorkerCompleted += delegate(object sender, RunWorkerCompletedEventArgs e)
+                worker.RunWorkerCompleted += (object sender, RunWorkerCompletedEventArgs e) =>
                 {
                     if (e.Error != null)
                     {
@@ -240,7 +245,7 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Queryi
             {
                 try
                 {
-                    ExecuteActionUsingDispatcher(action);
+                    executeActionUsingDispatcher(action);
                 }
                 catch (Exception e)
                 {
@@ -249,43 +254,36 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Queryi
             }
         }
 
-        private void ExecuteActionUsingDispatcher(Action action)
+        private void executeActionUsingDispatcher(Action action)
         {
-            if (CallingThreadDispatcher != null && !CallingThreadDispatcher.CheckAccess())
+            if (this.CallingThreadDispatcher?.CheckAccess() == false)
             {
-                CallingThreadDispatcher.Invoke(() => Invoke(action));
+                this.CallingThreadDispatcher.Invoke
+                    (
+                        new Action(() => invoke(action))
+                    );
             }
             else
             {
-                Invoke(action);
+                invoke(action);
             }
         }
 
-        private static void Invoke(Action action)
+        private static void invoke(Action action)
         {
-            Trace.WriteLine("------------------ START APPLAY FILTER ------------------------------");
-            Stopwatch sw = Stopwatch.StartNew();
-
             action.Invoke();
-
-            sw.Stop();
-            Trace.WriteLine("TIME: " + sw.ElapsedMilliseconds);
-            Trace.WriteLine("------------------ STOP APPLAY FILTER ------------------------------");
         }
 
-        private bool itemPassesFilter(object item)
-        {
-            return filteredCollectionHashSet.Contains(item);
-        }
+        private bool itemPassesFilter(object item) => filteredCollectionHashSet.Contains(item);
 
         #region Helpers
-        private HashSet<object> InitLookupDictionary(IList collection)
+        private HashSet<object> initLookupDictionary(IList collection)
         {
             HashSet<object> dictionary;
 
             if (collection != null)
             {
-                dictionary = new HashSet<object>(collection.Cast<object>());
+                dictionary = new HashSet<object>(collection.Cast<object>()/*.ToList()*/);
             }
             else
             {
@@ -300,9 +298,9 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Queryi
         #endregion
 
         #region Progress Notification
-        public event EventHandler<EventArgs>? FilteringStarted;
-        public event EventHandler<EventArgs>? FilteringFinished;
-        public event EventHandler<FilteringEventArgs>? FilteringError;
+        public event EventHandler<EventArgs> FilteringStarted;
+        public event EventHandler<EventArgs> FilteringFinished;
+        public event EventHandler<FilteringEventArgs> FilteringError;
 
         private void OnFilteringStarted(object sender, EventArgs e)
         {

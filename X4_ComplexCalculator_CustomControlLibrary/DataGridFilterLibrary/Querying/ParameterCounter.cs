@@ -3,10 +3,7 @@
     public class ParameterCounter
     {
         private int _Count = 0;
-        public int ParameterNumber
-        {
-            get => _Count - 1;
-        }
+        public int ParameterNumber => _Count - 1;
 
         public ParameterCounter()
         {

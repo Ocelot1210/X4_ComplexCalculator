@@ -121,7 +121,6 @@
                                 Name="PART_ComboBoxFilter"
                                 Grid.Column="2"
                                 Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Converter={StaticResource fontSizeToHeightConverter}, Path=FontSize}"
-                                IsEditable="{Binding Path=AssignedDataGridColumn.UserCanEnterText, RelativeSource={RelativeSource AncestorType={x:Type local:DataGridColumnFilter}}, FallbackValue=False}"
                                 IsReadOnly="False"
                                 IsTextSearchEnabled="True"
                                 SelectedValue="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:DataGridColumnFilter}}, Path=FilterCurrentData.QueryString, Mode=TwoWay, Converter={StaticResource comboBoxToQueryStringConverter}}"

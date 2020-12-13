@@ -1,13 +1,15 @@
 ﻿using System.Collections;
+using System.Windows.Controls;
+using System.Windows.Data;
 using X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Support;
 
 namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Querying
 {
     public class QueryControllerFactory
     {
-        public static QueryController 
+        public static QueryController
             GetQueryController(
-            System.Windows.Controls.DataGrid dataGrid,
+            DataGrid dataGrid,
             FilterData filterData, IEnumerable itemsSource)
         {
             QueryController? query;
@@ -18,14 +20,15 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Queryi
             {
                 //clear the filter if exisits begin
                 System.ComponentModel.ICollectionView view
-                    = System.Windows.Data.CollectionViewSource.GetDefaultView(dataGrid.ItemsSource);
-                if (view != null) view.Filter = null;
+                    = CollectionViewSource.GetDefaultView(dataGrid.ItemsSource);
+                if (view is not null)
+                {
+                    view.Filter = null;
+                }
                 //clear the filter if exisits end
 
-                query = new QueryController(filterData, itemsSource, dataGrid.Dispatcher, DataGridExtensions.GetUseBackgroundWorkerForFiltering(dataGrid));
+                query = new QueryController();
                 DataGridExtensions.SetDataGridFilterQueryController(dataGrid, query);
-
-                return query;
             }
 
             query.ColumnFilterData        = filterData;

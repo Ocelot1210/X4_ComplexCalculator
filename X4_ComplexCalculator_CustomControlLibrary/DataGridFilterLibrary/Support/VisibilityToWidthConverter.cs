@@ -1,7 +1,9 @@
 ﻿using System;
-using System.Globalization;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Windows.Data;
-using System.Windows;
+using System.Globalization;
 
 namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Support
 {
@@ -9,14 +11,11 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Suppor
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var visibility = (Visibility)value;
+            System.Windows.Visibility visibility = (System.Windows.Visibility)value;
 
-            return visibility == Visibility.Visible ? Double.NaN : 0;
+            return visibility == System.Windows.Visibility.Visible ? Double.NaN : 0;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return value;
-        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => value;
     }
 }

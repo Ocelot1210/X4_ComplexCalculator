@@ -1,13 +1,23 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Data;
-using X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Querying;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using System.Collections;
 using X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Support;
+using System.Reflection;
+using X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Querying;
+using System.ComponentModel;
+using System.Windows.Controls.Primitives;
+using X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary;
 
 namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary
 {
@@ -24,18 +34,16 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary
         {
             if (e.Property == DataGridItemsSourceProperty
                 && e.OldValue != e.NewValue
-                && AssignedDataGridColumn is not null && DataGrid is not null && AssignedDataGridColumn is DataGridColumn)
+                && AssignedDataGridColumn != null && DataGrid != null && AssignedDataGridColumn is DataGridColumn)
             {
-                Initialize();
+                initialize();
 
-                //query optimization filed
-                FilterCurrentData.IsRefresh = true;
+                FilterCurrentData.IsRefresh = true;//query optimization filed
 
-                //init query
-                FilterCurrentData_FilterChangedEvent(this, EventArgs.Empty);
+                filterCurrentData_FilterChangedEvent(this, EventArgs.Empty);//init query
 
-                FilterCurrentData.FilterChangedEvent -= new EventHandler<EventArgs>(FilterCurrentData_FilterChangedEvent);
-                FilterCurrentData.FilterChangedEvent += new EventHandler<EventArgs>(FilterCurrentData_FilterChangedEvent);
+                FilterCurrentData.FilterChangedEvent -= filterCurrentData_FilterChangedEvent;
+                FilterCurrentData.FilterChangedEvent += filterCurrentData_FilterChangedEvent;
             }
 
             base.OnPropertyChanged(e);
@@ -43,346 +51,297 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary
         #endregion
 
         #region Properties
-
-        public static readonly DependencyProperty FilterCurrentDataProperty =
-            DependencyProperty.Register(nameof(FilterCurrentData), typeof(FilterData), typeof(DataGridColumnFilter));
-
         public FilterData FilterCurrentData
         {
-            get => (FilterData)GetValue(FilterCurrentDataProperty);
-            set => SetValue(FilterCurrentDataProperty, value);
+            get { return (FilterData)GetValue(FilterCurrentDataProperty); }
+            set { SetValue(FilterCurrentDataProperty, value); }
         }
 
-
-
-
-        public static readonly DependencyProperty AssignedDataGridColumnHeaderProperty =
-            DependencyProperty.Register(nameof(AssignedDataGridColumnHeader), typeof(DataGridColumnHeader), typeof(DataGridColumnFilter));
+        public static readonly DependencyProperty FilterCurrentDataProperty =
+            DependencyProperty.Register("FilterCurrentData", typeof(FilterData), typeof(DataGridColumnFilter));
 
         public DataGridColumnHeader AssignedDataGridColumnHeader
         {
-            get => (DataGridColumnHeader)GetValue(AssignedDataGridColumnHeaderProperty);
-            set => SetValue(AssignedDataGridColumnHeaderProperty, value);
+            get { return (DataGridColumnHeader)GetValue(AssignedDataGridColumnHeaderProperty); }
+            set { SetValue(AssignedDataGridColumnHeaderProperty, value); }
         }
 
-
-
-
-        public static readonly DependencyProperty AssignedDataGridColumnProperty =
-            DependencyProperty.Register(nameof(AssignedDataGridColumn), typeof(DataGridColumn), typeof(DataGridColumnFilter));
+        public static readonly DependencyProperty AssignedDataGridColumnHeaderProperty =
+            DependencyProperty.Register("AssignedDataGridColumnHeader", typeof(DataGridColumnHeader), typeof(DataGridColumnFilter));
 
         public DataGridColumn AssignedDataGridColumn
         {
-            get => (DataGridColumn)GetValue(AssignedDataGridColumnProperty);
-            set => SetValue(AssignedDataGridColumnProperty, value);
+            get { return (DataGridColumn)GetValue(AssignedDataGridColumnProperty); }
+            set { SetValue(AssignedDataGridColumnProperty, value); }
         }
 
-
-
-
-        public static readonly DependencyProperty DataGridProperty =
-            DependencyProperty.Register(nameof(DataGrid), typeof(DataGrid), typeof(DataGridColumnFilter));
+        public static readonly DependencyProperty AssignedDataGridColumnProperty =
+            DependencyProperty.Register("AssignedDataGridColumn", typeof(DataGridColumn), typeof(DataGridColumnFilter));
 
         public DataGrid DataGrid
         {
-            get => (DataGrid)GetValue(DataGridProperty);
-            set => SetValue(DataGridProperty, value);
+            get { return (DataGrid)GetValue(DataGridProperty); }
+            set { SetValue(DataGridProperty, value); }
         }
 
-
-
-
-        public static readonly DependencyProperty DataGridItemsSourceProperty =
-            DependencyProperty.Register(nameof(DataGridItemsSource), typeof(IEnumerable), typeof(DataGridColumnFilter));
+        public static readonly DependencyProperty DataGridProperty =
+            DependencyProperty.Register("DataGrid", typeof(DataGrid), typeof(DataGridColumnFilter));
 
         public IEnumerable DataGridItemsSource
         {
-            get => (IEnumerable)GetValue(DataGridItemsSourceProperty);
-            set => SetValue(DataGridItemsSourceProperty, value);
+            get { return (IEnumerable)GetValue(DataGridItemsSourceProperty); }
+            set { SetValue(DataGridItemsSourceProperty, value); }
         }
 
+        public static readonly DependencyProperty DataGridItemsSourceProperty =
+            DependencyProperty.Register("DataGridItemsSource", typeof(IEnumerable), typeof(DataGridColumnFilter));
 
-
-
-        public static readonly DependencyProperty IsFilteringInProgressProperty =
-            DependencyProperty.Register(nameof(IsFilteringInProgress), typeof(bool), typeof(DataGridColumnFilter));
         public bool IsFilteringInProgress
         {
-            get => (bool)GetValue(IsFilteringInProgressProperty);
-            set => SetValue(IsFilteringInProgressProperty, value);
+            get { return (bool)GetValue(IsFilteringInProgressProperty); }
+            set { SetValue(IsFilteringInProgressProperty, value); }
         }
 
-
-
+        public static readonly DependencyProperty IsFilteringInProgressProperty =
+            DependencyProperty.Register("IsFilteringInProgress", typeof(bool), typeof(DataGridColumnFilter));
 
         public FilterType FilterType => FilterCurrentData != null ? FilterCurrentData.Type : FilterType.Text;
 
-
+        public bool IsTextFilterControl
+        {
+            get { return (bool)GetValue(IsTextFilterControlProperty); }
+            set { SetValue(IsTextFilterControlProperty, value); }
+        }
 
         public static readonly DependencyProperty IsTextFilterControlProperty =
             DependencyProperty.Register("IsTextFilterControl", typeof(bool), typeof(DataGridColumnFilter));
 
-        public bool IsTextFilterControl
+        public bool IsNumericFilterControl
         {
-            get => (bool)GetValue(IsTextFilterControlProperty);
-            set => SetValue(IsTextFilterControlProperty, value);
+            get { return (bool)GetValue(IsNumericFilterControlProperty); }
+            set { SetValue(IsNumericFilterControlProperty, value); }
         }
-
-
-
 
         public static readonly DependencyProperty IsNumericFilterControlProperty =
             DependencyProperty.Register("IsNumericFilterControl", typeof(bool), typeof(DataGridColumnFilter));
 
-        public bool IsNumericFilterControl
+        public bool IsNumericBetweenFilterControl
         {
-            get => (bool)GetValue(IsNumericFilterControlProperty);
-            set => SetValue(IsNumericFilterControlProperty, value);
+            get { return (bool)GetValue(IsNumericBetweenFilterControlProperty); }
+            set { SetValue(IsNumericBetweenFilterControlProperty, value); }
         }
-
-
-
 
         public static readonly DependencyProperty IsNumericBetweenFilterControlProperty =
             DependencyProperty.Register("IsNumericBetweenFilterControl", typeof(bool), typeof(DataGridColumnFilter));
 
-        public bool IsNumericBetweenFilterControl
+        public bool IsBooleanFilterControl
         {
-            get => (bool)GetValue(IsNumericBetweenFilterControlProperty);
-            set => SetValue(IsNumericBetweenFilterControlProperty, value);
+            get { return (bool)GetValue(IsBooleanFilterControlProperty); }
+            set { SetValue(IsBooleanFilterControlProperty, value); }
         }
-
-
-
 
         public static readonly DependencyProperty IsBooleanFilterControlProperty =
             DependencyProperty.Register("IsBooleanFilterControl", typeof(bool), typeof(DataGridColumnFilter));
 
-        public bool IsBooleanFilterControl
+        public bool IsListFilterControl
         {
-            get => (bool)GetValue(IsBooleanFilterControlProperty);
-            set => SetValue(IsBooleanFilterControlProperty, value);
+            get { return (bool)GetValue(IsListFilterControlProperty); }
+            set { SetValue(IsListFilterControlProperty, value); }
         }
-
-
-
 
         public static readonly DependencyProperty IsListFilterControlProperty =
             DependencyProperty.Register("IsListFilterControl", typeof(bool), typeof(DataGridColumnFilter));
 
-        public bool IsListFilterControl
+        public bool IsDateTimeFilterControl
         {
-            get => (bool)GetValue(IsListFilterControlProperty);
-            set => SetValue(IsListFilterControlProperty, value);
+            get { return (bool)GetValue(IsDateTimeFilterControlProperty); }
+            set { SetValue(IsDateTimeFilterControlProperty, value); }
         }
-
-
-
 
         public static readonly DependencyProperty IsDateTimeFilterControlProperty =
             DependencyProperty.Register("IsDateTimeFilterControl", typeof(bool), typeof(DataGridColumnFilter));
 
-        public bool IsDateTimeFilterControl
+        public bool IsDateTimeBetweenFilterControl
         {
-            get => (bool)GetValue(IsDateTimeFilterControlProperty);
-            set => SetValue(IsDateTimeFilterControlProperty, value);
+            get { return (bool)GetValue(IsDateTimeBetweenFilterControlProperty); }
+            set { SetValue(IsDateTimeBetweenFilterControlProperty, value); }
         }
-
-
-
 
         public static readonly DependencyProperty IsDateTimeBetweenFilterControlProperty =
             DependencyProperty.Register("IsDateTimeBetweenFilterControl", typeof(bool), typeof(DataGridColumnFilter));
 
-        public bool IsDateTimeBetweenFilterControl
+        public bool IsFirstFilterControl
         {
-            get => (bool)GetValue(IsDateTimeBetweenFilterControlProperty);
-            set => SetValue(IsDateTimeBetweenFilterControlProperty, value);
+            get { return (bool)GetValue(IsFirstFilterControlProperty); }
+            set { SetValue(IsFirstFilterControlProperty, value); }
         }
-
-
-
 
         public static readonly DependencyProperty IsFirstFilterControlProperty =
             DependencyProperty.Register("IsFirstFilterControl", typeof(bool), typeof(DataGridColumnFilter));
 
-        public bool IsFirstFilterControl
+        public bool IsControlInitialized
         {
-            get => (bool)GetValue(IsFirstFilterControlProperty);
-            set => SetValue(IsFirstFilterControlProperty, value);
+            get { return (bool)GetValue(IsControlInitializedProperty); }
+            set { SetValue(IsControlInitializedProperty, value); }
         }
-
-
-
 
         public static readonly DependencyProperty IsControlInitializedProperty =
             DependencyProperty.Register("IsControlInitialized", typeof(bool), typeof(DataGridColumnFilter));
-
-        public bool IsControlInitialized
-        {
-            get => (bool)GetValue(IsControlInitializedProperty);
-            set => SetValue(IsControlInitializedProperty, value);
-        }
         #endregion
 
-
-
         #region Initialization
-        private void Initialize()
+        private void initialize()
         {
-            if (DataGridItemsSource is not null && AssignedDataGridColumn is not null && DataGrid is not null)
+            if (DataGridItemsSource != null && AssignedDataGridColumn != null && DataGrid != null)
             {
-                InitFilterData();
+                initFilterData();
 
-                InitControlType();
+                initControlType();
 
-                HandleListFilterType();
+                handleListFilterType();
 
-                HookUpCommands();
+                hookUpCommands();
 
                 IsControlInitialized = true;
             }
         }
 
-
-        private void InitFilterData()
+        private void initFilterData()
         {
-            if (FilterCurrentData is null || !FilterCurrentData.IsTypeInitialized)
+            if (FilterCurrentData == null || !FilterCurrentData.IsTypeInitialized)
             {
-                string valuePropertyBindingPath = GetValuePropertyBindingPath(AssignedDataGridColumn);
+                string valuePropertyBindingPath = getValuePropertyBindingPath(AssignedDataGridColumn);
 
+                bool typeInitialized;
 
-                Type valuePropertyType = GetValuePropertyType(
-                    valuePropertyBindingPath, GetItemSourceElementType(out bool typeInitialized));
+                Type valuePropertyType = getValuePropertyType(
+                    valuePropertyBindingPath, getItemSourceElementType(out typeInitialized));
 
-                FilterType filterType = GetFilterType(
-                    valuePropertyType, 
-                    IsComboDataGridColumn(),
-                    IsBetweenType());
+                FilterType filterType = getFilterType(
+                    valuePropertyType,
+                    isComboDataGridColumn(),
+                    isBetweenType());
 
-                var filterOperator = FilterOperator.Undefined;
+                FilterOperator filterOperator = FilterOperator.Undefined;
 
-                string queryString = "";
-                string queryStringTo = "";
-
+                string queryString = string.Empty;
+                string queryStringTo = string.Empty;
 
                 FilterCurrentData = new FilterData(
-                    filterOperator, 
-                    filterType, 
-                    valuePropertyBindingPath, 
-                    valuePropertyType, 
-                    queryString, 
+                    filterOperator,
+                    filterType,
+                    valuePropertyBindingPath,
+                    valuePropertyType,
+                    queryString,
                     queryStringTo,
                     typeInitialized,
                     DataGridColumnExtensions.GetIsCaseSensitiveSearch(AssignedDataGridColumn));
             }
         }
 
-        private void InitControlType()
+        private void initControlType()
         {
-            IsFirstFilterControl    = false;
+            IsFirstFilterControl = false;
 
-            IsTextFilterControl     = false;
-            IsNumericFilterControl  = false;
-            IsBooleanFilterControl  = false;
-            IsListFilterControl     = false;
+            IsTextFilterControl = false;
+            IsNumericFilterControl = false;
+            IsBooleanFilterControl = false;
+            IsListFilterControl = false;
             IsDateTimeFilterControl = false;
 
             IsNumericBetweenFilterControl = false;
             IsDateTimeBetweenFilterControl = false;
 
-            switch (FilterType)
+            if (FilterType == FilterType.Text)
             {
-                case FilterType.Text:
-                    IsTextFilterControl = true;
-                    break;
-
-                case FilterType.Numeric:
-                    IsNumericFilterControl = true;
-                    break;
-
-                case FilterType.List:
-                    IsListFilterControl = true;
-                    break;
-
-                case FilterType.NumericBetween:
-                    IsNumericBetweenFilterControl = true;
-                    break;
-
-                case FilterType.DateTimeBetween:
-                    IsDateTimeBetweenFilterControl = true;
-                    break;
-
-                default:
-                    break;
+                IsTextFilterControl = true;
+            }
+            else if (FilterType == FilterType.Numeric)
+            {
+                IsNumericFilterControl = true;
+            }
+            else if (FilterType == FilterType.Boolean)
+            {
+                IsBooleanFilterControl = true;
+            }
+            else if (FilterType == FilterType.List)
+            {
+                IsListFilterControl = true;
+            }
+            else if (FilterType == FilterType.DateTime)
+            {
+                IsDateTimeFilterControl = true;
+            }
+            else if (FilterType == FilterType.NumericBetween)
+            {
+                IsNumericBetweenFilterControl = true;
+            }
+            else if (FilterType == FilterType.DateTimeBetween)
+            {
+                IsDateTimeBetweenFilterControl = true;
             }
         }
 
-        private void HandleListFilterType()
+        private void handleListFilterType()
         {
             if (FilterCurrentData.Type == FilterType.List)
             {
-                if (Template.FindName("PART_ComboBoxFilter", this) is ComboBox comboBox &&
-                    AssignedDataGridColumn is DataGridComboBoxColumn column)
-                {
+                ComboBox comboBox = Template.FindName("PART_ComboBoxFilter", this) as ComboBox;
+                DataGridComboBoxColumn column = AssignedDataGridColumn as DataGridComboBoxColumn;
 
+                if (comboBox != null && column != null)
+                {
                     if (DataGridComboBoxExtensions.GetIsTextFilter(column))
                     {
                         FilterCurrentData.Type = FilterType.Text;
-                        InitControlType();
-                        return;
+                        initControlType();
                     }
-
-
-                    //list filter type
-
-                    var columnItemsSourceBinding = BindingOperations.GetBinding(column, DataGridComboBoxColumn.ItemsSourceProperty);
-
-                    if (columnItemsSourceBinding == null)
+                    else //list filter type
                     {
-                        if (column.EditingElementStyle.Setters.First(s => ((Setter)s).Property == DataGridComboBoxColumn.ItemsSourceProperty) is Setter styleSetter)
+                        Binding columnItemsSourceBinding = BindingOperations.GetBinding(column, DataGridComboBoxColumn.ItemsSourceProperty);
+
+                        if (columnItemsSourceBinding == null)
                         {
-                            columnItemsSourceBinding = styleSetter.Value as Binding;
+                            Setter styleSetter = column.EditingElementStyle.Setters.First(s => ((Setter)s).Property == DataGridComboBoxColumn.ItemsSourceProperty) as Setter;
+                            if (styleSetter != null)
+                                columnItemsSourceBinding = styleSetter.Value as Binding;
                         }
+
+                        comboBox.DisplayMemberPath = column.DisplayMemberPath;
+                        comboBox.SelectedValuePath = column.SelectedValuePath;
+
+                        if (columnItemsSourceBinding != null)
+                        {
+                            BindingOperations.SetBinding(comboBox, ItemsControl.ItemsSourceProperty, columnItemsSourceBinding);
+                        }
+
+                        comboBox.RequestBringIntoView
+                            += new RequestBringIntoViewEventHandler(setComboBindingAndHanldeUnsetValue);
                     }
-
-                    comboBox.DisplayMemberPath = column.DisplayMemberPath;
-                    comboBox.SelectedValuePath = column.SelectedValuePath;
-
-                    if (columnItemsSourceBinding != null)
-                    {
-                        BindingOperations.SetBinding(comboBox, ComboBox.ItemsSourceProperty, columnItemsSourceBinding);
-                    }
-
-                    comboBox.RequestBringIntoView
-                        += new RequestBringIntoViewEventHandler(setComboBindingAndHanldeUnsetValue);
                 }
             }
         }
 
         private void setComboBindingAndHanldeUnsetValue(object sender, RequestBringIntoViewEventArgs e)
         {
-            if (sender is not ComboBox combo ||
-                AssignedDataGridColumn is not DataGridComboBoxColumn column)
-            {
-                return;
-            }
+            ComboBox combo = sender as ComboBox;
+            DataGridComboBoxColumn column = AssignedDataGridColumn as DataGridComboBoxColumn;
 
             if (column.ItemsSource == null)
             {
-                if (combo?.ItemsSource != null)
+                if (combo.ItemsSource != null)
                 {
-                    var list = combo.ItemsSource.Cast<object>().ToList();
+                    IList list = combo.ItemsSource.Cast<object>().ToList();
 
-                    if (list.Any() && list[0] != DependencyProperty.UnsetValue)
+                    if (list.Count > 0 && list[0] != DependencyProperty.UnsetValue)
                     {
                         combo.RequestBringIntoView -=
                             new RequestBringIntoViewEventHandler(setComboBindingAndHanldeUnsetValue);
 
                         list.Insert(0, DependencyProperty.UnsetValue);
 
-                        combo.DisplayMemberPath = column?.DisplayMemberPath;
-                        combo.SelectedValuePath = column?.SelectedValuePath;
+                        combo.DisplayMemberPath = column.DisplayMemberPath;
+                        combo.SelectedValuePath = column.SelectedValuePath;
 
                         combo.ItemsSource = list;
                     }
@@ -393,8 +352,8 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary
                 combo.RequestBringIntoView -=
                     new RequestBringIntoViewEventHandler(setComboBindingAndHanldeUnsetValue);
 
-                IList? comboList = null;
-                IList? columnList = null;
+                IList comboList = null;
+                IList columnList = null;
 
                 if (combo.ItemsSource != null)
                 {
@@ -403,8 +362,8 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary
 
                 columnList = column.ItemsSource.Cast<object>().ToList();
 
-                if (comboList == null ||
-                    (columnList.Count > 0 && columnList.Count + 1 != comboList.Count))
+                if (comboList == null
+                    || columnList.Count > 0 && columnList.Count + 1 != comboList.Count)
                 {
                     columnList = column.ItemsSource.Cast<object>().ToList();
                     columnList.Insert(0, DependencyProperty.UnsetValue);
@@ -417,41 +376,50 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary
             }
         }
 
-        private string GetValuePropertyBindingPath(DataGridColumn column)
+        private string getValuePropertyBindingPath(DataGridColumn column)
         {
-            var path = "";
+            string path = string.Empty;
 
-            if (column is DataGridBoundColumn bc)
+            if (column is DataGridBoundColumn)
             {
-                return (bc.Binding as Binding)?.Path.Path ?? "";
+                DataGridBoundColumn bc = column as DataGridBoundColumn;
+                path = (bc.Binding as Binding).Path.Path;
             }
-
-            if (column is DataGridTemplateColumn tc)
+            else if (column is DataGridTemplateColumn)
             {
-                var templateContent = tc.CellTemplate.LoadContent();
+                DataGridTemplateColumn tc = column as DataGridTemplateColumn;
 
-                if (templateContent is not null && templateContent is TextBlock textBlock)
+                object templateContent = tc.CellTemplate.LoadContent();
+
+                if (templateContent != null && templateContent is TextBlock)
                 {
-                    BindingExpression binding = textBlock.GetBindingExpression(TextBlock.TextProperty);
+                    TextBlock block = templateContent as TextBlock;
 
-                    return binding.ParentBinding.Path.Path;
+                    BindingExpression binding = block.GetBindingExpression(TextBlock.TextProperty);
+
+                    path = binding.ParentBinding.Path.Path;
                 }
-                return "";
             }
-
-            if (column is DataGridComboBoxColumn comboColumn)
+            else if (column is DataGridComboBoxColumn)
             {
-                path = ((comboColumn.SelectedValueBinding as Binding) ??
-                        (comboColumn.SelectedItemBinding as Binding) ??
-                        (comboColumn.SelectedValueBinding as Binding))?.Path.Path;
+                DataGridComboBoxColumn comboColumn = column as DataGridComboBoxColumn;
 
-                if (comboColumn.SelectedItemBinding is not null && comboColumn.SelectedValueBinding is null)
+                path = null;
+
+                Binding binding = comboColumn.SelectedValueBinding as Binding ?? comboColumn.SelectedItemBinding as Binding ?? comboColumn.SelectedValueBinding as Binding;
+
+                if (binding != null)
                 {
-                    if (path is not null && path.Trim().Length > 0)
+                    path = binding.Path.Path;
+                }
+
+                if (comboColumn.SelectedItemBinding != null && comboColumn.SelectedValueBinding == null)
+                {
+                    if (path?.Trim().Length > 0)
                     {
                         if (DataGridComboBoxExtensions.GetIsTextFilter(comboColumn))
                         {
-                            path += "." + comboColumn.DisplayMemberPath; 
+                            path += "." + comboColumn.DisplayMemberPath;
                         }
                         else
                         {
@@ -459,23 +427,20 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary
                         }
                     }
                 }
-
-                return path ?? "";
             }
-
 
             return path;
         }
 
-        private Type GetValuePropertyType(string path, Type? elementType)
+        private Type getValuePropertyType(string path, Type elementType)
         {
-            var type = typeof(object);
+            Type type = typeof(object);
 
-            if (elementType is not null)
+            if (elementType != null)
             {
-                var properties = path.Split(".".ToCharArray()[0]);
+                string[] properties = path.Split("."[0]);
 
-                PropertyInfo? pi = null;
+                PropertyInfo pi = null;
 
                 if (properties.Length == 1)
                 {
@@ -494,7 +459,6 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary
                     }
                 }
 
-
                 if (pi != null)
                 {
                     type = pi.PropertyType;
@@ -504,21 +468,21 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary
             return type;
         }
 
-        private Type? GetItemSourceElementType(out bool typeInitialized)
+        private Type getItemSourceElementType(out bool typeInitialized)
         {
             typeInitialized = false;
 
-            Type? elementType = null;
+            Type elementType = null;
 
-            var l = DataGridItemsSource as IList;
+            IList l = DataGridItemsSource as IList;
 
-            if (l is not null && l.Count > 0)
+            if (l?.Count > 0)
             {
-                var obj = l[0];
+                object obj = l[0];
 
-                if (obj is not null)
+                if (obj != null)
                 {
-                    elementType = obj.GetType();
+                    elementType = l[0].GetType();
                     typeInitialized = true;
                 }
                 else
@@ -526,14 +490,15 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary
                     elementType = typeof(object);
                 }
             }
-
-            if (l is null)
+            if (l == null)
             {
-                if (DataGridItemsSource is ListCollectionView lw && lw.Count > 0)
-                {
-                    var obj = lw.CurrentItem;
+                ListCollectionView lw = DataGridItemsSource as ListCollectionView;
 
-                    if (obj is not null)
+                if (lw?.Count > 0)
+                {
+                    object obj = lw.CurrentItem;
+
+                    if (obj != null)
                     {
                         elementType = lw.CurrentItem.GetType();
                         typeInitialized = true;
@@ -548,40 +513,80 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary
             return elementType;
         }
 
-
-        private FilterType GetFilterType(
-            Type valuePropertyType, 
+        private FilterType getFilterType(
+            Type valuePropertyType,
             bool isAssignedDataGridColumnComboDataGridColumn,
             bool isBetweenType)
         {
-            Type type = Nullable.GetUnderlyingType(valuePropertyType) ??
-                        valuePropertyType;
-
             FilterType filterType;
 
             if (isAssignedDataGridColumnComboDataGridColumn)
             {
                 filterType = FilterType.List;
             }
+            else if (valuePropertyType == typeof(bool) || valuePropertyType == typeof(bool?))
+            {
+                filterType = FilterType.Boolean;
+            }
+            else if (valuePropertyType == typeof(sbyte) || valuePropertyType == typeof(sbyte?))
+            {
+                filterType = FilterType.Numeric;
+            }
+            else if (valuePropertyType == typeof(byte) || valuePropertyType == typeof(byte?))
+            {
+                filterType = FilterType.Numeric;
+            }
+            else if (valuePropertyType == typeof(short) || valuePropertyType == typeof(short?))
+            {
+                filterType = FilterType.Numeric;
+            }
+            else if (valuePropertyType == typeof(ushort) || valuePropertyType == typeof(ushort?))
+            {
+                filterType = FilterType.Numeric;
+            }
+            else if (valuePropertyType == typeof(int) || valuePropertyType == typeof(int?))
+            {
+                filterType = FilterType.Numeric;
+            }
+            else if (valuePropertyType == typeof(uint) || valuePropertyType == typeof(uint?))
+            {
+                filterType = FilterType.Numeric;
+            }
+            else if (valuePropertyType == typeof(long) || valuePropertyType == typeof(long?))
+            {
+                filterType = FilterType.Numeric;
+            }
+            else if (valuePropertyType == typeof(float) || valuePropertyType == typeof(float?))
+            {
+                filterType = FilterType.Numeric;
+            }
+            else if (valuePropertyType == typeof(long) || valuePropertyType == typeof(long?))
+            {
+                filterType = FilterType.Numeric;
+            }
+            else if (valuePropertyType == typeof(decimal) || valuePropertyType == typeof(decimal?))
+            {
+                filterType = FilterType.Numeric;
+            }
+            else if (valuePropertyType == typeof(float) || valuePropertyType == typeof(float?))
+            {
+                filterType = FilterType.Numeric;
+            }
+            else if (valuePropertyType == typeof(double) || valuePropertyType == typeof(double?))
+            {
+                filterType = FilterType.Numeric;
+            }
+            else if (valuePropertyType == typeof(long) || valuePropertyType == typeof(long?))
+            {
+                filterType = FilterType.Numeric;
+            }
+            else if (valuePropertyType == typeof(DateTime) || valuePropertyType == typeof(DateTime?))
+            {
+                filterType = FilterType.DateTime;
+            }
             else
             {
-                filterType = Type.GetTypeCode(type) switch
-                {
-                    TypeCode.Boolean => FilterType.Boolean,
-                    TypeCode.SByte => FilterType.Numeric,
-                    TypeCode.Byte => FilterType.Numeric,
-                    TypeCode.Int16 => FilterType.Numeric,
-                    TypeCode.UInt16 => FilterType.Numeric,
-                    TypeCode.Int32 => FilterType.Numeric,
-                    TypeCode.UInt32 => FilterType.Numeric,
-                    TypeCode.Int64 => FilterType.Numeric,
-                    TypeCode.UInt64 => FilterType.Numeric,
-                    TypeCode.Single => FilterType.Numeric,
-                    TypeCode.Decimal => FilterType.Numeric,
-                    TypeCode.Double => FilterType.Numeric,
-                    TypeCode.DateTime => FilterType.DateTime,
-                    _ => FilterType.Text
-                };
+                filterType = FilterType.Text;
             }
 
             if (filterType == FilterType.Numeric && isBetweenType)
@@ -596,35 +601,31 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary
             return filterType;
         }
 
-        private bool IsComboDataGridColumn()
-        {
-            return AssignedDataGridColumn is DataGridComboBoxColumn;
-        }
+        private bool isComboDataGridColumn() => AssignedDataGridColumn is DataGridComboBoxColumn;
 
-        private bool IsBetweenType()
-        {
-            return DataGridColumnExtensions.GetIsBetweenFilterControl(AssignedDataGridColumn);
-        }
+        private bool isBetweenType() => DataGridColumnExtensions.GetIsBetweenFilterControl(AssignedDataGridColumn);
 
-        private void HookUpCommands()
+        private void hookUpCommands()
         {
             if (DataGridExtensions.GetClearFilterCommand(DataGrid) == null)
             {
-                DataGridExtensions.SetClearFilterCommand(DataGrid, new DataGridFilterCommand(ClearQuery));
+                DataGridExtensions.SetClearFilterCommand(
+                    DataGrid, new DataGridFilterCommand(clearQuery));
             }
         }
+
+        private
         #endregion
 
-
         #region Querying
-        void FilterCurrentData_FilterChangedEvent(object? sender, EventArgs e)
+        void filterCurrentData_FilterChangedEvent(object sender, EventArgs e)
         {
             if (DataGrid != null)
             {
                 QueryController query = QueryControllerFactory.GetQueryController(
                     DataGrid, FilterCurrentData, DataGridItemsSource);
 
-                AddFilterStateHandlers(query);
+                addFilterStateHandlers(query);
 
                 query.DoQuery();
 
@@ -632,36 +633,37 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary
             }
         }
 
-        private void ClearQuery(object parameter)
+        private void clearQuery(object parameter)
         {
             if (DataGrid != null)
             {
-                var query = QueryControllerFactory.GetQueryController(DataGrid, FilterCurrentData, DataGridItemsSource);
+                QueryController query = QueryControllerFactory.GetQueryController(
+                    DataGrid, FilterCurrentData, DataGridItemsSource);
 
                 query.ClearFilter();
             }
         }
 
-        private void AddFilterStateHandlers(QueryController query)
+        private void addFilterStateHandlers(QueryController query)
         {
-            query.FilteringStarted -= new EventHandler<EventArgs>(Query_FilteringStarted);
-            query.FilteringFinished -= new EventHandler<EventArgs>(Query_FilteringFinished);
+            query.FilteringStarted -= query_FilteringStarted;
+            query.FilteringFinished -= query_FilteringFinished;
 
-            query.FilteringStarted += new EventHandler<EventArgs>(Query_FilteringStarted);
-            query.FilteringFinished += new EventHandler<EventArgs>(Query_FilteringFinished);
+            query.FilteringStarted += query_FilteringStarted;
+            query.FilteringFinished += query_FilteringFinished;
         }
 
-        void Query_FilteringFinished(object? sender, EventArgs e)
+        private void query_FilteringFinished(object sender, EventArgs e)
         {
-            if (FilterCurrentData.Equals((sender as QueryController)?.ColumnFilterData))
+            if (FilterCurrentData != null && FilterCurrentData.Equals((sender as QueryController).ColumnFilterData))
             {
                 IsFilteringInProgress = false;
             }
         }
 
-        void Query_FilteringStarted(object? sender, EventArgs e)
+        private void query_FilteringStarted(object sender, EventArgs e)
         {
-            if (FilterCurrentData.Equals((sender as QueryController)?.ColumnFilterData))
+            if (FilterCurrentData != null && FilterCurrentData.Equals((sender as QueryController).ColumnFilterData))
             {
                 IsFilteringInProgress = true;
             }

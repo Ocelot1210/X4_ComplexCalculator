@@ -1,54 +1,61 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Querying
 {
     public class Query
     {
-        public string FilterString { get; set; } = "";
+        public Query()
+        {
+            lastFilterString    = String.Empty;
+            lastQueryParameters = new List<object>();
+        }
 
-        public List<object?> QueryParameters { get; set; } = new();
+        public string        FilterString { get; set; }
+        public List<object>  QueryParameters { get; set; }
 
-
-        private string _LastFilterString = "";
-
-
-        private List<object?> _LastQueryParameters = new();
-
-
+        private string       lastFilterString { get; set; }
+        private List<object> lastQueryParameters { get; set; }
 
         public bool IsQueryChanged
         {
             get
             {
-                if (FilterString != _LastFilterString)
+                bool queryChanged = false;
+
+                if (FilterString != lastFilterString)
                 {
-                    return true;
+                    queryChanged = true;
                 }
-
-                if (QueryParameters.Count != _LastQueryParameters.Count)
+                else
                 {
-                    return true;
-                }
-
-                using var qe = QueryParameters.GetEnumerator();
-                using var lqe = _LastQueryParameters.GetEnumerator();
-
-                while (qe.MoveNext() && lqe.MoveNext())
-                {
-                    if (!qe.Current?.Equals(lqe.Current) == true)
+                    if (QueryParameters.Count != lastQueryParameters.Count)
                     {
-                        return true;
+                        queryChanged = true;
+                    }
+                    else
+                    {
+                        for (int i = 0; i < QueryParameters.Count; i++)
+                        {
+                            if (!QueryParameters[i].Equals(lastQueryParameters[i]))
+                            {
+                                queryChanged = true;
+                                break;
+                            }
+                        }
                     }
                 }
 
-                return false;
+                return queryChanged;
             }
         }
 
         public void StoreLastUsedValues()
         {
-            _LastFilterString    = FilterString;
-            _LastQueryParameters = QueryParameters;
+            lastFilterString    = FilterString;
+            lastQueryParameters = QueryParameters;
         }
     }
 }

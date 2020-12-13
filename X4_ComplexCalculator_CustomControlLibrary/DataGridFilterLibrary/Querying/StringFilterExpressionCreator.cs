@@ -8,7 +8,7 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Queryi
 {
     internal class StringFilterExpressionCreator
     {
-        const string WildcardAnyString = "%";
+        private const string WildcardAnyString = "%";
 
         private enum StringExpressionFunction
         {
@@ -18,14 +18,14 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Queryi
             EndsWith = 3
         }
 
-        FilterData filterData;
-        List<object?> paramseters;
-        ParameterCounter paramCounter;
+        private FilterData filterData;
+        private List<object> paramseters;
+        private ParameterCounter paramCounter;
 
-        internal int ParametarsCrated { get { return paramseters.Count; } }
+        internal int ParametarsCrated => paramseters.Count;
 
         internal StringFilterExpressionCreator(
-            ParameterCounter paramCounter, FilterData filterData, List<object?> paramseters)
+            ParameterCounter paramCounter, FilterData filterData, List<object> paramseters)
         {
             this.paramCounter = paramCounter;
             this.filterData = filterData;
@@ -35,8 +35,8 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Queryi
         internal string Create()
         {
             StringBuilder filter = new StringBuilder();
-            
-            List<string> filterList = parse(filterData.QueryString);
+
+            List<string> filterList = parse(this.filterData.QueryString);
 
             for (int i = 0; i < filterList.Count; i++)
             {
@@ -56,7 +56,7 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Queryi
             string expressionValue = String.Empty;
             StringExpressionFunction function = StringExpressionFunction.Undefined;
 
-            string? token;
+            string? token = null;
             do
             {
                 token = i < filterString.Length ? filterString[i].ToString() : null;
@@ -94,7 +94,7 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Queryi
                     && function != StringExpressionFunction.Undefined
                     && expressionValue != String.Empty)
                 {
-                    string expressionValueCopy = new string(expressionValue.ToArray());
+                    string expressionValueCopy = String.Copy(expressionValue);
 
                     expressionValueCopy = expressionValueCopy.Replace(WildcardAnyString, String.Empty);
 
@@ -142,7 +142,7 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Queryi
                 filter.Append(" != -1 ");
             }
 
-            paramseters.Add(filterData.IsCaseSensitiveSearch 
+            paramseters.Add(filterData.IsCaseSensitiveSearch
                 ? StringComparison.CurrentCulture : StringComparison.CurrentCultureIgnoreCase);
 
             return filter.ToString();

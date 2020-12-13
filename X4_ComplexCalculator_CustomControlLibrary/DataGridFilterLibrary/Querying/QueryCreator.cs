@@ -8,7 +8,7 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Queryi
 {
     public class QueryCreator
     {
-        private List<object?> Parameters { get; set; } = new();
+        private List<object> Parameters = new();
 
         private readonly Dictionary<string, FilterData> filtersForColumns;
         private ParameterCounter paramCounter;
@@ -67,7 +67,7 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Queryi
                 (filterData.QueryString != String.Empty || filterData.QueryStringTo != String.Empty)
                 )
             {
-                if (!string.IsNullOrEmpty(filterData.QueryString))
+                if (filterData.QueryString != String.Empty)
                 {
                     createFilterExpression(
                         filterData, 
@@ -75,7 +75,7 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Queryi
                         filter,
                         getOperatorString(FilterOperator.GreaterThanOrEqual));
                 }
-                if (!string.IsNullOrEmpty(filterData.QueryStringTo))
+                if (filterData.QueryStringTo != String.Empty)
                 {
                     if (filter.Length > 0) filter.Append(" AND ");
 
@@ -86,7 +86,7 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Queryi
                         getOperatorString(FilterOperator.LessThanOrEqual));
                 }
             }
-            else if (!string.IsNullOrEmpty(filterData.QueryString)
+            else if (filterData.QueryString != String.Empty
                 &&
                 filterData.Operator != FilterOperator.Undefined)
             {
@@ -109,7 +109,8 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Queryi
         {
             filter.Append(filterData.ValuePropertyBindingPath);
 
-            if (trySetParameterValue(out var parameterValue, queryString, filterData.ValuePropertyType))
+
+            if (trySetParameterValue(out object parameterValue, queryString, filterData.ValuePropertyType))
             {
                 Parameters.Add(parameterValue);
 
@@ -124,14 +125,14 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Queryi
         }
 
         private bool trySetParameterValue(
-            out object? parameterValue, string stringValue, Type type)
+            out object parameterValue, string stringValue, Type type)
         {
             parameterValue = null;
             bool valueIsSet;
 
             try
             {
-                if (type == typeof(Nullable<DateTime>) || type == typeof(DateTime))
+                if (type == typeof(DateTime?) || type == typeof(DateTime))
                 {
                     parameterValue = DateTime.Parse(stringValue);
                 }

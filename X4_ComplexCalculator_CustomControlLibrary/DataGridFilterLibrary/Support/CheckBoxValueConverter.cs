@@ -1,29 +1,40 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Windows.Data;
 
 namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Support
 {
     public class CheckBoxValueConverter : IValueConverter
     {
+        #region IValueConverter Members
+
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             bool result = false;
+            if (value?.GetType() == typeof(string))
+            {
+                if (value.ToString().Length == 0)
+                {
+                    return null;
+                }
 
-            if (value is string str)
-            {
-                bool.TryParse(str, out result);
+                Boolean.TryParse(value.ToString(), out result);
             }
-            else if (value is not null)
+            else
             {
-                result = System.Convert.ToBoolean(value);
+                if (value != null)
+                {
+                    result = System.Convert.ToBoolean(value);
+                }
             }
 
             return result;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            return value;
-        }
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) => value;
+
+        #endregion
     }
 }

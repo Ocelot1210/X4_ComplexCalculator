@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Windows.Controls;
 using System.Timers;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Input;
 
 namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Support
 {
@@ -14,18 +15,20 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Suppor
     {
         #region private globals
 
-        private readonly Timer DelayTimer;              // used for the delay
-        private bool TimerElapsed = false;              // if true OnTextChanged is fired.
-        private bool KeysPressed = false;               // makes event fire immediately if it wasn't a keypress
-        private readonly int DELAY_TIME = 250;          //for now best empiric value
+        private Timer DelayTimer; // used for the delay
+        private bool TimerElapsed = false; // if true OnTextChanged is fired.
+        private bool KeysPressed = false; // makes event fire immediately if it wasn't a keypress
+        private int DELAY_TIME = 250;//for now best empiric value
 
         public static readonly DependencyProperty DelayTimeProperty =
             DependencyProperty.Register("DelayTime", typeof(int), typeof(DelayTextBox));
+
         #endregion
 
-
         #region ctor
-        public DelayTextBox() : base()
+
+        public DelayTextBox()
+            : base()
         {
             // Initialize Timer
             DelayTimer = new Timer(DELAY_TIME);
@@ -33,17 +36,15 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Suppor
 
             previousTextChangedEventArgs = null;
 
-            AddHandler(TextBox.PreviewKeyDownEvent, new KeyEventHandler(DelayTextBox_PreviewKeyDown));
+            AddHandler(TextBox.PreviewKeyDownEvent, new System.Windows.Input.KeyEventHandler(DelayTextBox_PreviewKeyDown));
 
             PreviousTextValue = String.Empty;
         }
 
-        void DelayTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        private void DelayTextBox_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (!DelayTimer.Enabled)
-            {
                 DelayTimer.Enabled = true;
-            }
             else
             {
                 DelayTimer.Enabled = false;
@@ -52,29 +53,27 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Suppor
 
             KeysPressed = true;
         }
-        #endregion
 
+        private
+
+        #endregion
 
         #region event handlers
 
-        void DelayTimer_Elapsed(object sender, ElapsedEventArgs e)
+                void DelayTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            // stop timer.
-            DelayTimer.Enabled = false;
+            DelayTimer.Enabled = false;// stop timer.
 
-            // set timer elapsed to true, so the OnTextChange knows to fire
-            TimerElapsed = true;
+            TimerElapsed = true;// set timer elapsed to true, so the OnTextChange knows to fire
 
-            // use invoke to get back on the UI thread.
-            Dispatcher.Invoke(new DelayOverHandler(DelayOver), null);
+            this.Dispatcher.Invoke(new DelayOverHandler(DelayOver), null);// use invoke to get back on the UI thread.
         }
-        #endregion
 
+        #endregion
 
         #region overrides
 
-        private TextChangedEventArgs? previousTextChangedEventArgs;
-
+        private TextChangedEventArgs previousTextChangedEventArgs;
         public string PreviousTextValue { get; private set; }
 
         protected override void OnTextChanged(TextChangedEventArgs e)
@@ -87,11 +86,8 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Suppor
                 KeysPressed = false;
                 base.OnTextChanged(e);
 
-                var be = GetBindingExpression(TextBox.TextProperty);
-                if (be is not null && be.Status == BindingStatus.Active)
-                {
-                    be.UpdateSource();
-                }
+                System.Windows.Data.BindingExpression be = this.GetBindingExpression(TextBox.TextProperty);
+                if (be?.Status == System.Windows.Data.BindingStatus.Active) be.UpdateSource();
 
                 PreviousTextValue = Text;
             }
@@ -101,20 +97,20 @@ namespace X4_ComplexCalculator_CustomControlLibrary.DataGridFilterLibrary.Suppor
 
         #endregion
 
-
         #region delegates
+
         public delegate void DelayOverHandler();
+
         #endregion
 
-
         #region private helpers
+
         private void DelayOver()
         {
             if (previousTextChangedEventArgs != null)
-            {
                 OnTextChanged(previousTextChangedEventArgs);
-            }
         }
+
         #endregion
     }
 }
