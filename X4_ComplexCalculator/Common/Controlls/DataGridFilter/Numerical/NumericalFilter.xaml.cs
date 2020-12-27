@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Windows;
 using X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions;
+using WPFLocalizeExtension.Engine;
+
 
 namespace X4_ComplexCalculator.Common.Controlls.DataGridFilter.Numerical
 {
@@ -110,7 +112,7 @@ namespace X4_ComplexCalculator.Common.Controlls.DataGridFilter.Numerical
                 nameof(Conditions),
                 typeof(NumericalFilterConditinos),
                 typeof(NumericalFilter),
-                new FrameworkPropertyMetadata(NumericalFilterConditinos.Equals, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
+                new FrameworkPropertyMetadata(NumericalFilterConditinos.Equals, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, (sender, e) => ((NumericalFilter)sender).Conditions_Changed())
             );
 
         private NumericalFilterConditinos Conditions
@@ -140,6 +142,38 @@ namespace X4_ComplexCalculator.Common.Controlls.DataGridFilter.Numerical
             set => SetValue(IsFilterEnabledProperty, value);
         }
         #endregion
+
+
+
+        #region フィルタ文字列1のウォーターマーク
+        /// <summary>
+        /// フィルタ文字列1のウォーターマーク
+        /// </summary>
+        private static readonly DependencyProperty FilterText1_WaterMarkProperty =
+            DependencyProperty.Register(
+                nameof(FilterText1_WaterMark),
+                typeof(string),
+                typeof(NumericalFilter),
+                new FrameworkPropertyMetadata((string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:NumericalFilter_EnterAValue", null, null), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
+            );
+        private string FilterText1_WaterMark
+        {
+            get => (string)GetValue(FilterText1_WaterMarkProperty);
+            set => SetValue(FilterText1_WaterMarkProperty, value);
+        }
+        #endregion
+
+
+
+        /// <summary>
+        /// 一致条件変更時のイベント
+        /// </summary>
+        private void Conditions_Changed()
+        {
+            var langID = Conditions == NumericalFilterConditinos.Between ? "Lang:NumericalFilter_EnterAMinValue" : "Lang:NumericalFilter_EnterAValue";
+
+            FilterText1_WaterMark = (string)LocalizeDictionary.Instance.GetLocalizedObject(langID, null, null);
+        }
 
 
 

@@ -4,10 +4,15 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:dgx="clr-namespace:X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions;assembly=X4_ComplexCalculator_CustomControlLibrary"
+    xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:x4conv="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     x:Name="Control"
+    lex:LocalizeDictionary.DefaultProvider="{StaticResource CSVLocalizationProvider}"
+    lex:LocalizeDictionary.DesignCulture="en-US"
+    lex:ResxLocalizationProvider.DefaultAssembly="WPFLocalizationExtension"
+    lex:ResxLocalizationProvider.DefaultDictionary="StringResources"
     mc:Ignorable="d">
 
     <Control.Resources>
@@ -66,33 +71,33 @@
                                 Click="PART_ClearButton_Click"
                                 Content="Clear" />
                         </StackPanel>
-                        <GroupBox Header="数値で検索">
+                        <GroupBox Header="{lex:Loc Lang:NumericalFilter_GroupBoxTitle}">
                             <StackPanel Orientation="Vertical">
                                 <xctk:WatermarkTextBox
                                     x:Name="PART_FilterText"
                                     Text="{Binding ElementName=Control, Path=FilterText1}"
                                     TextAlignment="Right"
-                                    Watermark="値を入力" />
+                                    Watermark="{Binding ElementName=Control, Path=FilterText1_WaterMark}" />
 
                                 <xctk:WatermarkTextBox
                                     Text="{Binding ElementName=Control, Path=FilterText2}"
                                     TextAlignment="Right"
                                     Visibility="{Binding Path=IsChecked, ElementName=PART_BetweenRadioButton, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                    Watermark="最大値を入力" />
+                                    Watermark="{lex:Loc Lang:NumericalFilter_EnterAMaxValue}" />
 
-                                <GroupBox Header="一致条件">
+                                <GroupBox Header="{lex:Loc Lang:DataGridColumnsFilter_Conditions}">
                                     <StackPanel Orientation="Vertical">
-                                        <RadioButton Content="＝ 指定の値に等しい" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Equals, UpdateSourceTrigger=PropertyChanged}" />
-                                        <RadioButton Content="≠ 指定の値に等しくない" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=NotEquals, UpdateSourceTrigger=PropertyChanged}" />
+                                        <RadioButton Content="{lex:Loc Lang:NumericalFilter_Equalls}" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Equals, UpdateSourceTrigger=PropertyChanged}" />
+                                        <RadioButton Content="{lex:Loc Lang:NumericalFilter_NotEquals}" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=NotEquals, UpdateSourceTrigger=PropertyChanged}" />
                                         <Separator />
-                                        <RadioButton Content="＞ 指定の値を超える" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=GreaterThan, UpdateSourceTrigger=PropertyChanged}" />
-                                        <RadioButton Content="≧ 指定の値以上" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=GreaterThanOrEqualTo, UpdateSourceTrigger=PropertyChanged}" />
-                                        <RadioButton Content="＜ 指定の値未満" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=LessThan, UpdateSourceTrigger=PropertyChanged}" />
-                                        <RadioButton Content="≦ 指定の値以下" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=LessThanOrEqualTo, UpdateSourceTrigger=PropertyChanged}" />
+                                        <RadioButton Content="{lex:Loc Lang:NumericalFilter_GreaterThan}" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=GreaterThan, UpdateSourceTrigger=PropertyChanged}" />
+                                        <RadioButton Content="{lex:Loc Lang:NumericalFilter_GreaterThanOrEqualTo}" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=GreaterThanOrEqualTo, UpdateSourceTrigger=PropertyChanged}" />
+                                        <RadioButton Content="{lex:Loc Lang:NumericalFilter_LessThan}" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=LessThan, UpdateSourceTrigger=PropertyChanged}" />
+                                        <RadioButton Content="{lex:Loc Lang:NumericalFilter_LessThanOrEqualTo}" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=LessThanOrEqualTo, UpdateSourceTrigger=PropertyChanged}" />
                                         <Separator />
                                         <RadioButton
                                             x:Name="PART_BetweenRadioButton"
-                                            Content="～ 指定の範囲内"
+                                            Content="{lex:Loc Lang:NumericalFilter_Between}"
                                             IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Between, UpdateSourceTrigger=PropertyChanged}" />
                                     </StackPanel>
                                 </GroupBox>

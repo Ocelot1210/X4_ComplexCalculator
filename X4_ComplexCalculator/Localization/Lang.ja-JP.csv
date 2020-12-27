@@ -15,6 +15,7 @@ OwnerFaction;所有派閥
 Turrets;タレット
 Shields;シールド
 SearchByEnteringText;テキストを入力して検索
+Search;検索
 Confirmation;確認
 Warning;警告
 Error;エラー
@@ -267,6 +268,31 @@ EditPresetName;プリセット名編集
 PresetName;プリセット名
 DeletePresetConfirmMessage;プリセット「{0}」を本当に削除しますか？
 InvalidPresetNameMessage;プリセット名が無効です。\r\n空白文字以外の文字を1文字以上入力して下さい。
+
+
+# ------------------------------------------------------
+# DataGridColumnsFilter
+# ------------------------------------------------------
+DataGridColumnsFilter_Conditions;一致条件
+ListFilter_GroupBoxHeader;リストから選択
+NumericalFilter_GroupBoxTitle;数値で検索
+NumericalFilter_EnterAValue;値を入力
+NumericalFilter_EnterAMinValue;最小値を入力
+NumericalFilter_EnterAMaxValue;最大値を入力
+NumericalFilter_Equalls;＝ 指定の値に等しい
+NumericalFilter_NotEquals;≠ 指定の値に等しくない
+NumericalFilter_GreaterThan;＞ 指定の値を超える
+NumericalFilter_GreaterThanOrEqualTo;≧ 指定の値以上
+NumericalFilter_LessThan;＜ 指定の値未満
+NumericalFilter_LessThanOrEqualTo;≦ 指定の値以下
+NumericalFilter_Between;～ 指定の範囲内
+TextFilter_GroupBoxTitle;文字列で検索
+TextFilter_Contains;指定の値を含む
+TextFilter_NotContains;指定の値を含まない
+TextFilter_Equals;指定の値と一致
+TextFilter_NotEqulas;指定の値と一致しない
+TextFilter_StartWith;指定の値で始まる
+TextFilter_EndWith;指定の値で終わる
 
 
 # ------------------------------------------------------

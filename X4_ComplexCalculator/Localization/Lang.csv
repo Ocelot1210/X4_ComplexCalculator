@@ -15,6 +15,7 @@ OwnerFaction;Owner faction
 Turrets;Turrets
 Shields;Shields
 SearchByEnteringText;Search by entering text
+Search;Search
 Confirmation;Confirmation
 Warning;Warning
 Error;Error
@@ -267,3 +268,41 @@ EditPresetName;Edit preset name
 PresetName;Preset name
 DeletePresetConfirmMessage;Do you really want to remove the preset "{0}"?
 InvalidPresetNameMessage;Invalid preset name. Please enter at least one non-whitespace character.
+
+
+# ------------------------------------------------------
+# DataGridColumnsFilter
+# ------------------------------------------------------
+DataGridColumnsFilter_Conditions;Conditions
+ListFilter_GroupBoxHeader;Select from list
+NumericalFilter_GroupBoxTitle;Search by number
+NumericalFilter_EnterAValue;Enter a value
+NumericalFilter_EnterAMinValue;Enter a min value
+NumericalFilter_EnterAMaxValue;Enter a max value
+NumericalFilter_Equalls;＝ Equals
+NumericalFilter_NotEquals;≠ Not equals
+NumericalFilter_GreaterThan;＞ Greater than
+NumericalFilter_GreaterThanOrEqualTo;≧ Greater than or equal to
+NumericalFilter_LessThan;＜ Less than
+NumericalFilter_LessThanOrEqualTo;≦ Less than or equal to
+NumericalFilter_Between;～ Between
+TextFilter_Contains;Contains
+TextFilter_NotContains;Not contains
+TextFilter_Equals;Equals
+TextFilter_NotEqulas;Not equals
+TextFilter_StartWith;Start with
+TextFilter_EndWith;End with
+
+
+
+
+# ------------------------------------------------------
+# DB Viewer
+# ------------------------------------------------------
+DBViewer;DB Viewer
+# Races
+Races;Races
+RaceID;Race ID
+RaceName;Race name
+ShortName;Short name
+Description;Description

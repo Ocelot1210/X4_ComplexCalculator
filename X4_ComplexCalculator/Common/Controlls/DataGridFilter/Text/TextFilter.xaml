@@ -4,10 +4,15 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:dgx="clr-namespace:X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions;assembly=X4_ComplexCalculator_CustomControlLibrary"
+    xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:x4conv="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     x:Name="Control"
+    lex:LocalizeDictionary.DefaultProvider="{StaticResource CSVLocalizationProvider}"
+    lex:LocalizeDictionary.DesignCulture="en-US"
+    lex:ResxLocalizationProvider.DefaultAssembly="WPFLocalizationExtension"
+    lex:ResxLocalizationProvider.DefaultDictionary="StringResources"
     mc:Ignorable="d">
     <!--    -->
 
@@ -66,20 +71,20 @@
                                 Click="PART_ClearButton_Click"
                                 Content="Clear" />
                         </StackPanel>
-                        <GroupBox Header="文字列で検索">
+                        <GroupBox Header="{lex:Loc Lang:TextFilter_GroupBoxTitle}">
                             <StackPanel Orientation="Vertical">
 
-                                <xctk:WatermarkTextBox Text="{Binding ElementName=Control, Path=FilterText}" Watermark="検索文字列" />
-                                <GroupBox Header="一致条件">
+                                <xctk:WatermarkTextBox Text="{Binding ElementName=Control, Path=FilterText}" Watermark="{lex:Loc Lang:Search}" />
+                                <GroupBox Header="{lex:Loc Lang:DataGridColumnsFilter_Conditions}">
                                     <StackPanel Orientation="Vertical">
-                                        <RadioButton Content="指定の値を含む" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Contains, UpdateSourceTrigger=PropertyChanged}" />
-                                        <RadioButton Content="指定の値を含まない" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=NotContains, UpdateSourceTrigger=PropertyChanged}" />
+                                        <RadioButton Content="{lex:Loc Lang:TextFilter_Contains}" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Contains, UpdateSourceTrigger=PropertyChanged}" />
+                                        <RadioButton Content="{lex:Loc Lang:TextFilter_NotContains}" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=NotContains, UpdateSourceTrigger=PropertyChanged}" />
                                         <Separator />
-                                        <RadioButton Content="指定の値と一致" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Equals, UpdateSourceTrigger=PropertyChanged}" />
-                                        <RadioButton Content="指定の値と一致しない" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=NotEquals, UpdateSourceTrigger=PropertyChanged}" />
+                                        <RadioButton Content="{lex:Loc Lang:TextFilter_Equals}" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Equals, UpdateSourceTrigger=PropertyChanged}" />
+                                        <RadioButton Content="{lex:Loc Lang:TextFilter_NotEqulas}" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=NotEquals, UpdateSourceTrigger=PropertyChanged}" />
                                         <Separator />
-                                        <RadioButton Content="指定の値で始まる" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=StartWith, UpdateSourceTrigger=PropertyChanged}" />
-                                        <RadioButton Content="指定の値で終わる" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=EndWith, UpdateSourceTrigger=PropertyChanged}" />
+                                        <RadioButton Content="{lex:Loc Lang:TextFilter_StartWith}" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=StartWith, UpdateSourceTrigger=PropertyChanged}" />
+                                        <RadioButton Content="{lex:Loc Lang:TextFilter_EndWith}" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=EndWith, UpdateSourceTrigger=PropertyChanged}" />
                                     </StackPanel>
                                 </GroupBox>
                             </StackPanel>

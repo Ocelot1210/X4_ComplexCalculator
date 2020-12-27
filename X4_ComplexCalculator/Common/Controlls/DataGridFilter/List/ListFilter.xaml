@@ -4,10 +4,15 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:dgx="clr-namespace:X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions;assembly=X4_ComplexCalculator_CustomControlLibrary"
+    xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:x4conv="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     x:Name="Control"
+    lex:LocalizeDictionary.DefaultProvider="{StaticResource CSVLocalizationProvider}"
+    lex:LocalizeDictionary.DesignCulture="en-US"
+    lex:ResxLocalizationProvider.DefaultAssembly="WPFLocalizationExtension"
+    lex:ResxLocalizationProvider.DefaultDictionary="StringResources"
     mc:Ignorable="d">
 
 
@@ -79,19 +84,19 @@
                         <GroupBox
                             Width="200"
                             Height="200"
-                            Header="リストから選択">
+                            Header="{lex:Loc Lang:ListFilter_GroupBoxHeader}">
                             <DockPanel>
                                 <xctk:WatermarkTextBox
                                     x:Name="PART_ListSearchTextBox"
                                     DockPanel.Dock="Top"
                                     Text="{Binding ElementName=Control, Path=ListBoxSearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                    Watermark="検索" />
+                                    Watermark="{lex:Loc Lang:Search}" />
                                 <xctk:CheckListBox
                                     x:Name="PART_ListBox"
                                     DisplayMemberPath="Text"
                                     IsSelectAllActive="True"
                                     ItemsSource="{Binding ElementName=Control, Path=ListBoxItems, Mode=OneTime}"
-                                    SelectAllContent="全選択"
+                                    SelectAllContent="{lex:Loc Lang:SelectAll}"
                                     SelectedMemberPath="IsChecked" />
                             </DockPanel>
                         </GroupBox>
