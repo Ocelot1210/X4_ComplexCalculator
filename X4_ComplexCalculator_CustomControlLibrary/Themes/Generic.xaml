@@ -11,7 +11,7 @@
 
         <ResourceDictionary Source="/X4_ComplexCalculator_CustomControlLibrary;component/CrossButton/Generic.xaml" />
 
-        <ResourceDictionary Source="pack://application:,,,/X4_ComplexCalculator_CustomControlLibrary;component/DataGridFilterLibrary/Themes/Generic.xaml" />
+        <ResourceDictionary Source="/X4_ComplexCalculator_CustomControlLibrary;component/DataGridExtensions/Themes/Generic.xaml" />
 
     </ResourceDictionary.MergedDictionaries>
 
