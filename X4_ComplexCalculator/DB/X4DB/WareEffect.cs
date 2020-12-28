@@ -90,8 +90,27 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="wareID">ウェアID</param>
         /// <param name="method">生産方式</param>
-        /// <param name="effectID">追加効果</param>
+        /// <param name="effectID">追加効果ID</param>
+        /// <returns>ウェア生産時の追加効果情報</returns>
         public static WareEffect? Get(string wareID, string method, string effectID)
+        {
+            var effects = Get(wareID, method);
+            if (effects is not null)
+            {
+                return effects!.TryGetValue(effectID, out var effect) ? effect : null;
+            }
+
+            return null;
+        }
+
+
+        /// <summary>
+        /// ウェア生産時の追加効果情報を取得
+        /// </summary>
+        /// <param name="wareID">ウェアID</param>
+        /// <param name="method">生産方式</param>
+        /// <returns>追加効果IDをキーにしたウェア生産時の追加効果情報のディクショナリ</returns>
+        public static IReadOnlyDictionary<string, WareEffect>? Get(string wareID, string method)
         {
             // ウェアIDで絞り込み
             if (_WareEffects.TryGetValue(wareID, out var methods))
@@ -109,7 +128,7 @@ namespace X4_ComplexCalculator.DB.X4DB
                     }
                 }
 
-                return effects!.TryGetValue(effectID, out var effect) ? effect : null;
+                return effects;
             }
             else
             {

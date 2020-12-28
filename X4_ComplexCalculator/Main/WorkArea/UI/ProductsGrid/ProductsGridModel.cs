@@ -499,7 +499,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 }
                 else
                 {
-                    if (ware.Efficiency != null)
+                    if (ware.Efficiency is not null)
                     {
                         detailsList.Add(new ProductDetailsListItem(moduleID, count, ware.Efficiency, ware.Amount, _Settings));
                     }
