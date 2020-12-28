@@ -7,6 +7,7 @@
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:X4_ComplexCalculator.Main.Menu.View.DBViewer"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:modules="clr-namespace:X4_ComplexCalculator.Main.Menu.View.DBViewer.Modules"
     xmlns:races="clr-namespace:X4_ComplexCalculator.Main.Menu.View.DBViewer.Races"
     xmlns:wares="clr-namespace:X4_ComplexCalculator.Main.Menu.View.DBViewer.Wares"
     Title="DBViewerWindow"
@@ -25,6 +26,7 @@
                     <LayoutAnchorablePaneGroup>
                         <LayoutAnchorablePane>
 
+                            <!--  種族一覧  -->
                             <LayoutAnchorable
                                 Title="{lex:Loc Lang:DBViewer_Races_Title}"
                                 CanClose="False"
@@ -33,6 +35,7 @@
                                 <races:RacesGrid />
                             </LayoutAnchorable>
 
+                            <!--  ウェア一覧  -->
                             <LayoutAnchorable
                                 Title="{lex:Loc Lang:DBViewer_Wares_Title}"
                                 CanClose="False"
@@ -41,6 +44,14 @@
                                 <wares:WaresGrid />
                             </LayoutAnchorable>
 
+                            <!--  モジュール一覧  -->
+                            <LayoutAnchorable
+                                Title="{lex:Loc Lang:DBViewer_Modules_Title}"
+                                CanClose="False"
+                                CanHide="False"
+                                ContentId="Modules">
+                                <modules:ModulesGrid />
+                            </LayoutAnchorable>
 
                         </LayoutAnchorablePane>
                     </LayoutAnchorablePaneGroup>

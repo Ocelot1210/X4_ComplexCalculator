@@ -301,12 +301,12 @@ TextFilter_EndWith;End with
 # ------------------------------------------------------
 DBViewer;DB Viewer
 DBViewer_Description;Description
-# Races
+# ■Races
 DBViewer_Races_Title;Races
 DBViewer_Races_RaceID;Race ID
 DBViewer_Races_RaceName;Race name
 DBViewer_Races_ShortName;Short name
-# Wares
+# ■Wares
 DBViewer_Wares_Title;Wares
 DBViewer_Wares_WareName;Name
 DBViewer_Wares_WareGroupName;Type
@@ -316,3 +316,12 @@ DBViewer_Wares_MaxPrice;Max price
 DBViewer_Wares_Profit;Profit
 DBViewer_Wares_Volume;Volume
 DBViewer_Wares_ProfitPerVolume;Profit/Volume
+# ■Modules
+DBViewer_Modules_Title;Modules
+DBViewer_Modules_ModuleName;Name
+DBViewer_Modules_ModuleType;Type
+DBViewer_Modules_OwnerRace;Owner race
+DBViewer_Modules_MaxWorkers;Workers
+DBViewer_Modules_WorkersCapacity;Capacity
+DBViewer_Modules_Product;Product
+DBViewer_Modules_MaxEfficiency;Max efficiency

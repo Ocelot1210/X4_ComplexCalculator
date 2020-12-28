@@ -300,12 +300,12 @@ TextFilter_EndWith;指定の値で終わる
 # ------------------------------------------------------
 DBViewer;DBビュワー
 DBViewer_Description;説明文
-# Races
+# ■Races
 DBViewer_Races_Title;種族
 DBViewer_Races_RaceID;種族ID
 DBViewer_Races_RaceName;種族名
 DBViewer_Races_ShortName;略称
-# Wares
+# ■Wares
 DBViewer_Wares_Title;ウェア
 DBViewer_Wares_WareName;名称
 DBViewer_Wares_WareGroupName;種別
@@ -315,3 +315,12 @@ DBViewer_Wares_MaxPrice;最高値
 DBViewer_Wares_Profit;利益
 DBViewer_Wares_Volume;サイズ
 DBViewer_Wares_ProfitPerVolume;利益/サイズ
+# ■Modules
+DBViewer_Modules_Title;モジュール
+DBViewer_Modules_ModuleName;名称
+DBViewer_Modules_ModuleType;種別
+DBViewer_Modules_OwnerRace;所有種族
+DBViewer_Modules_MaxWorker;労働者数
+DBViewer_Modules_WorkersCapacity;収容人数
+DBViewer_Modules_Product;製品
+DBViewer_Modules_MaxEfficiency;最大効率

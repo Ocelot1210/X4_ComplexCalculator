@@ -237,9 +237,12 @@ namespace X4_ComplexCalculator.DB
             Equipment.Init();
             TransportType.Init();
             WareGroup.Init();
+            WareEffect.Init();
             Ware.Init();
+            WareProduction.Init();
             ModuleType.Init();
             ModuleProduction.Init();
+            ModuleProduct.Init();
             Module.Init();
         }
     }

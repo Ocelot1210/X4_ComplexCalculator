@@ -1,11 +1,11 @@
 ﻿<UserControl
-    x:Class="X4_ComplexCalculator.Main.Menu.View.DBViewer.Wares.WaresGrid"
+    x:Class="X4_ComplexCalculator.Main.Menu.View.DBViewer.Modules.ModulesGrid"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:dgx="clr-namespace:X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions;assembly=X4_ComplexCalculator_CustomControlLibrary"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
-    xmlns:local="clr-namespace:X4_ComplexCalculator.Main.Menu.View.DBViewer.Wares"
+    xmlns:local="clr-namespace:X4_ComplexCalculator.Main.Menu.View.DBViewer.Modules"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="450"
     d:DesignWidth="800"
@@ -15,81 +15,72 @@
     lex:ResxLocalizationProvider.DefaultDictionary="StringResources"
     mc:Ignorable="d">
     <UserControl.DataContext>
-        <local:WaresViewModel />
+        <local:ModulesGridViewModel />
     </UserControl.DataContext>
+
     <DataGrid
         dgx:DataGridFilter.IsAutoFilterEnabled="True"
         HorizontalScrollBarVisibility="Visible"
         IsReadOnly="True"
-        ItemsSource="{Binding WaresView, Mode=OneTime}"
+        ItemsSource="{Binding ModulesView, Mode=OneTime}"
         Style="{StaticResource DefaultDataGridStyle}"
         VerticalScrollBarVisibility="Visible">
 
+
         <DataGrid.Columns>
 
-            <!--  ウェア名  -->
+            <!--  モジュール名  -->
             <DataGridTextColumn
                 dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnTextFilter}"
-                Binding="{Binding WareName, Mode=OneTime}"
-                Header="{lex:Loc Lang:DBViewer_Wares_WareName}" />
+                Binding="{Binding ModuleName, Mode=OneTime}"
+                Header="{lex:Loc Lang:DBViewer_Modules_ModuleName}" />
 
-            <!--  ウェア種別名  -->
+            <!--  モジュール種別  -->
             <DataGridTextColumn
                 dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
-                Binding="{Binding WareGroupName, Mode=OneTime}"
-                Header="{lex:Loc Lang:DBViewer_Wares_WareGroupName}" />
+                Binding="{Binding ModuleType, Mode=OneTime}"
+                Header="{lex:Loc Lang:DBViewer_Modules_ModuleType}" />
 
 
-            <!--  カーゴ種別名  -->
+            <!--  所有派閥  -->
             <DataGridTextColumn
                 dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
-                Binding="{Binding Transport, Mode=OneTime}"
-                Header="{lex:Loc Lang:DBViewer_Wares_TransportTypeName}" />
+                Binding="{Binding Race, Mode=OneTime}"
+                Header="{lex:Loc Lang:DBViewer_Modules_OwnerRace}" />
 
 
-            <!--  最安値  -->
+            <!--  従業員数  -->
             <DataGridTextColumn
                 dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                Binding="{Binding MinPrice, Mode=OneTime, StringFormat='{}{0:N0} cr'}"
+                Binding="{Binding MaxWorkers, Mode=OneTime, StringFormat='{}{0:N0}'}"
                 CellStyle="{StaticResource RightAlignedDataGridCell}"
                 ElementStyle="{StaticResource RightAlignedDataGridTexColumnElementStyle}"
-                Header="{lex:Loc Lang:DBViewer_Wares_MinPrice}" />
+                Header="{lex:Loc Lang:DBViewer_Modules_MaxWorker}" />
 
 
-            <!--  最高値  -->
+            <!--  収容人数  -->
             <DataGridTextColumn
                 dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                Binding="{Binding MaxPrice, Mode=OneTime, StringFormat='{}{0:N0} cr'}"
+                Binding="{Binding WorkersCapacity, Mode=OneTime, StringFormat='{}{0:N0}'}"
                 CellStyle="{StaticResource RightAlignedDataGridCell}"
                 ElementStyle="{StaticResource RightAlignedDataGridTexColumnElementStyle}"
-                Header="{lex:Loc Lang:DBViewer_Wares_MaxPrice}" />
+                Header="{lex:Loc Lang:DBViewer_Modules_WorkersCapacity}" />
 
 
-            <!--  利益  -->
+            <!--  製品  -->
+            <DataGridTextColumn
+                dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnTextFilter}"
+                Binding="{Binding Product, Mode=OneTime}"
+                Header="{lex:Loc Lang:DBViewer_Modules_Product}" />
+
+
+            <!--  最大効率  -->
             <DataGridTextColumn
                 dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                Binding="{Binding Profit, Mode=OneTime, StringFormat='{}{0:N0} cr'}"
+                Binding="{Binding MaxEfficiency, Mode=OneTime, StringFormat='{}{0:N0} %'}"
                 CellStyle="{StaticResource RightAlignedDataGridCell}"
                 ElementStyle="{StaticResource RightAlignedDataGridTexColumnElementStyle}"
-                Header="{lex:Loc Lang:DBViewer_Wares_Profit}" />
-
-
-            <!--  容量  -->
-            <DataGridTextColumn
-                dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                Binding="{Binding Volume, Mode=OneTime, StringFormat='{}{0:N0}'}"
-                CellStyle="{StaticResource RightAlignedDataGridCell}"
-                ElementStyle="{StaticResource RightAlignedDataGridTexColumnElementStyle}"
-                Header="{lex:Loc Lang:DBViewer_Wares_Volume}" />
-
-
-            <!--  容量当たりの利益  -->
-            <DataGridTextColumn
-                dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                Binding="{Binding ProfitPreVolume, Mode=OneTime, StringFormat='{}{0:N2} cr'}"
-                CellStyle="{StaticResource RightAlignedDataGridCell}"
-                ElementStyle="{StaticResource RightAlignedDataGridTexColumnElementStyle}"
-                Header="{lex:Loc Lang:DBViewer_Wares_ProfitPerVolume}" />
+                Header="{lex:Loc Lang:DBViewer_Modules_MaxEfficiency}" />
 
         </DataGrid.Columns>
 

@@ -114,7 +114,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// 全ウェアを取得
         /// </summary>
-        public static IEnumerable<Ware> GetAll() => _Wares.Select(x => x.Value);
+        public static IEnumerable<Ware> GetAll() => _Wares.Values;
 
 
         /// <summary>

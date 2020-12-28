@@ -86,11 +86,11 @@ namespace X4_ComplexCalculator.DB.X4DB
         public static Race? Get(string raceID) =>
             _Races.TryGetValue(raceID, out var race) ? race : null;
 
+
         /// <summary>
         /// 全種族を取得
         /// </summary>
-        public static IEnumerable<Race> GetAll() =>
-            _Races.Select(x => x.Value);
+        public static IEnumerable<Race> GetAll() => _Races.Values;
 
 
         /// <summary>

@@ -1,7 +1,5 @@
 ﻿using Prism.Mvvm;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Wares
@@ -9,7 +7,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Wares
     /// <summary>
     /// ウェア閲覧用DataGridの1レコード分
     /// </summary>
-    class WaresItem : BindableBase
+    class WaresGridItem : BindableBase
     {
         #region メンバ
         /// <summary>
@@ -19,6 +17,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Wares
         #endregion
 
 
+        #region プロパティ
         /// <summary>
         /// ウェア名
         /// </summary>
@@ -65,13 +64,15 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Wares
         /// 容量当たりの利益
         /// </summary>
         public double ProfitPreVolume => Math.Round((double)Profit / Volume, 1);
+        #endregion
+
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="ware">表示対象ウェア</param>
-        public WaresItem(Ware ware)
+        public WaresGridItem(Ware ware)
         {
             _Ware = ware;
         }
