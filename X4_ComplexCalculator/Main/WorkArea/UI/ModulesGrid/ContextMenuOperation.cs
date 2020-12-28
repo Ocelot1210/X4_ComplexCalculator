@@ -246,7 +246,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             }
 
             // セルフォーカス
-            if (dataGrid.CurrentCell.Column != null)
+            if (dataGrid.CurrentCell.Column is not null)
             {
                 CellFocusCommand?.Execute(new Tuple<DataGrid, int, int>(dataGrid, _CollectionView.CurrentPosition, dataGrid.CurrentCell.Column.DisplayIndex));
             }

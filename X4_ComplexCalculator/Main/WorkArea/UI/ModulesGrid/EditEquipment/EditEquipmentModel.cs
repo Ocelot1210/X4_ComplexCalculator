@@ -108,7 +108,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
                 bool chkState = 0 < SettingDatabase.Instance.ExecQuery($"SELECT ID FROM SelectModuleEquipmentCheckStateFactions WHERE ID = '{dr["FactionID"]}'", (_, _) => { });
 
                 var faction = Faction.Get((string)dr["FactionID"]);
-                if (faction != null) ((ICollection<FactionsListItem>)args[0]).Add(new FactionsListItem(faction, chkState));
+                if (faction is not null) ((ICollection<FactionsListItem>)args[0]).Add(new FactionsListItem(faction, chkState));
 
             }
 
@@ -156,7 +156,7 @@ WHERE
         /// </summary>
         public void EditPreset()
         {
-            if (SelectedPreset == null)
+            if (SelectedPreset is null)
             {
                 return;
             }
@@ -220,7 +220,7 @@ WHERE
         /// </summary>
         public void RemovePreset()
         {
-            if (SelectedPreset == null)
+            if (SelectedPreset is null)
             {
                 return;
             }

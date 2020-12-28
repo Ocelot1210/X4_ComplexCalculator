@@ -85,7 +85,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
             }
             set
             {
-                if (value == null)
+                if (value is null)
                 {
                     throw new InvalidOperationException();
                 }

@@ -63,7 +63,7 @@ namespace X4_ComplexCalculator.Common.Behavior
             }
 
             var mouseBindings = control.InputBindings.OfType<MouseBinding>()
-                                                     .Where(x => x.Gesture != null &&
+                                                     .Where(x => x.Gesture is not null &&
                                                                  ((MouseGesture)x.Gesture).MouseAction == MouseAction.LeftDoubleClick &&
                                                                  x.Command.CanExecute(null));
 

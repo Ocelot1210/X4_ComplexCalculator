@@ -217,7 +217,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             var shields = element.Element("shields").Elements("shield");
             var equipments = turrets.Concat(shields)
                 .Select(elem => Equipment.Get(elem.Attribute("id").Value))
-                .Where(e => e != null);
+                .Where(e => e is not null);
             foreach (var equipment in equipments)
             {
                 AddEquipment(equipment!);

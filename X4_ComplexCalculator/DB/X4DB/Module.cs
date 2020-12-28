@@ -139,7 +139,7 @@ namespace X4_ComplexCalculator.DB.X4DB
                 const string sql2 = "SELECT FactionID FROM ModuleOwner WHERE ModuleID = :ModuleID";
                 var owners = X4Database.Instance.Query<string>(sql2, record)
                     .Select<string, Faction>(Faction.Get!)
-                    .Where(x => x != null)
+                    .Where(x => x is not null)
                     .ToArray();
 
                 var buildMethods = record.NoBlueprint

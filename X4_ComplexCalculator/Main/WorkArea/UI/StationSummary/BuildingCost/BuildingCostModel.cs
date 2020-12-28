@@ -111,12 +111,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost
         /// <param name="e"></param>
         private void Resources_OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e.NewItems != null)
+            if (e.NewItems is not null)
             {
                 BuildingCost += e.NewItems.Cast<BuildResourcesGridItem>().Sum(x => x.Price);
             }
 
-            if (e.OldItems != null)
+            if (e.OldItems is not null)
             {
                 BuildingCost -= e.OldItems.Cast<BuildResourcesGridItem>().Sum(x => x.Price);
             }

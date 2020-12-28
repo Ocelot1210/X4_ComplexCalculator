@@ -75,7 +75,7 @@ namespace X4_ComplexCalculator.Infrastructure
         /// <summary>
         /// 更新をダウンロード中の場合は true
         /// </summary>
-        public bool NowDownloading => _DownloadTask != null;
+        public bool NowDownloading => _DownloadTask is not null;
 
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace X4_ComplexCalculator.Infrastructure
         public async ValueTask<string?> CheckUpdate()
         {
             var result = await _Manager.CheckForUpdatesAsync();
-            return result.CanUpdate && result.LastVersion != null
+            return result.CanUpdate && result.LastVersion is not null
                 ? (_LastVersion = result.LastVersion).ToString()
                 : null;
         }
@@ -134,7 +134,7 @@ namespace X4_ComplexCalculator.Infrastructure
         /// </summary>
         public async ValueTask UpdateAfterDownloading()
         {
-            if (_DownloadTask == null) return;
+            if (_DownloadTask is null) return;
             await _DownloadTask.ConfigureAwait(false);
             Update();
         }

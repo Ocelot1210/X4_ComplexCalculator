@@ -45,7 +45,7 @@ namespace X4_ComplexCalculator.Common.Behavior
             }
 
             // カレントセル変更時のイベントハンドラの登録/解除
-            if (e.NewValue != null)
+            if (e.NewValue is not null)
             {
                 dg.CurrentCellChanged += DataGrid_CurrentCellChanged;
             }
@@ -63,7 +63,7 @@ namespace X4_ComplexCalculator.Common.Behavior
         /// <param name="e"></param>
         private static void DataGrid_CurrentCellChanged(object? sender, EventArgs e)
         {
-            if (sender is not DataGrid dg || dg.CurrentCell == null || dg.CurrentCell.Column == null)
+            if (sender is not DataGrid dg || dg.CurrentCell == null || dg.CurrentCell.Column is null)
             {
                 return;
             }

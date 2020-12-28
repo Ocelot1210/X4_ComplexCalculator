@@ -157,7 +157,7 @@ WHERE
                 {
                     var module = Module.Get((string)dr["ModuleID"]);
 
-                    if (module != null)
+                    if (module is not null)
                     {
                         modules.Add(new ModulesGridItem(module));
                     }
@@ -183,7 +183,7 @@ WHERE
                     var moduleEquipment = modules[index].ModuleEquipment;
 
                     var equipment = Equipment.Get((string)dr["EquipmentID"]);
-                    if (equipment == null) return;
+                    if (equipment is null) return;
 
                     var count = (long)dr["Count"];
                     moduleEquipment.AddEquipment(equipment, count);
@@ -227,7 +227,7 @@ WHERE
             {
                 var wareID = ware.Attribute("ware").Value;
                 var prod = WorkArea.StationData.ProductsInfo.Products.FirstOrDefault(x => x.Ware.WareID == wareID);
-                if (prod != null)
+                if (prod is not null)
                 {
                     prod.UnitPrice = long.Parse(ware.Attribute("price").Value);
                 }
@@ -247,7 +247,7 @@ WHERE
                 var wareID = ware.Attribute("ware").Value;
 
                 var storage = WorkArea.StationData.StorageAssignInfo.StorageAssign.FirstOrDefault(x => x.WareID == wareID);
-                if (storage != null)
+                if (storage is not null)
                 {
                     var amount = long.Parse(ware.Attribute("amount").Value);
 

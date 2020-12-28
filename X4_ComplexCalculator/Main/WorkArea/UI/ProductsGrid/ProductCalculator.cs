@@ -156,7 +156,7 @@ WHERE
             get
             {
                 // 未作成なら作成する
-                if (_SingletonInstance == null)
+                if (_SingletonInstance is null)
                 {
                     _SingletonInstance = new ProductCalculator();
                 }
@@ -261,7 +261,7 @@ WHERE
 
                 // 不足しているウェアを製造するモジュールを検索
                 var module = _ModuleProduct.FirstOrDefault(x => x.Value.WareID == prod.Ware.WareID && x.Value.Method == "default");
-                if (module.Key == null)
+                if (module.Key is null)
                 {
                     module = _ModuleProduct.FirstOrDefault(x => x.Value.WareID == prod.Ware.WareID);
                 }

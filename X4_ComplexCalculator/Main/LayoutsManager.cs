@@ -103,7 +103,7 @@ namespace X4_ComplexCalculator.Main
             });
 
             var checkedLayout = Layouts.FirstOrDefault(x => x.IsChecked.Value);
-            if (checkedLayout != null)
+            if (checkedLayout is not null)
             {
                 _ActiveLayout.Value = checkedLayout;
             }
@@ -115,7 +115,7 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         public void SaveLayout(WorkAreaViewModel? vm)
         {
-            if (vm != null)
+            if (vm is not null)
             {
                 var (onOK, layoutName) = SelectStringDialog.ShowDialog("Lang:EditLayoutName", "Lang:LayoutName", "", IsValidLayoutName);
                 if (onOK)
@@ -150,7 +150,7 @@ namespace X4_ComplexCalculator.Main
         /// <param name="menuItem">上書きするレイアウト</param>
         private void OverwritedSaveLayout(LayoutMenuItem menuItem)
         {
-            if (_WorkAreaManager.ActiveContent == null) return;
+            if (_WorkAreaManager.ActiveContent is null) return;
 
             try
             {

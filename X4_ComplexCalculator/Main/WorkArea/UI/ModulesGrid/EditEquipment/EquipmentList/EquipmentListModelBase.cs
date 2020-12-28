@@ -148,7 +148,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <returns>装備が追加されたか</returns>
         public bool AddSelectedEquipments()
         {
-            if (SelectedSize == null)
+            if (SelectedSize is null)
             {
                 throw new InvalidOperationException();
             }
@@ -200,7 +200,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <returns>装備が削除されたか</returns>
         public bool RemoveSelectedEquipments()
         {
-            if (SelectedSize == null)
+            if (SelectedSize is null)
             {
                 throw new InvalidOperationException();
             }
@@ -226,7 +226,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         public virtual void SavePreset()
         {
             // 選択中のプリセットがあるか？
-            if (SelectedPreset != null)
+            if (SelectedPreset is not null)
             {
                 var id = Equipped.Values.SelectMany((x) => x).FirstOrDefault()?.Equipment.EquipmentType.EquipmentTypeID;
 

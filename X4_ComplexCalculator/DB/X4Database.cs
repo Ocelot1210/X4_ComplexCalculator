@@ -44,7 +44,7 @@ namespace X4_ComplexCalculator.DB
         /// <returns>X4 データベース</returns>
         public static void Open()
         {
-            if (_Instance != null) return;
+            if (_Instance is not null) return;
 
             var config = Configuration.GetConfiguration();
             var basePath = AppDomain.CurrentDomain.BaseDirectory ?? "";
@@ -185,7 +185,7 @@ namespace X4_ComplexCalculator.DB
 
             // レジストリ情報の取得を試みる
             RegistryKey? parent = Registry.LocalMachine.OpenSubKey(location, false);
-            if (parent == null)
+            if (parent is null)
             {
                 // だめだった場合諦める
                 return "";
@@ -199,7 +199,7 @@ namespace X4_ComplexCalculator.DB
             {
                 // 子のレジストリの情報を取得する
                 RegistryKey? child = Registry.LocalMachine.OpenSubKey(@$"{location}\{subKeyName}", false);
-                if (child == null)
+                if (child is null)
                 {
                     // 取得に失敗したら次のレジストリを見に行く
                     continue;
@@ -207,7 +207,7 @@ namespace X4_ComplexCalculator.DB
 
                 // 表示名を保持しているオブジェクトを取得する
                 var value = child.GetValue("DisplayName");
-                if (value == null)
+                if (value is null)
                 {
                     // 取得に失敗したら次のレジストリを見に行く
                     continue;

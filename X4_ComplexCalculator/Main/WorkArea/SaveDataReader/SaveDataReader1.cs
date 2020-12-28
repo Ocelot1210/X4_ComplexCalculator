@@ -76,7 +76,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             foreach (var (wareID, allocCount) in conn.Query<(string, long)>(sql))
             {
                 var itm = _WorkArea.StationData.StorageAssignInfo.StorageAssign.FirstOrDefault(x => x.WareID == wareID);
-                if (itm != null)
+                if (itm is not null)
                 {
                     itm.AllocCount = allocCount;
                 }

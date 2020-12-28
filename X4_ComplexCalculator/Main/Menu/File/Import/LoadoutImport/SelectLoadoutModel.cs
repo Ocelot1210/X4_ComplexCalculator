@@ -172,7 +172,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
                 }
 
                 var itm = LoadoutItem.Create(XElement.Parse(reader.ReadOuterXml()));
-                if (itm != null)
+                if (itm is not null)
                 {
                     addItems.Add(itm);
                 }

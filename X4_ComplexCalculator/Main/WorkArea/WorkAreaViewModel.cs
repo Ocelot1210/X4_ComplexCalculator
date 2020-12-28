@@ -178,12 +178,12 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <param name="e"></param>
         private void Instance_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(LocalizeDictionary.Instance.Culture) && _CurrentDockingManager != null)
+            if (e.PropertyName == nameof(LocalizeDictionary.Instance.Culture) && _CurrentDockingManager is not null)
             {
                 var serializer = new XmlLayoutSerializer(_CurrentDockingManager);
 
                 var layout = GetCurrentLayout();
-                if (layout != null)
+                if (layout is not null)
                 {
                     using var ms = new MemoryStream(layout, false);
                     using var ms2 = new MemoryStream(SetTitle(ms), false);
@@ -284,7 +284,7 @@ WHERE
             _LayoutID = layoutID;
             _Layout = SettingDatabase.Instance.QuerySingle<byte[]>("SELECT Layout FROM WorkAreaLayouts WHERE LayoutID = :layoutID", new { layoutID });
 
-            if (_Layout != null && _CurrentDockingManager != null)
+            if (_Layout is not null && _CurrentDockingManager is not null)
             {
                 var serializer = new XmlLayoutSerializer(_CurrentDockingManager);
 
@@ -294,7 +294,7 @@ WHERE
             }
 
             // 表示メニューを初期化
-            if (_CurrentDockingManager != null)
+            if (_CurrentDockingManager is not null)
             {
                 VisiblityMenuItems.Reset(_CurrentDockingManager.Layout.Descendents().OfType<LayoutAnchorable>().Select(x => new VisiblityMenuItem(x)));
             }
@@ -307,7 +307,7 @@ WHERE
         /// <returns>現在のレイアウトを表す UTF-8 XML</returns>
         private byte[]? GetCurrentLayout()
         {
-            if (_CurrentDockingManager == null)
+            if (_CurrentDockingManager is null)
             {
                 return _Layout;
             }
@@ -336,13 +336,13 @@ WHERE
                 return;
             }
 
-            if (_CurrentDockingManager == null)
+            if (_CurrentDockingManager is null)
             {
                 return;
             }
 
             // 前回レイアウトがあれば、レイアウト復元
-            if (_Layout != null)
+            if (_Layout is not null)
             {
                 var serializer = new XmlLayoutSerializer(_CurrentDockingManager);
 

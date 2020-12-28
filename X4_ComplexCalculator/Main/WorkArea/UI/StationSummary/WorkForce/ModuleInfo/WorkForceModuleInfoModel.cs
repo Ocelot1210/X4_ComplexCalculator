@@ -163,12 +163,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
         /// <param name="e"></param>
         private async Task OnModulesChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e.NewItems != null)
+            if (e.NewItems is not null)
             {
                 OnModuleAdded(e.NewItems.Cast<ModulesGridItem>());
             }
 
-            if (e.OldItems != null)
+            if (e.OldItems is not null)
             {
                 OnModuleRemoved(e.OldItems.Cast<ModulesGridItem>());
             }
@@ -209,7 +209,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
             foreach (var d in details)
             {
                 var itm = WorkForceDetails.FirstOrDefault(x => x.ModuleID == d.Module.ModuleID);
-                if (itm != null)
+                if (itm is not null)
                 {
                     if (0 < itm.WorkForce)
                     {
@@ -260,7 +260,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
             foreach (var d in details)
             {
                 var itm = WorkForceDetails.FirstOrDefault(x => x.ModuleID == d.Module.ModuleID);
-                if (itm != null)
+                if (itm is not null)
                 {
                     if (0 < itm.WorkForce)
                     {

@@ -418,7 +418,7 @@ namespace X4_ComplexCalculator.Main
                 }
                 return;
             }
-            if (latestVersion == null)
+            if (latestVersion is null)
             {
                 if (isUserOperation)
                 {
@@ -524,7 +524,7 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         private void OpenEmpireOverviewWindow()
         {
-            if (_EmpireOverviewWindow == null)
+            if (_EmpireOverviewWindow is null)
             {
                 _EmpireOverviewWindow = new EmpireOverviewWindow(Documents);
                 _EmpireOverviewWindow.Closed += (obj, e) => { _EmpireOverviewWindow = null; };
@@ -540,7 +540,7 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         private void OpenDBViewerWindow()
         {
-            if (_DBViewerWindow == null)
+            if (_DBViewerWindow is null)
             {
                 _DBViewerWindow = new DBViewerWindow();
                 _DBViewerWindow.Closed += (_, _) => { _DBViewerWindow = null; };

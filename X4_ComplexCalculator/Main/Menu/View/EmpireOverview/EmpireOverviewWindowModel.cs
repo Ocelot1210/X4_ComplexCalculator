@@ -79,7 +79,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
         /// <param name="e"></param>
         private void WorkAreas_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e.OldItems != null)
+            if (e.OldItems is not null)
             {
                 foreach (var item in e.OldItems.OfType<WorkAreaViewModel>().Select(x => x.Products.ProductsInfo.Products))
                 {
@@ -99,7 +99,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
                 }
             }
 
-            if (e.NewItems != null)
+            if (e.NewItems is not null)
             {
                 foreach (var item in e.NewItems.OfType<WorkAreaViewModel>().Select(x => x.Products.ProductsInfo.Products))
                 {
@@ -134,7 +134,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
                         }
 
                         var prod = Products.FirstOrDefault(x => x.Ware.WareID == product.Ware.WareID);
-                        if (prod != null)
+                        if (prod is not null)
                         {
                             prod.Count += ev.NewValue - ev.OldValue;
                         }
@@ -160,13 +160,13 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
             }
 
             // 生産/消費ウェアが削除された場合
-            if (e.OldItems != null)
+            if (e.OldItems is not null)
             {
                 OnProductsRemoved(products, e.OldItems.OfType<ProductsGridItem>());
             }
 
             // 生産/消費ウェアが追加された場合
-            if (e.NewItems != null)
+            if (e.NewItems is not null)
             {
                 OnProductsAdded(products, e.NewItems.OfType<ProductsGridItem>());
             }
@@ -207,7 +207,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
             foreach (var removedItem in removedItems)
             {
                 var prod = Products.FirstOrDefault(x => x.Ware.WareID == removedItem.Ware.WareID);
-                if (prod != null)
+                if (prod is not null)
                 {
                     prod.Count -= removedItem.Count;
                 }
@@ -234,7 +234,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
             {
                 var prod = Products.FirstOrDefault(x => x.Ware.WareID == addedItem.Ware.WareID);
 
-                if (prod == null)
+                if (prod is null)
                 {
                     // どのステーションでもまだ生産/消費していないウェアの場合
                     // 追加対象に突っ込む

@@ -39,7 +39,7 @@ namespace X4_ComplexCalculator.DB
         /// <returns>設定データベース</returns>
         public static void Open()
         {
-            if (_Instance != null) return;
+            if (_Instance is not null) return;
 
             var config = Configuration.GetConfiguration();
             var basePath = AppDomain.CurrentDomain.BaseDirectory ?? "";

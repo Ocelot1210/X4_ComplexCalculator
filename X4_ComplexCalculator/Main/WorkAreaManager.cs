@@ -74,7 +74,7 @@ namespace X4_ComplexCalculator.Main
 
             // 現在のレイアウトが変更された場合、開いているドキュメントすべてに適用する
             _LayoutsManager.ActiveLayout
-                .Where(layout => layout != null)
+                .Where(layout => layout is not null)
                 .Select(layout => layout?.LayoutID ?? throw new InvalidOperationException())
                 .Subscribe(layoutID =>
                 {

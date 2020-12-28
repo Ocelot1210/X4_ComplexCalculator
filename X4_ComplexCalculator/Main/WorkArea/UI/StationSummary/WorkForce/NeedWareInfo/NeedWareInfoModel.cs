@@ -158,7 +158,7 @@ WHERE
             var addWares = new Dictionary<string, Dictionary<string, long>>();
 
             // 削除予定のウェアを集計
-            if (e.OldItems != null)
+            if (e.OldItems is not null)
             {
                 var wares = _Calculator.Calc(e.OldItems.Cast<ModulesGridItem>().Where(x => 0 < x.Module.WorkersCapacity));
 
@@ -184,7 +184,7 @@ WHERE
             }
 
             // 追加予定のウェアを集計
-            if (e.NewItems != null)
+            if (e.NewItems is not null)
             {
                 var wares = _Calculator.Calc(e.NewItems.Cast<ModulesGridItem>().Where(x => 0 < x.Module.WorkersCapacity));
 
@@ -246,7 +246,7 @@ WHERE
                 {
                     var item = NeedWareInfoDetails.FirstOrDefault(x => x.Method == method && x.WareID == wareID);
 
-                    if (item != null)
+                    if (item is not null)
                     {
                         item.NeedAmount += amount;
 
@@ -259,7 +259,7 @@ WHERE
                     else
                     {
                         var race = (method == "default") ? Race.Get("argon") : Race.Get(method);
-                        if (race != null)
+                        if (race is not null)
                         {
                             NeedWareInfoDetails.Add(new NeedWareInfoDetailsItem(race, method, wareID, amount, AggregateTargetProducts[wareID]));
                         }
@@ -354,7 +354,7 @@ WHERE
 
             foreach (var item in items)
             {
-                if (item == null)
+                if (item is null)
                 {
                     continue;
                 }
@@ -366,7 +366,7 @@ WHERE
                     AggregateTargetProducts[prod.Ware.WareID] = amount;
 
                     var ware = NeedWareInfoDetails.FirstOrDefault(x => x.WareID == prod.Ware.WareID);
-                    if (ware != null)
+                    if (ware is not null)
                     {
                         ware.ProductionAmount = amount;
                     }

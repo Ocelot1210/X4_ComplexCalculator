@@ -51,7 +51,7 @@ namespace X4_ComplexCalculator.Common.Localize
         /// <returns>The Assembly name</returns>
         protected string GetAssemblyName(Assembly assembly)
         {
-            if (assembly.FullName == null)
+            if (assembly.FullName is null)
                 throw new NullReferenceException("assembly.FullName is null");
 
             return assembly.FullName.Split(',')[0];
@@ -144,7 +144,7 @@ namespace X4_ComplexCalculator.Common.Localize
 
             ParseKey(key, out var assembly, out var dictionary, out key);
 
-            if (target == null)
+            if (target is null)
                 return new FQAssemblyDictionaryKey(key, assembly, dictionary);
 
             if (string.IsNullOrEmpty(assembly))
