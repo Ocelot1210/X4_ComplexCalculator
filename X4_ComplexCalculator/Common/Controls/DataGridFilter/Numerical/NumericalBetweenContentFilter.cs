@@ -49,11 +49,21 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.Numerical
             }
 
             var val = Convert.ToDecimal(value);
+            var ret = true;
 
+            // 最小値以上か？
+            if (_MinValue is not null)
+            {
+                ret = _MinValue <= val;
+            }
 
-            // 最小値以上かつ最大値以下か？
-            return (_MaxValue is not null && _MinValue <= val) &&
-                   (_MaxValue is not null && val <= _MaxValue);
+            // 最大値以下か？
+            if (ret && _MaxValue is not null)
+            {
+                ret = val <= _MaxValue;
+            }
+
+            return ret;
         }
     }
 }

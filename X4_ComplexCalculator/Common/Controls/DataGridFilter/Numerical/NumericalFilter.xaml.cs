@@ -197,6 +197,14 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.Numerical
             }
             else
             {
+                var (minValue, isMinValidInput) = ParseDouble(FilterText1);
+                var (maxValue, isMaxValidInput) = ParseDouble(FilterText2);
+
+                if (isMinValidInput || isMaxValidInput)
+                {
+                    Filter = new NumericalBetweenContentFilter(minValue, maxValue);
+                }
+
                 IsFilterEnabled = FilterText1 != "" || FilterText2 != "";
             }
 
