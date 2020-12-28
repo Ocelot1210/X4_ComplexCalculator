@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Data;
+using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions;
 
 
@@ -135,14 +136,14 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.List
         private static readonly DependencyProperty ListBoxItemsProperty =
             DependencyProperty.Register(
                 nameof(ListBoxItems),
-                typeof(ObservableCollection<ListBoxItem>),
+                typeof(ObservableRangeCollection<ListBoxItem>),
                 typeof(ListFilter),
-                new FrameworkPropertyMetadata(new ObservableCollection<ListBoxItem>())
+                new FrameworkPropertyMetadata(new ObservableRangeCollection<ListBoxItem>())
             );
 
-        private ObservableCollection<ListBoxItem> ListBoxItems
+        private ObservableRangeCollection<ListBoxItem> ListBoxItems
         {
-            get => (ObservableCollection<ListBoxItem>)GetValue(ListBoxItemsProperty);
+            get => (ObservableRangeCollection<ListBoxItem>)GetValue(ListBoxItemsProperty);
             set => SetValue(ListBoxItemsProperty, value);
         }
         #endregion
@@ -154,25 +155,22 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.List
         /// </summary>
         private void PART_FilterButton_Click(object sender, RoutedEventArgs e)
         {
-            // _ListBoxItemsView を設定しないと何故かListBoxItemFilter() で ListBoxSearchText が空文字列になる
-            // → コンストラクタや OnApplyTemplate() で設定すると上手く動かない
-            //    TODO:原因が分かったら修正する
-            _ListBoxItemsView = CollectionViewSource.GetDefaultView(ListBoxItems);
-            _ListBoxItemsView.Filter = ListBoxItemFilter;
-
+            // Filterを設定する前に未チェックの項目を保存しないとチェック状態が意図しない状態になる
             _UnCheckedSet.Clear();
             foreach (var item in ListBoxItems.Where(x => !x.IsChecked))
             {
                 _UnCheckedSet.Add(item.Text);
             }
 
-            var srcValues = ((DataGridFilterColumnControl)TemplatedParent).SourceValues;
-            ListBoxItems.Clear();
-            foreach (var value in srcValues.Distinct().OrderBy(x => x))
-            {
-                ListBoxItems.Add(new ListBoxItem(value, !_UnCheckedSet.Contains(value)));
-            }
 
+            // _ListBoxItemsView を設定しないと何故かListBoxItemFilter() で ListBoxSearchText が空文字列になる
+            // → コンストラクタや OnApplyTemplate() で設定すると上手く動かない
+            //    TODO:原因が分かったら修正する
+            _ListBoxItemsView = CollectionViewSource.GetDefaultView(ListBoxItems);
+            _ListBoxItemsView.Filter = ListBoxItemFilter;
+
+            var srcValues = ((DataGridFilterColumnControl)TemplatedParent).SourceValues;
+            ListBoxItems.Reset(srcValues.Distinct().OrderBy(x => x).Select(x => new ListBoxItem(x, !_UnCheckedSet.Contains(x))));
             IsOpen = true;
         }
 
@@ -236,7 +234,7 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.List
             if (obj is ListBoxItem item)
             {
                 ret = ListBoxSearchText == "" | 0 <= item.Text.IndexOf(ListBoxSearchText, StringComparison.InvariantCultureIgnoreCase);
-                item.IsChecked = ret;
+                item.IsChecked = ret && !_UnCheckedSet.Contains(item.Text);
             }
 
             return ret;
