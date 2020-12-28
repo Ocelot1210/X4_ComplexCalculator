@@ -300,9 +300,19 @@ TextFilter_EndWith;End with
 # DB Viewer
 # ------------------------------------------------------
 DBViewer;DB Viewer
+DBViewer_Description;Description
 # Races
-Races;Races
-RaceID;Race ID
-RaceName;Race name
-ShortName;Short name
-Description;Description
+DBViewer_Races_Title;Races
+DBViewer_Races_RaceID;Race ID
+DBViewer_Races_RaceName;Race name
+DBViewer_Races_ShortName;Short name
+# Wares
+DBViewer_Wares_Title;Wares
+DBViewer_Wares_WareName;Name
+DBViewer_Wares_WareGroupName;Type
+DBViewer_Wares_TransportTypeName;Transport
+DBViewer_Wares_MinPrice;Min price
+DBViewer_Wares_MaxPrice;Max price
+DBViewer_Wares_Profit;Profit
+DBViewer_Wares_Volume;Volume
+DBViewer_Wares_ProfitPerVolume;Profit/Volume

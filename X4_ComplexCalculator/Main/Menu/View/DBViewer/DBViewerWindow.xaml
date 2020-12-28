@@ -8,6 +8,7 @@
     xmlns:local="clr-namespace:X4_ComplexCalculator.Main.Menu.View.DBViewer"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:races="clr-namespace:X4_ComplexCalculator.Main.Menu.View.DBViewer.Races"
+    xmlns:wares="clr-namespace:X4_ComplexCalculator.Main.Menu.View.DBViewer.Wares"
     Title="DBViewerWindow"
     Width="800"
     Height="450"
@@ -16,6 +17,7 @@
     lex:ResxLocalizationProvider.DefaultAssembly="WPFLocalizationExtension"
     lex:ResxLocalizationProvider.DefaultDictionary="StringResources"
     mc:Ignorable="d">
+
     <Grid>
         <avdk:DockingManager>
             <LayoutRoot>
@@ -24,12 +26,21 @@
                         <LayoutAnchorablePane>
 
                             <LayoutAnchorable
-                                Title="{lex:Loc Lang:Races}"
+                                Title="{lex:Loc Lang:DBViewer_Races_Title}"
                                 CanClose="False"
                                 CanHide="False"
                                 ContentId="Races">
                                 <races:RacesGrid />
                             </LayoutAnchorable>
+
+                            <LayoutAnchorable
+                                Title="{lex:Loc Lang:DBViewer_Wares_Title}"
+                                CanClose="False"
+                                CanHide="False"
+                                ContentId="Wares">
+                                <wares:WaresGrid />
+                            </LayoutAnchorable>
+
 
                         </LayoutAnchorablePane>
                     </LayoutAnchorablePaneGroup>

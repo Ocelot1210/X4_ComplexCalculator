@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Linq;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
@@ -109,6 +109,12 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <param name="wareID">ウェアID</param>
         /// <returns>ウェア</returns>
         public static Ware Get(string wareID) => _Wares[wareID];
+
+
+        /// <summary>
+        /// 全ウェアを取得
+        /// </summary>
+        public static IEnumerable<Ware> GetAll() => _Wares.Select(x => x.Value);
 
 
         /// <summary>

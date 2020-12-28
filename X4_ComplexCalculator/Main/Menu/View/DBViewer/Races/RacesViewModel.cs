@@ -12,6 +12,9 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Races
     class RacesViewModel : BindableBase
     {
         #region メンバ
+        /// <summary>
+        /// 種族一覧
+        /// </summary>
         private readonly ObservableRangeCollection<Race> _Races = new(Race.GetAll());
         #endregion
 

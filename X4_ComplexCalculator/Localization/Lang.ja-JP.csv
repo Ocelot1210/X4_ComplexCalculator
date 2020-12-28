@@ -299,9 +299,19 @@ TextFilter_EndWith;指定の値で終わる
 # DB Viewer
 # ------------------------------------------------------
 DBViewer;DBビュワー
+DBViewer_Description;説明文
 # Races
-Races;種族
-RaceID;種族ID
-RaceName;種族名
-ShortName;略称
-Description;説明文
+DBViewer_Races_Title;種族
+DBViewer_Races_RaceID;種族ID
+DBViewer_Races_RaceName;種族名
+DBViewer_Races_ShortName;略称
+# Wares
+DBViewer_Wares_Title;ウェア
+DBViewer_Wares_WareName;名称
+DBViewer_Wares_WareGroupName;種別
+DBViewer_Wares_TransportTypeName;輸送種別
+DBViewer_Wares_MinPrice;最安値
+DBViewer_Wares_MaxPrice;最高値
+DBViewer_Wares_Profit;利益
+DBViewer_Wares_Volume;サイズ
+DBViewer_Wares_ProfitPerVolume;利益/サイズ

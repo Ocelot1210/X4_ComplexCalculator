@@ -93,6 +93,10 @@
         <Setter Property="TextBlock.TextAlignment" Value="Right" />
     </Style>
 
+    <Style x:Key="RightAlignedDataGridTexColumnElementStyle" TargetType="TextBlock">
+        <Setter Property="TextAlignment" Value="Right" />
+    </Style>
+
     <!--  ValueConverter  -->
     <x4conv:Visiblity2NullableBooleanConverter x:Key="Visiblity2NullableConverter" />
     <BooleanToVisibilityConverter x:Key="Bool2VisiblityConverter" />

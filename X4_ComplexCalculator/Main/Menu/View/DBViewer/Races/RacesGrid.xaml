@@ -17,50 +17,34 @@
     <UserControl.DataContext>
         <local:RacesViewModel />
     </UserControl.DataContext>
-    <Grid>
-        <DataGrid
-            dgx:DataGridFilter.IsAutoFilterEnabled="True"
-            HorizontalScrollBarVisibility="Visible"
-            IsReadOnly="True"
-            ItemsSource="{Binding RacesView, Mode=OneTime}"
-            Style="{StaticResource DefaultDataGridStyle}"
-            VerticalScrollBarVisibility="Visible"
-            VirtualizingPanel.ScrollUnit="Pixel">
+    <DataGrid
+        dgx:DataGridFilter.IsAutoFilterEnabled="True"
+        HorizontalScrollBarVisibility="Visible"
+        IsReadOnly="True"
+        ItemsSource="{Binding RacesView, Mode=OneTime}"
+        Style="{StaticResource DefaultDataGridStyle}"
+        VerticalScrollBarVisibility="Visible"
+        VirtualizingPanel.ScrollUnit="Pixel">
 
-            <DataGrid.Columns>
-                <!--  種族ID  -->
-                <DataGridTextColumn
-                    dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
-                    Binding="{Binding RaceID, Mode=OneTime}"
-                    Header="{lex:Loc Lang:RaceID}" />
+        <DataGrid.Columns>
+            <!--  種族ID  -->
+            <DataGridTextColumn
+                dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
+                Binding="{Binding RaceID, Mode=OneTime}"
+                Header="{lex:Loc Lang:DBViewer_Races_RaceID}" />
 
-                <!--  種族名  -->
-                <DataGridTextColumn
-                    dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
-                    Binding="{Binding Name, Mode=OneTime}"
-                    Header="{lex:Loc Lang:RaceName}" />
+            <!--  種族名  -->
+            <DataGridTextColumn
+                dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
+                Binding="{Binding Name, Mode=OneTime}"
+                Header="{lex:Loc Lang:DBViewer_Races_RaceName}" />
 
-                <!--  種族略称  -->
-                <DataGridTextColumn
-                    dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
-                    Binding="{Binding ShortName, Mode=OneTime}"
-                    Header="{lex:Loc Lang:ShortName}" />
+            <!--  種族略称  -->
+            <DataGridTextColumn
+                dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
+                Binding="{Binding ShortName, Mode=OneTime}"
+                Header="{lex:Loc Lang:DBViewer_Races_ShortName}" />
 
-                <!--  説明文  -->
-                <DataGridTextColumn
-                    Width="*"
-                    dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnTextFilter}"
-                    Binding="{Binding Description, Mode=OneTime}"
-                    Header="{lex:Loc Lang:Description}">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="{x:Type TextBlock}">
-                            <Setter Property="TextWrapping" Value="Wrap" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-            </DataGrid.Columns>
-
-        </DataGrid>
-
-    </Grid>
+        </DataGrid.Columns>
+    </DataGrid>
 </UserControl>
