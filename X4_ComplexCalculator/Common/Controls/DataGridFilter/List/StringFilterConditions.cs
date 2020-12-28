@@ -1,4 +1,4 @@
-﻿namespace X4_ComplexCalculator.Common.Controlls.DataGridFilter.List
+﻿namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.List
 {
     /// <summary>
     /// 文字列用フィルタの一致条件

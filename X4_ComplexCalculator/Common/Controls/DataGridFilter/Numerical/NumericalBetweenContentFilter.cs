@@ -1,7 +1,7 @@
 ﻿using System;
 using X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions;
 
-namespace X4_ComplexCalculator.Common.Controlls.DataGridFilter.Numerical
+namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.Numerical
 {
     /// <summary>
     /// 数値フィルタ用クラス(指定の範囲内用)

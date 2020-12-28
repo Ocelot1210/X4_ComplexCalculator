@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Data;
 using X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions;
 
-namespace X4_ComplexCalculator.Common.Controlls.DataGridFilter.Text
+namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.Text
 {
     /// <summary>
     /// TextFilter.xaml の相互作用ロジック

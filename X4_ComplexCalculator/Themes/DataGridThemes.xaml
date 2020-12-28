@@ -2,10 +2,10 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:dgx="clr-namespace:X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions;assembly=X4_ComplexCalculator_CustomControlLibrary"
-    xmlns:listfilter="clr-namespace:X4_ComplexCalculator.Common.Controlls.DataGridFilter.List"
+    xmlns:listfilter="clr-namespace:X4_ComplexCalculator.Common.Controls.DataGridFilter.List"
     xmlns:local="clr-namespace:X4_ComplexCalculator.Themes"
-    xmlns:numericalfilter="clr-namespace:X4_ComplexCalculator.Common.Controlls.DataGridFilter.Numerical"
-    xmlns:textfilter="clr-namespace:X4_ComplexCalculator.Common.Controlls.DataGridFilter.Text"
+    xmlns:numericalfilter="clr-namespace:X4_ComplexCalculator.Common.Controls.DataGridFilter.Numerical"
+    xmlns:textfilter="clr-namespace:X4_ComplexCalculator.Common.Controls.DataGridFilter.Text"
     xmlns:x4conv="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
     xmlns:x4enum="clr-namespace:X4_ComplexCalculator.Common.EditStatus">
 

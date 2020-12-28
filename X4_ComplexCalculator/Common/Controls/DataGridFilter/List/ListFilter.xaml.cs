@@ -8,7 +8,7 @@ using System.Windows.Data;
 using X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions;
 
 
-namespace X4_ComplexCalculator.Common.Controlls.DataGridFilter.List
+namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.List
 {
     /// <summary>
     /// ListFilter.xaml の相互作用ロジック

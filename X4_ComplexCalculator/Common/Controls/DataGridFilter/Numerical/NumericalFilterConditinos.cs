@@ -1,4 +1,4 @@
-﻿namespace X4_ComplexCalculator.Common.Controlls.DataGridFilter.Numerical
+﻿namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.Numerical
 {
     /// <summary>
     /// 数値用フィルタの一致条件

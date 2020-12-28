@@ -1,5 +1,5 @@
 ﻿<Control
-    x:Class="X4_ComplexCalculator.Common.Controlls.DataGridFilter.Text.TextFilter"
+    x:Class="X4_ComplexCalculator.Common.Controls.DataGridFilter.List.ListFilter"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -14,7 +14,7 @@
     lex:ResxLocalizationProvider.DefaultAssembly="WPFLocalizationExtension"
     lex:ResxLocalizationProvider.DefaultDictionary="StringResources"
     mc:Ignorable="d">
-    <!--    -->
+
 
     <Control.Resources>
         <x4conv:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
@@ -24,8 +24,16 @@
     <Control.Template>
         <ControlTemplate>
             <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
                 <!--  フィルタのボタン  -->
-                <Button x:Name="PART_FilterButton" Click="PART_FilterButton_Click">
+                <Button
+                    x:Name="PART_FilterButton"
+                    Grid.Row="0"
+                    Click="PART_FilterButton_Click">
                     <Grid>
                         <TextBlock
                             x:Name="PART_TriangleIcon"
@@ -42,6 +50,7 @@
                 <!--  ボタンを押したら表示されるメニュー  -->
                 <Popup
                     x:Name="Popup"
+                    Grid.Row="1"
                     d:DataContext="{d:DesignInstance dgx:DataGridFilterColumnControl}"
                     AllowsTransparency="True"
                     IsOpen="{Binding ElementName=Control, Path=IsOpen}"
@@ -71,23 +80,25 @@
                                 Click="PART_ClearButton_Click"
                                 Content="Clear" />
                         </StackPanel>
-                        <GroupBox Header="{lex:Loc Lang:TextFilter_GroupBoxTitle}">
-                            <StackPanel Orientation="Vertical">
 
-                                <xctk:WatermarkTextBox Text="{Binding ElementName=Control, Path=FilterText}" Watermark="{lex:Loc Lang:Search}" />
-                                <GroupBox Header="{lex:Loc Lang:DataGridColumnsFilter_Conditions}">
-                                    <StackPanel Orientation="Vertical">
-                                        <RadioButton Content="{lex:Loc Lang:TextFilter_Contains}" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Contains, UpdateSourceTrigger=PropertyChanged}" />
-                                        <RadioButton Content="{lex:Loc Lang:TextFilter_NotContains}" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=NotContains, UpdateSourceTrigger=PropertyChanged}" />
-                                        <Separator />
-                                        <RadioButton Content="{lex:Loc Lang:TextFilter_Equals}" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Equals, UpdateSourceTrigger=PropertyChanged}" />
-                                        <RadioButton Content="{lex:Loc Lang:TextFilter_NotEqulas}" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=NotEquals, UpdateSourceTrigger=PropertyChanged}" />
-                                        <Separator />
-                                        <RadioButton Content="{lex:Loc Lang:TextFilter_StartWith}" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=StartWith, UpdateSourceTrigger=PropertyChanged}" />
-                                        <RadioButton Content="{lex:Loc Lang:TextFilter_EndWith}" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=EndWith, UpdateSourceTrigger=PropertyChanged}" />
-                                    </StackPanel>
-                                </GroupBox>
-                            </StackPanel>
+                        <GroupBox
+                            Width="200"
+                            Height="200"
+                            Header="{lex:Loc Lang:ListFilter_GroupBoxHeader}">
+                            <DockPanel>
+                                <xctk:WatermarkTextBox
+                                    x:Name="PART_ListSearchTextBox"
+                                    DockPanel.Dock="Top"
+                                    Text="{Binding ElementName=Control, Path=ListBoxSearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    Watermark="{lex:Loc Lang:Search}" />
+                                <xctk:CheckListBox
+                                    x:Name="PART_ListBox"
+                                    DisplayMemberPath="Text"
+                                    IsSelectAllActive="True"
+                                    ItemsSource="{Binding ElementName=Control, Path=ListBoxItems, Mode=OneTime}"
+                                    SelectAllContent="{lex:Loc Lang:SelectAll}"
+                                    SelectedMemberPath="IsChecked" />
+                            </DockPanel>
                         </GroupBox>
                     </StackPanel>
                 </Popup>

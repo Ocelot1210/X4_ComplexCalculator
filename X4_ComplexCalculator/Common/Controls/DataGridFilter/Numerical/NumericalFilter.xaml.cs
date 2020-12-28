@@ -4,7 +4,7 @@ using X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions;
 using WPFLocalizeExtension.Engine;
 
 
-namespace X4_ComplexCalculator.Common.Controlls.DataGridFilter.Numerical
+namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.Numerical
 {
     /// <summary>
     /// NumericalFilter.xaml の相互作用ロジック

@@ -1,7 +1,7 @@
 ﻿using System;
 using X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions;
 
-namespace X4_ComplexCalculator.Common.Controlls.DataGridFilter.Text
+namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.Text
 {
     /// <summary>
     /// 文字列フィルタ用クラス

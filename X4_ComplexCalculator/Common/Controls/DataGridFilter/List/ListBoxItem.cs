@@ -1,6 +1,6 @@
 ﻿using Prism.Mvvm;
 
-namespace X4_ComplexCalculator.Common.Controlls.DataGridFilter.List
+namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.List
 {
     /// <summary>
     /// リスト用のアイテム

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions;
 
-namespace X4_ComplexCalculator.Common.Controlls.DataGridFilter.List
+namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.List
 {
     /// <summary>
     /// リストフィルタ用クラス
