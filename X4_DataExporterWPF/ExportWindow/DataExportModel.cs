@@ -45,8 +45,9 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// <param name="inDirPath">入力元フォルダパス</param>
         /// <param name="outFilePath">出力先ファイルパス</param>
         /// <param name="language">選択された言語</param>
+        /// <param name="owner">親ウィンドウハンドル(メッセージボックス表示用)</param>
         /// <returns>現在数と合計数のタプルのイテレータ</returns>
-        public void Export(IProgress<(int currentStep, int maxSteps)> progless, string inDirPath, string outFilePath, LangComboboxItem language)
+        public void Export(IProgress<(int currentStep, int maxSteps)> progless, string inDirPath, string outFilePath, LangComboboxItem language, Window owner)
         {
             var catFile = new CatFile(inDirPath);
 
@@ -84,6 +85,7 @@ namespace X4_DataExporterWPF.DataExportWindow
                     new TransportTypeExporter(resolver),                // カーゴ種別情報
                     new RaceExporter(raceXml, resolver),                // 種族情報
                     new FactionExporter(factionsXml, resolver),         // 派閥情報
+                    new PurposeExporter(resolver),                      // 用途情報
                     //new MapExporter(mapXml, resolver),                 // マップ
 
                     // ウェア関連
@@ -113,7 +115,15 @@ namespace X4_DataExporterWPF.DataExportWindow
 
                     // 従業員関連
                     new WorkUnitProductionExporter(waresXml),           // 従業員用生産情報
-                    new WorkUnitResourceExporter(waresXml)              // 従業員用必要ウェア情報
+                    new WorkUnitResourceExporter(waresXml),             // 従業員用必要ウェア情報
+
+                    // 艦船関連
+                    new ShipTypeExporter(resolver),                     // 艦船種別情報
+                    new ShipExporter(catFile, waresXml, resolver),      // 艦船情報
+                    new ShipPurposeExporter(catFile, waresXml),         // 艦船用途情報
+                    new ShipEquipmentExporter(catFile, waresXml),       // 艦船装備情報
+                    new ShipHangerExporter(catFile, waresXml),          // 艦船ハンガー(機体格納庫)情報
+                    new ShipTransportTypeExporter(catFile, waresXml),   // 艦船カーゴ情報
                 };
 
                 // 進捗初期化
@@ -127,8 +137,10 @@ namespace X4_DataExporterWPF.DataExportWindow
                 }
 
                 trans.Commit();
-
-                MessageBox.Show("Data export completed.", "X4 DataExporter", MessageBoxButton.OK, MessageBoxImage.Information);
+                owner.Dispatcher.BeginInvoke((Action)(() =>
+                {
+                    MessageBox.Show("Data export completed.", "X4 DataExporter", MessageBoxButton.OK, MessageBoxImage.Information);
+                }));
             }
 #if !DEBUG
             catch (Exception e)
@@ -145,9 +157,11 @@ Please report the following content to the developer.
 2. Crash report file.
 3. Version of X4.";
 
-                MessageBox.Show(msg, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                System.Diagnostics.Process.Start("explorer.exe", $@"/select,""{dumpPath}""");
+                owner.Dispatcher.BeginInvoke((Action)(() =>
+                {
+                    MessageBox.Show(owner, msg, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    System.Diagnostics.Process.Start("explorer.exe", $@"/select,""{dumpPath}""");
+                }));
             }
 #endif
         }
