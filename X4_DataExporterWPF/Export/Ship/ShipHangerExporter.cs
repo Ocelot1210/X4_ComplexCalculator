@@ -78,9 +78,10 @@ CREATE TABLE IF NOT EXISTS ShipHanger
     SizeID      TEXT    NOT NULL,
     Count       INTEGER NOT NULL,
     Capacity    INTEGER NOT NULL,
+    PRIMARY KEY (ShipID, SizeID),
     FOREIGN KEY (ShipID)    REFERENCES Ship(ShipID),
     FOREIGN KEY (SizeID)    REFERENCES Size(SizeID)
-)");
+) WITHOUT ROWID");
             }
 
 

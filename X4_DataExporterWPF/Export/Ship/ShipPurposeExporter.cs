@@ -51,9 +51,10 @@ CREATE TABLE IF NOT EXISTS ShipPurpose
     ShipID          TEXT    NOT NULL,
     Type            TEXT    NOT NULL,
     PurposeID       TEXT    NOT NULL,
+    PRIMARY KEY (ShipID, Type),
     FOREIGN KEY (ShipID)    REFERENCES Ship(ShipID),
     FOREIGN KEY (PurposeID) REFERENCES Purpose(PurposeID)
-)");
+) WITHOUT ROWID");
             }
 
 

@@ -55,10 +55,11 @@ CREATE TABLE IF NOT EXISTS ShipEquipment
     EquipmentTypeID TEXT    NOT NULL,
     SizeID          TEXT    NOT NULL,
     Count           INTEGER NOT NULL,
+    PRIMARY KEY (ShipID, EquipmentTypeID, SizeID),
     FOREIGN KEY (ShipID)            REFERENCES Ship(ShipID),
     FOREIGN KEY (EquipmentTypeID)   REFERENCES EquipmentType(EquipmentTypeID),
     FOREIGN KEY (SizeID)            REFERENCES Size(SizeID)
-)");
+) WITHOUT ROWID");
             }
 
 

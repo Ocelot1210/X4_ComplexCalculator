@@ -44,8 +44,8 @@ CREATE TABLE IF NOT EXISTS ShipOwner
 (
     ShipID      TEXT    NOT NULL,
     FactionID   TEXT    NOT NULL,
-    PRIMARY KEY (ModuleID, FactionID),
-    FOREIGN KEY (ModuleID)  REFERENCES Module(ModuleID),
+    PRIMARY KEY (ShipID, FactionID),
+    FOREIGN KEY (ShipID)  REFERENCES Ship(ShipID),
     FOREIGN KEY (FactionID) REFERENCES Faction(FactionID)
 ) WITHOUT ROWID");
             }
