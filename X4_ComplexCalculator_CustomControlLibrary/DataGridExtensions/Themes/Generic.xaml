@@ -160,7 +160,7 @@
     <DataTemplate x:Key="{x:Static src:DataGridFilter.ColumnHeaderTemplateKey}">
         <DockPanel Background="Transparent">
             <!--  The control to host the filter UI for this column  -->
-            <src:DataGridFilterColumnControl DockPanel.Dock="Right" />
+            <src:DataGridFilterColumnControl Margin="10,0,0,0" DockPanel.Dock="Right" />
             <ContentPresenter
                 x:Name="PART_Content"
                 HorizontalAlignment="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGridColumnHeader}}"
