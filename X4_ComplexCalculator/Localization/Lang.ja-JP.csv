@@ -324,3 +324,15 @@ DBViewer_Modules_MaxWorker;労働者数
 DBViewer_Modules_WorkersCapacity;収容人数
 DBViewer_Modules_Product;製品
 DBViewer_Modules_MaxEfficiency;最大効率
+# Ships
+DBViewer_Ships_Title;艦船
+DBViewer_Ships_Name;名称
+DBViewer_Ships_Type;種別
+DBViewer_Ships_MakerRace;開発元派閥
+DBViewer_Ships_Size;サイズ
+DBViewer_Ships_Mass;重量
+DBViewer_Ships_MaxForwardSpeed;最高速度
+DBViewer_Ships_MaxReverseSpeed;後退速度
+DBViewer_Ships_MaxBoostSpeed;ブースト速度
+DBViewer_Ships_MaxTravelSpeed;トラベル速度
+DBViewer_Ships_MaxAcceleration;最大加速

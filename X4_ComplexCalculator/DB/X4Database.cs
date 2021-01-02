@@ -247,6 +247,7 @@ namespace X4_ComplexCalculator.DB
 
             ShipType.Init();
             Ship.Init();
+            ShipEquipment.Init();
         }
     }
 }

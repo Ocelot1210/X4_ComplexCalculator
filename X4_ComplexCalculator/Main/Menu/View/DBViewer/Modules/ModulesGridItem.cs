@@ -4,6 +4,9 @@ using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Modules
 {
+    /// <summary>
+    /// モジュール一覧表示用DataGridの1レコード分
+    /// </summary>
     class ModulesGridItem : BindableBase
     {
         #region メンバ

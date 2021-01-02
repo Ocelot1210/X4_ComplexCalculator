@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
@@ -153,6 +154,14 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <returns>装備</returns>
         public static Equipment? Get(string equipmentID) =>
             _Equipments.TryGetValue(equipmentID, out var equipment) ? equipment : null;
+
+
+        /// <summary>
+        /// 装備IDに対応する装備を取得する
+        /// </summary>
+        /// <typeparam name="T">取得する型</typeparam>
+        /// <returns>装備IDに対応する装備</returns>
+        public static IEnumerable<T> GetAll<T>() where T : Equipment => _Equipments.Values.OfType<T>();
 
 
         /// <summary>
