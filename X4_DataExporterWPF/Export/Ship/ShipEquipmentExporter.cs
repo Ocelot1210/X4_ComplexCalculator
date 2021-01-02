@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS ShipEquipment
                 if (componentXml is null) continue;
 
                 // 抽出対象装備種別一覧 (装備種別ID, tags内文字列)
-                (string, string)[] equipmentTypeIDs = { ("weapons", "weapon"), ("turrets", "turret"), ("shields", "shield") };
+                (string, string)[] equipmentTypeIDs = { ("weapons", "weapon"), ("turrets", "turret"), ("shields", "shield"), ("engines", "engine") };
                 foreach (var type in equipmentTypeIDs)
                 {
                     foreach (var equipment in GetEquipment(componentXml, type.Item2))
