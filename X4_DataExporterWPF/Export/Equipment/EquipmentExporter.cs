@@ -6,6 +6,7 @@ using System.Xml.XPath;
 using Dapper;
 using LibX4.FileSystem;
 using LibX4.Lang;
+using LibX4.Xml;
 using X4_DataExporterWPF.Entity;
 
 namespace X4_DataExporterWPF.Export
@@ -65,8 +66,14 @@ CREATE TABLE IF NOT EXISTS Equipment
     EquipmentTypeID TEXT    NOT NULL,
     SizeID          TEXT    NOT NULL,
     Name            TEXT    NOT NULL,
+    Hull            INTEGER NOT NULL,
+    HullIntegrated  BOOLEAN NOT NULL,
+    Mk              INTEGER NOT NULL,
+    MakerRace       TEXT,
+    Description     TEXT    NOT NULL,
     FOREIGN KEY (EquipmentTypeID)   REFERENCES EquipmentType(EquipmentTypeID),
-    FOREIGN KEY (SizeID)            REFERENCES Size(SizeID)
+    FOREIGN KEY (SizeID)            REFERENCES Size(SizeID),
+    FOREIGN KEY (MakerRace)         REFERENCES Race(RaceID)
 ) WITHOUT ROWID");
             }
 
@@ -77,7 +84,9 @@ CREATE TABLE IF NOT EXISTS Equipment
             {
                 var items = GetRecords();
 
-                connection.Execute("INSERT INTO Equipment (EquipmentID, MacroName, EquipmentTypeID, SizeID, Name) VALUES (@EquipmentID, @MacroName, @EquipmentTypeID, @SizeID, @Name)", items);
+                connection.Execute(@"
+INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  SizeID,  Name,  Hull,  HullIntegrated,  Mk,  MakerRace,  Description)
+            VALUES    (@EquipmentID, @MacroName, @EquipmentTypeID, @SizeID, @Name, @Hull, @HullIntegrated, @Mk, @MakerRace, @Description)", items);
             }
         }
 
@@ -99,6 +108,7 @@ CREATE TABLE IF NOT EXISTS Equipment
                 var equipmentTypeID = equipment.Attribute("group")?.Value;
                 if (string.IsNullOrEmpty(equipmentTypeID)) continue;
 
+                
                 var macroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
                 XDocument componentXml;
                 try
@@ -125,7 +135,20 @@ CREATE TABLE IF NOT EXISTS Equipment
                 var name = _Resolver.Resolve(equipment.Attribute("name").Value);
                 name = string.IsNullOrEmpty(name) ? macroName : name;
 
-                yield return new Equipment(equipmentID, macroName, equipmentTypeID, sizeID, name);
+                var idElm = macroXml.Root.XPathSelectElement("macro/properties/identification");
+                if (idElm is null) continue;
+
+                yield return new Equipment(
+                    equipmentID,
+                    macroName,
+                    equipmentTypeID,
+                    sizeID,
+                    name,
+                    macroXml.XPathSelectElement("macro/properties/hull")?.Attribute("max")?.GetInt() ?? 0,
+                    (macroXml.XPathSelectElement("macro/properties/hull")?.Attribute("integrated")?.GetInt() ?? 0) == 1,
+                    idElm.Attribute("mk")?.GetInt() ?? 0,
+                    idElm.Attribute("makerrace")?.Value,
+                    _Resolver.Resolve(idElm.Attribute("description")?.Value ?? ""));
             }
         }
     }

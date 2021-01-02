@@ -244,6 +244,9 @@ namespace X4_ComplexCalculator.DB
             ModuleProduction.Init();
             ModuleProduct.Init();
             Module.Init();
+
+            ShipType.Init();
+            Ship.Init();
         }
     }
 }

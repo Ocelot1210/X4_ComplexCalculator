@@ -112,6 +112,8 @@ namespace X4_DataExporterWPF.DataExportWindow
                     new EquipmentOwnerExporter(waresXml),               // 装備保有派閥情報
                     new EquipmentResourceExporter(waresXml),            // 装備生産に必要なウェア情報
                     new EquipmentProductionExporter(waresXml),          // 装備生産に関する情報
+                    new ShieldExporter(catFile, waresXml),              // シールド情報
+                    new EngineExporter(catFile, waresXml),              // エンジン情報
 
                     // 従業員関連
                     new WorkUnitProductionExporter(waresXml),           // 従業員用生産情報
