@@ -131,7 +131,7 @@ items);
                 if (property is null) continue;
 
                 var cargoSize = GetCargoSize(macroXml);
-                if (cargoSize < 1) continue;
+                if (cargoSize < 0) continue;
 
                 yield return new Ship(
                     shipID,
@@ -189,13 +189,13 @@ items);
         private int GetCargoSize(XDocument macroXml)
         {
             var componentName = macroXml.Root.XPathSelectElement("macro/component")?.Attribute("ref")?.Value ?? "";
-            if (string.IsNullOrEmpty(componentName)) return 0;
+            if (string.IsNullOrEmpty(componentName)) return -1;
 
             var componentXml = _CatFile.OpenIndexXml("index/components.xml", componentName);
-            if (componentXml is null) return 0;
+            if (componentXml is null) return -1;
 
             var connName = componentXml.Root.XPathSelectElement("component/connections/connection[contains(@tags, 'storage')]")?.Attribute("name")?.Value ?? "";
-            if (string.IsNullOrEmpty(connName)) return 0;
+            if (string.IsNullOrEmpty(connName)) return -1;
 
             var storage = macroXml.Root.XPathSelectElement($"macro/connections/connection[@ref='{connName}']/macro")?.Attribute("ref")?.Value ?? "";
             if (string.IsNullOrEmpty(storage))
@@ -206,7 +206,7 @@ items);
 
 
             var storageXml = _CatFile.OpenIndexXml("index/macros.xml", storage);
-            if (storageXml is null) return 0;
+            if (storageXml is null) return -1;
 
             return storageXml.Root.XPathSelectElement("macro/properties/cargo").Attribute("max").GetInt();
         }

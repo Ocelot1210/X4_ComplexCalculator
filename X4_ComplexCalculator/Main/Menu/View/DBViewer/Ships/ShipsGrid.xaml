@@ -36,7 +36,7 @@
             <DataGridTextColumn
                 dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
                 Binding="{Binding Ship.ShipType.Name, Mode=OneTime}"
-                Header="{lex:Loc Lang:DBViewer_Races_RaceName}" />
+                Header="{lex:Loc Lang:DBViewer_Ships_Type}" />
 
             <!--  サイズ  -->
             <DataGridTextColumn
@@ -47,7 +47,8 @@
             <!--  重量  -->
             <DataGridTextColumn
                 dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                Binding="{Binding Ship.Mass, Mode=OneTime}"
+                Binding="{Binding Ship.Mass, Mode=OneTime, StringFormat='{}{0:N0} t'}"
+                CellStyle="{StaticResource RightAlignedDataGridCell}"
                 Header="{lex:Loc Lang:DBViewer_Ships_Mass}" />
 
 
@@ -55,6 +56,7 @@
             <DataGridTextColumn
                 dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
                 Binding="{Binding MaxForwardSpeed, Mode=OneTime, StringFormat='{}{0:N0} m/s'}"
+                CellStyle="{StaticResource RightAlignedDataGridCell}"
                 Header="{lex:Loc Lang:DBViewer_Ships_MaxForwardSpeed}" />
 
 
@@ -62,6 +64,7 @@
             <DataGridTextColumn
                 dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
                 Binding="{Binding MaxReverseSpeed, Mode=OneTime, StringFormat='{}{0:N0} m/s'}"
+                CellStyle="{StaticResource RightAlignedDataGridCell}"
                 Header="{lex:Loc Lang:DBViewer_Ships_MaxReverseSpeed}" />
 
 
@@ -69,6 +72,7 @@
             <DataGridTextColumn
                 dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
                 Binding="{Binding MaxBoostSpeed, Mode=OneTime, StringFormat='{}{0:N0} m/s'}"
+                CellStyle="{StaticResource RightAlignedDataGridCell}"
                 Header="{lex:Loc Lang:DBViewer_Ships_MaxBoostSpeed}" />
 
 
@@ -76,6 +80,7 @@
             <DataGridTextColumn
                 dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
                 Binding="{Binding MaxTravelSpeed, Mode=OneTime, StringFormat='{}{0:N0} m/s'}"
+                CellStyle="{StaticResource RightAlignedDataGridCell}"
                 Header="{lex:Loc Lang:DBViewer_Ships_MaxTravelSpeed}" />
 
 
@@ -83,6 +88,7 @@
             <DataGridTextColumn
                 dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
                 Binding="{Binding MaxAcceleration, Mode=OneTime, StringFormat='{}{0:N0} m/s'}"
+                CellStyle="{StaticResource RightAlignedDataGridCell}"
                 Header="{lex:Loc Lang:DBViewer_Ships_MaxAcceleration}" />
 
 

@@ -123,28 +123,28 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
                     .Select(x => (bestEngines[x.Key].MaxForwardEngine, x.Value.Count))
                     .OrderBy(x => x.MaxForwardEngine.Size)
                     .ToArray();
-                MaxForwardSpeed = (long)Math.Round(_MaxForwardEngines.Sum(x => x.Item1.ForwardThrust * x.Item2) / (ship.ForwardDrag * 1000));
+                MaxForwardSpeed = (long)Math.Round(_MaxForwardEngines.Sum(x => x.Item1.ForwardThrust * x.Item2) / ship.ForwardDrag);
 
                 // 最高後退速度
                 _MaxReverseEngines = engines
                     .Select(x => (bestEngines[x.Key].MaxReverseSpeedEngine, x.Value.Count))
                     .OrderBy(x => x.MaxReverseSpeedEngine.Size)
                     .ToArray();
-                MaxReverseSpeed = (long)Math.Round(_MaxReverseEngines.Sum(x => x.Item1.ReverseThrust * x.Item2) / (ship.ReverseDrag * 1000));
+                MaxReverseSpeed = (long)Math.Round(_MaxReverseEngines.Sum(x => x.Item1.ReverseThrust * x.Item2) / ship.ReverseDrag);
 
                 // 最高ブースト速度
                 _MaxBoostEngines = engines
                     .Select(x => (bestEngines[x.Key].MaxBoostSpeedEngine, x.Value.Count))
                     .OrderBy(x => x.MaxBoostSpeedEngine.Size)
                     .ToArray();
-                MaxBoostSpeed = (long)Math.Round(_MaxBoostEngines.Sum(x => x.Item1.ForwardThrust * x.Item2) / (ship.ForwardDrag * 1000));
+                MaxBoostSpeed = (long)Math.Round(_MaxBoostEngines.Sum(x => x.Item1.ForwardThrust * x.Item2) / ship.ForwardDrag);
 
                 // 最高トラベル速度
                 _MaxTravelEngines = engines
                     .Select(x => (bestEngines[x.Key].MaxTravelSpeedEngine, x.Value.Count))
                     .OrderBy(x => x.MaxTravelSpeedEngine.Size)
                     .ToArray();
-                MaxTravelSpeed = (long)Math.Round(_MaxTravelEngines.Sum(x => x.Item1.ForwardThrust * x.Item2) / (ship.ForwardDrag * 1000));
+                MaxTravelSpeed = (long)Math.Round(_MaxTravelEngines.Sum(x => x.Item1.ForwardThrust * x.Item2) / ship.ForwardDrag);
 
 
                 // 最大加速
