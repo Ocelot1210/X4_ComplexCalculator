@@ -144,8 +144,8 @@ INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  SizeID,  Nam
                     equipmentTypeID,
                     sizeID,
                     name,
-                    macroXml.XPathSelectElement("macro/properties/hull")?.Attribute("max")?.GetInt() ?? 0,
-                    (macroXml.XPathSelectElement("macro/properties/hull")?.Attribute("integrated")?.GetInt() ?? 0) == 1,
+                    macroXml.Root.XPathSelectElement("macro/properties/hull")?.Attribute("max")?.GetInt() ?? 0,
+                    (macroXml.Root.XPathSelectElement("macro/properties/hull")?.Attribute("integrated")?.GetInt() ?? 0) == 1,
                     idElm.Attribute("mk")?.GetInt() ?? 0,
                     idElm.Attribute("makerrace")?.Value,
                     _Resolver.Resolve(idElm.Attribute("description")?.Value ?? ""));

@@ -43,7 +43,7 @@
 
 
         /// <summary>
-        /// 船体値を共有するか
+        /// 船体値が統合されているか
         /// </summary>
         public bool HullIntegrated { get; }
 
