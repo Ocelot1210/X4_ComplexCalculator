@@ -5,51 +5,45 @@ using System.Text;
 namespace X4_ComplexCalculator.DB.X4DB
 {
     /// <summary>
-    /// エンジン情報
+    /// スラスター情報を管理するクラス
     /// </summary>
-    public class Engine : Equipment
+    public class Thruster : Equipment
     {
         #region プロパティ
         /// <summary>
-        /// 前方推進力
+        /// 推進(水平・垂直)？
         /// </summary>
-        public long ForwardThrust { get; }
+        public double ThrustStrafe { get; }
 
 
         /// <summary>
-        /// 後方推進力
+        /// 推進(ピッチ)
         /// </summary>
-        public long ReverseThrust { get; }
+        public double ThrustPitch { get; }
 
 
         /// <summary>
-        /// ブースト推進力
+        /// 推進(ヨー)
         /// </summary>
-        public long BoostThrust { get; }
+        public double ThrustYaw { get; }
 
 
         /// <summary>
-        /// ブースト持続時間
+        /// 推進(ロール)
         /// </summary>
-        public double BoostDuration { get; }
+        public double ThrustRoll { get; }
 
 
         /// <summary>
-        /// ブースト解除時間
+        /// 角度(ロール)？
         /// </summary>
-        public double BoostReleaseTime { get; }
+        public double AngularRoll { get; }
 
 
         /// <summary>
-        /// トラベル推進力
+        /// 角度(ピッチ)？
         /// </summary>
-        public long TravelThrust { get; }
-
-
-        /// <summary>
-        /// トラベル解除時間
-        /// </summary>
-        public double TravelReleaseTime { get; }
+        public double AngularPitch { get; }
         #endregion
 
 
@@ -66,7 +60,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <param name="mk">MK</param>
         /// <param name="makerRace">製造種族</param>
         /// <param name="description">説明文</param>
-        internal Engine(
+        internal Thruster(
             string equipmentID,
             string macro,
             string name,
@@ -79,17 +73,16 @@ namespace X4_ComplexCalculator.DB.X4DB
             string description
         ) : base(equipmentID, macro, name, equipmentTypeID, sizeID, hull, hullIntegrated, mk, makerRace, description)
         {
-            const string sql = "SELECT ForwardThrust, ReverseThrust, BoostThrust, BoostDuration, BoostReleaseTime, TravelThrust, TravelReleaseTime FROM Engine WHERE EquipmentID = :EquipmentID";
+            const string sql = "SELECT ThrustStrafe, ThrustPitch, ThrustYaw, ThrustRoll, AngularRoll, AngularPitch FROM Thruster WHERE EquipmentID = :EquipmentID";
 
             (
-                ForwardThrust,
-                ReverseThrust,
-                BoostThrust,
-                BoostDuration,
-                BoostReleaseTime,
-                TravelThrust,
-                TravelReleaseTime
-            ) = X4Database.Instance.QuerySingle<(long, long, long, double, double, long, double)> (sql, new { EquipmentID = equipmentID });
+                ThrustStrafe,
+                ThrustPitch,
+                ThrustYaw,
+                ThrustRoll,
+                AngularRoll,
+                AngularPitch
+            ) = X4Database.Instance.QuerySingle<(double, double, double, double, double, double)>(sql, new { EquipmentID = equipmentID });
         }
     }
 }

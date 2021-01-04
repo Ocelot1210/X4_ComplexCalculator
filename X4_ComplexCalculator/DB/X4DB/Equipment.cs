@@ -136,8 +136,9 @@ namespace X4_ComplexCalculator.DB.X4DB
 
                 var entity = equipmentTypeID switch
                 {
-                    "engines" => new Engine(equipmentID, macro, name, equipmentTypeID, sizeID, hull, hullIntegrated, mk, makerRace, description),
-                    "shields" => new Shield(equipmentID, macro, name, equipmentTypeID, sizeID, hull, hullIntegrated, mk, makerRace, description),
+                    "engines"   => new Engine(equipmentID, macro, name, equipmentTypeID, sizeID, hull, hullIntegrated, mk, makerRace, description),
+                    "shields"   => new Shield(equipmentID, macro, name, equipmentTypeID, sizeID, hull, hullIntegrated, mk, makerRace, description),
+                    "thrusters" => new Thruster(equipmentID, macro, name, equipmentTypeID, sizeID, hull, hullIntegrated, mk, makerRace, description),
                     _ => new Equipment(equipmentID, macro, name, equipmentTypeID, sizeID, hull, hullIntegrated, mk, makerRace, description)
                 };
 
