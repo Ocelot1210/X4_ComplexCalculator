@@ -1,10 +1,9 @@
 ﻿using Prism.Mvvm;
+using System.ComponentModel;
+using System.Linq;
 using System.Windows.Data;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB.X4DB;
-using System.ComponentModel;
-using System.Linq;
-using System.Collections.Generic;
 
 
 namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
@@ -45,7 +44,13 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
                 .GroupBy(x => x.Size.SizeID)
                 .ToDictionary(x => x.Key, x => x.OrderByDescending(y => y.Capacity).First());
 
-            _Ships.Reset(Ship.GetAll().Select(x => new ShipsGridItem(x, engines, maxCapacityShields)));
+            // サイズ単位のスラスター
+            var thrusters = Equipment.GetAll<Thruster>()
+                .GroupBy(x => x.Size.SizeID)
+                .ToDictionary(x => x.Key, x => new ThrusterManager(x));
+
+
+            _Ships.Reset(Ship.GetAll().Select(x => new ShipsGridItem(x, engines, maxCapacityShields, thrusters)));
 
             ShipsView = (ListCollectionView)CollectionViewSource.GetDefaultView(_Ships);
             ShipsView.SortDescriptions.Clear();

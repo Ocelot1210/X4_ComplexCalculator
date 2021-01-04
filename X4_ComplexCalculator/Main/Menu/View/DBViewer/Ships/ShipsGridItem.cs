@@ -48,7 +48,31 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         /// <summary>
         /// 装備したシールド一覧
         /// </summary>
-        private readonly IReadOnlyList<(Shield, long)> _Shields;
+        private readonly IReadOnlyList<(Shield, long)> _EquippedShields;
+
+
+        /// <summary>
+        /// 平行移動が最大のスラスターと個数のペア
+        /// </summary>
+        private readonly IReadOnlyList<(Thruster, long)> _MaxTranslationThrusters;
+
+
+        /// <summary>
+        /// ピッチ推進力が最大のスラスター
+        /// </summary>
+        private readonly IReadOnlyList<(Thruster, long)> _MaxPitchThruster;
+
+
+        /// <summary>
+        /// ヨー推進力が最大のスラスター
+        /// </summary>
+        private readonly IReadOnlyList<(Thruster, long)> _MaxYawThruster;
+
+
+        /// <summary>
+        /// ロール推進力が最大のスラスター
+        /// </summary>
+        private readonly IReadOnlyList<(Thruster, long)> _MaxRollThruster;
         #endregion
 
 
@@ -59,6 +83,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         public Ship Ship { get; }
 
 
+        #region 速度
         /// <summary>
         /// 最高速度
         /// </summary>
@@ -81,6 +106,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         /// 最高トラベル速度
         /// </summary>
         public double MaxTravelSpeed { get; }
+        #endregion
 
 
         /// <summary>
@@ -89,6 +115,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         public double MaxAcceleration { get; }
 
 
+        #region シールド
         /// <summary>
         /// シールド容量
         /// </summary>
@@ -102,6 +129,48 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         #endregion
 
 
+        #region 平行移動速度
+        /// <summary>
+        /// 垂直移動速度
+        /// </summary>
+        public double VerticalMovementSpeed { get; }
+
+
+        /// <summary>
+        /// 水平移動速度
+        /// </summary>
+        public double HorizontalMovementSpeed { get; }
+        #endregion
+
+
+
+        #region 操舵性能
+        /// <summary>
+        /// ピッチ
+        /// </summary>
+        public double PitchRate { get; }
+
+
+        /// <summary>
+        /// ヨー
+        /// </summary>
+        public double YawRate { get; }
+
+
+        /// <summary>
+        /// ロール
+        /// </summary>
+        public double RollRate { get; }
+
+
+        /// <summary>
+        /// 反応性
+        /// </summary>
+        public double Responsiveness { get; }
+        #endregion
+        #endregion
+
+
 
 
         /// <summary>
@@ -110,10 +179,12 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         /// <param name="ship">艦船情報</param>
         /// <param name="bestEngines">最高性能のエンジン一覧</param>
         /// <param name="maxCapacityShields">サイズごとの最大容量のシールド</param>
+        /// <param name="bestThrusters">最高性能のスラスター一覧</param>
         public ShipsGridItem(
             Ship ship,
             IReadOnlyDictionary<string, EngineManager> bestEngines,
-            IReadOnlyDictionary<string, Shield> maxCapacityShields)
+            IReadOnlyDictionary<string, Shield> maxCapacityShields,
+            IReadOnlyDictionary<string, ThrusterManager> bestThrusters)
         {
             Ship = ship;
 
@@ -164,15 +235,61 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
 
             // シールドを設定
             {
-                _Shields = equipment["shields"]
+                _EquippedShields = equipment["shields"]
                     .Select(x => (maxCapacityShields[x.Key], x.Value.Count))
                     .OrderBy(x => x.Item1.Size)
                     .ToArray();
-                MaxShieldCapacity = _Shields.Sum(x => x.Item1.Capacity * x.Item2);
+                MaxShieldCapacity = _EquippedShields.Sum(x => x.Item1.Capacity * x.Item2);
 
-                ShieldsCount = (int)_Shields.Sum(x => x.Item2);
+                ShieldsCount = (int)_EquippedShields.Sum(x => x.Item2);
             }
-            
+
+
+            // スラスターを設定
+            {
+                // 装備可能なスラスター一覧
+                var thrusters = equipment["thrusters"];
+
+
+                // 平行移動が最大のスラスター
+                _MaxTranslationThrusters = thrusters
+                    .Select(x => (bestThrusters[x.Key].MaxStrafeThruster, x.Value.Count))
+                    .OrderBy(x => x.MaxStrafeThruster.Size)
+                    .ToArray();
+                {
+                    var totalThrust = _MaxTranslationThrusters.Sum(x => x.Item1.ThrustStrafe * x.Item2);
+                    VerticalMovementSpeed = Math.Round(totalThrust / ship.DragVertical, 1);
+                    HorizontalMovementSpeed = Math.Round(totalThrust / ship.DragHorizontal, 1);
+                }
+
+
+                // ピッチ
+                _MaxPitchThruster = thrusters
+                    .Select(x => (bestThrusters[x.Key].MaxPitchThruster, x.Value.Count))
+                    .OrderBy(x => x.MaxPitchThruster.Size)
+                    .ToArray();
+                PitchRate = Math.Round(_MaxPitchThruster.Sum(x => x.Item1.ThrustPitch * x.Item2) / ship.DragPitch, 1);
+
+
+                // ヨー
+                _MaxYawThruster = thrusters
+                    .Select(x => (bestThrusters[x.Key].MaxYawThruster, x.Value.Count))
+                    .OrderBy(x => x.MaxYawThruster.Size)
+                    .ToArray();
+                YawRate = Math.Round(_MaxYawThruster.Sum(x => x.Item1.ThrustYaw * x.Item2) / ship.DragYaw, 1);
+
+
+                // ロール
+                _MaxRollThruster = thrusters
+                    .Select(x => (bestThrusters[x.Key].MaxRollThruster, x.Value.Count))
+                    .OrderBy(x => x.MaxRollThruster.Size)
+                    .ToArray();
+                RollRate = Math.Round(_MaxRollThruster.Sum(x => x.Item1.ThrustRoll * x.Item2) / ship.DragRoll, 1);
+
+
+                // 反応性
+                Responsiveness = Math.Round(ship.DragYaw / ship.InertiaYaw, 3);
+            }
         }
     }
 }
