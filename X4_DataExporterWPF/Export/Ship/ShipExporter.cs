@@ -67,13 +67,16 @@ CREATE TABLE IF NOT EXISTS Ship
     Macro           TEXT    NOT NULL,
     SizeID          TEXT    NOT NULL,
     Mass            REAL    NOT NULL,
-    ForwardDrag     REAL    NOT NULL,
-    ReverseDrag     REAL    NOT NULL,
-    HorizontalDrag  REAL    NOT NULL,
-    VerticalDrag    REAL    NOT NULL,
-    PitchDrag       REAL    NOT NULL,
-    YawDrag         REAL    NOT NULL,
-    RollDrag        REAL    NOT NULL,
+    DragForward     REAL    NOT NULL,
+    DragReverse     REAL    NOT NULL,
+    DragHorizontal  REAL    NOT NULL,
+    DragVertical    REAL    NOT NULL,
+    DragPitch       REAL    NOT NULL,
+    DragYaw         REAL    NOT NULL,
+    DragRoll        REAL    NOT NULL,
+    InertiaPitch    REAL    NOT NULL,
+    InertiaYaw      REAL    NOT NULL,
+    InertiaRoll     REAL    NOT NULL,
     Hull            INTEGER NOT NULL,
     People          INTEGER NOT NULL,
     MissileStorage  INTEGER NOT NULL,
@@ -97,8 +100,8 @@ CREATE TABLE IF NOT EXISTS Ship
 
                 connection.Execute(@"
 INSERT INTO
-Ship   ( ShipID,  ShipTypeID,  Name,  Macro,  SizeID,  Mass,  ForwardDrag,  ReverseDrag,  HorizontalDrag,  VerticalDrag,  PitchDrag,  YawDrag,  RollDrag,  Hull,  People,  MissileStorage,  DroneStorage,  CargoSize,  MinPrice,  AvgPrice,  MaxPrice,  Description) 
-VALUES (@ShipID, @ShipTypeID, @Name, @Macro, @SizeID, @Mass, @ForwardDrag, @ReverseDrag, @HorizontalDrag, @VerticalDrag, @PitchDrag, @YawDrag, @RollDrag, @Hull, @People, @MissileStorage, @DroneStorage, @CargoSize, @MinPrice, @AvgPrice, @MaxPrice, @Description)",
+Ship   ( ShipID,  ShipTypeID,  Name,  Macro,  SizeID,  Mass,  DragForward,  DragReverse,  DragHorizontal,  DragVertical,  DragPitch,  DragYaw,  DragRoll,  InertiaPitch,  InertiaYaw,  InertiaRoll,  Hull,  People,  MissileStorage,  DroneStorage,  CargoSize,  MinPrice,  AvgPrice,  MaxPrice,  Description) 
+VALUES (@ShipID, @ShipTypeID, @Name, @Macro, @SizeID, @Mass, @DragForward, @DragReverse, @DragHorizontal, @DragVertical, @DragPitch, @DragYaw, @DragRoll, @InertiaPitch, @InertiaYaw, @InertiaRoll, @Hull, @People, @MissileStorage, @DroneStorage, @CargoSize, @MinPrice, @AvgPrice, @MaxPrice, @Description)",
 items);
             }
         }
@@ -139,13 +142,16 @@ items);
                     shipName, macroName,
                     shipSizeID,
                     property.Mass,
-                    property.ForwardDrag,
-                    property.ReverseDrag,
-                    property.HorizontalDrag,
-                    property.VerticalDrag,
-                    property.PitchDrag,
-                    property.YawDrag,
-                    property.RollDrag,
+                    property.DragForward,
+                    property.DragReverse,
+                    property.DragHorizontal,
+                    property.DragVertical,
+                    property.DragPitch,
+                    property.DragYaw,
+                    property.DragRoll,
+                    property.InertiaPitch,
+                    property.InertiaYaw,
+                    property.InertiaRoll,
                     property.Hull,
                     property.People,
                     property.MissileStorage,
@@ -237,15 +243,24 @@ items);
                 var drag = properties.XPathSelectElement("physics/drag");
                 if (drag is null) return null;
 
-                ret.ForwardDrag = drag.Attribute("forward").GetDouble();
-                ret.ReverseDrag = drag.Attribute("reverse").GetDouble();
-                ret.HorizontalDrag = drag.Attribute("horizontal").GetDouble();
-                ret.VerticalDrag = drag.Attribute("vertical").GetDouble();
-                ret.PitchDrag = drag.Attribute("pitch").GetDouble();
-                ret.YawDrag = drag.Attribute("yaw").GetDouble();
-                ret.RollDrag = drag.Attribute("roll").GetDouble();
+                ret.DragForward = drag.Attribute("forward").GetDouble();
+                ret.DragReverse = drag.Attribute("reverse").GetDouble();
+                ret.DragHorizontal = drag.Attribute("horizontal").GetDouble();
+                ret.DragVertical = drag.Attribute("vertical").GetDouble();
+                ret.DragPitch = drag.Attribute("pitch").GetDouble();
+                ret.DragYaw = drag.Attribute("yaw").GetDouble();
+                ret.DragRoll = drag.Attribute("roll").GetDouble();
             }
 
+            // 慣性を取得
+            {
+                var inertia = properties.XPathSelectElement("physics/inertia");
+                if (inertia is null) return null;
+
+                ret.InertiaPitch = inertia.Attribute("pitch").GetDouble();
+                ret.InertiaYaw = inertia.Attribute("yaw").GetDouble();
+                ret.InertiaRoll = inertia.Attribute("roll").GetDouble();
+            }
 
             ret.Hull = properties.Element("hull").Attribute("max").GetInt();
             ret.Mass = properties.Element("physics").Attribute("mass").GetDouble();
@@ -262,13 +277,16 @@ items);
             public string ShipTypeID = "";
             public string Description = "";
             public double Mass;
-            public double ForwardDrag;
-            public double ReverseDrag;
-            public double HorizontalDrag;
-            public double VerticalDrag;
-            public double PitchDrag;
-            public double YawDrag;
-            public double RollDrag;
+            public double DragForward;
+            public double DragReverse;
+            public double DragHorizontal;
+            public double DragVertical;
+            public double DragPitch;
+            public double DragYaw;
+            public double DragRoll;
+            public double InertiaPitch;
+            public double InertiaYaw;
+            public double InertiaRoll;
             public int Hull;
             public int People;
             public int MissileStorage;

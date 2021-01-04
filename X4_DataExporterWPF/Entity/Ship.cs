@@ -44,45 +44,65 @@
 
         #region 抗力
         /// <summary>
-        /// 前方抗力
+        /// 抗力(前方)
         /// </summary>
-        public double ForwardDrag { get; }
+        public double DragForward { get; }
 
 
         /// <summary>
-        /// 後方抗力
+        /// 抗力(後方)
         /// </summary>
-        public double ReverseDrag { get; }
+        public double DragReverse { get; }
 
 
         /// <summary>
-        /// 水平抗力
+        /// 抗力(水平)
         /// </summary>
-        public double HorizontalDrag { get; }
+        public double DragHorizontal { get; }
 
 
         /// <summary>
-        /// 垂直抗力
+        /// 抗力(垂直)
         /// </summary>
-        public double VerticalDrag { get; }
+        public double DragVertical { get; }
 
 
         /// <summary>
-        /// ピッチ抗力
+        /// 抗力(ピッチ)
         /// </summary>
-        public double PitchDrag { get; }
+        public double DragPitch { get; }
 
 
         /// <summary>
-        /// ヨー抗力
+        /// 抗力(ヨー)
         /// </summary>
-        public double YawDrag { get; }
+        public double DragYaw { get; }
 
 
         /// <summary>
-        /// ロール抗力
+        /// 抗力(ロール)
         /// </summary>
-        public double RollDrag { get; }
+        public double DragRoll { get; }
+        #endregion
+
+
+        #region 慣性
+        /// <summary>
+        /// 慣性(ピッチ)
+        /// </summary>
+        public double InertiaPitch { get; }
+
+
+        /// <summary>
+        /// 慣性(ヨー)
+        /// </summary>
+        public double InertiaYaw { get; }
+
+
+        /// <summary>
+        /// 慣性(ロール)
+        /// </summary>
+        public double InertiaRoll { get; }
         #endregion
 
 
@@ -150,13 +170,16 @@
         /// <param name="macro">マクロ名</param>
         /// <param name="sizeID">サイズID</param>
         /// <param name="mass">質量</param>
-        /// <param name="forwardDrag">前方抗力</param>
-        /// <param name="reverseDrag">後方抗力</param>
-        /// <param name="horizontalDrag">水平抗力</param>
-        /// <param name="verticalDrag">垂直抗力</param>
-        /// <param name="pitchDrag">ピッチ抗力</param>
-        /// <param name="yawDrag">ヨー抗力</param>
-        /// <param name="rollDrag">ロール抗力</param>
+        /// <param name="dragForward">抗力(前方)</param>
+        /// <param name="dragReverse">抗力(後方)</param>
+        /// <param name="dragHorizontal">抗力(水平)</param>
+        /// <param name="dragVertical">抗力(垂直)</param>
+        /// <param name="dragPitch">抗力(ピッチ)</param>
+        /// <param name="dragYaw">抗力(ヨー)</param>
+        /// <param name="dragRoll">抗力(ロール)</param>
+        /// <param name="inertiaPitch">慣性(ピッチ)</param>
+        /// <param name="inertiaYaw">慣性(ヨー)</param>
+        /// <param name="inertiaRoll">慣性(ロール)</param>
         /// <param name="hull">船体強度</param>
         /// <param name="people">船員数</param>
         /// <param name="missileStorage">ミサイル搭載量</param>
@@ -173,13 +196,16 @@
             string macro,
             string sizeID,
             double mass,
-            double forwardDrag,
-            double reverseDrag,
-            double horizontalDrag,
-            double verticalDrag,
-            double pitchDrag,
-            double yawDrag,
-            double rollDrag,
+            double dragForward,
+            double dragReverse,
+            double dragHorizontal,
+            double dragVertical,
+            double dragPitch,
+            double dragYaw,
+            double dragRoll,
+            double inertiaPitch,
+            double inertiaYaw,
+            double inertiaRoll,
             int hull,
             int people,
             int missileStorage,
@@ -196,13 +222,16 @@
             Macro = macro;
             SizeID = sizeID;
             Mass = mass;
-            ForwardDrag = forwardDrag;
-            ReverseDrag = reverseDrag;
-            HorizontalDrag = horizontalDrag;
-            VerticalDrag = verticalDrag;
-            PitchDrag = pitchDrag;
-            YawDrag = yawDrag;
-            RollDrag = rollDrag;
+            DragForward = dragForward;
+            DragReverse = dragReverse;
+            DragHorizontal = dragHorizontal;
+            DragVertical = dragVertical;
+            DragPitch = dragPitch;
+            DragYaw = dragYaw;
+            DragRoll = dragRoll;
+            InertiaPitch = inertiaPitch;
+            InertiaYaw = inertiaYaw;
+            InertiaRoll = inertiaRoll;
             Hull = hull;
             People = people;
             MissileStorage = missileStorage;
