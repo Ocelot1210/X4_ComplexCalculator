@@ -136,8 +136,7 @@ CREATE TABLE IF NOT EXISTS ShipEquipment
             foreach (var connection in componentXml.Root.XPathSelectElements($"component/connections/connection[contains(@tags, '{equipmentTypeID}')]"))
             {
                 // 装備のサイズを取得する
-                var attr = connection.Attribute("tags").Value;
-                var size = sizeDict.Keys.FirstOrDefault(x => attr.Contains(x));
+                var size = Util.GetSizeIDFromTags(connection.Attribute("tags")?.Value ?? "");
 
                 if (string.IsNullOrEmpty(size)) continue;
 

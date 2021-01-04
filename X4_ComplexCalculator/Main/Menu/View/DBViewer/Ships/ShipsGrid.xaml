@@ -7,6 +7,7 @@
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
     d:DesignHeight="450"
     d:DesignWidth="800"
     lex:LocalizeDictionary.DefaultProvider="{StaticResource CSVLocalizationProvider}"
@@ -17,81 +18,254 @@
     <UserControl.DataContext>
         <local:ShipsViewModel />
     </UserControl.DataContext>
-    <DataGrid
-        dgx:DataGridFilter.IsAutoFilterEnabled="True"
-        HorizontalScrollBarVisibility="Visible"
-        IsReadOnly="True"
-        ItemsSource="{Binding ShipsView, Mode=OneTime}"
-        Style="{StaticResource DefaultDataGridStyle}"
-        VerticalScrollBarVisibility="Visible">
+    <Grid>
 
-        <DataGrid.Columns>
-            <!--  艦船名称  -->
-            <DataGridTextColumn
-                dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnTextFilter}"
-                Binding="{Binding Ship.Name, Mode=OneTime}"
-                Header="{lex:Loc Lang:DBViewer_Ships_Name}" />
+        <Grid.Resources>
+            <SolidColorBrush x:Key="HeaderBackground" Color="Aqua" />
 
-            <!--  艦船種別  -->
-            <DataGridTextColumn
-                dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
-                Binding="{Binding Ship.ShipType.Name, Mode=OneTime}"
-                Header="{lex:Loc Lang:DBViewer_Ships_Type}" />
+            <!--  Gridのヘッダー  -->
+            <Style x:Key="HeaderStyle" TargetType="Border">
+                <Setter Property="BorderBrush" Value="Black" />
+                <Setter Property="Background" Value="{StaticResource HeaderBackground}" />
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="BorderThickness" Value="0,0,0.5,0.5" />
+                <Setter Property="SnapsToDevicePixels" Value="True" />
+            </Style>
 
-            <!--  サイズ  -->
-            <DataGridTextColumn
-                dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
-                Binding="{Binding Ship.Size.Name, Mode=OneTime}"
-                Header="{lex:Loc Lang:DBViewer_Ships_Size}" />
+            <!--  カラムのリサイズ用Thumbのスタイル  -->
+            <Style x:Key="ColumnHeaderGripperStyle" TargetType="{x:Type Thumb}">
+                <Setter Property="Width" Value="8" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Cursor" Value="SizeWE" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Thumb}">
+                            <Border Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" />
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
 
-            <!--  重量  -->
-            <DataGridTextColumn
-                dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                Binding="{Binding Ship.Mass, Mode=OneTime, StringFormat='{}{0:N0} t'}"
-                CellStyle="{StaticResource RightAlignedDataGridCell}"
-                Header="{lex:Loc Lang:DBViewer_Ships_Mass}" />
+        </Grid.Resources>
 
-
-            <!--  最高速度  -->
-            <DataGridTextColumn
-                dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                Binding="{Binding MaxForwardSpeed, Mode=OneTime, StringFormat='{}{0:N0} m/s'}"
-                CellStyle="{StaticResource RightAlignedDataGridCell}"
-                Header="{lex:Loc Lang:DBViewer_Ships_MaxForwardSpeed}" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
 
 
-            <!--  後退速度  -->
-            <DataGridTextColumn
-                dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                Binding="{Binding MaxReverseSpeed, Mode=OneTime, StringFormat='{}{0:N0} m/s'}"
-                CellStyle="{StaticResource RightAlignedDataGridCell}"
-                Header="{lex:Loc Lang:DBViewer_Ships_MaxReverseSpeed}" />
+        <!--  2段組み上段  -->
+        <Grid Grid.Row="0" Height="25">
+            <Grid.ColumnDefinitions>
+                <!--  Rowヘッダー固定用  -->
+                <ColumnDefinition Width="6" />
+                <!--  横スクロール範囲用  -->
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!--  Rowヘッダー固定用  -->
+            <Border Grid.Column="0" Style="{StaticResource HeaderStyle}" />
+
+            <!--  横スクロールのためにScrollViewerでくくる  -->
+            <ScrollViewer
+                x:Name="HeaderScrollViewer"
+                Grid.Column="1"
+                HorizontalScrollBarVisibility="Hidden"
+                VerticalScrollBarVisibility="Visible">
+                <ScrollViewer.Resources>
+                    <!--  右側のスクロールバーを塗りつぶす  -->
+                    <Style TargetType="ScrollBar">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate>
+                                    <Grid Background="{TemplateBinding ContentControl.Background}" />
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ScrollViewer.Resources>
+
+                <!--  2段組本体  -->
+                <Grid Grid.Row="0" Height="25">
+                    <Grid.ColumnDefinitions>
+
+                        <!--  対応するDataGridのカラムのActualWidthをバインドする  -->
+                        <ColumnDefinition Width="{Binding ElementName=Column_ShipName, Path=ActualWidth}" />
+                        <ColumnDefinition Width="{Binding ElementName=Column_ShipType, Path=ActualWidth}" />
+                        <ColumnDefinition Width="{Binding ElementName=Column_ShipSize, Path=ActualWidth}" />
+                        <ColumnDefinition Width="{Binding ElementName=Column_ShipMass, Path=ActualWidth}" />
+                        <ColumnDefinition Width="{Binding ElementName=Column_MaxForwardSpeed, Path=ActualWidth}" />
+                        <ColumnDefinition Width="{Binding ElementName=Column_MaxReverseSpeed, Path=ActualWidth}" />
+                        <ColumnDefinition Width="{Binding ElementName=Column_MaxBoostSpeed, Path=ActualWidth}" />
+                        <ColumnDefinition Width="{Binding ElementName=Column_MaxTravelSpeed, Path=ActualWidth}" />
+                        <ColumnDefinition Width="{Binding ElementName=Column_MaxAcceleration, Path=ActualWidth}" />
+                        <ColumnDefinition Width="{Binding ElementName=Column_SheildMounted, Path=ActualWidth}" />
+                        <ColumnDefinition Width="{Binding ElementName=Column_MaxShieldCapacity, Path=ActualWidth}" />
+
+                        <!--  カラム表示エリアが余った場合用  -->
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!--  名称～重量  -->
+                    <Grid Grid.Column="0" Grid.ColumnSpan="4">
+                        <Border Style="{StaticResource HeaderStyle}" />
+                        <Thumb
+                            HorizontalAlignment="Right"
+                            x4bhv:DataGridHeaderThumbBehavior.SyncColumn="{Binding ElementName=Column_ShipMass}"
+                            Style="{StaticResource ColumnHeaderGripperStyle}" />
+                    </Grid>
 
 
-            <!--  ブースト速度  -->
-            <DataGridTextColumn
-                dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                Binding="{Binding MaxBoostSpeed, Mode=OneTime, StringFormat='{}{0:N0} m/s'}"
-                CellStyle="{StaticResource RightAlignedDataGridCell}"
-                Header="{lex:Loc Lang:DBViewer_Ships_MaxBoostSpeed}" />
+                    <!--  速度  -->
+                    <Grid Grid.Column="4" Grid.ColumnSpan="4">
+                        <Border Style="{StaticResource HeaderStyle}">
+                            <Label HorizontalAlignment="Center" Content="{lex:Loc Lang:DBViewer_Ships_Speed}" />
+                        </Border>
+                        <Thumb
+                            HorizontalAlignment="Right"
+                            x4bhv:DataGridHeaderThumbBehavior.SyncColumn="{Binding ElementName=Column_MaxTravelSpeed}"
+                            Style="{StaticResource ColumnHeaderGripperStyle}" />
+                    </Grid>
+
+                    <!--  加速  -->
+                    <Grid Grid.Column="8">
+                        <Border Style="{StaticResource HeaderStyle}" />
+                        <Thumb
+                            HorizontalAlignment="Right"
+                            x4bhv:DataGridHeaderThumbBehavior.SyncColumn="{Binding ElementName=Column_MaxAcceleration}"
+                            Style="{StaticResource ColumnHeaderGripperStyle}" />
+                    </Grid>
+
+                    <!--  シールド  -->
+                    <Grid Grid.Column="9" Grid.ColumnSpan="2">
+                        <Border Style="{StaticResource HeaderStyle}">
+                            <Label HorizontalAlignment="Center" Content="{lex:Loc Lang:DBViewer_Ships_Sheild}" />
+                        </Border>
+                        <Thumb
+                            HorizontalAlignment="Right"
+                            x4bhv:DataGridHeaderThumbBehavior.SyncColumn="{Binding ElementName=Column_MaxShieldCapacity}"
+                            Style="{StaticResource ColumnHeaderGripperStyle}" />
+                    </Grid>
 
 
-            <!--  トラベル速度  -->
-            <DataGridTextColumn
-                dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                Binding="{Binding MaxTravelSpeed, Mode=OneTime, StringFormat='{}{0:N0} m/s'}"
-                CellStyle="{StaticResource RightAlignedDataGridCell}"
-                Header="{lex:Loc Lang:DBViewer_Ships_MaxTravelSpeed}" />
+                </Grid>
+            </ScrollViewer>
+        </Grid>
 
 
-            <!--  最大加速  -->
-            <DataGridTextColumn
-                dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                Binding="{Binding MaxAcceleration, Mode=OneTime, StringFormat='{}{0:N0} m/s'}"
-                CellStyle="{StaticResource RightAlignedDataGridCell}"
-                Header="{lex:Loc Lang:DBViewer_Ships_MaxAcceleration}" />
+        <DataGrid
+            x:Name="ShipsDataGrid"
+            Grid.Row="1"
+            dgx:DataGridFilter.IsAutoFilterEnabled="True"
+            CanUserReorderColumns="False"
+            HorizontalScrollBarVisibility="Visible"
+            IsReadOnly="True"
+            ItemsSource="{Binding ShipsView, Mode=OneTime}"
+            RowHeaderWidth="5"
+            Style="{StaticResource DefaultDataGridStyle}"
+            VerticalScrollBarVisibility="Visible">
+
+            <DataGrid.Resources>
+                <!--  上段と横スクロールをあわせるためのビヘイビア  -->
+                <Style TargetType="ScrollViewer">
+                    <Setter Property="x4bhv:HorizontalScrollSyncBehavior.SyncElement" Value="{Binding ElementName=HeaderScrollViewer}" />
+                </Style>
+            </DataGrid.Resources>
 
 
-        </DataGrid.Columns>
-    </DataGrid>
+            <DataGrid.Columns>
+                <!--  艦船名称  -->
+                <DataGridTextColumn
+                    x:Name="Column_ShipName"
+                    dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnTextFilter}"
+                    Binding="{Binding Ship.Name, Mode=OneTime}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_Name}" />
+
+                <!--  艦船種別  -->
+                <DataGridTextColumn
+                    x:Name="Column_ShipType"
+                    dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
+                    Binding="{Binding Ship.ShipType.Name, Mode=OneTime}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_Type}" />
+
+                <!--  サイズ  -->
+                <DataGridTextColumn
+                    x:Name="Column_ShipSize"
+                    dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
+                    Binding="{Binding Ship.Size.Name, Mode=OneTime}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_Size}" />
+
+                <!--  重量  -->
+                <DataGridTextColumn
+                    x:Name="Column_ShipMass"
+                    dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
+                    Binding="{Binding Ship.Mass, Mode=OneTime, StringFormat='{}{0:N1} t'}"
+                    CellStyle="{StaticResource RightAlignedDataGridCell}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_Mass}" />
+
+
+                <!--  最高速度  -->
+                <DataGridTextColumn
+                    x:Name="Column_MaxForwardSpeed"
+                    dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
+                    Binding="{Binding MaxForwardSpeed, Mode=OneTime, StringFormat='{}{0:N1} m/s'}"
+                    CellStyle="{StaticResource RightAlignedDataGridCell}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_MaxForwardSpeed}" />
+
+
+                <!--  後退速度  -->
+                <DataGridTextColumn
+                    x:Name="Column_MaxReverseSpeed"
+                    dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
+                    Binding="{Binding MaxReverseSpeed, Mode=OneTime, StringFormat='{}{0:N1} m/s'}"
+                    CellStyle="{StaticResource RightAlignedDataGridCell}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_MaxReverseSpeed}" />
+
+
+                <!--  ブースト速度  -->
+                <DataGridTextColumn
+                    x:Name="Column_MaxBoostSpeed"
+                    dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
+                    Binding="{Binding MaxBoostSpeed, Mode=OneTime, StringFormat='{}{0:N1} m/s'}"
+                    CellStyle="{StaticResource RightAlignedDataGridCell}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_MaxBoostSpeed}" />
+
+
+                <!--  トラベル速度  -->
+                <DataGridTextColumn
+                    x:Name="Column_MaxTravelSpeed"
+                    dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
+                    Binding="{Binding MaxTravelSpeed, Mode=OneTime, StringFormat='{}{0:N1} m/s'}"
+                    CellStyle="{StaticResource RightAlignedDataGridCell}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_MaxTravelSpeed}" />
+
+
+                <!--  最大加速  -->
+                <DataGridTextColumn
+                    x:Name="Column_MaxAcceleration"
+                    dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
+                    Binding="{Binding MaxAcceleration, Mode=OneTime, StringFormat='{}{0:N1} m/s'}"
+                    CellStyle="{StaticResource RightAlignedDataGridCell}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_MaxAcceleration}" />
+
+
+                <!--  シールド搭載数  -->
+                <DataGridTextColumn
+                    x:Name="Column_SheildMounted"
+                    dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
+                    Binding="{Binding MaxShieldCapacity, Mode=OneTime, StringFormat='{}{0:N0}'}"
+                    CellStyle="{StaticResource RightAlignedDataGridCell}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_Sheild_Capacity}" />
+
+                <!--  シールド容量  -->
+                <DataGridTextColumn
+                    x:Name="Column_MaxShieldCapacity"
+                    dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
+                    Binding="{Binding MaxShieldCapacity, Mode=OneTime, StringFormat='{}{0:N0} MJ'}"
+                    CellStyle="{StaticResource RightAlignedDataGridCell}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_Sheild_Capacity}" />
+
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
 </UserControl>

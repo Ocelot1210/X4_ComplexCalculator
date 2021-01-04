@@ -79,7 +79,7 @@ namespace X4_ComplexCalculator.DB.X4DB
             string description
         ) : base(equipmentID, macro, name, equipmentTypeID, sizeID, hull, hullIntegrated, mk, makerRace, description)
         {
-            const string sql = "SELECT ForwardThrust ReverseThrust, BoostThrust, BoostDuration, BoostReleaseTime, TravelThrust, TravelReleaseTime FROM Engine WHERE EquipmentID = :EquipmentID";
+            const string sql = "SELECT ForwardThrust, ReverseThrust, BoostThrust, BoostDuration, BoostReleaseTime, TravelThrust, TravelReleaseTime FROM Engine WHERE EquipmentID = :EquipmentID";
 
             (
                 ForwardThrust,
@@ -89,7 +89,7 @@ namespace X4_ComplexCalculator.DB.X4DB
                 BoostReleaseTime,
                 TravelThrust,
                 TravelReleaseTime
-            ) = X4Database.Instance.QuerySingle<(long, long, long, double, double, long, double)> (sql, new { EquipmentID = equipmentID });
+            ) = X4Database.Instance.QuerySingle<(long ForwardThrust, long ReverseThrust, long, double, double, long, double)> (sql, new { EquipmentID = equipmentID });
         }
     }
 }

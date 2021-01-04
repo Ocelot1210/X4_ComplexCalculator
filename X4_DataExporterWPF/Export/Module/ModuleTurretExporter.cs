@@ -102,9 +102,7 @@ CREATE TABLE IF NOT EXISTS ModuleTurret
                 foreach (var connections in componentXml.Root.XPathSelectElements("component/connections/connection[contains(@tags, 'turret')]"))
                 {
                     // タレットのサイズを取得
-                    var attr = connections.Attribute("tags").Value;
-                    var size = sizeDict.Keys.FirstOrDefault(x => attr.Contains(x));
-
+                    var size = Util.GetSizeIDFromTags(connections.Attribute("tags")?.Value);
                     if (string.IsNullOrEmpty(size)) continue;
 
                     sizeDict[size]++;

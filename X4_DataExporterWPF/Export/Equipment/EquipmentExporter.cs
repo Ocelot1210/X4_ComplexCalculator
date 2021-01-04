@@ -123,13 +123,8 @@ INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  SizeID,  Nam
                 // 装備が記載されているタグを取得する
                 var component = componentXml.Root.XPathSelectElement("component/connections/connection[contains(@tags, 'component')]");
 
-                // サイズ一覧
-                string[] sizes = { "extrasmall", "small", "medium", "large", "extralarge" };
-
-                // 一致するサイズを探す
-                var tags = component?.Attribute("tags")?.Value.Split(" ");
-                var sizeID = sizes.FirstOrDefault(x => tags?.Contains(x) == true);
-                // 一致するサイズがなかった場合
+                // サイズIDを取得
+                var sizeID = Util.GetSizeIDFromTags(component?.Attribute("tags")?.Value);
                 if (string.IsNullOrEmpty(sizeID)) continue;
 
                 var name = _Resolver.Resolve(equipment.Attribute("name").Value);

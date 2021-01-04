@@ -62,25 +62,25 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         /// <summary>
         /// 最高速度
         /// </summary>
-        public long MaxForwardSpeed { get; }
+        public double MaxForwardSpeed { get; }
 
 
         /// <summary>
         /// 最高後退速度
         /// </summary>
-        public long MaxReverseSpeed { get; }
+        public double MaxReverseSpeed { get; }
 
 
         /// <summary>
         /// 最高ブースト速度
         /// </summary>
-        public long MaxBoostSpeed { get; }
+        public double MaxBoostSpeed { get; }
 
 
         /// <summary>
         /// 最高トラベル速度
         /// </summary>
-        public long MaxTravelSpeed { get; }
+        public double MaxTravelSpeed { get; }
 
 
         /// <summary>
@@ -93,6 +93,12 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         /// シールド容量
         /// </summary>
         public long MaxShieldCapacity { get; }
+
+
+        /// <summary>
+        /// シールド搭載数
+        /// </summary>
+        public int ShieldsCount { get; }
         #endregion
 
 
@@ -123,28 +129,28 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
                     .Select(x => (bestEngines[x.Key].MaxForwardEngine, x.Value.Count))
                     .OrderBy(x => x.MaxForwardEngine.Size)
                     .ToArray();
-                MaxForwardSpeed = (long)Math.Round(_MaxForwardEngines.Sum(x => x.Item1.ForwardThrust * x.Item2) / ship.ForwardDrag);
+                MaxForwardSpeed = Math.Round(_MaxForwardEngines.Sum(x => x.Item1.ForwardThrust * x.Item2) / ship.ForwardDrag, 1);
 
                 // 最高後退速度
                 _MaxReverseEngines = engines
                     .Select(x => (bestEngines[x.Key].MaxReverseSpeedEngine, x.Value.Count))
                     .OrderBy(x => x.MaxReverseSpeedEngine.Size)
                     .ToArray();
-                MaxReverseSpeed = (long)Math.Round(_MaxReverseEngines.Sum(x => x.Item1.ReverseThrust * x.Item2) / ship.ReverseDrag);
+                MaxReverseSpeed = Math.Round(_MaxReverseEngines.Sum(x => x.Item1.ReverseThrust * x.Item2) / ship.ReverseDrag, 1);
 
                 // 最高ブースト速度
                 _MaxBoostEngines = engines
                     .Select(x => (bestEngines[x.Key].MaxBoostSpeedEngine, x.Value.Count))
                     .OrderBy(x => x.MaxBoostSpeedEngine.Size)
                     .ToArray();
-                MaxBoostSpeed = (long)Math.Round(_MaxBoostEngines.Sum(x => x.Item1.ForwardThrust * x.Item2) / ship.ForwardDrag);
+                MaxBoostSpeed = Math.Round(_MaxBoostEngines.Sum(x => x.Item1.BoostThrust * x.Item2) / ship.ForwardDrag, 1);
 
                 // 最高トラベル速度
                 _MaxTravelEngines = engines
                     .Select(x => (bestEngines[x.Key].MaxTravelSpeedEngine, x.Value.Count))
                     .OrderBy(x => x.MaxTravelSpeedEngine.Size)
                     .ToArray();
-                MaxTravelSpeed = (long)Math.Round(_MaxTravelEngines.Sum(x => x.Item1.ForwardThrust * x.Item2) / ship.ForwardDrag);
+                MaxTravelSpeed = Math.Round(_MaxTravelEngines.Sum(x => x.Item1.TravelThrust * x.Item2) / ship.ForwardDrag, 1);
 
 
                 // 最大加速
@@ -152,7 +158,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
                     .Select(x => (bestEngines[x.Key].MaxAccelerateEngine, x.Value.Count))
                     .OrderBy(x => x.MaxAccelerateEngine.Size)
                     .ToArray();
-                MaxAcceleration = _MaxAccelerateEngines.Sum(x => x.Item1.ForwardThrust * x.Item2) / ship.Mass;
+                MaxAcceleration = Math.Round(_MaxAccelerateEngines.Sum(x => x.Item1.ForwardThrust * x.Item2) / ship.Mass, 1);
             }
 
 
@@ -163,6 +169,8 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
                     .OrderBy(x => x.Item1.Size)
                     .ToArray();
                 MaxShieldCapacity = _Shields.Sum(x => x.Item1.Capacity * x.Item2);
+
+                ShieldsCount = (int)_Shields.Sum(x => x.Item2);
             }
             
         }

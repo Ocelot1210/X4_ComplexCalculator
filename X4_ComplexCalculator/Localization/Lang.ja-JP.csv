@@ -331,8 +331,12 @@ DBViewer_Ships_Type;種別
 DBViewer_Ships_MakerRace;開発元派閥
 DBViewer_Ships_Size;サイズ
 DBViewer_Ships_Mass;重量
-DBViewer_Ships_MaxForwardSpeed;最高速度
-DBViewer_Ships_MaxReverseSpeed;後退速度
-DBViewer_Ships_MaxBoostSpeed;ブースト速度
-DBViewer_Ships_MaxTravelSpeed;トラベル速度
+DBViewer_Ships_Speed;速度
+DBViewer_Ships_MaxForwardSpeed;最高
+DBViewer_Ships_MaxReverseSpeed;後退
+DBViewer_Ships_MaxBoostSpeed;ブースト
+DBViewer_Ships_MaxTravelSpeed;トラベル
 DBViewer_Ships_MaxAcceleration;最大加速
+DBViewer_Ships_Sheild;シールド
+DBViewer_Ships_Sheild_Mounted;搭載数
+DBViewer_Ships_Sheild_Capacity;容量
