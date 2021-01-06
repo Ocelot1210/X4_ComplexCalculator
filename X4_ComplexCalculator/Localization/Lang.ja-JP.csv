@@ -331,6 +331,7 @@ DBViewer_Ships_Type;種別
 DBViewer_Ships_MakerRace;開発元派閥
 DBViewer_Ships_Size;サイズ
 DBViewer_Ships_Mass;重量
+DBViewer_Ships_People;人員
 DBViewer_Ships_Speed;速度
 DBViewer_Ships_MaxForwardSpeed;最高
 DBViewer_Ships_MaxReverseSpeed;後退

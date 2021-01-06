@@ -94,6 +94,7 @@
                         <ColumnDefinition Width="{Binding ElementName=Column_ShipType, Path=ActualWidth}" />
                         <ColumnDefinition Width="{Binding ElementName=Column_ShipSize, Path=ActualWidth}" />
                         <ColumnDefinition Width="{Binding ElementName=Column_ShipMass, Path=ActualWidth}" />
+                        <ColumnDefinition Width="{Binding ElementName=Column_People, Path=ActualWidth}" />
                         <ColumnDefinition Width="{Binding ElementName=Column_MaxForwardSpeed, Path=ActualWidth}" />
                         <ColumnDefinition Width="{Binding ElementName=Column_MaxReverseSpeed, Path=ActualWidth}" />
                         <ColumnDefinition Width="{Binding ElementName=Column_MaxBoostSpeed, Path=ActualWidth}" />
@@ -118,7 +119,7 @@
                     </Grid.ColumnDefinitions>
 
                     <!--  名称～重量  -->
-                    <Grid Grid.Column="0" Grid.ColumnSpan="4">
+                    <Grid Grid.Column="0" Grid.ColumnSpan="5">
                         <Border Style="{StaticResource HeaderStyle}" />
                         <Thumb
                             HorizontalAlignment="Right"
@@ -128,7 +129,7 @@
 
 
                     <!--  速度  -->
-                    <Grid Grid.Column="4" Grid.ColumnSpan="5">
+                    <Grid Grid.Column="5" Grid.ColumnSpan="5">
                         <Border Style="{StaticResource HeaderStyle}">
                             <Label HorizontalAlignment="Center" Content="{lex:Loc Lang:DBViewer_Ships_Speed}" />
                         </Border>
@@ -139,7 +140,7 @@
                     </Grid>
 
                     <!--  平行移動速度  -->
-                    <Grid Grid.Column="9" Grid.ColumnSpan="2">
+                    <Grid Grid.Column="10" Grid.ColumnSpan="2">
                         <Border Style="{StaticResource HeaderStyle}">
                             <Label HorizontalAlignment="Center" Content="{lex:Loc Lang:DBViewer_Ships_TranslationSpeed}" />
                         </Border>
@@ -150,7 +151,7 @@
                     </Grid>
 
                     <!--  操舵性能  -->
-                    <Grid Grid.Column="11" Grid.ColumnSpan="4">
+                    <Grid Grid.Column="12" Grid.ColumnSpan="4">
                         <Border Style="{StaticResource HeaderStyle}">
                             <Label HorizontalAlignment="Center" Content="{lex:Loc Lang:DBViewer_Ships_Steering}" />
                         </Border>
@@ -161,7 +162,7 @@
                     </Grid>
 
                     <!--  武装  -->
-                    <Grid Grid.Column="15" Grid.ColumnSpan="3">
+                    <Grid Grid.Column="16" Grid.ColumnSpan="3">
                         <Border Style="{StaticResource HeaderStyle}">
                             <Label HorizontalAlignment="Center" Content="{lex:Loc Lang:DBViewer_Ships_Armed}" />
                         </Border>
@@ -172,7 +173,7 @@
                     </Grid>
 
                     <!--  シールド  -->
-                    <Grid Grid.Column="18" Grid.ColumnSpan="2">
+                    <Grid Grid.Column="19" Grid.ColumnSpan="2">
                         <Border Style="{StaticResource HeaderStyle}">
                             <Label HorizontalAlignment="Center" Content="{lex:Loc Lang:DBViewer_Ships_Sheild}" />
                         </Border>
@@ -183,7 +184,7 @@
                     </Grid>
 
                     <!--  保管庫  -->
-                    <Grid Grid.Column="20" Grid.ColumnSpan="2">
+                    <Grid Grid.Column="21" Grid.ColumnSpan="2">
                         <Border Style="{StaticResource HeaderStyle}">
                             <Label HorizontalAlignment="Center" Content="{lex:Loc Lang:DBViewer_Ships_Cargo}" />
                         </Border>
@@ -194,7 +195,7 @@
                     </Grid>
 
                     <!--  右端の余り用  -->
-                    <Grid Grid.Column="22">
+                    <Grid Grid.Column="23">
                         <Border Style="{StaticResource HeaderStyle}" />
                     </Grid>
 
@@ -252,6 +253,15 @@
                     Binding="{Binding Ship.Mass, Mode=OneTime, StringFormat='{}{0:N1} t'}"
                     CellStyle="{StaticResource RightAlignedDataGridCell}"
                     Header="{lex:Loc Lang:DBViewer_Ships_Mass}" />
+
+
+                <!--  人員  -->
+                <DataGridTextColumn
+                    x:Name="Column_People"
+                    dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
+                    Binding="{Binding Ship.People, Mode=OneTime, StringFormat='{}{0:N0}'}"
+                    CellStyle="{StaticResource RightAlignedDataGridCell}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_People}" />
 
 
                 <!--  速度 ===================================================================================  -->
