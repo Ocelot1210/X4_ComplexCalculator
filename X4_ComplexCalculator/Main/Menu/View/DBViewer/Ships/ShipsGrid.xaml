@@ -110,6 +110,8 @@
                         <ColumnDefinition Width="{Binding ElementName=Column_Missiles, Path=ActualWidth}" />
                         <ColumnDefinition Width="{Binding ElementName=Column_SheildMounted, Path=ActualWidth}" />
                         <ColumnDefinition Width="{Binding ElementName=Column_MaxShieldCapacity, Path=ActualWidth}" />
+                        <ColumnDefinition Width="{Binding ElementName=Column_CargoCapacity, Path=ActualWidth}" />
+                        <ColumnDefinition Width="{Binding ElementName=Column_CargoType, Path=ActualWidth}" />
 
                         <!--  カラム表示エリアが余った場合用  -->
                         <ColumnDefinition Width="*" />
@@ -180,6 +182,21 @@
                             Style="{StaticResource ColumnHeaderGripperStyle}" />
                     </Grid>
 
+                    <!--  保管庫  -->
+                    <Grid Grid.Column="20" Grid.ColumnSpan="2">
+                        <Border Style="{StaticResource HeaderStyle}">
+                            <Label HorizontalAlignment="Center" Content="{lex:Loc Lang:DBViewer_Ships_Cargo}" />
+                        </Border>
+                        <Thumb
+                            HorizontalAlignment="Right"
+                            x4bhv:DataGridHeaderThumbBehavior.SyncColumn="{Binding ElementName=Column_MaxShieldCapacity}"
+                            Style="{StaticResource ColumnHeaderGripperStyle}" />
+                    </Grid>
+
+                    <!--  右端の余り用  -->
+                    <Grid Grid.Column="22">
+                        <Border Style="{StaticResource HeaderStyle}" />
+                    </Grid>
 
                 </Grid>
             </ScrollViewer>
