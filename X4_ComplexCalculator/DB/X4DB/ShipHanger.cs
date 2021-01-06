@@ -39,13 +39,13 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// 発着パッド数
         /// </summary>
-        public int Count { get; }
+        public long Count { get; }
 
 
         /// <summary>
         /// 機体格納数
         /// </summary>
-        public int Capacity { get; }
+        public long Capacity { get; }
         #endregion
 
 
@@ -56,7 +56,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <param name="sizeID">発着パッドのサイズID</param>
         /// <param name="count">発着パッド数</param>
         /// <param name="capacity">機体格納数</param>
-        private ShipHanger(string shipID, string sizeID, int count, int capacity)
+        private ShipHanger(string shipID, string sizeID, long count, long capacity)
         {
             ShipID = shipID;
             Size = X4Size.Get(sizeID);

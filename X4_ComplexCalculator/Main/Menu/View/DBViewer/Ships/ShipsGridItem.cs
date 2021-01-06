@@ -190,6 +190,24 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         /// 保管庫種別
         /// </summary>
         public string CargoType { get; }
+
+
+        /// <summary>
+        /// 中型ドック数
+        /// </summary>
+        public int MediumDockCount { get; }
+
+
+        /// <summary>
+        /// 小型ドック数
+        /// </summary>
+        public int SmallDockCount { get; }
+
+
+        /// <summary>
+        /// 機体搭載量
+        /// </summary>
+        public int HangerCapacity { get; }
         #endregion
 
 
@@ -337,6 +355,14 @@ WHERE
     ShipID = :ShipID";
 
                 CargoType = string.Join('/', X4Database.Instance.Query<string>(sql, new { ship.ShipID }));
+            }
+
+
+            // ドック・機体
+            {
+                MediumDockCount = (int)ship.ShipHanger.Where(x => x.Key == "medium").Sum(x => x.Value.Count);
+                SmallDockCount  = (int)ship.ShipHanger.Where(x => x.Key == "small").Sum(x => x.Value.Count);
+                HangerCapacity  = (int)ship.ShipHanger.Where(x => x.Key != "extrasmall").Sum(x => x.Value.Capacity);
             }
         }
     }

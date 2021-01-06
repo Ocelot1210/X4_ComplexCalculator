@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
@@ -174,6 +175,12 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// 艦船のハンガー情報
         /// </summary>
         public IReadOnlyDictionary<string, ShipHanger> ShipHanger { get; }
+
+
+        /// <summary>
+        /// 所有派閥一覧
+        /// </summary>
+        public IReadOnlyList<Faction> Owners { get; }
         #endregion
 
 
@@ -255,6 +262,11 @@ namespace X4_ComplexCalculator.DB.X4DB
             MaxPrice = maxPrice;
             Description = description;
             ShipHanger = X4DB.ShipHanger.Get(shipID);
+            Owners = X4Database.Instance.Query<string>("SELECT FactionID FROM ShipOwner WHERE ShipID = :ShipID", this)
+                .Select(x => Faction.Get(x))
+                .Where(x => x != null)
+                .Select(x => x!)
+                .ToArray();
         }
 
 

@@ -113,14 +113,20 @@
                         <ColumnDefinition Width="{Binding ElementName=Column_MaxShieldCapacity, Path=ActualWidth}" />
                         <ColumnDefinition Width="{Binding ElementName=Column_CargoCapacity, Path=ActualWidth}" />
                         <ColumnDefinition Width="{Binding ElementName=Column_CargoType, Path=ActualWidth}" />
+                        <ColumnDefinition Width="{Binding ElementName=Column_DockMedium, Path=ActualWidth}" />
+                        <ColumnDefinition Width="{Binding ElementName=Column_DockSmall, Path=ActualWidth}" />
+                        <ColumnDefinition Width="{Binding ElementName=Column_HangerCapacity_Aircraft, Path=ActualWidth}" />
+                        <ColumnDefinition Width="{Binding ElementName=Column_HangerCapacity_Drone, Path=ActualWidth}" />
 
                         <!--  カラム表示エリアが余った場合用  -->
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <!--  名称～重量  -->
+                    <!--  基礎情報  -->
                     <Grid Grid.Column="0" Grid.ColumnSpan="5">
-                        <Border Style="{StaticResource HeaderStyle}" />
+                        <Border Style="{StaticResource HeaderStyle}">
+                            <Label HorizontalAlignment="Center" Content="{lex:Loc Lang:DBViewer_Ships_BasicInfo}" />
+                        </Border>
                         <Thumb
                             HorizontalAlignment="Right"
                             x4bhv:DataGridHeaderThumbBehavior.SyncColumn="{Binding ElementName=Column_ShipMass}"
@@ -190,12 +196,34 @@
                         </Border>
                         <Thumb
                             HorizontalAlignment="Right"
-                            x4bhv:DataGridHeaderThumbBehavior.SyncColumn="{Binding ElementName=Column_MaxShieldCapacity}"
+                            x4bhv:DataGridHeaderThumbBehavior.SyncColumn="{Binding ElementName=Column_CargoType}"
+                            Style="{StaticResource ColumnHeaderGripperStyle}" />
+                    </Grid>
+
+                    <!--  ドック  -->
+                    <Grid Grid.Column="23" Grid.ColumnSpan="2">
+                        <Border Style="{StaticResource HeaderStyle}">
+                            <Label HorizontalAlignment="Center" Content="{lex:Loc Lang:DBViewer_Ships_Dock}" />
+                        </Border>
+                        <Thumb
+                            HorizontalAlignment="Right"
+                            x4bhv:DataGridHeaderThumbBehavior.SyncColumn="{Binding ElementName=Column_DockSmall}"
+                            Style="{StaticResource ColumnHeaderGripperStyle}" />
+                    </Grid>
+
+                    <!--  搭載量  -->
+                    <Grid Grid.Column="25" Grid.ColumnSpan="2">
+                        <Border Style="{StaticResource HeaderStyle}">
+                            <Label HorizontalAlignment="Center" Content="{lex:Loc Lang:DBViewer_Ships_HangerCapacity}" />
+                        </Border>
+                        <Thumb
+                            HorizontalAlignment="Right"
+                            x4bhv:DataGridHeaderThumbBehavior.SyncColumn="{Binding ElementName=Column_HangerCapacity_Drone}"
                             Style="{StaticResource ColumnHeaderGripperStyle}" />
                     </Grid>
 
                     <!--  右端の余り用  -->
-                    <Grid Grid.Column="23">
+                    <Grid Grid.Column="27">
                         <Border Style="{StaticResource HeaderStyle}" />
                     </Grid>
 
@@ -213,6 +241,7 @@
             IsReadOnly="True"
             ItemsSource="{Binding ShipsView, Mode=OneTime}"
             RowHeaderWidth="5"
+            RowHeight="20"
             Style="{StaticResource DefaultDataGridStyle}"
             VerticalScrollBarVisibility="Visible">
 
@@ -230,21 +259,21 @@
                     x:Name="Column_ShipName"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnTextFilter}"
                     Binding="{Binding Ship.Name, Mode=OneTime}"
-                    Header="{lex:Loc Lang:DBViewer_Ships_Name}" />
+                    Header="{lex:Loc Lang:DBViewer_Ships_BasicInfo_Name}" />
 
                 <!--  艦船種別  -->
                 <DataGridTextColumn
                     x:Name="Column_ShipType"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
                     Binding="{Binding Ship.ShipType.Name, Mode=OneTime}"
-                    Header="{lex:Loc Lang:DBViewer_Ships_Type}" />
+                    Header="{lex:Loc Lang:DBViewer_Ships_BasicInfo_Type}" />
 
                 <!--  サイズ  -->
                 <DataGridTextColumn
                     x:Name="Column_ShipSize"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
                     Binding="{Binding Ship.Size, Mode=OneTime}"
-                    Header="{lex:Loc Lang:DBViewer_Ships_Size}" />
+                    Header="{lex:Loc Lang:DBViewer_Ships_BasicInfo_Size}" />
 
                 <!--  重量  -->
                 <DataGridTextColumn
@@ -252,7 +281,7 @@
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
                     Binding="{Binding Ship.Mass, Mode=OneTime, StringFormat='{}{0:N1} t'}"
                     CellStyle="{StaticResource RightAlignedDataGridCell}"
-                    Header="{lex:Loc Lang:DBViewer_Ships_Mass}" />
+                    Header="{lex:Loc Lang:DBViewer_Ships_BasicInfo_Mass}" />
 
 
                 <!--  人員  -->
@@ -261,7 +290,7 @@
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
                     Binding="{Binding Ship.People, Mode=OneTime, StringFormat='{}{0:N0}'}"
                     CellStyle="{StaticResource RightAlignedDataGridCell}"
-                    Header="{lex:Loc Lang:DBViewer_Ships_People}" />
+                    Header="{lex:Loc Lang:DBViewer_Ships_BasicInfo_People}" />
 
 
                 <!--  速度 ===================================================================================  -->
@@ -434,8 +463,45 @@
                 <DataGridTextColumn
                     x:Name="Column_CargoType"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
-                    Binding="{Binding CargoType, Mode=OneTime, StringFormat='{}{0:N0}'}"
+                    Binding="{Binding CargoType, Mode=OneTime}"
                     Header="{lex:Loc Lang:DBViewer_Ships_Cargo_Type}" />
+
+                <!--  ドック ===================================================================================  -->
+
+                <!--  中型  -->
+                <DataGridTextColumn
+                    x:Name="Column_DockMedium"
+                    dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
+                    Binding="{Binding MediumDockCount, Mode=OneTime, StringFormat='{}{0:N0}'}"
+                    CellStyle="{StaticResource RightAlignedDataGridCell}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_Dock_Medium}" />
+
+                <!--  小型  -->
+                <DataGridTextColumn
+                    x:Name="Column_DockSmall"
+                    dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
+                    Binding="{Binding SmallDockCount, Mode=OneTime, StringFormat='{}{0:N0}'}"
+                    CellStyle="{StaticResource RightAlignedDataGridCell}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_Dock_Small}" />
+
+
+                <!--  搭載量 ===================================================================================  -->
+
+                <!--  機体  -->
+                <DataGridTextColumn
+                    x:Name="Column_HangerCapacity_Aircraft"
+                    dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
+                    Binding="{Binding HangerCapacity, Mode=OneTime, StringFormat='{}{0:N0}'}"
+                    CellStyle="{StaticResource RightAlignedDataGridCell}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_HangerCapacity_Aircraft}" />
+
+                <!--  ドローン  -->
+                <DataGridTextColumn
+                    x:Name="Column_HangerCapacity_Drone"
+                    dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
+                    Binding="{Binding Ship.DroneStorage, Mode=OneTime, StringFormat='{}{0:N0}'}"
+                    CellStyle="{StaticResource RightAlignedDataGridCell}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_HangerCapacity_Drone}" />
 
 
             </DataGrid.Columns>
