@@ -86,7 +86,7 @@
                 </ScrollViewer.Resources>
 
                 <!--  2段組本体  -->
-                <Grid Grid.Row="0" Height="25">
+                <Grid Grid.Row="0" Height="30">
                     <Grid.ColumnDefinitions>
 
                         <!--  対応するDataGridのカラムのActualWidthをバインドする  -->
@@ -109,7 +109,7 @@
                         <ColumnDefinition Width="{Binding ElementName=Column_Weapons, Path=ActualWidth}" />
                         <ColumnDefinition Width="{Binding ElementName=Column_Turrets, Path=ActualWidth}" />
                         <ColumnDefinition Width="{Binding ElementName=Column_Missiles, Path=ActualWidth}" />
-                        <ColumnDefinition Width="{Binding ElementName=Column_SheildMounted, Path=ActualWidth}" />
+                        <ColumnDefinition Width="{Binding ElementName=Column_ShieldMounted, Path=ActualWidth}" />
                         <ColumnDefinition Width="{Binding ElementName=Column_MaxShieldCapacity, Path=ActualWidth}" />
                         <ColumnDefinition Width="{Binding ElementName=Column_CargoCapacity, Path=ActualWidth}" />
                         <ColumnDefinition Width="{Binding ElementName=Column_CargoType, Path=ActualWidth}" />
@@ -129,7 +129,7 @@
                         </Border>
                         <Thumb
                             HorizontalAlignment="Right"
-                            x4bhv:DataGridHeaderThumbBehavior.SyncColumn="{Binding ElementName=Column_ShipMass}"
+                            x4bhv:DataGridHeaderThumbBehavior.SyncColumn="{Binding ElementName=Column_People}"
                             Style="{StaticResource ColumnHeaderGripperStyle}" />
                     </Grid>
 
@@ -148,7 +148,7 @@
                     <!--  平行移動速度  -->
                     <Grid Grid.Column="10" Grid.ColumnSpan="2">
                         <Border Style="{StaticResource HeaderStyle}">
-                            <Label HorizontalAlignment="Center" Content="{lex:Loc Lang:DBViewer_Ships_TranslationSpeed}" />
+                            <Label HorizontalAlignment="Center" Content="{lex:Loc Lang:DBViewer_Ships_ParallelMoveSpeed}" />
                         </Border>
                         <Thumb
                             HorizontalAlignment="Right"
@@ -181,7 +181,7 @@
                     <!--  シールド  -->
                     <Grid Grid.Column="19" Grid.ColumnSpan="2">
                         <Border Style="{StaticResource HeaderStyle}">
-                            <Label HorizontalAlignment="Center" Content="{lex:Loc Lang:DBViewer_Ships_Sheild}" />
+                            <Label HorizontalAlignment="Center" Content="{lex:Loc Lang:DBViewer_Ships_Shield}" />
                         </Border>
                         <Thumb
                             HorizontalAlignment="Right"
@@ -433,11 +433,11 @@
 
                 <!--  シールド搭載数  -->
                 <DataGridTextColumn
-                    x:Name="Column_SheildMounted"
+                    x:Name="Column_ShieldMounted"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
                     Binding="{Binding ShieldsCount, Mode=OneTime, StringFormat='{}{0:N0}'}"
                     CellStyle="{StaticResource RightAlignedDataGridCell}"
-                    Header="{lex:Loc Lang:DBViewer_Ships_Sheild_Mounted}" />
+                    Header="{lex:Loc Lang:DBViewer_Ships_Shield_Count}" />
 
 
                 <!--  シールド容量  -->
@@ -446,7 +446,7 @@
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
                     Binding="{Binding MaxShieldCapacity, Mode=OneTime, StringFormat='{}{0:N0} MJ'}"
                     CellStyle="{StaticResource RightAlignedDataGridCell}"
-                    Header="{lex:Loc Lang:DBViewer_Ships_Sheild_Capacity}" />
+                    Header="{lex:Loc Lang:DBViewer_Ships_Shield_Capacity}" />
 
 
                 <!--  保管庫 ===================================================================================  -->

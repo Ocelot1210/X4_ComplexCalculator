@@ -11,7 +11,7 @@
     xmlns:races="clr-namespace:X4_ComplexCalculator.Main.Menu.View.DBViewer.Races"
     xmlns:ships="clr-namespace:X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships"
     xmlns:wares="clr-namespace:X4_ComplexCalculator.Main.Menu.View.DBViewer.Wares"
-    Title="DBViewerWindow"
+    Title="{lex:Loc Lang:DBViewer}"
     Width="800"
     Height="450"
     lex:LocalizeDictionary.DefaultProvider="{StaticResource CSVLocalizationProvider}"

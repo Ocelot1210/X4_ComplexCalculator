@@ -300,9 +300,66 @@ TextFilter_EndWith;End with
 # DB Viewer
 # ------------------------------------------------------
 DBViewer;DB Viewer
-# Races
-Races;Races
-RaceID;Race ID
-RaceName;Race name
-ShortName;Short name
-Description;Description
+DBViewer_Description;Description
+# ■Races
+DBViewer_Races_Title;Races
+DBViewer_Races_RaceID;Race ID
+DBViewer_Races_RaceName;Race name
+DBViewer_Races_ShortName;Short name
+# ■Wares
+DBViewer_Wares_Title;Wares
+DBViewer_Wares_WareName;Name
+DBViewer_Wares_WareGroupName;Type
+DBViewer_Wares_TransportTypeName;Transport
+DBViewer_Wares_MinPrice;Min price
+DBViewer_Wares_MaxPrice;Max price
+DBViewer_Wares_Profit;Profit
+DBViewer_Wares_Volume;Volume
+DBViewer_Wares_ProfitPerVolume;Profit/Volume
+# ■Modules
+DBViewer_Modules_Title;Modules
+DBViewer_Modules_ModuleName;Name
+DBViewer_Modules_ModuleType;Type
+DBViewer_Modules_OwnerRace;Owner race
+DBViewer_Modules_MaxWorkers;Workers
+DBViewer_Modules_WorkersCapacity;Capacity
+DBViewer_Modules_Product;Product
+DBViewer_Modules_MaxEfficiency;Max efficiency
+# ■Ships
+DBViewer_Ships_Title;Ships
+DBViewer_Ships_BasicInfo;Basic info
+DBViewer_Ships_BasicInfo_Name;Name
+DBViewer_Ships_BasicInfo_Type;Type
+DBViewer_Ships_BasicInfo_Size;Size
+DBViewer_Ships_BasicInfo_Mass;Mass
+DBViewer_Ships_BasicInfo_People;People
+DBViewer_Ships_Speed;Speed
+DBViewer_Ships_MaxForwardSpeed;Forward
+DBViewer_Ships_MaxReverseSpeed;Reverse
+DBViewer_Ships_MaxBoostSpeed;Boost
+DBViewer_Ships_MaxTravelSpeed;Travel
+DBViewer_Ships_MaxAcceleration;Acc
+DBViewer_Ships_ParallelMoveSpeed;Parallel move speed
+DBViewer_Ships_VerticalMovementSpeed;Vertical
+DBViewer_Ships_HorizontalMovementSpeed;Horizontal
+DBViewer_Ships_Steering;Steering
+DBViewer_Ships_Steering_Pitch;Pitch
+DBViewer_Ships_Steering_Yaw;Yaw
+DBViewer_Ships_Steering_Roll;Roll
+DBViewer_Ships_Steering_Responsiveness;Responsiveness
+DBViewer_Ships_Armed;Armed(Quantity)
+DBViewer_Ships_Armed_Weapons;Weapons
+DBViewer_Ships_Armed_Turrets;Turrets
+DBViewer_Ships_Armed_Missiles;Missiles
+DBViewer_Ships_Shield;Shield
+DBViewer_Ships_Shield_Count;Count
+DBViewer_Ships_Shield_Capacity;Capacity
+DBViewer_Ships_Cargo;Cargo
+DBViewer_Ships_Cargo_Capacity;Capacity
+DBViewer_Ships_Cargo_Type;Type
+DBViewer_Ships_Dock;Dock
+DBViewer_Ships_Dock_Medium;M
+DBViewer_Ships_Dock_Small;S
+DBViewer_Ships_HangerCapacity;Hanger
+DBViewer_Ships_HangerCapacity_Aircraft;Aircraft
+DBViewer_Ships_HangerCapacity_Drone;Drone
