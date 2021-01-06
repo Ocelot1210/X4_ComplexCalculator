@@ -345,6 +345,13 @@ DBViewer_Ships_Steering_Pitch;ピッチ
 DBViewer_Ships_Steering_Yaw;ヨー
 DBViewer_Ships_Steering_Roll;ロール
 DBViewer_Ships_Steering_Responsiveness;反応性
+DBViewer_Ships_Armed;武装(搭載量)
+DBViewer_Ships_Armed_Weapons;武器
+DBViewer_Ships_Armed_Turrets;タレット
+DBViewer_Ships_Armed_Missiles;ミサイル
 DBViewer_Ships_Sheild;シールド
 DBViewer_Ships_Sheild_Mounted;搭載数
 DBViewer_Ships_Sheild_Capacity;容量
+DBViewer_Ships_Cargo;保管庫
+DBViewer_Ships_Cargo_Capacity;容量
+DBViewer_Ships_Cargo_Type;種別

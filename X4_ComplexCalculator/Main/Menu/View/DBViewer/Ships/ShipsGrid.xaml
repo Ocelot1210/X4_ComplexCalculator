@@ -105,6 +105,9 @@
                         <ColumnDefinition Width="{Binding ElementName=Column_MaxYawRate, Path=ActualWidth}" />
                         <ColumnDefinition Width="{Binding ElementName=Column_MaxRollRate, Path=ActualWidth}" />
                         <ColumnDefinition Width="{Binding ElementName=Column_Responsiveness, Path=ActualWidth}" />
+                        <ColumnDefinition Width="{Binding ElementName=Column_Weapons, Path=ActualWidth}" />
+                        <ColumnDefinition Width="{Binding ElementName=Column_Turrets, Path=ActualWidth}" />
+                        <ColumnDefinition Width="{Binding ElementName=Column_Missiles, Path=ActualWidth}" />
                         <ColumnDefinition Width="{Binding ElementName=Column_SheildMounted, Path=ActualWidth}" />
                         <ColumnDefinition Width="{Binding ElementName=Column_MaxShieldCapacity, Path=ActualWidth}" />
 
@@ -129,7 +132,7 @@
                         </Border>
                         <Thumb
                             HorizontalAlignment="Right"
-                            x4bhv:DataGridHeaderThumbBehavior.SyncColumn="{Binding ElementName=Column_MaxTravelSpeed}"
+                            x4bhv:DataGridHeaderThumbBehavior.SyncColumn="{Binding ElementName=Column_MaxAcceleration}"
                             Style="{StaticResource ColumnHeaderGripperStyle}" />
                     </Grid>
 
@@ -155,8 +158,19 @@
                             Style="{StaticResource ColumnHeaderGripperStyle}" />
                     </Grid>
 
+                    <!--  武装  -->
+                    <Grid Grid.Column="15" Grid.ColumnSpan="3">
+                        <Border Style="{StaticResource HeaderStyle}">
+                            <Label HorizontalAlignment="Center" Content="{lex:Loc Lang:DBViewer_Ships_Armed}" />
+                        </Border>
+                        <Thumb
+                            HorizontalAlignment="Right"
+                            x4bhv:DataGridHeaderThumbBehavior.SyncColumn="{Binding ElementName=Column_Missiles}"
+                            Style="{StaticResource ColumnHeaderGripperStyle}" />
+                    </Grid>
+
                     <!--  シールド  -->
-                    <Grid Grid.Column="15" Grid.ColumnSpan="2">
+                    <Grid Grid.Column="18" Grid.ColumnSpan="2">
                         <Border Style="{StaticResource HeaderStyle}">
                             <Label HorizontalAlignment="Center" Content="{lex:Loc Lang:DBViewer_Ships_Sheild}" />
                         </Border>
@@ -211,7 +225,7 @@
                 <DataGridTextColumn
                     x:Name="Column_ShipSize"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
-                    Binding="{Binding Ship.Size.Name, Mode=OneTime}"
+                    Binding="{Binding Ship.Size, Mode=OneTime}"
                     Header="{lex:Loc Lang:DBViewer_Ships_Size}" />
 
                 <!--  重量  -->
@@ -331,6 +345,33 @@
                     Header="{lex:Loc Lang:DBViewer_Ships_Steering_Responsiveness}" />
 
 
+                <!--  武装 ===================================================================================  -->
+
+                <!--  武器  -->
+                <DataGridTextColumn
+                    x:Name="Column_Weapons"
+                    dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
+                    Binding="{Binding Weapons, Mode=OneTime, StringFormat='{}{0:N0}'}"
+                    CellStyle="{StaticResource RightAlignedDataGridCell}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_Armed_Weapons}" />
+
+                <!--  タレット  -->
+                <DataGridTextColumn
+                    x:Name="Column_Turrets"
+                    dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
+                    Binding="{Binding Turrets, Mode=OneTime, StringFormat='{}{0:N0}'}"
+                    CellStyle="{StaticResource RightAlignedDataGridCell}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_Armed_Turrets}" />
+
+                <!--  ミサイル搭載量  -->
+                <DataGridTextColumn
+                    x:Name="Column_Missiles"
+                    dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
+                    Binding="{Binding Ship.MissileStorage, Mode=OneTime, StringFormat='{}{0:N0}'}"
+                    CellStyle="{StaticResource RightAlignedDataGridCell}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_Armed_Missiles}" />
+
+
                 <!--  シールド ===================================================================================  -->
 
 
@@ -350,6 +391,25 @@
                     Binding="{Binding MaxShieldCapacity, Mode=OneTime, StringFormat='{}{0:N0} MJ'}"
                     CellStyle="{StaticResource RightAlignedDataGridCell}"
                     Header="{lex:Loc Lang:DBViewer_Ships_Sheild_Capacity}" />
+
+
+                <!--  保管庫 ===================================================================================  -->
+
+                <!--  容量  -->
+                <DataGridTextColumn
+                    x:Name="Column_CargoCapacity"
+                    dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
+                    Binding="{Binding Ship.CargoSize, Mode=OneTime, StringFormat='{}{0:N0}'}"
+                    CellStyle="{StaticResource RightAlignedDataGridCell}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_Cargo_Capacity}" />
+
+                <!--  種別  -->
+                <DataGridTextColumn
+                    x:Name="Column_CargoType"
+                    dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
+                    Binding="{Binding CargoType, Mode=OneTime, StringFormat='{}{0:N0}'}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_Cargo_Type}" />
+
 
             </DataGrid.Columns>
         </DataGrid>

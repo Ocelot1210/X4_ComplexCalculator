@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using X4_ComplexCalculator.DB;
 
 namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
 {
@@ -115,19 +116,6 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         public double MaxAcceleration { get; }
 
 
-        #region シールド
-        /// <summary>
-        /// シールド容量
-        /// </summary>
-        public long MaxShieldCapacity { get; }
-
-
-        /// <summary>
-        /// シールド搭載数
-        /// </summary>
-        public int ShieldsCount { get; }
-        #endregion
-
 
         #region 平行移動速度
         /// <summary>
@@ -141,7 +129,6 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         /// </summary>
         public double HorizontalMovementSpeed { get; }
         #endregion
-
 
 
         #region 操舵性能
@@ -168,6 +155,41 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         /// </summary>
         public double Responsiveness { get; }
         #endregion
+
+        #region 武装
+        /// <summary>
+        /// 武器
+        /// </summary>
+        public int Weapons { get; }
+
+
+        /// <summary>
+        /// タレット
+        /// </summary>
+        public int Turrets { get; }
+        #endregion
+
+
+
+
+        #region シールド
+        /// <summary>
+        /// シールド容量
+        /// </summary>
+        public long MaxShieldCapacity { get; }
+
+
+        /// <summary>
+        /// シールド搭載数
+        /// </summary>
+        public int ShieldsCount { get; }
+        #endregion
+
+
+        /// <summary>
+        /// 保管庫種別
+        /// </summary>
+        public string CargoType { get; }
         #endregion
 
 
@@ -187,7 +209,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
             IReadOnlyDictionary<string, ThrusterManager> bestThrusters)
         {
             Ship = ship;
-
+            
             var equipment = ShipEquipment.Get(ship.ShipID);
 
             // エンジンを設定
@@ -289,6 +311,32 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
 
                 // 反応性
                 Responsiveness = Math.Round(ship.DragYaw / ship.InertiaYaw, 3);
+            }
+
+
+            // 武装
+            {
+                {
+                    Weapons = equipment.TryGetValue("weapons", out var x) ? x.Sum(x => (int)x.Value.Count) : 0;
+                }
+                {
+                    Turrets = equipment.TryGetValue("turrets", out var x) ? x.Sum(x => (int)x.Value.Count) : 0;
+                }
+            }
+
+
+            // 保管庫種別
+            {
+                const string sql = @"
+SELECT
+    TransportType.Name
+FROM
+    TransportType, ShipTransportType
+WHERE
+    ShipTransportType.TransportTypeID = TransportType.TransportTypeID AND
+    ShipID = :ShipID";
+
+                CargoType = string.Join('/', X4Database.Instance.Query<string>(sql, new { ship.ShipID }));
             }
         }
     }
