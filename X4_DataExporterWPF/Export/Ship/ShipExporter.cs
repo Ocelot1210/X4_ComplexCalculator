@@ -18,7 +18,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// catファイルオブジェクト
         /// </summary>
-        private readonly IIndexResolver _CatFile;
+        private readonly CatFile _CatFile;
 
 
         /// <summary>
@@ -32,6 +32,10 @@ namespace X4_DataExporterWPF.Export
         /// </summary>
         private readonly ILanguageResolver _Resolver;
 
+        /// <summary>
+        /// サムネ画像が見つからなかった場合の画像
+        /// </summary>
+        private byte[]? _NotFoundThumbnail;
 
 
         /// <summary>
@@ -40,7 +44,7 @@ namespace X4_DataExporterWPF.Export
         /// <param name="catFile">catファイルオブジェクト</param>
         /// <param name="waresXml">ウェア情報xml</param>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public ShipExporter(IIndexResolver catFile, XDocument waresXml, ILanguageResolver resolver)
+        public ShipExporter(CatFile catFile, XDocument waresXml, ILanguageResolver resolver)
         {
             _CatFile = catFile;
             _WaresXml = waresXml;
@@ -86,6 +90,7 @@ CREATE TABLE IF NOT EXISTS Ship
     AvgPrice        INTEGER NOT NULL,
     MaxPrice        INTEGER NOT NULL,
     Description     TEXT    NOT NULL,
+    Thumbnail       BLOB,
     FOREIGN KEY (ShipTypeID)        REFERENCES ShipType(ShipTypeID),
     FOREIGN KEY (SizeID)            REFERENCES Size(SizeID)
 ) WITHOUT ROWID");
@@ -100,8 +105,8 @@ CREATE TABLE IF NOT EXISTS Ship
 
                 connection.Execute(@"
 INSERT INTO
-Ship   ( ShipID,  ShipTypeID,  Name,  Macro,  SizeID,  Mass,  DragForward,  DragReverse,  DragHorizontal,  DragVertical,  DragPitch,  DragYaw,  DragRoll,  InertiaPitch,  InertiaYaw,  InertiaRoll,  Hull,  People,  MissileStorage,  DroneStorage,  CargoSize,  MinPrice,  AvgPrice,  MaxPrice,  Description) 
-VALUES (@ShipID, @ShipTypeID, @Name, @Macro, @SizeID, @Mass, @DragForward, @DragReverse, @DragHorizontal, @DragVertical, @DragPitch, @DragYaw, @DragRoll, @InertiaPitch, @InertiaYaw, @InertiaRoll, @Hull, @People, @MissileStorage, @DroneStorage, @CargoSize, @MinPrice, @AvgPrice, @MaxPrice, @Description)",
+Ship   ( ShipID,  ShipTypeID,  Name,  Macro,  SizeID,  Mass,  DragForward,  DragReverse,  DragHorizontal,  DragVertical,  DragPitch,  DragYaw,  DragRoll,  InertiaPitch,  InertiaYaw,  InertiaRoll,  Hull,  People,  MissileStorage,  DroneStorage,  CargoSize,  MinPrice,  AvgPrice,  MaxPrice,  Description,  Thumbnail) 
+VALUES (@ShipID, @ShipTypeID, @Name, @Macro, @SizeID, @Mass, @DragForward, @DragReverse, @DragHorizontal, @DragVertical, @DragPitch, @DragYaw, @DragRoll, @InertiaPitch, @InertiaYaw, @InertiaRoll, @Hull, @People, @MissileStorage, @DroneStorage, @CargoSize, @MinPrice, @AvgPrice, @MaxPrice, @Description, @Thumbnail)",
 items);
             }
         }
@@ -160,8 +165,9 @@ items);
                     price.Attribute("min").GetInt(),
                     price.Attribute("average").GetInt(),
                     price.Attribute("max").GetInt(),
-                    property.Description
-                    );
+                    property.Description,
+                    GetThumbnail(macroName)                    
+                );
             }
         }
 
@@ -291,6 +297,29 @@ items);
             public int People;
             public int MissileStorage;
             public int DroneStorage;
+        }
+
+
+        
+        /// <summary>
+        /// サムネ画像を取得する
+        /// </summary>
+        /// <param name="macroName">マクロ名</param>
+        /// <returns>サムネ画像のbyte配列</returns>
+        private byte[]? GetThumbnail(string macroName)
+        {
+            var ret = Util.GzDds2Png(_CatFile, "assets/fx/gui/textures/ships", macroName);
+            if (ret is not null)
+            {
+                return ret;
+            }
+
+            if (_NotFoundThumbnail is null)
+            {
+                _NotFoundThumbnail = Util.GzDds2Png(_CatFile, "assets/fx/gui/textures/ships", "notfound.gz");
+            }
+
+            return _NotFoundThumbnail;
         }
     }
 }

@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.IO;
+using System.IO.Compression;
 using System.Xml.Linq;
 using Dapper;
+using LibX4.FileSystem;
 using LibX4.Lang;
 using X4_DataExporterWPF.Entity;
 
@@ -13,9 +16,9 @@ namespace X4_DataExporterWPF.Export
     public class RaceExporter : IExporter
     {
         /// <summary>
-        /// 種族情報xml
+        /// catファイルオブジェクト
         /// </summary>
-        private readonly XDocument _RaceXml;
+        private readonly CatFile _CatFile;
 
 
         /// <summary>
@@ -27,11 +30,11 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="raceXml">'libraries/races.xml' の XDocument</param>
+        /// <param name="raceXml">catファイルオブジェクト</param>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public RaceExporter(XDocument raceXml, ILanguageResolver resolver)
+        public RaceExporter(CatFile catFile, ILanguageResolver resolver)
         {
-            _RaceXml = raceXml;
+            _CatFile = catFile;
             _Resolver = resolver;
         }
 
@@ -52,7 +55,8 @@ CREATE TABLE IF NOT EXISTS Race
     RaceID      TEXT    NOT NULL PRIMARY KEY,
     Name        TEXT    NOT NULL,
     ShortName   TEXT    NOT NULL,
-    Description TEXT    NOT NULL
+    Description TEXT    NOT NULL,
+    Icon        BLOB
 ) WITHOUT ROWID");
             }
 
@@ -63,7 +67,7 @@ CREATE TABLE IF NOT EXISTS Race
             {
                 var items = GetRecords();
 
-                connection.Execute("INSERT INTO Race (RaceID, Name, ShortName, Description) VALUES (@RaceID, @Name, @ShortName, @Description)", items);
+                connection.Execute("INSERT INTO Race (RaceID, Name, ShortName, Description, Icon) VALUES (@RaceID, @Name, @ShortName, @Description, @Icon)", items);
             }
         }
 
@@ -74,7 +78,9 @@ CREATE TABLE IF NOT EXISTS Race
         /// <returns>読み出した Race データ</returns>
         private IEnumerable<Race> GetRecords()
         {
-            foreach (var race in _RaceXml.Root.Elements())
+            var raceXml = _CatFile.OpenXml("libraries/races.xml");
+
+            foreach (var race in raceXml.Root.Elements())
             {
                 var raceID = race.Attribute("id")?.Value;
                 if (string.IsNullOrEmpty(raceID)) continue;
@@ -86,7 +92,13 @@ CREATE TABLE IF NOT EXISTS Race
                 
                 var description = _Resolver.Resolve(race.Attribute("description")?.Value ?? "");
 
-                yield return new Race(raceID, name, shortName, description);
+                yield return new Race(
+                    raceID,
+                    name,
+                    shortName,
+                    description,
+                    Util.GzDds2Png(_CatFile, "assets/fx/gui/textures/races", race.Element("icon")?.Attribute("active")?.Value)
+                );
             }
         }
     }

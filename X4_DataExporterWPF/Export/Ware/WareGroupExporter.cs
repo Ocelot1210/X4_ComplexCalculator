@@ -3,6 +3,7 @@ using System.Data;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Dapper;
+using LibX4.FileSystem;
 using LibX4.Lang;
 using LibX4.Xml;
 using X4_DataExporterWPF.Entity;
@@ -15,9 +16,9 @@ namespace X4_DataExporterWPF.Export
     public class WareGroupExporter : IExporter
     {
         /// <summary>
-        /// ウェア種別情報xml
+        /// catファイルオブジェクト
         /// </summary>
-        private readonly XDocument _WareGroupXml;
+        private readonly CatFile _CatFile;
 
 
         /// <summary>
@@ -31,9 +32,9 @@ namespace X4_DataExporterWPF.Export
         /// </summary>
         /// <param name="wareGroupXml">'libraries/waregroups.xml' の XDocument</param>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public WareGroupExporter(XDocument wareGroupXml, ILanguageResolver resolver)
+        public WareGroupExporter(CatFile catFile, ILanguageResolver resolver)
         {
-            _WareGroupXml = wareGroupXml;
+            _CatFile = catFile;
             _Resolver = resolver;
         }
 
@@ -76,7 +77,9 @@ CREATE TABLE IF NOT EXISTS WareGroup
         /// <returns>読み出した WareGroup データ</returns>
         internal IEnumerable<WareGroup> GetRecords()
         {
-            foreach (var wareGroup in _WareGroupXml.Root.XPathSelectElements("group[@tags='tradable']"))
+            var wareGroupXml = _CatFile.OpenXml("libraries/waregroups.xml");
+
+            foreach (var wareGroup in wareGroupXml.Root.XPathSelectElements("group[@tags='tradable']"))
             {
                 var wareGroupID = wareGroup.Attribute("id")?.Value;
                 if (string.IsNullOrEmpty(wareGroupID)) continue;

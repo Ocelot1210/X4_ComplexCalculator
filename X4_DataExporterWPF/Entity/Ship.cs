@@ -158,6 +158,12 @@
         /// 説明文
         /// </summary>
         public string Description { get; }
+
+
+        /// <summary>
+        /// サムネ画像
+        /// </summary>
+        public byte[]? Thumbnail { get; }
         #endregion
 
 
@@ -189,6 +195,7 @@
         /// <param name="avgPrice">平均値</param>
         /// <param name="maxPrice">最高値</param>
         /// <param name="description">説明文</param>
+        /// <param name="thumbnail">サムネ画像</param>
         public Ship(
             string shipID,
             string shipTypeID,
@@ -214,7 +221,8 @@
             int minPrice,
             int avgPrice,
             int maxPrice,
-            string description)
+            string description, 
+            byte[]? thumbnail)
         {
             ShipID = shipID;
             ShipTypeID = shipTypeID;
@@ -241,6 +249,7 @@
             AvgPrice = avgPrice;
             MaxPrice = maxPrice;
             Description = description;
+            Thumbnail = thumbnail;
         }
     }
 }

@@ -1,10 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.IO.Compression;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Dapper;
+using LibX4.FileSystem;
 using LibX4.Lang;
 using X4_DataExporterWPF.Entity;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using System.IO;
 
 namespace X4_DataExporterWPF.Export
 {
@@ -14,9 +19,9 @@ namespace X4_DataExporterWPF.Export
     public class FactionExporter : IExporter
     {
         /// <summary>
-        /// 派閥情報xml
+        /// catファイルオブジェクト
         /// </summary>
-        private readonly XDocument _FactionsXml;
+        private readonly CatFile _CatFile;
 
 
         /// <summary>
@@ -28,12 +33,11 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="factionsXml">'libraries/factions.xml' の XDocument</param>
+        /// <param name="catFile">catファイルオブジェクト</param>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public FactionExporter(XDocument factionsXml, ILanguageResolver resolver)
+        public FactionExporter(CatFile catFile, ILanguageResolver resolver)
         {
-            _FactionsXml = factionsXml;
-
+            _CatFile = catFile;
             _Resolver = resolver;
         }
 
@@ -55,6 +59,7 @@ CREATE TABLE IF NOT EXISTS Faction
     Name        TEXT    NOT NULL,
     RaceID      TEXT    NOT NULL,
     ShortName   TEXT    NOT NULL,
+    Icon        BLOB,
     FOREIGN KEY (RaceID)   REFERENCES Race(RaceID)
 ) WITHOUT ROWID");
             }
@@ -66,7 +71,7 @@ CREATE TABLE IF NOT EXISTS Faction
             {
                 var items = GetRecords();
 
-                connection.Execute("INSERT INTO Faction (FactionID, Name, RaceID, ShortName) VALUES (@FactionID, @Name, @RaceID, @ShortName)", items);
+                connection.Execute("INSERT INTO Faction (FactionID, Name, RaceID, ShortName, Icon) VALUES (@FactionID, @Name, @RaceID, @ShortName, @Icon)", items);
             }
         }
 
@@ -77,7 +82,9 @@ CREATE TABLE IF NOT EXISTS Faction
         /// <returns>読み出した Faction データ</returns>
         private IEnumerable<Faction> GetRecords()
         {
-            foreach (var faction in _FactionsXml.Root.XPathSelectElements("faction[@name]"))
+            var factionsXml = _CatFile.OpenXml("libraries/factions.xml");
+
+            foreach (var faction in factionsXml.Root.XPathSelectElements("faction[@name]"))
             {
                 var factionID = faction.Attribute("id")?.Value;
                 if (string.IsNullOrEmpty(factionID)) continue;
@@ -88,7 +95,13 @@ CREATE TABLE IF NOT EXISTS Faction
                 var raceID = faction.Attribute("primaryrace")?.Value ?? "";
                 var shortName = _Resolver.Resolve(faction.Attribute("shortname")?.Value ?? "");
 
-                yield return new Faction(factionID, name, raceID, shortName);
+                yield return new Faction(
+                    factionID,
+                    name,
+                    raceID,
+                    shortName,
+                    Util.GzDds2Png(_CatFile, "assets/fx/gui/textures/factions", faction.Element("icon")?.Attribute("active")?.Value)
+                );
             }
         }
     }
