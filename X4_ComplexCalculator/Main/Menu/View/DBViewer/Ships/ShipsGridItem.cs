@@ -232,7 +232,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
 
             // エンジンを設定
             {
-                // 装備可能なエンジン一覧
+                // サイズIDをキーにした装備可能なエンジンの個数一覧
                 var engines = equipment["engines"];
 
                 // 最高速度
@@ -287,7 +287,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
 
             // スラスターを設定
             {
-                // 装備可能なスラスター一覧
+                // サイズIDをキーにした装備可能なスラスターの個数一覧
                 var thrusters = equipment["thrusters"];
 
 

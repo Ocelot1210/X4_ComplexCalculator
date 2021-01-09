@@ -63,5 +63,19 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
             MaxTravelSpeedEngine  = engines.OrderByDescending(x => x.TravelThrust).First();
             MaxAccelerateEngine   = MaxForwardEngine;       // 前方推力が最高のエンジンが最大の加速を生む
         }
+
+
+        /// <summary>
+        /// コンストラクタ(デフォルトのロードアウトがある艦船専用)
+        /// </summary>
+        /// <param name="engine">エンジン</param>
+        public EngineManager(Engine engine)
+        {
+            MaxForwardEngine =
+            MaxReverseSpeedEngine =
+            MaxBoostSpeedEngine =
+            MaxTravelSpeedEngine =
+            MaxAccelerateEngine = engine;
+        }
     }
 }

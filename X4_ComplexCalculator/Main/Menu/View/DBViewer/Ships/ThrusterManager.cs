@@ -56,5 +56,18 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
             MaxYawThruster    = thrusters.OrderBy(x => x.ThrustYaw).First();
             MaxRollThruster   = thrusters.OrderBy(x => x.ThrustRoll).First();
         }
+
+
+        /// <summary>
+        /// コンストラクタ(デフォルトのロードアウトがある艦船専用)
+        /// </summary>
+        /// <param name="thruster">スラスター</param>
+        public ThrusterManager(Thruster thruster)
+        {
+            MaxStrafeThruster =
+            MaxPitchThruster =
+            MaxYawThruster =
+            MaxRollThruster = thruster;
+        }
     }
 }

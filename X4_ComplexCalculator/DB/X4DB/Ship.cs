@@ -181,6 +181,12 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// 所有派閥一覧
         /// </summary>
         public IReadOnlyList<Faction> Owners { get; }
+
+
+        /// <summary>
+        /// ロードアウトIDをキーにしたデフォルトのロードアウト情報のディクショナリ
+        /// </summary>
+        public IReadOnlyDictionary<string, IReadOnlyList<(Equipment Equipment, long Count)>> Loadouts { get; }
         #endregion
 
 
@@ -267,6 +273,25 @@ namespace X4_ComplexCalculator.DB.X4DB
                 .Where(x => x != null)
                 .Select(x => x!)
                 .ToArray();
+
+
+            const string sql1 = @"
+SELECT
+	ShipLoadout.LoadoutID, Equipment.EquipmentID, ShipLoadout.Count
+
+FROM
+	ShipLoadout, Equipment
+
+WHERE
+	ShipLoadout.MacroName = Equipment.MacroName AND
+	ShipLoadout.ShipID = :ShipID";
+
+            Loadouts = X4Database.Instance.Query<(string LoadoutID, string EquipmentID, long Count)>(sql1, new { ShipID })
+                .GroupBy(x => x.LoadoutID)
+                .ToDictionary(
+                    x => x.Key,
+                    x => x.Select(y => (Equipment.Get(y.EquipmentID), y.Count)).ToArray() as IReadOnlyList<(Equipment Equipment, long Count)>
+                );
         }
 
 
