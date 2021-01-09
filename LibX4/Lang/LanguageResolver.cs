@@ -58,7 +58,7 @@ namespace LibX4.Lang
                 .Select(languageId => catFile.OpenXml($"t/0001-l{languageId,3:D3}.xml"));
 
             var defaultLanguageXml = catFile.TryOpenXml("t/0001.xml");
-            if (defaultLanguageXml != null) languageXmls = languageXmls.Append(defaultLanguageXml);
+            if (defaultLanguageXml is not null) languageXmls = languageXmls.Append(defaultLanguageXml);
 
             _LanguagesXml = languageXmls.ToArray();
         }
@@ -83,8 +83,9 @@ namespace LibX4.Lang
                 var findT = languageXml.Root
                     ?.XPathSelectElement($"./page[@id='{pageID}']/t[@id='{tID}']")
                     ?.Value;
-                if (findT != null)
+                if (findT is not null)
                 {
+                    findT = findT.Replace("\\n", "\n");
                     var uncommentedT = _RemoveCommentRegex.Replace(findT, "");
                     var resolvedText = target.Replace(matchLangField.Value, uncommentedT);
                     var unescapedText = _UnescapeRegex.Replace(resolvedText, "$1");
