@@ -32,6 +32,7 @@ namespace X4_DataExporterWPF.Export
         /// </summary>
         private readonly ILanguageResolver _Resolver;
 
+
         /// <summary>
         /// サムネ画像が見つからなかった場合の画像
         /// </summary>
@@ -308,7 +309,9 @@ items);
         /// <returns>サムネ画像のbyte配列</returns>
         private byte[]? GetThumbnail(string macroName)
         {
-            var ret = Util.GzDds2Png(_CatFile, "assets/fx/gui/textures/ships", macroName);
+            const string dir = "assets/fx/gui/textures/ships";
+
+            var ret = Util.GzDds2Png(_CatFile, dir, macroName);
             if (ret is not null)
             {
                 return ret;
@@ -316,7 +319,7 @@ items);
 
             if (_NotFoundThumbnail is null)
             {
-                _NotFoundThumbnail = Util.GzDds2Png(_CatFile, "assets/fx/gui/textures/ships", "notfound.gz");
+                _NotFoundThumbnail = Util.GzDds2Png(_CatFile, dir, "notfound");
             }
 
             return _NotFoundThumbnail;

@@ -35,6 +35,12 @@ namespace X4_DataExporterWPF.Export
 
 
         /// <summary>
+        /// サムネが見つからない場合のサムネ
+        /// </summary>
+        private byte[]? _NotFoundThumb;
+
+
+        /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="catFile">catファイルオブジェクト</param>
@@ -144,10 +150,33 @@ INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  SizeID,  Nam
                     (macroXml.Root.XPathSelectElement("macro/properties/hull")?.Attribute("integrated")?.GetInt() ?? 0) == 1,
                     idElm.Attribute("mk")?.GetInt() ?? 0,
                     idElm.Attribute("makerrace")?.Value,
-                    _Resolver.Resolve(idElm.Attribute("description")?.Value ?? ""), 
-                    Util.GzDds2Png(_CatFile, "assets/fx/gui/textures/upgrades", macroName)
+                    _Resolver.Resolve(idElm.Attribute("description")?.Value ?? ""),
+                    GetThumbnail(macroName)
                 );
             }
+        }
+
+
+        /// <summary>
+        /// サムネ画像を取得する
+        /// </summary>
+        /// <param name="macroName">マクロ名</param>
+        /// <returns>サムネ画像のバイト配列</returns>
+        private byte[]? GetThumbnail(string macroName)
+        {
+            const string dir = "assets/fx/gui/textures/upgrades";
+            var thumb = Util.GzDds2Png(_CatFile, dir, macroName);
+            if (thumb is not null)
+            {
+                return thumb;
+            }
+
+            if (_NotFoundThumb is null)
+            {
+                _NotFoundThumb = Util.GzDds2Png(_CatFile, dir, "notfound");
+            }
+
+            return _NotFoundThumb;
         }
     }
 }

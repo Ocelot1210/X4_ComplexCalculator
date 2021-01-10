@@ -3,17 +3,17 @@
     /// <summary>
     /// 艦船製造に必要なウェア情報
     /// </summary>
-    public class EquipmentResource
+    public class ShipResource
     {
         #region メンバ
         /// <summary>
-        /// 装備ID
+        /// 艦船ID
         /// </summary>
-        public string EquipmentID { get; }
+        public string ShipID { get; }
 
 
         /// <summary>
-        /// 装備作成方法
+        /// 艦船建造方法
         /// </summary>
         public string Method { get; }
 
@@ -21,7 +21,7 @@
         /// <summary>
         /// 必要ウェアID
         /// </summary>
-        public string NeedWareID { get; }
+        public string WareID { get; }
 
 
         /// <summary>
@@ -34,15 +34,15 @@
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="equipmentID">装備ID</param>
+        /// <param name="shipID">装備ID</param>
         /// <param name="method">装備作成方法</param>
         /// <param name="needWareID">必要ウェアID</param>
         /// <param name="amount">必要ウェア数</param>
-        public EquipmentResource(string equipmentID, string method, string needWareID, int amount)
+        public ShipResource(string shipID, string method, string needWareID, int amount)
         {
-            EquipmentID = equipmentID;
+            ShipID = shipID;
             Method = method;
-            NeedWareID = needWareID;
+            WareID = needWareID;
             Amount = amount;
         }
 

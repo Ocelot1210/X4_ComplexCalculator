@@ -121,6 +121,8 @@ namespace X4_DataExporterWPF.DataExportWindow
                     // 艦船関連
                     new ShipTypeExporter(resolver),                             // 艦船種別情報
                     new ShipExporter(catFile, waresXml, resolver),              // 艦船情報
+                    new ShipProductionExporter(waresXml),                       // 艦船の建造情報
+                    new ShipResourceExporter(waresXml),                         // 艦船の建造リソース
                     new ShipPurposeExporter(catFile, waresXml),                 // 艦船用途情報
                     new ShipEquipmentExporter(catFile, waresXml),               // 艦船装備情報
                     new ShipHangerExporter(catFile, waresXml),                  // 艦船ハンガー(機体格納庫)情報

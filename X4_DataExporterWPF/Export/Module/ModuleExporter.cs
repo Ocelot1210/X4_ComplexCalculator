@@ -33,6 +33,12 @@ namespace X4_DataExporterWPF.Export
 
 
         /// <summary>
+        /// サムネが見つからなかった場合のサムネ
+        /// </summary>
+        private byte[]? _NotFoundThumb;
+
+
+        /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="catFile">catファイルオブジェクト</param>
@@ -111,8 +117,31 @@ CREATE TABLE IF NOT EXISTS Module
 
                 var noBluePrint = module.Attribute("tags").Value.Contains("noblueprint");
 
-                yield return new Module(moduleID, moduleTypeID, name, macroName, maxWorkers, capacity, noBluePrint, Util.GzDds2Png(_CatFile, "assets/fx/gui/textures/stationmodules", macroName));
+                yield return new Module(moduleID, moduleTypeID, name, macroName, maxWorkers, capacity, noBluePrint, GetThumbnail(macroName));
             }
+        }
+
+
+        /// <summary>
+        /// サムネ画像を取得する
+        /// </summary>
+        /// <param name="macroName">マクロ名</param>
+        /// <returns>サムネ画像のバイト配列</returns>
+        private byte[]? GetThumbnail(string macroName)
+        {
+            const string dir = "assets/fx/gui/textures/stationmodules";
+            var thumb = Util.GzDds2Png(_CatFile, dir, macroName);
+            if (thumb is not null)
+            {
+                return thumb;
+            }
+
+            if (_NotFoundThumb is null)
+            {
+                _NotFoundThumb = Util.GzDds2Png(_CatFile, dir, "notfound");
+            }
+
+            return _NotFoundThumb;
         }
     }
 }
