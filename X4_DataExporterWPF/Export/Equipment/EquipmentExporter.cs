@@ -19,7 +19,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// catファイルオブジェクト
         /// </summary>
-        private readonly IIndexResolver _CatFile;
+        private readonly ICatFile _CatFile;
 
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace X4_DataExporterWPF.Export
         /// <param name="catFile">catファイルオブジェクト</param>
         /// <param name="waresXml">ウェア情報xml</param>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public EquipmentExporter(IIndexResolver catFile, XDocument waresXml, ILanguageResolver resolver)
+        public EquipmentExporter(ICatFile catFile, XDocument waresXml, ILanguageResolver resolver)
         {
             _CatFile = catFile;
             _WaresXml = waresXml;
@@ -71,6 +71,7 @@ CREATE TABLE IF NOT EXISTS Equipment
     Mk              INTEGER NOT NULL,
     MakerRace       TEXT,
     Description     TEXT    NOT NULL,
+    Thumbnail       BLOB,
     FOREIGN KEY (EquipmentTypeID)   REFERENCES EquipmentType(EquipmentTypeID),
     FOREIGN KEY (SizeID)            REFERENCES Size(SizeID),
     FOREIGN KEY (MakerRace)         REFERENCES Race(RaceID)
@@ -85,8 +86,8 @@ CREATE TABLE IF NOT EXISTS Equipment
                 var items = GetRecords();
 
                 connection.Execute(@"
-INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  SizeID,  Name,  Hull,  HullIntegrated,  Mk,  MakerRace,  Description)
-            VALUES    (@EquipmentID, @MacroName, @EquipmentTypeID, @SizeID, @Name, @Hull, @HullIntegrated, @Mk, @MakerRace, @Description)", items);
+INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  SizeID,  Name,  Hull,  HullIntegrated,  Mk,  MakerRace,  Description,  Thumbnail)
+            VALUES    (@EquipmentID, @MacroName, @EquipmentTypeID, @SizeID, @Name, @Hull, @HullIntegrated, @Mk, @MakerRace, @Description, @Thumbnail)", items);
             }
         }
 
@@ -143,7 +144,9 @@ INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  SizeID,  Nam
                     (macroXml.Root.XPathSelectElement("macro/properties/hull")?.Attribute("integrated")?.GetInt() ?? 0) == 1,
                     idElm.Attribute("mk")?.GetInt() ?? 0,
                     idElm.Attribute("makerrace")?.Value,
-                    _Resolver.Resolve(idElm.Attribute("description")?.Value ?? ""));
+                    _Resolver.Resolve(idElm.Attribute("description")?.Value ?? ""), 
+                    Util.GzDds2Png(_CatFile, "assets/fx/gui/textures/upgrades", macroName)
+                );
             }
         }
     }

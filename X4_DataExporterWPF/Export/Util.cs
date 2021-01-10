@@ -62,7 +62,7 @@ namespace X4_DataExporterWPF.Export
         /// <param name="dir">フォルダパス</param>
         /// <param name="fileName">gzipで圧縮された画像のファイル名(拡張子は除く)</param>
         /// <returns></returns>
-        public static byte[]? GzDds2Png(CatFile catFile, string dir, string? fileName)
+        public static byte[]? GzDds2Png(ICatFile catFile, string dir, string? fileName)
         {
             if (string.IsNullOrEmpty(fileName))
             {
@@ -93,7 +93,7 @@ namespace X4_DataExporterWPF.Export
         /// </summary>
         /// <param name="stream">変換対象のDDSファイルのStream</param>
         /// <returns>バイト配列</returns>
-        public static byte[]? DDS2Png(Stream stream)
+        private static byte[]? DDS2Png(Stream stream)
         {
             var image = Pfim.Dds.Create(stream, new Pfim.PfimConfig());
             if (image.Compressed)

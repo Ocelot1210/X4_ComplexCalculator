@@ -18,7 +18,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// catファイルオブジェクト
         /// </summary>
-        private readonly CatFile _CatFile;
+        private readonly ICatFile _CatFile;
 
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace X4_DataExporterWPF.Export
         /// </summary>
         /// <param name="wareGroupXml">'libraries/waregroups.xml' の XDocument</param>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public WareGroupExporter(CatFile catFile, ILanguageResolver resolver)
+        public WareGroupExporter(ICatFile catFile, ILanguageResolver resolver)
         {
             _CatFile = catFile;
             _Resolver = resolver;

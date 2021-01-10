@@ -18,7 +18,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// catファイルオブジェクト
         /// </summary>
-        private readonly IIndexResolver _CatFile;
+        private readonly ICatFile _CatFile;
 
         /// <summary>
         /// ウェア情報xml
@@ -38,7 +38,7 @@ namespace X4_DataExporterWPF.Export
         /// <param name="catFile">catファイルオブジェクト</param>
         /// <param name="waresXml">ウェア情報xml</param>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public ModuleExporter(IIndexResolver catFile, XDocument waresXml, ILanguageResolver resolver)
+        public ModuleExporter(ICatFile catFile, XDocument waresXml, ILanguageResolver resolver)
         {
             _CatFile = catFile;
             _WaresXml = waresXml;
@@ -66,6 +66,7 @@ CREATE TABLE IF NOT EXISTS Module
     MaxWorkers      INTEGER NOT NULL,
     WorkersCapacity INTEGER NOT NULL,
     NoBlueprint     BOOLEAN NOT NULL,
+    Thumbnail       BLOB,
     FOREIGN KEY (ModuleTypeID)  REFERENCES ModuleType(ModuleTypeID)
 ) WITHOUT ROWID");
             }
@@ -77,7 +78,7 @@ CREATE TABLE IF NOT EXISTS Module
             {
                 var items = GetRecords();
 
-                connection.Execute("INSERT INTO Module (ModuleID, ModuleTypeID, Name, Macro, MaxWorkers, WorkersCapacity, NoBlueprint) VALUES (@ModuleID, @ModuleTypeID, @Name, @Macro, @MaxWorkers, @WorkersCapacity, @NoBlueprint)", items);
+                connection.Execute("INSERT INTO Module (ModuleID, ModuleTypeID, Name, Macro, MaxWorkers, WorkersCapacity, NoBlueprint, Thumbnail) VALUES (@ModuleID, @ModuleTypeID, @Name, @Macro, @MaxWorkers, @WorkersCapacity, @NoBlueprint, @Thumbnail)", items);
             }
         }
 
@@ -110,7 +111,7 @@ CREATE TABLE IF NOT EXISTS Module
 
                 var noBluePrint = module.Attribute("tags").Value.Contains("noblueprint");
 
-                yield return new Module(moduleID, moduleTypeID, name, macroName, maxWorkers, capacity, noBluePrint);
+                yield return new Module(moduleID, moduleTypeID, name, macroName, maxWorkers, capacity, noBluePrint, Util.GzDds2Png(_CatFile, "assets/fx/gui/textures/stationmodules", macroName));
             }
         }
     }

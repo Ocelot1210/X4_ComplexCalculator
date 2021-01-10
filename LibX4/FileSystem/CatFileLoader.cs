@@ -147,6 +147,11 @@ namespace LibX4.FileSystem
                 var fileName = Path.GetFileName(matchs[1].Value);
                 var fileSize = int.Parse(matchs[2].Value);
                 var offset = fileOffset;
+                if (fileSize == 0)
+                {
+                    continue;
+                }
+
                 fileOffset += fileSize;
 
                 var entry = new CatEntry(datFilePath, fileName, fileSize, offset);

@@ -31,6 +31,12 @@
 
 
         /// <summary>
+        /// 説明文
+        /// </summary>
+        public string Description { get; }
+
+
+        /// <summary>
         /// アイコン画像
         /// </summary>
         public byte[]? Icon { get; }
@@ -44,13 +50,15 @@
         /// <param name="name">派閥名</param>
         /// <param name="raceID">種族ID</param>
         /// <param name="shortName">派閥略称</param>
+        /// <param name="description">説明文</param>
         /// <param name="icon">アイコン画像</param>
-        public Faction(string factionID, string name, string raceID, string shortName, byte[]? icon)
+        public Faction(string factionID, string name, string raceID, string shortName, string description, byte[]? icon)
         {
             FactionID = factionID;
             Name = name;
             RaceID = raceID;
             ShortName = shortName;
+            Description = description;
             Icon = icon;
         }
     }

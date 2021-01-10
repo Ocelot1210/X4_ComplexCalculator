@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS Faction
     Name        TEXT    NOT NULL,
     RaceID      TEXT    NOT NULL,
     ShortName   TEXT    NOT NULL,
+    Description TEXT    NOT NULL,
     Icon        BLOB,
     FOREIGN KEY (RaceID)   REFERENCES Race(RaceID)
 ) WITHOUT ROWID");
@@ -71,7 +72,7 @@ CREATE TABLE IF NOT EXISTS Faction
             {
                 var items = GetRecords();
 
-                connection.Execute("INSERT INTO Faction (FactionID, Name, RaceID, ShortName, Icon) VALUES (@FactionID, @Name, @RaceID, @ShortName, @Icon)", items);
+                connection.Execute("INSERT INTO Faction (FactionID, Name, RaceID, ShortName, Description, Icon) VALUES (@FactionID, @Name, @RaceID, @ShortName, @Description, @Icon)", items);
             }
         }
 
@@ -100,6 +101,7 @@ CREATE TABLE IF NOT EXISTS Faction
                     name,
                     raceID,
                     shortName,
+                    _Resolver.Resolve(faction.Attribute("description")?.Value ?? ""),
                     Util.GzDds2Png(_CatFile, "assets/fx/gui/textures/factions", faction.Element("icon")?.Attribute("active")?.Value)
                 );
             }
