@@ -100,7 +100,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             foreach (var (moduleID, count) in conn.Query<(string, long)>(sql1))
             {
                 var module = Module.Get(moduleID);
-                if (module != null)
+                if (module is not null)
                 {
                     var mod = new ModulesGridItem(module, null, count) { EditStatus = EditStatus.Unedited };
                     modules.Add(mod);
@@ -113,7 +113,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             foreach (var (row, equipmentID) in conn.Query<(int, string)>(sql2))
             {
                 var eqp = Equipment.Get(equipmentID);
-                if (eqp != null)
+                if (eqp is not null)
                 {
                     modules[row].AddEquipment(eqp);
                 }
@@ -134,7 +134,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             foreach (var (wareID, price) in conn.Query<(string, long)>(sql))
             {
                 var itm = _WorkArea.StationData.ProductsInfo.Products.FirstOrDefault(x => x.Ware.WareID == wareID);
-                if (itm != null)
+                if (itm is not null)
                 {
                     itm.UnitPrice = price;
                 }
@@ -152,7 +152,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             foreach (var (wareID, price) in conn.Query<(string, long)>(sql))
             {
                 var itm = _WorkArea.StationData.BuildResourcesInfo.BuildResources.FirstOrDefault(x => x.Ware.WareID == wareID);
-                if (itm != null)
+                if (itm is not null)
                 {
                     itm.UnitPrice = price;
                 }

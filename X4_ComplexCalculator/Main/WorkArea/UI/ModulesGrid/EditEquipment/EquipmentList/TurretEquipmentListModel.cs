@@ -31,7 +31,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
             set
             {
                 _SelectedPreset = value;
-                if (_SelectedPreset != null)
+                if (_SelectedPreset is not null)
                 {
                     OnSelectedPresetChanged();
                 }
@@ -72,7 +72,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
             {
                 foreach (PresetComboboxItem? item in e.OldItems)
                 {
-                    if (item == null)
+                    if (item is null)
                     {
                         throw new InvalidOperationException();
                     }
@@ -95,7 +95,7 @@ WHERE
 
                 foreach (PresetComboboxItem? item in e.NewItems)
                 {
-                    if (item == null)
+                    if (item is null)
                     {
                         throw new InvalidOperationException();
 
@@ -124,7 +124,7 @@ VALUES(
         /// </summary>
         protected override void UpdateEquipmentsMain()
         {
-            if (SelectedSize == null)
+            if (SelectedSize is null)
             {
                 return;
             }
@@ -150,7 +150,7 @@ WHERE
             X4Database.Instance.ExecQuery(query, (dr, _) =>
             {
                 var eqp = Equipment.Get((string)dr["EquipmentID"]);
-                if (eqp != null)
+                if (eqp is not null)
                 {
                     items.Add(new EquipmentListItem(eqp));
                 }
@@ -177,7 +177,7 @@ WHERE
         /// </summary>
         private void OnSelectedPresetChanged()
         {
-            if (SelectedPreset == null)
+            if (SelectedPreset is null)
             {
                 throw new InvalidOperationException();
             }
@@ -199,7 +199,7 @@ WHERE
             SettingDatabase.Instance.ExecQuery(query, (dr, args) =>
             {
                 var eqp = Equipment.Get((string)dr["EquipmentID"]);
-                if (eqp != null)
+                if (eqp is not null)
                 {
                     equipments.Add(new EquipmentListItem(eqp));
                 }

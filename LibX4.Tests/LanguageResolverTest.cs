@@ -215,5 +215,23 @@ namespace LibX4.Tests
             ".ToXDocument()).Resolve("{1,1}");
             Assert.Equal("aaaacc", resolve);
         }
+
+
+
+        /// <summary>
+        /// 改行
+        /// </summary>
+        [Fact]
+        public void NewLine()
+        {
+            var resolve = new LanguageResolver(@"
+            <language>
+                <page id=""1"">
+                    <t id=""1"">aaaa\nbbbb</t>
+                </page>
+            </language>
+            ".ToXDocument()).Resolve("{1,1}");
+            Assert.Equal("aaaa\nbbbb", resolve);
+        }
     }
 }

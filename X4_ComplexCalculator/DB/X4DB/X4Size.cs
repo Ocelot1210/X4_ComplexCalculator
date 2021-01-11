@@ -6,7 +6,7 @@ namespace X4_ComplexCalculator.DB.X4DB
     /// <summary>
     /// サイズ管理用クラス
     /// </summary>
-    public class X4Size
+    public class X4Size : IComparable
     {
         #region スタティックメンバ
         /// <summary>
@@ -27,6 +27,12 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// サイズ名
         /// </summary>
         public string Name { get; }
+
+
+        /// <summary>
+        /// 比較用の値
+        /// </summary>
+        private int _CompareValue;
         #endregion
 
 
@@ -39,6 +45,16 @@ namespace X4_ComplexCalculator.DB.X4DB
         {
             SizeID = sizeID;
             Name = name;
+
+            _CompareValue = SizeID switch
+            {
+                "extrasmall" => 0,
+                "small" => 1,
+                "medium" => 2,
+                "large" => 3,
+                "extralarge" => 4,
+                _ => throw new NotSupportedException($"SizeID \"{SizeID}\" is not supported.")
+            };
         }
 
 
@@ -79,5 +95,33 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <returns>ハッシュ値</returns>
         public override int GetHashCode() => HashCode.Combine(SizeID);
+
+
+        /// <summary>
+        /// 文字列化
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString() => Name;
+
+
+        /// <summary>
+        /// 大小比較
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public int CompareTo(object? obj)
+        {
+            if (obj is null)
+            {
+                return 1;
+            }
+
+            if (obj is not X4Size size)
+            {
+                throw new ArgumentException();
+            }
+
+            return _CompareValue - size._CompareValue;
+        }
     }
 }

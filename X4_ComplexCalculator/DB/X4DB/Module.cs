@@ -49,9 +49,21 @@ namespace X4_ComplexCalculator.DB.X4DB
 
 
         /// <summary>
+        /// 設計図が無いか
+        /// </summary>
+        public bool NoBluePrint { get; }
+
+
+        /// <summary>
         /// 建造方式
         /// </summary>
         public IReadOnlyList<ModuleProduction> ModuleProductions { get; }
+
+
+        /// <summary>
+        /// モジュールの製品
+        /// </summary>
+        public ModuleProduct? ModuleProduct { get; }
 
 
         /// <summary>
@@ -85,11 +97,17 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <param name="owners">所有派閥</param>
         /// <param name="turretCapacity">装備可能なタレットの数</param>
         /// <param name="shieldCapacity">装備可能なシールドの数</param>
-        private Module(string moduleID, string name, ModuleType moduleType,
-                       long maxWorkers, long workersCapacity,
-                       ModuleProduction[] buildMethods, Faction[] owners,
-                       Dictionary<X4Size, int> turretCapacity,
-                       Dictionary<X4Size, int> shieldCapacity)
+        private Module(
+            string moduleID,
+            string name,
+            ModuleType moduleType,
+            long maxWorkers, 
+            long workersCapacity,
+            bool noBluePrint,
+            ModuleProduction[] buildMethods, 
+            Faction[] owners,
+            Dictionary<X4Size, int> turretCapacity,
+            Dictionary<X4Size, int> shieldCapacity)
         {
             ModuleID = moduleID;
             Name = name;
@@ -97,9 +115,11 @@ namespace X4_ComplexCalculator.DB.X4DB
             MaxWorkers = maxWorkers;
             WorkersCapacity = workersCapacity;
             Owners = owners;
+            NoBluePrint = noBluePrint;
             ModuleProductions = buildMethods;
             TurretCapacity = turretCapacity;
             ShieldCapacity = shieldCapacity;
+            ModuleProduct = ModuleProduct.Get(moduleID);
         }
 
 
@@ -119,7 +139,7 @@ namespace X4_ComplexCalculator.DB.X4DB
                 const string sql2 = "SELECT FactionID FROM ModuleOwner WHERE ModuleID = :ModuleID";
                 var owners = X4Database.Instance.Query<string>(sql2, record)
                     .Select<string, Faction>(Faction.Get!)
-                    .Where(x => x != null)
+                    .Where(x => x is not null)
                     .ToArray();
 
                 var buildMethods = record.NoBlueprint
@@ -137,7 +157,7 @@ namespace X4_ComplexCalculator.DB.X4DB
                     .ToDictionary(t => X4Size.Get(t.sizeID), t => t.amount);
 
                 var module = new Module(record.ModuleID, record.Name, moduleType,
-                                        record.MaxWorkers, record.WorkersCapacity,
+                                        record.MaxWorkers, record.WorkersCapacity, record.NoBlueprint,
                                         buildMethods, owners, turretCapacity, shieldCapacity);
                 _Modules.Add(record.ModuleID, module);
             }
@@ -151,6 +171,12 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <returns>モジュール</returns>
         public static Module? Get(string moduleID) =>
             _Modules.TryGetValue(moduleID, out var module) ? module : null;
+
+
+        /// <summary>
+        /// 全モジュール情報を取得する
+        /// </summary>
+        public static IEnumerable<Module> GetAll() => _Modules.Values;
 
 
         /// <summary>

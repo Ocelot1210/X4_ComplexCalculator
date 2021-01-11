@@ -15,6 +15,7 @@ OwnerFaction;所有派閥
 Turrets;タレット
 Shields;シールド
 SearchByEnteringText;テキストを入力して検索
+Search;検索
 Confirmation;確認
 Warning;警告
 Error;エラー
@@ -267,3 +268,96 @@ EditPresetName;プリセット名編集
 PresetName;プリセット名
 DeletePresetConfirmMessage;プリセット「{0}」を本当に削除しますか？
 InvalidPresetNameMessage;プリセット名が無効です。\r\n空白文字以外の文字を1文字以上入力して下さい。
+
+
+# ------------------------------------------------------
+# DataGridColumnsFilter
+# ------------------------------------------------------
+DataGridColumnsFilter_Conditions;一致条件
+ListFilter_GroupBoxHeader;リストから選択
+NumericalFilter_GroupBoxTitle;数値で検索
+NumericalFilter_EnterAValue;値を入力
+NumericalFilter_EnterAMinValue;最小値を入力
+NumericalFilter_EnterAMaxValue;最大値を入力
+NumericalFilter_Equalls;＝ 指定の値に等しい
+NumericalFilter_NotEquals;≠ 指定の値に等しくない
+NumericalFilter_GreaterThan;＞ 指定の値を超える
+NumericalFilter_GreaterThanOrEqualTo;≧ 指定の値以上
+NumericalFilter_LessThan;＜ 指定の値未満
+NumericalFilter_LessThanOrEqualTo;≦ 指定の値以下
+NumericalFilter_Between;～ 指定の範囲内
+TextFilter_GroupBoxTitle;文字列で検索
+TextFilter_Contains;指定の値を含む
+TextFilter_NotContains;指定の値を含まない
+TextFilter_Equals;指定の値と一致
+TextFilter_NotEqulas;指定の値と一致しない
+TextFilter_StartWith;指定の値で始まる
+TextFilter_EndWith;指定の値で終わる
+
+
+# ------------------------------------------------------
+# DB Viewer
+# ------------------------------------------------------
+DBViewer;DBビュワー
+# ■Races
+DBViewer_Races_Title;種族
+DBViewer_Races_RaceID;種族ID
+DBViewer_Races_RaceName;種族名
+DBViewer_Races_ShortName;略称
+# ■Wares
+DBViewer_Wares_Title;ウェア
+DBViewer_Wares_WareName;名称
+DBViewer_Wares_WareGroupName;種別
+DBViewer_Wares_TransportTypeName;輸送種別
+DBViewer_Wares_MinPrice;最安値
+DBViewer_Wares_MaxPrice;最高値
+DBViewer_Wares_Profit;利益
+DBViewer_Wares_Volume;サイズ
+DBViewer_Wares_ProfitPerVolume;利益/サイズ
+# ■Modules
+DBViewer_Modules_Title;モジュール
+DBViewer_Modules_ModuleName;名称
+DBViewer_Modules_ModuleType;種別
+DBViewer_Modules_OwnerRace;所有種族
+DBViewer_Modules_MaxWorkers;労働者数
+DBViewer_Modules_WorkersCapacity;収容人数
+DBViewer_Modules_Product;製品
+DBViewer_Modules_MaxEfficiency;最大効率
+# ■Ships
+DBViewer_Ships_Title;艦船
+DBViewer_Ships_BasicInfo;基礎情報
+DBViewer_Ships_BasicInfo_Name;名称
+DBViewer_Ships_BasicInfo_Type;種別
+DBViewer_Ships_BasicInfo_Size;サイズ
+DBViewer_Ships_BasicInfo_Mass;重量
+DBViewer_Ships_BasicInfo_People;人員
+DBViewer_Ships_Speed;速度
+DBViewer_Ships_MaxForwardSpeed;最高
+DBViewer_Ships_MaxReverseSpeed;後退
+DBViewer_Ships_MaxBoostSpeed;ブースト
+DBViewer_Ships_MaxTravelSpeed;トラベル
+DBViewer_Ships_MaxAcceleration;加速
+DBViewer_Ships_ParallelMoveSpeed;平行移動速度
+DBViewer_Ships_VerticalMovementSpeed;垂直
+DBViewer_Ships_HorizontalMovementSpeed;水平
+DBViewer_Ships_Steering;操舵性能
+DBViewer_Ships_Steering_Pitch;ピッチ
+DBViewer_Ships_Steering_Yaw;ヨー
+DBViewer_Ships_Steering_Roll;ロール
+DBViewer_Ships_Steering_Responsiveness;反応性
+DBViewer_Ships_Armed;武装(搭載量)
+DBViewer_Ships_Armed_Weapons;武器
+DBViewer_Ships_Armed_Turrets;タレット
+DBViewer_Ships_Armed_Missiles;ミサイル
+DBViewer_Ships_Shield;シールド
+DBViewer_Ships_Shield_Count;搭載数
+DBViewer_Ships_Shield_Capacity;容量
+DBViewer_Ships_Cargo;保管庫
+DBViewer_Ships_Cargo_Capacity;容量
+DBViewer_Ships_Cargo_Type;種別
+DBViewer_Ships_Dock;ドック
+DBViewer_Ships_Dock_Medium;中型
+DBViewer_Ships_Dock_Small;小型
+DBViewer_Ships_HangerCapacity;搭載量
+DBViewer_Ships_HangerCapacity_Aircraft;機体
+DBViewer_Ships_HangerCapacity_Drone;ドローン

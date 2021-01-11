@@ -112,7 +112,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             foreach (var (wareID, price, noBuy, noSell) in conn.Query<(string, long, long, long)>(sql))
             {
                 var itm = _WorkArea.StationData.ProductsInfo.Products.FirstOrDefault(x => x.Ware.WareID == wareID);
-                if (itm != null)
+                if (itm is not null)
                 {
                     itm.UnitPrice = price;
                     itm.NoBuy = noBuy == 1;
@@ -132,7 +132,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             foreach (var (wareID, price, noBuy) in conn.Query<(string, long, long)>(sql))
             {
                 var itm = _WorkArea.StationData.BuildResourcesInfo.BuildResources.FirstOrDefault(x => x.Ware.WareID == wareID);
-                if (itm != null)
+                if (itm is not null)
                 {
                     itm.UnitPrice = price;
                     itm.NoBuy = noBuy == 1;

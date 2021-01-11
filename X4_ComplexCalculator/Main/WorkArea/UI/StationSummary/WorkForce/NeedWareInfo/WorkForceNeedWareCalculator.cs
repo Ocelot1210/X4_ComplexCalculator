@@ -77,7 +77,7 @@ WHERE
         {
             get
             {
-                if (_SingletonInstance == null)
+                if (_SingletonInstance is null)
                 {
                     _SingletonInstance = new WorkForceNeedWareCalculator();
                 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
@@ -24,22 +25,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// key = ModuleID
         /// </summary>
         private readonly IReadOnlyDictionary<string, (string WareID, string Method)> _ModuleProduct;
-
-
-        /// <summary>
-        /// ウェア生産時の追加効果一覧
-        /// key = WareID
-        /// Tuple&lt;string Method, string EffectID, double Product&gt;
-        /// </summary>
-        private readonly IReadOnlyDictionary<string, Tuple<string, string, double>[]> _WareEffect;
-
-
-        /// <summary>
-        /// ウェア生産に必要な時間一覧
-        /// key = WareID
-        /// Tuple&lt;string Method, long Amount, double Time&gt;
-        /// </summary>
-        private readonly IReadOnlyDictionary<string, Tuple<string, long, double>[]> _WareProduction;
 
 
         /// <summary>
@@ -80,43 +65,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 });
 
                 _ModuleProduct = dict;
-            }
-
-            // ウェア生産時の追加効果一覧を作成
-            {
-                var dict = new Dictionary<string, List<Tuple<string, string, double>>>();
-
-                X4Database.Instance.ExecQuery("SELECT * FROM WareEffect", (dr, _) =>
-                {
-                    var wareID = (string)dr["WareID"];
-                    if (!dict.ContainsKey(wareID))
-                    {
-                        dict.Add(wareID, new List<Tuple<string, string, double>>());
-                    }
-
-                    dict[wareID].Add(new Tuple<string, string, double>((string)dr["Method"], (string)dr["EffectID"], (double)dr["Product"]));
-                });
-
-                _WareEffect = dict.ToDictionary(x => x.Key, x => x.Value.ToArray());
-            }
-
-
-            // ウェア生産に必要な時間一覧を作成
-            {
-                var dict = new Dictionary<string, List<Tuple<string, long, double>>>();
-
-                X4Database.Instance.ExecQuery("SELECT * FROM WareProduction", (dr, _) =>
-                {
-                    var wareID = (string)dr["WareID"];
-                    if (!dict.ContainsKey(wareID))
-                    {
-                        dict.Add(wareID, new List<Tuple<string, long, double>>());
-                    }
-
-                    dict[wareID].Add(new Tuple<string, long, double>((string)dr["Method"], (long)dr["Amount"], (double)dr["Time"]));
-                });
-
-                _WareProduction = dict.ToDictionary(x => x.Key, x => x.Value.ToArray());
             }
 
 
@@ -208,7 +156,7 @@ WHERE
             get
             {
                 // 未作成なら作成する
-                if (_SingletonInstance == null)
+                if (_SingletonInstance is null)
                 {
                     _SingletonInstance = new ProductCalculator();
                 }
@@ -223,41 +171,31 @@ WHERE
         /// </summary>
         /// <param name="moduleID">モジュールID</param>
         /// <returns>製品と必要ウェア</returns>
-        public IEnumerable<(string WareID, long Amount, Dictionary<string, double>? Efficiency)> CalcProduction(string moduleID)
+        public IEnumerable<(string WareID, long Amount, IReadOnlyDictionary<string, WareEffect>? Efficiency)> CalcProduction(string moduleID)
         {
             // モジュールの生産品を取得
-            var (prodWareID, prodMethod) = _ModuleProduct[moduleID];
-
-            // ウェア生産に必要な時間(候補)
-            var wareProdArr = _WareProduction[prodWareID];
-
-            // ウェア生産に必要な時間
-            var wareProd = wareProdArr.FirstOrDefault(x => x.Item1 == prodMethod) ??
-                           wareProdArr.FirstOrDefault(x => x.Item1 == "default");
-
+            var product = Module.Get(moduleID)?.ModuleProduct ?? throw new ArgumentException();
+            
+            // ウェア生産情報を取得
+            var wareProduction = WareProduction.Get(product.WareID, product.Method) ?? throw new ArgumentException();
             {
-                // ウェア生産時の追加効果一覧
-                var effectArr = _WareEffect[prodWareID];
-
                 // ウェア生産時の追加効果一覧をウェア生産方式別に抽出
-                var effects = effectArr.Where(x => x.Item1 == prodMethod);
-                if (!effects.Any())
-                {
-                    effects = effectArr.Where(x => x.Item1 == "default");
-                }
+                var effects = WareEffect.Get(product.WareID, product.Method);
 
-                yield return (prodWareID, (long)Math.Floor(wareProd.Item2 * (3600 / wareProd.Item3)), effects.ToDictionary(x => x.Item2, x => x.Item3));
+                yield return (product.WareID, (long)Math.Floor(wareProduction.Amount * (3600 / wareProduction.Time)), effects);
             }
 
+
+
             // ウェア生産に必要なウェア一覧(候補)
-            if (_WareResource.TryGetValue(prodWareID, out Tuple<string, string, long>[]? wareResourceArr))
+            if (_WareResource.TryGetValue(product.WareID, out Tuple<string, string, long>[]? wareResourceArr))
             {
                 // ウェア生産に必要なウェア一覧
                 var wareResources = Enumerable.Empty<Tuple<string, string, long>>();
 
-                if (prodMethod != "default")
+                if (product.Method != "default")
                 {
-                    wareResources = wareResourceArr.Where(x => x.Item1 != "default" && x.Item1 == prodMethod);
+                    wareResources = wareResourceArr.Where(x => x.Item1 != "default" && x.Item1 == product.Method);
                 }
 
                 if (!wareResources.Any())
@@ -267,7 +205,7 @@ WHERE
 
                 foreach (var res in wareResources)
                 {
-                    yield return (res.Item2, (long)Math.Floor(-3600 / wareProd.Item3 * res.Item3), null);
+                    yield return (res.Item2, (long)Math.Floor(-3600 / wareProduction.Time * res.Item3), null);
                 }
             }
         }
@@ -323,7 +261,7 @@ WHERE
 
                 // 不足しているウェアを製造するモジュールを検索
                 var module = _ModuleProduct.FirstOrDefault(x => x.Value.WareID == prod.Ware.WareID && x.Value.Method == "default");
-                if (module.Key == null)
+                if (module.Key is null)
                 {
                     module = _ModuleProduct.FirstOrDefault(x => x.Value.WareID == prod.Ware.WareID);
                 }
@@ -333,7 +271,7 @@ WHERE
                 var (_, addAmount, addEfficiency) = addProducts.First();
                 if (addEfficiency?.ContainsKey("sunlight") ?? false)
                 {
-                    addAmount = (long)Math.Floor(addAmount * addEfficiency["sunlight"] * settings.Sunlight);
+                    addAmount = (long)Math.Floor(addAmount * addEfficiency["sunlight"].Product * settings.Sunlight);
                 }
 
                 // 生産数が0の場合、計算除外製品一覧に突っ込む

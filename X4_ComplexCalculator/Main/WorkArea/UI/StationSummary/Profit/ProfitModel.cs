@@ -72,13 +72,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit
         private void OnProductsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             // 製品が削除された場合
-            if (e.OldItems != null)
+            if (e.OldItems is not null)
             {
                 Profit -= e.OldItems.Cast<ProductsGridItem>().Sum(x => x.Price);
             }
 
             // 製品が追加された場合
-            if (e.NewItems != null)
+            if (e.NewItems is not null)
             {
                 Profit += e.NewItems.Cast<ProductsGridItem>().Sum(x => x.Price);
             }

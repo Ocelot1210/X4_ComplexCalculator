@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
@@ -33,7 +34,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// 最大生産性
         /// </summary>
-        private readonly Dictionary<string, double> _MaxEfficiencies;
+        private readonly IReadOnlyDictionary<string, WareEffect> _MaxEfficiencies;
         #endregion
 
 
@@ -83,7 +84,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
                 if (_Efficiencies.ContainsKey("work"))
                 {
-                    ret *= _MaxEfficiencies["work"] * _Efficiencies["work"] + 1.0;
+                    ret *= _MaxEfficiencies["work"].Product * _Efficiencies["work"] + 1.0;
                 }
 
                 if (_Efficiencies.ContainsKey("sunlight"))
@@ -105,7 +106,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <param name="efficiency">効率</param>
         /// <param name="amount">製品数</param>
         /// <param name="settings">ステーションの設定</param>
-        public ProductDetailsListItem(string moduleID, long moduleCount, Dictionary<string, double> efficiency, long amount, IStationSettings settings)
+        public ProductDetailsListItem(string moduleID, long moduleCount, IReadOnlyDictionary<string, WareEffect> efficiency, long amount, IStationSettings settings)
         {
             ModuleID = moduleID;
             ModuleCount = moduleCount;

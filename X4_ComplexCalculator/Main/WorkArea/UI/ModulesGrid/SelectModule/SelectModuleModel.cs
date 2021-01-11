@@ -106,7 +106,7 @@ ORDER BY Name", init, "SelectModuleCheckStateTypes");
                 bool isChecked = 0 < SettingDatabase.Instance.ExecQuery($"SELECT * FROM SelectModuleCheckStateModuleOwners WHERE ID = '{dr["FactionID"]}'", (_, _) => { });
 
                 var faction = Faction.Get((string)dr["FactionID"]);
-                if (faction != null) items.Add(new FactionsListItem(faction, isChecked));
+                if (faction is not null) items.Add(new FactionsListItem(faction, isChecked));
             }
 
             X4Database.Instance.ExecQuery(@"
@@ -177,7 +177,7 @@ WHERE
             // 選択されているアイテムを追加
             var items = Modules.Where(x => x.IsChecked)
                                .Select(x => DB.X4DB.Module.Get(x.ID))
-                               .Where(x => x != null)
+                               .Where(x => x is not null)
                                .Select(x => x!)
                                .Select(x => new ModulesGridItem(x) { EditStatus = EditStatus.Edited });
 

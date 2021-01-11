@@ -38,25 +38,25 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 装備一覧表示用
         /// </summary>
-        public ListCollectionView? EquipmentsView => (_Model.SelectedSize != null) ? _EquipmentsViews[_Model.SelectedSize] : null;
+        public ListCollectionView? EquipmentsView => (_Model.SelectedSize is not null) ? _EquipmentsViews[_Model.SelectedSize] : null;
 
 
         /// <summary>
         /// 装備中の装備
         /// </summary>
-        public ObservableCollection<EquipmentListItem>? Equipped => (_Model.SelectedSize != null) ? _Model.Equipped[_Model.SelectedSize] : null;
+        public ObservableCollection<EquipmentListItem>? Equipped => (_Model.SelectedSize is not null) ? _Model.Equipped[_Model.SelectedSize] : null;
 
 
         /// <summary>
         /// 装備可能な個数
         /// </summary>
-        public int MaxAmount => (_Model.SelectedSize != null) ? _Model.MaxAmount[_Model.SelectedSize] : 0;
+        public int MaxAmount => (_Model.SelectedSize is not null) ? _Model.MaxAmount[_Model.SelectedSize] : 0;
 
 
         /// <summary>
         /// 現在装備中の個数
         /// </summary>
-        public int EquippedCount => (_Model.SelectedSize != null) ? _Model.Equipped[_Model.SelectedSize].Count : 0;
+        public int EquippedCount => (_Model.SelectedSize is not null) ? _Model.Equipped[_Model.SelectedSize].Count : 0;
 
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
                 {
                     _SearchEquipmentName = value;
                     RaisePropertyChanged();
-                    if (EquipmentsView == null)
+                    if (EquipmentsView is null)
                     {
                         throw new InvalidOperationException();
                     }

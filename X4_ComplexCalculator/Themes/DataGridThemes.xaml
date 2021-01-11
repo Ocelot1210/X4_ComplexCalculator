@@ -1,10 +1,34 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:dgx="clr-namespace:X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions;assembly=X4_ComplexCalculator_CustomControlLibrary"
+    xmlns:listfilter="clr-namespace:X4_ComplexCalculator.Common.Controls.DataGridFilter.List"
     xmlns:local="clr-namespace:X4_ComplexCalculator.Themes"
+    xmlns:multilistfilter="clr-namespace:X4_ComplexCalculator.Common.Controls.DataGridFilter.MultiList"
+    xmlns:numericalfilter="clr-namespace:X4_ComplexCalculator.Common.Controls.DataGridFilter.Numerical"
+    xmlns:textfilter="clr-namespace:X4_ComplexCalculator.Common.Controls.DataGridFilter.Text"
     xmlns:x4conv="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
     xmlns:x4enum="clr-namespace:X4_ComplexCalculator.Common.EditStatus">
 
+    <!--  文字列用フィルタ  -->
+    <ControlTemplate x:Key="DataGridColumnTextFilter">
+        <textfilter:TextFilter Filter="{Binding Path=Filter, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=dgx:DataGridFilterColumnControl}}" />
+    </ControlTemplate>
+
+    <!--  数値フィルタ  -->
+    <ControlTemplate x:Key="DataGridColumnNumericalFilter">
+        <numericalfilter:NumericalFilter Filter="{Binding Path=Filter, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=dgx:DataGridFilterColumnControl}}" />
+    </ControlTemplate>
+
+    <!--  リストフィルタ  -->
+    <ControlTemplate x:Key="DataGridColumnListFilter">
+        <listfilter:ListFilter Filter="{Binding Path=Filter, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=dgx:DataGridFilterColumnControl}}" />
+    </ControlTemplate>
+
+    <!--  リストフィルタ  -->
+    <ControlTemplate x:Key="DataGridColumnMultiListFilter">
+        <multilistfilter:MultiListFilter Filter="{Binding Path=Filter, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=dgx:DataGridFilterColumnControl}}" />
+    </ControlTemplate>
 
     <!--  DataGridColumnHeaderの初期設定  -->
     <Style x:Key="DefaultDataGridColumnHeaderStyle" TargetType="{x:Type DataGridColumnHeader}">
@@ -72,6 +96,10 @@
         BasedOn="{StaticResource DataGridCellDefaultStyle}"
         TargetType="{x:Type DataGridCell}">
         <Setter Property="TextBlock.TextAlignment" Value="Right" />
+    </Style>
+
+    <Style x:Key="RightAlignedDataGridTexColumnElementStyle" TargetType="TextBlock">
+        <Setter Property="TextAlignment" Value="Right" />
     </Style>
 
     <!--  ValueConverter  -->
@@ -177,5 +205,8 @@
             </MultiDataTrigger>
         </Style.Triggers>
     </Style>
+
+
+
 
 </ResourceDictionary>

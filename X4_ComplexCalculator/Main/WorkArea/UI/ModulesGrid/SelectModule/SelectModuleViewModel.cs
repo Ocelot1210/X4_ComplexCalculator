@@ -186,7 +186,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
             Task.Run(_Model.SaveCheckState);
             _Model.Dispose();
 
-            if (Application.Current.MainWindow != null)
+            if (Application.Current.MainWindow is not null)
             {
                 Application.Current.MainWindow.Closed -= MainWindow_Closed;
             }

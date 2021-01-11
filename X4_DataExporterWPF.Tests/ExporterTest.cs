@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using System.IO;
+using System.Xml.Linq;
 using LibX4.FileSystem;
 using LibX4.Lang;
 using X4_DataExporterWPF.Entity;
@@ -64,7 +65,8 @@ namespace X4_DataExporterWPF.Tests
                 macro: "hab_arg_l_01_macro",
                 maxWorkers: 0,
                 workersCapacity: 1000,
-                noBluePrint: false
+                noBluePrint: false,
+                thumbnail: null
             )});
         }
 
@@ -100,7 +102,8 @@ namespace X4_DataExporterWPF.Tests
                 macro: "prod_arg_foodrations_macro",
                 maxWorkers: 90,
                 workersCapacity: 0,
-                noBluePrint: false
+                noBluePrint: false,
+                thumbnail: null
             )});
         }
 
@@ -175,7 +178,7 @@ namespace X4_DataExporterWPF.Tests
                         tags=""tradable"" />
                 </groups>
             ".ToXDocument();
-            var exporter = new WareGroupExporter(xml, new DummyLanguageResolver());
+            var exporter = new WareGroupExporter(new DummyCat(xml), new DummyLanguageResolver());
 
             Assert.Equal(exporter.GetRecords(), new[] { new WareGroup(
                 wareGroupID: "gases",
@@ -190,12 +193,13 @@ namespace X4_DataExporterWPF.Tests
         /// <summary>
         /// コンストラクタに渡された XML をマクロとして返すダミー CatFile クラス
         /// </summary>
-        internal class DummyCat : IIndexResolver
+        internal class DummyCat : ICatFile
         {
             /// <summary>
             /// OpenIndexXml で返す XML
             /// </summary>
             private readonly XDocument _Xml;
+
 
             /// <summary>
             /// 引数に渡された XML を返すだけのダミー CatFile クラスを初期化する
@@ -203,11 +207,22 @@ namespace X4_DataExporterWPF.Tests
             /// <param name="xml"></param>
             internal DummyCat(XDocument xml) => _Xml = xml;
 
+
+            public MemoryStream OpenFile(string filePath)
+                => throw new FileNotFoundException(nameof(filePath), filePath);
+
+
             /// <summary>
             /// インデックスの解決を行う代わりに、コンストラクタに渡された XML を返す
             /// </summary>
             /// <returns>コンストラクタで与えられた XML</returns>
             public XDocument OpenIndexXml(string indexFilePath, string name) => _Xml;
+
+
+            public XDocument OpenXml(string filePath) => _Xml;
+
+
+            public XDocument? TryOpenXml(string filePath) => _Xml;
         }
 
 

@@ -200,7 +200,7 @@ namespace X4_ComplexCalculator.Common.Localize
         {
             ParseKey(key, out string assembly, out string dictionary, out key);
 
-            if (target == null)
+            if (target is null)
                 return new FQAssemblyDictionaryKey(key, assembly, dictionary);
 
             if (string.IsNullOrEmpty(assembly))
@@ -256,7 +256,7 @@ namespace X4_ComplexCalculator.Common.Localize
         /// <returns>The assembly name, if available.</returns>
         protected string GetAssembly(DependencyObject? target)
         {
-            if (target == null)
+            if (target is null)
             {
                 return "";
             }
@@ -271,7 +271,7 @@ namespace X4_ComplexCalculator.Common.Localize
         /// <returns>The dictionary name, if available.</returns>
         protected string GetDictionary(DependencyObject? target)
         {
-            if (target == null)
+            if (target is null)
             {
                 return "";
             }
@@ -302,7 +302,7 @@ namespace X4_ComplexCalculator.Common.Localize
             const string csvDirectory = "Localization";
             var csvPath = "";
 
-            if (culture == null)
+            if (culture is null)
             {
                 culture = LocalizeDictionary.CurrentCulture;
             }
@@ -339,7 +339,7 @@ namespace X4_ComplexCalculator.Common.Localize
             }
 
             // Nothing found -> Raise the error message.
-            if (ret == null)
+            if (ret is null)
                 OnProviderError(target, key, "The key does not exist in " + csvPath + ".");
 
             return ret ?? key;

@@ -148,7 +148,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         /// <param name="e"></param>
         private void Storages_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e.NewItems != null)
+            if (e.NewItems is not null)
             {
                 foreach (var storage in e.NewItems.Cast<StoragesGridItem>())
                 {
@@ -156,7 +156,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
                 }
             }
 
-            if (e.OldItems != null)
+            if (e.OldItems is not null)
             {
                 foreach (var storage in e.OldItems.Cast<StoragesGridItem>())
                 {
@@ -192,7 +192,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
             }
 
             var assign = _StorageAssignInfo.StorageAssign.FirstOrDefault(x => x.WareID == product.Ware.WareID);
-            if (assign != null)
+            if (assign is not null)
             {
                 assign.ProductPerHour = product.Count;
             }
@@ -206,12 +206,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         /// <param name="e"></param>
         private void Products_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e.NewItems != null)
+            if (e.NewItems is not null)
             {
                 OnProductsAdded(e.NewItems.Cast<ProductsGridItem>());
             }
 
-            if (e.OldItems != null)
+            if (e.OldItems is not null)
             {
                 OnProductsRemoved(e.OldItems.Cast<ProductsGridItem>());
             }

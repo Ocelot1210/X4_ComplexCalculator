@@ -137,7 +137,7 @@ namespace X4_ComplexCalculator.Common.Behavior
                 else
                 {
                     var childOfChild = FindVisualChild<T>(child);
-                    if (childOfChild != null)
+                    if (childOfChild is not null)
                     {
                         return childOfChild;
                     }
@@ -156,18 +156,18 @@ namespace X4_ComplexCalculator.Common.Behavior
         /// <returns>セル</returns>
         private static DataGridCell? GetCell(DataGrid grid, DataGridRow row, int column)
         {
-            if (row != null)
+            if (row is not null)
             {
                 var presenter = FindVisualChild<DataGridCellsPresenter>(row);
-                if (presenter == null)
+                if (presenter is null)
                 {
                     row.ApplyTemplate();
                     presenter = FindVisualChild<DataGridCellsPresenter>(row);
                 }
-                if (presenter != null)
+                if (presenter is not null)
                 {
                     var cell = presenter.ItemContainerGenerator.ContainerFromIndex(column) as DataGridCell;
-                    if (cell != null)
+                    if (cell is not null)
                     {
                         grid.ScrollIntoView(row, grid.Columns[column]);
                         cell = presenter.ItemContainerGenerator.ContainerFromIndex(column) as DataGridCell;

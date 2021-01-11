@@ -136,11 +136,11 @@ namespace X4_ComplexCalculator.Common.Localize
         {
             get
             {
-                if (_instance == null)
+                if (_instance is null)
                 {
                     lock (InstanceLock)
                     {
-                        if (_instance == null)
+                        if (_instance is null)
                             _instance = new CSVEmbeddedLocalizationProvider();
                     }
                 }
@@ -226,7 +226,7 @@ namespace X4_ComplexCalculator.Common.Localize
             var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
             foreach (var assemblyInAppDomain in loadedAssemblies)
             {
-                if (assemblyInAppDomain == null || string.IsNullOrEmpty(assemblyInAppDomain.FullName))
+                if (assemblyInAppDomain is null || string.IsNullOrEmpty(assemblyInAppDomain.FullName))
                 {
                     continue;
                 }
@@ -239,7 +239,7 @@ namespace X4_ComplexCalculator.Common.Localize
                 {
                     //filename = assemblyInAppDomain.GetManifestResourceNames().Where(r => r.Contains(dictionary)).FirstOrDefault();
                     filename = assemblyInAppDomain.GetManifestResourceNames().FirstOrDefault(r => r.Contains($"{dictionary}{(string.IsNullOrEmpty(culture.Name) ? "" : "-")}{culture.Name}"));
-                    if (filename != null)
+                    if (filename is not null)
                     {
                         using (var reader = new StreamReader(assemblyInAppDomain.GetManifestResourceStream(filename) ?? throw new InvalidOperationException(), Encoding.Default))
                         {
@@ -250,7 +250,7 @@ namespace X4_ComplexCalculator.Common.Localize
                             while (!reader.EndOfStream)
                             {
                                 var line = reader.ReadLine();
-                                if (line != null)
+                                if (line is not null)
                                 {
                                     var parts = line.Split(";".ToCharArray());
 
@@ -272,7 +272,7 @@ namespace X4_ComplexCalculator.Common.Localize
             }
 
             // Nothing found -> Raise the error message.
-            if (ret == null)
+            if (ret is null)
             {
                 OnProviderError(target, key, "The key does not exist in " + filename + ".");
                 ret = key;

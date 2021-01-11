@@ -11,7 +11,7 @@ namespace LibX4.FileSystem
     /// <summary>
     /// catファイル用ユーティリティクラス
     /// </summary>
-    public class CatFile : IIndexResolver
+    public class CatFile : ICatFile
     {
         #region スタティックメンバ
         /// <summary>
@@ -100,9 +100,20 @@ namespace LibX4.FileSystem
         /// <param name="filePath">ファイルパス</param>
         /// <returns>ファイルの内容</returns>
         public MemoryStream OpenFile(string filePath)
-            => _FileLoaders
-                .Select(fileLoader => fileLoader.OpenFile(filePath))
-                .FirstOrDefault() ?? throw new FileNotFoundException(nameof(filePath));
+        {
+            filePath = PathCanonicalize(filePath);
+
+            foreach (var loader in _FileLoaders)
+            {
+                var ms = loader.OpenFile(filePath);
+                if (ms is not null)
+                {
+                    return ms;
+                }
+            }
+
+            throw new FileNotFoundException(nameof(filePath), filePath);
+        }
 
 
         /// <summary>

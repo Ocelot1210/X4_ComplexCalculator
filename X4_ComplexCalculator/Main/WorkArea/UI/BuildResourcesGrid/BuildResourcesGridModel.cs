@@ -143,12 +143,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         /// <param name="e"></param>
         private async Task OnModulesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e.NewItems != null)
+            if (e.NewItems is not null)
             {
                 OnModulesAdded(e.NewItems.Cast<ModulesGridItem>());
             }
 
-            if (e.OldItems != null)
+            if (e.OldItems is not null)
             {
                 OnModulesRemoved(e.OldItems.Cast<ModulesGridItem>());
             }
@@ -214,7 +214,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             foreach (var kvp in resources)
             {
                 var itm = Resources.FirstOrDefault(x => x.Ware.WareID == kvp.Key);
-                if (itm != null)
+                if (itm is not null)
                 {
                     itm.Amount += kvp.Value * (module.ModuleCount - prevModuleCount);
                 }
@@ -241,7 +241,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             foreach (var kvp in resources)
             {
                 var item = Resources.FirstOrDefault(x => x.Ware.WareID == kvp.Key);
-                if (item != null)
+                if (item is not null)
                 {
                     // 既にウェアが一覧にある場合
                     item.Amount += kvp.Value * module.ModuleCount;
@@ -281,7 +281,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             foreach (var kvp in resources)
             {
                 var item = Resources.FirstOrDefault(x => x.Ware.WareID == kvp.Key);
-                if (item != null)
+                if (item is not null)
                 {
                     // 既にウェアが一覧にある場合
                     item.Amount += (kvp.Value * module.ModuleCount);
@@ -310,7 +310,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             foreach (var kvp in resourcesDict)
             {
                 var item = Resources.FirstOrDefault(x => x.Ware.WareID == kvp.Key);
-                if (item != null)
+                if (item is not null)
                 {
                     // 既にウェアが一覧にある場合
                     item.Amount += kvp.Value;
@@ -337,7 +337,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             foreach (var kvp in resourcesDict)
             {
                 var itm = Resources.FirstOrDefault(x => x.Ware.WareID == kvp.Key);
-                if (itm != null)
+                if (itm is not null)
                 {
                     itm.Amount -= kvp.Value;
                 }

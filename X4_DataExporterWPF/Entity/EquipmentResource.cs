@@ -1,7 +1,7 @@
 ﻿namespace X4_DataExporterWPF.Entity
 {
     /// <summary>
-    /// 装備生産に必要なウェア情報
+    /// 艦船製造に必要なウェア情報
     /// </summary>
     public class EquipmentResource
     {

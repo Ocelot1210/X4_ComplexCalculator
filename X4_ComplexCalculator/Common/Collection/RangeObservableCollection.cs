@@ -137,7 +137,7 @@ namespace System.Collections.ObjectModel
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is not in the collection range.</exception>
         public void InsertRange(int index, IEnumerable<T> collection)
         {
-            if (collection == null)
+            if (collection is null)
                 throw new ArgumentNullException(nameof(collection));
             if (index < 0)
                 throw new ArgumentOutOfRangeException(nameof(index));
@@ -181,7 +181,7 @@ namespace System.Collections.ObjectModel
         /// <exception cref="ArgumentNullException"><paramref name="collection"/> is null.</exception>
         public virtual void RemoveRange(IEnumerable<T> collection)
         {
-            if (collection == null)
+            if (collection is null)
                 throw new ArgumentNullException(nameof(collection));
 
             if (Count == 0)
@@ -214,7 +214,7 @@ namespace System.Collections.ObjectModel
 
                 Items.RemoveAt(index);
 
-                if (lastIndex == index && lastCluster != null)
+                if (lastIndex == index && lastCluster is not null)
                     lastCluster.Add(item);
                 else
                     clusters[lastIndex = index] = lastCluster = new List<T> { item };
@@ -288,7 +288,7 @@ namespace System.Collections.ObjectModel
                 throw new ArgumentOutOfRangeException(nameof(count));
             if (index + count > Count)
                 throw new ArgumentOutOfRangeException(nameof(index));
-            if (match == null)
+            if (match is null)
                 throw new ArgumentNullException(nameof(match));
 
             if (Count == 0)
@@ -311,7 +311,7 @@ namespace System.Collections.ObjectModel
 
                         if (clusterIndex == index)
                         {
-                            Debug.Assert(cluster != null);
+                            Debug.Assert(cluster is not null);
                             cluster!.Add(item);
                         }
                         else
@@ -410,7 +410,7 @@ namespace System.Collections.ObjectModel
             if (index + count > Count)
                 throw new ArgumentOutOfRangeException(nameof(index));
 
-            if (collection == null)
+            if (collection is null)
                 throw new ArgumentNullException(nameof(collection));
 
             if (!AllowDuplicates)
@@ -468,9 +468,9 @@ namespace System.Collections.ObjectModel
                     {
                         Items[i] = @new;
 
-                        if (newCluster == null)
+                        if (newCluster is null)
                         {
-                            Debug.Assert(oldCluster == null);
+                            Debug.Assert(oldCluster is null);
                             newCluster = new List<T> { @new };
                             oldCluster = new List<T> { old };
                         }
@@ -586,7 +586,7 @@ namespace System.Collections.ObjectModel
         /// </remarks>
         protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
-            if (_deferredEvents != null)
+            if (_deferredEvents is not null)
             {
                 _deferredEvents.Add(e);
                 return;
@@ -653,9 +653,9 @@ namespace System.Collections.ObjectModel
         //move when supported language version updated.
         void OnRangeReplaced(int followingItemIndex, ICollection<T> newCluster, ICollection<T> oldCluster)
         {
-            if (oldCluster == null || oldCluster.Count == 0)
+            if (oldCluster is null || oldCluster.Count == 0)
             {
-                Debug.Assert(newCluster == null || newCluster.Count == 0);
+                Debug.Assert(newCluster is null || newCluster.Count == 0);
                 return;
             }
 
@@ -684,8 +684,8 @@ namespace System.Collections.ObjectModel
             readonly RangeObservableCollection<T> _collection;
             public DeferredEventsCollection(RangeObservableCollection<T> collection)
             {
-                Debug.Assert(collection != null);
-                Debug.Assert(collection._deferredEvents == null);
+                Debug.Assert(collection is not null);
+                Debug.Assert(collection._deferredEvents is null);
                 _collection = collection;
                 _collection._deferredEvents = this;
             }

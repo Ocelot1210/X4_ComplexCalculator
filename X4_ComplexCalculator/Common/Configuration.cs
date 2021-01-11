@@ -22,7 +22,7 @@ namespace X4_ComplexCalculator.Common
         /// <returns></returns>
         public static IConfigurationRoot GetConfiguration()
         {
-            if (Config == null)
+            if (Config is null)
             {
                 Config = new ConfigurationBuilder()
                     .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
@@ -41,7 +41,7 @@ namespace X4_ComplexCalculator.Common
         /// <param name="value">設定値</param>
         public static void SetValue(string key, string value)
         {
-            if (Config == null)
+            if (Config is null)
             {
                 throw new InvalidOperationException();
             }

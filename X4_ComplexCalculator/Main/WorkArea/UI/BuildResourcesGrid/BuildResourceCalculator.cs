@@ -105,7 +105,7 @@ WHERE
             get
             {
                 // 未作成なら作成する
-                if (_SingletonInstance == null)
+                if (_SingletonInstance is null)
                 {
                     _SingletonInstance = new BuildResourceCalculator();
                 }

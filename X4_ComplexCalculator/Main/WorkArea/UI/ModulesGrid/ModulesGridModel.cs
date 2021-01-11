@@ -107,7 +107,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             _SelectModuleWindowClosed = false;
 
 
-            if (_SelectModuleWindow == null)
+            if (_SelectModuleWindow is null)
             {
                 throw new InvalidOperationException();
             }

@@ -49,6 +49,9 @@ namespace X4_DataExporterWPF.Entity
         /// 設計図有無
         /// </summary>
         public bool NoBlueprint { get; }
+
+
+        public byte[]? Thumbnail { get; }
         #endregion
 
 
@@ -62,8 +65,9 @@ namespace X4_DataExporterWPF.Entity
         /// <param name="maxWorkers">最大労働者数</param>
         /// <param name="workersCapacity">収容可能な労働者数</param>
         /// <param name="noBluePrint">設計図有無</param>
+        /// <param name="thumbnail">サムネ画像</param>
         public Module(string moduleID, string moduleTypeID, string name, string macro,
-                      int maxWorkers, int workersCapacity, bool noBluePrint)
+                      int maxWorkers, int workersCapacity, bool noBluePrint, byte[]? thumbnail)
         {
             ModuleID = moduleID;
             ModuleTypeID = moduleTypeID;
@@ -72,6 +76,7 @@ namespace X4_DataExporterWPF.Entity
             MaxWorkers = maxWorkers;
             WorkersCapacity = workersCapacity;
             NoBlueprint = noBluePrint;
+            Thumbnail = thumbnail;
         }
 
 

@@ -236,7 +236,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             foreach (var item in details)
             {
                 var tmp = Details.FirstOrDefault(x => x.ModuleID == item.ModuleID);
-                if (tmp != null)
+                if (tmp is not null)
                 {
                     // 既にモジュールがある場合
                     tmp.ModuleCount += item.ModuleCount;
@@ -279,7 +279,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             {
                 // 更新対象のモジュールを検索
                 var tmp = Details.FirstOrDefault(x => x.ModuleID == item.ModuleID);
-                if (tmp != null)
+                if (tmp is not null)
                 {
                     tmp.ModuleCount += (item.ModuleCount - prevModuleCount);
                 }
@@ -315,7 +315,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             foreach (var item in details)
             {
                 var tmp = Details.FirstOrDefault(x => x.ModuleID == item.ModuleID);
-                if (tmp != null)
+                if (tmp is not null)
                 {
                     // 既にモジュールがある場合
                     tmp.ModuleCount -= item.ModuleCount;

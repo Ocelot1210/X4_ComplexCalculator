@@ -84,7 +84,7 @@ namespace X4_ComplexCalculator.Common.Collection
         private void CollectionChangedEvent(object? sender, NotifyCollectionChangedEventArgs e)
         {
             // 非同期版イベントが購読されていなければ何もしない
-            if (CollectionChangedAsync == null)
+            if (CollectionChangedAsync is null)
             {
                 return;
             }
@@ -103,7 +103,7 @@ namespace X4_ComplexCalculator.Common.Collection
         /// <param name="e"></param>
         private async void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (sender == null)
+            if (sender is null)
             {
                 throw new InvalidOperationException();
             }
@@ -112,7 +112,7 @@ namespace X4_ComplexCalculator.Common.Collection
 
             // 非同期版イベントが購読されていなければ何もしない
             var handler = CollectionPropertyChangedAsync;
-            if (handler == null)
+            if (handler is null)
             {
                 return;
             }

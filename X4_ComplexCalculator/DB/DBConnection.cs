@@ -72,7 +72,7 @@ namespace X4_ComplexCalculator.DB
         /// </summary>
         public void BeginTransaction()
         {
-            if (_Transaction != null)
+            if (_Transaction is not null)
             {
                 throw new InvalidOperationException("前回のトランザクションが終了せずにトランザクションが開始されました。");
             }
@@ -85,7 +85,7 @@ namespace X4_ComplexCalculator.DB
         /// </summary>
         public void Commit()
         {
-            if (_Transaction == null)
+            if (_Transaction is null)
             {
                 throw new InvalidOperationException();
             }
@@ -100,7 +100,7 @@ namespace X4_ComplexCalculator.DB
         /// </summary>
         public void Rollback()
         {
-            if (_Transaction == null)
+            if (_Transaction is null)
             {
                 throw new InvalidOperationException();
             }
@@ -192,7 +192,7 @@ namespace X4_ComplexCalculator.DB
                 cmd.Parameters.Add(sqlParam);
             }
 
-            if (callback == null) return cmd.ExecuteNonQuery();
+            if (callback is null) return cmd.ExecuteNonQuery();
 
             using var dr = cmd.ExecuteReader();
             int ret = 0;

@@ -6,6 +6,7 @@ using System.Xml.XPath;
 using Dapper;
 using LibX4.FileSystem;
 using LibX4.Lang;
+using LibX4.Xml;
 using X4_DataExporterWPF.Entity;
 
 namespace X4_DataExporterWPF.Export
@@ -18,7 +19,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// catファイルオブジェクト
         /// </summary>
-        private readonly IIndexResolver _CatFile;
+        private readonly ICatFile _CatFile;
 
 
         /// <summary>
@@ -34,12 +35,18 @@ namespace X4_DataExporterWPF.Export
 
 
         /// <summary>
+        /// サムネが見つからない場合のサムネ
+        /// </summary>
+        private byte[]? _NotFoundThumb;
+
+
+        /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="catFile">catファイルオブジェクト</param>
         /// <param name="waresXml">ウェア情報xml</param>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public EquipmentExporter(IIndexResolver catFile, XDocument waresXml, ILanguageResolver resolver)
+        public EquipmentExporter(ICatFile catFile, XDocument waresXml, ILanguageResolver resolver)
         {
             _CatFile = catFile;
             _WaresXml = waresXml;
@@ -65,8 +72,15 @@ CREATE TABLE IF NOT EXISTS Equipment
     EquipmentTypeID TEXT    NOT NULL,
     SizeID          TEXT    NOT NULL,
     Name            TEXT    NOT NULL,
+    Hull            INTEGER NOT NULL,
+    HullIntegrated  BOOLEAN NOT NULL,
+    Mk              INTEGER NOT NULL,
+    MakerRace       TEXT,
+    Description     TEXT    NOT NULL,
+    Thumbnail       BLOB,
     FOREIGN KEY (EquipmentTypeID)   REFERENCES EquipmentType(EquipmentTypeID),
-    FOREIGN KEY (SizeID)            REFERENCES Size(SizeID)
+    FOREIGN KEY (SizeID)            REFERENCES Size(SizeID),
+    FOREIGN KEY (MakerRace)         REFERENCES Race(RaceID)
 ) WITHOUT ROWID");
             }
 
@@ -77,7 +91,9 @@ CREATE TABLE IF NOT EXISTS Equipment
             {
                 var items = GetRecords();
 
-                connection.Execute("INSERT INTO Equipment (EquipmentID, MacroName, EquipmentTypeID, SizeID, Name) VALUES (@EquipmentID, @MacroName, @EquipmentTypeID, @SizeID, @Name)", items);
+                connection.Execute(@"
+INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  SizeID,  Name,  Hull,  HullIntegrated,  Mk,  MakerRace,  Description,  Thumbnail)
+            VALUES    (@EquipmentID, @MacroName, @EquipmentTypeID, @SizeID, @Name, @Hull, @HullIntegrated, @Mk, @MakerRace, @Description, @Thumbnail)", items);
             }
         }
 
@@ -99,6 +115,7 @@ CREATE TABLE IF NOT EXISTS Equipment
                 var equipmentTypeID = equipment.Attribute("group")?.Value;
                 if (string.IsNullOrEmpty(equipmentTypeID)) continue;
 
+                
                 var macroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
                 XDocument componentXml;
                 try
@@ -113,20 +130,53 @@ CREATE TABLE IF NOT EXISTS Equipment
                 // 装備が記載されているタグを取得する
                 var component = componentXml.Root.XPathSelectElement("component/connections/connection[contains(@tags, 'component')]");
 
-                // サイズ一覧
-                string[] sizes = { "extrasmall", "small", "medium", "large", "extralarge" };
-
-                // 一致するサイズを探す
-                var tags = component?.Attribute("tags")?.Value.Split(" ");
-                var sizeID = sizes.FirstOrDefault(x => tags?.Contains(x) == true);
-                // 一致するサイズがなかった場合
+                // サイズIDを取得
+                var sizeID = Util.GetSizeIDFromTags(component?.Attribute("tags")?.Value);
                 if (string.IsNullOrEmpty(sizeID)) continue;
 
                 var name = _Resolver.Resolve(equipment.Attribute("name").Value);
                 name = string.IsNullOrEmpty(name) ? macroName : name;
 
-                yield return new Equipment(equipmentID, macroName, equipmentTypeID, sizeID, name);
+                var idElm = macroXml.Root.XPathSelectElement("macro/properties/identification");
+                if (idElm is null) continue;
+
+                yield return new Equipment(
+                    equipmentID,
+                    macroName,
+                    equipmentTypeID,
+                    sizeID,
+                    name,
+                    macroXml.Root.XPathSelectElement("macro/properties/hull")?.Attribute("max")?.GetInt() ?? 0,
+                    (macroXml.Root.XPathSelectElement("macro/properties/hull")?.Attribute("integrated")?.GetInt() ?? 0) == 1,
+                    idElm.Attribute("mk")?.GetInt() ?? 0,
+                    idElm.Attribute("makerrace")?.Value,
+                    _Resolver.Resolve(idElm.Attribute("description")?.Value ?? ""),
+                    GetThumbnail(macroName)
+                );
             }
+        }
+
+
+        /// <summary>
+        /// サムネ画像を取得する
+        /// </summary>
+        /// <param name="macroName">マクロ名</param>
+        /// <returns>サムネ画像のバイト配列</returns>
+        private byte[]? GetThumbnail(string macroName)
+        {
+            const string dir = "assets/fx/gui/textures/upgrades";
+            var thumb = Util.GzDds2Png(_CatFile, dir, macroName);
+            if (thumb is not null)
+            {
+                return thumb;
+            }
+
+            if (_NotFoundThumb is null)
+            {
+                _NotFoundThumb = Util.GzDds2Png(_CatFile, dir, "notfound");
+            }
+
+            return _NotFoundThumb;
         }
     }
 }

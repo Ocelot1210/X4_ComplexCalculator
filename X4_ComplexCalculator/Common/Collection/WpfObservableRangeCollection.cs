@@ -36,7 +36,7 @@
         protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
             var _deferredEvents = (ICollection<NotifyCollectionChangedEventArgs>?)typeof(RangeObservableCollection<T>)?.GetField("_deferredEvents", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(this);
-            if (_deferredEvents != null)
+            if (_deferredEvents is not null)
             {
                 _deferredEvents.Add(e);
                 return;
@@ -80,8 +80,8 @@
             private readonly WpfObservableRangeCollection<T> _collection;
             public DeferredEventsCollection(WpfObservableRangeCollection<T> collection)
             {
-                Debug.Assert(collection != null);
-                Debug.Assert(collection._deferredEvents == null);
+                Debug.Assert(collection is not null);
+                Debug.Assert(collection._deferredEvents is null);
                 _collection = collection;
                 _collection._deferredEvents = this;
             }

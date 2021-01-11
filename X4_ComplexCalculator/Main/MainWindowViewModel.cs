@@ -23,6 +23,7 @@ using X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport;
 using X4_ComplexCalculator.Main.Menu.Lang;
 using X4_ComplexCalculator.Main.Menu.Layout;
 using X4_ComplexCalculator.Main.Menu.View.EmpireOverview;
+using X4_ComplexCalculator.Main.Menu.View.DBViewer;
 using X4_ComplexCalculator.Main.WorkArea;
 
 namespace X4_ComplexCalculator.Main
@@ -67,6 +68,12 @@ namespace X4_ComplexCalculator.Main
         /// 帝国の概要ウィンドウ
         /// </summary>
         private Window? _EmpireOverviewWindow;
+
+
+        /// <summary>
+        /// DBビュワーウィンドウ
+        /// </summary>
+        private Window? _DBViewerWindow;
 
 
         /// <summary>
@@ -122,6 +129,12 @@ namespace X4_ComplexCalculator.Main
         /// 帝国の概要ウィンドウを開く
         /// </summary>
         public ICommand OpenEmpireOverviewWindowCommand { get; }
+
+
+        /// <summary>
+        /// DBビュワーウィンドウを開く
+        /// </summary>
+        public ICommand OpenDBViewerWindowCommand { get; }
 
 
         /// <summary>
@@ -233,6 +246,7 @@ namespace X4_ComplexCalculator.Main
             VersionInfoCommand               = new DelegateCommand(ShowVersionInfo);
             DocumentClosingCommand           = new DelegateCommand<DocumentClosingEventArgs>(DocumentClosing);
             OpenEmpireOverviewWindowCommand  = new DelegateCommand(OpenEmpireOverviewWindow);
+            OpenDBViewerWindowCommand        = new DelegateCommand(OpenDBViewerWindow);
             _WorkAreaFileIO.PropertyChanged += Member_PropertyChanged;
 
             _ImportExporter = new ImportExporter(_WorkAreaManager);
@@ -404,7 +418,7 @@ namespace X4_ComplexCalculator.Main
                 }
                 return;
             }
-            if (latestVersion == null)
+            if (latestVersion is null)
             {
                 if (isUserOperation)
                 {
@@ -510,7 +524,7 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         private void OpenEmpireOverviewWindow()
         {
-            if (_EmpireOverviewWindow == null)
+            if (_EmpireOverviewWindow is null)
             {
                 _EmpireOverviewWindow = new EmpireOverviewWindow(Documents);
                 _EmpireOverviewWindow.Closed += (obj, e) => { _EmpireOverviewWindow = null; };
@@ -518,6 +532,22 @@ namespace X4_ComplexCalculator.Main
             }
 
             _EmpireOverviewWindow.Activate();
+        }
+
+
+        /// <summary>
+        /// DBビュワーウィンドウを開く
+        /// </summary>
+        private void OpenDBViewerWindow()
+        {
+            if (_DBViewerWindow is null)
+            {
+                _DBViewerWindow = new DBViewerWindow();
+                _DBViewerWindow.Closed += (_, _) => { _DBViewerWindow = null; };
+                _DBViewerWindow.Show();
+            }
+
+            _DBViewerWindow.Activate();
         }
     }
 }

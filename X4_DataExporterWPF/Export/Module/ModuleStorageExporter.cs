@@ -89,14 +89,13 @@ CREATE TABLE IF NOT EXISTS ModuleStorage
                 var cargo = macroXml.Root.XPathSelectElement("macro/properties/cargo");
                 if (cargo == null) continue;
 
-                // 総合保管庫は飛ばす
-                var transportTypeID = cargo.Attribute("tags")?.Value;
-                if (string.IsNullOrEmpty(transportTypeID)) continue;
-                if (transportTypeID.Contains(' ') == true) continue;
+                // 保管庫種別が1種類の項目のみDB登録(総合保管庫は飛ばす)
+                var transportTypeIDs = Util.SplitTags(cargo.Attribute("tags")?.Value);
+                if (transportTypeIDs.Length != 1) continue;
 
                 var amount = cargo.Attribute("max").GetInt();
 
-                yield return new ModuleStorage(moduleID, transportTypeID, amount);
+                yield return new ModuleStorage(moduleID, transportTypeIDs[0], amount);
             }
         }
     }

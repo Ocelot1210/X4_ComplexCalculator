@@ -108,12 +108,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         /// <param name="e"></param>
         private async Task OnModulesChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e.NewItems != null)
+            if (e.NewItems is not null)
             {
                 OnModulesAdded(e.NewItems.Cast<ModulesGridItem>());
             }
 
-            if (e.OldItems != null)
+            if (e.OldItems is not null)
             {
                 OnModulesRemoved(e.OldItems.Cast<ModulesGridItem>());
             }
@@ -141,7 +141,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
             {
                 // 一致するレコードを探す
                 var itm = Storages.FirstOrDefault(x => x.TransportType.TransportTypeID == kvp.Key);
-                if (itm != null)
+                if (itm is not null)
                 {
                     // 既にレコードがある場合
                     itm.AddDetails(kvp.Value);
@@ -168,7 +168,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
             {
                 // 一致するレコードを探す
                 var itm = Storages.FirstOrDefault(x => x.TransportType.TransportTypeID == kvp.Key);
-                if (itm != null)
+                if (itm is not null)
                 {
                     itm.RemoveDetails(kvp.Value);
                 }
@@ -271,7 +271,7 @@ WHERE
 
             // このカーゴ種別に対し、既にモジュールが追加されているか？
             var itm = modulesDict[transportTypeID].FirstOrDefault(x => x.ModuleID == moduleID);
-            if (itm != null)
+            if (itm is not null)
             {
                 // 既にモジュールが追加されている場合、モジュール数を増やしてレコードがなるべく少なくなるようにする
                 itm.ModuleCount += moduleCount;

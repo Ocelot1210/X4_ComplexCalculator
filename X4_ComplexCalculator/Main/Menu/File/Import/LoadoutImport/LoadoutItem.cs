@@ -131,7 +131,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
             });
 
             var module = Module.Get(moduleID);
-            if (module == null)
+            if (module is null)
             {
                 return null;
             }
@@ -169,7 +169,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
                     SettingDatabase.Instance.ExecQuery($"SELECT EquipmentID FROM ModulePresetsEquipment WHERE ModuleID = '{module.ModuleID}' AND PresetID = {(long)dr1["PresetID"]}", (dr2, _) =>
                     {
                         var eqp = DB.X4DB.Equipment.Get((string)dr2["EquipmentID"]);
-                        if (eqp != null)
+                        if (eqp is not null)
                         {
                             eq.Add(eqp);
                         }
@@ -201,7 +201,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
                 for (var cnt = 0; cnt < max; cnt++)
                 {
                     var eqp = DB.X4DB.Equipment.Get(id);
-                    if (eqp != null)
+                    if (eqp is not null)
                     {
                         manager.AddEquipment(eqp);
                     }

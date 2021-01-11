@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Interop;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Prism.Mvvm;
 using Reactive.Bindings;
@@ -182,6 +184,8 @@ namespace X4_DataExporterWPF.DataExportWindow
                 return;
             }
 
+            var owner = Application.Current.Windows.OfType<Window>().SingleOrDefault(x => x.IsActive);
+
             var progless = new Progress<(int currentStep, int maxSteps)>(s =>
             {
                 CurrentStep.Value = s.currentStep;
@@ -191,7 +195,8 @@ namespace X4_DataExporterWPF.DataExportWindow
                 progless,
                 InDirPath.Value,
                 _OutFilePath,
-                SelectedLanguage.Value
+                SelectedLanguage.Value,
+                owner
             ));
             CurrentStep.Value = 0;
         }
