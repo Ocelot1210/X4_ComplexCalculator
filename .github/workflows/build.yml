@@ -24,6 +24,9 @@ jobs:
         with:
           dotnet-version: 3.1.x
 
+      - name: Clean
+        run: dotnet clean X4_ComplexCalculator.sln --configuration ${{ matrix.Configuration }} && dotnet nuget locals all --clear
+
       - name: Restore dependencies
         run: dotnet restore
 
