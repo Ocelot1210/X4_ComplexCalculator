@@ -314,7 +314,7 @@ DBViewer_Wares_MinPrice;Min price
 DBViewer_Wares_MaxPrice;Max price
 DBViewer_Wares_Profit;Profit
 DBViewer_Wares_Volume;Volume
-DBViewer_Wares_ProfitPerVolume;Profit/Volume
+DBViewer_Wares_ProfitPerVolume;Profit / Volume
 # ■Modules
 DBViewer_Modules_Title;Modules
 DBViewer_Modules_ModuleName;Name

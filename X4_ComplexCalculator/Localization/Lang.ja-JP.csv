@@ -319,7 +319,7 @@ DBViewer_Modules_Title;モジュール
 DBViewer_Modules_ModuleName;名称
 DBViewer_Modules_ModuleType;種別
 DBViewer_Modules_OwnerRace;所有種族
-DBViewer_Modules_MaxWorker;労働者数
+DBViewer_Modules_MaxWorkers;労働者数
 DBViewer_Modules_WorkersCapacity;収容人数
 DBViewer_Modules_Product;製品
 DBViewer_Modules_MaxEfficiency;最大効率

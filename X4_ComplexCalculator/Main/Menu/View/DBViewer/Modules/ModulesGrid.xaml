@@ -49,13 +49,13 @@
                 Header="{lex:Loc Lang:DBViewer_Modules_OwnerRace}" />
 
 
-            <!--  従業員数  -->
+            <!--  労働者数  -->
             <DataGridTextColumn
                 dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
                 Binding="{Binding MaxWorkers, Mode=OneTime, StringFormat='{}{0:N0}'}"
                 CellStyle="{StaticResource RightAlignedDataGridCell}"
                 ElementStyle="{StaticResource RightAlignedDataGridTexColumnElementStyle}"
-                Header="{lex:Loc Lang:DBViewer_Modules_MaxWorker}" />
+                Header="{lex:Loc Lang:DBViewer_Modules_MaxWorkers}" />
 
 
             <!--  収容人数  -->
