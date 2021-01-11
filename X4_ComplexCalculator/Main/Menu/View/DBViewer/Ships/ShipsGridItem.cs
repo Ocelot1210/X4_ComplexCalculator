@@ -195,7 +195,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         /// <summary>
         /// 保管庫種別
         /// </summary>
-        public string CargoType { get; }
+        public IReadOnlyCollection<string> CargoTypes { get; }
 
 
         /// <summary>
@@ -364,7 +364,7 @@ WHERE
     ShipTransportType.TransportTypeID = TransportType.TransportTypeID AND
     ShipID = :ShipID";
 
-                CargoType = string.Join('/', X4Database.Instance.Query<string>(sql, new { ship.ShipID }));
+                CargoTypes = X4Database.Instance.Query<string>(sql, new { ship.ShipID }).ToArray();
             }
 
 

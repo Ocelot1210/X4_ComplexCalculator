@@ -183,6 +183,27 @@
             }
         }
 
+        public IEnumerable<T> GetSourceValuesRaw<T>()
+        {
+            var predicate = FilterHost?.CreatePredicate(null) ?? (_ => true);
+
+            var itemsSource = DataGrid?.ItemsSource;
+
+            if (itemsSource is null)
+                return Enumerable.Empty<T>();
+
+            var collectionView = itemsSource as ICollectionView;
+
+            var items = collectionView?.SourceCollection ?? itemsSource;
+
+            return items.Cast<object>()
+                .Where(item => item is not null && predicate(item))
+                .Select(item => Column?.GetCellContentData(item))
+                .OfType<T>();
+        }
+
+
+
         /// <summary>
         /// Returns all distinct selectable values of this column as string.
         /// This can be used to e.g. feed the ItemsSource of an Excel-like auto-filter, that only shows the values that are currently selectable, depending on the other filters.

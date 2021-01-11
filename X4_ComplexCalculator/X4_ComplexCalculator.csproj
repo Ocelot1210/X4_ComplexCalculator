@@ -54,6 +54,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Common\Controls\DataGridFilter\MultiList\MultiListFilter.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Common\Dialog\SelectStringDialog\SelectStringDialog.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -78,6 +81,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="Common\Controls\DataGridFilter\MultiList\MultiListFilter.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Common\Dialog\SelectStringDialog\SelectStringDialog.xaml">
       <SubType>Designer</SubType>
     </Page>

@@ -4,6 +4,7 @@
     xmlns:dgx="clr-namespace:X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions;assembly=X4_ComplexCalculator_CustomControlLibrary"
     xmlns:listfilter="clr-namespace:X4_ComplexCalculator.Common.Controls.DataGridFilter.List"
     xmlns:local="clr-namespace:X4_ComplexCalculator.Themes"
+    xmlns:multilistfilter="clr-namespace:X4_ComplexCalculator.Common.Controls.DataGridFilter.MultiList"
     xmlns:numericalfilter="clr-namespace:X4_ComplexCalculator.Common.Controls.DataGridFilter.Numerical"
     xmlns:textfilter="clr-namespace:X4_ComplexCalculator.Common.Controls.DataGridFilter.Text"
     xmlns:x4conv="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
@@ -24,6 +25,10 @@
         <listfilter:ListFilter Filter="{Binding Path=Filter, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=dgx:DataGridFilterColumnControl}}" />
     </ControlTemplate>
 
+    <!--  リストフィルタ  -->
+    <ControlTemplate x:Key="DataGridColumnMultiListFilter">
+        <multilistfilter:MultiListFilter Filter="{Binding Path=Filter, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=dgx:DataGridFilterColumnControl}}" />
+    </ControlTemplate>
 
     <!--  DataGridColumnHeaderの初期設定  -->
     <Style x:Key="DefaultDataGridColumnHeaderStyle" TargetType="{x:Type DataGridColumnHeader}">
