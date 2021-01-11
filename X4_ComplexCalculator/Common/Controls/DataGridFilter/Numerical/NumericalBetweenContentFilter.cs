@@ -1,4 +1,5 @@
 ﻿using System;
+using X4_ComplexCalculator.Common.Controls.DataGridFilter.Interface;
 using X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions;
 
 namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.Numerical
@@ -6,7 +7,7 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.Numerical
     /// <summary>
     /// 数値フィルタ用クラス(指定の範囲内用)
     /// </summary>
-    class NumericalBetweenContentFilter : IContentFilter
+    class NumericalBetweenContentFilter : IDataGridFilter
     {
         #region メンバ
         /// <summary>
@@ -21,15 +22,42 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.Numerical
         #endregion
 
 
+        #region プロパティ
+        /// <summary>
+        /// 最小値テキスト
+        /// </summary>
+        public string MinValueText { get; }
+
+
+        /// <summary>
+        /// 最大値テキスト
+        /// </summary>
+        public string MaxValueText { get; }
+
+
+        /// <inheritdoc/>
+        public bool IsFilterEnabled => _MinValue is not null || _MaxValue is not null;
+        #endregion
+
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="minValue">最小値</param>
-        /// <param name="maxValue">最大値</param>
-        public NumericalBetweenContentFilter(decimal? minValue, decimal? maxValue)
+        /// <param name="minValueText">最小値</param>
+        /// <param name="maxValueText">最大値</param>
+        public NumericalBetweenContentFilter(string minValueText, string maxValueText)
         {
-            _MinValue = minValue;
-            _MaxValue = maxValue;
+            if (decimal.TryParse(minValueText, out var minResult))
+            {
+                _MinValue = minResult;
+            }
+            MinValueText = minValueText;
+
+            if (decimal.TryParse(maxValueText, out var maxResult))
+            {
+                _MaxValue = maxResult;
+            }
+            MaxValueText = maxValueText;
         }
 
 
@@ -64,6 +92,18 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.Numerical
             }
 
             return ret;
+        }
+
+
+        /// <inheritdoc/>
+        public bool Equals(IContentFilter? other)
+        {
+            if (other is NumericalBetweenContentFilter filter)
+            {
+                return _MinValue == filter._MinValue && _MaxValue == filter._MaxValue;
+            }
+
+            return false;
         }
     }
 }

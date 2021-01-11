@@ -1,4 +1,5 @@
 ﻿using System;
+using X4_ComplexCalculator.Common.Controls.DataGridFilter.Interface;
 using X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions;
 
 namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.Text
@@ -6,7 +7,7 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.Text
     /// <summary>
     /// 文字列フィルタ用クラス
     /// </summary>
-    class TextContentFilter : IContentFilter
+    class TextContentFilter : IDataGridFilter
     {
         /// <summary>
         /// フィルタ文字列
@@ -18,6 +19,10 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.Text
         /// 一致条件
         /// </summary>
         public TextFilterConditions Conditions { get; }
+
+
+        /// <inheritdoc/>
+        public bool IsFilterEnabled => FilterText != "";
 
 
         /// <summary>
@@ -55,6 +60,18 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.Text
             };
 
             return ret;
+        }
+
+
+        /// <inheritdoc/>
+        public bool Equals(IContentFilter? other)
+        {
+            if (other is TextContentFilter textFilter)
+            {
+                return FilterText == textFilter.FilterText && Conditions == textFilter.Conditions;
+            }
+
+            return false;
         }
     }
 }

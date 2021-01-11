@@ -285,6 +285,26 @@
                 .Select(content => content?.ToString() ?? string.Empty);
         }
 
+        public IContentFilter? LoadFilter()
+        {
+            var column = ColumnHeader?.Column;
+            if (column is not null)
+            {
+                return DataGrid?.LoadFilter(column);
+            }
+
+            return null;
+        }
+
+        public void SaveFilter()
+        {
+            var column = ColumnHeader?.Column;
+            if (column is not null)
+            {
+                DataGrid?.SaveFilter(column);
+            }
+        }
+
         #region INotifyPropertyChanged Members
         /// <summary>
         /// Raises the PropertyChanged event.

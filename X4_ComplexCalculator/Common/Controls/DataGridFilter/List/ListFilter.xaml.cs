@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Data;
 using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Controls.DataGridFilter.Interface;
 using X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions;
 
 
@@ -16,6 +17,7 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.List
     /// </summary>
     public partial class ListFilter
     {
+        #region メンバ
         /// <summary>
         /// 未チェック項目一覧(前回値復元用)
         /// </summary>
@@ -26,16 +28,44 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.List
         /// </summary>
         private ICollectionView? _ListBoxItemsView;
 
+        /// <summary>
+        /// DataContext
+        /// </summary>
+        private DataGridFilterColumnControl? _FilterColumnControl;
+        #endregion
 
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
         public ListFilter()
         {
             InitializeComponent();
         }
 
 
+        /// <inheritdoc/>
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
+
+            // DataContext経由で前回のフィルタを取得
+            _FilterColumnControl = DataContext as DataGridFilterColumnControl;
+            if (_FilterColumnControl?.LoadFilter() is ListContentFilter prevFilter)
+            {
+                Filter = prevFilter;
+                foreach (var item in ListBoxItems)
+                {
+                    item.IsChecked = prevFilter.IsMatch(item.Text);
+                }
+            }
+            else
+            {
+                foreach (var item in ListBoxItems)
+                {
+                    item.IsChecked = true;
+                }
+            }
         }
 
 
@@ -46,15 +76,26 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.List
         public static readonly DependencyProperty FilterProperty =
             DependencyProperty.Register(
                 nameof(Filter),
-                typeof(IContentFilter),
+                typeof(IDataGridFilter),
                 typeof(ListFilter),
                 new FrameworkPropertyMetadata(new ListContentFilter(Enumerable.Empty<string>()), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
             );
 
-        public IContentFilter Filter
+        public IDataGridFilter Filter
         {
-            get => (IContentFilter)GetValue(FilterProperty);
-            set => SetValue(FilterProperty, value);
+            get => (IDataGridFilter)GetValue(FilterProperty);
+            set
+            {
+                if (Filter is null || !Filter.Equals(value))
+                {
+                    SetValue(FilterProperty, value);
+
+                    IsFilterEnabled = value.IsFilterEnabled;
+
+                    // 仮想化対策のためフィルタを保存
+                    _FilterColumnControl?.SaveFilter();
+                }
+            }
         }
         #endregion
 
@@ -180,9 +221,7 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.List
         /// </summary>
         private void PART_OKButton_Click(object sender, RoutedEventArgs e)
         {
-            var filter = new ListContentFilter(ListBoxItems.Where(x => !x.IsChecked).Select(x => x.Text));
-            Filter = filter;
-            IsFilterEnabled = filter.IsEnabled;
+            Filter = new ListContentFilter(ListBoxItems.Where(x => !x.IsChecked).Select(x => x.Text));
             IsOpen = false;
         }
 

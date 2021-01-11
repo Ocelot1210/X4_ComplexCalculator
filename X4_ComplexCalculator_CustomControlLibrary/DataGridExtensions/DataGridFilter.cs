@@ -1,6 +1,7 @@
 ﻿namespace X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions
 {
     using System;
+    using System.Collections.Generic;
     using System.Windows;
     using System.Windows.Controls;
 
@@ -207,6 +208,52 @@
         {
             ((DataGrid)d).GetFilter().SetGlobalFilter((Predicate<object?>)e.NewValue);
         }
+
+
+        #region 仮想化対策
+        /// <summary>
+        /// フィルターを管理するディクショナリ
+        /// </summary>
+        private static readonly DependencyProperty FilterManagerProperty =
+            DependencyProperty.RegisterAttached("FilterManager", typeof(IDictionary<string, IContentFilter>), typeof(DataGridFilter), new FrameworkPropertyMetadata(null));
+
+        private static IDictionary<string, IContentFilter> GetFilterManager(DependencyObject dataGrid)
+        {
+            var ret = (IDictionary<string, IContentFilter>?)dataGrid.GetValue(FilterManagerProperty);
+            if (ret is null)
+            {
+                ret = new Dictionary<string, IContentFilter>();
+                dataGrid.SetValue(FilterManagerProperty, ret);
+            }
+            return ret;
+        }
+
+
+        public static IContentFilter? LoadFilter(this DataGrid dataGrid, DataGridColumn column)
+        {
+            var fm = GetFilterManager(dataGrid);
+            if (fm.TryGetValue(column.SortMemberPath, out var contentFilter))
+            {
+                return contentFilter;
+            }
+
+            return null;
+        }
+
+        public static void SaveFilter(this DataGrid dataGrid, DataGridColumn column)
+        {
+            var filter = DataGridFilterColumn.GetActiveFilter(column);
+            if (filter is null)
+            {
+                return;
+            }
+
+            var key = column.SortMemberPath;
+            var fm = GetFilterManager(dataGrid);
+            fm[key] = filter;
+        }
+        #endregion
+
 
         #region Resource keys
 

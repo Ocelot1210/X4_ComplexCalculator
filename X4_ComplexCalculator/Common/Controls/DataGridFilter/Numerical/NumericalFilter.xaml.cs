@@ -2,7 +2,7 @@
 using System.Windows;
 using X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions;
 using WPFLocalizeExtension.Engine;
-
+using X4_ComplexCalculator.Common.Controls.DataGridFilter.Interface;
 
 namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.Numerical
 {
@@ -11,14 +11,52 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.Numerical
     /// </summary>
     public partial class NumericalFilter
     {
+        #region メンバ
         /// <summary>
         /// 画面前回値
         /// </summary>
         private (string, string, NumericalFilterConditinos) _PrevValue;
 
+
+        /// <summary>
+        /// DataContext
+        /// </summary>
+        private DataGridFilterColumnControl? _FilterColumnControl;
+        #endregion
+
+
         public NumericalFilter()
         {
             InitializeComponent();
+        }
+
+
+        /// <inheritdoc/>
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+
+            _FilterColumnControl = DataContext as DataGridFilterColumnControl;
+
+            // DataContext経由で前回のフィルタを取得
+            _FilterColumnControl = DataContext as DataGridFilterColumnControl;
+            if (_FilterColumnControl?.LoadFilter() is IDataGridFilter prevFilter)
+            {
+                Filter = prevFilter;
+
+                // 画面の前回値復元
+                if (prevFilter is NumericalContentFilter numFilter)
+                {
+                    FilterText1 = numFilter.InputText;
+                    Conditions  = numFilter.Conditinos;
+                }
+                else if (prevFilter is NumericalBetweenContentFilter betweenFilter)
+                {
+                    FilterText1 = betweenFilter.MinValueText;
+                    FilterText2 = betweenFilter.MaxValueText;
+                    Conditions = NumericalFilterConditinos.Between;
+                }
+            }
         }
 
 
@@ -29,15 +67,25 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.Numerical
         public static readonly DependencyProperty FilterProperty =
             DependencyProperty.Register(
                 nameof(Filter),
-                typeof(IContentFilter),
+                typeof(IDataGridFilter),
                 typeof(NumericalFilter),
-                new FrameworkPropertyMetadata(new NumericalContentFilter(null, NumericalFilterConditinos.Equals), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
+                new FrameworkPropertyMetadata(new NumericalContentFilter("", NumericalFilterConditinos.Equals), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
             );
 
-        public IContentFilter Filter
+        public IDataGridFilter Filter
         {
-            get => (IContentFilter)GetValue(FilterProperty);
-            set => SetValue(FilterProperty, value);
+            get => (IDataGridFilter)GetValue(FilterProperty);
+            set
+            {
+                if (Filter is null || !Filter.Equals(value))
+                {
+                    SetValue(FilterProperty, value);
+                    IsFilterEnabled = value.IsFilterEnabled;
+                }
+
+                // 仮想化対策のためフィルタを保存
+                _FilterColumnControl?.SaveFilter();
+            }
         }
         #endregion
 
@@ -182,53 +230,17 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.Numerical
         /// </summary>
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            var canClose = true;
-
             if (Conditions != NumericalFilterConditinos.Between)
             {
-                var (value, isValidInput) = ParseDouble(FilterText1);
-
-                if (isValidInput)
-                {
-                    Filter = new NumericalContentFilter(value, Conditions);
-                }
-
-                IsFilterEnabled = FilterText1 != "";
+                Filter = new NumericalContentFilter(FilterText1, Conditions);
             }
             else
             {
-                var (minValue, isMinValidInput) = ParseDouble(FilterText1);
-                var (maxValue, isMaxValidInput) = ParseDouble(FilterText2);
-
-                if (isMinValidInput || isMaxValidInput)
-                {
-                    Filter = new NumericalBetweenContentFilter(minValue, maxValue);
-                }
-
-                IsFilterEnabled = FilterText1 != "" || FilterText2 != "";
+                Filter = new NumericalBetweenContentFilter(FilterText1, FilterText2);
             }
 
-
-            IsOpen = !canClose;
+            IsOpen = false;
         }
-
-
-        /// <summary>
-        /// 文字列をdouble型に変換する
-        /// </summary>
-        /// <param name="text">変換対象</param>
-        /// <returns>変換結果と有効な入力だったかのタプル</returns>
-        private static (decimal?, bool) ParseDouble(string text)
-        {
-            if (decimal.TryParse(text, out var result))
-            {
-                return (result, true);
-            }
-
-            // 空文字列以外でパースに失敗するのはNG
-            return (null, text == "");
-        }
-
 
 
         /// <summary>
@@ -238,7 +250,7 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.Numerical
         {
             FilterText1 = _PrevValue.Item1;
             FilterText2 = _PrevValue.Item2;
-            Conditions = _PrevValue.Item3;
+            Conditions  = _PrevValue.Item3;
 
             IsOpen = false;
         }

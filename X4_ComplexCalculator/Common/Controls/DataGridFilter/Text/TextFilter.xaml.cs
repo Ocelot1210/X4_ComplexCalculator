@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
+using X4_ComplexCalculator.Common.Controls.DataGridFilter.Interface;
 using X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions;
 
 namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.Text
@@ -11,10 +12,18 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.Text
     /// </summary>
     public partial class TextFilter
     {
+        #region メンバ
         /// <summary>
         /// 画面前回値
         /// </summary>
         private (string, TextFilterConditions) _PrevValue;
+
+
+        /// <summary>
+        /// DataContext
+        /// </summary>
+        private DataGridFilterColumnControl? _FilterColumnControl;
+        #endregion
 
 
         public TextFilter()
@@ -26,6 +35,18 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.Text
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
+
+            _FilterColumnControl = DataContext as DataGridFilterColumnControl;
+
+            // DataContext経由で前回のフィルタを取得
+            _FilterColumnControl = DataContext as DataGridFilterColumnControl;
+            var prevFilter = _FilterColumnControl?.LoadFilter();
+            if (prevFilter is TextContentFilter filter)
+            {
+                Filter = filter;
+                FilterText = filter.FilterText;
+                Conditions = filter.Conditions;
+            }
         }
 
 
@@ -36,15 +57,25 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.Text
         public static readonly DependencyProperty FilterProperty =
             DependencyProperty.Register(
                 nameof(Filter),
-                typeof(IContentFilter),
+                typeof(IDataGridFilter),
                 typeof(TextFilter),
                 new FrameworkPropertyMetadata(new TextContentFilter("", TextFilterConditions.Contains), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
             );
 
-        public IContentFilter Filter
+        public IDataGridFilter Filter
         {
-            get => (IContentFilter)GetValue(FilterProperty);
-            set => SetValue(FilterProperty, value);
+            get => (IDataGridFilter)GetValue(FilterProperty);
+            set
+            {
+                if (Filter is null || !Filter.Equals(value))
+                {
+                    SetValue(FilterProperty, value);
+                    IsFilterEnabled = value.IsFilterEnabled;
+                }
+
+                // 仮想化対策のためフィルタを保存
+                _FilterColumnControl?.SaveFilter();
+            }
         }
         #endregion
 
@@ -155,7 +186,6 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.Text
         private void PART_OKButton_Click(object sender, RoutedEventArgs e)
         {
             Filter = new TextContentFilter(FilterText, Conditions);
-            IsFilterEnabled = FilterText != "";
             IsOpen = false;
         }
 
