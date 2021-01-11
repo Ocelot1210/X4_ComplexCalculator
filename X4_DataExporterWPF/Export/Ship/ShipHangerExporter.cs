@@ -166,23 +166,22 @@ CREATE TABLE IF NOT EXISTS ShipHanger
         /// <returns></returns>
         private (string, int)? GetDockingBayCapacity(XDocument shipMacroXml, string dockingBayName)
         {
-            // 登録済みにあればxmlを見ないで機体格納数を返す
-            if (_DockingBayDict.TryGetValue(dockingBayName, out var registerdCapacity))
-            {
-                return registerdCapacity;
-            }
-
             var macroName = shipMacroXml.Root.XPathSelectElement($"macro/connections/connection[@ref='{dockingBayName}']/macro")?.Attribute("ref")?.Value ?? "";
             if (string.IsNullOrEmpty(macroName))
             {
-                _DockingBayDict.TryAdd(dockingBayName, null);
                 return null;
+            }
+
+            // 登録済みにあればxmlを見ないで機体格納数を返す
+            if (_DockingBayDict.TryGetValue(macroName, out var registerdCapacity))
+            {
+                return registerdCapacity;
             }
 
             var dockingBayXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
             if (dockingBayXml is null)
             {
-                _DockingBayDict.TryAdd(dockingBayName, null);
+                _DockingBayDict.TryAdd(macroName, null);
                 return null;
             }
 
@@ -193,11 +192,11 @@ CREATE TABLE IF NOT EXISTS ShipHanger
             // 容量が1未満 又は 無効なドックサイズの場合、空の要素を登録
             if (capacity < 1 || string.IsNullOrEmpty(size))
             {
-                _DockingBayDict.TryAdd(dockingBayName, null);
+                _DockingBayDict.TryAdd(macroName, null);
                 return null;
             }
 
-            _DockingBayDict.Add(dockingBayName, (size, capacity));
+            _DockingBayDict.Add(macroName, (size, capacity));
             return (size, capacity);
         }
 
@@ -212,25 +211,25 @@ CREATE TABLE IF NOT EXISTS ShipHanger
         /// <returns></returns>
         private IReadOnlyDictionary<string, int> CountDockArea(XDocument shipMacroXml, string dockName)
         {
+            var macroName = shipMacroXml.Root.XPathSelectElement($"macro/connections/connection[@ref='{dockName}']/macro")?.Attribute("ref")?.Value ?? "";
+            if (string.IsNullOrEmpty(macroName))
+            {
+                return new Dictionary<string, int>();
+            }
+
             // 登録済みにあればxmlを見ないでドック数を返す
-            if (_DockAreaDict.TryGetValue(dockName, out var registeredDict))
+            if (_DockAreaDict.TryGetValue(macroName, out var registeredDict))
             {
                 return registeredDict;
             }
 
-            var macroName = shipMacroXml.Root.XPathSelectElement($"macro/connections/connection[@ref='{dockName}']/macro")?.Attribute("ref")?.Value ?? "";
-            if (string.IsNullOrEmpty(macroName))
-            {
-                var ret = new Dictionary<string, int>();
-                _DockAreaDict.TryAdd(dockName, ret);
-                return ret;
-            }
+
 
             var dockMacroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
             if (dockMacroXml is null)
             {
                 var ret = new Dictionary<string, int>();
-                _DockAreaDict.TryAdd(dockName, ret);
+                _DockAreaDict.TryAdd(macroName, ret);
                 return ret;
             }
 
@@ -257,7 +256,7 @@ CREATE TABLE IF NOT EXISTS ShipHanger
 
             {
                 var ret = sizeDict.Where(x => 0 < x.Value).ToDictionary(x => x.Key, x => x.Value);
-                _DockAreaDict.Add(dockName, ret);
+                _DockAreaDict.Add(macroName, ret);
                 return ret;
             }
         }
