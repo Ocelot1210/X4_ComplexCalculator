@@ -279,7 +279,7 @@
                 <DataGridTextColumn
                     x:Name="Column_ShipMass"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                    Binding="{Binding Ship.Mass, Mode=OneTime, StringFormat='{}{0:N1} t'}"
+                    Binding="{Binding ShipMass, Mode=OneTime, StringFormat='{}{0:N1} t'}"
                     CellStyle="{StaticResource RightAlignedDataGridCell}"
                     Header="{lex:Loc Lang:DBViewer_Ships_BasicInfo_Mass}" />
 

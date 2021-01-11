@@ -1,8 +1,7 @@
-﻿using System;
-using System.Windows;
-using X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions;
+﻿using System.Windows;
 using WPFLocalizeExtension.Engine;
 using X4_ComplexCalculator.Common.Controls.DataGridFilter.Interface;
+using X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions;
 
 namespace X4_ComplexCalculator.Common.Controls.DataGridFilter.Numerical
 {

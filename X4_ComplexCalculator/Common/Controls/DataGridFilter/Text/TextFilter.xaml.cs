@@ -1,7 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Windows;
-using System.Windows.Data;
+﻿using System.Windows;
 using X4_ComplexCalculator.Common.Controls.DataGridFilter.Interface;
 using X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions;
 

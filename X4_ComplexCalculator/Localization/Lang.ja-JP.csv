@@ -299,7 +299,6 @@ TextFilter_EndWith;指定の値で終わる
 # DB Viewer
 # ------------------------------------------------------
 DBViewer;DBビュワー
-DBViewer_Description;説明文
 # ■Races
 DBViewer_Races_Title;種族
 DBViewer_Races_RaceID;種族ID

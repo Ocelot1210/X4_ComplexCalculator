@@ -84,6 +84,12 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         public Ship Ship { get; }
 
 
+        /// <summary>
+        /// 艦船重量
+        /// </summary>
+        public double ShipMass { get; }
+
+
         #region 速度
         /// <summary>
         /// 最高速度
@@ -229,6 +235,10 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
             Ship = ship;
             
             var equipment = ShipEquipment.Get(ship.ShipID);
+
+            // xaml上のStringFormatで丸めるとフィルターの挙動がおかしくなるため
+            // あらかじめ丸めた艦船重量を作成しておく
+            ShipMass = Math.Round(ship.Mass, 1);
 
             // エンジンを設定
             {

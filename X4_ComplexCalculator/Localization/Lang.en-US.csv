@@ -300,7 +300,6 @@ TextFilter_EndWith;End with
 # DB Viewer
 # ------------------------------------------------------
 DBViewer;DB Viewer
-DBViewer_Description;Description
 # ■Races
 DBViewer_Races_Title;Races
 DBViewer_Races_RaceID;Race ID
