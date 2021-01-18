@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS ShipLoadout
     ShipID      TEXT    NOT NULL,
     LoadoutID   TEXT    NOT NULL,
     MacroName   TEXT    NOT NULL,
+    GroupName   TEXT    NOT NULL,
     Count       INTEGER NOT NULL
 )");
             }
@@ -66,7 +67,7 @@ CREATE TABLE IF NOT EXISTS ShipLoadout
             {
                 var items = GetRecords();
 
-                connection.Execute(@"INSERT INTO ShipLoadout(ShipID, LoadoutID, MacroName, Count) VALUES (@ShipID, @LoadoutID, @MacroName, @Count)", items);
+                connection.Execute(@"INSERT INTO ShipLoadout(ShipID, LoadoutID, MacroName, GroupName, Count) VALUES (@ShipID, @LoadoutID, @MacroName, @GroupName, @Count)", items);
             }
         }
 
@@ -96,12 +97,11 @@ CREATE TABLE IF NOT EXISTS ShipLoadout
                     foreach (var xpath in xpathes)
                     {
                         var equipments = loadout.XPathSelectElements(xpath)
-                            .Select(x => (Macro: x.Attribute("macro")?.Value ?? "", Exact: x.Attribute("exact")?.GetInt() ?? 1))
-                            .Where(x => !string.IsNullOrEmpty(x.Macro))
-                            .GroupBy(x => x.Macro);
-                        foreach (var equipment in equipments)
+                            .Select(x => (Macro: x.Attribute("macro")?.Value ?? "", GroupName: x.Attribute("group")?.Value ?? "", Exact: x.Attribute("exact")?.GetInt() ?? 1))
+                            .Where(x => !string.IsNullOrEmpty(x.Macro) && !string.IsNullOrEmpty(x.GroupName));
+                        foreach (var (macro, groupName, exact) in equipments)
                         {
-                            yield return new ShipLoadout(shipID, loadoutID, equipment.Key, equipment.Sum(x => x.Exact));
+                            yield return new ShipLoadout(shipID, loadoutID, macro, groupName, exact);
                         }
                     }
                 }

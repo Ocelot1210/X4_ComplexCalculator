@@ -116,7 +116,7 @@ SELECT
 FROM
     Faction
 WHERE
-    FactionID IN (SELECT FactionID FROM ModuleOwner)
+    FactionID IN (SELECT FactionID FROM WareOwner)
 ORDER BY Name ASC", init, "SelectModuleCheckStateTypes");
 
             ModuleOwners.AddRange(items);
@@ -139,33 +139,22 @@ ORDER BY Name ASC", init, "SelectModuleCheckStateTypes");
         {
             var query = $@"
 SELECT
-    DISTINCT Module.ModuleID,
-	Module.Name
+    DISTINCT Module.ModuleID
 FROM
     Module,
-	ModuleOwner
+	WareOwner
 WHERE
-	Module.ModuleID = ModuleOwner.ModuleID AND
+	Module.ModuleID = WareOwner.WareID AND
     Module.NoBlueprint = 0 AND
-    Module.ModuleTypeID   IN ({string.Join(", ", ModuleTypes.Where(x => x.IsChecked).Select(x => $"'{x.ID}'"))}) AND
-	ModuleOwner.FactionID IN ({string.Join(", ", ModuleOwners.Where(x => x.IsChecked).Select(x => $"'{x.Faction.FactionID}'"))})";
+    Module.ModuleTypeID IN ({string.Join(", ", ModuleTypes.Where(x => x.IsChecked).Select(x => $"'{x.ID}'"))}) AND
+	WareOwner.FactionID IN ({string.Join(", ", ModuleOwners.Where(x => x.IsChecked).Select(x => $"'{x.Faction.FactionID}'"))})";
 
             var list = new List<ModulesListItem>();
-            X4Database.Instance.ExecQuery(query, SetModules, list);
-            Modules.Reset(list);
-        }
 
-
-
-        /// <summary>
-        /// モジュール一覧用ListViewを初期化する
-        /// </summary>
-        /// <param name="dr">クエリ結果</param>
-        /// <param name="args">可変長引数</param>
-        private void SetModules(SQLiteDataReader dr, object[] args)
-        {
-            var list = (List<ModulesListItem>)args[0];
-            list.Add(new ModulesListItem((string)dr["ModuleID"], (string)dr["Name"], false));
+            var newModules = X4Database.Instance.Query<string>(query)
+                .Select(x => new ModulesListItem(Ware.Get(x)));
+                
+            Modules.Reset(newModules);
         }
 
 
@@ -176,10 +165,9 @@ WHERE
         {
             // 選択されているアイテムを追加
             var items = Modules.Where(x => x.IsChecked)
-                               .Select(x => DB.X4DB.Module.Get(x.ID))
+                               .Select(x =>Ware.TryGet<Module>(x.ID))
                                .Where(x => x is not null)
-                               .Select(x => x!)
-                               .Select(x => new ModulesGridItem(x) { EditStatus = EditStatus.Edited });
+                               .Select(x => new ModulesGridItem(x!) { EditStatus = EditStatus.Edited });
 
             ItemCollection.AddRange(items);
         }

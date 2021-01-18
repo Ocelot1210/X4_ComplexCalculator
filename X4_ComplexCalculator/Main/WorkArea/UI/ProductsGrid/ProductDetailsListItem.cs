@@ -125,7 +125,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 _Efficiencies["sunlight"] = settings.Sunlight;
             }
 
-            ModuleName = DB.X4DB.Module.Get(moduleID)?.Name ?? throw new ArgumentException($"Invalid module ID. ({moduleID})", nameof(moduleID));
+            ModuleName = Ware.TryGet<Module>(moduleID)?.Name ?? throw new ArgumentException($"Invalid module ID. ({moduleID})", nameof(moduleID));
         }
 
 

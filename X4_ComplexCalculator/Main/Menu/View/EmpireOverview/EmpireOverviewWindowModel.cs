@@ -89,7 +89,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
                     // 削除された製品の生産/消費量を減算する
                     foreach (var removedItem in _ProductsBak[item])
                     {
-                        Products.First(x => x.Ware.WareID == removedItem.Ware.WareID).Count -= removedItem.Count;
+                        Products.First(x => x.Ware.ID == removedItem.Ware.ID).Count -= removedItem.Count;
                     }
 
                     _ProductsBak.Remove(item);
@@ -133,7 +133,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
                             return;
                         }
 
-                        var prod = Products.FirstOrDefault(x => x.Ware.WareID == product.Ware.WareID);
+                        var prod = Products.FirstOrDefault(x => x.Ware.ID == product.Ware.ID);
                         if (prod is not null)
                         {
                             prod.Count += ev.NewValue - ev.OldValue;
@@ -179,7 +179,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
 
                 foreach (var prod in _ProductsBak[products])
                 {
-                    if (products.Any(x => x.Ware.WareID == prod.Ware.WareID))
+                    if (products.Any(x => x.Ware.ID == prod.Ware.ID))
                     {
                         added.Add(prod);
                     }
@@ -206,7 +206,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
             // 削除された製品の生産/消費量を減算する
             foreach (var removedItem in removedItems)
             {
-                var prod = Products.FirstOrDefault(x => x.Ware.WareID == removedItem.Ware.WareID);
+                var prod = Products.FirstOrDefault(x => x.Ware.ID == removedItem.Ware.ID);
                 if (prod is not null)
                 {
                     prod.Count -= removedItem.Count;
@@ -232,7 +232,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
 
             foreach (var addedItem in addedItems)
             {
-                var prod = Products.FirstOrDefault(x => x.Ware.WareID == addedItem.Ware.WareID);
+                var prod = Products.FirstOrDefault(x => x.Ware.ID == addedItem.Ware.ID);
 
                 if (prod is null)
                 {

@@ -21,6 +21,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         public string EquipmentTypeID { get; }
 
+
         /// <summary>
         /// 装備種別名
         /// </summary>
@@ -70,6 +71,13 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <param name="obj">比較対象</param>
         /// <returns></returns>
         public override bool Equals(object? obj) => obj is EquipmentType tgt && tgt.EquipmentTypeID == EquipmentTypeID;
+
+
+        public static bool operator ==(EquipmentType e1, EquipmentType e2)
+            => e1.EquipmentTypeID == e2.EquipmentTypeID;
+
+        public static bool operator !=(EquipmentType e1, EquipmentType e2)
+            => e1.EquipmentTypeID != e2.EquipmentTypeID;
 
 
         /// <summary>

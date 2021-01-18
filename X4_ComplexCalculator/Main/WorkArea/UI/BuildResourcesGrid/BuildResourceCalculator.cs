@@ -36,9 +36,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
 
             // モジュールの生産に必要なリソース一覧を取得
             {
-                X4Database.Instance.ExecQuery("SELECT ModuleID, Method, WareID, Amount FROM ModuleResource", (dr, _) =>
+                X4Database.Instance.ExecQuery("SELECT WareID, Method, NeedWareID, Amount FROM WareResource", (dr, _) =>
                 {
-                    var id = (string)dr["ModuleID"];
+                    var id = (string)dr["WareID"];
                     if (!resources.ContainsKey(id))
                     {
                         resources.Add(id, new Dictionary<string, List<(string, long)>>());
@@ -50,7 +50,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
                         resources[id].Add(method, new List<(string, long)>());
                     }
 
-                    var wareID = (string)dr["WareID"];
+                    var wareID = (string)dr["NeedWareID"];
                     var amount = (long)dr["Amount"];
                     resources[id][method].Add((wareID, amount));
                 });
@@ -61,21 +61,21 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             {
                 var query = @"
 SELECT
-    EquipmentResource.EquipmentID,
-    EquipmentResource.Method,
-    EquipmentResource.NeedWareID,
-    EquipmentResource.Amount
+    WareResource.WareID,
+    WareResource.Method,
+    WareResource.NeedWareID,
+    WareResource.Amount
 FROM
     Equipment,
-    EquipmentResource
+    WareResource
 
 WHERE
-    Equipment.EquipmentID = EquipmentResource.EquipmentID AND
+    Equipment.EquipmentID = WareResource.WareID AND
     Equipment.EquipmentTypeID IN ('turrets', 'shields')";
 
                 X4Database.Instance.ExecQuery(query, (dr, _) =>
                 {
-                    var id = (string)dr["EquipmentID"];
+                    var id = (string)dr["WareID"];
                     if (!resources.ContainsKey(id))
                     {
                         resources.Add(id, new Dictionary<string, List<(string, long)>>());

@@ -38,18 +38,18 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
 
             var query = @"
 SELECT
-	WorkUnitResource.Method,
-	WorkUnitResource.WareID,
-	CAST(WorkUnitResource.Amount AS REAL) / WorkUnitProduction.Amount AS Amount
+	WareResource.Method,
+	WareResource.WareID,
+	(CAST(WareResource.Amount AS REAL) / WareProduction.Amount) / (WareProduction.Time / 3600.0) AS Amount
 	
 FROM
-	WorkUnitProduction,
-	WorkUnitResource
+	WareProduction,
+	WareResource
 	
 WHERE
-	WorkUnitResource.WorkUnitID = 'workunit_busy' AND
-	WorkUnitResource.WorkUnitID = WorkUnitProduction.WorkUnitID AND
-	WorkUnitResource.Method     = WorkUnitProduction.Method";
+	WareResource.WareID = 'workunit_busy' AND
+	WareResource.WareID = WareProduction.WareID AND
+	WareResource.Method = WareProduction.Method";
 
             X4Database.Instance.ExecQuery(query, (dr, _) =>
             {

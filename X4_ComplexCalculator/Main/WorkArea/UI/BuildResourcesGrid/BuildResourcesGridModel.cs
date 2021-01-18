@@ -108,7 +108,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
                     break;
 
                 // 装備変更の場合
-                case nameof(ModulesGridItem.ModuleEquipment):
+                case nameof(ModulesGridItem.Equipments):
                     {
                         if (e is PropertyChangedExtendedEventArgs<IEnumerable<string>> ev)
                         {
@@ -121,7 +121,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
                 // 建造方式変更の場合
                 case nameof(ModulesGridItem.SelectedMethod):
                     {
-                        if (e is PropertyChangedExtendedEventArgs<ModuleProduction> ev)
+                        if (e is PropertyChangedExtendedEventArgs<WareProduction> ev)
                         {
                             OnModuleSelectedMethodChanged(module, ev.OldValue.Method);
                         }
@@ -158,9 +158,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
                 // 前回値保存
                 foreach (var resource in Resources)
                 {
-                    if (!_OptionsBakDict.TryAdd(resource.Ware.WareID, resource))
+                    if (!_OptionsBakDict.TryAdd(resource.Ware.ID, resource))
                     {
-                        _OptionsBakDict[resource.Ware.WareID] = resource;
+                        _OptionsBakDict[resource.Ware.ID] = resource;
                     }
                 }
 
@@ -200,12 +200,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         {
             (string ModuleID, string Method, long ModuleCount)[] modules =
             {
-                (module.Module.ModuleID, module.SelectedMethod.Method, 1)
+                (module.Module.ID, module.SelectedMethod.Method, 1)
             };
 
             // モジュールの建造に必要なリソースを集計
             // モジュールの装備一覧(装備IDごとに集計)
-            var equipments = module.ModuleEquipment.AllEquipments.Select(x => (ID: x.EquipmentID, Count: 1))
+            var equipments = module.Equipments.AllEquipments.Select(x => (ID: x.ID, Count: 1))
                                    .GroupBy(x => x.ID)
                                    .Select(x => (ID: x.Key, Method: "default", Count: x.LongCount()));
 
@@ -213,7 +213,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
 
             foreach (var kvp in resources)
             {
-                var itm = Resources.FirstOrDefault(x => x.Ware.WareID == kvp.Key);
+                var itm = Resources.FirstOrDefault(x => x.Ware.ID == kvp.Key);
                 if (itm is not null)
                 {
                     itm.Amount += kvp.Value * (module.ModuleCount - prevModuleCount);
@@ -231,8 +231,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         {
             (string ModuleID, string Method, long ModuleCount)[] modules =
             {
-                (module.Module.ModuleID, buildMethod, -1),                  // 変更前のため-1
-                (module.Module.ModuleID, module.SelectedMethod.Method, 1)   // 変更後のため+1
+                (module.Module.ID, buildMethod, -1),                  // 変更前のため-1
+                (module.Module.ID, module.SelectedMethod.Method, 1)   // 変更後のため+1
             };
 
             Dictionary<string, long> resources = _Calculator.CalcResource(modules);
@@ -240,7 +240,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             var addTarget = new List<BuildResourcesGridItem>();
             foreach (var kvp in resources)
             {
-                var item = Resources.FirstOrDefault(x => x.Ware.WareID == kvp.Key);
+                var item = Resources.FirstOrDefault(x => x.Ware.ID == kvp.Key);
                 if (item is not null)
                 {
                     // 既にウェアが一覧にある場合
@@ -266,8 +266,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         private void OnModuleEquipmentChanged(ModulesGridItem module, IEnumerable<string> prevEquipments)
         {
             // 新しい装備一覧
-            var newEquipments = module.ModuleEquipment.AllEquipments
-                                                      .GroupBy(x => x.EquipmentID)
+            var newEquipments = module.Equipments.AllEquipments
+                                                      .GroupBy(x => x.ID)
                                                       .Select(x => (x.Key, "default", (long)x.Count()));
 
             // 古い装備一覧
@@ -280,7 +280,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             var addTarget = new List<BuildResourcesGridItem>();
             foreach (var kvp in resources)
             {
-                var item = Resources.FirstOrDefault(x => x.Ware.WareID == kvp.Key);
+                var item = Resources.FirstOrDefault(x => x.Ware.ID == kvp.Key);
                 if (item is not null)
                 {
                     // 既にウェアが一覧にある場合
@@ -309,7 +309,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             var addTarget = new List<BuildResourcesGridItem>();
             foreach (var kvp in resourcesDict)
             {
-                var item = Resources.FirstOrDefault(x => x.Ware.WareID == kvp.Key);
+                var item = Resources.FirstOrDefault(x => x.Ware.ID == kvp.Key);
                 if (item is not null)
                 {
                     // 既にウェアが一覧にある場合
@@ -336,7 +336,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
 
             foreach (var kvp in resourcesDict)
             {
-                var itm = Resources.FirstOrDefault(x => x.Ware.WareID == kvp.Key);
+                var itm = Resources.FirstOrDefault(x => x.Ware.ID == kvp.Key);
                 if (itm is not null)
                 {
                     itm.Amount -= kvp.Value;
@@ -355,16 +355,16 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         private Dictionary<string, long> AggregateModules(IEnumerable<ModulesGridItem> modules)
         {
             // モジュール一覧
-            var moduleList = modules.Select(x => (x.Module.ModuleID, x.SelectedMethod.Method, x.ModuleCount));
+            var moduleList = modules.Select(x => (x.Module.ID, x.SelectedMethod.Method, x.ModuleCount));
 
             // モジュールの装備一覧(装備IDごとに集計)
-            var equipments = modules.Where(x => x.ModuleEquipment.CanEquipped &&
-                                                x.ModuleEquipment.AllEquipments.Any())
+            var equipments = modules.Where(x => x.Equipments.CanEquipped &&
+                                                x.Equipments.AllEquipments.Any())
                                     .SelectMany
                                     (
-                                        x => x.ModuleEquipment.AllEquipments.Select
+                                        x => x.Equipments.AllEquipments.Select
                                         (
-                                            y => (ID: y.EquipmentID, Count: x.ModuleCount)
+                                            y => (ID: y.ID, Count: x.ModuleCount)
                                         )
                                     )
                                     .GroupBy(x => x.ID)

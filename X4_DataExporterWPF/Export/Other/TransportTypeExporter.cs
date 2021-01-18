@@ -65,9 +65,24 @@ CREATE TABLE IF NOT EXISTS TransportType
         private IEnumerable<TransportType> GetRecords()
         {
             // TODO: 可能ならファイルから抽出する
-            yield return new TransportType("container", Resolver.Resolve("{20205, 100}"));
-            yield return new TransportType("liquid", Resolver.Resolve("{20205, 300}"));
-            yield return new TransportType("solid", Resolver.Resolve("{20205, 200}"));
+            (string ID, int Code)[] data =
+            {
+                ("container",   100),
+                ("solid",       200),
+                ("liquid",      300),
+                ("passenger",   400),
+                ("equipment",   500),
+                ("inventory",   600),
+                ("software",    700),
+                ("workunit",    800),
+                ("ship",        900),
+                ("research",   1000),
+            };
+
+            foreach (var (id, code) in data)
+            {
+                yield return new TransportType(id, Resolver.Resolve($"{{20205, {code}}}"));
+            }
         }
     }
 }

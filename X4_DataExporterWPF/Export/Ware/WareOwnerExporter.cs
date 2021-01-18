@@ -9,12 +9,12 @@ using X4_DataExporterWPF.Entity;
 namespace X4_DataExporterWPF.Export
 {
     /// <summary>
-    /// モジュール所有派閥情報抽出用クラス
+    /// ウェア所有派閥情報抽出用クラス
     /// </summary>
-    public class ShipOwnerExporter : IExporter
+    public class WareOwnerExporter : IExporter
     {
         /// <summary>
-        /// 情報xml
+        /// ウェア情報xml
         /// </summary>
         private readonly XDocument _WaresXml;
 
@@ -23,7 +23,7 @@ namespace X4_DataExporterWPF.Export
         /// コンストラクタ
         /// </summary>
         /// <param name="waresXml">ウェア情報xml</param>
-        public ShipOwnerExporter(XDocument waresXml)
+        public WareOwnerExporter(XDocument waresXml)
         {
             _WaresXml = waresXml;
         }
@@ -40,12 +40,12 @@ namespace X4_DataExporterWPF.Export
             //////////////////
             {
                 connection.Execute(@"
-CREATE TABLE IF NOT EXISTS ShipOwner
+CREATE TABLE IF NOT EXISTS WareOwner
 (
-    ShipID      TEXT    NOT NULL,
+    WareID      TEXT    NOT NULL,
     FactionID   TEXT    NOT NULL,
-    PRIMARY KEY (ShipID, FactionID),
-    FOREIGN KEY (ShipID)  REFERENCES Ship(ShipID),
+    PRIMARY KEY (WareID, FactionID),
+    FOREIGN KEY (WareID)  REFERENCES Ware(WareID),
     FOREIGN KEY (FactionID) REFERENCES Faction(FactionID)
 ) WITHOUT ROWID");
             }
@@ -57,31 +57,32 @@ CREATE TABLE IF NOT EXISTS ShipOwner
             {
                 var items = GetRecords();
 
-                connection.Execute("INSERT INTO ShipOwner(ShipID, FactionID) VALUES(@ShipID, @FactionID)", items);
+
+                connection.Execute("INSERT INTO WareOwner (WareID, FactionID) VALUES (@WareID, @FactionID)", items);
             }
         }
 
 
         /// <summary>
-        /// XML から ModuleOwner データを読み出す
+        /// XML から WareOwner データを読み出す
         /// </summary>
-        /// <returns>読み出した ModuleOwner データ</returns>
-        internal IEnumerable<ShipOwner> GetRecords()
+        /// <returns>読み出した WareOwner データ</returns>
+        internal IEnumerable<WareOwner> GetRecords()
         {
-            foreach (var module in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'ship')]"))
+            foreach (var ware in _WaresXml.Root.XPathSelectElements("ware"))
             {
-                var moduleID = module.Attribute("id")?.Value;
-                if (string.IsNullOrEmpty(moduleID)) continue;
+                var wareID = ware.Attribute("id")?.Value;
+                if (string.IsNullOrEmpty(wareID)) continue;
 
-                var owners = module.XPathSelectElements("owner")
+                var owners = ware.XPathSelectElements("owner")
                     .Select(owner => owner.Attribute("faction")?.Value)
                     .Where(factionID => !string.IsNullOrEmpty(factionID))
+                    .Select(x => x!)
                     .Distinct();
 
                 foreach (var factionID in owners)
                 {
-                    if (factionID == null) continue;
-                    yield return new ShipOwner(moduleID, factionID);
+                    yield return new WareOwner(wareID, factionID);
                 }
             }
         }

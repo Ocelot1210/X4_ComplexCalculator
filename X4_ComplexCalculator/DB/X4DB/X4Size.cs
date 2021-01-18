@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
@@ -64,13 +65,12 @@ namespace X4_ComplexCalculator.DB.X4DB
         public static void Init()
         {
             _Sizes.Clear();
-            X4Database.Instance.ExecQuery("SELECT SizeID, Name FROM Size", (dr, args) =>
-            {
-                var id = (string)dr["SizeID"];
-                var name = (string)dr["Name"];
 
-                _Sizes.Add(id, new X4Size(id, name));
-            });
+            const string sql = "SELECT SizeID, Name FROM Size";
+            foreach (var size in X4Database.Instance.Query<X4Size>(sql))
+            {
+                _Sizes.Add(size.SizeID, size);
+            }
         }
 
 
@@ -80,6 +80,15 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <param name="sizeID">サイズID</param>
         /// <returns>サイズ</returns>
         public static X4Size Get(string sizeID) => _Sizes[sizeID];
+
+
+        /// <summary>
+        /// サイズIDに対応するサイズの取得を試みる
+        /// </summary>
+        /// <param name="sizeID">サイズID</param>
+        /// <returns>サイズIDに対応するサイズ</returns>
+        public static X4Size? TryGet(string sizeID) => _Sizes.TryGetValue(sizeID, out var ret) ? ret : null;
+
 
 
         /// <summary>

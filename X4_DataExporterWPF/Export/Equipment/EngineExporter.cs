@@ -52,9 +52,9 @@ namespace X4_DataExporterWPF.Export
 CREATE TABLE IF NOT EXISTS Engine
 (
     EquipmentID         TEXT    NOT NULL PRIMARY KEY,
-    ForwardThrust       INTEGER NOT NULL,
-    ReverseThrust       INTEGER NOT NULL,
-    BoostThrust         INTEGER NOT NULL,
+    ForwardThrust       REAL    NOT NULL,
+    ReverseThrust       REAL    NOT NULL,
+    BoostThrust         REAL    NOT NULL,
     BoostDuration       REAL    NOT NULL,
     BoostReleaseTime    REAL    NOT NULL,
     TravelThrust        INTEGER NOT NULL,
@@ -100,7 +100,7 @@ INSERT INTO Engine ( EquipmentID,  ForwardThrust,  ReverseThrust,  BoostThrust, 
                 var travel = macroXml.Root.XPathSelectElement("macro/properties/travel");
                 if (thrust is null || boost is null || travel is null) continue;
 
-                var forwardThrust = thrust.Attribute("forward")?.GetInt() ?? 0;
+                var forwardThrust = thrust.Attribute("forward")?.GetDouble() ?? 0;
 
                 yield return new Engine(
                     equipmentID,

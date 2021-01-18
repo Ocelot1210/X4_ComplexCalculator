@@ -234,20 +234,10 @@ namespace X4_ComplexCalculator.DB
             Race.Init();
             Faction.Init();
             EquipmentType.Init();
-            Equipment.Init();
             TransportType.Init();
             WareGroup.Init();
-            WareEffect.Init();
             Ware.Init();
-            WareProduction.Init();
-            ModuleType.Init();
-            ModuleProduction.Init();
-            ModuleProduct.Init();
-            Module.Init();
-            ShipHanger.Init();
-            ShipType.Init();
-            Ship.Init();
-            ShipEquipment.Init();
+            ShipLoadout.Init();
         }
     }
 }

@@ -176,7 +176,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
 
             foreach (var (module, idx) in Modules.Select((x, idx) => (x, idx)))
             {
-                var hash = HashCode.Combine(module.Module, module.ModuleEquipment, module.SelectedMethod);
+                var hash = HashCode.Combine(module.Module, module.Equipments, module.SelectedMethod);
                 if (dict.ContainsKey(hash))
                 {
                     var tmp = dict[hash];

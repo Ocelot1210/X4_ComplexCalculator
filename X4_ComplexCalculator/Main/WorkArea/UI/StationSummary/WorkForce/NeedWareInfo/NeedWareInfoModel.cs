@@ -43,7 +43,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
         /// 
         /// イベントの発火順番が前後する事を考慮したいため、集計対象のウェアの情報をここに格納しておく
         /// </remarks>
-        private readonly Dictionary<string, long> AggregateTargetProducts = new();
+        private readonly Dictionary<string, long> AggregateTargetProducts;
 
 
         /// <summary>
@@ -78,19 +78,17 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
 
             var query = @"
 SELECT
-	DISTINCT WareID
+	DISTINCT NeedWareID
 	
 FROM
-	WorkUnitResource
+	WareResource
 	
 WHERE
-	WorkUnitID = 'workunit_busy'";
+	WareID = 'workunit_busy'";
 
             // 集計対象ウェアを取得
-            X4Database.Instance.ExecQuery(query, (dr, _) =>
-            {
-                AggregateTargetProducts.Add((string)dr["WareID"], 0);
-            });
+            AggregateTargetProducts = X4Database.Instance.Query<string>(query)
+                .ToDictionary(x => x, x => 0L);
         }
 
 
@@ -329,7 +327,7 @@ WHERE
 
             // 同じウェアの数量更新
             var keys = AggregateTargetProducts.Keys.ToArray();
-            foreach (var wareID in keys.Where(x => x == product.Ware.WareID))
+            foreach (var wareID in keys.Where(x => x == product.Ware.ID))
             {
                 var amount = product.Details.Where(x => 0 < x.Amount).Sum(x => x.Amount);
                 AggregateTargetProducts[wareID] = amount;
@@ -360,12 +358,12 @@ WHERE
                 }
 
 
-                foreach (var prod in item.Cast<ProductsGridItem>().Where(x => AggregateTargetProducts.ContainsKey(x.Ware.WareID)))
+                foreach (var prod in item.Cast<ProductsGridItem>().Where(x => AggregateTargetProducts.ContainsKey(x.Ware.ID)))
                 {
                     var amount = prod.Details.Where(x => 0 < x.Amount).Sum(x => x.Amount);
-                    AggregateTargetProducts[prod.Ware.WareID] = amount;
+                    AggregateTargetProducts[prod.Ware.ID] = amount;
 
-                    var ware = NeedWareInfoDetails.FirstOrDefault(x => x.WareID == prod.Ware.WareID);
+                    var ware = NeedWareInfoDetails.FirstOrDefault(x => x.WareID == prod.Ware.ID);
                     if (ware is not null)
                     {
                         ware.ProductionAmount = amount;

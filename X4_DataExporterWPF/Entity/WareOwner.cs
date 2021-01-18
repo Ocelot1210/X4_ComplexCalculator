@@ -4,15 +4,15 @@ using System.Collections.Generic;
 namespace X4_DataExporterWPF.Entity
 {
     /// <summary>
-    /// 装備保有派閥
+    /// ウェア所有派閥
     /// </summary>
-    public class EquipmentOwner : IEquatable<EquipmentOwner>, IEqualityComparer<EquipmentOwner>
+    public class WareOwner : IEquatable<WareOwner>, IEqualityComparer<WareOwner>
     {
         #region プロパティ
         /// <summary>
-        /// 装備ID
+        /// ウェアID
         /// </summary>
-        public string EquipmentID { get; }
+        public string WareID { get; }
 
 
         /// <summary>
@@ -25,12 +25,12 @@ namespace X4_DataExporterWPF.Entity
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="equipmentID">装備ID</param>
+        /// <param name="wareID">ウェアID</param>
         /// <param name="factionID">派閥ID</param>
-        public EquipmentOwner(string equipmentID, string factionID)
+        public WareOwner(string wareID, string factionID)
         {
-            this.EquipmentID = equipmentID;
-            this.FactionID = factionID;
+            WareID = wareID;
+            FactionID = factionID;
         }
 
 
@@ -39,8 +39,8 @@ namespace X4_DataExporterWPF.Entity
         /// </summary>
         /// <param name="owner">比較対象のオブジェクト</param>
         /// <returns>等価である場合は true、それ以外の場合は false</returns>
-        public bool Equals(EquipmentOwner? owner)
-            => this.EquipmentID == owner?.EquipmentID && this.FactionID == owner.FactionID;
+        public bool Equals(WareOwner? owner)
+            => this.WareID == owner?.WareID && this.FactionID == owner.FactionID;
 
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace X4_DataExporterWPF.Entity
         /// <param name="x">比較対象のオブジェクト</param>
         /// <param name="y">比較対象のオブジェクト</param>
         /// <returns>等価である場合は true、それ以外の場合は false</returns>
-        public bool Equals(EquipmentOwner? x, EquipmentOwner? y) => x?.Equals(y) ?? false;
+        public bool Equals(WareOwner? x, WareOwner? y) => x?.Equals(y) ?? false;
 
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace X4_DataExporterWPF.Entity
         /// </summary>
         /// <param name="obj">算出対象のオブジェクト</param>
         /// <returns>指定したオブジェクトのハッシュコード</returns>
-        public int GetHashCode(EquipmentOwner obj) => obj.GetHashCode();
+        public int GetHashCode(WareOwner obj) => obj.GetHashCode();
 
 
         /// <summary>
@@ -65,13 +65,13 @@ namespace X4_DataExporterWPF.Entity
         /// </summary>
         /// <param name="obj">比較対象のオブジェクト</param>
         /// <returns>等価である場合は true、それ以外の場合は false</returns>
-        public override bool Equals(object? obj) => obj is EquipmentOwner owner && Equals(owner);
+        public override bool Equals(object? obj) => obj is WareOwner owner && Equals(owner);
 
 
         /// <summary>
         /// 指定したオブジェクトのハッシュコードを算出する
         /// </summary>
         /// <returns>指定したオブジェクトのハッシュコード</returns>
-        public override int GetHashCode() => HashCode.Combine(this.EquipmentID, this.FactionID);
+        public override int GetHashCode() => HashCode.Combine(this.WareID, this.FactionID);
     }
 }

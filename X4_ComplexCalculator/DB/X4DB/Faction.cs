@@ -50,23 +50,33 @@ namespace X4_ComplexCalculator.DB.X4DB
 
 
         /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="factionID">派閥ID</param>
+        /// <param name="name">派閥名</param>
+        /// <param name="race">種族ID</param>
+        private Faction(string factionID, string name, string raceID)
+        {
+            FactionID = factionID;
+            Name = name;
+            Race = Race.Get(raceID) ?? throw new ArgumentException();
+        }
+
+
+        /// <summary>
         /// 初期化
         /// </summary>
         public static void Init()
         {
             _Factions.Clear();
-            X4Database.Instance.ExecQuery("SELECT FactionID, Name, RaceID FROM Faction", (dr, args) =>
+
+            const string sql = "SELECT FactionID, Name, RaceID FROM Faction";
+            foreach (var item in X4Database.Instance.Query<Faction>(sql))
             {
-                var id = (string)dr["FactionID"];
-                var name = (string)dr["Name"];
-                var raceID = (string)dr["RaceID"];
-
-                var race = Race.Get(raceID);
-                if (race is null) return;
-
-                _Factions.Add(id, new Faction(id, name, race));
-            });
+                _Factions.Add(item.FactionID, item);
+            }
         }
+
 
         /// <summary>
         /// 派閥IDに対応する派閥を取得

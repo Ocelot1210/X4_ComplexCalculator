@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS Effect
         {
             // TODO: 可能ならファイルから抽出する
             yield return new Effect("work", "work");
+            yield return new Effect("sunlight", "sunlight");
         }
     }
 }

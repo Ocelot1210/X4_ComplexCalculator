@@ -27,12 +27,6 @@ namespace X4_DataExporterWPF.Export
 
 
         /// <summary>
-        /// 言語解決用オブジェクト
-        /// </summary>
-        private readonly ILanguageResolver _Resolver;
-
-
-        /// <summary>
         /// サムネが見つからなかった場合のサムネ
         /// </summary>
         private byte[]? _NotFoundThumb;
@@ -43,12 +37,10 @@ namespace X4_DataExporterWPF.Export
         /// </summary>
         /// <param name="catFile">catファイルオブジェクト</param>
         /// <param name="waresXml">ウェア情報xml</param>
-        /// <param name="resolver">言語解決用オブジェクト</param>
-        public ModuleExporter(ICatFile catFile, XDocument waresXml, ILanguageResolver resolver)
+        public ModuleExporter(ICatFile catFile, XDocument waresXml)
         {
             _CatFile = catFile;
             _WaresXml = waresXml;
-            _Resolver = resolver;
         }
 
 
@@ -67,7 +59,6 @@ CREATE TABLE IF NOT EXISTS Module
 (
     ModuleID        TEXT    NOT NULL PRIMARY KEY,
     ModuleTypeID    TEXT    NOT NULL,
-    Name            TEXT    NOT NULL,
     Macro           TEXT    NOT NULL,
     MaxWorkers      INTEGER NOT NULL,
     WorkersCapacity INTEGER NOT NULL,
@@ -84,7 +75,7 @@ CREATE TABLE IF NOT EXISTS Module
             {
                 var items = GetRecords();
 
-                connection.Execute("INSERT INTO Module (ModuleID, ModuleTypeID, Name, Macro, MaxWorkers, WorkersCapacity, NoBlueprint, Thumbnail) VALUES (@ModuleID, @ModuleTypeID, @Name, @Macro, @MaxWorkers, @WorkersCapacity, @NoBlueprint, @Thumbnail)", items);
+                connection.Execute("INSERT INTO Module (ModuleID, ModuleTypeID, Macro, MaxWorkers, WorkersCapacity, NoBlueprint, Thumbnail) VALUES (@ModuleID, @ModuleTypeID, @Macro, @MaxWorkers, @WorkersCapacity, @NoBlueprint, @Thumbnail)", items);
             }
         }
 
@@ -112,12 +103,9 @@ CREATE TABLE IF NOT EXISTS Module
                 var maxWorkers = workForce?.Attribute("max")?.GetInt() ?? 0;
                 var capacity = workForce?.Attribute("capacity")?.GetInt() ?? 0;
 
-                var name = _Resolver.Resolve(module.Attribute("name")?.Value ?? "");
-                name = string.IsNullOrEmpty(name) ? macroName : name;
-
                 var noBluePrint = module.Attribute("tags").Value.Contains("noblueprint");
 
-                yield return new Module(moduleID, moduleTypeID, name, macroName, maxWorkers, capacity, noBluePrint, GetThumbnail(macroName));
+                yield return new Module(moduleID, moduleTypeID, macroName, maxWorkers, capacity, noBluePrint, GetThumbnail(macroName));
             }
         }
 

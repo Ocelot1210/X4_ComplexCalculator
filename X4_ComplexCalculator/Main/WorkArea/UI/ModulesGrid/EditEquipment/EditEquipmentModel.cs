@@ -18,9 +18,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
     {
         #region メンバ
         /// <summary>
-        /// 編集対象モジュール
+        /// 編集対象のウェア
         /// </summary>
-        private readonly Module _Module;
+        private readonly Ware _Ware;
 
 
         /// <summary>
@@ -71,13 +71,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// コンストラクタ
         /// </summary>
         /// <param name="module">編集対象モジュール</param>
-        public EditEquipmentModel(Module module)
+        public EditEquipmentModel(Ware module)
         {
             // 初期化
-            _Module = module;
-            InitEquipmentSizes(module.ModuleID);
+            _Ware = module;
+            InitEquipmentSizes(module.ID);
             UpdateFactions();
-            InitPreset(module.ModuleID);
+            InitPreset(module.ID);
         }
 
 
@@ -169,7 +169,7 @@ WHERE
 
                 var param = new SQLiteCommandParameters(3);
                 param.Add("presetName", System.Data.DbType.String, newPresetName);
-                param.Add("moduleID", System.Data.DbType.String, _Module.ModuleID);
+                param.Add("moduleID", System.Data.DbType.String, _Ware.ID);
                 param.Add("presetID", System.Data.DbType.Int64, SelectedPreset.ID);
                 SettingDatabase.Instance.ExecQuery($"UPDATE ModulePresets Set PresetName = :presetName WHERE ModuleID = :moduleID AND presetID = :presetID", param);
 
@@ -196,8 +196,8 @@ SELECT
 FROM
     ModulePresets
 WHERE
-	ModuleID = '{_Module.ModuleID}' AND
-    ( PresetID + 1 ) NOT IN ( SELECT PresetID FROM ModulePresets WHERE ModuleID = '{_Module.ModuleID}')";
+	ModuleID = '{_Ware.ID}' AND
+    ( PresetID + 1 ) NOT IN ( SELECT PresetID FROM ModulePresets WHERE ModuleID = '{_Ware.ID}')";
 
                 SettingDatabase.Instance.ExecQuery(query, (dr, _) =>
                 {
@@ -207,7 +207,7 @@ WHERE
                 var item = new PresetComboboxItem(id, presetName);
 
                 SettingDatabase.Instance.BeginTransaction();
-                SettingDatabase.Instance.ExecQuery($"INSERT INTO ModulePresets(ModuleID, PresetID, PresetName) VALUES('{_Module.ModuleID}', {item.ID}, '{item.Name}')");
+                SettingDatabase.Instance.ExecQuery($"INSERT INTO ModulePresets(ModuleID, PresetID, PresetName) VALUES('{_Ware.ID}', {item.ID}, '{item.Name}')");
                 Presets.Add(item);
                 SettingDatabase.Instance.Commit();
 
@@ -229,7 +229,7 @@ WHERE
             if (result == MessageBoxResult.Yes)
             {
                 SettingDatabase.Instance.BeginTransaction();
-                SettingDatabase.Instance.ExecQuery($"DELETE FROM ModulePresets WHERE ModuleID = '{_Module.ModuleID}' AND PresetID = {SelectedPreset.ID}");
+                SettingDatabase.Instance.ExecQuery($"DELETE FROM ModulePresets WHERE ModuleID = '{_Ware.ID}' AND PresetID = {SelectedPreset.ID}");
                 Presets.Remove(SelectedPreset);
                 SettingDatabase.Instance.Commit();
 

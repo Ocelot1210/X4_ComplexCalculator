@@ -72,16 +72,16 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
 
             var query = $@"
 SELECT
-	Module.Name,
+	Ware.Name,
 	ModuleStorage.Amount
 	
 FROM
-	Module,
+	Ware,
 	ModuleStorage
 	
 WHERE
-	Module.ModuleID = ModuleStorage.ModuleID AND
-	Module.ModuleID = '{moduleID}'";
+	Ware.WareID = ModuleStorage.ModuleID AND
+	Ware.WareID = '{moduleID}'";
 
             string? moduleName = null;
             long capacity = 0;

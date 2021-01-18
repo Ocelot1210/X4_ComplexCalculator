@@ -8,6 +8,7 @@ using Prism.Mvvm;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Entity;
+using Dapper;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
 {
@@ -45,7 +46,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// <summary>
         /// 装備
         /// </summary>
-        public ModuleEquipment Equipment { get; }
+        public WareEquipmentManager Equipment { get; }
 
 
         /// <summary>
@@ -83,25 +84,25 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// <summary>
         /// 装備中のタレットの個数
         /// </summary>
-        public int TurretsCount => Equipment.Turret.AllEquipmentsCount;
+        public int TurretsCount { get; }
 
 
         /// <summary>
         /// タレットのツールチップ文字列
         /// </summary>
-        public string TurretsToolTip => MakeEquipmentToolTipString(Equipment.Turret);
+        public string TurretsToolTip { get; }
 
 
         /// <summary>
         /// 装備中のシールドの個数
         /// </summary>
-        public int ShieldsCount => Equipment.Shield.AllEquipmentsCount;
+        public int ShieldsCount { get; }
 
 
         /// <summary>
         /// シールドのツールチップ文字列
         /// </summary>
-        public string ShieldsToolTip => MakeEquipmentToolTipString(Equipment.Shield);
+        public string ShieldsToolTip { get; }
         #endregion
 
 
@@ -130,7 +131,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
                 moduleID = (string)dr["ModuleID"];
             });
 
-            var module = Module.Get(moduleID);
+            var module = Ware.TryGet<Module>(moduleID);
             if (module is null)
             {
                 return null;
@@ -152,32 +153,40 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
             Name = elm.Attribute("name").Value;
 
             Module = module;
-            Equipment = new ModuleEquipment(module);
+            Equipment = new WareEquipmentManager(module);
 
-            AddEquipment(elm.XPathSelectElements("groups/shields"), Equipment.Shield);
-            AddEquipment(elm.XPathSelectElements("groups/turrets"), Equipment.Turret);
+            AddEquipment(elm.XPathSelectElements("groups/shields"));
+            AddEquipment(elm.XPathSelectElements("groups/turrets"));
 
 
             // 同一の内容がプリセット一覧に無ければインポート可能にする
             {
-                var currentEquipmentIds = Equipment.AllEquipments.Select(x => x.EquipmentID).OrderBy(x => x).ToArray();
+                var currentEquipmentIds = Equipment.AllEquipments.Select(x => x.ID).OrderBy(x => x).ToArray();
 
-                SettingDatabase.Instance.ExecQuery($"SELECT * FROM ModulePresets WHERE ModuleID = '{module.ModuleID}' AND PresetName = '{Name}'", (dr1, _) =>
+                SettingDatabase.Instance.ExecQuery($"SELECT * FROM ModulePresets WHERE ModuleID = '{module.ID}' AND PresetName = '{Name}'", (dr1, _) =>
                 {
                     var eq = new List<Equipment>();
 
-                    SettingDatabase.Instance.ExecQuery($"SELECT EquipmentID FROM ModulePresetsEquipment WHERE ModuleID = '{module.ModuleID}' AND PresetID = {(long)dr1["PresetID"]}", (dr2, _) =>
+                    SettingDatabase.Instance.ExecQuery($"SELECT EquipmentID FROM ModulePresetsEquipment WHERE ModuleID = '{module.ID}' AND PresetID = {(long)dr1["PresetID"]}", (dr2, _) =>
                     {
-                        var eqp = DB.X4DB.Equipment.Get((string)dr2["EquipmentID"]);
+                        var eqp = Ware.Get<Equipment>((string)dr2["EquipmentID"]);
                         if (eqp is not null)
                         {
                             eq.Add(eqp);
                         }
                     });
 
-                    Imported |= currentEquipmentIds.SequenceEqual(eq.Select(x => x.EquipmentID).OrderBy(x => x));
+                    Imported |= currentEquipmentIds.SequenceEqual(eq.Select(x => x.ID).OrderBy(x => x));
                 });
             }
+
+            var turrets     = Equipment.AllEquipments.Where(x => x.EquipmentType.EquipmentTypeID == "turrets").ToArray();
+            TurretsCount    = turrets.Length;
+            TurretsToolTip  = MakeEquipmentToolTipString(turrets);
+
+            var shields     = Equipment.AllEquipments.Where(x => x.EquipmentType.EquipmentTypeID == "shields").ToArray();
+            ShieldsCount    = Equipment.AllEquipments.Count(x => x.EquipmentType.EquipmentTypeID == "shields");
+            ShieldsToolTip  = MakeEquipmentToolTipString(shields);
         }
 
 
@@ -186,25 +195,19 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// </summary>
         /// <param name="elements"></param>
         /// <param name="manager"></param>
-        private void AddEquipment(IEnumerable<XElement> elements, ModuleEquipmentCollection manager)
+        private void AddEquipment(IEnumerable<XElement> elements)
         {
             foreach (var elm in elements)
             {
-                var id = "";
+                const string sql = "SELECT EquipmentID FROM Equipment WHERE MacroName = :MacroName'";
 
-                X4Database.Instance.ExecQuery($"SELECT EquipmentID FROM Equipment WHERE MacroName = '{elm.Attribute("macro").Value}'", (dr, _) =>
-                {
-                    id = (string)dr["EquipmentID"];
-                });
+                var equipmentID = X4Database.Instance.QuerySingle<string>(sql, new { MacroName = elm.Attribute("macro")?.Value ?? "" });
 
                 var max = int.Parse(elm.Attribute("exact")?.Value ?? "1");
-                for (var cnt = 0; cnt < max; cnt++)
+                var eqp = Ware.Get<Equipment>(equipmentID);
+                if (eqp is not null)
                 {
-                    var eqp = DB.X4DB.Equipment.Get(id);
-                    if (eqp is not null)
-                    {
-                        manager.AddEquipment(eqp);
-                    }
+                    Equipment.AddEquipment(eqp, max);
                 }
             }
         }
@@ -215,34 +218,30 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// </summary>
         public bool Import()
         {
-            var id = 0L;
             bool ret = true;
-
-            var query = @$"
-SELECT
-    ifnull(MIN( PresetID + 1 ), 0) AS PresetID
-FROM
-    ModulePresets
-WHERE
-	ModuleID = '{Module.ModuleID}' AND
-    ( PresetID + 1 ) NOT IN ( SELECT PresetID FROM ModulePresets WHERE ModuleID = '{Module.ModuleID}')";
-
-            SettingDatabase.Instance.ExecQuery(query, (dr, _) =>
-            {
-                id = (long)dr["PresetID"];
-            });
+            var id = SettingDatabase.Instance.GetLastModulePresetsID(Module.ID);
 
             try
             {
                 SettingDatabase.Instance.BeginTransaction();
-                SettingDatabase.Instance.ExecQuery($"INSERT INTO ModulePresets(ModuleID, PresetID, PresetName) VALUES('{Module.ModuleID}', {id}, '{Name}')");
+
+                {
+                    const string sql1 = "INSERT INTO ModulePresets(ModuleID, PresetID, PresetName) VALUES(@ModuleID, @PresetID, @PresetName)";
+                    var param1 = new SQLiteCommandParameters(3);
+                    param1.Add("ModuleID", DbType.String, Module.ID);
+                    param1.Add("PresetID", DbType.Int64, id);
+                    param1.Add("PresetName", DbType.String, Name);
+
+                    SettingDatabase.Instance.ExecQuery(sql1, param1);
+                }
+
 
                 var param = new SQLiteCommandParameters(4);
                 foreach (var eqp in Equipment.AllEquipments)
                 {
-                    param.Add("moduleID", DbType.String, Module.ModuleID);
+                    param.Add("moduleID", DbType.String, Module.ID);
                     param.Add("presetID", DbType.Int32, id);
-                    param.Add("equipmentID", DbType.String, eqp.EquipmentID);
+                    param.Add("equipmentID", DbType.String, eqp.ID);
                     param.Add("equipmentType", DbType.String, eqp.EquipmentType.EquipmentTypeID);
                 }
                 SettingDatabase.Instance.ExecQuery($"INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES(:moduleID, :presetID, :equipmentID, :equipmentType)", param);
@@ -264,26 +263,14 @@ WHERE
         /// 装備のツールチップ文字列を作成
         /// </summary>
         /// <returns></returns>
-        private string MakeEquipmentToolTipString(ModuleEquipmentCollection equipmentManager)
+        private string MakeEquipmentToolTipString(IEnumerable<Ware> wares)
         {
             var sb = new StringBuilder();
 
-            foreach (var size in equipmentManager.Sizes)
+            var cnt = 1;
+            foreach (var ware in wares.OrderBy(x => x.Name))
             {
-                var cnt = 1;
-
-                foreach (var eq in equipmentManager.GetEquipment(size))
-                {
-                    if (cnt == 1)
-                    {
-                        if (sb.Length != 0)
-                        {
-                            sb.AppendLine();
-                        }
-                        sb.AppendLine($"【{size.Name}】");
-                    }
-                    sb.AppendLine($"{cnt++:D2} ： {eq.Name}");
-                }
+                sb.AppendLine($"{cnt++:D2} ： {ware.Name}");
             }
 
             if (sb.Length == 0)

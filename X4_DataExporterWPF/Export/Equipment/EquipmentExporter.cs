@@ -1,13 +1,13 @@
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Xml.Linq;
-using System.Xml.XPath;
 using Dapper;
 using LibX4.FileSystem;
 using LibX4.Lang;
 using LibX4.Xml;
+using System.Collections.Generic;
+using System.Data;
+using System.Xml.Linq;
+using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
+using System.Linq;
 
 namespace X4_DataExporterWPF.Export
 {
@@ -29,15 +29,15 @@ namespace X4_DataExporterWPF.Export
 
 
         /// <summary>
-        /// 言語解決用オブジェクト
-        /// </summary>
-        private readonly ILanguageResolver _Resolver;
-
-
-        /// <summary>
         /// サムネが見つからない場合のサムネ
         /// </summary>
         private byte[]? _NotFoundThumb;
+
+
+        /// <summary>
+        /// 装備のタグ一覧
+        /// </summary>
+        private readonly LinkedList<IReadOnlyList<EquipmentTag>> _EquipmentTags = new();
 
 
         /// <summary>
@@ -45,12 +45,10 @@ namespace X4_DataExporterWPF.Export
         /// </summary>
         /// <param name="catFile">catファイルオブジェクト</param>
         /// <param name="waresXml">ウェア情報xml</param>
-        /// <param name="resolver">言語解決用オブジェクト</param>
-        public EquipmentExporter(ICatFile catFile, XDocument waresXml, ILanguageResolver resolver)
+        public EquipmentExporter(ICatFile catFile, XDocument waresXml)
         {
             _CatFile = catFile;
             _WaresXml = waresXml;
-            _Resolver = resolver;
         }
 
 
@@ -70,18 +68,23 @@ CREATE TABLE IF NOT EXISTS Equipment
     EquipmentID     TEXT    NOT NULL PRIMARY KEY,
     MacroName       TEXT    NOT NULL,
     EquipmentTypeID TEXT    NOT NULL,
-    SizeID          TEXT    NOT NULL,
-    Name            TEXT    NOT NULL,
     Hull            INTEGER NOT NULL,
     HullIntegrated  BOOLEAN NOT NULL,
     Mk              INTEGER NOT NULL,
     MakerRace       TEXT,
-    Description     TEXT    NOT NULL,
     Thumbnail       BLOB,
+    FOREIGN KEY (EquipmentID)       REFERENCES Ware(WareID),
     FOREIGN KEY (EquipmentTypeID)   REFERENCES EquipmentType(EquipmentTypeID),
-    FOREIGN KEY (SizeID)            REFERENCES Size(SizeID),
     FOREIGN KEY (MakerRace)         REFERENCES Race(RaceID)
 ) WITHOUT ROWID");
+
+                connection.Execute(@"
+CREATE TABLE IF NOT EXISTS EquipmentTag
+(
+    EquipmentID     TEXT    NOT NULL,
+    Tag             TEXT    NOT NULL,
+    FOREIGN KEY (EquipmentID)       REFERENCES Equipment(EquipmentID)
+)");
             }
 
 
@@ -92,8 +95,10 @@ CREATE TABLE IF NOT EXISTS Equipment
                 var items = GetRecords();
 
                 connection.Execute(@"
-INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  SizeID,  Name,  Hull,  HullIntegrated,  Mk,  MakerRace,  Description,  Thumbnail)
-            VALUES    (@EquipmentID, @MacroName, @EquipmentTypeID, @SizeID, @Name, @Hull, @HullIntegrated, @Mk, @MakerRace, @Description, @Thumbnail)", items);
+INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  Hull,  HullIntegrated,  Mk,  MakerRace,  Thumbnail)
+            VALUES    (@EquipmentID, @MacroName, @EquipmentTypeID, @Hull, @HullIntegrated, @Mk, @MakerRace, @Thumbnail)", items);
+
+                connection.Execute("INSERT INTO EquipmentTag (EquipmentID, Tag) VALUES (@EquipmentID, @Tag)", _EquipmentTags.SelectMany(x => x));
             }
         }
 
@@ -130,12 +135,12 @@ INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  SizeID,  Nam
                 // 装備が記載されているタグを取得する
                 var component = componentXml.Root.XPathSelectElement("component/connections/connection[contains(@tags, 'component')]");
 
-                // サイズIDを取得
-                var sizeID = Util.GetSizeIDFromTags(component?.Attribute("tags")?.Value);
-                if (string.IsNullOrEmpty(sizeID)) continue;
-
-                var name = _Resolver.Resolve(equipment.Attribute("name").Value);
-                name = string.IsNullOrEmpty(name) ? macroName : name;
+                // タグがあれば格納する
+                var tags = Util.SplitTags(component?.Attribute("tags")?.Value).Distinct();
+                if (tags.Any())
+                {
+                    _EquipmentTags.AddLast(tags.Select(x => new EquipmentTag(equipmentID, x)).ToArray());
+                }
 
                 var idElm = macroXml.Root.XPathSelectElement("macro/properties/identification");
                 if (idElm is null) continue;
@@ -144,13 +149,10 @@ INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  SizeID,  Nam
                     equipmentID,
                     macroName,
                     equipmentTypeID,
-                    sizeID,
-                    name,
                     macroXml.Root.XPathSelectElement("macro/properties/hull")?.Attribute("max")?.GetInt() ?? 0,
                     (macroXml.Root.XPathSelectElement("macro/properties/hull")?.Attribute("integrated")?.GetInt() ?? 0) == 1,
                     idElm.Attribute("mk")?.GetInt() ?? 0,
                     idElm.Attribute("makerrace")?.Value,
-                    _Resolver.Resolve(idElm.Attribute("description")?.Value ?? ""),
                     GetThumbnail(macroName)
                 );
             }

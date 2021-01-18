@@ -32,7 +32,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// key = WareID
         /// Tuple&lt;string Method, string NeedWareID, long Amount&gt;
         /// </summary>
-        private readonly IReadOnlyDictionary<string, Tuple<string, string, long>[]> _WareResource;
+        private readonly IReadOnlyDictionary<string, IReadOnlyList<(string, string, long)>> _WareResource;
 
 
         /// <summary>
@@ -57,14 +57,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         {
             // モジュールが生産するウェア一覧作成を作成
             {
-                var dict = new Dictionary<string, (string, string)>();
-
-                X4Database.Instance.ExecQuery("SELECT * FROM ModuleProduct", (dr, _) =>
-                {
-                    dict.Add((string)dr["ModuleID"], ((string)dr["WareID"], (string)dr["Method"]));
-                });
-
-                _ModuleProduct = dict;
+                const string query = "SELECT ModuleID, WareID, Method FROM ModuleProduct";
+                _ModuleProduct = X4Database.Instance.Query<(string ModuleID, string WareID, string Method)>(query)
+                    .ToDictionary(x => x.ModuleID, x => (x.WareID, x.Method));
             }
 
 
@@ -72,18 +67,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             {
                 var dict = new Dictionary<string, List<Tuple<string, string, long>>>();
 
-                X4Database.Instance.ExecQuery("SELECT * FROM WareResource", (dr, _) =>
-                {
-                    var wareID = (string)dr["WareID"];
-                    if (!dict.ContainsKey(wareID))
-                    {
-                        dict.Add(wareID, new List<Tuple<string, string, long>>());
-                    }
-
-                    dict[wareID].Add(new Tuple<string, string, long>((string)dr["Method"], (string)dr["NeedWareID"], (long)dr["Amount"]));
-                });
-
-                _WareResource = dict.ToDictionary(x => x.Key, x => x.Value.ToArray());
+                const string query = "SELECT WareID, Method, NeedWareID, Amount FROM WareResource";
+                _WareResource = X4Database.Instance.Query<(string WareID, string Method, string NeedWareID, long Amount)>(query)
+                    .GroupBy(x => x.WareID)
+                    .ToDictionary(x => x.Key, x => x.Select(y => (y.Method, y.NeedWareID, y.Amount)).ToArray() as IReadOnlyList<(string, string, long)>);
             }
 
             // 従業員が必要とするウェア一覧を作成
@@ -92,29 +79,22 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
                 var query = @"
 SELECT
-	WorkUnitProduction.Method,
-	WorkUnitResource.WareID,
-	CAST(WorkUnitResource.Amount AS REAL) / WorkUnitProduction.Amount AS Amount
+	WareResource.Method,
+	WareResource.WareID,
+	(CAST(WareResource.Amount AS REAL) / WareProduction.Amount) / (WareProduction.Time / 3600.0) AS Amount
+	
 FROM
-	WorkUnitProduction,
-	WorkUnitResource
+	WareProduction,
+	WareResource
+	
 WHERE
-	WorkUnitProduction.WorkUnitID = WorkUnitResource.WorkUnitID AND
-	WorkUnitProduction.WorkUnitID = 'workunit_busy' AND
-	WorkUnitProduction.Method = WorkUnitResource.Method";
+	WareResource.WareID = 'workunit_busy' AND
+	WareResource.WareID = WareProduction.WareID AND
+	WareResource.Method = WareProduction.Method";
 
-                X4Database.Instance.ExecQuery(query, (dr, _) =>
-                {
-                    var method = (string)dr["Method"];
-                    if (!dict.ContainsKey(method))
-                    {
-                        dict.Add(method, new List<(string, double)>());
-                    }
-
-                    dict[method].Add(((string)dr["WareID"], (double)dr["Amount"]));
-                });
-
-                _WorkUnitWares = dict.ToDictionary(x => x.Key, x => x.Value.ToArray());
+                _WorkUnitWares = X4Database.Instance.Query<(string Method, string WareID, double Amount)>(query)
+                    .GroupBy(x => x.Method)
+                    .ToDictionary(x => x.Key, x => x.Select(y => (y.WareID, y.Amount)).ToArray());
             }
 
             // 居住モジュールの所有種族一覧を作成
@@ -126,24 +106,19 @@ SELECT
 	Race.RaceID
 	
 FROM
-	ModuleOwner,
+	WareOwner,
 	Faction,
 	Race,
 	Module
 	
 WHERE
-	Module.ModuleID = ModuleOwner.ModuleID AND
-	ModuleOwner.FactionID = Faction.FactionID AND
-	Faction.RaceID = Race.RaceID AND
+	Module.ModuleID     = WareOwner.WareID AND
+	WareOwner.FactionID = Faction.FactionID AND
+	Faction.RaceID      = Race.RaceID AND
 	Module.ModuleTypeID = 'habitation'";
 
-                var dict = new Dictionary<string, (string, long)>();
-                X4Database.Instance.ExecQuery(query, (dr, _) =>
-                {
-                    dict.Add((string)dr["ModuleID"], ((string)dr["RaceID"], (long)dr["WorkersCapacity"]));
-                });
-
-                _HabitationModuleOwners = dict;
+                _HabitationModuleOwners = X4Database.Instance.Query<(string ModuleID, long WorkersCapacity, string RaceID)>(query)
+                    .ToDictionary(x => x.ModuleID, x => (x.RaceID, x.WorkersCapacity));
             }
         }
 
@@ -174,7 +149,7 @@ WHERE
         public IEnumerable<(string WareID, long Amount, IReadOnlyDictionary<string, WareEffect>? Efficiency)> CalcProduction(string moduleID)
         {
             // モジュールの生産品を取得
-            var product = Module.Get(moduleID)?.ModuleProduct ?? throw new ArgumentException();
+            var product = Ware.TryGet<Module>(moduleID)?.ModuleProduct ?? throw new ArgumentException();
             
             // ウェア生産情報を取得
             var wareProduction = WareProduction.Get(product.WareID, product.Method) ?? throw new ArgumentException();
@@ -188,10 +163,10 @@ WHERE
 
 
             // ウェア生産に必要なウェア一覧(候補)
-            if (_WareResource.TryGetValue(product.WareID, out Tuple<string, string, long>[]? wareResourceArr))
+            if (_WareResource.TryGetValue(product.WareID, out var wareResourceArr))
             {
                 // ウェア生産に必要なウェア一覧
-                var wareResources = Enumerable.Empty<Tuple<string, string, long>>();
+                var wareResources = Enumerable.Empty<(string, string, long)>();
 
                 if (product.Method != "default")
                 {
@@ -251,19 +226,19 @@ WHERE
             foreach (var prod in products.Where(x => 0 < x.Ware.WareGroup.Tier).OrderBy(x => x.Ware.WareGroup.Tier))
             {
                 // 追加予定のモジュールも含めた製造ウェア数
-                var totalCount = prod.Count + addModuleProducts.FirstOrDefault(x => x.WareID == prod.Ware.WareID).Count;
+                var totalCount = prod.Count + addModuleProducts.FirstOrDefault(x => x.WareID == prod.Ware.ID).Count;
 
                 // 不足していない or 計算除外ウェアの場合、何もしない
-                if (0 <= totalCount || excludeWares.Contains(prod.Ware.WareID))
+                if (0 <= totalCount || excludeWares.Contains(prod.Ware.ID))
                 {
                     continue;
                 }
 
                 // 不足しているウェアを製造するモジュールを検索
-                var module = _ModuleProduct.FirstOrDefault(x => x.Value.WareID == prod.Ware.WareID && x.Value.Method == "default");
+                var module = _ModuleProduct.FirstOrDefault(x => x.Value.WareID == prod.Ware.ID && x.Value.Method == "default");
                 if (module.Key is null)
                 {
-                    module = _ModuleProduct.FirstOrDefault(x => x.Value.WareID == prod.Ware.WareID);
+                    module = _ModuleProduct.FirstOrDefault(x => x.Value.WareID == prod.Ware.ID);
                 }
 
                 // モジュールが製造するウェア数を計算
@@ -277,7 +252,7 @@ WHERE
                 // 生産数が0の場合、計算除外製品一覧に突っ込む
                 if (addAmount == 0)
                 {
-                    excludeWares.Add(prod.Ware.WareID);
+                    excludeWares.Add(prod.Ware.ID);
                     continue;
                 }
 

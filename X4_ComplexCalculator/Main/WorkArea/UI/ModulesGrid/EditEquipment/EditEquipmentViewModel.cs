@@ -10,6 +10,7 @@ using Prism.Commands;
 using Prism.Mvvm;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.Entity;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
@@ -182,20 +183,20 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="module">編集対象モジュール</param>
-        public EditEquipmentViewModel(ModulesGridItem module)
+        /// <param name="equipmentManager">編集対象の装備情報</param>
+        public EditEquipmentViewModel(WareEquipmentManager equipmentManager)
         {
-            ModuleName = module.Module.Name;
+            ModuleName = equipmentManager.Ware.Name;
 
             // Model類
-            Model = new EditEquipmentModel(module.Module);
+            Model = new EditEquipmentModel(equipmentManager.Ware);
             Model.PropertyChanged += Model_PropertyChanged;
 
             // サブViewModel類
-            TurretsViewModel = new EquipmentListViewModel(new TurretEquipmentListModel(module, Model.Factions));
+            TurretsViewModel = new EquipmentListViewModel(new EquipmentListModel(equipmentManager, "turrets", Model.Factions));
             Presets.CollectionChanged += TurretsViewModel.OnPresetsCollectionChanged;
 
-            ShieldsViewModel = new EquipmentListViewModel(new ShieldEquipmentListModel(module, Model.Factions));
+            ShieldsViewModel = new EquipmentListViewModel(new EquipmentListModel(equipmentManager, "shields", Model.Factions));
             Presets.CollectionChanged += ShieldsViewModel.OnPresetsCollectionChanged;
 
             // コマンド類

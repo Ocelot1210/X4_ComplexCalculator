@@ -78,7 +78,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
         /// <param name="moduleCount">モジュール数</param>
         public WorkForceModuleInfoDetailsItem(Module module, long moduleCount)
         {
-            ModuleID = module.ModuleID;
+            ModuleID = module.ID;
             ModuleName = module.Name;
             _ModuleCount = moduleCount;
             MaxWorkers = module.MaxWorkers;
@@ -96,7 +96,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
         public WorkForceModuleInfoDetailsItem(string moduleID, long moduleCount, long maxWorkers, long workersCapacity)
         {
             ModuleID = moduleID;
-            ModuleName = Module.Get(moduleID)?.Name ?? throw new ArgumentException($"Invalid module ID. ({moduleID})", nameof(moduleID));
+            ModuleName = Ware.TryGet<Module>(moduleID)?.Name ?? throw new ArgumentException($"Invalid module ID. ({moduleID})", nameof(moduleID));
             _ModuleCount = moduleCount;
             MaxWorkers = maxWorkers;
             WorkersCapacity = workersCapacity;

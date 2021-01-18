@@ -18,19 +18,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 装備一覧用Model
         /// </summary>
-        readonly EquipmentListModelBase _Model;
+        private readonly EquipmentListModel _Model;
 
 
         /// <summary>
         /// 装備検索文字列
         /// </summary>
         private string _SearchEquipmentName = "";
-
-
-        /// <summary>
-        /// 装備一覧表示用
-        /// </summary>
-        private readonly Dictionary<X4Size, ListCollectionView> _EquipmentsViews = new();
         #endregion
 
 
@@ -38,25 +32,25 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 装備一覧表示用
         /// </summary>
-        public ListCollectionView? EquipmentsView => (_Model.SelectedSize is not null) ? _EquipmentsViews[_Model.SelectedSize] : null;
+        public ListCollectionView EquipmentsView { get; }
 
 
         /// <summary>
         /// 装備中の装備
         /// </summary>
-        public ObservableCollection<EquipmentListItem>? Equipped => (_Model.SelectedSize is not null) ? _Model.Equipped[_Model.SelectedSize] : null;
+        public ObservableCollection<EquipmentListItem> Equipped => _Model.Equipped;
 
 
         /// <summary>
         /// 装備可能な個数
         /// </summary>
-        public int MaxAmount => (_Model.SelectedSize is not null) ? _Model.MaxAmount[_Model.SelectedSize] : 0;
+        public int MaxAmount => _Model.Equippable.Count;
 
 
         /// <summary>
         /// 現在装備中の個数
         /// </summary>
-        public int EquippedCount => (_Model.SelectedSize is not null) ? _Model.Equipped[_Model.SelectedSize].Count : 0;
+        public int EquippedCount => _Model.Equipped.Count;
 
 
         /// <summary>
@@ -93,6 +87,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         public DelegateCommand RemoveButtonClickedCommand { get; }
 
 
+
         /// <summary>
         /// 選択中の装備サイズ
         /// </summary>
@@ -100,7 +95,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         {
             set
             {
-                _Model.SelectedSize = value;
                 RaisePropertyChanged(nameof(MaxAmount));
                 RaisePropertyChanged(nameof(EquippedCount));
                 RaisePropertyChanged(nameof(Equipped));
@@ -118,7 +112,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         {
             set
             {
-                _Model.SelectedPreset = value;
                 RaisePropertyChanged(nameof(MaxAmount));
                 RaisePropertyChanged(nameof(EquippedCount));
                 RaisePropertyChanged(nameof(Equipped));
@@ -141,16 +134,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// コンストラクタ
         /// </summary>
         /// <param name="model"></param>
-        public EquipmentListViewModel(EquipmentListModelBase model)
+        public EquipmentListViewModel(EquipmentListModel model)
         {
             _Model = model;
 
-            foreach (var pair in _Model.Equipments)
-            {
-                var item = (ListCollectionView)CollectionViewSource.GetDefaultView(pair.Value);
-                item.Filter = Filter;
-                _EquipmentsViews.Add(pair.Key, item);
-            }
+            EquipmentsView = (ListCollectionView)CollectionViewSource.GetDefaultView(model.Equippable);
 
             AddButtonClickedCommand = new DelegateCommand(AddButtonClicked, () => EquippedCount < MaxAmount);
             RemoveButtonClickedCommand = new DelegateCommand(DeleteButtonClicked, () => 0 < EquippedCount);

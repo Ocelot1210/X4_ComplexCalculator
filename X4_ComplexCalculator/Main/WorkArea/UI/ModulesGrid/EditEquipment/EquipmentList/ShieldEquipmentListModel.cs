@@ -47,16 +47,16 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <param name="factions">種族一覧</param>
         public ShieldEquipmentListModel(ModulesGridItem module, ObservablePropertyChangedCollection<FactionsListItem> factions) : base(module, factions)
         {
-            foreach (X4Size size in Module.ModuleEquipment.Shield.Sizes)
-            {
-                _Equipments.Add(size, new ObservableRangeCollection<EquipmentListItem>());
-                _Equipped.Add(size, new ObservableRangeCollection<EquipmentListItem>());
-                _MaxAmount.Add(size, Module.ModuleEquipment.Shield.MaxAmount[size]);
+            //foreach (X4Size size in Module.Equipments.Shield.Sizes)
+            //{
+            //    _Equipments.Add(size, new ObservableRangeCollection<EquipmentListItem>());
+            //    _Equipped.Add(size, new ObservableRangeCollection<EquipmentListItem>());
+            //    _MaxAmount.Add(size, Module.Equipments.Shield.MaxAmount[size]);
 
-                // 前回値復元
-                var equipments = Module.ModuleEquipment.Shield.GetEquipment(size).Take(_MaxAmount[size]).Select(x => new EquipmentListItem(x));
-                _Equipped[size].AddRange(equipments);
-            }
+            //    // 前回値復元
+            //    var equipments = Module.Equipments.Shield.GetEquipment(size).Take(_MaxAmount[size]).Select(x => new EquipmentListItem(x));
+            //    _Equipped[size].AddRange(equipments);
+            //}
         }
 
 
@@ -82,7 +82,7 @@ DELETE FROM
     ModulePresetsEquipment
 
 WHERE
-    ModuleID = '{Module.Module.ModuleID}' AND
+    ModuleID = '{Module.Module.ID}' AND
     PresetID = {item.ID} AND
     EquipmentType = 'shields'";
                     SettingDatabase.Instance.ExecQuery(query);
@@ -108,9 +108,9 @@ INSERT INTO
     ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType)
 
 VALUES(
-    '{Module.Module.ModuleID}',
+    '{Module.Module.ID}',
     {item.ID},
-    '{equipment.Equipment.EquipmentID}',
+    '{equipment.Equipment.ID}',
     '{equipment.Equipment.EquipmentType.EquipmentTypeID}'
 )";
                         SettingDatabase.Instance.ExecQuery(query);
@@ -149,7 +149,7 @@ WHERE
 
             X4Database.Instance.ExecQuery(query, (dr, _) =>
             {
-                var eqp = Equipment.Get((string)dr["EquipmentID"]);
+                var eqp = Ware.TryGet<Equipment>((string)dr["EquipmentID"]);
                 if (eqp is not null)
                 {
                     items.Add(new EquipmentListItem(eqp));
@@ -165,10 +165,10 @@ WHERE
         /// </summary>
         public override void SaveEquipment()
         {
-            foreach (var size in _Equipments.Keys)
-            {
-                Module.ModuleEquipment.Shield.ResetEquipment(size, Equipped[size].Select(x => x.Equipment).ToArray());
-            }
+            //foreach (var size in _Equipments.Keys)
+            //{
+            //    Module.Equipments.Shield.ResetEquipment(size, Equipped[size].Select(x => x.Equipment).ToArray());
+            //}
         }
 
 
@@ -177,39 +177,39 @@ WHERE
         /// </summary>
         private void OnSelectedPresetChanged()
         {
-            if (SelectedPreset is null)
-            {
-                throw new InvalidOperationException();
-            }
+//            if (SelectedPreset is null)
+//            {
+//                throw new InvalidOperationException();
+//            }
 
-            var query = @$"
-SELECT
-    EquipmentID
+//            var query = @$"
+//SELECT
+//    EquipmentID
 
-FROM
-    ModulePresetsEquipment
+//FROM
+//    ModulePresetsEquipment
 
-WHERE
-    ModuleID      = '{Module.Module.ModuleID}' AND
-    PresetID      = {SelectedPreset.ID} AND
-    EquipmentType = 'shields'";
+//WHERE
+//    ModuleID      = '{Module.Module.ID}' AND
+//    PresetID      = {SelectedPreset.ID} AND
+//    EquipmentType = 'shields'";
 
-            var equipments = new List<EquipmentListItem>(_MaxAmount.Values.Count);
+//            var equipments = new List<EquipmentListItem>(_MaxAmount.Values.Count);
 
-            SettingDatabase.Instance.ExecQuery(query, (dr, _) =>
-            {
-                var eqp = Equipment.Get((string)dr["EquipmentID"]);
-                if (eqp is not null)
-                {
-                    equipments.Add(new EquipmentListItem(eqp));
-                }
-            });
+//            SettingDatabase.Instance.ExecQuery(query, (dr, _) =>
+//            {
+//                var eqp = Ware.TryGet<Equipment>((string)dr["EquipmentID"]);
+//                if (eqp is not null)
+//                {
+//                    equipments.Add(new EquipmentListItem(eqp));
+//                }
+//            });
 
-            foreach (var size in Module.ModuleEquipment.Shield.Sizes)
-            {
-                _Equipped[size].Clear();
-                _Equipped[size].AddRange(equipments.Where(x => x.Equipment.Size.Equals(size)));
-            }
+//            foreach (var size in Module.Equipments.Shield.Sizes)
+//            {
+//                _Equipped[size].Clear();
+//                _Equipped[size].AddRange(equipments.Where(x => x.Equipment.Size.Equals(size)));
+//            }
         }
     }
 }

@@ -11,6 +11,7 @@ using Prism.Mvvm;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.Common.Localize;
+using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Products;
@@ -194,7 +195,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                     {
                         // モジュール自動追加作業用に実際に追加するモジュールが存在しない場合、
                         // 実際に追加するモジュールと見なす
-                        var module = DB.X4DB.Module.Get(moduleID);
+                        var module = Ware.TryGet<Module>(moduleID);
                         if (module is null) return;
 
                         var mgi = new ModulesGridItem(module, null, count) { EditStatus = EditStatus.Edited };
@@ -289,9 +290,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 // 前回値保存
                 foreach (var prod in Products)
                 {
-                    if (!_OptionsBakDict.TryAdd(prod.Ware.WareID, prod))
+                    if (!_OptionsBakDict.TryAdd(prod.Ware.ID, prod))
                     {
-                        _OptionsBakDict[prod.Ware.WareID] = prod;
+                        _OptionsBakDict[prod.Ware.ID] = prod;
                     }
                 }
 
@@ -366,7 +367,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             foreach (var item in prodDict)
             {
                 // 変更対象のウェアを検索
-                Products.FirstOrDefault(x => x.Ware.WareID == item.Key)?.SetDetails(item.Value, prevModuleCount);
+                Products.FirstOrDefault(x => x.Ware.ID == item.Key)?.SetDetails(item.Value, prevModuleCount);
             }
         }
 
@@ -384,7 +385,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             foreach (var item in prodDict)
             {
                 // すでにウェアが存在するか検索
-                var prod = Products.FirstOrDefault(x => x.Ware.WareID == item.Key);
+                var prod = Products.FirstOrDefault(x => x.Ware.ID == item.Key);
                 if (prod is not null)
                 {
                     // ウェアが一覧にある場合
@@ -413,7 +414,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             foreach (var item in prodDict)
             {
                 // 一致するウェアの詳細情報を削除
-                Products.FirstOrDefault(x => x.Ware.WareID == item.Key)?.RemoveDetails(item.Value);
+                Products.FirstOrDefault(x => x.Ware.ID == item.Key)?.RemoveDetails(item.Value);
             }
 
             _Products.Products.RemoveAll(x => !x.Details.Any());
@@ -435,11 +436,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                                                    0 < x.Module.WorkersCapacity ||
                                                    x.Module.ModuleType.ModuleTypeID == "production" ||
                                                    x.Module.ModuleType.ModuleTypeID == "habitation")
-                                       .GroupBy(x => x.Module.ModuleID)
+                                       .GroupBy(x => x.Module.ID)
                                        .Select(x =>
                                        {
                                            var module = x.First().Module;
-                                           return (module.ModuleID, module.ModuleType.ModuleTypeID, Count: x.Sum(y => y.ModuleCount));
+                                           return (module.ID, module.ModuleType.ModuleTypeID, Count: x.Sum(y => y.ModuleCount));
                                        });
 
             // 処理対象モジュールが無ければ何もしない
@@ -455,12 +456,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 {
                     // 製造モジュールの場合
                     case "production":
-                        SumProduct(module.ModuleID, module.Count, prodDict);
+                        SumProduct(module.ID, module.Count, prodDict);
                         break;
 
                     // 居住モジュールの場合
                     case "habitation":
-                        SumHabitation(module.ModuleID, module.Count, prodDict);
+                        SumHabitation(module.ID, module.Count, prodDict);
                         break;
 
                     default:

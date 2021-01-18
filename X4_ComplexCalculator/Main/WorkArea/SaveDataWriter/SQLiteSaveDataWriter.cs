@@ -121,7 +121,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
             foreach (var (module, i) in WorkArea.StationData.ModulesInfo.Modules.Select((module, i) => (module, i)))
             {
                 const string sql1 = "INSERT INTO Modules(Row, ModuleID, Count) Values(:i, :ModuleID, :ModuleCount)";
-                conn.Execute(sql1, new { i, module.Module.ModuleID, module.ModuleCount });
+                conn.Execute(sql1, new { i, module.Module.ID, module.ModuleCount });
 
                 if (module.EditStatus == EditStatus.Edited)
                 {
@@ -129,7 +129,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
                 }
 
                 const string sql2 = "INSERT INTO Equipments(Row, EquipmentID) Values(:i, :EquipmentID)";
-                var param2 = module.ModuleEquipment.AllEquipments.Select(e => new { i, e.EquipmentID });
+                var param2 = module.Equipments.AllEquipments.Select(e => new { i, e.ID });
                 conn.Execute(sql2, param2);
             }
 
@@ -187,7 +187,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
             public override void SetValue(IDbDataParameter parameter, Ware value)
             {
                 parameter.DbType = DbType.String;
-                parameter.Value = value.WareID;
+                parameter.Value = value.ID;
             }
         }
     }

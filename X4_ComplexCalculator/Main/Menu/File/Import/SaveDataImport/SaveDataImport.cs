@@ -152,16 +152,11 @@ FROM
 WHERE
     Macro = :macro";
 
-
-                X4Database.Instance.ExecQuery(query, modParam, (dr, _) =>
-                {
-                    var module = Module.Get((string)dr["ModuleID"]);
-
-                    if (module is not null)
-                    {
-                        modules.Add(new ModulesGridItem(module));
-                    }
-                });
+                var modules2 = X4Database.Instance.Query<string>(query, modParam)
+                    .Select(x => Ware.TryGet<Module>(x))
+                    .Where(x => x is not null)
+                    .Select(x => new ModulesGridItem(x!));
+                modules.AddRange(modules2);
             }
 
 
@@ -180,9 +175,9 @@ WHERE
                 X4Database.Instance.ExecQuery(query, eqParam, (dr, _) =>
                 {
                     var index = (int)(long)dr["Index"] - 1;
-                    var moduleEquipment = modules[index].ModuleEquipment;
+                    var moduleEquipment = modules[index].Equipments;
 
-                    var equipment = Equipment.Get((string)dr["EquipmentID"]);
+                    var equipment = Ware.Get<Equipment>((string)dr["EquipmentID"]);
                     if (equipment is null) return;
 
                     var count = (long)dr["Count"];
@@ -191,7 +186,7 @@ WHERE
             }
 
             // 同一モジュールをマージ
-            var dict = new Dictionary<int, (int, Module, ModuleProduction, long)>();
+            var dict = new Dictionary<int, (int, Module, WareProduction, long)>();
 
             foreach (var (module, idx) in modules.Select((x, idx) => (x, idx)))
             {
@@ -226,7 +221,7 @@ WHERE
             foreach (var ware in saveData.XElement.XPathSelectElements("/economylog/*[not(self::cargo)]"))
             {
                 var wareID = ware.Attribute("ware").Value;
-                var prod = WorkArea.StationData.ProductsInfo.Products.FirstOrDefault(x => x.Ware.WareID == wareID);
+                var prod = WorkArea.StationData.ProductsInfo.Products.FirstOrDefault(x => x.Ware.ID == wareID);
                 if (prod is not null)
                 {
                     prod.UnitPrice = long.Parse(ware.Attribute("price").Value);

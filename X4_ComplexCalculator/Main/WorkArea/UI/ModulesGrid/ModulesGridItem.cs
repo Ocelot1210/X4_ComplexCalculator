@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -34,9 +35,33 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
 
 
         /// <summary>
+        /// タレット数
+        /// </summary>
+        private int _TurretsCount;
+
+
+        /// <summary>
+        /// シールド数
+        /// </summary>
+        private int _ShieldsCount;
+
+
+        /// <summary>
+        /// タレットのツールチップ文字列
+        /// </summary>
+        private string _TurretsToolTip = "";
+
+
+        /// <summary>
+        /// シールドのツールチップ文字列
+        /// </summary>
+        private string _ShieldsToolTip = "";
+
+
+        /// <summary>
         /// 選択された建造方式
         /// </summary>
-        private ModuleProduction _SelectedMethod;
+        private WareProduction _SelectedMethod;
 
 
         /// <summary>
@@ -68,7 +93,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <summary>
         /// 装備情報
         /// </summary>
-        public ModuleEquipment ModuleEquipment { get; }
+        public WareEquipmentManager Equipments { get; }
 
 
         /// <summary>
@@ -108,43 +133,59 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <summary>
         /// 装備中のタレットの個数
         /// </summary>
-        public int TurretsCount => ModuleEquipment.Turret.AllEquipmentsCount;
+        public int TurretsCount
+        {
+            get => _TurretsCount;
+            private set => SetProperty(ref _TurretsCount, value);
+        }
 
 
         /// <summary>
         /// タレットのツールチップ文字列
         /// </summary>
-        public string TurretsToolTip => MakeEquipmentToolTipString(ModuleEquipment.Turret);
+        public string TurretsToolTip
+        {
+            get => _TurretsToolTip;
+            set => SetProperty(ref _TurretsToolTip, value);
+        }
 
 
         /// <summary>
         /// 装備中のシールドの個数
         /// </summary>
-        public int ShieldsCount => ModuleEquipment.Shield.AllEquipmentsCount;
+        public int ShieldsCount
+        {
+            get => _ShieldsCount;
+            private set => SetProperty(ref _ShieldsCount, value);
+        }
 
 
         /// <summary>
         /// シールドのツールチップ文字列
         /// </summary>
-        public string ShieldsToolTip => MakeEquipmentToolTipString(ModuleEquipment.Shield);
+        public string ShieldsToolTip
+        {
+            get => _ShieldsToolTip;
+            set => SetProperty(ref _ShieldsToolTip, value);
+        }
 
 
         /// <summary>
         /// 編集ボタンを表示すべきか
         /// </summary>
-        public Visibility EditEquipmentButtonVisiblity => (ModuleEquipment.CanEquipped) ? Visibility.Visible : Visibility.Hidden;
+        public Visibility EditEquipmentButtonVisiblity => (Equipments.CanEquipped) ? Visibility.Visible : Visibility.Hidden;
 
 
         /// <summary>
         /// 建造方式を表示すべきか
         /// </summary>
-        public Visibility SelectedMethodVisiblity => (2 <= Module.ModuleProductions.Count) ? Visibility.Visible : Visibility.Hidden;
+        public Visibility SelectedMethodVisiblity => (2 <= Module.Productions.Count) ? Visibility.Visible : Visibility.Hidden;
 
 
         /// <summary>
         /// 選択中の建造方式
         /// </summary>
-        public ModuleProduction SelectedMethod
+        public WareProduction SelectedMethod
         {
             get => _SelectedMethod;
             set
@@ -186,14 +227,17 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <param name="module">モジュール</param>
         /// <param name="selectedMethod">選択中の建造方式</param>
         /// <param name="moduleCount">モジュール数</param>
-        public ModulesGridItem(Module module, ModuleProduction? selectedMethod = null, long moduleCount = 1)
+        public ModulesGridItem(Module module, WareProduction? selectedMethod = null, long moduleCount = 1)
         {
             Module = module;
             ModuleCount = moduleCount;
             EditEquipmentCommand = new DelegateCommand(EditEquipment);
-            ModuleEquipment = new ModuleEquipment(module);
+            Equipments = new WareEquipmentManager(module);
 
-            _SelectedMethod = selectedMethod ?? Module.ModuleProductions[0];
+            TurretsToolTip = MakeEquipmentToolTipString(Enumerable.Empty<Ware>());
+            ShieldsToolTip = MakeEquipmentToolTipString(Enumerable.Empty<Ware>());
+
+            _SelectedMethod = selectedMethod ?? Module.Productions[0];
         }
 
 
@@ -203,25 +247,18 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <param name="element">モジュール情報が記載されたxml</param>
         public ModulesGridItem(XElement element)
         {
-            Module = Module.Get(element.Attribute("id").Value) ?? throw new ArgumentException("Invalid XElement.", nameof(element));
-            ModuleEquipment = new ModuleEquipment(Module);
+            Module = Ware.TryGet<Module>(element.Attribute("id").Value) ?? throw new ArgumentException("Invalid XElement.", nameof(element));
+            Equipments = new WareEquipmentManager(Module, element.Element("equipments"));
 
             ModuleCount = long.Parse(element.Attribute("count").Value);
-            SelectedMethod = Module.ModuleProductions.FirstOrDefault(x => x.Method == element.Attribute("method")?.Value)
-                ?? Module.ModuleProductions.First();
+            SelectedMethod = Module.Productions.FirstOrDefault(x => x.Method == element.Attribute("method")?.Value)
+                ?? Module.Productions.First();
             _SelectedMethod = SelectedMethod;
-            EditEquipmentCommand = new DelegateCommand(EditEquipment);
 
-            // タレットとシールドを追加
-            var turrets = element.Element("turrets").Elements("turret");
-            var shields = element.Element("shields").Elements("shield");
-            var equipments = turrets.Concat(shields)
-                .Select(elem => Equipment.Get(elem.Attribute("id").Value))
-                .Where(e => e is not null);
-            foreach (var equipment in equipments)
-            {
-                AddEquipment(equipment!);
-            }
+            TurretsToolTip = MakeEquipmentToolTipString(Equipments.AllEquipments.Where(x => x.EquipmentType.EquipmentTypeID == "turrets"));
+            ShieldsToolTip = MakeEquipmentToolTipString(Equipments.AllEquipments.Where(x => x.EquipmentType.EquipmentTypeID == "shields"));
+
+            EditEquipmentCommand = new DelegateCommand(EditEquipment);
         }
 
 
@@ -233,13 +270,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         {
             // それぞれのモジュールの情報を設定
             var ret = new XElement("module");
-            ret.Add(new XAttribute("id", Module.ModuleID));
+            ret.Add(new XAttribute("id", Module.ID));
             ret.Add(new XAttribute("count", ModuleCount));
             ret.Add(new XAttribute("method", SelectedMethod.Method));
 
-            // タレットとシールドをXML化
-            ret.Add(ModuleEquipment.Turret.Serialize());
-            ret.Add(ModuleEquipment.Shield.Serialize());
+            // 装備をXML化
+            ret.Add(Equipments.Serialize());
 
             return ret;
         }
@@ -249,7 +285,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// 装備を追加
         /// </summary>
         /// <param name="equipment">追加したい装備</param>
-        public void AddEquipment(Equipment equipment) => ModuleEquipment.AddEquipment(equipment);
+        public void AddEquipment(Equipment equipment) => Equipments.AddEquipment(equipment);
 
 
         /// <summary>
@@ -257,7 +293,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// </summary>
         public void UpdateTooltip()
         {
-            if (ModuleEquipment.CanEquipped)
+            if (Equipments.CanEquipped)
             {
                 RaisePropertyChanged(nameof(TurretsToolTip));
                 RaisePropertyChanged(nameof(ShieldsToolTip));
@@ -271,24 +307,32 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         private void EditEquipment()
         {
             // 変更前
-            var turretsOld = ModuleEquipment.Turret.AllEquipments.Select(x => x.EquipmentID).OrderBy(x => x).ToArray();
-            var shieldsOld = ModuleEquipment.Shield.AllEquipments.Select(x => x.EquipmentID).OrderBy(x => x).ToArray();
+            var turretsOld = Equipments.AllEquipments
+                .Where(x => x.EquipmentType.EquipmentTypeID == "turrets")
+                .Select(x => x.ID)
+                .OrderBy(x => x).ToArray();
 
-            var window = new EditEquipmentWindow(this);
+            var shieldsOld = Equipments.AllEquipments
+                .Where(x => x.EquipmentType.EquipmentTypeID == "shields")
+                .Select(x => x.ID)
+                .OrderBy(x => x).ToArray();
+
+
+            var window = new EditEquipmentWindow(Equipments);
             window.Owner = Application.Current.MainWindow;
             window.ShowDialog();
 
             bool equipmentChanged = false;
 
             // 変更があった場合のみ通知
-            if (!turretsOld.SequenceEqual(ModuleEquipment.Turret.AllEquipments.Select(x => x.EquipmentID).OrderBy(x => x)))
+            if (!turretsOld.SequenceEqual(Equipments.AllEquipments.Where(x => x.EquipmentType.EquipmentTypeID == "turrets").Select(x => x.ID).OrderBy(x => x)))
             {
                 RaisePropertyChanged(nameof(TurretsCount));
                 RaisePropertyChanged(nameof(TurretsToolTip));
                 equipmentChanged = true;
             }
 
-            if (!shieldsOld.SequenceEqual(ModuleEquipment.Shield.AllEquipments.Select(x => x.EquipmentID).OrderBy(x => x)))
+            if (!shieldsOld.SequenceEqual(Equipments.AllEquipments.Where(x => x.EquipmentType.EquipmentTypeID == "shields").Select(x => x.ID).OrderBy(x => x)))
             {
                 RaisePropertyChanged(nameof(ShieldsCount));
                 RaisePropertyChanged(nameof(ShieldsToolTip));
@@ -297,40 +341,33 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
 
             if (equipmentChanged)
             {
-                RaisePropertyChangedEx(turretsOld.Concat(shieldsOld), ModuleEquipment.AllEquipments.Select(x => x.EquipmentID).ToArray(), nameof(ModuleEquipment));
+                var newItems = Equipments.AllEquipments
+                    .Where(x => x.EquipmentType.EquipmentTypeID == "shields")
+                    .Select(x => x.ID)
+                    .ToArray();
+                RaisePropertyChangedEx(turretsOld.Concat(shieldsOld), newItems, nameof(Equipments));
                 EditStatus = EditStatus.Edited;
             }
         }
+
 
         /// <summary>
         /// 装備のツールチップ文字列を作成
         /// </summary>
         /// <returns></returns>
-        private string MakeEquipmentToolTipString(ModuleEquipmentCollection equipmentCollections)
+        private string MakeEquipmentToolTipString(IEnumerable<Ware> wares)
         {
-            var sb = new StringBuilder();
-
-            foreach (var size in equipmentCollections.Sizes)
+            if (!wares.Any())
             {
-                var cnt = 1;
-
-                foreach (var eq in equipmentCollections.GetEquipment(size))
-                {
-                    if (cnt == 1)
-                    {
-                        if (sb.Length != 0)
-                        {
-                            sb.AppendLine();
-                        }
-                        sb.AppendLine($"【{size.Name}】");
-                    }
-                    sb.AppendLine($"{cnt++:D2} ： {eq.Name}");
-                }
+                return (string)WPFLocalizeExtension.Engine.LocalizeDictionary.Instance.GetLocalizedObject("Lang:NotEquippedToolTipText", null, null);
             }
 
-            if (sb.Length == 0)
+            var sb = new StringBuilder();
+            var cnt = 1;
+
+            foreach (var ware in wares.OrderBy(x => x.Name))
             {
-                sb.Append((string)WPFLocalizeExtension.Engine.LocalizeDictionary.Instance.GetLocalizedObject("Lang:NotEquippedToolTipText", null, null));
+                sb.AppendLine($"{cnt++:D2} ： {ware.Name}");
             }
 
             return sb.ToString();
@@ -343,7 +380,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <returns></returns>
         public override int GetHashCode()
         {
-            return HashCode.Combine(Module, ModuleCount, ModuleEquipment, SelectedMethod);
+            return HashCode.Combine(Module, ModuleCount, Equipments, SelectedMethod);
         }
     }
 }

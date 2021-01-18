@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace X4_ComplexCalculator.DB.X4DB
+﻿namespace X4_ComplexCalculator.DB.X4DB
 {
     /// <summary>
     /// エンジン情報
@@ -13,19 +9,19 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// 前方推進力
         /// </summary>
-        public long ForwardThrust { get; }
+        public double ForwardThrust { get; }
 
 
         /// <summary>
         /// 後方推進力
         /// </summary>
-        public long ReverseThrust { get; }
+        public double ReverseThrust { get; }
 
 
         /// <summary>
         /// ブースト推進力
         /// </summary>
-        public long BoostThrust { get; }
+        public double BoostThrust { get; }
 
 
         /// <summary>
@@ -43,7 +39,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// トラベル推進力
         /// </summary>
-        public long TravelThrust { get; }
+        public double TravelThrust { get; }
 
 
         /// <summary>
@@ -56,28 +52,8 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="equipmentID">装備ID</param>
-        /// <param name="macro">マクロ名</param>
-        /// <param name="name">装備名称</param>
-        /// <param name="equipmentTypeID">装備種別ID</param>
-        /// <param name="sizeID">装備サイズ</param>
-        /// <param name="hull">船体値</param>
-        /// <param name="hullIntegrated">船体値が統合されているか</param>
-        /// <param name="mk">MK</param>
-        /// <param name="makerRace">製造種族</param>
-        /// <param name="description">説明文</param>
-        internal Engine(
-            string equipmentID,
-            string macro,
-            string name,
-            string equipmentTypeID,
-            string sizeID,
-            long hull,
-            bool hullIntegrated,
-            long mk,
-            string? makerRace,
-            string description
-        ) : base(equipmentID, macro, name, equipmentTypeID, sizeID, hull, hullIntegrated, mk, makerRace, description)
+        /// <param name="id">装備ID</param>
+        internal Engine(string id) : base(id)
         {
             const string sql = "SELECT ForwardThrust, ReverseThrust, BoostThrust, BoostDuration, BoostReleaseTime, TravelThrust, TravelReleaseTime FROM Engine WHERE EquipmentID = :EquipmentID";
 
@@ -89,7 +65,7 @@ namespace X4_ComplexCalculator.DB.X4DB
                 BoostReleaseTime,
                 TravelThrust,
                 TravelReleaseTime
-            ) = X4Database.Instance.QuerySingle<(long, long, long, double, double, long, double)> (sql, new { EquipmentID = equipmentID });
+            ) = X4Database.Instance.QuerySingle<(double, double, double, double, double, double, double)>(sql, new { EquipmentID = id });
         }
     }
 }

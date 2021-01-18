@@ -54,8 +54,6 @@ CREATE TABLE IF NOT EXISTS WareGroup
 (
     WareGroupID TEXT    NOT NULL PRIMARY KEY,
     Name        TEXT    NOT NULL,
-    FactoryName TEXT    NOT NULL,
-    Icon        TEXT    NOT NULL,
     Tier        INTEGER NOT NULL
 ) WITHOUT ROWID");
             }
@@ -66,7 +64,7 @@ CREATE TABLE IF NOT EXISTS WareGroup
             {
                 var items = GetRecords();
 
-                connection.Execute("INSERT INTO WareGroup (WareGroupID, Name, FactoryName, Icon, Tier) VALUES (@WareGroupID, @Name, @FactoryName, @Icon, @Tier)", items);
+                connection.Execute("INSERT INTO WareGroup (WareGroupID, Name, Tier) VALUES (@WareGroupID, @Name, @Tier)", items);
             }
         }
 
@@ -79,19 +77,16 @@ CREATE TABLE IF NOT EXISTS WareGroup
         {
             var wareGroupXml = _CatFile.OpenXml("libraries/waregroups.xml");
 
-            foreach (var wareGroup in wareGroupXml.Root.XPathSelectElements("group[@tags='tradable']"))
+            foreach (var wareGroup in wareGroupXml.Root.XPathSelectElements("group"))
             {
                 var wareGroupID = wareGroup.Attribute("id")?.Value;
                 if (string.IsNullOrEmpty(wareGroupID)) continue;
 
                 var name = _Resolver.Resolve(wareGroup.Attribute("name")?.Value ?? "");
-                if (string.IsNullOrEmpty(name)) continue;
 
-                var factoryName = _Resolver.Resolve(wareGroup.Attribute("factoryname")?.Value ?? "");
-                var icon = wareGroup.Attribute("icon")?.Value ?? "";
                 var tier = wareGroup.Attribute("tier")?.GetInt() ?? 0;
 
-                yield return new WareGroup(wareGroupID, name, factoryName, icon, tier);
+                yield return new WareGroup(wareGroupID, name, tier);
             }
         }
     }

@@ -84,7 +84,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Modules
             if (_Module.ModuleProduct is not null)
             {
                 _Product = Ware.Get(_Module.ModuleProduct.WareID);
-                MaxEfficiency = (long)((WareEffect.Get(_Product.WareID, _Module.ModuleProduct.Method, "work")!.Product + 1) * 100);
+                MaxEfficiency = (long)((WareEffect.Get(_Product.ID, _Module.ModuleProduct.Method, "work")!.Product + 1) * 100);
             }
         }
     }

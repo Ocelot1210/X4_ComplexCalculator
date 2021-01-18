@@ -92,42 +92,30 @@ namespace X4_DataExporterWPF.DataExportWindow
                     new WareResourceExporter(waresXml),                         // ウェア生産時に必要な情報
                     new WareProductionExporter(waresXml, resolver),             // ウェア生産に必要な情報
                     new WareEffectExporter(waresXml),                           // ウェア生産時の追加効果情報
+                    new WareOwnerExporter(waresXml),                            // ウェア所有派閥情報
+                    new WareEquipmentExporter(catFile, waresXml),               // ウェアの装備情報
+                    new WareTagsExporter(waresXml),                             // ウェアのタグ情報
 
                     // モジュール関連
                     new ModuleTypeExporter(resolver),                           // モジュール種別情報
-                    new ModuleExporter(catFile, waresXml, resolver),            // モジュール情報
-                    new ModuleOwnerExporter(waresXml),                          // モジュール所有派閥情報
-                    new ModuleProductionExporter(waresXml),                     // モジュール建造情報
-                    new ModuleResourceExporter(waresXml),                       // モジュール建造に必要なウェア情報
+                    new ModuleExporter(catFile, waresXml),                      // モジュール情報
                     new ModuleProductExporter(catFile, waresXml),               // モジュールの生産品情報
-                    new ModuleShieldExporter(catFile, waresXml),                // モジュールのシールド情報
-                    new ModuleTurretExporter(catFile, waresXml),                // モジュールのタレット情報
                     new ModuleStorageExporter(catFile, waresXml),               // モジュールの保管容量情報
 
                     // 装備関連
                     new EquipmentTypeExporter(resolver),                        // 装備種別情報
-                    new EquipmentExporter(catFile, waresXml, resolver),         // 装備情報
-                    new EquipmentOwnerExporter(waresXml),                       // 装備保有派閥情報
-                    new EquipmentResourceExporter(waresXml),                    // 装備生産に必要なウェア情報
-                    new EquipmentProductionExporter(waresXml),                  // 装備生産に関する情報
+                    new EquipmentExporter(catFile, waresXml),                   // 装備情報
                     new ShieldExporter(catFile, waresXml),                      // シールド情報
                     new EngineExporter(catFile, waresXml),                      // エンジン情報
                     new ThrusterExporter(catFile, waresXml),                    // スラスター情報
 
-                    // 従業員関連
-                    new WorkUnitProductionExporter(waresXml),                   // 従業員用生産情報
-                    new WorkUnitResourceExporter(waresXml),                     // 従業員用必要ウェア情報
 
                     // 艦船関連
                     new ShipTypeExporter(resolver),                             // 艦船種別情報
-                    new ShipExporter(catFile, waresXml, resolver),              // 艦船情報
-                    new ShipProductionExporter(waresXml),                       // 艦船の建造情報
-                    new ShipResourceExporter(waresXml),                         // 艦船の建造リソース
+                    new ShipExporter(catFile, waresXml),                        // 艦船情報
                     new ShipPurposeExporter(catFile, waresXml),                 // 艦船用途情報
-                    new ShipEquipmentExporter(catFile, waresXml),               // 艦船装備情報
                     new ShipHangerExporter(catFile, waresXml),                  // 艦船ハンガー(機体格納庫)情報
                     new ShipTransportTypeExporter(catFile, waresXml),           // 艦船カーゴ情報
-                    new ShipOwnerExporter(waresXml),                            // 艦船所有派閥情報
                     new ShipLoadoutExporter(catFile, waresXml),                 // 艦船のロードアウト情報
                 };
 

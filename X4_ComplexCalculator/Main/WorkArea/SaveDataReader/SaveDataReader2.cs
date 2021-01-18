@@ -111,7 +111,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             const string sql = "SELECT WareID, Price, NoBuy, NoSell FROM Products";
             foreach (var (wareID, price, noBuy, noSell) in conn.Query<(string, long, long, long)>(sql))
             {
-                var itm = _WorkArea.StationData.ProductsInfo.Products.FirstOrDefault(x => x.Ware.WareID == wareID);
+                var itm = _WorkArea.StationData.ProductsInfo.Products.FirstOrDefault(x => x.Ware.ID == wareID);
                 if (itm is not null)
                 {
                     itm.UnitPrice = price;
@@ -131,7 +131,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             const string sql = "SELECT WareID, Price, NoBuy FROM BuildResources";
             foreach (var (wareID, price, noBuy) in conn.Query<(string, long, long)>(sql))
             {
-                var itm = _WorkArea.StationData.BuildResourcesInfo.BuildResources.FirstOrDefault(x => x.Ware.WareID == wareID);
+                var itm = _WorkArea.StationData.BuildResourcesInfo.BuildResources.FirstOrDefault(x => x.Ware.ID == wareID);
                 if (itm is not null)
                 {
                     itm.UnitPrice = price;

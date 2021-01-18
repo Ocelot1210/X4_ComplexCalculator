@@ -29,6 +29,7 @@
 1. ゲームファイルよりデータを直接抽出
     1. Modのサポート
     1. 今後のバージョンアップへの対応
+    1. 抽出したデータの閲覧機能
 1. ステーション全体の製品/必要資源の計算
 1. モジュールの兵装も考慮したステーションの建造に必要なウェアの計算
 1. 保管庫のウェア割当容量計算
@@ -68,15 +69,27 @@ X4 Complex Calclator は [Apache License 2.0](https://github.com/Ocelot1210/X4_C
 <br>
 
 ## 9. 使用ライブラリ
-- [Dapper](https://github.com/StackExchange/Dapper)
-- [AvalonDock](https://github.com/Dirkster99/AvalonDock)
-- [WpfExToolkit](https://github.com/dotnetprojects/WpfExtendedToolkit)
-- [GongSolutions.WPF.DragDrop](https://github.com/punker76/gong-wpf-dragdrop)
 - [.NET Extensions](https://github.com/dotnet/extensions)
-- [Windows-API-Code-Pack-1.1.4](https://github.com/contre/Windows-API-Code-Pack-1.1)
-- [XamlBehaviors for WPF](https://github.com/Microsoft/XamlBehaviorsWpf)
+- [AvalonDock](https://github.com/Dirkster99/AvalonDock)
+- [Coverlet](https://github.com/coverlet-coverage/coverlet)
+- [Dapper](https://github.com/StackExchange/Dapper)
+- [DataGridExtensions](https://github.com/dotnet/DataGridExtensions)
+- [GitInfo](https://github.com/devlooped/GitInfo)
+- [GongSolutions.WPF.DragDrop](https://github.com/punker76/gong-wpf-dragdrop)
+- [ImageSharp](https://github.com/SixLabors/ImageSharp)
 - [Json.NET](https://github.com/JamesNK/Newtonsoft.Json)
+- [Microsoft.Extensions.Configuration](https://github.com/dotnet/runtime)
+- [Microsoft.NET.Test.Sdk](https://github.com/microsoft/vstest/)
+- [Microsoft.Xaml.Behaviors.Wpf](https://github.com/microsoft/XamlBehaviorsWpf)
+- [Onova](https://github.com/Tyrrrz/Onova)
+- [Pfim](https://github.com/nickbabcock/Pfim)
 - [Prism](https://github.com/PrismLibrary/Prism)
 - [ReactiveProperty](https://github.com/runceel/ReactiveProperty)
 - [System.Data.SQLite.Core](https://system.data.sqlite.org/index.html/doc/trunk/www/index.wiki)
+- [Throttle.Fody](https://github.com/tom-englert/Throttle.Fody)
+- [Windows-API-Code-Pack-1.1.4](https://github.com/contre/Windows-API-Code-Pack-1.1)
+- [WpfExToolkit](https://github.com/dotnetprojects/WpfExtendedToolkit)
 - [WpfLocalizeExtension](https://github.com/XAMLMarkupExtensions/WPFLocalizationExtension/)
+- [XamlBehaviors for WPF](https://github.com/Microsoft/XamlBehaviorsWpf)
+- [xUnit](https://github.com/xunit/xunit)
+- [xunit.runner.visualstudio](https://github.com/xunit/visualstudio.xunit)

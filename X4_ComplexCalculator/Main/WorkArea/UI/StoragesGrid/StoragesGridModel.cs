@@ -209,8 +209,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
             var modulesDict = new Dictionary<string, List<StorageDetailsListItem>>();
 
             var targetModules = modules.Where(x => x.Module.ModuleType.ModuleTypeID == "storage")
-                                       .GroupBy(x => x.Module.ModuleID)
-                                       .Select(x => (x.First().Module.ModuleID, Count: x.Sum(y => y.ModuleCount)));
+                                       .GroupBy(x => x.Module.ID)
+                                       .Select(x => (x.First().Module.ID, Count: x.Sum(y => y.ModuleCount)));
 
             if (!targetModules.Any())
             {
@@ -233,7 +233,7 @@ WHERE
             var sqlParam = new SQLiteCommandParameters(2);
             foreach (var module in targetModules)
             {
-                sqlParam.Add("moduleID", System.Data.DbType.String, module.ModuleID);
+                sqlParam.Add("moduleID", System.Data.DbType.String, module.ID);
                 sqlParam.Add("count", System.Data.DbType.Int32, module.Count);
             }
 

@@ -130,15 +130,11 @@ FROM
 WHERE
     Macro = :macro";
 
-
-                X4Database.Instance.ExecQuery(query, modParam, (dr, _) =>
-                {
-                    var module = Module.Get((string)dr["ModuleID"]);
-                    if (module is not null)
-                    {
-                        modules.Add(new ModulesGridItem(module));
-                    }
-                });
+                var tmpModules = X4Database.Instance.Query<string>(query, modParam)
+                    .Select(x => Ware.TryGet<Module>(x))
+                    .Where(x => x is not null)
+                    .Select(x => new ModulesGridItem(x!));
+                modules.AddRange(tmpModules);
             }
 
             // 装備追加
@@ -156,9 +152,9 @@ WHERE
                 X4Database.Instance.ExecQuery(query, eqParam, (dr, _) =>
                 {
                     var index = (int)(long)dr["Index"] - 1;
-                    var moduleEquipment = modules[index].ModuleEquipment;
+                    var moduleEquipment = modules[index].Equipments;
 
-                    var equipment = Equipment.Get((string)dr["EquipmentID"]);
+                    var equipment = Ware.TryGet<Equipment>((string)dr["EquipmentID"]);
                     if (equipment is null) return;
 
                     var count = (long)dr["Count"];

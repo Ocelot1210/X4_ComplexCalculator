@@ -65,16 +65,12 @@ namespace X4_ComplexCalculator.DB.X4DB
         public static void Init()
         {
             _Races.Clear();
-            X4Database.Instance.ExecQuery("SELECT * FROM Race", (dr, args) =>
-            {
-                var id = (string)dr["RaceID"];
-                var name = (string)dr["Name"];
-                var shortName = (string)dr["ShortName"];
-                var description = (string)dr["Description"];
 
-                _Races.Add(id, new Race(id, name, shortName, description));
-            });
-            var values = _Races.Values;
+            const string sql = "SELECT RaceID, Name, ShortName, Description FROM Race";
+            foreach (var item in X4Database.Instance.Query<Race>(sql))
+            {
+                _Races.Add(item.RaceID, item);
+            }
         }
 
 

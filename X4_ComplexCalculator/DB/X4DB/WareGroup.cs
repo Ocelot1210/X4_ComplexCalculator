@@ -14,6 +14,12 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// ウェア種別一覧
         /// </summary>
         private static readonly Dictionary<string, WareGroup> _WareGroups = new();
+
+
+        /// <summary>
+        /// ダミー用ウェア種別
+        /// </summary>
+        private static readonly WareGroup _DummyWareGroup = new("", "", -1);
         #endregion
 
         #region プロパティ
@@ -56,14 +62,12 @@ namespace X4_ComplexCalculator.DB.X4DB
         public static void Init()
         {
             _WareGroups.Clear();
-            X4Database.Instance.ExecQuery($"SELECT WareGroupID, Name, Tier FROM WareGroup", (dr, args) =>
-            {
-                var id = (string)dr["WareGroupID"];
-                var name = (string)dr["Name"];
-                var tier = (long)dr["Tier"];
 
-                _WareGroups.Add(id, new WareGroup(id, name, tier));
-            });
+            const string sql = "SELECT WareGroupID, Name, Tier FROM WareGroup";
+            foreach (var item in X4Database.Instance.Query<WareGroup>(sql))
+            {
+                _WareGroups.Add(item.WareGroupID, item);
+            }
         }
 
 
@@ -72,7 +76,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="wareGroupID">ウェア種別ID</param>
         /// <returns>ウェア種別</returns>
-        public static WareGroup Get(string wareGroupID) => _WareGroups[wareGroupID];
+        public static WareGroup Get(string wareGroupID) => _WareGroups.TryGetValue(wareGroupID, out var ret)? ret : _DummyWareGroup;
 
 
         /// <summary>

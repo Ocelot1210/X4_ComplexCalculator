@@ -1,5 +1,5 @@
 ﻿using System.Windows;
-using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.Entity;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
 {
@@ -11,12 +11,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="module">編集対象モジュール</param>
-        public EditEquipmentWindow(ModulesGridItem module)
+        /// <param name="equipmentManager">編集対象の装備情報</param>
+        public EditEquipmentWindow(WareEquipmentManager equipmentManager)
         {
             InitializeComponent();
 
-            DataContext = new EditEquipmentViewModel(module);
+            DataContext = new EditEquipmentViewModel(equipmentManager);
         }
     }
 }

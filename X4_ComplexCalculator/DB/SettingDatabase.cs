@@ -66,5 +66,25 @@ namespace X4_ComplexCalculator.DB
                 });
             }
         }
+
+
+        /// <summary>
+        /// 指定したモジュールに対する使用可能なプリセットIDを返す
+        /// </summary>
+        /// <param name="moduleID">指定したモジュールID</param>
+        /// <returns>使用可能なプリセットID</returns>
+        public long GetLastModulePresetsID(string moduleID)
+        {
+            const string sql = @"
+SELECT
+    ifnull(MIN( PresetID + 1 ), 0) AS PresetID
+FROM
+    ModulePresets
+WHERE
+	ModuleID = :ModuleID AND
+    ( PresetID + 1 ) NOT IN ( SELECT PresetID FROM ModulePresets WHERE ModuleID = :ModuleID)";
+
+            return Instance.QuerySingle<long>(sql, new { ModuleID = moduleID });
+        }
     }
 }
