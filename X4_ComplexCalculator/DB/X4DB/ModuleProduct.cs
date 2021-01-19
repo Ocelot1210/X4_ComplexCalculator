@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Linq;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
@@ -13,7 +13,12 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// モジュールの製品情報一覧
         /// </summary>
-        private static readonly Dictionary<string, ModuleProduct> _ModuleProducts = new();
+        private static readonly Dictionary<string, IReadOnlyList<ModuleProduct>> _ModuleProducts = new();
+
+        /// <summary>
+        /// ダミーの製品情報一覧
+        /// </summary>
+        private static readonly IReadOnlyList<ModuleProduct> _DummyProduct = Array.Empty<ModuleProduct>();
         #endregion
 
 
@@ -74,9 +79,9 @@ namespace X4_ComplexCalculator.DB.X4DB
             _ModuleProducts.Clear();
 
             const string sql = "SELECT ModuleID, WareID, Method FROM ModuleProduct";
-            foreach (var item in X4Database.Instance.Query<ModuleProduct>(sql))
+            foreach (var item in X4Database.Instance.Query<ModuleProduct>(sql).GroupBy(x => x.ModuleID))
             {
-                _ModuleProducts.Add(item.ModuleID, item);
+                _ModuleProducts.Add(item.Key, item.ToArray());
             }
         }
 
@@ -86,7 +91,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="moduleID>モジュールID</param>
         /// <returns>モジュールの製品情報</returns>
-        public static ModuleProduct? Get(string moduleID) => 
-            _ModuleProducts.TryGetValue(moduleID, out var ret) ? ret : null;
+        public static IReadOnlyList<ModuleProduct> Get(string moduleID) => 
+            _ModuleProducts.TryGetValue(moduleID, out var ret) ? ret : _DummyProduct;
     }
 }

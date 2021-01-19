@@ -55,70 +55,38 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// </summary>
         private ProductCalculator()
         {
-            // モジュールが生産するウェア一覧作成を作成
+            // モジュールが生産するウェア一覧を作成
             {
-                const string query = "SELECT ModuleID, WareID, Method FROM ModuleProduct";
-                _ModuleProduct = X4Database.Instance.Query<(string ModuleID, string WareID, string Method)>(query)
-                    .ToDictionary(x => x.ModuleID, x => (x.WareID, x.Method));
+                _ModuleProduct = Ware.GetAll<Module>()
+                    .Where(x => x.Product.Any())
+                    .ToDictionary(x => x.ID, x => (x.Product.First().WareID, x.Product.First().Method));
             }
 
 
             // ウェア生産に必要なウェア一覧を作成
             {
-                var dict = new Dictionary<string, List<Tuple<string, string, long>>>();
-
-                const string query = "SELECT WareID, Method, NeedWareID, Amount FROM WareResource";
-                _WareResource = X4Database.Instance.Query<(string WareID, string Method, string NeedWareID, long Amount)>(query)
-                    .GroupBy(x => x.WareID)
-                    .ToDictionary(x => x.Key, x => x.Select(y => (y.Method, y.NeedWareID, y.Amount)).ToArray() as IReadOnlyList<(string, string, long)>);
+                _WareResource = Ware.GetAll()
+                    .Where(x => x.Resources.Any())
+                    .ToDictionary(x => x.ID, x => x.Resources.SelectMany(y => y.Value.Select(z => (z.Method, z.NeedWareID, z.Amount))).ToArray() as IReadOnlyList<(string, string, long)>);
             }
 
             // 従業員が必要とするウェア一覧を作成
             {
-                var dict = new Dictionary<string, List<(string, double)>>();
-
-                var query = @"
-SELECT
-	WareResource.Method,
-	WareResource.WareID,
-	(CAST(WareResource.Amount AS REAL) / WareProduction.Amount) / (WareProduction.Time / 3600.0) AS Amount
-	
-FROM
-	WareProduction,
-	WareResource
-	
-WHERE
-	WareResource.WareID = 'workunit_busy' AND
-	WareResource.WareID = WareProduction.WareID AND
-	WareResource.Method = WareProduction.Method";
-
-                _WorkUnitWares = X4Database.Instance.Query<(string Method, string WareID, double Amount)>(query)
-                    .GroupBy(x => x.Method)
-                    .ToDictionary(x => x.Key, x => x.Select(y => (y.WareID, y.Amount)).ToArray());
+                var workUnit = Ware.Get("workunit_busy");
+                _WorkUnitWares = workUnit.Productions
+                    .ToDictionary(
+                        x => x.Method,
+                        x => workUnit.Resources[x.Method]
+                        .Select(y => (y.NeedWareID, (double)y.Amount / x.Amount / (x.Time / 3600.0)))
+                        .ToArray()
+                    );
             }
 
             // 居住モジュールの所有種族一覧を作成
             {
-                var query = @"
-SELECT
-	DISTINCT Module.ModuleID,
-	Module.WorkersCapacity,
-	Race.RaceID
-	
-FROM
-	WareOwner,
-	Faction,
-	Race,
-	Module
-	
-WHERE
-	Module.ModuleID     = WareOwner.WareID AND
-	WareOwner.FactionID = Faction.FactionID AND
-	Faction.RaceID      = Race.RaceID AND
-	Module.ModuleTypeID = 'habitation'";
-
-                _HabitationModuleOwners = X4Database.Instance.Query<(string ModuleID, long WorkersCapacity, string RaceID)>(query)
-                    .ToDictionary(x => x.ModuleID, x => (x.RaceID, x.WorkersCapacity));
+                _HabitationModuleOwners = Ware.GetAll<Module>()
+                    .Where(x => x.ModuleType.ModuleTypeID == "habitation" && x.Owners.Any())
+                    .ToDictionary(x => x.ID, x => (x.Owners.First().Race.RaceID, x.WorkersCapacity));
             }
         }
 
@@ -146,41 +114,42 @@ WHERE
         /// </summary>
         /// <param name="moduleID">モジュールID</param>
         /// <returns>製品と必要ウェア</returns>
-        public IEnumerable<(string WareID, long Amount, IReadOnlyDictionary<string, WareEffect>? Efficiency)> CalcProduction(string moduleID)
+        public IEnumerable<(string WareID, long Amount, IReadOnlyDictionary<string, WareEffect>? Efficiency)> CalcProduction(Module module)
         {
             // モジュールの生産品を取得
-            var product = Ware.TryGet<Module>(moduleID)?.ModuleProduct ?? throw new ArgumentException();
-            
-            // ウェア生産情報を取得
-            var wareProduction = WareProduction.Get(product.WareID, product.Method) ?? throw new ArgumentException();
+            foreach (var product in module.Product)
             {
-                // ウェア生産時の追加効果一覧をウェア生産方式別に抽出
-                var effects = WareEffect.Get(product.WareID, product.Method);
-
-                yield return (product.WareID, (long)Math.Floor(wareProduction.Amount * (3600 / wareProduction.Time)), effects);
-            }
-
-
-
-            // ウェア生産に必要なウェア一覧(候補)
-            if (_WareResource.TryGetValue(product.WareID, out var wareResourceArr))
-            {
-                // ウェア生産に必要なウェア一覧
-                var wareResources = Enumerable.Empty<(string, string, long)>();
-
-                if (product.Method != "default")
+                // ウェア生産情報を取得
+                var wareProduction = WareProduction.Get(product.WareID, product.Method) ?? throw new ArgumentException();
                 {
-                    wareResources = wareResourceArr.Where(x => x.Item1 != "default" && x.Item1 == product.Method);
+                    // ウェア生産時の追加効果一覧をウェア生産方式別に抽出
+                    var effects = WareEffect.Get(product.WareID, product.Method);
+
+                    yield return (product.WareID, (long)Math.Floor(wareProduction.Amount * (3600 / wareProduction.Time)), effects);
                 }
 
-                if (!wareResources.Any())
-                {
-                    wareResources = wareResourceArr.Where(x => x.Item1 == "default");
-                }
 
-                foreach (var res in wareResources)
+
+                // ウェア生産に必要なウェア一覧(候補)
+                if (_WareResource.TryGetValue(product.WareID, out var wareResourceArr))
                 {
-                    yield return (res.Item2, (long)Math.Floor(-3600 / wareProduction.Time * res.Item3), null);
+                    // ウェア生産に必要なウェア一覧
+                    var wareResources = Enumerable.Empty<(string, string, long)>();
+
+                    if (product.Method != "default")
+                    {
+                        wareResources = wareResourceArr.Where(x => x.Item1 != "default" && x.Item1 == product.Method);
+                    }
+
+                    if (!wareResources.Any())
+                    {
+                        wareResources = wareResourceArr.Where(x => x.Item1 == "default");
+                    }
+
+                    foreach (var res in wareResources)
+                    {
+                        yield return (res.Item2, (long)Math.Floor(-3600 / wareProduction.Time * res.Item3), null);
+                    }
                 }
             }
         }
@@ -242,7 +211,7 @@ WHERE
                 }
 
                 // モジュールが製造するウェア数を計算
-                var addProducts = CalcProduction(module.Key);
+                var addProducts = CalcProduction(Ware.Get<Module>(module.Key));
                 var (_, addAmount, addEfficiency) = addProducts.First();
                 if (addEfficiency?.ContainsKey("sunlight") ?? false)
                 {

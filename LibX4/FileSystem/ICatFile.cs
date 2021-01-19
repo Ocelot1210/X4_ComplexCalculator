@@ -18,6 +18,14 @@ namespace LibX4.FileSystem
 
 
         /// <summary>
+        /// 指定したファイルのオープンをを試みる
+        /// </summary>
+        /// <param name="filePath">ファイルパス</param>
+        /// <returns>ファイルの内容又はnull</returns>
+        public MemoryStream? TryOpenFile(string filePath);
+
+
+        /// <summary>
         /// XML ファイルの読み込みを試みる
         /// </summary>
         /// <param name="filePath">開くファイルの相対パス</param>

@@ -1,5 +1,4 @@
 ﻿using Prism.Mvvm;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using X4_ComplexCalculator.DB.X4DB;
@@ -39,21 +38,19 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
 
         #region プロパティ
-        /// <summary>
-        /// モジュールID
-        /// </summary>
+        /// <inheritdoc/>
+        public string WareID { get; }
+
+
+        //// <inheritdoc/>
         public string ModuleID { get; }
 
 
-        /// <summary>
-        /// モジュール名
-        /// </summary>
+        /// <inheritdoc/>
         public string ModuleName { get; }
 
 
-        /// <summary>
-        /// モジュール数
-        /// </summary>
+        /// <inheritdoc/>
         public long ModuleCount
         {
             get => _ModuleCount;
@@ -67,15 +64,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         }
 
 
-        /// <summary>
-        /// 製品数
-        /// </summary>
+        /// <inheritdoc/>
         public long Amount => (long)(Efficiency * _Amount * ModuleCount);
 
 
-        /// <summary>
-        /// 生産性(効率)
-        /// </summary>
+        /// <inheritdoc/>
         public double Efficiency
         {
             get
@@ -101,14 +94,17 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="moduleID">モジュールID</param>
+        /// <param name="wareID">親要素のウェアID</param>
+        /// <param name="module">モジュールID</param>
         /// <param name="moduleCount">モジュール数</param>
         /// <param name="efficiency">効率</param>
         /// <param name="amount">製品数</param>
         /// <param name="settings">ステーションの設定</param>
-        public ProductDetailsListItem(string moduleID, long moduleCount, IReadOnlyDictionary<string, WareEffect> efficiency, long amount, IStationSettings settings)
+        public ProductDetailsListItem(string wareID, Module module, long moduleCount, IReadOnlyDictionary<string, WareEffect> efficiency, long amount, IStationSettings settings)
         {
-            ModuleID = moduleID;
+            WareID = wareID;
+            ModuleID = module.ID;
+            ModuleName = module.Name;
             ModuleCount = moduleCount;
             _Amount = amount;
             _MaxEfficiencies = efficiency;
@@ -124,9 +120,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             {
                 _Efficiencies["sunlight"] = settings.Sunlight;
             }
-
-            ModuleName = Ware.TryGet<Module>(moduleID)?.Name ?? throw new ArgumentException($"Invalid module ID. ({moduleID})", nameof(moduleID));
         }
+
+
 
 
         /// <summary>

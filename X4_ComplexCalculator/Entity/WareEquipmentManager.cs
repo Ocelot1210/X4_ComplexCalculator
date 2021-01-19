@@ -131,7 +131,7 @@ namespace X4_ComplexCalculator.Entity
 
         /// <inheritdoc />
         public bool Equals(WareEquipmentManager? other)
-            => other is not null && other.Ware == Ware && other._Equipped.SequenceEqual(_Equipped);
+            => other is not null && Ware.Equals(other.Ware) && other._Equipped.SequenceEqual(_Equipped);
 
 
         /// <inheritdoc />

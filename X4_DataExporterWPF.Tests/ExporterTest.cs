@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Xml.Linq;
 using LibX4.FileSystem;
 using LibX4.Lang;
@@ -181,7 +182,11 @@ namespace X4_DataExporterWPF.Tests
 
 
             public MemoryStream OpenFile(string filePath)
-                => throw new FileNotFoundException(nameof(filePath), filePath);
+                => throw new NotSupportedException();
+
+
+            public MemoryStream? TryOpenFile(string filePath)
+                => throw new NotSupportedException();
 
 
             /// <summary>

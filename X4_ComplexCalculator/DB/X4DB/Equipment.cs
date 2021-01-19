@@ -57,7 +57,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// タグ情報
         /// </summary>
-        public IReadOnlyList<string> Tags { get; }
+        public HashSet<string> Tags { get; }
         #endregion
 
 
@@ -88,7 +88,7 @@ namespace X4_ComplexCalculator.DB.X4DB
             MakerRace = (makerRace is not null) ? Race.Get(makerRace) : null;
 
             const string tagsSql = "SELECT Tag FROM EquipmentTag WHERE EquipmentID = :EquipmentID";
-            Tags = X4Database.Instance.Query<string>(tagsSql, keyObj).ToArray();
+            Tags = new HashSet<string>(X4Database.Instance.Query<string>(tagsSql, keyObj));
         }
 
 

@@ -70,7 +70,15 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="obj">比較対象</param>
         /// <returns></returns>
-        public override bool Equals(object? obj) => obj is TransportType tgt && tgt.TransportTypeID == TransportTypeID;
+        public override bool Equals(object? obj) => obj is TransportType other && Equals(other);
+
+
+        /// <summary>
+        /// 比較
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals(TransportType other) => TransportTypeID == other.TransportTypeID;
 
 
         /// <summary>

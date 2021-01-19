@@ -59,11 +59,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="transportTypeID">カーゴ種別ID</param>
+        /// <param name="transportType">カーゴ種別</param>
         /// <param name="details">詳細情報</param>
-        public StoragesGridItem(string transportTypeID, IEnumerable<StorageDetailsListItem> details)
+        public StoragesGridItem(TransportType transportType, IEnumerable<StorageDetailsListItem> details)
         {
-            TransportType = TransportType.Get(transportTypeID);
+            TransportType = transportType;
             Details = new ObservableRangeCollection<StorageDetailsListItem>(details);
         }
 

@@ -27,7 +27,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// タグ一覧
         /// </summary>
 
-        private static readonly Dictionary<string, IReadOnlyList<string>> _TagsDict = new();
+        private static readonly Dictionary<string, HashSet<string>> _TagsDict = new();
         #endregion
 
 
@@ -59,7 +59,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// タグ情報
         /// </summary>
-        public IReadOnlyList<string> Tags { get; }
+        public HashSet<string> Tags { get; }
         #endregion
 
 
@@ -92,7 +92,7 @@ namespace X4_ComplexCalculator.DB.X4DB
 
             // 単純に装備情報一覧を作成しようとすると時間がかかるため
             // Tagsを何度も作成しないように工夫する
-            const string sql2 = @"
+            const string sql = @"
 SELECT
 	WareEquipment.WareID,
 	WareEquipment.ConnectionName,
@@ -111,7 +111,7 @@ WHERE
 GROUP BY
 	WareEquipment.WareID,
 	WareEquipment.ConnectionName";
-            foreach (var item in X4Database.Instance.Query<WareEquipment>(sql2).GroupBy(x => x.ID))
+            foreach (var item in X4Database.Instance.Query<WareEquipment>(sql).GroupBy(x => x.ID))
             {
                 _WareEquipments.Add(item.Key, item.ToArray());
             }
@@ -151,7 +151,7 @@ GROUP BY
 
             foreach (var tagsText in X4Database.Instance.Query<string>(sql))
             {
-                _TagsDict.Add(tagsText, tagsText.Split('彁'));
+                _TagsDict.Add(tagsText, new HashSet<string>(tagsText.Split('彁')));
             }
         }
 

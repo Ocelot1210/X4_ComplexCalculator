@@ -5,6 +5,7 @@ using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
+
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWareInfo
 {
     /// <summary>
@@ -34,39 +35,14 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
         /// </summary>
         private WorkForceNeedWareCalculator()
         {
-            var dict = new Dictionary<string, List<(string, double)>>();
-
-            var query = @"
-SELECT
-	WareResource.Method,
-	WareResource.WareID,
-	(CAST(WareResource.Amount AS REAL) / WareProduction.Amount) / (WareProduction.Time / 3600.0) AS Amount
-	
-FROM
-	WareProduction,
-	WareResource
-	
-WHERE
-	WareResource.WareID = 'workunit_busy' AND
-	WareResource.WareID = WareProduction.WareID AND
-	WareResource.Method = WareProduction.Method";
-
-            X4Database.Instance.ExecQuery(query, (dr, _) =>
-            {
-                var method = (string)dr["Method"];
-                var wareID = (string)dr["WareID"];
-                var amount = (double)dr["Amount"];
-
-                if (!dict.ContainsKey(method))
-                {
-                    dict.Add(method, new List<(string, double)>());
-                }
-
-                dict[method].Add((wareID, amount));
-            });
-
-
-            _NeedWares = dict.ToDictionary(x => x.Key, x => x.Value.ToArray());
+            var workUnit = Ware.Get("workunit_busy");
+            _NeedWares = workUnit.Productions
+                .ToDictionary(
+                    x => x.Method,
+                    x => workUnit.Resources[x.Method]
+                    .Select(y => (y.NeedWareID, (double)y.Amount / x.Amount / (x.Time / 3600.0)))
+                    .ToArray()
+                );
         }
 
 
@@ -121,7 +97,7 @@ WHERE
         /// 計算する
         /// </summary>
         /// <param name="modules">モジュール一覧</param>
-        public Dictionary<string, (string WareID, long Amount)[]> Calc(IEnumerable<ModulesGridItem> modules)
+        public Dictionary<string, IReadOnlyList<(string WareID, long Amount)>> Calc(IEnumerable<ModulesGridItem> modules)
         {
             var ret = new Dictionary<string, List<(string WareID, long Amount)>>();
 
@@ -143,7 +119,7 @@ WHERE
                 ret[method].AddRange(wares.Select(x => (x.Item1, (long)Math.Ceiling(x.Item2 * module.Module.WorkersCapacity) * module.ModuleCount)));
             }
 
-            return ret.ToDictionary(x => x.Key, x => x.Value.ToArray());
+            return ret.ToDictionary(x => x.Key, x => x.Value as IReadOnlyList<(string, long)>);
         }
     }
 }

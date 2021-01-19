@@ -87,6 +87,12 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// 装備一覧
         /// </summary>
         public IReadOnlyDictionary<string, WareEquipment> Equipments { get; }
+
+
+        /// <summary>
+        /// 生産に必要なウェア情報
+        /// </summary>
+        public IReadOnlyDictionary<string, IReadOnlyList<WareResource>> Resources { get; }
         #endregion
 
 
@@ -136,6 +142,8 @@ WHERE
 
             Equipments = WareEquipment.Get(wareID)
                 .ToDictionary(x => x.ConnectionName);
+
+            Resources = WareResource.Get(wareID);
         }
 
 
@@ -183,9 +191,11 @@ WHERE
             WareProduction.Init();
             WareEquipment.Init();
             WareEffect.Init();
+            WareResource.Init();
 
             ModuleType.Init();
             ModuleProduct.Init();
+            ModuleStorage.Init();
             ShipHanger.Init();
             ShipType.Init();
 
@@ -248,18 +258,18 @@ WHERE
 
 
         /// <summary>
+        /// 比較
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public virtual bool Equals(Ware other) => ID == other.ID;
+
+
+        /// <summary>
         /// ハッシュ値を取得
         /// </summary>
         /// <returns>ハッシュ値</returns>
         public override int GetHashCode() => HashCode.Combine(ID);
-
-
-
-        public static bool operator ==(Ware ware1, Ware ware2) => ware1.ID == ware2.ID;
-
-        public static bool operator !=(Ware ware1, Ware ware2) => ware1.ID != ware2.ID;
-
-
 
 
         /// <summary>

@@ -45,7 +45,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// モジュールの製品
         /// </summary>
-        public ModuleProduct? ModuleProduct { get; }
+        public IReadOnlyList<ModuleProduct> Product { get; }
 
 
         /// <summary>
@@ -58,6 +58,12 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// 装備可能なシールドの数
         /// </summary>
         public IReadOnlyDictionary<X4Size, int> ShieldCapacity { get; }
+
+
+        /// <summary>
+        /// 保管庫情報
+        /// </summary>
+        public ModuleStorage Storage { get; }
         #endregion
 
 
@@ -97,7 +103,9 @@ namespace X4_ComplexCalculator.DB.X4DB
 
             ModuleType = ModuleType.Get(moduleTypeID);
 
-            ModuleProduct = ModuleProduct.Get(id);
+            Product = ModuleProduct.Get(id);
+
+            Storage = ModuleStorage.Get(id);
         }
 
 

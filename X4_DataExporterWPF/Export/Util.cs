@@ -95,18 +95,11 @@ namespace X4_DataExporterWPF.Export
                 return null;
             }
 
-            try
+            using var rawIconStream = catFile.TryOpenFile(Path.Combine(dir, $"{fileName}.gz"));
+            if (rawIconStream is not null)
             {
-                using var rawIconStream = catFile.OpenFile(Path.Combine(dir, $"{fileName}.gz"));
-                if (rawIconStream is not null)
-                {
-                    var inStream = new GZipStream(rawIconStream, CompressionMode.Decompress);
-                    return DDS2Png(inStream);
-                }
-            }
-            catch (FileNotFoundException)
-            {
-                return null;
+                var inStream = new GZipStream(rawIconStream, CompressionMode.Decompress);
+                return DDS2Png(inStream);
             }
 
             return null;

@@ -83,16 +83,15 @@ CREATE TABLE IF NOT EXISTS ModuleProduct
 
                 var macroName = module.XPathSelectElement("component").Attribute("ref").Value;
                 var macroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
-                var prod = macroXml.Root.XPathSelectElement("macro/properties/production");
 
-                if (prod == null) continue;
+                foreach (var queue in macroXml.Root.XPathSelectElements("macro/properties/production/queue"))
+                {
+                    var wareID = queue.Attribute("ware")?.Value ?? "";
+                    var method = queue.Attribute("method")?.Value ?? "";
+                    if (string.IsNullOrEmpty(wareID) || string.IsNullOrEmpty(method)) continue;
 
-                var wareID = prod?.Attribute("wares")?.Value;
-                if (string.IsNullOrEmpty(wareID)) continue;
-
-                var method = prod?.XPathSelectElement("queue")?.Attribute("method")?.Value ?? "default";
-
-                yield return new ModuleProduct(moduleID, wareID, method);
+                    yield return new ModuleProduct(moduleID, wareID, method);
+                }
             }
         }
     }

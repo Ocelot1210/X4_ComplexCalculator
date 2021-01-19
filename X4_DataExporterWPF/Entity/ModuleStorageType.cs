@@ -1,9 +1,9 @@
 ﻿namespace X4_DataExporterWPF.Entity
 {
     /// <summary>
-    /// モジュールの保管容量
+    /// モジュールの保管庫種別
     /// </summary>
-    public class ModuleStorage
+    public class ModuleStorageType
     {
         #region プロパティ
         /// <summary>
@@ -13,9 +13,9 @@
 
 
         /// <summary>
-        /// 保管庫容量
+        /// 保管庫種別
         /// </summary>
-        public int Amount { get; }
+        public string TransportTypeID { get; }
         #endregion
 
 
@@ -23,11 +23,11 @@
         /// コンストラクタ
         /// </summary>
         /// <param name="moduleID">モジュールID</param>
-        /// <param name="amount">保管庫容量</param>
-        public ModuleStorage(string moduleID, int amount)
+        /// <param name="transportTypeID">保管庫種別</param>
+        public ModuleStorageType(string moduleID, string transportTypeID)
         {
             ModuleID = moduleID;
-            Amount = amount;
+            TransportTypeID = transportTypeID;
         }
     }
 }

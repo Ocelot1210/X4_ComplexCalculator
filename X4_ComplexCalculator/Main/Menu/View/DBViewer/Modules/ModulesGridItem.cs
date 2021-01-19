@@ -81,10 +81,11 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Modules
 
 
             // 製品がある場合、製品の情報を設定
-            if (_Module.ModuleProduct is not null)
+            if (_Module.Product.Any())
             {
-                _Product = Ware.Get(_Module.ModuleProduct.WareID);
-                MaxEfficiency = (long)((WareEffect.Get(_Product.ID, _Module.ModuleProduct.Method, "work")!.Product + 1) * 100);
+                var firstWare = _Module.Product.First();
+                _Product = Ware.Get(firstWare.WareID);
+                MaxEfficiency = (long)((WareEffect.Get(_Product.ID, firstWare.Method, "work")!.Product + 1) * 100);
             }
         }
     }
