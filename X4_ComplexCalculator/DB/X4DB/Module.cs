@@ -70,8 +70,9 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="id"></param>
-        public Module(string id) : base(id)
+        /// <param name="id">ウェアID</param>
+        /// <param name="tags">タグ文字列</param>
+        public Module(string id, string tags) : base(id, tags)
         {
             string moduleTypeID;
             var keyObj = new { ID = id };

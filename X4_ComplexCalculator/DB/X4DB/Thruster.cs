@@ -48,7 +48,7 @@
         /// コンストラクタ
         /// </summary>
         /// <param name="id">装備ID</param>
-        internal Thruster(string id) : base(id)
+        internal Thruster(string id, string tags) : base(id, tags)
         {
             const string sql = "SELECT ThrustStrafe, ThrustPitch, ThrustYaw, ThrustRoll, AngularRoll, AngularPitch FROM Thruster WHERE EquipmentID = :EquipmentID";
 

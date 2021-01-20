@@ -143,8 +143,9 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="id"></param>
-        public Ship(string id) : base(id)
+        /// <param name="id">ウェアID</param>
+        /// <param name="tags">タグ文字列</param>
+        public Ship(string id, string tags) : base(id, tags)
         {
             const string sql1 = @"
 SELECT
@@ -227,7 +228,7 @@ WHERE
 
                 var equipments = _Wares.Values
                     .OfType<T>()
-                    .Where(x => !x.Tags.Except(wareEquipment.Tags).Any());
+                    .Where(x => !x.EquipmentTags.Except(wareEquipment.Tags).Any());
                 foreach (var equipment in equipments)
                 {
                     yield return equipment;

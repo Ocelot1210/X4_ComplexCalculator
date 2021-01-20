@@ -87,8 +87,8 @@ CREATE TABLE IF NOT EXISTS ModuleProduct
                 foreach (var queue in macroXml.Root.XPathSelectElements("macro/properties/production/queue"))
                 {
                     var wareID = queue.Attribute("ware")?.Value ?? "";
-                    var method = queue.Attribute("method")?.Value ?? "";
-                    if (string.IsNullOrEmpty(wareID) || string.IsNullOrEmpty(method)) continue;
+                    var method = queue.Attribute("method")?.Value ?? "default";
+                    if (string.IsNullOrEmpty(wareID)) continue;
 
                     yield return new ModuleProduct(moduleID, wareID, method);
                 }

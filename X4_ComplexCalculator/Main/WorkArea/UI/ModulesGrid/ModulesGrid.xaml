@@ -303,7 +303,7 @@
                             <ComboBox
                                 DisplayMemberPath="Method"
                                 FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
-                                ItemsSource="{Binding Module.ModuleProductions, Mode=OneTime}"
+                                ItemsSource="{Binding Module.Productions, Mode=OneTime}"
                                 SelectedItem="{Binding SelectedMethod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 Visibility="{Binding SelectedMethodVisiblity, Mode=OneTime}" />
                         </DataTemplate>

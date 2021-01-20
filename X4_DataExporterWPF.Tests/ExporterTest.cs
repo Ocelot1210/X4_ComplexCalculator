@@ -186,7 +186,7 @@ namespace X4_DataExporterWPF.Tests
 
 
             public MemoryStream? TryOpenFile(string filePath)
-                => throw new NotSupportedException();
+                => null;
 
 
             /// <summary>

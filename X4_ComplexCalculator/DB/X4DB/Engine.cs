@@ -53,7 +53,7 @@
         /// コンストラクタ
         /// </summary>
         /// <param name="id">装備ID</param>
-        internal Engine(string id) : base(id)
+        internal Engine(string id, string tags) : base(id, tags)
         {
             const string sql = "SELECT ForwardThrust, ReverseThrust, BoostThrust, BoostDuration, BoostReleaseTime, TravelThrust, TravelReleaseTime FROM Engine WHERE EquipmentID = :EquipmentID";
 

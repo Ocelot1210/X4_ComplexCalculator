@@ -126,7 +126,6 @@ GROUP BY
             _TagsDict.Clear();
 
             // Tagのユニークな組み合わせ一覧を取得する
-            // (幽霊文字を区切り文字にすれば安全に文字列を連結→分割できる気がする)
             const string sql = @"
 SELECT
 	DISTINCT group_concat(TmpTagsTable.Tag, '彁') As Tags
@@ -172,6 +171,6 @@ GROUP BY
         /// <param name="equipment">判定したい装備</param>
         /// <returns>指定した装備がthisに装備可能か</returns>
         public bool CanEquipped(Equipment equipment)
-            => EquipmentType == equipment.EquipmentType && !equipment.Tags.Except(Tags).Any();
+            => EquipmentType == equipment.EquipmentType && !equipment.EquipmentTags.Except(Tags).Any();
     }
 }

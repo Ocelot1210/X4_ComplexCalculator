@@ -30,7 +30,7 @@
         /// コンストラクタ
         /// </summary>
         /// <param name="id">装備ID</param>
-        internal Shield(string id) : base(id)
+        internal Shield(string id, string tags) : base(id, tags)
         {
             const string sql = "SELECT Capacity RechargeRate, RechargeDelay FROM Shield WHERE EquipmentID = :EquipmentID";
 

@@ -14,6 +14,13 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// ウェア一覧
         /// </summary>
         protected readonly static Dictionary<string, Ware> _Wares = new();
+
+
+        /// <summary>
+        /// タグ一覧
+        /// </summary>
+
+        private static readonly Dictionary<string, HashSet<string>> _TagsDict = new();
         #endregion
 
 
@@ -93,6 +100,12 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// 生産に必要なウェア情報
         /// </summary>
         public IReadOnlyDictionary<string, IReadOnlyList<WareResource>> Resources { get; }
+
+
+        /// <summary>
+        /// タグ一覧
+        /// </summary>
+        public HashSet<string> Tags { get; }
         #endregion
 
 
@@ -101,7 +114,8 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// コンストラクタ
         /// </summary>
         /// <param name="wareID">ウェアID</param>
-        protected Ware(string wareID)
+        /// <param name="tags">タグ一覧</param>
+        protected Ware(string wareID, string tags)
         {
             ID = wareID;
 
@@ -144,6 +158,7 @@ WHERE
                 .ToDictionary(x => x.ConnectionName);
 
             Resources = WareResource.Get(wareID);
+            Tags = _TagsDict[tags];
         }
 
 
@@ -151,32 +166,30 @@ WHERE
         /// ウェアを作成する
         /// </summary>
         /// <param name="id">ウェアID</param>
+        /// <param name="tagsText">タグ一覧</param>
         /// <returns>ウェアIDに対応するウェア</returns>
-        private static Ware Create(string id)
+        private static Ware Create(string id, string tagsText, HashSet<string> tags)
         {
-            const string tagQuery = @"SELECT Tag FROM WareTags WHERE WareID = :WareID ORDER BY Tag";
-            var tags = X4Database.Instance.Query<string>(tagQuery, new { WareID = id }).ToArray();
-
             // ステーションモジュールの場合
             if (tags.Contains("module"))
             {
-                return new Module(id);
+                return new Module(id, tagsText);
             }
             
             // 装備の場合
             if (tags.Contains("equipment"))
             {
-                return Equipment.Create(id) ?? new Ware(id);
+                return Equipment.Create(id, tagsText) ?? new Ware(id, tagsText);
             }
 
             // 艦船の場合
             if (tags.Contains("ship"))
             {
-                return new Ship(id);
+                return new Ship(id, tagsText);
             }
 
             // それ以外の場合
-            return new Ware(id);
+            return new Ware(id, tagsText);
         }
 
 
@@ -199,12 +212,66 @@ WHERE
             ShipHanger.Init();
             ShipType.Init();
 
-            const string sql = "SELECT WareID FROM Ware WHERE TransportTypeID <> 'inventory'";
-            foreach (var wareID in X4Database.Instance.Query<string>(sql))
+            InitTagsDict();
+            const string sql = @"
+SELECT
+	Ware.WareID,
+	group_concat(Sorted_WareTags.Tag, '彁') AS Tags
+FROM
+	Ware,
+	(SELECT WareTags.WareID, WareTags.Tag FROM WareTags ORDER BY WareTags.WareID, WareTags.Tag) Sorted_WareTags
+	
+WHERE
+	Ware.WareID = Sorted_WareTags.WareID AND
+	Ware.TransportTypeID <> 'inventory'
+
+GROUP BY
+	Ware.WareID";
+            foreach (var (wareID, tags) in X4Database.Instance.Query<(string wareID, string tags)>(sql))
             {
-                _Wares.Add(wareID, Create(wareID));
+                _Wares.Add(wareID, Create(wareID, tags, _TagsDict[tags]));
             }
         }
+
+
+        /// <summary>
+        /// タグ一覧のディクショナリを初期化する
+        /// </summary>
+        private static void InitTagsDict()
+        {
+            _TagsDict.Clear();
+
+            // Tagのユニークな組み合わせ一覧を取得する
+            const string sql = @"
+SELECT
+	DISTINCT group_concat(TmpTagsTable.Tag, '彁') As Tags
+	
+FROM
+	(
+		SELECT
+			WareTags.WareID,
+			WareTags.Tag
+		FROM
+			WareTags
+		ORDER BY
+			WareTags.WareID,
+			WareTags.Tag
+	) TmpTagsTable
+
+GROUP BY
+	TmpTagsTable.WareID";
+
+            foreach (var tagsText in X4Database.Instance.Query<string>(sql))
+            {
+                _TagsDict.Add(tagsText, new HashSet<string>(tagsText.Split('彁')));
+            }
+        }
+
+
+
+
+
+
 
 
         /// <summary>
@@ -282,7 +349,7 @@ WHERE
             {
                 return _Wares.Values
                     .OfType<T>()
-                    .Where(x => !x.Tags.Except(wareEquipment.Tags).Any());
+                    .Where(x => !x.EquipmentTags.Except(wareEquipment.Tags).Any());
             }
 
             return Enumerable.Empty<T>();

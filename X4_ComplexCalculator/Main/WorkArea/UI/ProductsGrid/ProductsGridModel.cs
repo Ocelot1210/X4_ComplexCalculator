@@ -59,12 +59,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// 前回値オプション保存用
         /// </summary>
         private readonly Dictionary<string, ProductsGridItem> _OptionsBakDict = new();
-
-
-        /// <summary>
-        /// モジュール自動追加作業用
-        /// </summary>
-        private readonly Dictionary<string, ModulesGridItem> AutoAddModuleWork = new();
         #endregion
 
 
@@ -167,7 +161,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             var addedRecords = 0L;              // 追加レコード数
             var addedModules = 0L;              // 追加モジュール数
 
-            AutoAddModuleWork.Clear();
+            // モジュール自動追加で追加されたモジュール一覧
+            var autoAddedModules = new Dictionary<string, ModulesGridItem>();
+
 
             while (true)
             {
@@ -180,27 +176,24 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                     break;
                 }
 
-                var addModulesGridItems = new List<ModulesGridItem>();      // 実際に追加するモジュール一覧
+                var addTarget = new List<ModulesGridItem>();      // 実際に追加するモジュール一覧
 
-                foreach (var (moduleID, count) in addModules)
+                foreach (var (module, count) in addModules)
                 {
                     // モジュール自動追加作業用に実際に追加するモジュールが存在するか？
-                    if (AutoAddModuleWork.ContainsKey(moduleID))
+                    if (autoAddedModules.ContainsKey(module.ID))
                     {
                         // モジュール自動追加作業用に実際に追加するモジュールが存在する場合、
                         // モジュール数を増やしてレコードがなるべく増えないようにする
-                        AutoAddModuleWork[moduleID].ModuleCount += count;
+                        autoAddedModules[module.ID].ModuleCount += count;
                     }
                     else
                     {
                         // モジュール自動追加作業用に実際に追加するモジュールが存在しない場合、
                         // 実際に追加するモジュールと見なす
-                        var module = Ware.TryGet<Module>(moduleID);
-                        if (module is null) return;
-
                         var mgi = new ModulesGridItem(module, null, count) { EditStatus = EditStatus.Edited };
-                        addModulesGridItems.Add(mgi);
-                        AutoAddModuleWork.Add(moduleID, mgi);
+                        addTarget.Add(mgi);
+                        autoAddedModules.Add(module.ID, mgi);
 
                         // 追加レコード数更新
                         addedRecords++;
@@ -211,7 +204,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 }
 
                 // モジュール一覧に追加対象モジュールを追加
-                _Modules.Modules.AddRange(addModulesGridItems);
+                _Modules.Modules.AddRange(addTarget);
             }
 
 
@@ -224,7 +217,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 LocalizedMessageBox.Show("Lang:AddedModulesAutomaticallyMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, addedRecords, addedModules);
             }
 
-            AutoAddModuleWork.Clear();
+            autoAddedModules.Clear();
         }
 
 
@@ -428,7 +421,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 .Where(x => x.Module.Resources.Any() || x.Module.Product.Any())
                 .GroupBy(x => x.Module)
                 .Select(x => (Module: x.Key, Count: x.Sum(y => y.ModuleCount)))
-                .SelectMany(x => AggregateHelper(x.Module, x.Count))
+                .SelectMany(x => _ProductCalculator.Calc(x.Module, x.Count))
                 .GroupBy(x => x.WareID)
                 .ToDictionary(
                     x => Ware.Get(x.Key),
@@ -441,85 +434,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                             ).ToArray() as IReadOnlyList<IProductDetailsListItem>
                 );
 
-        }
-
-
-
-        /// <summary>
-        /// モジュールの種類別に集計方法を変えて製品を集計する
-        /// </summary>
-        /// <param name="module"></param>
-        /// <param name="count"></param>
-        /// <returns></returns>
-        private IEnumerable<AggregateInternal> AggregateHelper(Module module, long count)
-        {
-            return module.ModuleType.ModuleTypeID switch
-            {
-                "production" => AggregateProduct2(module, count),
-                "habitation" => AggregateHabitation2(module, count),
-                _ => Enumerable.Empty<AggregateInternal>()
-            };
-        }
-
-
-        /// <summary>
-        /// 製品を集計
-        /// </summary>
-        /// <param name="moduleID"></param>
-        /// <param name="count"></param>
-        /// <param name="prodDict"></param>
-        private IEnumerable<AggregateInternal> AggregateProduct2(Module module, long count)
-        {
-            foreach (var ware in _ProductCalculator.CalcProduction(module))
-            {
-                if (ware.Efficiency is not null)
-                {
-                    yield return new AggregateInternal(ware.WareID, module, count, ware.Amount, ware.Efficiency);
-                }
-                else
-                {
-                    yield return new AggregateInternal(ware.WareID, module, count, ware.Amount);
-                }
-            }
-        }
-
-
-        /// <summary>
-        /// 居住モジュールを集計
-        /// </summary>
-        /// <param name="moduleID"></param>
-        /// <param name="moduleCount">モジュール数</param>
-        /// <param name="prodDict"></param>
-        private IEnumerable<AggregateInternal> AggregateHabitation2(Module module, long moduleCount)
-        {
-            foreach (var ware in _ProductCalculator.CalcHabitation(module.ID))
-            {
-                yield return new AggregateInternal(ware.WareID, module, moduleCount, ware.Amount);
-            }
-        }
-
-
-        private class AggregateInternal
-        {
-            public string WareID { get; }
-
-            public Module Module { get; }
-
-            public long ModuleCount { get; }
-
-            public long WareAmount { get; }
-
-            public IReadOnlyDictionary<string, WareEffect>? Efficiency { get; }
-
-
-            public AggregateInternal(string wareID, Module module, long moduleCount, long wareAmount, IReadOnlyDictionary<string, WareEffect>? efficiency = null)
-            {
-                WareID = wareID;
-                Module = module;
-                ModuleCount = moduleCount;
-                WareAmount = wareAmount;
-                Efficiency = efficiency;
-            }
         }
     }
 }

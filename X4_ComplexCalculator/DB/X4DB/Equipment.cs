@@ -57,7 +57,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// タグ情報
         /// </summary>
-        public HashSet<string> Tags { get; }
+        public HashSet<string> EquipmentTags { get; }
         #endregion
 
 
@@ -65,8 +65,9 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="id"></param>
-        protected Equipment(string id) : base(id)
+        /// <param name="id">ウェアID</param>
+        /// <param name="tags">タグ文字列</param>
+        protected Equipment(string id, string tags) : base(id, tags)
         {
             var keyObj = new { EquipmentID = id };
 
@@ -88,7 +89,7 @@ namespace X4_ComplexCalculator.DB.X4DB
             MakerRace = (makerRace is not null) ? Race.Get(makerRace) : null;
 
             const string tagsSql = "SELECT Tag FROM EquipmentTag WHERE EquipmentID = :EquipmentID";
-            Tags = new HashSet<string>(X4Database.Instance.Query<string>(tagsSql, keyObj));
+            EquipmentTags = new HashSet<string>(X4Database.Instance.Query<string>(tagsSql, keyObj));
         }
 
 
@@ -96,9 +97,10 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// インスタンスを作成
         /// </summary>
-        /// <param name="id">装備品ID</param>
+        /// <param name="id">ウェアID</param>
+        /// <param name="tags">タグ文字列</param>
         /// <returns>装備品IDに対応するインスタンス</returns>
-        public static Equipment? Create(string id)
+        public static Equipment? Create(string id, string tags)
         {
             const string sql = "SELECT EquipmentTypeID FROM Equipment WHERE EquipmentID = :EquipmentID UNION ALL SELECT '' AS EquipmentTypeID LIMIT 1";
 
@@ -112,15 +114,15 @@ namespace X4_ComplexCalculator.DB.X4DB
             {
                 return equipmentTypeID switch
                 {
-                    "engines" => new Engine(id),
-                    "shields" => new Shield(id),
-                    "thrusters" => new Thruster(id),
-                    _ => new Equipment(id)
+                    "engines" => new Engine(id, tags),
+                    "shields" => new Shield(id, tags),
+                    "thrusters" => new Thruster(id, tags),
+                    _ => new Equipment(id, tags)
                 };
             }
             catch
             {
-                return new Equipment(id);
+                return new Equipment(id, tags);
             }
         }
 
