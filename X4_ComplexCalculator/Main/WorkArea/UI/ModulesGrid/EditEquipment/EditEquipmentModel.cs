@@ -8,6 +8,7 @@ using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
 {
@@ -64,20 +65,26 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
                 RaisePropertyChanged();
             }
         }
+
+
+        /// <summary>
+        /// タブアイテム一覧
+        /// </summary>
+        public ObservableRangeCollection<EquipmentListViewModel> EquipmentListViewModels { get; } = new();
         #endregion
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="module">編集対象モジュール</param>
-        public EditEquipmentModel(Ware module)
+        /// <param name="ware">編集対象ウェア</param>
+        public EditEquipmentModel(Ware ware)
         {
             // 初期化
-            _Ware = module;
-            InitEquipmentSizes(module.ID);
+            _Ware = ware;
+            InitEquipmentSizes(ware.ID);
             UpdateFactions();
-            InitPreset(module.ID);
+            InitPreset(ware.ID);
         }
 
 
@@ -166,13 +173,7 @@ WHERE
             if (onOK)
             {
                 // 新プリセット名が設定された場合
-
-                var param = new SQLiteCommandParameters(3);
-                param.Add("presetName", System.Data.DbType.String, newPresetName);
-                param.Add("moduleID", System.Data.DbType.String, _Ware.ID);
-                param.Add("presetID", System.Data.DbType.Int64, SelectedPreset.ID);
-                SettingDatabase.Instance.ExecQuery($"UPDATE ModulePresets Set PresetName = :presetName WHERE ModuleID = :moduleID AND presetID = :presetID", param);
-
+                SettingDatabase.Instance.UpdateModulePresetName(_Ware.ID, SelectedPreset.ID, newPresetName);
                 var newPreset = new PresetComboboxItem(SelectedPreset.ID, newPresetName);
                 Presets.Replace(SelectedPreset, newPreset);
                 SelectedPreset = newPreset;
@@ -188,28 +189,9 @@ WHERE
             var (onOK, presetName) = SelectStringDialog.ShowDialog("Lang:EditPresetName", "Lang:PresetName", "", IsValidPresetName);
             if (onOK)
             {
-                var id = 0L;
-
-                var query = @$"
-SELECT
-    ifnull(MIN( PresetID + 1 ), 0) AS PresetID
-FROM
-    ModulePresets
-WHERE
-	ModuleID = '{_Ware.ID}' AND
-    ( PresetID + 1 ) NOT IN ( SELECT PresetID FROM ModulePresets WHERE ModuleID = '{_Ware.ID}')";
-
-                SettingDatabase.Instance.ExecQuery(query, (dr, _) =>
-                {
-                    id = (long)dr["PresetID"];
-                });
-
+                var id = SettingDatabase.Instance.AddModulePreset(_Ware.ID, presetName);
                 var item = new PresetComboboxItem(id, presetName);
-
-                SettingDatabase.Instance.BeginTransaction();
-                SettingDatabase.Instance.ExecQuery($"INSERT INTO ModulePresets(ModuleID, PresetID, PresetName) VALUES('{_Ware.ID}', {item.ID}, '{item.Name}')");
                 Presets.Add(item);
-                SettingDatabase.Instance.Commit();
 
                 SelectedPreset = item;
             }
@@ -236,6 +218,7 @@ WHERE
                 SelectedPreset = Presets.FirstOrDefault();
             }
         }
+
 
         /// <summary>
         /// プリセット名が有効か判定する

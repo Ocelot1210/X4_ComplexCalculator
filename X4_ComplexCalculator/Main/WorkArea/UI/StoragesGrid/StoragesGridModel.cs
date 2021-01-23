@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Data.SQLite;
 using System.Linq;
 using System.Threading.Tasks;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
@@ -74,7 +72,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         private async Task OnModulePropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             // モジュール数変更時のみ処理
-            if (e.PropertyName != "ModuleCount")
+            if (e.PropertyName != nameof(ModulesGridItem.ModuleCount))
             {
                 await Task.CompletedTask;
                 return;
@@ -86,9 +84,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
                 await Task.CompletedTask;
                 return;
             }
-
+            
             // 保管モジュールの場合のみ更新
-            if (module.Module.ModuleType.ModuleTypeID == "storage")
+            if (0 < module.Module.Storage.Amount && module.Module.Storage.Types.Any())
             {
                 if (e is not PropertyChangedExtendedEventArgs<long> ev)
                 {
@@ -128,6 +126,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
             await Task.CompletedTask;
         }
 
+
         /// <summary>
         /// モジュールが追加された時
         /// </summary>
@@ -156,6 +155,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
 
             Storages.AddRange(addTarget);
         }
+
 
         /// <summary>
         /// モジュールが削除された時
@@ -199,6 +199,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         }
 
 
+
         /// <summary>
         /// モジュール情報を保管庫種別単位に集計
         /// </summary>
@@ -207,7 +208,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         private IReadOnlyDictionary<TransportType, IReadOnlyList<StorageDetailsListItem>> AggregateStorage(IEnumerable<ModulesGridItem> modules)
         {
             return modules
-                .Where(x => x.Module.ModuleType.ModuleTypeID == "storage")
+                .Where(x => 0 < x.Module.Storage.Amount && x.Module.Storage.Types.Any())
                 .GroupBy(x => x.Module.ID)
                 .Select(x => (x.First().Module, Count: x.Sum(y => y.ModuleCount)))
                 .SelectMany(x => x.Module.Storage.Types.Select(y => new StorageDetailsListItem(x.Module, x.Count, y)))

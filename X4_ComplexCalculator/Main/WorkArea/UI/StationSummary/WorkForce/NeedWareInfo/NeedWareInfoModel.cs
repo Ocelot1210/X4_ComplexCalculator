@@ -70,18 +70,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
             _Products.Products.CollectionChanged += Products_CollectionChanged;
             _Products.Products.CollectionPropertyChanged += Products_CollectionPropertyChanged;
 
-            var query = @"
-SELECT
-	DISTINCT NeedWareID
-	
-FROM
-	WareResource
-	
-WHERE
-	WareID = 'workunit_busy'";
 
             // 集計対象ウェアを取得
-            AggregateTargetProducts = X4Database.Instance.Query<string>(query)
+            AggregateTargetProducts = Ware.Get("workunit_busy")
+                .Resources
+                .SelectMany(x => x.Value.Select(y => y.NeedWareID))
+                .Distinct()
                 .ToDictionary(x => x, x => 0L);
         }
 
@@ -299,7 +293,9 @@ WHERE
         /// </summary>
         private void UpdateTotalNeedAmount()
         {
-            var totalWares = NeedWareInfoDetails.GroupBy(x => x.WareID).Select(x => (WareID: x.Key, Amount: x.Sum(y => y.NeedAmount)));
+            var totalWares = NeedWareInfoDetails
+                .GroupBy(x => x.WareID)
+                .Select(x => (WareID: x.Key, Amount: x.Sum(y => y.NeedAmount)));
             foreach (var (WareID, Amount) in totalWares)
             {
                 var items = NeedWareInfoDetails.Where(x => x.WareID == WareID);

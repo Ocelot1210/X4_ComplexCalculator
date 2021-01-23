@@ -58,6 +58,12 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// タグ情報
         /// </summary>
         public HashSet<string> EquipmentTags { get; }
+
+
+        /// <summary>
+        /// サイズ
+        /// </summary>
+        public X4Size? Size { get; }
         #endregion
 
 
@@ -90,6 +96,8 @@ namespace X4_ComplexCalculator.DB.X4DB
 
             const string tagsSql = "SELECT Tag FROM EquipmentTag WHERE EquipmentID = :EquipmentID";
             EquipmentTags = new HashSet<string>(X4Database.Instance.Query<string>(tagsSql, keyObj));
+
+            Size = EquipmentTags.Select(x => X4Size.TryGet(x)).FirstOrDefault(x => x is not null);
         }
 
 

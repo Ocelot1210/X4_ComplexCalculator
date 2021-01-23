@@ -24,7 +24,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// 装備編集画面のModel
         /// </summary>
-        private readonly EditEquipmentModel Model;
+        private readonly EditEquipmentModel _Model;
 
         /// <summary>
         /// ウィンドウの表示状態
@@ -72,7 +72,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// 装備サイズ一覧
         /// </summary>
-        public ObservableCollection<X4Size> EquipmentSizes => Model.EquipmentSizes;
+        public ObservableCollection<X4Size> EquipmentSizes => _Model.EquipmentSizes;
 
 
         /// <summary>
@@ -91,11 +91,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
                     throw new InvalidOperationException();
                 }
 
-                if (value.SizeID != (_SelectedSize?.SizeID ?? ""))
+                if (value.Equals(_SelectedSize))
                 {
                     _SelectedSize = value;
-                    TurretsViewModel.SelectedSize = value;
-                    ShieldsViewModel.SelectedSize = value;
                     RaisePropertyChanged();
                 }
             }
@@ -110,7 +108,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// プリセット
         /// </summary>
-        public ObservableCollection<PresetComboboxItem> Presets => Model.Presets;
+        public ObservableCollection<PresetComboboxItem> Presets => _Model.Presets;
 
 
         /// <summary>
@@ -118,14 +116,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// </summary>
         public PresetComboboxItem? SelectedPreset
         {
-            get => Model.SelectedPreset;
+            get => _Model.SelectedPreset;
             set
             {
-                if (Model.SelectedPreset != value)
+                if (_Model.SelectedPreset != value)
                 {
-                    Model.SelectedPreset = value;
-                    TurretsViewModel.SelectedPreset = value;
-                    ShieldsViewModel.SelectedPreset = value;
+                    _Model.SelectedPreset = value;
                 }
             }
         }
@@ -141,18 +137,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// 閉じるボタンクリック時のコマンド
         /// </summary>
         public ICommand CloseWindowCommand { get; }
-
-
-        /// <summary>
-        /// タレット用ViewModel
-        /// </summary>
-        public EquipmentListViewModel TurretsViewModel { get; }
-
-
-        /// <summary>
-        /// シールド用ViewModel
-        /// </summary>
-        public EquipmentListViewModel ShieldsViewModel { get; }
 
 
         /// <summary>
@@ -177,6 +161,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// プリセット削除
         /// </summary>
         public ICommand RemovePresetCommand { get; }
+
+
+        /// <summary>
+        /// タブアイテム一覧
+        /// </summary>
+        public ObservableCollection<EquipmentListViewModel> EquipmentListViewModels => _Model.EquipmentListViewModels;
         #endregion
 
 
@@ -189,28 +179,23 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
             ModuleName = equipmentManager.Ware.Name;
 
             // Model類
-            Model = new EditEquipmentModel(equipmentManager.Ware);
-            Model.PropertyChanged += Model_PropertyChanged;
+            _Model = new EditEquipmentModel(equipmentManager.Ware);
+            _Model.PropertyChanged += Model_PropertyChanged;
 
-            // サブViewModel類
-            TurretsViewModel = new EquipmentListViewModel(new EquipmentListModel(equipmentManager, "turrets", Model.Factions));
-            Presets.CollectionChanged += TurretsViewModel.OnPresetsCollectionChanged;
-
-            ShieldsViewModel = new EquipmentListViewModel(new EquipmentListModel(equipmentManager, "shields", Model.Factions));
-            Presets.CollectionChanged += ShieldsViewModel.OnPresetsCollectionChanged;
 
             // コマンド類
             SaveButtonClickedCommand = new DelegateCommand(SavebuttonClicked);
             CloseWindowCommand       = new DelegateCommand(CloseWindow);
             SavePresetCommand        = new DelegateCommand(SavePreset);
-            EditPresetCommand        = new DelegateCommand(Model.EditPreset);
-            AddPresetCommand         = new DelegateCommand(Model.AddPreset);
-            RemovePresetCommand      = new DelegateCommand(Model.RemovePreset);
+            EditPresetCommand        = new DelegateCommand(_Model.EditPreset);
+            AddPresetCommand         = new DelegateCommand(_Model.AddPreset);
+            RemovePresetCommand      = new DelegateCommand(_Model.RemovePreset);
             WindowClosingCommand     = new DelegateCommand<CancelEventArgs>(WindowClosing);
+
 
             // その他初期化
             SelectedSize = EquipmentSizes.FirstOrDefault();
-            FactionsView = CollectionViewSource.GetDefaultView(Model.Factions);
+            FactionsView = CollectionViewSource.GetDefaultView(_Model.Factions);
             FactionsView.SortDescriptions.Clear();
             FactionsView.SortDescriptions.Add(new SortDescription(nameof(FactionsListItem.RaceName), ListSortDirection.Ascending));
             FactionsView.SortDescriptions.Add(new SortDescription(nameof(FactionsListItem.FactionName), ListSortDirection.Ascending));
@@ -224,12 +209,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// </summary>
         public void Dispose()
         {
-            Model.PropertyChanged     -= Model_PropertyChanged;
-            Presets.CollectionChanged -= TurretsViewModel.OnPresetsCollectionChanged;
-            Presets.CollectionChanged -= ShieldsViewModel.OnPresetsCollectionChanged;
-
-            TurretsViewModel.Dispose();
-            ShieldsViewModel.Dispose();
+            _Model.PropertyChanged    -= Model_PropertyChanged;
         }
 
 
@@ -242,7 +222,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         {
             switch (e.PropertyName)
             {
-                case nameof(Model.SelectedPreset):
+                case nameof(_Model.SelectedPreset):
                     RaisePropertyChanged(nameof(SelectedPreset));
                     break;
 
@@ -259,7 +239,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         public void WindowClosing(CancelEventArgs e)
         {
             // 装備が未保存の場合
-            if (TurretsViewModel.Unsaved || ShieldsViewModel.Unsaved)
+            if (EquipmentListViewModels.Any(x => x.Unsaved))
             {
                 var result = LocalizedMessageBox.Show("Lang:EditEquipmentWindowCloseConfirmMessage", "Lang:Confirmation", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 
@@ -267,8 +247,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
                 {
                     // 保存する場合
                     case MessageBoxResult.Yes:
-                        TurretsViewModel.SaveEquipment();
-                        ShieldsViewModel.SaveEquipment();
+                        foreach (var vm in EquipmentListViewModels)
+                        {
+                            vm.SavePreset();
+                        }
                         break;
 
                     // 保存せずに閉じる場合
@@ -286,7 +268,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
             // ウィンドウを閉じる場合、チェック状態を保存
             if (!e.Cancel)
             {
-                Task.Run(Model.SaveCheckState);
+                Task.Run(_Model.SaveCheckState);
                 Dispose();
             }
         }
@@ -297,8 +279,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// </summary>
         private void SavebuttonClicked()
         {
-            TurretsViewModel.SaveEquipment();
-            ShieldsViewModel.SaveEquipment();
+            foreach (var vm in EquipmentListViewModels)
+            {
+                vm.SaveEquipment();
+            }
             CloseWindowProperty = true;
         }
 
@@ -314,8 +298,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// </summary>
         private void SavePreset()
         {
-            TurretsViewModel.SavePreset();
-            ShieldsViewModel.SavePreset();
+            foreach (var vm in EquipmentListViewModels)
+            {
+                vm.SavePreset();
+            }
         }
     }
 }

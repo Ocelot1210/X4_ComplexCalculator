@@ -1,7 +1,4 @@
-﻿using System;
-using System.Data.SQLite;
-using Prism.Mvvm;
-using X4_ComplexCalculator.DB;
+﻿using Prism.Mvvm;
 using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
@@ -84,6 +81,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         {
             _Module = module;
             ModuleCount = moduleCount;
+            Capacity = module.Storage.Amount / module.Storage.Types.Count;
             TransportType = transportType;
         }
     }

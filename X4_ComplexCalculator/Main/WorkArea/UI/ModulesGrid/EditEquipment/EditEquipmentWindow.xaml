@@ -199,13 +199,18 @@
             Grid.Row="2"
             Grid.Column="1"
             Grid.ColumnSpan="3"
-            Margin="5,5,5,5">
-            <TabItem Header="{lex:Loc Lang:Turrets}">
-                <eqlst:EquipmentList x:Name="TurretsList" DataContext="{Binding TurretsViewModel, Mode=OneTime}" />
-            </TabItem>
-            <TabItem Header="{lex:Loc Lang:Shields}">
-                <eqlst:EquipmentList x:Name="ShieldsList" DataContext="{Binding ShieldsViewModel, Mode=OneTime}" />
-            </TabItem>
+            Margin="5,5,5,5"
+            ItemsSource="{Binding EquipmentListViewModels, Mode=OneTime}">
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Title, Mode=OneTime}" />
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <eqlst:EquipmentList />
+                </DataTemplate>
+            </TabControl.ContentTemplate>
         </TabControl>
 
     </Grid>

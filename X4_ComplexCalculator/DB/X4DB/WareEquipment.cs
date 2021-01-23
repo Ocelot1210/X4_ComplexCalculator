@@ -171,6 +171,6 @@ GROUP BY
         /// <param name="equipment">判定したい装備</param>
         /// <returns>指定した装備がthisに装備可能か</returns>
         public bool CanEquipped(Equipment equipment)
-            => EquipmentType == equipment.EquipmentType && !equipment.EquipmentTags.Except(Tags).Any();
+            => !equipment.EquipmentTags.Where(x => x != "component").Except(Tags).Any();
     }
 }

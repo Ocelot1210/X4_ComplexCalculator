@@ -64,7 +64,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
                 {
                     foreach (var module in _ModulesInfo.Modules)
                     {
-                        module.UpdateTooltip();
+                        module.UpdateEquipmentInfo();
                     }
                 });
             }

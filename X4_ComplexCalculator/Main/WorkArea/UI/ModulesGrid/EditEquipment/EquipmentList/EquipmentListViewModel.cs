@@ -30,6 +30,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
 
         #region プロパティ
         /// <summary>
+        /// タイトル文字列
+        /// </summary>
+        public string Title => _Model.Title;
+
+
+        /// <summary>
         /// 装備一覧表示用
         /// </summary>
         public ListCollectionView EquipmentsView { get; }

@@ -35,6 +35,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
 
         #region プロパティ
         /// <summary>
+        /// タイトル文字列
+        /// </summary>
+        public string Title { get; }
+
+
+        /// <summary>
         /// 装備可能な装備一覧
         /// </summary>
         public ObservablePropertyChangedCollection<EquipmentListItem> Equippable { get; } = new();
@@ -48,12 +54,19 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
 
 
 
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="manager"></param>
+        /// <param name="equipmentTypeID"></param>
+        /// <param name="factions"></param>
         public EquipmentListModel(
             WareEquipmentManager manager,
             string equipmentTypeID,
             ObservablePropertyChangedCollection<FactionsListItem> factions
         )
         {
+            Title = EquipmentType.Get(equipmentTypeID).Name;
             _Manager = manager;
             _Factions = factions;
             _EquipmentTypeID = equipmentTypeID;

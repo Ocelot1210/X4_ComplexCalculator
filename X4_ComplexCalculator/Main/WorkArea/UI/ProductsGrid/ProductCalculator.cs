@@ -25,13 +25,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// ウェアとウェアを生産するモジュールを対応付けたディクショナリ
         /// </summary>
         private readonly Dictionary<Ware, Module> _Ware2ModuleDict;
-
-
-        /// <summary>
-        /// 従業員が必要とするウェア一覧
-        /// key = Method
-        /// </summary>
-        private readonly IReadOnlyDictionary<string, IReadOnlyList<(Ware NeedWare, double Amount)>> _WorkUnitWares;
         #endregion
 
 
@@ -45,20 +38,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                 .Where(x => x.Product.Any())
                 .GroupBy(x => Ware.Get((x.Product.FirstOrDefault(y => y.Method == "default") ?? x.Product.First()).WareID))
                 .ToDictionary(x => x.Key, x => x.First());
-            
-
-
-            // 従業員が必要とするウェア一覧を作成
-            {
-                var workUnit = Ware.Get("workunit_busy");
-                _WorkUnitWares = workUnit.Productions
-                    .ToDictionary(
-                        x => x.Method,
-                        x => workUnit.Resources[x.Method]
-                        .Select(y => (Ware.Get(y.NeedWareID), (double)y.Amount / x.Amount / (x.Time / 3600.0)))
-                        .ToArray() as IReadOnlyList<(Ware NeedWare, double Amount)>
-                    );
-            }
         }
 
 
@@ -122,6 +101,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
                     yield return new CalcResult(product.WareID, amount, method, module, moduleCount, effects);
                 }
+
 
                 // 有効なウェア生産方式か？
                 if (prodWare.Resources.TryGetValue(method, out var resources))

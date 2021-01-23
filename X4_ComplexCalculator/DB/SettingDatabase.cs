@@ -13,7 +13,7 @@ namespace X4_ComplexCalculator.DB
         /// <summary>
         /// インスタンス
         /// </summary>
-        public static SettingDatabase? _Instance;
+        private static SettingDatabase? _Instance;
         #endregion
 
 
@@ -84,7 +84,45 @@ WHERE
 	ModuleID = :ModuleID AND
     ( PresetID + 1 ) NOT IN ( SELECT PresetID FROM ModulePresets WHERE ModuleID = :ModuleID)";
 
-            return Instance.QuerySingle<long>(sql, new { ModuleID = moduleID });
+            return QuerySingle<long>(sql, new { ModuleID = moduleID });
+        }
+
+
+        /// <summary>
+        /// プリセットを追加する
+        /// </summary>
+        /// <param name="moduleID"></param>
+        /// <param name="presetName"></param>
+        /// <returns>追加されたプリセットID</returns>
+        public long AddModulePreset(string moduleID, string presetName)
+        {
+            var presetID = GetLastModulePresetsID(moduleID);
+
+            var param = new SQLiteCommandParameters(3);
+            param.Add("moduleID",   System.Data.DbType.String, moduleID);
+            param.Add("presetID",   System.Data.DbType.Int64, presetID);
+            param.Add("presetName", System.Data.DbType.String, presetName);
+
+            ExecQuery($"INSERT INTO ModulePresets(ModuleID, PresetID, PresetName) VALUES(:moduleID, :presetID, :presetName)", param);
+
+            return presetID;
+        }
+
+
+        /// <summary>
+        /// プリセット名を更新する
+        /// </summary>
+        /// <param name="moduleID"></param>
+        /// <param name="presetID"></param>
+        /// <param name="newPresetName"></param>
+        public void UpdateModulePresetName(string moduleID, long presetID, string newPresetName)
+        {
+            var param = new SQLiteCommandParameters(3);
+            param.Add("moduleID",   System.Data.DbType.String, moduleID);
+            param.Add("presetID",   System.Data.DbType.Int64, presetID);
+            param.Add("presetName", System.Data.DbType.String, newPresetName);
+
+            ExecQuery($"UPDATE ModulePresets Set PresetName = :presetName WHERE ModuleID = :moduleID AND presetID = :presetID", param);
         }
     }
 }

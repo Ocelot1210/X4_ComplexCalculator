@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Xml.Linq;
 using X4_ComplexCalculator.DB.X4DB;
@@ -9,7 +10,7 @@ namespace X4_ComplexCalculator.Entity
     /// <summary>
     /// ウェアの装備品管理クラス
     /// </summary>
-    public class WareEquipmentManager
+    public class WareEquipmentManager : INotifyCollectionChanged
     {
         #region メンバ
         /// <summary>
@@ -45,6 +46,12 @@ namespace X4_ComplexCalculator.Entity
         #endregion
 
 
+        #region イベント
+        /// <inheritdoc/>
+        public event NotifyCollectionChangedEventHandler? CollectionChanged;
+        #endregion
+
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -57,10 +64,10 @@ namespace X4_ComplexCalculator.Entity
 
 
         /// <summary>
-        /// 
+        /// コンストラクタ
         /// </summary>
-        /// <param name="ware"></param>
-        /// <param name="element"></param>
+        /// <param name="ware">管理対象のウェア</param>
+        /// <param name="element">シリアライズされたXElement</param>
         public WareEquipmentManager(Ware ware, XElement element) : this(ware)
         {
             try
@@ -87,10 +94,21 @@ namespace X4_ComplexCalculator.Entity
         /// </summary>
         /// <param name="equipment">追加対象</param>
         /// <param name="count">追加個数</param>
+        /// <returns>追加された個数</returns>
         public void AddEquipment(Equipment equipment, long count = 1)
         {
-            var i = 0L;
-            while (i++ < count && AddEquipmentInternal(equipment)) { }
+            var added = CollectionChanged is null ? null : new List<Equipment>((int)count);
+            var ret = 0L;
+            while (ret < count && AddEquipmentInternal(equipment))
+            {
+                ret++;
+                added?.Add(equipment);
+            }
+
+            if (CollectionChanged is not null && 0 < added!.Count)
+            {
+                CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, added));
+            }
         }
 
 

@@ -33,7 +33,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// 比較用の値
         /// </summary>
-        private int _CompareValue;
+        private readonly int _CompareValue;
         #endregion
 
 
@@ -91,33 +91,27 @@ namespace X4_ComplexCalculator.DB.X4DB
 
 
 
+        /// <inheritdoc/>
+        public override bool Equals(object? obj) => obj is X4Size other && Equals(other);
+
+
         /// <summary>
         /// 比較
         /// </summary>
-        /// <param name="obj">比較対象</param>
+        /// <param name="other"></param>
         /// <returns></returns>
-        public override bool Equals(object? obj) => obj is X4Size tgt && tgt.SizeID == SizeID;
+        public bool Equals(X4Size? other) => other is not null && SizeID == other.SizeID;
 
 
-        /// <summary>
-        /// ハッシュ値を取得
-        /// </summary>
-        /// <returns>ハッシュ値</returns>
+        /// <inheritdoc/>
         public override int GetHashCode() => HashCode.Combine(SizeID);
 
 
-        /// <summary>
-        /// 文字列化
-        /// </summary>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public override string ToString() => Name;
 
 
-        /// <summary>
-        /// 大小比較
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public int CompareTo(object? obj)
         {
             if (obj is null)

@@ -11,6 +11,7 @@ using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Entity;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
+using System.Collections.Specialized;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
 {
@@ -35,27 +36,15 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
 
 
         /// <summary>
-        /// タレット数
+        /// タレット用ツールチップ
         /// </summary>
-        private int _TurretsCount;
+        private readonly EquipmentsInfo _TurretToolTip;
 
 
         /// <summary>
-        /// シールド数
+        /// シールド用ツールチップ
         /// </summary>
-        private int _ShieldsCount;
-
-
-        /// <summary>
-        /// タレットのツールチップ文字列
-        /// </summary>
-        private string _TurretsToolTip = "";
-
-
-        /// <summary>
-        /// シールドのツールチップ文字列
-        /// </summary>
-        private string _ShieldsToolTip = "";
+        private readonly EquipmentsInfo _ShieldToolTip;
 
 
         /// <summary>
@@ -133,41 +122,25 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <summary>
         /// 装備中のタレットの個数
         /// </summary>
-        public int TurretsCount
-        {
-            get => _TurretsCount;
-            private set => SetProperty(ref _TurretsCount, value);
-        }
+        public int TurretsCount => _TurretToolTip.Count;
 
 
         /// <summary>
         /// タレットのツールチップ文字列
         /// </summary>
-        public string TurretsToolTip
-        {
-            get => _TurretsToolTip;
-            set => SetProperty(ref _TurretsToolTip, value);
-        }
+        public string TurretsToolTip => _TurretToolTip.DetailsText;
 
 
         /// <summary>
         /// 装備中のシールドの個数
         /// </summary>
-        public int ShieldsCount
-        {
-            get => _ShieldsCount;
-            private set => SetProperty(ref _ShieldsCount, value);
-        }
+        public int ShieldsCount => _ShieldToolTip.Count;
 
 
         /// <summary>
         /// シールドのツールチップ文字列
         /// </summary>
-        public string ShieldsToolTip
-        {
-            get => _ShieldsToolTip;
-            set => SetProperty(ref _ShieldsToolTip, value);
-        }
+        public string ShieldsToolTip => _ShieldToolTip.DetailsText;
 
 
         /// <summary>
@@ -233,9 +206,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             ModuleCount = moduleCount;
             EditEquipmentCommand = new DelegateCommand(EditEquipment);
             Equipments = new WareEquipmentManager(module);
+            Equipments.CollectionChanged += Equipments_CollectionChanged;
 
-            TurretsToolTip = MakeEquipmentToolTipString(Enumerable.Empty<Ware>());
-            ShieldsToolTip = MakeEquipmentToolTipString(Enumerable.Empty<Ware>());
+            _TurretToolTip = new EquipmentsInfo(Equipments, "turrets");
+            _ShieldToolTip = new EquipmentsInfo(Equipments, "shields");
 
             _SelectedMethod = selectedMethod ?? Module.Productions[0];
         }
@@ -255,8 +229,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
                 ?? Module.Productions.First();
             _SelectedMethod = SelectedMethod;
 
-            TurretsToolTip = MakeEquipmentToolTipString(Equipments.AllEquipments.Where(x => x.EquipmentType.EquipmentTypeID == "turrets"));
-            ShieldsToolTip = MakeEquipmentToolTipString(Equipments.AllEquipments.Where(x => x.EquipmentType.EquipmentTypeID == "shields"));
+            _TurretToolTip = new EquipmentsInfo(Equipments, "turrets");
+            _ShieldToolTip = new EquipmentsInfo(Equipments, "shields");
+            UpdateEquipmentInfo();
 
             EditEquipmentCommand = new DelegateCommand(EditEquipment);
         }
@@ -289,12 +264,16 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
 
 
         /// <summary>
-        /// ツールチップ文字列を更新する
+        /// 装備情報を更新する
         /// </summary>
-        public void UpdateTooltip()
+        public void UpdateEquipmentInfo()
         {
             if (Equipments.CanEquipped)
             {
+                _TurretToolTip.RequireUpdate();
+                _ShieldToolTip.RequireUpdate();
+                RaisePropertyChanged(nameof(TurretsCount));
+                RaisePropertyChanged(nameof(ShieldsCount));
                 RaisePropertyChanged(nameof(TurretsToolTip));
                 RaisePropertyChanged(nameof(ShieldsToolTip));
             }
@@ -351,26 +330,64 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         }
 
 
+
         /// <summary>
-        /// 装備のツールチップ文字列を作成
+        /// 装備に変更があった場合
         /// </summary>
-        /// <returns></returns>
-        private string MakeEquipmentToolTipString(IEnumerable<Ware> wares)
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Equipments_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (!wares.Any())
+            var addedTurretCount = 0;
+            var addedShieldCount = 0;
+
+            if (e.NewItems is not null)
             {
-                return (string)WPFLocalizeExtension.Engine.LocalizeDictionary.Instance.GetLocalizedObject("Lang:NotEquippedToolTipText", null, null);
+                var groups = e.NewItems
+                    .Cast<Equipment>()
+                    .Where(x => x.EquipmentType.EquipmentTypeID == "shields" || x.EquipmentType.EquipmentTypeID == "turrets")
+                    .GroupBy(x => x.EquipmentType);
+                
+                foreach (var grp in groups)
+                {
+                    if (grp.Key.EquipmentTypeID == "shields")
+                    {
+                        addedTurretCount += grp.Count();
+                        continue;
+                    }
+
+                    if (grp.Key.EquipmentTypeID == "turrets")
+                    {
+                        addedShieldCount += grp.Count();
+                        continue;
+                    }
+                }
             }
 
-            var sb = new StringBuilder();
-            var cnt = 1;
-
-            foreach (var ware in wares.OrderBy(x => x.Name))
+            if (e.OldItems is not null)
             {
-                sb.AppendLine($"{cnt++:D2} ： {ware.Name}");
+                var groups = e.OldItems
+                    .Cast<Equipment>()
+                    .Where(x => x.EquipmentType.EquipmentTypeID == "shields" || x.EquipmentType.EquipmentTypeID == "turrets")
+                    .GroupBy(x => x.EquipmentType);
+
+                foreach (var grp in groups)
+                {
+                    if (grp.Key.EquipmentTypeID == "shields")
+                    {
+                        addedTurretCount -= grp.Count();
+                        continue;
+                    }
+
+                    if (grp.Key.EquipmentTypeID == "turrets")
+                    {
+                        addedShieldCount -= grp.Count();
+                        continue;
+                    }
+                }
             }
 
-            return sb.ToString();
+            UpdateEquipmentInfo();
         }
 
 
