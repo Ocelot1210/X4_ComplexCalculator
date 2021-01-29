@@ -101,66 +101,43 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
         {
             var modParam = new SQLiteCommandParameters(1);
             var eqParam = new SQLiteCommandParameters(3);
-            var moduleCount = 0;
 
-            foreach (var module in planItem.Plan.XPathSelectElements("entry"))
+            var modules = new List<ModulesGridItem>((int)(double)planItem.Plan.XPathEvaluate("count(entry)"));
+
+            foreach (var entry in planItem.Plan.XPathSelectElements("entry"))
             {
-                var index = int.Parse(module.Attribute("index").Value);
-                modParam.Add("macro", System.Data.DbType.String, module.Attribute("macro").Value);
-
-                foreach (var equipmet in module.XPathSelectElements("upgrades/groups/*"))
+                // マクロ名を取得
+                var macro = entry.Attribute("macro")?.Value ?? "";
+                if (string.IsNullOrEmpty(macro))
                 {
-                    eqParam.Add("index", System.Data.DbType.Int32, index);
-                    eqParam.Add("macro", System.Data.DbType.String, equipmet.Attribute("macro").Value);
-                    eqParam.Add("count", System.Data.DbType.Int32, int.Parse(equipmet.Attribute("exact")?.Value ?? "1"));
+                    continue;
                 }
 
-                moduleCount++;
-            }
-
-            var modules = new List<ModulesGridItem>(moduleCount);
-
-            // モジュール追加
-            {
-                var query = @"
-SELECT
-    ModuleID
-FROM
-    Module
-WHERE
-    Macro = :macro";
-
-                var tmpModules = X4Database.Instance.Query<string>(query, modParam)
-                    .Select(x => Ware.TryGet<Module>(x))
-                    .Where(x => x is not null)
-                    .Select(x => new ModulesGridItem(x!));
-                modules.AddRange(tmpModules);
-            }
-
-            // 装備追加
-            {
-                var query = @"
-SELECT
-    EquipmentID,
-    :index AS 'Index',
-    :count AS Count
-FROM
-    Equipment
-WHERE
-    MacroName = :macro";
-
-                X4Database.Instance.ExecQuery(query, eqParam, (dr, _) =>
+                // マクロ名からモジュールを取得
+                var module = Ware.GetAll<Module>().FirstOrDefault(x => x.Macro == macro);
+                if (module is null)
                 {
-                    var index = (int)(long)dr["Index"] - 1;
-                    var moduleEquipment = modules[index].Equipments;
+                    continue;
+                }
 
-                    var equipment = Ware.TryGet<Equipment>((string)dr["EquipmentID"]);
-                    if (equipment is null) return;
+                // モジュールの装備を取得
+                var equipments = entry.XPathSelectElements("upgrades/groups/*")
+                    .Select(x => (Macro: x.Attribute("macro")?.Value, Count: int.Parse(x.Attribute("exact")?.Value ?? "1")))
+                    .Where(x => !string.IsNullOrEmpty(x.Macro))
+                    .Select(x => (Equipment: Ware.GetAll<Equipment>().FirstOrDefault(y => y.Macro == x.Macro), x.Count))
+                    .Where(x => x.Equipment is not null)
+                    .Select(x => (Equipment: x.Equipment!, x.Count));
 
-                    var count = (long)dr["Count"];
-                    moduleEquipment.Add(equipment, count);
-                });
+                var modulesGridItem = new ModulesGridItem(module);
+                foreach (var equipment in equipments)
+                {
+                    modulesGridItem.Equipments.Add(equipment.Equipment, equipment.Count);
+                }
+
+                modules.Add(modulesGridItem);
             }
+
+
 
 
             // 同一モジュールをマージ

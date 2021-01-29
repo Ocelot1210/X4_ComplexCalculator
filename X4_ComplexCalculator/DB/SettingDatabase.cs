@@ -119,6 +119,11 @@ WHERE
             return new HashSet<string>(Query<string>(sql));
         }
 
+
+        /// <summary>
+        /// 装備編集画面でチェックされた派閥一覧を設定する
+        /// </summary>
+        /// <param name="checkedFactions">装備編集画面でチェックされた派閥一覧</param>
         public void SetCheckedFactionsAtSelectEquipmentWindow(IEnumerable<Faction> checkedFactions)
         {
             BeginTransaction(db =>

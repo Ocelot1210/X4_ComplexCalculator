@@ -7,7 +7,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
     /// <summary>
     /// 装備情報
     /// </summary>
-    class EquipmentsInfo
+    public class EquipmentsInfo
     {
         #region メンバ 
         /// <summary>

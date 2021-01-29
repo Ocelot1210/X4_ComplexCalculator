@@ -19,6 +19,12 @@ namespace X4_ComplexCalculator.DB.X4DB
 
         #region プロパティ
         /// <summary>
+        /// マクロ名
+        /// </summary>
+        public string Macro { get; }
+
+
+        /// <summary>
         /// モジュール種別
         /// </summary>
         public ModuleType ModuleType { get; }
@@ -77,13 +83,14 @@ namespace X4_ComplexCalculator.DB.X4DB
             string moduleTypeID;
             var keyObj = new { ID = id };
 
-            const string sql1 = "SELECT ModuleTypeID, MaxWorkers, WorkersCapacity, NoBluePrint FROM Module WHERE ModuleID = :ID";
+            const string sql1 = "SELECT Macro, ModuleTypeID, MaxWorkers, WorkersCapacity, NoBluePrint FROM Module WHERE ModuleID = :ID";
             (
+                Macro,
                 moduleTypeID,
                 MaxWorkers,
                 WorkersCapacity,
                 NoBluePrint
-            ) = X4Database.Instance.QuerySingle<(string, long, long, bool)>(sql1, keyObj);
+            ) = X4Database.Instance.QuerySingle<(string, string, long, long, bool)>(sql1, keyObj);
 
 
             TurretCapacity = Equipments.Values
