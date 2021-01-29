@@ -1,10 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Prism.Mvvm;
+using Reactive.Bindings;
+using Reactive.Bindings.Extensions;
+using System;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Linq;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Windows.Data;
-using Prism.Commands;
-using Prism.Mvvm;
+using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList
@@ -22,9 +26,15 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
 
 
         /// <summary>
-        /// 装備検索文字列
+        /// ゴミ箱
         /// </summary>
-        private string _SearchEquipmentName = "";
+        private readonly CompositeDisposable _Disposables = new();
+
+
+        /// <summary>
+        /// 派閥一覧
+        /// </summary>
+        private readonly ObservablePropertyChangedCollection<FactionsListItem> _Factions;
         #endregion
 
 
@@ -48,122 +58,161 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
 
 
         /// <summary>
+        /// 装備中の装備
+        /// </summary>
+        public ListCollectionView EquippedView { get; }
+
+
+
+        /// <summary>
         /// 装備可能な個数
         /// </summary>
-        public int MaxAmount => _Model.Equippable.Count;
+        public ReadOnlyReactiveProperty<int> MaxAmount { get; }
+
 
 
         /// <summary>
         /// 現在装備中の個数
         /// </summary>
-        public int EquippedCount => _Model.Equipped.Count;
+        public ReadOnlyReactiveProperty<int> EquippedCount { get; }
 
 
         /// <summary>
         /// 装備の検索文字列
         /// </summary>
-        public string SearchEquipmentName
-        {
-            get => _SearchEquipmentName;
-            set
-            {
-                if (_SearchEquipmentName != value)
-                {
-                    _SearchEquipmentName = value;
-                    RaisePropertyChanged();
-                    if (EquipmentsView is null)
-                    {
-                        throw new InvalidOperationException();
-                    }
-                    EquipmentsView.Refresh();
-                }
-            }
-        }
+        public ReactiveProperty<string> SearchEquipmentName { get; } = new("");
 
 
         /// <summary>
         /// 追加ボタンクリック時のコマンド
         /// </summary>
-        public DelegateCommand AddButtonClickedCommand { get; }
+        public ReactiveCommand AddButtonClickedCommand { get; }
 
 
         /// <summary>
         /// 削除ボタンクリック時のコマンド
         /// </summary>
-        public DelegateCommand RemoveButtonClickedCommand { get; }
+        public ReactiveCommand RemoveButtonClickedCommand { get; }
 
 
 
         /// <summary>
         /// 選択中の装備サイズ
         /// </summary>
-        public X4Size SelectedSize
-        {
-            set
-            {
-                RaisePropertyChanged(nameof(MaxAmount));
-                RaisePropertyChanged(nameof(EquippedCount));
-                RaisePropertyChanged(nameof(Equipped));
-                AddButtonClickedCommand.RaiseCanExecuteChanged();
-                RemoveButtonClickedCommand.RaiseCanExecuteChanged();
-                RaisePropertyChanged(nameof(EquipmentsView));
-            }
-        }
+        public ReactiveProperty<X4Size> SelectedSize { get; }
 
 
         /// <summary>
         /// 選択中のプリセット
         /// </summary>
-        public PresetComboboxItem? SelectedPreset
-        {
-            set
-            {
-                RaisePropertyChanged(nameof(MaxAmount));
-                RaisePropertyChanged(nameof(EquippedCount));
-                RaisePropertyChanged(nameof(Equipped));
-                AddButtonClickedCommand.RaiseCanExecuteChanged();
-                RemoveButtonClickedCommand.RaiseCanExecuteChanged();
-                RaisePropertyChanged(nameof(EquipmentsView));
-                Unsaved = true;
-            }
-        }
+        public ReactiveProperty<PresetComboboxItem?> SelectedPreset { get; }
 
 
         /// <summary>
         /// 未保存か
         /// </summary>
-        public bool Unsaved { get; set; } = false;
+        public ReactiveProperty<bool> Unsaved { get; }
         #endregion
+
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="model"></param>
-        public EquipmentListViewModel(EquipmentListModel model)
+        /// <param name="model">装備一覧用Model</param>
+        /// <param name="factions">派閥一覧</param>
+        public EquipmentListViewModel(
+            EquipmentListModel model,
+            ObservablePropertyChangedCollection<FactionsListItem> factions
+        )
         {
             _Model = model;
 
-            EquipmentsView = (ListCollectionView)CollectionViewSource.GetDefaultView(model.Equippable);
+            _Factions = factions;
+            _Factions.CollectionPropertyChanged += Factions_CollectionPropertyChanged;
 
-            AddButtonClickedCommand = new DelegateCommand(AddButtonClicked, () => EquippedCount < MaxAmount);
-            RemoveButtonClickedCommand = new DelegateCommand(DeleteButtonClicked, () => 0 < EquippedCount);
+            // 選択中の装備サイズ
+            SelectedSize = _Model.SelectedSize
+                .ToReactivePropertyAsSynchronized(x => x.Value)
+                .AddTo(_Disposables);
+
+            // 装備可能個数
+            MaxAmount = _Model
+                .ObserveProperty(x => x.MaxAmount)
+                .ToReadOnlyReactiveProperty()
+                .AddTo(_Disposables);
+
+            // 装備中の個数
+            EquippedCount = _Model
+                .ObserveProperty(x => x.EquippedCount)
+                .ToReadOnlyReactiveProperty()
+                .AddTo(_Disposables);
+
+            // 装備追加ボタンクリック
+            AddButtonClickedCommand = EquippedCount
+                .CombineLatest(MaxAmount, (eqp, max) => eqp < max)
+                .ToReactiveCommand()
+                .AddTo(_Disposables);
+            AddButtonClickedCommand
+                .Subscribe(AddButtonClicked)
+                .AddTo(_Disposables);
+
+            // 装備削除ボタンクリック
+            RemoveButtonClickedCommand = EquippedCount
+                .Select(x => 0 < x)
+                .ToReactiveCommand()
+                .AddTo(_Disposables);
+            RemoveButtonClickedCommand
+                .Subscribe(RemoveButtonClicked)
+                .AddTo(_Disposables);
+
+            // 未保存か
+            Unsaved = _Model.Unsaved
+                .ToReactiveProperty()
+                .AddTo(_Disposables);
+
+            // 選択中のプリセット
+            SelectedPreset = _Model.SelectedPreset
+                .ToReactivePropertyAsSynchronized(x => x.Value)
+                .AddTo(_Disposables);
+
+
+            EquipmentsView = (ListCollectionView)CollectionViewSource.GetDefaultView(model.Equippable);
+            EquipmentsView.Filter = EquipmentsFilter;
+
+            EquippedView = (ListCollectionView)CollectionViewSource.GetDefaultView(model.Equipped);
+            EquippedView.Filter = EquippedFilter;
+
+            // 装備一覧更新用
+            SearchEquipmentName
+                .Subscribe(x => EquipmentsView.Refresh())
+                .AddTo(_Disposables);
+            SelectedSize
+                .Subscribe(x => { EquipmentsView.Refresh(); EquippedView.Refresh(); })
+                .AddTo(_Disposables);
         }
+
+
 
 
         /// <summary>
         /// リソースを開放
         /// </summary>
-        public void Dispose() => _Model.Dispose();
+        public void Dispose()
+        {
+            _Factions.CollectionPropertyChanged -= Factions_CollectionPropertyChanged;
+            _Disposables.Dispose();
+        }
 
 
         /// <summary>
-        /// 装備を保存
+        /// 派閥のチェック変更時
         /// </summary>
-        public void SaveEquipment()
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Factions_CollectionPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            _Model.SaveEquipment();
-            Unsaved = false;
+            EquipmentsView.Refresh();
         }
 
 
@@ -175,10 +224,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
             if (_Model.AddSelectedEquipments())
             {
                 // 装備が追加された場合
-                Unsaved = true;
-                AddButtonClickedCommand.RaiseCanExecuteChanged();
-                RemoveButtonClickedCommand.RaiseCanExecuteChanged();
-                RaisePropertyChanged(nameof(EquippedCount));
+                Unsaved.Value = true;
             }
         }
 
@@ -186,45 +232,74 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 削除ボタンクリック時
         /// </summary>
-        void DeleteButtonClicked()
+        void RemoveButtonClicked()
         {
             if (_Model.RemoveSelectedEquipments())
             {
                 // 装備が削除された場合
-                Unsaved = true;
-                AddButtonClickedCommand.RaiseCanExecuteChanged();
-                RemoveButtonClickedCommand.RaiseCanExecuteChanged();
-                RaisePropertyChanged(nameof(EquippedCount));
+                Unsaved.Value = true;
             }
         }
 
 
+
         /// <summary>
-        /// フィルタイベント
+        /// フィルタイベント(装備済み用)
         /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        private bool Filter(object obj)
+        /// <param name="obj">評価対象</param>
+        /// <returns>評価対象を表示するか</returns>
+        private bool EquippedFilter(object obj)
         {
-            return obj is EquipmentListItem src && (SearchEquipmentName == "" || 0 <= src.Equipment.Name.IndexOf(SearchEquipmentName, StringComparison.InvariantCultureIgnoreCase));
+            if (obj is EquipmentListItem item)
+            {
+                item.IsSelected = false;
+
+                // サイズ違いなら表示しない
+                if (!item.Equipment.EquipmentTags.Contains(SelectedSize.Value.SizeID))
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
+            return false;
         }
 
 
         /// <summary>
-        /// プリセット一覧変更時
+        /// フィルタイベント(装備一覧用)
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public void OnPresetsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        /// <param name="obj">評価対象</param>
+        /// <returns>評価対象を表示するか</returns>
+        private bool EquipmentsFilter(object obj)
         {
-            _Model.OnPresetsCollectionChanged(sender, e);
-            Unsaved = true;
+            if (obj is EquipmentListItem item)
+            {
+                item.IsSelected = false;
+
+                // サイズ違いなら表示しない
+                if (!item.Equipment.EquipmentTags.Contains(SelectedSize.Value.SizeID))
+                {
+                    return false;
+                }
+
+                // 所有派閥でなければ表示しない
+                if (!item.Equipment.Owners.Intersect(_Factions.Where(x => x.IsChecked).Select(x => x.Faction)).Any())
+                {
+                    return false;
+                }
+
+                // フィルタが空なら表示する
+                if (SearchEquipmentName.Value == "")
+                {
+                    return true;
+                }
+
+                return 0 <= item.Equipment.Name.IndexOf(SearchEquipmentName.Value, StringComparison.InvariantCultureIgnoreCase);
+            }
+
+            return false;
         }
-
-
-        /// <summary>
-        /// プリセット保存
-        /// </summary>
-        public void SavePreset() => _Model.SavePreset();
     }
 }

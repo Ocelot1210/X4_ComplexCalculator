@@ -207,7 +207,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
                 var eqp = Ware.Get<Equipment>(equipmentID);
                 if (eqp is not null)
                 {
-                    Equipment.AddEquipment(eqp, max);
+                    Equipment.Add(eqp, max);
                 }
             }
         }

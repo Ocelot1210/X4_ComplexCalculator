@@ -22,7 +22,7 @@ namespace X4_ComplexCalculator.Entity
         /// <summary>
         /// 接続名をキーにした装備中の項目一覧
         /// </summary>
-        private readonly Dictionary<string, Equipment> _Equipped = new();
+        private readonly Dictionary<string, Equipment> _Equipped;
         #endregion
 
 
@@ -60,6 +60,19 @@ namespace X4_ComplexCalculator.Entity
         {
             Ware = ware;
             _WareEquipments = WareEquipment.Get(ware.ID);
+            _Equipped = new Dictionary<string, Equipment>();
+        }
+
+
+        /// <summary>
+        /// コピーコンストラクタ
+        /// </summary>
+        /// <param name="manager">コピー元インスタンス</param>
+        public WareEquipmentManager(WareEquipmentManager manager)
+        {
+            Ware = manager.Ware;
+            _WareEquipments = WareEquipment.Get(Ware.ID);
+            _Equipped = manager._Equipped.ToDictionary(x => x.Key, x => x.Value);
         }
 
 
@@ -88,20 +101,84 @@ namespace X4_ComplexCalculator.Entity
         }
 
 
+        /// <summary>
+        /// 装備をリセットする
+        /// </summary>
+        /// <param name="equipments"></param>
+        public void ResetEquipment(IEnumerable<Equipment> equipments)
+        {
+            _Equipped.Clear();
+
+            foreach (var equipment in equipments)
+            {
+                AddEquipmentInternal(equipment);
+            }
+
+            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        }
+
+
+        /// <summary>
+        /// 装備を削除する
+        /// </summary>
+        /// <param name="equipments"></param>
+        public void RemoveRange(IEnumerable<Equipment> equipments)
+        {
+            var removed = CollectionChanged is null ? null : new List<Equipment>();
+
+            foreach (var equipment in equipments)
+            {
+                var key = _Equipped.Where(x => x.Value == equipment).Select(x => x.Key).FirstOrDefault();
+                if (key is not null)
+                {
+                    _Equipped.Remove(key);
+                    removed?.Add(equipment);
+                }
+            }
+
+            if (CollectionChanged is not null && 0 < removed!.Count)
+            {
+                CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removed));
+            }
+        }
+
+
+
+        /// <summary>
+        /// 装備を追加する
+        /// </summary>
+        /// <param name="equipment">追加対象の列挙</param>
+        public void AddRange(IEnumerable<Equipment> equipments)
+        {
+            var added = CollectionChanged is null ? null : new List<Equipment>();
+
+            foreach (var equipment in equipments)
+            {
+                if (AddEquipmentInternal(equipment))
+                {
+                    added?.Add(equipment);
+                }
+            }
+
+            if (CollectionChanged is not null && 0 < added!.Count)
+            {
+                CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, added));
+            }
+        }
+
 
         /// <summary>
         /// 装備を追加する
         /// </summary>
         /// <param name="equipment">追加対象</param>
         /// <param name="count">追加個数</param>
-        /// <returns>追加された個数</returns>
-        public void AddEquipment(Equipment equipment, long count = 1)
+        public void Add(Equipment equipment, long count = 1)
         {
             var added = CollectionChanged is null ? null : new List<Equipment>((int)count);
-            var ret = 0L;
-            while (ret < count && AddEquipmentInternal(equipment))
+            var cnt = 0L;
+            while (cnt < count && AddEquipmentInternal(equipment))
             {
-                ret++;
+                cnt++;
                 added?.Add(equipment);
             }
 
@@ -145,6 +222,30 @@ namespace X4_ComplexCalculator.Entity
 
             return new XElement("equipments", equipments);
         }
+
+
+        /// <summary>
+        /// 現在装備可能な個数を取得する
+        /// </summary>
+        /// <param name="type">装備ID</param>
+        /// <param name="size">装備サイズ</param>
+        /// <returns>装備IDと装備サイズに対応する装備があと何個装備できるか</returns>
+        public int GetEquippableCount(EquipmentType type, X4Size size)
+            => _WareEquipments.Count(x =>
+            !_Equipped.ContainsKey(x.ConnectionName) &&
+            x.Tags.Contains(type.EquipmentTypeID[..^1]) &&
+            x.Tags.Contains(size.SizeID)
+        );
+
+
+        /// <summary>
+        /// 装備可能な最大個数を取得する
+        /// </summary>
+        /// <param name="type">装備ID</param>
+        /// <param name="size">装備サイズ</param>
+        /// <returns>装備IDと装備サイズに対応する装備が何個装備できるか</returns>
+        public int GetMaxEquippableCount(EquipmentType type, X4Size size)
+            => _WareEquipments.Count(x => x.Tags.Contains(type.EquipmentTypeID[..^1]) && x.Tags.Contains(size.SizeID));
 
 
         /// <inheritdoc />

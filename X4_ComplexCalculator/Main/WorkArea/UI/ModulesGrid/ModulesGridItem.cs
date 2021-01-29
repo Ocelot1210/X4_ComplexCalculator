@@ -260,7 +260,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// 装備を追加
         /// </summary>
         /// <param name="equipment">追加したい装備</param>
-        public void AddEquipment(Equipment equipment) => Equipments.AddEquipment(equipment);
+        public void AddEquipment(Equipment equipment) => Equipments.Add(equipment);
 
 
         /// <summary>

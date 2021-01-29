@@ -112,24 +112,24 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
             conn.Execute("INSERT INTO Common(Item, Value) VALUES('FormatVersion', 2)");
 
             // ステーションの設定保存
-            conn.Execute("INSERT INTO StationSettings(Key, Value) VALUES('IsHeadquarters', :IsHeadquarters)", WorkArea.StationData.Settings);
+            conn.Execute("INSERT INTO StationSettings(Key, Value) VALUES('IsHeadquarters', :IsHeadquarters)", new { IsHeadquarters = WorkArea.StationData.Settings.IsHeadquarters.ToString() });
             conn.Execute("INSERT INTO StationSettings(Key, Value) VALUES('Sunlight', :Sunlight)", WorkArea.StationData.Settings);
             conn.Execute("INSERT INTO StationSettings(Key, Value) VALUES('ActualWorkforce', :Actual)", WorkArea.StationData.Settings.Workforce);
-            conn.Execute("INSERT INTO StationSettings(Key, Value) VALUES('AlwaysMaximumWorkforce', :AlwaysMaximum)", WorkArea.StationData.Settings.Workforce);
+            conn.Execute("INSERT INTO StationSettings(Key, Value) VALUES('AlwaysMaximumWorkforce', :AlwaysMaximum)", new { AlwaysMaximum = WorkArea.StationData.Settings.Workforce.AlwaysMaximum.ToString() });
 
             // モジュール保存
             foreach (var (module, i) in WorkArea.StationData.ModulesInfo.Modules.Select((module, i) => (module, i)))
             {
-                const string sql1 = "INSERT INTO Modules(Row, ModuleID, Count) Values(:i, :ModuleID, :ModuleCount)";
-                conn.Execute(sql1, new { i, module.Module.ID, module.ModuleCount });
+                const string sql1 = "INSERT INTO Modules(Row, ModuleID, Count) Values(:Row, :ModuleID, :ModuleCount)";
+                conn.Execute(sql1, new { Row = i, ModuleID = module.Module.ID, ModuleCount = module.ModuleCount });
 
                 if (module.EditStatus == EditStatus.Edited)
                 {
                     module.EditStatus |= EditStatus.Saved;
                 }
 
-                const string sql2 = "INSERT INTO Equipments(Row, EquipmentID) Values(:i, :EquipmentID)";
-                var param2 = module.Equipments.AllEquipments.Select(e => new { i, e.ID });
+                const string sql2 = "INSERT INTO Equipments(Row, EquipmentID) Values(:Row, :EquipmentID)";
+                var param2 = module.Equipments.AllEquipments.Select(e => new { Row = i, EquipmentID = e.ID });
                 conn.Execute(sql2, param2);
             }
 

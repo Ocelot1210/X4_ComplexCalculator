@@ -181,7 +181,7 @@ WHERE
                     if (equipment is null) return;
 
                     var count = (long)dr["Count"];
-                    moduleEquipment.AddEquipment(equipment, count);
+                    moduleEquipment.Add(equipment, count);
                 });
             }
 

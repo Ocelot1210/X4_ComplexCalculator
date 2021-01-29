@@ -2,12 +2,16 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using Prism.Commands;
 using Prism.Mvvm;
+using Reactive.Bindings;
+using Reactive.Bindings.Extensions;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Entity;
@@ -26,6 +30,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// </summary>
         private readonly EditEquipmentModel _Model;
 
+
         /// <summary>
         /// ウィンドウの表示状態
         /// </summary>
@@ -33,9 +38,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
 
 
         /// <summary>
-        /// 選択中の装備サイズ
+        /// ゴミ箱
         /// </summary>
-        private X4Size? _SelectedSize;
+        private readonly CompositeDisposable _Disposables = new();
         #endregion
 
 
@@ -78,26 +83,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// 選択中の装備サイズ
         /// </summary>
-        public X4Size? SelectedSize
-        {
-            get
-            {
-                return _SelectedSize;
-            }
-            set
-            {
-                if (value is null)
-                {
-                    throw new InvalidOperationException();
-                }
+        public ReactiveProperty<X4Size> SelectedSize { get; }
 
-                if (value.Equals(_SelectedSize))
-                {
-                    _SelectedSize = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
 
         /// <summary>
         /// 種族一覧
@@ -114,17 +101,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// 選択中のプリセット
         /// </summary>
-        public PresetComboboxItem? SelectedPreset
-        {
-            get => _Model.SelectedPreset;
-            set
-            {
-                if (_Model.SelectedPreset != value)
-                {
-                    _Model.SelectedPreset = value;
-                }
-            }
-        }
+        public ReactiveProperty<PresetComboboxItem?> SelectedPreset { get; }
 
 
         /// <summary>
@@ -142,7 +119,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// プリセット編集
         /// </summary>
-        public ICommand EditPresetCommand { get; }
+        public ICommand EditPresetNameCommand { get; }
 
 
         /// <summary>
@@ -154,13 +131,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// プリセット保存
         /// </summary>
-        public ICommand SavePresetCommand { get; }
+        public ICommand OverwritePresetCommand { get; }
 
 
         /// <summary>
         /// プリセット削除
         /// </summary>
-        public ICommand RemovePresetCommand { get; }
+        public ICommand DeletePresetCommand { get; }
 
 
         /// <summary>
@@ -179,22 +156,29 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
             ModuleName = equipmentManager.Ware.Name;
 
             // Model類
-            _Model = new EditEquipmentModel(equipmentManager.Ware);
-            _Model.PropertyChanged += Model_PropertyChanged;
+            _Model = new EditEquipmentModel(equipmentManager);
 
 
             // コマンド類
             SaveButtonClickedCommand = new DelegateCommand(SavebuttonClicked);
             CloseWindowCommand       = new DelegateCommand(CloseWindow);
-            SavePresetCommand        = new DelegateCommand(SavePreset);
-            EditPresetCommand        = new DelegateCommand(_Model.EditPreset);
+            OverwritePresetCommand   = new DelegateCommand(_Model.OverwritePreset);
+            EditPresetNameCommand    = new DelegateCommand(_Model.EditPresetName);
             AddPresetCommand         = new DelegateCommand(_Model.AddPreset);
-            RemovePresetCommand      = new DelegateCommand(_Model.RemovePreset);
+            DeletePresetCommand      = new DelegateCommand(_Model.DeletePreset);
             WindowClosingCommand     = new DelegateCommand<CancelEventArgs>(WindowClosing);
 
 
             // その他初期化
-            SelectedSize = EquipmentSizes.FirstOrDefault();
+            SelectedSize = _Model.SelectedSize
+                .ToReactivePropertyAsSynchronized(x => x.Value)
+                .AddTo(_Disposables);
+
+            SelectedPreset = _Model.SelectedPreset
+                .ToReactivePropertyAsSynchronized(x => x.Value)
+                .AddTo(_Disposables);
+
+
             FactionsView = CollectionViewSource.GetDefaultView(_Model.Factions);
             FactionsView.SortDescriptions.Clear();
             FactionsView.SortDescriptions.Add(new SortDescription(nameof(FactionsListItem.RaceName), ListSortDirection.Ascending));
@@ -209,26 +193,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// </summary>
         public void Dispose()
         {
-            _Model.PropertyChanged    -= Model_PropertyChanged;
-        }
-
-
-        /// <summary>
-        /// Modelのプロパティ変更時
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Model_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-        {
-            switch (e.PropertyName)
-            {
-                case nameof(_Model.SelectedPreset):
-                    RaisePropertyChanged(nameof(SelectedPreset));
-                    break;
-
-                default:
-                    break;
-            }
+            _Model.Dispose();
+            _Disposables.Dispose();
         }
 
 
@@ -239,7 +205,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         public void WindowClosing(CancelEventArgs e)
         {
             // 装備が未保存の場合
-            if (EquipmentListViewModels.Any(x => x.Unsaved))
+            if (EquipmentListViewModels.Any(x => x.Unsaved.Value))
             {
                 var result = LocalizedMessageBox.Show("Lang:EditEquipmentWindowCloseConfirmMessage", "Lang:Confirmation", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 
@@ -247,10 +213,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
                 {
                     // 保存する場合
                     case MessageBoxResult.Yes:
-                        foreach (var vm in EquipmentListViewModels)
-                        {
-                            vm.SavePreset();
-                        }
+                        _Model.SaveEquipment();
                         break;
 
                     // 保存せずに閉じる場合
@@ -279,10 +242,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// </summary>
         private void SavebuttonClicked()
         {
-            foreach (var vm in EquipmentListViewModels)
-            {
-                vm.SaveEquipment();
-            }
+            _Model.SaveEquipment();
             CloseWindowProperty = true;
         }
 
@@ -291,17 +251,5 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// 閉じるボタンクリック時
         /// </summary>
         private void CloseWindow() => CloseWindowProperty = true;
-
-
-        /// <summary>
-        /// プリセット保存
-        /// </summary>
-        private void SavePreset()
-        {
-            foreach (var vm in EquipmentListViewModels)
-            {
-                vm.SavePreset();
-            }
-        }
     }
 }
