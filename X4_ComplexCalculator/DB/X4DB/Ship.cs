@@ -226,9 +226,10 @@ WHERE
                     }
                 }
 
+
                 var equipments = _Wares.Values
                     .OfType<T>()
-                    .Where(x => !x.EquipmentTags.Except(wareEquipment.Tags).Any());
+                    .Where(x => wareEquipment.CanEquipped(x));
                 foreach (var equipment in equipments)
                 {
                     yield return equipment;

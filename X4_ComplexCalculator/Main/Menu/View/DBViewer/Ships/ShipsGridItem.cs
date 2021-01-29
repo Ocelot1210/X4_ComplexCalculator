@@ -417,7 +417,7 @@ WHERE
     ShipTransportType.TransportTypeID = TransportType.TransportTypeID AND
     ShipID = :ShipID";
 
-                CargoTypes = X4Database.Instance.Query<string>(sql, new { ship.ID }).ToArray();
+                CargoTypes = X4Database.Instance.Query<string>(sql, new { ShipID = ship.ID }).ToArray();
             }
 
 

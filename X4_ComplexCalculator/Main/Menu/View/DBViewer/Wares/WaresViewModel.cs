@@ -17,7 +17,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Wares
         /// <summary>
         /// ウェア一覧
         /// </summary>
-        private readonly ObservableRangeCollection<WaresGridItem> _Wares = new (Ware.GetAll().Select(x => new WaresGridItem(x)));
+        private readonly ObservableRangeCollection<WaresGridItem> _Wares;
         #endregion
 
 
@@ -34,6 +34,12 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Wares
         /// </summary>
         public WaresViewModel()
         {
+            var items = Ware.GetAll()
+                .Where(x => x.Tags.Contains("economy"))
+                .Select(x => new WaresGridItem(x));
+
+            _Wares = new(items);
+
             WaresView = (ListCollectionView)CollectionViewSource.GetDefaultView(_Wares);
             WaresView.SortDescriptions.Clear();
             WaresView.SortDescriptions.Add(new SortDescription(nameof(WaresGridItem.WareName), ListSortDirection.Ascending));

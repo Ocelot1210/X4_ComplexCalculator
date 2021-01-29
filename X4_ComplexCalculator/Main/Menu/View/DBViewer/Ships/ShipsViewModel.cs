@@ -34,7 +34,12 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         /// </summary>
         public ShipsViewModel()
         {
-            _Ships.Reset(Ware.GetAll<Ship>().Select(x => ShipsGridItem.Create(x)).Where(x => x is not null).Select(x => x!));
+            var items = Ware.GetAll<Ship>()
+                .Select(x => ShipsGridItem.Create(x))
+                .Where(x => x is not null)
+                .Select(x => x!);
+
+            _Ships = new(items);
 
             ShipsView = (ListCollectionView)CollectionViewSource.GetDefaultView(_Ships);
             ShipsView.SortDescriptions.Clear();
