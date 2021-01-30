@@ -64,7 +64,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 装備済みの個数
         /// </summary>
-        public int EquippedCount => _TempManager.AllEquipments.Count(x => x.EquipmentTags.Contains(SelectedSize.Value.SizeID));
+        public int EquippedCount => _TempManager.AllEquipments.Count(x => x.EquipmentType.Equals(_EquipmentType) && x.EquipmentTags.Contains(SelectedSize.Value.SizeID));
 
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
             // 装備可能な装備一覧を作成
             {
                 var equipments = Ware.GetAll<Equipment>()
-                    .Where(x => x.EquipmentType == equipmentType && !x.EquipmentTags.Contains("unhittable"))
+                    .Where(x => x.EquipmentType.Equals(equipmentType) && !x.EquipmentTags.Contains("unhittable"))
                     .Select(x => new EquipmentListItem(x));
                 Equippable.AddRange(equipments);
             }
@@ -118,7 +118,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
             // 装備済みの装備一覧を作成
             {
                 var equipments = _TempManager.AllEquipments
-                    .Where(x => x.EquipmentType == equipmentType)
+                    .Where(x => x.EquipmentType.Equals(equipmentType))
                     .Select(x => new EquipmentListItem(x));
                 Equipped.AddRange(equipments);
             }

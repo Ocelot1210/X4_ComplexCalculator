@@ -58,10 +58,10 @@ namespace X4_DataExporterWPF.Export
 CREATE TABLE IF NOT EXISTS WareEquipment
 (
     WareID          TEXT    NOT NULL,
+    GroupName       TEXT    NOT NULL,
     ConnectionName  TEXT    NOT NULL,
     EquipmentTypeID TEXT    NOT NULL,
-    GroupName       TEXT,
-    PRIMARY KEY (WareID, ConnectionName),
+    PRIMARY KEY (WareID, ConnectionName, GroupName),
     FOREIGN KEY (WareID)            REFERENCES Ware(WareID),
     FOREIGN KEY (EquipmentTypeID)   REFERENCES EquipmentType(EquipmentTypeID)
 ) WITHOUT ROWID");
@@ -82,11 +82,25 @@ CREATE TABLE IF NOT EXISTS WareEquipmentTag
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords();
+                var items = GetRecords2();
 
-                connection.Execute(@"INSERT INTO WareEquipment (WareID, ConnectionName, EquipmentTypeID, GroupName) VALUES (@WareID, @ConnectionName, @EquipmentTypeID, @GroupName)", items);
+                connection.Execute(@"INSERT INTO WareEquipment (WareID, GroupName, ConnectionName, EquipmentTypeID) VALUES (@WareID, @GroupName, @ConnectionName, @EquipmentTypeID)", items);
 
                 connection.Execute(@"INSERT INTO WareEquipmentTag (WareID, ConnectionName, Tag) VALUES (@WareID, @ConnectionName, @Tag)", _EquipmentTags.SelectMany(x => x));
+            }
+        }
+
+        private IEnumerable<WareEquipment> GetRecords2()
+        {
+            var hash = new HashSet<(string, string)>();
+            foreach (var item in GetRecords())
+            {
+                if (hash.Contains((item.WareID, item.ConnectionName)))
+                {
+                    continue;
+                }
+                hash.Add((item.WareID, item.ConnectionName));
+                yield return item;
             }
         }
 
@@ -123,7 +137,7 @@ CREATE TABLE IF NOT EXISTS WareEquipmentTag
                         if (string.IsNullOrEmpty(name)) continue;
 
                         equipmentTags.AddRange(Util.SplitTags(connection.Attribute("tags")?.Value).Select(x => new WareEquipmentTag(wareID, name, x)));
-                        yield return new WareEquipment(wareID, name, equipmentTypeID, connection.Attribute("group")?.Value);
+                        yield return new WareEquipment(wareID, name, equipmentTypeID, connection.Attribute("group")?.Value ?? "");
                     }
                 }
 
@@ -135,7 +149,7 @@ CREATE TABLE IF NOT EXISTS WareEquipmentTag
                     const string thrusterConnectionName = "thruster";
 
                     equipmentTags.AddRange(Util.SplitTags(thruster).Select(x => new WareEquipmentTag(wareID, thrusterConnectionName, x)));
-                    yield return new WareEquipment(wareID, thrusterConnectionName, "thrusters", null);
+                    yield return new WareEquipment(wareID, thrusterConnectionName, "thrusters", "");
                 }
 
                 if (equipmentTags.Any())

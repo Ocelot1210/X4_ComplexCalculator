@@ -185,7 +185,7 @@ items);
             if (componentXml is null) return -1;
 
             var connName = componentXml.Root.XPathSelectElement("component/connections/connection[contains(@tags, 'storage')]")?.Attribute("name")?.Value ?? "";
-            if (string.IsNullOrEmpty(connName)) return -1;
+            if (string.IsNullOrEmpty(connName)) return 0;
 
             var storage = macroXml.Root.XPathSelectElement($"macro/connections/connection[@ref='{connName}']/macro")?.Attribute("ref")?.Value ?? "";
             if (string.IsNullOrEmpty(storage))

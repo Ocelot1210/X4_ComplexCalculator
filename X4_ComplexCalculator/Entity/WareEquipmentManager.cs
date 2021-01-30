@@ -20,9 +20,9 @@ namespace X4_ComplexCalculator.Entity
 
 
         /// <summary>
-        /// 接続名をキーにした装備中の項目一覧
+        /// グループ名と接続名をキーにした装備中の項目一覧
         /// </summary>
-        private readonly Dictionary<string, Equipment> _Equipped;
+        private readonly Dictionary<WareEquipment, Equipment> _Equipped;
         #endregion
 
 
@@ -60,7 +60,7 @@ namespace X4_ComplexCalculator.Entity
         {
             Ware = ware;
             _WareEquipments = WareEquipment.Get(ware.ID);
-            _Equipped = new Dictionary<string, Equipment>();
+            _Equipped = new();
         }
 
 
@@ -87,11 +87,21 @@ namespace X4_ComplexCalculator.Entity
             {
                 foreach (var elm in element.Elements())
                 {
-                    var connection = elm.Name.LocalName;
+                    var conn = elm.Attribute("connection")?.Value;
+                    var group = elm.Attribute("group")?.Value;
                     var id = elm.Attribute("id")?.Value;
-                    if (string.IsNullOrEmpty(id)) continue;
+                    if (string.IsNullOrEmpty(conn) || string.IsNullOrEmpty(group) || string.IsNullOrEmpty(id))
+                    {
+                        continue;
+                    }
 
-                    _Equipped.Add(connection, Ware.Get<Equipment>(id));
+                    var wareEquipment = _WareEquipments
+                        .FirstOrDefault(x => x.GroupName == group && x.ConnectionName == conn);
+
+                    if (wareEquipment is not null)
+                    {
+                        _Equipped.Add(wareEquipment, Ware.Get<Equipment>(id));
+                    }
                 }
             }
             catch
@@ -198,12 +208,12 @@ namespace X4_ComplexCalculator.Entity
         {
             // 装備可能な接続情報を取得する
             var equippableInfo = _WareEquipments
-                .FirstOrDefault(x => !_Equipped.ContainsKey(x.ConnectionName) && x.CanEquipped(equipment));
+                .FirstOrDefault(x => !_Equipped.ContainsKey(x) && x.CanEquipped(equipment));
 
             // 装備可能な接続がある場合、装備する
             if (equippableInfo is not null)
             {
-                _Equipped.Add(equippableInfo.ConnectionName, equipment);
+                _Equipped.Add(equippableInfo, equipment);
                 return true;
             }
 
@@ -218,7 +228,14 @@ namespace X4_ComplexCalculator.Entity
         /// <returns>インスタンスの現在の状態を表す XElement</returns>
         public XElement Serialize()
         {
-            var equipments = _Equipped.Select(x => new XElement(x.Key, new XAttribute("id", x.Value.ID)));
+            var equipments = _Equipped
+                .Select(x =>new XElement(
+                    "equipment",
+                    new XAttribute("group", x.Key.GroupName),
+                    new XAttribute("connection", x.Key.ConnectionName),
+                    new XAttribute("id", x.Value.ID)
+                    )
+                );
 
             return new XElement("equipments", equipments);
         }
@@ -232,7 +249,7 @@ namespace X4_ComplexCalculator.Entity
         /// <returns>装備IDと装備サイズに対応する装備があと何個装備できるか</returns>
         public int GetEquippableCount(EquipmentType type, X4Size size)
             => _WareEquipments.Count(x =>
-            !_Equipped.ContainsKey(x.ConnectionName) &&
+            !_Equipped.ContainsKey(x) &&
             x.Tags.Contains(type.EquipmentTypeID[..^1]) &&
             x.Tags.Contains(size.SizeID)
         );

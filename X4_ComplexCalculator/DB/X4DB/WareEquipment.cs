@@ -33,7 +33,7 @@ namespace X4_ComplexCalculator.DB.X4DB
 
         #region プロパティ
         /// <summary>
-        /// 識別ID
+        /// ウェアID
         /// </summary>
         public string ID { get; }
 
@@ -53,7 +53,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// グループ名
         /// </summary>
-        public string? GroupName { get; }
+        public string GroupName { get; }
 
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <param name="equipmentTypeID">装備種別ID</param>
         /// <param name="groupName">グループ名</param>
         /// <param name="tags">タグを区切り文字で連結した文字列</param>
-        private WareEquipment(string wareID, string connectionName, string equipmentTypeID, string? groupName, string tags)
+        private WareEquipment(string wareID, string connectionName, string equipmentTypeID, string groupName, string tags)
         {
             ID = wareID;
             ConnectionName = connectionName;
@@ -178,5 +178,9 @@ GROUP BY
                 _ => !equipment.EquipmentTags.Where(x => x != "component").Except(Tags).Any(),
             };
         }
+
+
+        public override int GetHashCode()
+            => HashCode.Combine(ID, GroupName, ConnectionName);
     }
 }

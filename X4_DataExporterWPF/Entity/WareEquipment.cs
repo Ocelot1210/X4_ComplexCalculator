@@ -26,7 +26,7 @@
         /// <summary>
         /// グループ名
         /// </summary>
-        public string? GroupName { get; }
+        public string GroupName { get; }
 
 
 
@@ -37,12 +37,12 @@
         /// <param name="connectionName">コネクション名</param>
         /// <param name="equipmentTypeID">装備種別</param>
         /// <param name="groupName">グループ名</param>
-        public WareEquipment(string wareID, string connectionName, string equipmentTypeID, string? groupName)
+        public WareEquipment(string wareID, string connectionName, string equipmentTypeID, string groupName)
         {
             WareID = wareID;
-            ConnectionName = connectionName;
+            ConnectionName = connectionName.Trim();
             EquipmentTypeID = equipmentTypeID;
-            GroupName = groupName;
+            GroupName = groupName.Trim();
         }
     }
 }
