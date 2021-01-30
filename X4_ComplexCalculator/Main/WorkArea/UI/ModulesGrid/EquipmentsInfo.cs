@@ -85,7 +85,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         {
             _Manager = manager;
             _EquipmentTypeID = equipmentTypeID;
-            Update();
+            _UpdateNeeded = true;
         }
 
 
