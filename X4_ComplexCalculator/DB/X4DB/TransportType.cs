@@ -16,6 +16,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         private readonly static Dictionary<string, TransportType> _TransportTypes = new();
         #endregion
 
+
         #region プロパティ
         /// <summary>
         /// カーゴ種別ID
@@ -63,6 +64,13 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <param name="transportTypeID">カーゴ種別ID</param>
         /// <returns>カーゴ種別</returns>
         public static TransportType Get(string transportTypeID) => _TransportTypes[transportTypeID];
+
+
+        /// <summary>
+        /// 全カーゴ種別を取得する
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumerable<TransportType> GetAll() => _TransportTypes.Values;
 
 
         /// <summary>

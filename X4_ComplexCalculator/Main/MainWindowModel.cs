@@ -46,21 +46,16 @@ namespace X4_ComplexCalculator.Main
             X4Database.Open();
             SettingDatabase.Open();
 
-            var pathes = new List<string>();
-
             var vmList = new List<WorkAreaViewModel>();
 
-            SettingDatabase.Instance.ExecQuery("SELECT * FROM OpenedFiles", (dr, _) =>
-            {
-                var path = (string)dr["Path"];
-                if (File.Exists(path))
-                {
-                    pathes.Add(path);
-                }
-            });
+            const string sql = "SELECT Path FROM OpenedFiles";
+            var pathes = SettingDatabase.Instance.Query<string>(sql)
+                .Where(x => File.Exists(x))
+                .ToArray();
+
 
             // 開いているファイルテーブルを初期化
-            SettingDatabase.Instance.ExecQuery("DELETE FROM OpenedFiles");
+            SettingDatabase.Instance.Execute("DELETE FROM OpenedFiles");
 
             _WorkAreFileIO.OpenFiles(pathes);
 
@@ -132,14 +127,11 @@ namespace X4_ComplexCalculator.Main
             // 閉じる場合、開いていたファイル一覧を保存する
             if (!canceled)
             {
-                var param = new SQLiteCommandParameters(1);
+                var pathes = _WorkAreaManager.Documents
+                    .Where(x => File.Exists(x.SaveFilePath))
+                    .Select(x => new { Path = x.SaveFilePath });
 
-                var pathes = _WorkAreaManager.Documents.Where(x => File.Exists(x.SaveFilePath))
-                                                       .Select(x => x.SaveFilePath);
-
-                param.AddRange("path", System.Data.DbType.String, pathes);
-
-                SettingDatabase.Instance.ExecQuery("INSERT INTO OpenedFiles(Path) VALUES(:path)", param);
+                SettingDatabase.Instance.Execute("INSERT INTO OpenedFiles(Path) VALUES(@Path)", pathes);
             }
 
             return canceled;

@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Products;
@@ -47,7 +48,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         /// <summary>
         /// 保管庫容量情報
         /// </summary>
-        private readonly Dictionary<string, StorageCapacityInfo> _CapacityDict = new();
+        private readonly Dictionary<string, StorageCapacityInfo> _CapacityDict;
 
 
         /// <summary>
@@ -103,11 +104,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
 
             _StorageAssignInfo = storageAssignInfo;
 
-
-            X4Database.Instance.ExecQuery("SELECT TransportTypeID FROM TransportType", (dr, args) =>
-            {
-                _CapacityDict.Add((string)dr["TransportTypeID"], new StorageCapacityInfo());
-            });
+            _CapacityDict = TransportType.GetAll()
+                .ToDictionary(x => x.TransportTypeID, x => new StorageCapacityInfo());
 
             foreach (var storage in _Storages.Storages)
             {

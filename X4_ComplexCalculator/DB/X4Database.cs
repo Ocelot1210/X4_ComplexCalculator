@@ -60,7 +60,7 @@ namespace X4_ComplexCalculator.DB
                     // X4DBが存在する場合
 
                     _Instance = new X4Database(dbPath);
-                    if (X4_DataExporterWPF.Export.CommonExporter.CURRENT_FORMAT_VERSION == GetDBVersion())
+                    if (X4_DataExporterWPF.Export.CommonExporter.CURRENT_FORMAT_VERSION == _Instance.GetDBVersion())
                     {
                         // 想定するDBのフォーマットと実際のフォーマットが同じ場合
                         InitX4DB();
@@ -71,7 +71,7 @@ namespace X4_ComplexCalculator.DB
                         // DB更新を要求
 
                         LocalizedMessageBox.Show("Lang:OldFormatMessage", "Lang:Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-                        if (!UpdateDB() || GetDBVersion() != X4_DataExporterWPF.Export.CommonExporter.CURRENT_FORMAT_VERSION)
+                        if (!UpdateDB() || _Instance.GetDBVersion() != X4_DataExporterWPF.Export.CommonExporter.CURRENT_FORMAT_VERSION)
                         {
                             // DB更新を要求してもフォーマットが変わらない場合
 
@@ -119,27 +119,18 @@ namespace X4_ComplexCalculator.DB
         /// <summary>
         /// DBのバージョン取得
         /// </summary>
-        private static long GetDBVersion()
+        private long GetDBVersion()
         {
-            var ret = 0L;
-            var tableExists = false;
+            const string sql1 = "SELECT count(*) AS Count FROM sqlite_master WHERE type = 'table' AND name = 'Common'";
+            var tableExists = 0 < QuerySingle<long>(sql1);
 
+            if (!tableExists)
             {
-                Instance.ExecQuery("SELECT count(*) AS Count FROM sqlite_master WHERE type = 'table' AND name = 'Common'", (dr, _) =>
-                {
-                    tableExists = 0L < (long)dr["Count"];
-                });
+                return 0;
             }
 
-            if (tableExists)
-            {
-                Instance.ExecQuery("SELECT Value FROM Common WHERE Item = 'FormatVersion'", (dr, _) =>
-                {
-                    ret = (long)dr["Value"];
-                });
-            }
-
-            return ret;
+            const string sql2 = "SELECT Value FROM Common WHERE Item = 'FormatVersion' UNION ALL SELECT 0 LIMIT 1";
+            return QuerySingle<long>(sql2);
         }
 
 

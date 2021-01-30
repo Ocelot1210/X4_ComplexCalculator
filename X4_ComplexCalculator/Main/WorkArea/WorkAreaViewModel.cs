@@ -235,29 +235,17 @@ namespace X4_ComplexCalculator.Main.WorkArea
         /// <returns>レイアウトID</returns>
         public long SaveLayout(string layoutName)
         {
-            var id = 0L;
+            var id = SettingDatabase.Instance.GetLastLayoutID();
 
-            // 空いているレイアウトIDを取得する
-            var query = @$"
-SELECT
-    ifnull(MIN( LayoutID + 1 ), 0) AS LayoutID
-FROM
-    WorkAreaLayouts
-WHERE
-    ( LayoutID + 1 ) NOT IN ( SELECT LayoutID FROM WorkAreaLayouts)";
-
-            SettingDatabase.Instance.ExecQuery(query, (dr, args) =>
+            var param = new
             {
-                id = (long)dr["LayoutID"];
-            });
+                LayoutID = id,
+                LayoutName = layoutName,
+                Layout = GetCurrentLayout() ?? throw new InvalidOperationException(),
+            };
 
-
-            var param = new SQLiteCommandParameters(3);
-            param.Add("layoutID",   System.Data.DbType.Int32,  id);
-            param.Add("layoutName", System.Data.DbType.String, layoutName);
-            param.Add("layout",     System.Data.DbType.Binary, GetCurrentLayout() ?? throw new InvalidOperationException());
-
-            SettingDatabase.Instance.ExecQuery("INSERT INTO WorkAreaLayouts(LayoutID, LayoutName, Layout) VALUES(:layoutID, :layoutName, :layout)", param);
+            const string sql = "INSERT INTO WorkAreaLayouts(LayoutID, LayoutName, Layout) VALUES(:LayoutID, :LayoutName, :Layout)";
+            SettingDatabase.Instance.Execute(sql, param);
 
             return id;
         }
@@ -268,10 +256,14 @@ WHERE
         /// <param name="layoutID">レイアウトID</param>
         public void OverwriteSaveLayout(long layoutID)
         {
-            var param = new SQLiteCommandParameters(2);
-            param.Add("layout", System.Data.DbType.Binary, GetCurrentLayout() ?? throw new InvalidOperationException());
-            param.Add("LayoutID", System.Data.DbType.Int32, layoutID);
-            SettingDatabase.Instance.ExecQuery($"UPDATE WorkAreaLayouts SET Layout = :layout WHERE LayoutID = :layoutID", param);
+            var param = new
+            {
+                LayoutID = layoutID,
+                Layout = GetCurrentLayout() ?? throw new InvalidOperationException(),
+            };
+
+            const string sql = "UPDATE WorkAreaLayouts SET Layout = :Layout WHERE LayoutID = :LayoutID";
+            SettingDatabase.Instance.Execute(sql, param);
         }
 
 

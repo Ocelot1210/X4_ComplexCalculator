@@ -99,9 +99,6 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
         /// <returns></returns>
         private bool ImportMain(IWorkArea WorkArea, StationPlanItem planItem)
         {
-            var modParam = new SQLiteCommandParameters(1);
-            var eqParam = new SQLiteCommandParameters(3);
-
             var modules = new List<ModulesGridItem>((int)(double)planItem.Plan.XPathEvaluate("count(entry)"));
 
             foreach (var entry in planItem.Plan.XPathSelectElements("entry"))
