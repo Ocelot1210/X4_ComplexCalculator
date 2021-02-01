@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS Race
                     name,
                     shortName,
                     description,
-                    Util.GzDds2Png(_CatFile, "assets/fx/gui/textures/races", race.Element("icon")?.Attribute("active")?.Value)
+                    Util.DDS2Png(_CatFile, "assets/fx/gui/textures/races", race.Element("icon")?.Attribute("active")?.Value)
                 );
             }
         }

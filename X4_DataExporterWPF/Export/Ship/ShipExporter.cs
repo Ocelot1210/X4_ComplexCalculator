@@ -286,7 +286,7 @@ items);
         {
             const string dir = "assets/fx/gui/textures/ships";
 
-            var ret = Util.GzDds2Png(_CatFile, dir, macroName);
+            var ret = Util.DDS2Png(_CatFile, dir, macroName);
             if (ret is not null)
             {
                 return ret;
@@ -294,7 +294,7 @@ items);
 
             if (_NotFoundThumbnail is null)
             {
-                _NotFoundThumbnail = Util.GzDds2Png(_CatFile, dir, "notfound");
+                _NotFoundThumbnail = Util.DDS2Png(_CatFile, dir, "notfound");
             }
 
             return _NotFoundThumbnail;

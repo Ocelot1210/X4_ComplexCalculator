@@ -118,7 +118,7 @@ CREATE TABLE IF NOT EXISTS Module
         private byte[]? GetThumbnail(string macroName)
         {
             const string dir = "assets/fx/gui/textures/stationmodules";
-            var thumb = Util.GzDds2Png(_CatFile, dir, macroName);
+            var thumb = Util.DDS2Png(_CatFile, dir, macroName);
             if (thumb is not null)
             {
                 return thumb;
@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS Module
 
             if (_NotFoundThumb is null)
             {
-                _NotFoundThumb = Util.GzDds2Png(_CatFile, dir, "notfound");
+                _NotFoundThumb = Util.DDS2Png(_CatFile, dir, "notfound");
             }
 
             return _NotFoundThumb;

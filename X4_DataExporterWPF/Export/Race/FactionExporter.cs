@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS Faction
                     raceID,
                     shortName,
                     _Resolver.Resolve(faction.Attribute("description")?.Value ?? ""),
-                    Util.GzDds2Png(_CatFile, "assets/fx/gui/textures/factions", faction.Element("icon")?.Attribute("active")?.Value)
+                    Util.DDS2Png(_CatFile, "assets/fx/gui/textures/factions", faction.Element("icon")?.Attribute("active")?.Value)
                 );
             }
         }
