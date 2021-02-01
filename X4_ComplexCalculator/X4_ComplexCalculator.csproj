@@ -66,9 +66,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="App.config.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="Localization\Lang.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -51,10 +51,8 @@ namespace X4_DataExporterWPF.DataExportWindow
         {
             var catFile = new CatFile(inDirPath);
 
-            // 抽出に失敗した場合、どこで例外が発生したか知りたいため、Debugビルドではtry-catchを無効化する
-#if !DEBUG
+            // 抽出に失敗した場合、例外設定で「Common Languate Runtime Exceptions」にチェックを入れるとどこで例外が発生したか分かる
             try
-#endif
             {
                 if (File.Exists(outFilePath))
                 {
@@ -135,7 +133,6 @@ namespace X4_DataExporterWPF.DataExportWindow
                     MessageBox.Show("Data export completed.", "X4 DataExporter", MessageBoxButton.OK, MessageBoxImage.Information);
                 }));
             }
-#if !DEBUG
             catch (Exception e)
             {
                 // テンポラリフォルダにクラッシュレポートをダンプする
@@ -156,7 +153,6 @@ Please report the following content to the developer.
                     System.Diagnostics.Process.Start("explorer.exe", $@"/select,""{dumpPath}""");
                 }));
             }
-#endif
         }
 
 

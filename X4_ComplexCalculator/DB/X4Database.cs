@@ -46,9 +46,8 @@ namespace X4_ComplexCalculator.DB
         {
             if (_Instance is not null) return;
 
-            var config = Configuration.GetConfiguration();
             var basePath = AppDomain.CurrentDomain.BaseDirectory ?? "";
-            var dbPath = Path.Combine(basePath, config["AppSettings:X4DBPath"]);
+            var dbPath = Path.Combine(basePath, Configuration.Instance.X4DBPath);
 
             try
             {
@@ -142,14 +141,12 @@ namespace X4_ComplexCalculator.DB
         {
             _Instance?.Dispose();
 
-            var conf = Configuration.GetConfiguration();
-
-            var dbFilePath = conf["AppSettings:X4DBPath"];
+            var dbFilePath = Configuration.Instance.X4DBPath;
             if (!Path.IsPathRooted(dbFilePath))
             {
                 // DBファイルが相対パスの場合、実行ファイルのパスをベースにパスを正規化する
                 var exeDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? "";
-                dbFilePath = Path.GetFullPath(Path.Combine(exeDir, conf["AppSettings:X4DBPath"]));
+                dbFilePath = Path.GetFullPath(Path.Combine(exeDir, Configuration.Instance.X4DBPath));
             }
 
             DataExportWindow.ShowDialog(GetX4InstallDirectory(), dbFilePath);

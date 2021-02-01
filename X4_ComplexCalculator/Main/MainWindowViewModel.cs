@@ -25,6 +25,7 @@ using X4_ComplexCalculator.Main.Menu.Layout;
 using X4_ComplexCalculator.Main.Menu.View.EmpireOverview;
 using X4_ComplexCalculator.Main.Menu.View.DBViewer;
 using X4_ComplexCalculator.Main.WorkArea;
+using X4_ComplexCalculator.Common;
 
 namespace X4_ComplexCalculator.Main
 {
@@ -466,22 +467,23 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         private void WindowLoaded()
         {
-#if _DEBUG
             try
-#endif
             {
                 // DB接続開始
                 _MainWindowModel.Init();
                 _WorkAreaManager.Init();
-                CheckUpdateCommand.Execute(false);
+
+                // 更新チェックが有効な場合のみ更新を確認する
+                if (Configuration.Instance.CheckUpdateAtLaunch)
+                {
+                    CheckUpdateCommand.Execute(false);
+                }
             }
-#if _DEBUG
             catch (Exception e)
             {
                 LocalizedMessageBox.Show("Lang:UnexpectedErrorMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message, e.StackTrace ?? "");
                 Environment.Exit(-1);
             }
-#endif
         }
 
 

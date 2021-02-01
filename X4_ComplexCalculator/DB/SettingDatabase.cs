@@ -44,9 +44,8 @@ namespace X4_ComplexCalculator.DB
         {
             if (_Instance is not null) return;
 
-            var config = Configuration.GetConfiguration();
             var basePath = AppDomain.CurrentDomain.BaseDirectory ?? "";
-            var dbPath = Path.Combine(basePath, config["AppSettings:CommonDBPath"]);
+            var dbPath = Path.Combine(basePath, Configuration.Instance.CommonDBPath);
 
             _Instance = new SettingDatabase(dbPath);
             _Instance.BeginTransaction(db =>
