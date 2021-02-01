@@ -151,6 +151,18 @@ namespace X4_ComplexCalculator.Main
 
 
         /// <summary>
+        /// 起動時に更新を確認するかのチェック状態
+        /// </summary>
+        public ReactiveProperty<bool> CheckUpdateAtLaunch { get; }
+
+
+        /// <summary>
+        /// 起動時に更新を確認するか
+        /// </summary>
+        public ICommand SetCheckUpdateAtLaunchCommand { get; }
+
+
+        /// <summary>
         /// 更新を確認...
         /// </summary>
         public AsyncReactiveCommand<bool> CheckUpdateCommand { get; }
@@ -243,6 +255,8 @@ namespace X4_ComplexCalculator.Main
             OpenCommand                      = new DelegateCommand(Open);
             UpdateDBCommand                  = new DelegateCommand(_MainWindowModel.UpdateDB);
             ReportIssueCommand               = new DelegateCommand(ReportIssue);
+            CheckUpdateAtLaunch              = new ReactiveProperty<bool>(Configuration.Instance.CheckUpdateAtLaunch);
+            SetCheckUpdateAtLaunchCommand    = new DelegateCommand(SetCheckUpdateAtLaunch);
             CheckUpdateCommand               = new AsyncReactiveCommand<bool>().WithSubscribe(CheckUpdate);
             VersionInfoCommand               = new DelegateCommand(ShowVersionInfo);
             DocumentClosingCommand           = new DelegateCommand<DocumentClosingEventArgs>(DocumentClosing);
@@ -384,6 +398,16 @@ namespace X4_ComplexCalculator.Main
         {
             const string url = ThisAssembly.Git.RepositoryUrl + "/issues";
             Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+        }
+
+
+        /// <summary>
+        /// 更新確認ON/OFF
+        /// </summary>
+        private void SetCheckUpdateAtLaunch()
+        {
+            Configuration.Instance.CheckUpdateAtLaunch = !Configuration.Instance.CheckUpdateAtLaunch;
+            CheckUpdateAtLaunch.Value = Configuration.Instance.CheckUpdateAtLaunch;
         }
 
 

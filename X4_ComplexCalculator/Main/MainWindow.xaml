@@ -199,6 +199,14 @@
 
                 <Separator />
 
+                <!--  起動時に更新を確認する  -->
+                <MenuItem
+                    Command="{Binding SetCheckUpdateAtLaunchCommand, Mode=OneTime}"
+                    Header="起動時に更新を確認する"
+                    IsCheckable="True"
+                    IsChecked="{Binding CheckUpdateAtLaunch.Value, Mode=TwoWay}" />
+
+
                 <!--  更新を確認...  -->
                 <MenuItem Command="{Binding CheckUpdateCommand, Mode=OneTime}" Header="{lex:Loc Lang:CheckUpdate}">
                     <MenuItem.CommandParameter>
