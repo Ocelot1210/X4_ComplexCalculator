@@ -93,6 +93,7 @@ Language;Language
 # Help(H) ---------------------------------------------
 Help;Help(_H)
 ReportIssue;Report Issue
+CheckUpdateAtLaunch;Check Update At Launch
 CheckUpdate;Check Update...
 CheckUpdateNoUpdateDescription;X4_ComplexCalculator v{0} is up to date.
 CheckUpdateHasUpdateDescription;X4_ComplexCalculator v{0} can be update to v{1}.\r\nDo you want to update now?

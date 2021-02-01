@@ -1,4 +1,9 @@
-﻿using System;
+﻿using AvalonDock;
+using GongSolutions.Wpf.DragDrop;
+using Prism.Commands;
+using Prism.Mvvm;
+using Reactive.Bindings;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -9,11 +14,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using AvalonDock;
-using GongSolutions.Wpf.DragDrop;
-using Prism.Commands;
-using Prism.Mvvm;
-using Reactive.Bindings;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Infrastructure;
 using X4_ComplexCalculator.Main.Menu.File.Export;
@@ -22,10 +23,9 @@ using X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport;
 using X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport;
 using X4_ComplexCalculator.Main.Menu.Lang;
 using X4_ComplexCalculator.Main.Menu.Layout;
-using X4_ComplexCalculator.Main.Menu.View.EmpireOverview;
 using X4_ComplexCalculator.Main.Menu.View.DBViewer;
+using X4_ComplexCalculator.Main.Menu.View.EmpireOverview;
 using X4_ComplexCalculator.Main.WorkArea;
-using X4_ComplexCalculator.Common;
 
 namespace X4_ComplexCalculator.Main
 {
