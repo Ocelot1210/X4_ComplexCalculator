@@ -53,6 +53,7 @@ namespace LibX4.FileSystem
         private readonly IReadOnlyList<ModInfo> _ModInfo;
         #endregion
 
+
         #region プロパティ
         /// <summary>
         /// Modが導入されているか
@@ -114,6 +115,41 @@ namespace LibX4.FileSystem
             }
 
             return null;
+        }
+
+
+        /// <summary>
+        /// 指定されたパスに一致するxmlファイルを全部開く
+        /// </summary>
+        /// <param name="filePath">ファイルパス</param>
+        /// <returns>XDocumentの列挙</returns>
+        public IEnumerable<XDocument> OpenXmlFiles(string filePath)
+        {
+            foreach (var ms in OpenFiles(filePath))
+            {
+                yield return XDocument.Load(ms);
+                ms.Dispose();
+            }
+        }
+
+
+        /// <summary>
+        /// 指定されたパスに一致するファイルを全部開く
+        /// </summary>
+        /// <param name="filePath">ファイルパス</param>
+        /// <returns>ファイルの内容の列挙</returns>
+        public IEnumerable<MemoryStream> OpenFiles(string filePath)
+        {
+            filePath = PathCanonicalize(filePath);
+
+            foreach (var loader in _FileLoaders)
+            {
+                var ms = loader.OpenFile(filePath);
+                if (ms is not null)
+                {
+                    yield return ms;
+                }
+            }
         }
 
 
