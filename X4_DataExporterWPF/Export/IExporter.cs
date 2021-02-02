@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 
 namespace X4_DataExporterWPF.Export
 {
@@ -11,6 +12,6 @@ namespace X4_DataExporterWPF.Export
         /// エクスポート処理
         /// </summary>
         /// <param name="connection"></param>
-        void Export(IDbConnection connection);
+        void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progless);
     }
 }

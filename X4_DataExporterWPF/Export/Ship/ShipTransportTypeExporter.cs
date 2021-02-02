@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using LibX4.FileSystem;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -43,7 +44,7 @@ namespace X4_DataExporterWPF.Export
         /// 抽出処理
         /// </summary>
         /// <param name="connection"></param>
-        public void Export(IDbConnection connection)
+        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
         {
             //////////////////
             // テーブル作成 //
@@ -64,7 +65,7 @@ CREATE TABLE IF NOT EXISTS ShipTransportType
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords();
+                var items = GetRecords(progress);
 
                 connection.Execute(@"INSERT INTO ShipTransportType(ShipID, TransportTypeID) VALUES(@ShipID, @TransportTypeID)", items);
             }
@@ -74,10 +75,15 @@ CREATE TABLE IF NOT EXISTS ShipTransportType
         /// <summary>
         /// レコード抽出
         /// </summary>
-        private IEnumerable<ShipTransportType> GetRecords()
+        private IEnumerable<ShipTransportType> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
         {
+            var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
+            var currentStep = 0;
+
             foreach (var ship in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'ship')]"))
             {
+                progress.Report((currentStep++, maxSteps));
+
                 var shipID = ship.Attribute("id")?.Value;
                 if (string.IsNullOrEmpty(shipID)) continue;
 
@@ -89,6 +95,8 @@ CREATE TABLE IF NOT EXISTS ShipTransportType
                     yield return new ShipTransportType(shipID, type);
                 }
             }
+
+            progress.Report((currentStep++, maxSteps));
         }
 
 

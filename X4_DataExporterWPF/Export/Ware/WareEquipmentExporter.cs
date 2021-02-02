@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using LibX4.FileSystem;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -48,7 +49,7 @@ namespace X4_DataExporterWPF.Export
         /// 抽出処理
         /// </summary>
         /// <param name="connection"></param>
-        public void Export(IDbConnection connection)
+        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
         {
             //////////////////
             // テーブル作成 //
@@ -82,7 +83,7 @@ CREATE TABLE IF NOT EXISTS WareEquipmentTag
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords2();
+                var items = GetRecords2(progress);
 
                 connection.Execute(@"INSERT INTO WareEquipment (WareID, GroupName, ConnectionName, EquipmentTypeID) VALUES (@WareID, @GroupName, @ConnectionName, @EquipmentTypeID)", items);
 
@@ -90,10 +91,10 @@ CREATE TABLE IF NOT EXISTS WareEquipmentTag
             }
         }
 
-        private IEnumerable<WareEquipment> GetRecords2()
+        private IEnumerable<WareEquipment> GetRecords2(IProgress<(int currentStep, int maxSteps)> progress)
         {
             var hash = new HashSet<(string, string)>();
-            foreach (var item in GetRecords())
+            foreach (var item in GetRecords(progress))
             {
                 if (hash.Contains((item.WareID, item.ConnectionName)))
                 {
@@ -108,10 +109,17 @@ CREATE TABLE IF NOT EXISTS WareEquipmentTag
         /// <summary>
         /// レコード抽出
         /// </summary>
-        private IEnumerable<WareEquipment> GetRecords()
+        private IEnumerable<WareEquipment> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
         {
+            var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware)");
+            var currentStep = 0;
+
+
             foreach (var ware in _WaresXml.Root.XPathSelectElements("ware"))
             {
+                progress.Report((currentStep++, maxSteps));
+
+
                 var wareID = ware.Attribute("id")?.Value;
                 if (string.IsNullOrEmpty(wareID)) continue;
 
@@ -157,6 +165,8 @@ CREATE TABLE IF NOT EXISTS WareEquipmentTag
                     _EquipmentTags.AddLast(equipmentTags);
                 }
             }
+
+            progress.Report((currentStep++, maxSteps));
         }
     }
 }

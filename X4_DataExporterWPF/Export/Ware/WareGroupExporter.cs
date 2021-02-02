@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -43,7 +44,7 @@ namespace X4_DataExporterWPF.Export
         /// 抽出処理
         /// </summary>
         /// <param name="connection"></param>
-        public void Export(IDbConnection connection)
+        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
         {
             //////////////////
             // テーブル作成 //
@@ -62,7 +63,7 @@ CREATE TABLE IF NOT EXISTS WareGroup
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords();
+                var items = GetRecords(progress);
 
                 connection.Execute("INSERT INTO WareGroup (WareGroupID, Name, Tier) VALUES (@WareGroupID, @Name, @Tier)", items);
             }
@@ -73,12 +74,17 @@ CREATE TABLE IF NOT EXISTS WareGroup
         /// XML から WareGroup データを読み出す
         /// </summary>
         /// <returns>読み出した WareGroup データ</returns>
-        internal IEnumerable<WareGroup> GetRecords()
+        internal IEnumerable<WareGroup> GetRecords(IProgress<(int currentStep, int maxSteps)>? progress = null)
         {
             var wareGroupXml = _CatFile.OpenXml("libraries/waregroups.xml");
 
+            var maxSteps = (int)(double)wareGroupXml.Root.XPathEvaluate("count(group)");
+            var currentStep = 0;
+            
             foreach (var wareGroup in wareGroupXml.Root.XPathSelectElements("group"))
             {
+                progress?.Report((currentStep++, maxSteps));
+
                 var wareGroupID = wareGroup.Attribute("id")?.Value;
                 if (string.IsNullOrEmpty(wareGroupID)) continue;
 
@@ -88,6 +94,8 @@ CREATE TABLE IF NOT EXISTS WareGroup
 
                 yield return new WareGroup(wareGroupID, name, tier);
             }
+
+            progress?.Report((currentStep++, maxSteps));
         }
     }
 }

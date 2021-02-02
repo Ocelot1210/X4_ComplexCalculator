@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -29,7 +30,7 @@ namespace X4_DataExporterWPF.Export
         }
 
 
-        public void Export(IDbConnection connection)
+        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
         {
             //////////////////
             // テーブル作成 //
@@ -50,7 +51,7 @@ CREATE TABLE IF NOT EXISTS WareTags
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords();
+                var items = GetRecords(progress);
 
                 connection.Execute("INSERT INTO WareTags (WareID, Tag) VALUES (@WareID, @Tag)", items);
             }
@@ -58,10 +59,16 @@ CREATE TABLE IF NOT EXISTS WareTags
 
 
 
-        private IEnumerable<WareTag> GetRecords()
+        private IEnumerable<WareTag> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
         {
+            var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware)");
+            var currentStep = 0;
+
+
             foreach (var ware in _WaresXml.Root.XPathSelectElements("ware"))
             {
+                progress.Report((currentStep++, maxSteps));
+
                 var wareID = ware.Attribute("id")?.Value;
                 if (string.IsNullOrEmpty(wareID)) continue;
 
@@ -72,6 +79,8 @@ CREATE TABLE IF NOT EXISTS WareTags
                     yield return new WareTag(wareID, tag);
                 }
             }
+
+            progress.Report((currentStep++, maxSteps));
         }
     }
 }

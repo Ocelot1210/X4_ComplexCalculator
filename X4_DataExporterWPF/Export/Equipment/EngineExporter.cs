@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using LibX4.FileSystem;
 using LibX4.Xml;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Xml.Linq;
@@ -42,7 +43,7 @@ namespace X4_DataExporterWPF.Export
         /// 抽出処理
         /// </summary>
         /// <param name="connection"></param>
-        public void Export(IDbConnection connection)
+        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
         {
             //////////////////
             // テーブル作成 //
@@ -68,7 +69,7 @@ CREATE TABLE IF NOT EXISTS Engine
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords();
+                var items = GetRecords(progress);
 
                 connection.Execute(@"
 INSERT INTO Engine ( EquipmentID,  ForwardThrust,  ReverseThrust,  BoostThrust,  BoostDuration,  BoostReleaseTime,  TravelThrust,  TravelReleaseTime,  TravelThrust,  TravelReleaseTime)
@@ -81,10 +82,17 @@ INSERT INTO Engine ( EquipmentID,  ForwardThrust,  ReverseThrust,  BoostThrust, 
         /// XML から Engine データを読み出す
         /// </summary>
         /// <returns>読み出した Engine データ</returns>
-        private IEnumerable<Engine> GetRecords()
+        private IEnumerable<Engine> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
         {
+            var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[@transport='equipment'][@group='engines'])");
+            var currentStep = 0;
+
+
             foreach (var equipment in _WaresXml.Root.XPathSelectElements("ware[@transport='equipment'][@group='engines']"))
             {
+                progress.Report((currentStep++, maxSteps));
+
+
                 var equipmentID = equipment.Attribute("id")?.Value;
                 if (string.IsNullOrEmpty(equipmentID)) continue;
 
@@ -112,6 +120,8 @@ INSERT INTO Engine ( EquipmentID,  ForwardThrust,  ReverseThrust,  BoostThrust, 
                     (int)(forwardThrust * travel.Attribute("thrust")?.GetDouble() ?? 1.0),
                     travel.Attribute("release")?.GetDouble() ?? 0.0);
             }
+
+            progress.Report((currentStep++, maxSteps));
         }
     }
 }

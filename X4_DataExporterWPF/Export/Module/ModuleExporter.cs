@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Xml.Linq;
@@ -48,7 +49,7 @@ namespace X4_DataExporterWPF.Export
         /// 抽出処理
         /// </summary>
         /// <param name="connection"></param>
-        public void Export(IDbConnection connection)
+        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
         {
             //////////////////
             // テーブル作成 //
@@ -73,7 +74,7 @@ CREATE TABLE IF NOT EXISTS Module
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords();
+                var items = GetRecords(progress);
 
                 connection.Execute("INSERT INTO Module (ModuleID, ModuleTypeID, Macro, MaxWorkers, WorkersCapacity, NoBlueprint, Thumbnail) VALUES (@ModuleID, @ModuleTypeID, @Macro, @MaxWorkers, @WorkersCapacity, @NoBlueprint, @Thumbnail)", items);
             }
@@ -84,10 +85,17 @@ CREATE TABLE IF NOT EXISTS Module
         /// XML から Module データを読み出す
         /// </summary>
         /// <returns>読み出した Module データ</returns>
-        internal IEnumerable<Module> GetRecords()
+        internal IEnumerable<Module> GetRecords(IProgress<(int currentStep, int maxSteps)>? progress = null)
         {
+            var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'module')])");
+            var currentStep = 0;
+
+
             foreach (var module in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'module')]"))
             {
+                progress?.Report((currentStep++, maxSteps));
+
+
                 var moduleID = module.Attribute("id").Value;
                 if (string.IsNullOrEmpty(moduleID)) continue;
 
@@ -107,6 +115,8 @@ CREATE TABLE IF NOT EXISTS Module
 
                 yield return new Module(moduleID, moduleTypeID, macroName, maxWorkers, capacity, noBluePrint, GetThumbnail(macroName));
             }
+
+            progress?.Report((currentStep++, maxSteps));
         }
 
 

@@ -2,6 +2,7 @@
 using LibX4.FileSystem;
 using LibX4.Lang;
 using LibX4.Xml;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Xml.Linq;
@@ -49,7 +50,7 @@ namespace X4_DataExporterWPF.Export
         /// 抽出処理
         /// </summary>
         /// <param name="connection"></param>
-        public void Export(IDbConnection connection)
+        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
         {
             //////////////////
             // テーブル作成 //
@@ -90,7 +91,7 @@ CREATE TABLE IF NOT EXISTS Ship
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords();
+                var items = GetRecords(progress);
 
                 connection.Execute(@"
 INSERT INTO
@@ -104,10 +105,17 @@ items);
         /// <summary>
         /// レコード抽出
         /// </summary>
-        private IEnumerable<Ship> GetRecords()
+        private IEnumerable<Ship> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
         {
+            var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
+            var currentStep = 0;
+
+
             foreach (var ship in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'ship')]"))
             {
+                progress.Report((currentStep++, maxSteps));
+
+
                 var shipID = ship.Attribute("id")?.Value;
                 if (string.IsNullOrEmpty(shipID)) continue;
 
@@ -147,6 +155,8 @@ items);
                     GetThumbnail(macroName)                    
                 );
             }
+
+            progress.Report((currentStep++, maxSteps));
         }
 
 

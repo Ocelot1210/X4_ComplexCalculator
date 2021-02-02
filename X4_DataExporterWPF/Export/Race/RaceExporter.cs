@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Xml.Linq;
 using Dapper;
 using LibX4.FileSystem;
@@ -43,7 +45,7 @@ namespace X4_DataExporterWPF.Export
         /// データ抽出
         /// </summary>
         /// <param name="connection"></param>
-        public void Export(IDbConnection connection)
+        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
         {
             //////////////////
             // テーブル作成 //
@@ -65,7 +67,7 @@ CREATE TABLE IF NOT EXISTS Race
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords();
+                var items = GetRecords(progress);
 
                 connection.Execute("INSERT INTO Race (RaceID, Name, ShortName, Description, Icon) VALUES (@RaceID, @Name, @ShortName, @Description, @Icon)", items);
             }
@@ -76,12 +78,17 @@ CREATE TABLE IF NOT EXISTS Race
         /// XML から Race データを読み出す
         /// </summary>
         /// <returns>読み出した Race データ</returns>
-        private IEnumerable<Race> GetRecords()
+        private IEnumerable<Race> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
         {
             var raceXml = _CatFile.OpenXml("libraries/races.xml");
 
+            var maxSteps = raceXml.Root.Elements().Count();
+            int currentStep = 0;
+
             foreach (var race in raceXml.Root.Elements())
             {
+                progress.Report((currentStep++, maxSteps));
+
                 var raceID = race.Attribute("id")?.Value;
                 if (string.IsNullOrEmpty(raceID)) continue;
 
@@ -100,6 +107,8 @@ CREATE TABLE IF NOT EXISTS Race
                     Util.DDS2Png(_CatFile, "assets/fx/gui/textures/races", race.Element("icon")?.Attribute("active")?.Value)
                 );
             }
+
+            progress.Report((currentStep++, maxSteps));
         }
     }
 }

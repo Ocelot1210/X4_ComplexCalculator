@@ -47,7 +47,14 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// <param name="language">選択された言語</param>
         /// <param name="owner">親ウィンドウハンドル(メッセージボックス表示用)</param>
         /// <returns>現在数と合計数のタプルのイテレータ</returns>
-        public void Export(IProgress<(int currentStep, int maxSteps)> progless, string inDirPath, string outFilePath, LangComboboxItem language, Window owner)
+        public void Export(
+            IProgress<(int currentStep, int maxSteps)> progress, 
+            IProgress<(int currentStep, int maxSteps)> progressSub,
+            string inDirPath,
+            string outFilePath,
+            LangComboboxItem language,
+            Window owner
+        )
         {
             var catFile = new CatFile(inDirPath);
 
@@ -122,9 +129,9 @@ namespace X4_DataExporterWPF.DataExportWindow
                 var currentStep = 0;
                 foreach (var exporter in exporters)
                 {
-                    exporter.Export(conn);
+                    exporter.Export(conn, progressSub);
                     currentStep++;
-                    progless.Report((currentStep, maxSteps));
+                    progress.Report((currentStep, maxSteps));
                 }
 
                 trans.Commit();
@@ -152,6 +159,11 @@ Please report the following content to the developer.
                     MessageBox.Show(owner, msg, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     System.Diagnostics.Process.Start("explorer.exe", $@"/select,""{dumpPath}""");
                 }));
+            }
+            finally
+            {
+                progress.Report((0, 1));
+                progressSub.Report((0, 1));
             }
         }
 

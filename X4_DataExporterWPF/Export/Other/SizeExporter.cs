@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using Dapper;
 using LibX4.Lang;
@@ -31,7 +32,7 @@ namespace X4_DataExporterWPF.Export
         /// 抽出処理
         /// </summary>
         /// <param name="connection"></param>
-        public void Export(IDbConnection connection)
+        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
         {
             //////////////////
             // テーブル作成 //
@@ -50,7 +51,7 @@ CREATE TABLE IF NOT EXISTS Size
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords();
+                var items = GetRecords(progress);
 
                 connection.Execute("INSERT INTO Size (SizeID, Name) VALUES (@SizeID, @Name)", items);
             }
@@ -61,14 +62,25 @@ CREATE TABLE IF NOT EXISTS Size
         /// XML から Size データを読み出す
         /// </summary>
         /// <returns>読み出した Size データ</returns>
-        private IEnumerable<Size> GetRecords()
+        private IEnumerable<Size> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
         {
             // TODO: 可能ならファイルから抽出する
-            yield return new Size("extrasmall", Resolver.Resolve("{1001, 52}"));
-            yield return new Size("small", Resolver.Resolve("{1001, 51}"));
-            yield return new Size("medium", Resolver.Resolve("{1001, 50}"));
-            yield return new Size("large", Resolver.Resolve("{1001, 49}"));
-            yield return new Size("extralarge", Resolver.Resolve("{1001, 48}"));
+            (string id, string name)[] data =
+            {
+                ("extrasmall",  "{1001, 52}"),
+                ("small",       "{1001, 51}"),
+                ("medium",      "{1001, 50}"),
+                ("large",       "{1001, 49}"),
+                ("extralarge",  "{1001, 48}"),
+            };
+
+            int currentStep = 0;
+            progress.Report((currentStep++, data.Length));
+            foreach (var (id, name) in data)
+            {
+                yield return new Size(id, name);
+                progress.Report((currentStep++, data.Length));
+            }
         }
     }
 }

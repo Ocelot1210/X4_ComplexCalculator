@@ -8,6 +8,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
 using System.Linq;
+using System;
 
 namespace X4_DataExporterWPF.Export
 {
@@ -56,7 +57,7 @@ namespace X4_DataExporterWPF.Export
         /// 抽出処理
         /// </summary>
         /// <param name="connection"></param>
-        public void Export(IDbConnection connection)
+        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
         {
             //////////////////
             // テーブル作成 //
@@ -92,7 +93,7 @@ CREATE TABLE IF NOT EXISTS EquipmentTag
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords();
+                var items = GetRecords(progress);
 
                 connection.Execute(@"
 INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  Hull,  HullIntegrated,  Mk,  MakerRace,  Thumbnail)
@@ -107,10 +108,16 @@ INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  Hull,  HullI
         /// XML から Equipment データを読み出す
         /// </summary>
         /// <returns>読み出した Equipment データ</returns>
-        private IEnumerable<Equipment> GetRecords()
+        private IEnumerable<Equipment> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
         {
+            var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[@transport='equipment'])");
+            var currentStep = 0;
+
+
             foreach (var equipment in _WaresXml.Root.XPathSelectElements("ware[@transport='equipment']"))
             {
+                progress?.Report((currentStep++, maxSteps));
+
                 var equipmentID = equipment.Attribute("id")?.Value;
                 if (string.IsNullOrEmpty(equipmentID)) continue;
 
@@ -156,6 +163,8 @@ INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  Hull,  HullI
                     GetThumbnail(macroName)
                 );
             }
+
+            progress?.Report((currentStep++, maxSteps));
         }
 
 

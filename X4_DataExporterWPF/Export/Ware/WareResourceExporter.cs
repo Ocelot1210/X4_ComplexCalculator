@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -34,7 +35,7 @@ namespace X4_DataExporterWPF.Export
         /// 抽出処理
         /// </summary>
         /// <param name="connection"></param>
-        public void Export(IDbConnection connection)
+        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
         {
             //////////////////
             // テーブル作成 //
@@ -58,7 +59,7 @@ CREATE TABLE IF NOT EXISTS WareResource
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords();
+                var items = GetRecords(progress);
 
                 connection.Execute("INSERT INTO WareResource (WareID, Method, NeedWareID, Amount) VALUES (@WareID, @Method, @NeedWareID, @Amount)", items);
             }
@@ -69,10 +70,17 @@ CREATE TABLE IF NOT EXISTS WareResource
         /// XML から WareResource データを読み出す
         /// </summary>
         /// <returns>読み出した WareResource データ</returns>
-        private IEnumerable<WareResource> GetRecords()
+        private IEnumerable<WareResource> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
         {
+            var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware)");
+            var currentStep = 0;
+
+
             foreach (var ware in _WaresXml.Root.XPathSelectElements("ware"))
             {
+                progress.Report((currentStep++, maxSteps));
+
+
                 var wareID = ware.Attribute("id")?.Value;
                 if (string.IsNullOrEmpty(wareID)) continue;
 
@@ -80,6 +88,8 @@ CREATE TABLE IF NOT EXISTS WareResource
 
                 foreach (var prod in ware.XPathSelectElements("production"))
                 {
+                    progress.Report((currentStep++, maxSteps));
+
                     var method = prod.Attribute("method")?.Value;
                     if (string.IsNullOrEmpty(method) || methods.Contains(method)) continue;
                     methods.Add(method);
@@ -97,6 +107,8 @@ CREATE TABLE IF NOT EXISTS WareResource
                     }
                 }
             }
+
+            progress.Report((currentStep++, maxSteps));
         }
     }
 }

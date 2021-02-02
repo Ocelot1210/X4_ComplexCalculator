@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Xml.Linq;
@@ -46,7 +47,7 @@ namespace X4_DataExporterWPF.Export
         /// 抽出処理
         /// </summary>
         /// <param name="connection"></param>
-        public void Export(IDbConnection connection)
+        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
         {
             //////////////////
             // テーブル作成 //
@@ -76,7 +77,7 @@ CREATE TABLE IF NOT EXISTS ModuleStorageType
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords();
+                var items = GetRecords(progress);
 
                 connection.Execute("INSERT INTO ModuleStorage (ModuleID, Amount) VALUES (@ModuleID, @Amount)", items);
 
@@ -89,10 +90,17 @@ CREATE TABLE IF NOT EXISTS ModuleStorageType
         /// XML から ModuleStorage データを読み出す
         /// </summary>
         /// <returns>読み出した ModuleStorage データ</returns>
-        private IEnumerable<ModuleStorage> GetRecords()
+        private IEnumerable<ModuleStorage> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
         {
+            var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'module')])");
+            var currentStep = 0;
+
+
             foreach (var module in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'module')]"))
             {
+                progress.Report((currentStep++, maxSteps));
+
+
                 var moduleID = module.Attribute("id")?.Value;
                 if (string.IsNullOrEmpty(moduleID)) continue;
 
@@ -118,6 +126,8 @@ CREATE TABLE IF NOT EXISTS ModuleStorageType
 
                 yield return new ModuleStorage(moduleID, amount);
             }
+
+            progress.Report((currentStep++, maxSteps));
         }
     }
 }
