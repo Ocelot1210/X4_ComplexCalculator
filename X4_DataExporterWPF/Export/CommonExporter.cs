@@ -14,7 +14,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// 現在のDBフォーマットバージョン
         /// </summary>
-        public const int CURRENT_FORMAT_VERSION = 2;
+        public const int CURRENT_FORMAT_VERSION = 3;
 
 
         public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
