@@ -117,11 +117,18 @@
                 <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
 
-            <ProgressBar
-                Grid.Column="0"
-                Margin="3"
-                Maximum="{Binding MaxSteps.Value, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                Value="{Binding CurrentStep.Value, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+            <StackPanel Grid.Column="0" Orientation="Vertical">
+                <ProgressBar
+                    Grid.Column="0"
+                    Height="15"
+                    Maximum="{Binding MaxSteps.Value, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                    Value="{Binding CurrentStep.Value, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                <ProgressBar
+                    Height="15"
+                    Maximum="{Binding MaxStepsSub.Value, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                    Value="{Binding CurrentStepSub.Value, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
 
             <Button
                 Grid.Column="1"

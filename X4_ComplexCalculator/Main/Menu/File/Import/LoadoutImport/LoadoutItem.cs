@@ -8,6 +8,8 @@ using Prism.Mvvm;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Entity;
+using Dapper;
+using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
 {
@@ -45,7 +47,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// <summary>
         /// 装備
         /// </summary>
-        public ModuleEquipment Equipment { get; }
+        public WareEquipmentManager Equipment { get; }
 
 
         /// <summary>
@@ -80,28 +82,17 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
             }
         }
 
-        /// <summary>
-        /// 装備中のタレットの個数
-        /// </summary>
-        public int TurretsCount => Equipment.Turret.AllEquipmentsCount;
-
 
         /// <summary>
-        /// タレットのツールチップ文字列
+        /// タレット情報
         /// </summary>
-        public string TurretsToolTip => MakeEquipmentToolTipString(Equipment.Turret);
+        public EquipmentsInfo TurretInfo { get; }
 
 
         /// <summary>
-        /// 装備中のシールドの個数
+        /// シールド情報
         /// </summary>
-        public int ShieldsCount => Equipment.Shield.AllEquipmentsCount;
-
-
-        /// <summary>
-        /// シールドのツールチップ文字列
-        /// </summary>
-        public string ShieldsToolTip => MakeEquipmentToolTipString(Equipment.Shield);
+        public EquipmentsInfo ShieldInfo { get; }
         #endregion
 
 
@@ -112,25 +103,15 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// <returns>対応するマクロが無ければnull あればそのオブジェクト</returns>
         public static LoadoutItem? Create(XElement elm)
         {
-            string macro = "";
-
-            X4Database.Instance.ExecQuery($"SELECT Macro FROM Module WHERE Macro = '{elm.Attribute("macro").Value}'", (dr, _) =>
-            {
-                macro = (string)dr["Macro"];
-            });
-
+            var macro = elm.Attribute("macro")?.Value ?? "";
             if (string.IsNullOrEmpty(macro))
             {
                 return null;
             }
 
-            string moduleID = "";
-            X4Database.Instance.ExecQuery($"SELECT ModuleID FROM Module WHERE Macro = '{macro}'", (dr, _) =>
-            {
-                moduleID = (string)dr["ModuleID"];
-            });
+            var module = Ware.GetAll<Module>()
+                .FirstOrDefault(x => x.Macro == macro);
 
-            var module = Module.Get(moduleID);
             if (module is null)
             {
                 return null;
@@ -152,32 +133,40 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
             Name = elm.Attribute("name").Value;
 
             Module = module;
-            Equipment = new ModuleEquipment(module);
+            Equipment = new WareEquipmentManager(module);
 
-            AddEquipment(elm.XPathSelectElements("groups/shields"), Equipment.Shield);
-            AddEquipment(elm.XPathSelectElements("groups/turrets"), Equipment.Turret);
+            AddEquipment(elm.XPathSelectElements("groups/shields"));
+            AddEquipment(elm.XPathSelectElements("groups/turrets"));
 
 
             // 同一の内容がプリセット一覧に無ければインポート可能にする
             {
-                var currentEquipmentIds = Equipment.AllEquipments.Select(x => x.EquipmentID).OrderBy(x => x).ToArray();
+                var currentEquipmentIds = Equipment.AllEquipments.Select(x => x.ID).OrderBy(x => x).ToArray();
 
-                SettingDatabase.Instance.ExecQuery($"SELECT * FROM ModulePresets WHERE ModuleID = '{module.ModuleID}' AND PresetName = '{Name}'", (dr1, _) =>
+                // 同一モジュールの同一名称のプリセットを取得する
+                var presets = SettingDatabase.Instance.GetModulePreset(module.ID)
+                    .Where(x => x.Name == Name)
+                    .Select(x => new { ModuleID = Module.ID, PresetID = x.ID });
+
+                foreach (var preset in presets)
                 {
-                    var eq = new List<Equipment>();
+                    const string sqla = "SELECT EquipmentID FROM ModulePresetsEquipment WHERE ModuleID = :ModuleID AND PresetID = :PresetID";
 
-                    SettingDatabase.Instance.ExecQuery($"SELECT EquipmentID FROM ModulePresetsEquipment WHERE ModuleID = '{module.ModuleID}' AND PresetID = {(long)dr1["PresetID"]}", (dr2, _) =>
+                    var eqp = SettingDatabase.Instance.Query<string>(sqla, preset)
+                        .Select(x => Ware.TryGet<Equipment>(x))
+                        .Where(x => x is not null)
+                        .Select(x => x!);
+
+                    Imported |= currentEquipmentIds.SequenceEqual(eqp.Select(x => x.ID).OrderBy(x => x));
+                    if (Imported)
                     {
-                        var eqp = DB.X4DB.Equipment.Get((string)dr2["EquipmentID"]);
-                        if (eqp is not null)
-                        {
-                            eq.Add(eqp);
-                        }
-                    });
-
-                    Imported |= currentEquipmentIds.SequenceEqual(eq.Select(x => x.EquipmentID).OrderBy(x => x));
-                });
+                        break;
+                    }
+                }
             }
+
+            TurretInfo = new EquipmentsInfo(Equipment, "turrets");
+            ShieldInfo = new EquipmentsInfo(Equipment, "shields");
         }
 
 
@@ -186,25 +175,23 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// </summary>
         /// <param name="elements"></param>
         /// <param name="manager"></param>
-        private void AddEquipment(IEnumerable<XElement> elements, ModuleEquipmentCollection manager)
+        private void AddEquipment(IEnumerable<XElement> elements)
         {
             foreach (var elm in elements)
             {
-                var id = "";
-
-                X4Database.Instance.ExecQuery($"SELECT EquipmentID FROM Equipment WHERE MacroName = '{elm.Attribute("macro").Value}'", (dr, _) =>
+                var macro = elm.Attribute("macro")?.Value ?? "";
+                if (string.IsNullOrEmpty(macro))
                 {
-                    id = (string)dr["EquipmentID"];
-                });
+                    continue;
+                }
+
+                var equipment = Ware.GetAll<Equipment>()
+                    .FirstOrDefault(x => x.Macro == macro);
 
                 var max = int.Parse(elm.Attribute("exact")?.Value ?? "1");
-                for (var cnt = 0; cnt < max; cnt++)
+                if (equipment is not null)
                 {
-                    var eqp = DB.X4DB.Equipment.Get(id);
-                    if (eqp is not null)
-                    {
-                        manager.AddEquipment(eqp);
-                    }
+                    Equipment.Add(equipment, max);
                 }
             }
         }
@@ -215,83 +202,20 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// </summary>
         public bool Import()
         {
-            var id = 0L;
             bool ret = true;
-
-            var query = @$"
-SELECT
-    ifnull(MIN( PresetID + 1 ), 0) AS PresetID
-FROM
-    ModulePresets
-WHERE
-	ModuleID = '{Module.ModuleID}' AND
-    ( PresetID + 1 ) NOT IN ( SELECT PresetID FROM ModulePresets WHERE ModuleID = '{Module.ModuleID}')";
-
-            SettingDatabase.Instance.ExecQuery(query, (dr, _) =>
-            {
-                id = (long)dr["PresetID"];
-            });
+            var presetID = SettingDatabase.Instance.GetLastModulePresetsID(Module.ID);
 
             try
             {
-                SettingDatabase.Instance.BeginTransaction();
-                SettingDatabase.Instance.ExecQuery($"INSERT INTO ModulePresets(ModuleID, PresetID, PresetName) VALUES('{Module.ModuleID}', {id}, '{Name}')");
-
-                var param = new SQLiteCommandParameters(4);
-                foreach (var eqp in Equipment.AllEquipments)
-                {
-                    param.Add("moduleID", DbType.String, Module.ModuleID);
-                    param.Add("presetID", DbType.Int32, id);
-                    param.Add("equipmentID", DbType.String, eqp.EquipmentID);
-                    param.Add("equipmentType", DbType.String, eqp.EquipmentType.EquipmentTypeID);
-                }
-                SettingDatabase.Instance.ExecQuery($"INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES(:moduleID, :presetID, :equipmentID, :equipmentType)", param);
-
-                SettingDatabase.Instance.Commit();
+                SettingDatabase.Instance.AddModulePreset(Module.ID, presetID, Name, Equipment.AllEquipments);
                 Imported = true;
             }
             catch
             {
-                SettingDatabase.Instance.Rollback();
                 ret = false;
             }
 
             return ret;
-        }
-
-
-        /// <summary>
-        /// 装備のツールチップ文字列を作成
-        /// </summary>
-        /// <returns></returns>
-        private string MakeEquipmentToolTipString(ModuleEquipmentCollection equipmentManager)
-        {
-            var sb = new StringBuilder();
-
-            foreach (var size in equipmentManager.Sizes)
-            {
-                var cnt = 1;
-
-                foreach (var eq in equipmentManager.GetEquipment(size))
-                {
-                    if (cnt == 1)
-                    {
-                        if (sb.Length != 0)
-                        {
-                            sb.AppendLine();
-                        }
-                        sb.AppendLine($"【{size.Name}】");
-                    }
-                    sb.AppendLine($"{cnt++:D2} ： {eq.Name}");
-                }
-            }
-
-            if (sb.Length == 0)
-            {
-                sb.Append((string)WPFLocalizeExtension.Engine.LocalizeDictionary.Instance.GetLocalizedObject("Lang:NotEquippedToolTipText", null, null));
-            }
-
-            return sb.ToString();
         }
     }
 }

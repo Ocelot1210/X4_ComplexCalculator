@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using Dapper;
 using X4_DataExporterWPF.Entity;
@@ -13,10 +14,10 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// 現在のDBフォーマットバージョン
         /// </summary>
-        public const int CURRENT_FORMAT_VERSION = 2;
+        public const int CURRENT_FORMAT_VERSION = 3;
 
 
-        public void Export(IDbConnection connection)
+        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
         {
             //////////////////
             // テーブル作成 //
@@ -36,7 +37,7 @@ CREATE TABLE IF NOT EXISTS Common
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords();
+                var items = GetRecords(progress);
 
                 connection.Execute($"INSERT INTO Common (Item, Value) VALUES (@Item, @Value)", items);
             }
@@ -47,10 +48,21 @@ CREATE TABLE IF NOT EXISTS Common
         /// Common データを返す
         /// </summary>
         /// <returns>Common データ</returns>
-        private IEnumerable<Common> GetRecords()
+        private IEnumerable<Common> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
         {
-            // TODO: 可能ならファイルから抽出する
-            yield return new Common("FormatVersion", CURRENT_FORMAT_VERSION);
+            (string item, int value)[] data =
+            {
+                ("FormatVersion", CURRENT_FORMAT_VERSION)
+            };
+
+            int currentStep = 0;
+            progress.Report((currentStep++, data.Length));
+
+            foreach (var (item, value) in data)
+            {
+                yield return new Common(item, value);
+                progress.Report((currentStep++, data.Length));
+            }
         }
     }
 }

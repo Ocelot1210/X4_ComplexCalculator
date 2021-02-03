@@ -35,7 +35,7 @@
             <TextBlock Margin="5,0,0,0" VerticalAlignment="Center">
                 <Run Text="{lex:Loc Lang:List}" />
                 ：</TextBlock>
-            <x4ccrtl:ClearableWaterMarkTextBox Text="{Binding SearchEquipmentName, UpdateSourceTrigger=PropertyChanged}" Watermark="{lex:Loc Lang:SearchByEnteringText}" />
+            <x4ccrtl:ClearableWaterMarkTextBox Text="{Binding SearchEquipmentName.Value, UpdateSourceTrigger=PropertyChanged}" Watermark="{lex:Loc Lang:SearchByEnteringText}" />
         </DockPanel>
 
         <TextBlock
@@ -47,12 +47,12 @@
                     <lex:BLoc Key="Lang:Equiped" />
                     <Binding
                         Mode="OneWay"
-                        Path="EquippedCount"
+                        Path="EquippedCount.Value"
                         UpdateSourceTrigger="PropertyChanged" />
 
                     <Binding
                         Mode="OneWay"
-                        Path="MaxAmount"
+                        Path="MaxAmount.Value"
                         UpdateSourceTrigger="PropertyChanged" />
                 </MultiBinding>
             </TextBlock.Text>
@@ -92,7 +92,7 @@
             Grid.Column="0"
             x4bhv:ControlItemDoubleClick.ItemsDoubleClick="True"
             DisplayMemberPath="Equipment.Name"
-            ItemsSource="{Binding EquipmentsView}"
+            ItemsSource="{Binding EquipmentsView, Mode=OneTime}"
             SelectedValue="IsSelected"
             SelectionMode="Extended">
             <ListBox.ItemContainerStyle>
@@ -112,7 +112,7 @@
             Grid.Column="2"
             x4bhv:ControlItemDoubleClick.ItemsDoubleClick="True"
             DisplayMemberPath="Equipment.Name"
-            ItemsSource="{Binding Equipped}"
+            ItemsSource="{Binding EquippedView, Mode=OneTime}"
             SelectionMode="Extended">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">

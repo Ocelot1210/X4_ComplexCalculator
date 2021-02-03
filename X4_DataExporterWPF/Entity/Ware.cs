@@ -15,13 +15,13 @@
         /// <summary>
         /// ウェア種別ID
         /// </summary>
-        public string WareGroupID { get; }
+        public string? WareGroupID { get; }
 
 
         /// <summary>
         /// カーゴ種別ID
         /// </summary>
-        public string TransportTypeID { get; }
+        public string? TransportTypeID { get; }
 
 
         /// <summary>
@@ -34,12 +34,6 @@
         /// 説明
         /// </summary>
         public string Description { get; }
-
-
-        /// <summary>
-        /// 工場名
-        /// </summary>
-        public string FactoryName { get; }
 
 
         /// <summary>
@@ -75,14 +69,13 @@
         /// <param name="transportTypeID">カーゴ種別ID</param>
         /// <param name="name">ウェア名称</param>
         /// <param name="description">説明</param>
-        /// <param name="factoryName">工場名</param>
         /// <param name="volume">大きさ</param>
         /// <param name="minPrice">MinPrice</param>
         /// <param name="avgPrice">平均価格</param>
         /// <param name="maxPrice">MaxPrice</param>
         public Ware(
-            string wareID, string wareGroupID, string transportTypeID,
-            string name, string description, string factoryName,
+            string wareID, string? wareGroupID, string? transportTypeID,
+            string name, string description,
             int volume, int minPrice, int avgPrice, int maxPrice
         )
         {
@@ -91,7 +84,6 @@
             TransportTypeID = transportTypeID;
             Name = name;
             Description = description;
-            FactoryName = factoryName;
             Volume = volume;
             MinPrice = minPrice;
             AvgPrice = avgPrice;

@@ -16,6 +16,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         private readonly static Dictionary<string, TransportType> _TransportTypes = new();
         #endregion
 
+
         #region プロパティ
         /// <summary>
         /// カーゴ種別ID
@@ -48,13 +49,12 @@ namespace X4_ComplexCalculator.DB.X4DB
         public static void Init()
         {
             _TransportTypes.Clear();
-            X4Database.Instance.ExecQuery($"SELECT TransportTypeID, Name FROM TransportType", (dr, args) =>
-            {
-                var id = (string)dr["TransportTypeID"];
-                var name = (string)dr["Name"];
 
-                _TransportTypes.Add(id, new TransportType(id, name));
-            });
+            const string sql = "SELECT TransportTypeID, Name FROM TransportType";
+            foreach (var item in X4Database.Instance.Query<TransportType>(sql))
+            {
+                _TransportTypes.Add(item.TransportTypeID, item);
+            }
         }
 
 
@@ -67,11 +67,26 @@ namespace X4_ComplexCalculator.DB.X4DB
 
 
         /// <summary>
+        /// 全カーゴ種別を取得する
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumerable<TransportType> GetAll() => _TransportTypes.Values;
+
+
+        /// <summary>
         /// 比較
         /// </summary>
         /// <param name="obj">比較対象</param>
         /// <returns></returns>
-        public override bool Equals(object? obj) => obj is TransportType tgt && tgt.TransportTypeID == TransportTypeID;
+        public override bool Equals(object? obj) => obj is TransportType other && Equals(other);
+
+
+        /// <summary>
+        /// 比較
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals(TransportType other) => TransportTypeID == other.TransportTypeID;
 
 
         /// <summary>

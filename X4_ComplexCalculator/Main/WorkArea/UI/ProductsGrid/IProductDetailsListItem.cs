@@ -8,6 +8,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
     public interface IProductDetailsListItem : INotifyPropertyChanged
     {
         /// <summary>
+        /// 生産/消費ウェアID
+        /// </summary>
+        public string WareID { get; }
+
+
+        /// <summary>
         /// モジュールID
         /// </summary>
         string ModuleID { get; }

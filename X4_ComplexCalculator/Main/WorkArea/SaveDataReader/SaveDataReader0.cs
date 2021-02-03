@@ -99,7 +99,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             const string sql1 = "SELECT ModuleID, Count FROM Modules ORDER BY Row ASC";
             foreach (var (moduleID, count) in conn.Query<(string, long)>(sql1))
             {
-                var module = Module.Get(moduleID);
+                var module = Ware.TryGet<Module>(moduleID);
                 if (module is not null)
                 {
                     var mod = new ModulesGridItem(module, null, count) { EditStatus = EditStatus.Unedited };
@@ -112,7 +112,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             const string sql2 = "SELECT Row, EquipmentID FROM Equipments";
             foreach (var (row, equipmentID) in conn.Query<(int, string)>(sql2))
             {
-                var eqp = Equipment.Get(equipmentID);
+                var eqp = Ware.TryGet<Equipment>(equipmentID);
                 if (eqp is not null)
                 {
                     modules[row].AddEquipment(eqp);
@@ -133,7 +133,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             const string sql = "SELECT WareID, Price FROM Products";
             foreach (var (wareID, price) in conn.Query<(string, long)>(sql))
             {
-                var itm = _WorkArea.StationData.ProductsInfo.Products.FirstOrDefault(x => x.Ware.WareID == wareID);
+                var itm = _WorkArea.StationData.ProductsInfo.Products.FirstOrDefault(x => x.Ware.ID == wareID);
                 if (itm is not null)
                 {
                     itm.UnitPrice = price;
@@ -151,7 +151,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             const string sql = "SELECT WareID, Price FROM BuildResources";
             foreach (var (wareID, price) in conn.Query<(string, long)>(sql))
             {
-                var itm = _WorkArea.StationData.BuildResourcesInfo.BuildResources.FirstOrDefault(x => x.Ware.WareID == wareID);
+                var itm = _WorkArea.StationData.BuildResourcesInfo.BuildResources.FirstOrDefault(x => x.Ware.ID == wareID);
                 if (itm is not null)
                 {
                     itm.UnitPrice = price;

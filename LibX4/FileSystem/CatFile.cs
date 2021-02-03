@@ -53,6 +53,7 @@ namespace LibX4.FileSystem
         private readonly IReadOnlyList<ModInfo> _ModInfo;
         #endregion
 
+
         #region プロパティ
         /// <summary>
         /// Modが導入されているか
@@ -94,12 +95,13 @@ namespace LibX4.FileSystem
         }
 
 
-        /// <summary>
-        /// 指定したファイルを開く
-        /// </summary>
-        /// <param name="filePath">ファイルパス</param>
-        /// <returns>ファイルの内容</returns>
+        /// <inheritdoc/>
         public MemoryStream OpenFile(string filePath)
+            => TryOpenFile(filePath) ?? throw new FileNotFoundException(nameof(filePath), filePath);
+
+
+        /// <inheritdoc/>
+        public MemoryStream? TryOpenFile(string filePath)
         {
             filePath = PathCanonicalize(filePath);
 
@@ -112,15 +114,47 @@ namespace LibX4.FileSystem
                 }
             }
 
-            throw new FileNotFoundException(nameof(filePath), filePath);
+            return null;
         }
 
 
         /// <summary>
-        /// XML ファイルの読み込みを試みる
+        /// 指定されたパスに一致するxmlファイルを全部開く
         /// </summary>
-        /// <param name="filePath">開くファイルの相対パス</param>
-        /// <returns>開いた XML 文書、該当ファイルが無かった場合は null</returns>
+        /// <param name="filePath">ファイルパス</param>
+        /// <returns>XDocumentの列挙</returns>
+        public IEnumerable<XDocument> OpenXmlFiles(string filePath)
+        {
+            foreach (var ms in OpenFiles(filePath))
+            {
+                yield return XDocument.Load(ms);
+                ms.Dispose();
+            }
+        }
+
+
+        /// <summary>
+        /// 指定されたパスに一致するファイルを全部開く
+        /// </summary>
+        /// <param name="filePath">ファイルパス</param>
+        /// <returns>ファイルの内容の列挙</returns>
+        public IEnumerable<MemoryStream> OpenFiles(string filePath)
+        {
+            filePath = PathCanonicalize(filePath);
+
+            foreach (var loader in _FileLoaders)
+            {
+                var ms = loader.OpenFile(filePath);
+                if (ms is not null)
+                {
+                    yield return ms;
+                }
+            }
+        }
+
+
+
+        /// <inheritdoc/>
         public XDocument? TryOpenXml(string filePath)
         {
             filePath = PathCanonicalize(filePath);
@@ -148,23 +182,12 @@ namespace LibX4.FileSystem
         }
 
 
-        /// <summary>
-        /// XML ファイルを開く
-        /// </summary>
-        /// <param name="filePath">開くファイルの相対パス</param>
-        /// <exception cref="FileNotFoundException">該当ファイルが無い</exception>
-        /// <returns>開いた XML 文書</returns>
+        /// <inheritdoc/>
         public XDocument OpenXml(string filePath)
             => TryOpenXml(filePath) ?? throw new FileNotFoundException(filePath);
 
 
-        /// <summary>
-        /// indexファイルに記載されているxmlを開く
-        /// </summary>
-        /// <param name="indexFilePath">indexファイルパス</param>
-        /// <param name="name">マクロ名等</param>
-        /// <exception cref="FileNotFoundException">インデックスファイルに該当する名前が記載されていない場合</exception>
-        /// <returns>解決結果先のファイル</returns>
+        /// <inheritdoc/>
         public XDocument OpenIndexXml(string indexFilePath, string name)
         {
             if (!_LoadedIndex.Contains(indexFilePath))

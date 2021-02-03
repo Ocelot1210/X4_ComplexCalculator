@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Xml.Linq;
@@ -40,7 +41,7 @@ namespace X4_DataExporterWPF.Export
         /// 抽出処理
         /// </summary>
         /// <param name="connection"></param>
-        public void Export(IDbConnection connection)
+        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
         {
             //////////////////
             // テーブル作成 //
@@ -63,7 +64,7 @@ CREATE TABLE IF NOT EXISTS ModuleProduct
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords();
+                var items = GetRecords(progress);
 
                 connection.Execute("INSERT INTO ModuleProduct (ModuleID, WareID, Method) VALUES (@ModuleID, @WareID, @Method)", items);
             }
@@ -74,26 +75,32 @@ CREATE TABLE IF NOT EXISTS ModuleProduct
         /// XML から ModuleProduct データを読み出す
         /// </summary>
         /// <returns>読み出した ModuleProduct データ</returns>
-        private IEnumerable<ModuleProduct> GetRecords()
+        private IEnumerable<ModuleProduct> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
         {
+            var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'module')])");
+            var currentStep = 0;
+
             foreach (var module in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'module')]"))
             {
+                progress.Report((currentStep++, maxSteps));
+
                 var moduleID = module.Attribute("id")?.Value;
                 if (string.IsNullOrEmpty(moduleID)) continue;
 
                 var macroName = module.XPathSelectElement("component").Attribute("ref").Value;
                 var macroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
-                var prod = macroXml.Root.XPathSelectElement("macro/properties/production");
 
-                if (prod == null) continue;
+                foreach (var queue in macroXml.Root.XPathSelectElements("macro/properties/production/queue"))
+                {
+                    var wareID = queue.Attribute("ware")?.Value ?? "";
+                    var method = queue.Attribute("method")?.Value ?? "default";
+                    if (string.IsNullOrEmpty(wareID)) continue;
 
-                var wareID = prod?.Attribute("wares")?.Value;
-                if (string.IsNullOrEmpty(wareID)) continue;
-
-                var method = prod?.XPathSelectElement("queue")?.Attribute("method")?.Value ?? "default";
-
-                yield return new ModuleProduct(moduleID, wareID, method);
+                    yield return new ModuleProduct(moduleID, wareID, method);
+                }
             }
+
+            progress.Report((currentStep++, maxSteps));
         }
     }
 }

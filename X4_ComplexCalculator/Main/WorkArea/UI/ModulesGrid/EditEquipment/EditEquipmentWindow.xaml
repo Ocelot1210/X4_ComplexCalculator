@@ -79,7 +79,7 @@
                 DisplayMemberPath="Name"
                 ItemsSource="{Binding EquipmentSizes}"
                 SelectedIndex="0"
-                SelectedItem="{Binding SelectedSize, Mode=TwoWay}" />
+                SelectedItem="{Binding SelectedSize.Value, Mode=TwoWay}" />
         </StackPanel>
 
         <!--  プリセット  -->
@@ -91,7 +91,7 @@
             <DockPanel>
                 <Button
                     Width="20"
-                    Command="{Binding RemovePresetCommand, Mode=OneTime}"
+                    Command="{Binding DeletePresetCommand, Mode=OneTime}"
                     Content="🗑️"
                     DockPanel.Dock="Right"
                     ToolTip="{lex:Loc Lang:PresetRemoveButtonToolTip}" />
@@ -105,14 +105,14 @@
 
                 <Button
                     Width="20"
-                    Command="{Binding EditPresetCommand, Mode=OneTime}"
+                    Command="{Binding EditPresetNameCommand, Mode=OneTime}"
                     Content="✏"
                     DockPanel.Dock="Right"
                     ToolTip="{lex:Loc Lang:PresetEditButtonToolTip}" />
 
                 <Button
                     Width="20"
-                    Command="{Binding SavePresetCommand, Mode=OneTime}"
+                    Command="{Binding OverwritePresetCommand, Mode=OneTime}"
                     Content="💾"
                     DockPanel.Dock="Right"
                     ToolTip="{lex:Loc Lang:PresetSaveButtonToolTip}" />
@@ -127,7 +127,7 @@
                     IsSynchronizedWithCurrentItem="True"
                     IsTextSearchEnabled="True"
                     ItemsSource="{Binding Presets}"
-                    SelectedItem="{Binding SelectedPreset}" />
+                    SelectedItem="{Binding SelectedPreset.Value}" />
 
             </DockPanel>
         </StackPanel>
@@ -199,13 +199,19 @@
             Grid.Row="2"
             Grid.Column="1"
             Grid.ColumnSpan="3"
-            Margin="5,5,5,5">
-            <TabItem Header="{lex:Loc Lang:Turrets}">
-                <eqlst:EquipmentList x:Name="TurretsList" DataContext="{Binding TurretsViewModel, Mode=OneTime}" />
-            </TabItem>
-            <TabItem Header="{lex:Loc Lang:Shields}">
-                <eqlst:EquipmentList x:Name="ShieldsList" DataContext="{Binding ShieldsViewModel, Mode=OneTime}" />
-            </TabItem>
+            Margin="5,5,5,5"
+            ItemsSource="{Binding EquipmentListViewModels, Mode=OneTime}"
+            SelectedIndex="0">
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Title, Mode=OneTime}" />
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <eqlst:EquipmentList />
+                </DataTemplate>
+            </TabControl.ContentTemplate>
         </TabControl>
 
     </Grid>

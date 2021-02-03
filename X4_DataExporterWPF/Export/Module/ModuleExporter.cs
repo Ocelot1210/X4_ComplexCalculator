@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Xml.Linq;
@@ -27,12 +28,6 @@ namespace X4_DataExporterWPF.Export
 
 
         /// <summary>
-        /// 言語解決用オブジェクト
-        /// </summary>
-        private readonly ILanguageResolver _Resolver;
-
-
-        /// <summary>
         /// サムネが見つからなかった場合のサムネ
         /// </summary>
         private byte[]? _NotFoundThumb;
@@ -43,12 +38,10 @@ namespace X4_DataExporterWPF.Export
         /// </summary>
         /// <param name="catFile">catファイルオブジェクト</param>
         /// <param name="waresXml">ウェア情報xml</param>
-        /// <param name="resolver">言語解決用オブジェクト</param>
-        public ModuleExporter(ICatFile catFile, XDocument waresXml, ILanguageResolver resolver)
+        public ModuleExporter(ICatFile catFile, XDocument waresXml)
         {
             _CatFile = catFile;
             _WaresXml = waresXml;
-            _Resolver = resolver;
         }
 
 
@@ -56,7 +49,7 @@ namespace X4_DataExporterWPF.Export
         /// 抽出処理
         /// </summary>
         /// <param name="connection"></param>
-        public void Export(IDbConnection connection)
+        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
         {
             //////////////////
             // テーブル作成 //
@@ -67,7 +60,6 @@ CREATE TABLE IF NOT EXISTS Module
 (
     ModuleID        TEXT    NOT NULL PRIMARY KEY,
     ModuleTypeID    TEXT    NOT NULL,
-    Name            TEXT    NOT NULL,
     Macro           TEXT    NOT NULL,
     MaxWorkers      INTEGER NOT NULL,
     WorkersCapacity INTEGER NOT NULL,
@@ -82,9 +74,9 @@ CREATE TABLE IF NOT EXISTS Module
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords();
+                var items = GetRecords(progress);
 
-                connection.Execute("INSERT INTO Module (ModuleID, ModuleTypeID, Name, Macro, MaxWorkers, WorkersCapacity, NoBlueprint, Thumbnail) VALUES (@ModuleID, @ModuleTypeID, @Name, @Macro, @MaxWorkers, @WorkersCapacity, @NoBlueprint, @Thumbnail)", items);
+                connection.Execute("INSERT INTO Module (ModuleID, ModuleTypeID, Macro, MaxWorkers, WorkersCapacity, NoBlueprint, Thumbnail) VALUES (@ModuleID, @ModuleTypeID, @Macro, @MaxWorkers, @WorkersCapacity, @NoBlueprint, @Thumbnail)", items);
             }
         }
 
@@ -93,10 +85,17 @@ CREATE TABLE IF NOT EXISTS Module
         /// XML から Module データを読み出す
         /// </summary>
         /// <returns>読み出した Module データ</returns>
-        internal IEnumerable<Module> GetRecords()
+        internal IEnumerable<Module> GetRecords(IProgress<(int currentStep, int maxSteps)>? progress = null)
         {
+            var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'module')])");
+            var currentStep = 0;
+
+
             foreach (var module in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'module')]"))
             {
+                progress?.Report((currentStep++, maxSteps));
+
+
                 var moduleID = module.Attribute("id").Value;
                 if (string.IsNullOrEmpty(moduleID)) continue;
 
@@ -112,13 +111,12 @@ CREATE TABLE IF NOT EXISTS Module
                 var maxWorkers = workForce?.Attribute("max")?.GetInt() ?? 0;
                 var capacity = workForce?.Attribute("capacity")?.GetInt() ?? 0;
 
-                var name = _Resolver.Resolve(module.Attribute("name")?.Value ?? "");
-                name = string.IsNullOrEmpty(name) ? macroName : name;
-
                 var noBluePrint = module.Attribute("tags").Value.Contains("noblueprint");
 
-                yield return new Module(moduleID, moduleTypeID, name, macroName, maxWorkers, capacity, noBluePrint, GetThumbnail(macroName));
+                yield return new Module(moduleID, moduleTypeID, macroName, maxWorkers, capacity, noBluePrint, GetThumbnail(macroName));
             }
+
+            progress?.Report((currentStep++, maxSteps));
         }
 
 
@@ -130,7 +128,7 @@ CREATE TABLE IF NOT EXISTS Module
         private byte[]? GetThumbnail(string macroName)
         {
             const string dir = "assets/fx/gui/textures/stationmodules";
-            var thumb = Util.GzDds2Png(_CatFile, dir, macroName);
+            var thumb = Util.DDS2Png(_CatFile, dir, macroName);
             if (thumb is not null)
             {
                 return thumb;
@@ -138,7 +136,7 @@ CREATE TABLE IF NOT EXISTS Module
 
             if (_NotFoundThumb is null)
             {
-                _NotFoundThumb = Util.GzDds2Png(_CatFile, dir, "notfound");
+                _NotFoundThumb = Util.DDS2Png(_CatFile, dir, "notfound");
             }
 
             return _NotFoundThumb;

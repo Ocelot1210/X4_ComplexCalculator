@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using LibX4.FileSystem;
 using LibX4.Xml;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Xml.Linq;
@@ -42,7 +43,7 @@ namespace X4_DataExporterWPF.Export
         /// 抽出処理
         /// </summary>
         /// <param name="connection"></param>
-        public void Export(IDbConnection connection)
+        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
         {
             //////////////////
             // テーブル作成 //
@@ -67,7 +68,7 @@ CREATE TABLE IF NOT EXISTS Thruster
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords();
+                var items = GetRecords(progress);
 
                 connection.Execute(@"
 INSERT INTO Thruster ( EquipmentID,  ThrustStrafe,  ThrustPitch,  ThrustYaw,  ThrustRoll,  AngularRoll,  AngularPitch)
@@ -80,10 +81,17 @@ INSERT INTO Thruster ( EquipmentID,  ThrustStrafe,  ThrustPitch,  ThrustYaw,  Th
         /// XML から Engine データを読み出す
         /// </summary>
         /// <returns>読み出した Engine データ</returns>
-        private IEnumerable<Thruster> GetRecords()
+        private IEnumerable<Thruster> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
         {
+            var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[@transport='equipment'][@group='thrusters'])");
+            var currentStep = 0;
+
+
             foreach (var equipment in _WaresXml.Root.XPathSelectElements("ware[@transport='equipment'][@group='thrusters']"))
             {
+                progress.Report((currentStep++, maxSteps));
+
+
                 var equipmentID = equipment.Attribute("id")?.Value;
                 if (string.IsNullOrEmpty(equipmentID)) continue;
 
@@ -109,6 +117,8 @@ INSERT INTO Thruster ( EquipmentID,  ThrustStrafe,  ThrustPitch,  ThrustYaw,  Th
                     angular.Attribute("pitch")?.GetDouble() ?? 0.0
                 );
             }
+
+            progress.Report((currentStep++, maxSteps));
         }
     }
 }

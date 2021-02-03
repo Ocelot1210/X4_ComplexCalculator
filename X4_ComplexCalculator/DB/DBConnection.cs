@@ -1,8 +1,7 @@
-﻿using System;
+﻿using Dapper;
+using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
-using System.Linq;
-using Dapper;
 
 namespace X4_ComplexCalculator.DB
 {
@@ -140,71 +139,5 @@ namespace X4_ComplexCalculator.DB
         /// <returns>マッピング済みのクエリ実行結果</returns>
         public T QuerySingle<T>(string sql, object? param = null)
             => _Connection.QuerySingle<T>(sql, param, _Transaction);
-
-
-        /// <summary>
-        /// クエリを実行
-        /// </summary>
-        /// <param name="query">クエリ</param>
-        /// <param name="callback">実行結果に対する処理</param>
-        /// <param name="args">可変長引数</param>
-        /// <returns>結果の行数</returns>
-        public int ExecQuery(string query,
-                             Action<SQLiteDataReader, object[]>? callback = null,
-                             params object[] args)
-            => ExecQueryMain(query, null, callback, args);
-
-
-        /// <summary>
-        /// クエリを実行
-        /// </summary>
-        /// <param name="query">クエリ</param>
-        /// <param name="parameters">バインド変数格納用オブジェクト</param>
-        /// <param name="callback">実行結果に対する処理</param>
-        /// <param name="args">可変長引数</param>
-        /// <returns>結果の行数</returns>
-        public int ExecQuery(string query,
-                             SQLiteCommandParameters parameters,
-                             Action<SQLiteDataReader, object[]>? callback = null,
-                             params object[] args)
-            => parameters.Parameters
-                .Select(sqlParams => ExecQueryMain(query, sqlParams, callback, args))
-                .Sum();
-
-
-        /// <summary>
-        /// クエリを実行メイン
-        /// </summary>
-        /// <param name="query">クエリ</param>
-        /// <param name="parameters">バインド変数格納用オブジェクト</param>
-        /// <param name="callback">実行結果に対する処理</param>
-        /// <param name="args">可変長引数</param>
-        /// <returns>結果の行数</returns>
-        private int ExecQueryMain(string query,
-                                  IEnumerable<SQLiteParameter>? parameters,
-                                  Action<SQLiteDataReader, object[]>? callback,
-                                  params object[] args)
-        {
-            using var cmd = new SQLiteCommand(query, _Connection, _Transaction);
-
-            foreach (var sqlParam in parameters ?? Enumerable.Empty<SQLiteParameter>())
-            {
-                cmd.Parameters.Add(sqlParam);
-            }
-
-            if (callback is null) return cmd.ExecuteNonQuery();
-
-            using var dr = cmd.ExecuteReader();
-            int ret = 0;
-            if (dr.HasRows)
-            {
-                while (dr.Read())
-                {
-                    callback(dr, args);
-                    ret++;
-                }
-            }
-            return ret;
-        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using Dapper;
 using LibX4.Lang;
@@ -31,7 +32,7 @@ namespace X4_DataExporterWPF.Export
         /// 抽出処理
         /// </summary>
         /// <param name="connection"></param>
-        public void Export(IDbConnection connection)
+        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
         {
             //////////////////
             // テーブル作成 //
@@ -50,7 +51,7 @@ CREATE TABLE IF NOT EXISTS TransportType
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords();
+                var items = GetRecords(progress);
 
                 // レコード追加
                 connection.Execute("INSERT INTO TransportType (TransportTypeID, Name) VALUES (@TransportTypeID, @Name)", items);
@@ -62,12 +63,30 @@ CREATE TABLE IF NOT EXISTS TransportType
         /// XML から TransportType データを読み出す
         /// </summary>
         /// <returns>読み出した TransportType データ</returns>
-        private IEnumerable<TransportType> GetRecords()
+        private IEnumerable<TransportType> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
         {
             // TODO: 可能ならファイルから抽出する
-            yield return new TransportType("container", Resolver.Resolve("{20205, 100}"));
-            yield return new TransportType("liquid", Resolver.Resolve("{20205, 300}"));
-            yield return new TransportType("solid", Resolver.Resolve("{20205, 200}"));
+            (string ID, int Code)[] data =
+            {
+                ("container",   100),
+                ("solid",       200),
+                ("liquid",      300),
+                ("passenger",   400),
+                ("equipment",   500),
+                ("inventory",   600),
+                ("software",    700),
+                ("workunit",    800),
+                ("ship",        900),
+                ("research",   1000),
+            };
+
+            int currentStep = 0;
+            progress.Report((currentStep++, data.Length));
+            foreach (var (id, code) in data)
+            {
+                yield return new TransportType(id, Resolver.Resolve($"{{20205, {code}}}"));
+                progress.Report((currentStep++, data.Length));
+            }
         }
     }
 }

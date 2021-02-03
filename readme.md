@@ -27,6 +27,7 @@ This application is a station calculator for the game [X4: Foundations](http://w
 1. Direct data extraction from game files.
     1. Support mods.
     1. Support for future versions.
+    1. Browsing feature of extracted data.
 1. Calculation of product/resource for the entire station.
 1. Calculation of the ware required for construction, taking into account the armament.
 1. Storage allocation capacity calculation.
@@ -66,15 +67,27 @@ Contributions are welcomed!
 <br>
 
 ## 9. Used libraries
-- [Dapper](https://github.com/StackExchange/Dapper)
-- [AvalonDock](https://github.com/Dirkster99/AvalonDock)
-- [WpfExToolkit](https://github.com/dotnetprojects/WpfExtendedToolkit)
-- [GongSolutions.WPF.DragDrop](https://github.com/punker76/gong-wpf-dragdrop)
 - [.NET Extensions](https://github.com/dotnet/extensions)
-- [Windows-API-Code-Pack-1.1.4](https://github.com/contre/Windows-API-Code-Pack-1.1)
-- [XamlBehaviors for WPF](https://github.com/Microsoft/XamlBehaviorsWpf)
+- [AvalonDock](https://github.com/Dirkster99/AvalonDock)
+- [Coverlet](https://github.com/coverlet-coverage/coverlet)
+- [Dapper](https://github.com/StackExchange/Dapper)
+- [DataGridExtensions](https://github.com/dotnet/DataGridExtensions)
+- [GitInfo](https://github.com/devlooped/GitInfo)
+- [GongSolutions.WPF.DragDrop](https://github.com/punker76/gong-wpf-dragdrop)
+- [ImageSharp](https://github.com/SixLabors/ImageSharp)
 - [Json.NET](https://github.com/JamesNK/Newtonsoft.Json)
+- [Microsoft.Extensions.Configuration](https://github.com/dotnet/runtime)
+- [Microsoft.NET.Test.Sdk](https://github.com/microsoft/vstest/)
+- [Microsoft.Xaml.Behaviors.Wpf](https://github.com/microsoft/XamlBehaviorsWpf)
+- [Onova](https://github.com/Tyrrrz/Onova)
+- [Pfim](https://github.com/nickbabcock/Pfim)
 - [Prism](https://github.com/PrismLibrary/Prism)
 - [ReactiveProperty](https://github.com/runceel/ReactiveProperty)
 - [System.Data.SQLite.Core](https://system.data.sqlite.org/index.html/doc/trunk/www/index.wiki)
+- [Throttle.Fody](https://github.com/tom-englert/Throttle.Fody)
+- [Windows-API-Code-Pack-1.1.4](https://github.com/contre/Windows-API-Code-Pack-1.1)
+- [WpfExToolkit](https://github.com/dotnetprojects/WpfExtendedToolkit)
 - [WpfLocalizeExtension](https://github.com/XAMLMarkupExtensions/WPFLocalizationExtension/)
+- [XamlBehaviors for WPF](https://github.com/Microsoft/XamlBehaviorsWpf)
+- [xUnit](https://github.com/xunit/xunit)
+- [xunit.runner.visualstudio](https://github.com/xunit/visualstudio.xunit)

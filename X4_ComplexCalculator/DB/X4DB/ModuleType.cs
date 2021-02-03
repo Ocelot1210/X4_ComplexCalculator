@@ -47,13 +47,12 @@ namespace X4_ComplexCalculator.DB.X4DB
         public static void Init()
         {
             _ModuleTypes.Clear();
-            X4Database.Instance.ExecQuery($"SELECT ModuleTypeID, Name FROM ModuleType", (dr, args) =>
-            {
-                var id = (string)dr["ModuleTypeID"];
-                var name = (string)dr["Name"];
 
-                _ModuleTypes.Add(id, new ModuleType(id, name));
-            });
+            const string sql = "SELECT ModuleTypeID, Name FROM ModuleType";
+            foreach (var item in X4Database.Instance.Query<ModuleType>(sql))
+            {
+                _ModuleTypes.Add(item.ModuleTypeID, item);
+            }
         }
 
 

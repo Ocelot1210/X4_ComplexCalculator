@@ -1,4 +1,9 @@
-﻿using System;
+﻿using AvalonDock;
+using GongSolutions.Wpf.DragDrop;
+using Prism.Commands;
+using Prism.Mvvm;
+using Reactive.Bindings;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -9,11 +14,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using AvalonDock;
-using GongSolutions.Wpf.DragDrop;
-using Prism.Commands;
-using Prism.Mvvm;
-using Reactive.Bindings;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Infrastructure;
 using X4_ComplexCalculator.Main.Menu.File.Export;
@@ -22,8 +23,8 @@ using X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport;
 using X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport;
 using X4_ComplexCalculator.Main.Menu.Lang;
 using X4_ComplexCalculator.Main.Menu.Layout;
-using X4_ComplexCalculator.Main.Menu.View.EmpireOverview;
 using X4_ComplexCalculator.Main.Menu.View.DBViewer;
+using X4_ComplexCalculator.Main.Menu.View.EmpireOverview;
 using X4_ComplexCalculator.Main.WorkArea;
 
 namespace X4_ComplexCalculator.Main
@@ -150,6 +151,18 @@ namespace X4_ComplexCalculator.Main
 
 
         /// <summary>
+        /// 起動時に更新を確認するかのチェック状態
+        /// </summary>
+        public ReactiveProperty<bool> CheckUpdateAtLaunch { get; }
+
+
+        /// <summary>
+        /// 起動時に更新を確認するか
+        /// </summary>
+        public ICommand SetCheckUpdateAtLaunchCommand { get; }
+
+
+        /// <summary>
         /// 更新を確認...
         /// </summary>
         public AsyncReactiveCommand<bool> CheckUpdateCommand { get; }
@@ -242,6 +255,8 @@ namespace X4_ComplexCalculator.Main
             OpenCommand                      = new DelegateCommand(Open);
             UpdateDBCommand                  = new DelegateCommand(_MainWindowModel.UpdateDB);
             ReportIssueCommand               = new DelegateCommand(ReportIssue);
+            CheckUpdateAtLaunch              = new ReactiveProperty<bool>(Configuration.Instance.CheckUpdateAtLaunch);
+            SetCheckUpdateAtLaunchCommand    = new DelegateCommand(SetCheckUpdateAtLaunch);
             CheckUpdateCommand               = new AsyncReactiveCommand<bool>().WithSubscribe(CheckUpdate);
             VersionInfoCommand               = new DelegateCommand(ShowVersionInfo);
             DocumentClosingCommand           = new DelegateCommand<DocumentClosingEventArgs>(DocumentClosing);
@@ -387,6 +402,16 @@ namespace X4_ComplexCalculator.Main
 
 
         /// <summary>
+        /// 更新確認ON/OFF
+        /// </summary>
+        private void SetCheckUpdateAtLaunch()
+        {
+            Configuration.Instance.CheckUpdateAtLaunch = !Configuration.Instance.CheckUpdateAtLaunch;
+            CheckUpdateAtLaunch.Value = Configuration.Instance.CheckUpdateAtLaunch;
+        }
+
+
+        /// <summary>
         /// 更新を確認...
         /// </summary>
         private async Task CheckUpdate(bool isUserOperation = false)
@@ -466,22 +491,23 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         private void WindowLoaded()
         {
-#if _DEBUG
             try
-#endif
             {
                 // DB接続開始
                 _MainWindowModel.Init();
                 _WorkAreaManager.Init();
-                CheckUpdateCommand.Execute(false);
+
+                // 更新チェックが有効な場合のみ更新を確認する
+                if (Configuration.Instance.CheckUpdateAtLaunch)
+                {
+                    CheckUpdateCommand.Execute(false);
+                }
             }
-#if _DEBUG
             catch (Exception e)
             {
                 LocalizedMessageBox.Show("Lang:UnexpectedErrorMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message, e.StackTrace ?? "");
                 Environment.Exit(-1);
             }
-#endif
         }
 
 

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Xml.Linq;
 using LibX4.FileSystem;
 using LibX4.Lang;
@@ -10,30 +11,6 @@ namespace X4_DataExporterWPF.Tests
 {
     public class ExporterTest
     {
-        /// <summary>
-        /// 重複する EquipmentOwner は無視する
-        /// 参照: <a href="https://github.com/Ocelot1210/X4_DataExporterWPF/pull/6">X4_DataExporterWPF#6</a>
-        /// </summary>
-        [Fact]
-        public void EquipmentOwnerIgnoreDuplicates()
-        {
-            var xml = @"
-                <wares>
-                    <ware id=""engine_arg_l_allround_01_mk1"" transport=""equipment"">
-                        <owner faction=""alliance"" />
-                        <owner faction=""alliance"" />
-                    </ware>
-                </wares>
-            ".ToXDocument();
-            var exporter = new EquipmentOwnerExporter(xml);
-
-            Assert.Equal(exporter.GetRecords(), new[] { new EquipmentOwner(
-                equipmentID: "engine_arg_l_allround_01_mk1",
-                factionID: "alliance"
-            )});
-        }
-
-
         /// <summary>
         /// モジュールの最大収容人数が省略されている場合、0 として扱う。
         /// </summary>
@@ -56,12 +33,11 @@ namespace X4_DataExporterWPF.Tests
                 </macro>
             </macros>
             ".ToXDocument();
-            var exporter = new ModuleExporter(new DummyCat(macroXml), wareXml, new DummyLanguageResolver());
+            var exporter = new ModuleExporter(new DummyCat(macroXml), wareXml);
 
             Assert.Equal(exporter.GetRecords(), new[] { new Module(
                 moduleID: "module_arg_hab_l_01",
                 moduleTypeID: "habitation",
-                name: "{20104,30301}",
                 macro: "hab_arg_l_01_macro",
                 maxWorkers: 0,
                 workersCapacity: 1000,
@@ -93,12 +69,11 @@ namespace X4_DataExporterWPF.Tests
                 </macro>
             </macros>
             ".ToXDocument();
-            var exporter = new ModuleExporter(new DummyCat(macroXml), wareXml, new DummyLanguageResolver());
+            var exporter = new ModuleExporter(new DummyCat(macroXml), wareXml);
 
             Assert.Equal(exporter.GetRecords(), new[] { new Module(
                 moduleID: "module_arg_prod_foodrations_01",
                 moduleTypeID: "production",
-                name: "{20104,13401}",
                 macro: "prod_arg_foodrations_macro",
                 maxWorkers: 90,
                 workersCapacity: 0,
@@ -109,11 +84,11 @@ namespace X4_DataExporterWPF.Tests
 
 
         /// <summary>
-        /// 重複する ModuleOwner は無視する
+        /// 重複する WareOwner は無視する
         /// 参照: <a href="https://github.com/Ocelot1210/X4_ComplexCalculator/pull/6">#6</a>
         /// </summary>
         [Fact]
-        public void ModuleOwnerIgnoreDuplicates()
+        public void WareOwnerIgnoreDuplicates()
         {
             var xml = @"
                 <wares>
@@ -123,10 +98,10 @@ namespace X4_DataExporterWPF.Tests
                     </ware>
                 </wares>
             ".ToXDocument();
-            var exporter = new ModuleOwnerExporter(xml);
+            var exporter = new WareOwnerExporter(xml);
 
-            Assert.Equal(exporter.GetRecords(), new[] { new ModuleOwner(
-                moduleID: "module_arg_conn_base_01",
+            Assert.Equal(exporter.GetRecords(), new[] { new WareOwner(
+                wareID: "module_arg_conn_base_01",
                 factionID: "antigone"
             )});
         }
@@ -183,8 +158,6 @@ namespace X4_DataExporterWPF.Tests
             Assert.Equal(exporter.GetRecords(), new[] { new WareGroup(
                 wareGroupID: "gases",
                 name: "{20215,401}",
-                factoryName: "{20215,404}",
-                icon: "be_upgrade_resource",
                 tier: 0
             )});
         }
@@ -209,7 +182,11 @@ namespace X4_DataExporterWPF.Tests
 
 
             public MemoryStream OpenFile(string filePath)
-                => throw new FileNotFoundException(nameof(filePath), filePath);
+                => throw new NotSupportedException();
+
+
+            public MemoryStream? TryOpenFile(string filePath)
+                => null;
 
 
             /// <summary>

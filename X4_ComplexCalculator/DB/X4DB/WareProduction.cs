@@ -12,6 +12,11 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// ウェアの生産量と生産時間情報の一覧
         /// </summary>
         private static readonly Dictionary<string, Dictionary<string, WareProduction>> _WareProductions = new();
+
+        /// <summary>
+        /// ダミー用ウェア生産情報
+        /// </summary>
+        private static readonly IReadOnlyDictionary<string, WareProduction> _DummyWareProduction = new Dictionary<string, WareProduction>();
         #endregion
 
 
@@ -111,5 +116,14 @@ namespace X4_ComplexCalculator.DB.X4DB
 
             return null;
         }
+
+
+        /// <summary>
+        /// ウェアIDに対応するウェア生産方式一覧を取得
+        /// </summary>
+        /// <param name="id">ウェアID</param>
+        /// <returns>ウェアIDに対応するウェア生産方式一覧</returns>
+        public static IReadOnlyDictionary<string, WareProduction> Get(string id)
+            => _WareProductions.TryGetValue(id, out var ret)? ret : _DummyWareProduction;
     }
 }

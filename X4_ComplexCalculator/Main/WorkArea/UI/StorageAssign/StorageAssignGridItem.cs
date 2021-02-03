@@ -186,7 +186,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         /// <param name="hour">指定時間</param>
         public StorageAssignGridItem(Ware ware, StorageCapacityInfo capacityInfo, long productPerHour, long hour)
         {
-            WareID = ware.WareID;
+            WareID = ware.ID;
             WareName = ware.Name;
             Tier = ware.WareGroup.Tier;
 

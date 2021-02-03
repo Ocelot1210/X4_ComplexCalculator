@@ -47,14 +47,19 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// <param name="language">選択された言語</param>
         /// <param name="owner">親ウィンドウハンドル(メッセージボックス表示用)</param>
         /// <returns>現在数と合計数のタプルのイテレータ</returns>
-        public void Export(IProgress<(int currentStep, int maxSteps)> progless, string inDirPath, string outFilePath, LangComboboxItem language, Window owner)
+        public void Export(
+            IProgress<(int currentStep, int maxSteps)> progress, 
+            IProgress<(int currentStep, int maxSteps)> progressSub,
+            string inDirPath,
+            string outFilePath,
+            LangComboboxItem language,
+            Window owner
+        )
         {
             var catFile = new CatFile(inDirPath);
 
-            // 抽出に失敗した場合、どこで例外が発生したか知りたいため、Debugビルドではtry-catchを無効化する
-#if !DEBUG
+            // 抽出に失敗した場合、例外設定で「Common Languate Runtime Exceptions」にチェックを入れるとどこで例外が発生したか分かる
             try
-#endif
             {
                 if (File.Exists(outFilePath))
                 {
@@ -92,42 +97,30 @@ namespace X4_DataExporterWPF.DataExportWindow
                     new WareResourceExporter(waresXml),                         // ウェア生産時に必要な情報
                     new WareProductionExporter(waresXml, resolver),             // ウェア生産に必要な情報
                     new WareEffectExporter(waresXml),                           // ウェア生産時の追加効果情報
+                    new WareOwnerExporter(waresXml),                            // ウェア所有派閥情報
+                    new WareEquipmentExporter(catFile, waresXml),               // ウェアの装備情報
+                    new WareTagsExporter(waresXml),                             // ウェアのタグ情報
 
                     // モジュール関連
                     new ModuleTypeExporter(resolver),                           // モジュール種別情報
-                    new ModuleExporter(catFile, waresXml, resolver),            // モジュール情報
-                    new ModuleOwnerExporter(waresXml),                          // モジュール所有派閥情報
-                    new ModuleProductionExporter(waresXml),                     // モジュール建造情報
-                    new ModuleResourceExporter(waresXml),                       // モジュール建造に必要なウェア情報
+                    new ModuleExporter(catFile, waresXml),                      // モジュール情報
                     new ModuleProductExporter(catFile, waresXml),               // モジュールの生産品情報
-                    new ModuleShieldExporter(catFile, waresXml),                // モジュールのシールド情報
-                    new ModuleTurretExporter(catFile, waresXml),                // モジュールのタレット情報
                     new ModuleStorageExporter(catFile, waresXml),               // モジュールの保管容量情報
 
                     // 装備関連
                     new EquipmentTypeExporter(resolver),                        // 装備種別情報
-                    new EquipmentExporter(catFile, waresXml, resolver),         // 装備情報
-                    new EquipmentOwnerExporter(waresXml),                       // 装備保有派閥情報
-                    new EquipmentResourceExporter(waresXml),                    // 装備生産に必要なウェア情報
-                    new EquipmentProductionExporter(waresXml),                  // 装備生産に関する情報
+                    new EquipmentExporter(catFile, waresXml),                   // 装備情報
                     new ShieldExporter(catFile, waresXml),                      // シールド情報
                     new EngineExporter(catFile, waresXml),                      // エンジン情報
                     new ThrusterExporter(catFile, waresXml),                    // スラスター情報
 
-                    // 従業員関連
-                    new WorkUnitProductionExporter(waresXml),                   // 従業員用生産情報
-                    new WorkUnitResourceExporter(waresXml),                     // 従業員用必要ウェア情報
 
                     // 艦船関連
                     new ShipTypeExporter(resolver),                             // 艦船種別情報
-                    new ShipExporter(catFile, waresXml, resolver),              // 艦船情報
-                    new ShipProductionExporter(waresXml),                       // 艦船の建造情報
-                    new ShipResourceExporter(waresXml),                         // 艦船の建造リソース
+                    new ShipExporter(catFile, waresXml),                        // 艦船情報
                     new ShipPurposeExporter(catFile, waresXml),                 // 艦船用途情報
-                    new ShipEquipmentExporter(catFile, waresXml),               // 艦船装備情報
                     new ShipHangerExporter(catFile, waresXml),                  // 艦船ハンガー(機体格納庫)情報
                     new ShipTransportTypeExporter(catFile, waresXml),           // 艦船カーゴ情報
-                    new ShipOwnerExporter(waresXml),                            // 艦船所有派閥情報
                     new ShipLoadoutExporter(catFile, waresXml),                 // 艦船のロードアウト情報
                 };
 
@@ -136,9 +129,9 @@ namespace X4_DataExporterWPF.DataExportWindow
                 var currentStep = 0;
                 foreach (var exporter in exporters)
                 {
-                    exporter.Export(conn);
+                    exporter.Export(conn, progressSub);
                     currentStep++;
-                    progless.Report((currentStep, maxSteps));
+                    progress.Report((currentStep, maxSteps));
                 }
 
                 trans.Commit();
@@ -147,7 +140,6 @@ namespace X4_DataExporterWPF.DataExportWindow
                     MessageBox.Show("Data export completed.", "X4 DataExporter", MessageBoxButton.OK, MessageBoxImage.Information);
                 }));
             }
-#if !DEBUG
             catch (Exception e)
             {
                 // テンポラリフォルダにクラッシュレポートをダンプする
@@ -168,7 +160,11 @@ Please report the following content to the developer.
                     System.Diagnostics.Process.Start("explorer.exe", $@"/select,""{dumpPath}""");
                 }));
             }
-#endif
+            finally
+            {
+                progress.Report((0, 1));
+                progressSub.Report((0, 1));
+            }
         }
 
 

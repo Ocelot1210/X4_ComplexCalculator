@@ -120,78 +120,45 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
         /// <param name="saveData"></param>
         private void SetModules(IWorkArea WorkArea, SaveDataStationItem saveData)
         {
-            var modParam = new SQLiteCommandParameters(1);
-            var eqParam = new SQLiteCommandParameters(3);
-            var moduleCount = 0;
+            var modules = new List<ModulesGridItem>((int)(double)saveData.XElement.XPathEvaluate("count(construction/sequence/entry)"));
 
             foreach (var entry in saveData.XElement.XPathSelectElements("construction/sequence/entry"))
             {
-                var index = int.Parse(entry.Attribute("index").Value);
-                modParam.Add("macro", System.Data.DbType.String, entry.Attribute("macro").Value);
-
-                foreach (var equipmet in entry.XPathSelectElements("upgrades/groups/*"))
+                // マクロ名を取得
+                var macro = entry.Attribute("macro")?.Value ?? "";
+                if (string.IsNullOrEmpty(macro))
                 {
-                    eqParam.Add("index", System.Data.DbType.Int32, index);
-                    eqParam.Add("macro", System.Data.DbType.String, equipmet.Attribute("macro").Value);
-                    eqParam.Add("count", System.Data.DbType.Int32, int.Parse(equipmet.Attribute("exact")?.Value ?? "1"));
+                    continue;
                 }
 
-                moduleCount++;
-            }
-
-
-            var modules = new List<ModulesGridItem>(moduleCount);
-
-            // モジュール追加
-            {
-                var query = @"
-SELECT
-    ModuleID
-FROM
-    Module
-WHERE
-    Macro = :macro";
-
-
-                X4Database.Instance.ExecQuery(query, modParam, (dr, _) =>
+                // マクロ名からモジュールを取得
+                var module = Ware.GetAll<Module>().FirstOrDefault(x => x.Macro == macro);
+                if (module is null)
                 {
-                    var module = Module.Get((string)dr["ModuleID"]);
+                    continue;
+                }
 
-                    if (module is not null)
-                    {
-                        modules.Add(new ModulesGridItem(module));
-                    }
-                });
-            }
+                // モジュールの装備を取得
+                var equipments = entry.XPathSelectElements("upgrades/groups/*")
+                    .Select(x => (Macro: x.Attribute("macro")?.Value, Count: int.Parse(x.Attribute("exact")?.Value ?? "1")))
+                    .Where(x => !string.IsNullOrEmpty(x.Macro))
+                    .Select(x => (Equipment: Ware.GetAll<Equipment>().FirstOrDefault(y => y.Macro == x.Macro), x.Count))
+                    .Where(x => x.Equipment is not null)
+                    .Select(x => (Equipment: x.Equipment!, x.Count));
 
-
-            // 装備追加
-            {
-                var query = @"
-SELECT
-    EquipmentID,
-    :index AS 'Index',
-    :count AS Count
-FROM
-    Equipment
-WHERE
-    MacroName = :macro";
-
-                X4Database.Instance.ExecQuery(query, eqParam, (dr, _) =>
+                var modulesGridItem = new ModulesGridItem(module);
+                foreach (var equipment in equipments)
                 {
-                    var index = (int)(long)dr["Index"] - 1;
-                    var moduleEquipment = modules[index].ModuleEquipment;
+                    modulesGridItem.Equipments.Add(equipment.Equipment, equipment.Count);
+                }
 
-                    var equipment = Equipment.Get((string)dr["EquipmentID"]);
-                    if (equipment is null) return;
-
-                    var count = (long)dr["Count"];
-                    moduleEquipment.AddEquipment(equipment, count);
-                });
+                modules.Add(modulesGridItem);
             }
+
+
 
             // 同一モジュールをマージ
-            var dict = new Dictionary<int, (int, Module, ModuleProduction, long)>();
+            var dict = new Dictionary<int, (int, Module, WareProduction, long)>();
 
             foreach (var (module, idx) in modules.Select((x, idx) => (x, idx)))
             {
@@ -225,8 +192,13 @@ WHERE
         {
             foreach (var ware in saveData.XElement.XPathSelectElements("/economylog/*[not(self::cargo)]"))
             {
-                var wareID = ware.Attribute("ware").Value;
-                var prod = WorkArea.StationData.ProductsInfo.Products.FirstOrDefault(x => x.Ware.WareID == wareID);
+                var wareID = ware.Attribute("ware")?.Value ?? "";
+                if (string.IsNullOrEmpty(wareID))
+                {
+                    continue;
+                }
+
+                var prod = WorkArea.StationData.ProductsInfo.Products.FirstOrDefault(x => x.Ware.ID == wareID);
                 if (prod is not null)
                 {
                     prod.UnitPrice = long.Parse(ware.Attribute("price").Value);
@@ -244,7 +216,11 @@ WHERE
         {
             foreach (var ware in saveData.XElement.XPathSelectElements("overrides/max/ware"))
             {
-                var wareID = ware.Attribute("ware").Value;
+                var wareID = ware.Attribute("ware")?.Value ?? "";
+                if (string.IsNullOrEmpty(wareID))
+                {
+                    continue;
+                }
 
                 var storage = WorkArea.StationData.StorageAssignInfo.StorageAssign.FirstOrDefault(x => x.WareID == wareID);
                 if (storage is not null)

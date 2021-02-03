@@ -1,7 +1,0 @@
-{
-  "AppSettings": {
-    "X4DBPath": ".\\db\\x4.db",
-    "CommonDBPath": ".\\db\\common.db",
-    "Language": ""
-  }
-}

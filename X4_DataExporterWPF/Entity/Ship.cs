@@ -19,12 +19,6 @@
 
 
         /// <summary>
-        /// 艦船名称
-        /// </summary>
-        public string Name { get; }
-
-
-        /// <summary>
         /// マクロ名
         /// </summary>
         public string Macro { get; }
@@ -137,30 +131,6 @@
 
 
         /// <summary>
-        /// 最安値
-        /// </summary>
-        public int MinPrice { get; }
-
-
-        /// <summary>
-        /// 平均値
-        /// </summary>
-        public int AvgPrice { get; }
-
-
-        /// <summary>
-        /// 最高値
-        /// </summary>
-        public int MaxPrice { get; }
-
-
-        /// <summary>
-        /// 説明文
-        /// </summary>
-        public string Description { get; }
-
-
-        /// <summary>
         /// サムネ画像
         /// </summary>
         public byte[]? Thumbnail { get; }
@@ -199,7 +169,6 @@
         public Ship(
             string shipID,
             string shipTypeID,
-            string name,
             string macro,
             string sizeID,
             double mass,
@@ -218,15 +187,10 @@
             int missileStorage,
             int droneStorage,
             int cagoSize,
-            int minPrice,
-            int avgPrice,
-            int maxPrice,
-            string description, 
             byte[]? thumbnail)
         {
             ShipID = shipID;
             ShipTypeID = shipTypeID;
-            Name = name;
             Macro = macro;
             SizeID = sizeID;
             Mass = mass;
@@ -245,10 +209,6 @@
             MissileStorage = missileStorage;
             DroneStorage = droneStorage;
             CargoSize = cagoSize;
-            MinPrice = minPrice;
-            AvgPrice = avgPrice;
-            MaxPrice = maxPrice;
-            Description = description;
             Thumbnail = thumbnail;
         }
     }

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Data.SQLite;
-using Prism.Mvvm;
-using X4_ComplexCalculator.DB;
+﻿using Prism.Mvvm;
+using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
 {
@@ -11,6 +9,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
     public class StorageDetailsListItem : BindableBase
     {
         #region メンバ
+        /// <summary>
+        /// モジュール
+        /// </summary>
+        private readonly Module _Module;
+
+
         /// <summary>
         /// モジュール数
         /// </summary>
@@ -22,13 +26,20 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         /// <summary>
         /// モジュールID
         /// </summary>
-        public string ModuleID { get; }
+        public string ModuleID => _Module.ID;
 
 
         /// <summary>
         /// モジュール名
         /// </summary>
-        public string ModuleName { get; }
+        public string ModuleName => _Module.Name;
+
+
+        /// <summary>
+        /// 保管庫種別
+        /// </summary>
+        public TransportType TransportType { get; }
+
 
 
         /// <summary>
@@ -63,35 +74,15 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="moduleID">モジュールID</param>
+        /// <param name="module">モジュール</param>
         /// <param name="moduleCount">モジュール数</param>
-        public StorageDetailsListItem(string moduleID, long moduleCount)
+        /// <param name="transportType">保管庫種別</param>
+        public StorageDetailsListItem(Module module, long moduleCount, TransportType transportType)
         {
-            ModuleID = moduleID;
+            _Module = module;
             ModuleCount = moduleCount;
-
-            var query = $@"
-SELECT
-	Module.Name,
-	ModuleStorage.Amount
-	
-FROM
-	Module,
-	ModuleStorage
-	
-WHERE
-	Module.ModuleID = ModuleStorage.ModuleID AND
-	Module.ModuleID = '{moduleID}'";
-
-            string? moduleName = null;
-            long capacity = 0;
-            X4Database.Instance.ExecQuery(query, (dr, args) =>
-            {
-                moduleName = (string)dr["Name"];
-                capacity   = (long)dr["Amount"];
-            });
-            ModuleName = moduleName ?? throw new ArgumentException("Invalid moduleID.", nameof(moduleID));
-            Capacity = capacity;
+            Capacity = module.Storage.Amount / module.Storage.Types.Count;
+            TransportType = transportType;
         }
     }
 }

@@ -6,33 +6,13 @@ namespace X4_ComplexCalculator.DB.X4DB
     /// <summary>
     /// 艦船情報管理用クラス
     /// </summary>
-    public class Ship
+    public class Ship : Ware
     {
-        #region スタティックメンバ
-        /// <summary>
-        /// 艦船一覧
-        /// </summary>
-        private static readonly Dictionary<string, Ship> _Ships = new();
-        #endregion
-
-
         #region プロパティ
-        /// <summary>
-        /// 艦船ID
-        /// </summary>
-        public string ShipID { get; }
-
-
         /// <summary>
         /// 艦船種別
         /// </summary>
         public ShipType ShipType { get; }
-
-
-        /// <summary>
-        /// 艦船名称
-        /// </summary>
-        public string Name { get; }
 
 
         /// <summary>
@@ -148,183 +128,113 @@ namespace X4_ComplexCalculator.DB.X4DB
 
 
         /// <summary>
-        /// 最安値
-        /// </summary>
-        public long MinPrice { get; }
-
-
-        /// <summary>
-        /// 平均値
-        /// </summary>
-        public long AvgPrice { get; }
-
-
-        /// <summary>
-        /// 最高値
-        /// </summary>
-        public long MaxPrice { get; }
-
-
-        /// <summary>
-        /// 説明文
-        /// </summary>
-        public string Description { get; }
-
-
-        /// <summary>
         /// 艦船のハンガー情報
         /// </summary>
         public IReadOnlyDictionary<string, ShipHanger> ShipHanger { get; }
 
 
         /// <summary>
-        /// 所有派閥一覧
+        /// ロードアウトIDをキーにしたロードアウト情報のディクショナリ
         /// </summary>
-        public IReadOnlyList<Faction> Owners { get; }
-
-
-        /// <summary>
-        /// ロードアウトIDをキーにしたデフォルトのロードアウト情報のディクショナリ
-        /// </summary>
-        public IReadOnlyDictionary<string, IReadOnlyList<(Equipment Equipment, long Count)>> Loadouts { get; }
+        public IReadOnlyDictionary<string, IReadOnlyList<ShipLoadout>> Loadouts { get; }
         #endregion
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="shipID">艦船ID</param>
-        /// <param name="shipTypeID">艦船種別ID</param>
-        /// <param name="name">艦船名称</param>
-        /// <param name="macro">マクロ名</param>
-        /// <param name="sizeID">サイズID</param>
-        /// <param name="mass">質量</param>
-        /// <param name="dragForward">前方抗力</param>
-        /// <param name="dragReverse">後方抗力</param>
-        /// <param name="dragHorizontal">水平抗力</param>
-        /// <param name="dragVertical">垂直抗力</param>
-        /// <param name="dragPitch">ピッチ抗力</param>
-        /// <param name="dragYaw">ヨー抗力</param>
-        /// <param name="dragRoll">ロール抗力</param>
-        /// <param name="hull">船体強度</param>
-        /// <param name="people">船員数</param>
-        /// <param name="missileStorage">ミサイル搭載量</param>
-        /// <param name="droneStorage">ドローン搭載量</param>
-        /// <param name="cargoSize">カーゴサイズ</param>
-        /// <param name="minPrice">最安値</param>
-        /// <param name="avgPrice">平均値</param>
-        /// <param name="maxPrice">最高値</param>
-        /// <param name="description">説明文</param>
-        private Ship(
-            string shipID,
-            string shipTypeID,
-            string name,
-            string macro,
-            string sizeID,
-            double mass,
-            double dragForward,
-            double dragReverse,
-            double dragHorizontal,
-            double dragVertical,
-            double dragPitch,
-            double dragYaw,
-            double dragRoll,
-            double inertiaPitch,
-            double inertiaYaw,
-            double inertiaRoll,
-            long hull,
-            long people,
-            long missileStorage,
-            long droneStorage,
-            long cargoSize,
-            long minPrice,
-            long avgPrice,
-            long maxPrice,
-            string description)
+        /// <param name="id">ウェアID</param>
+        /// <param name="tags">タグ文字列</param>
+        public Ship(string id, string tags) : base(id, tags)
         {
-            ShipID = shipID;
-            ShipType = ShipType.Get(shipTypeID);
-            Name = name;
-            Macro = macro;
-            Size = X4Size.Get(sizeID);
-            Mass = mass;
-            DragForward = dragForward;
-            DragReverse = dragReverse;
-            DragHorizontal = dragHorizontal;
-            DragVertical = dragVertical;
-            DragPitch = dragPitch;
-            DragYaw = dragYaw;
-            DragRoll = dragRoll;
-            InertiaPitch = inertiaPitch;
-            InertiaYaw = inertiaYaw;
-            InertiaRoll = inertiaRoll;
-            Hull = hull;
-            People = people;
-            MissileStorage = missileStorage;
-            DroneStorage = droneStorage;
-            CargoSize = cargoSize;
-            MinPrice = minPrice;
-            AvgPrice = avgPrice;
-            MaxPrice = maxPrice;
-            Description = description;
-            ShipHanger = X4DB.ShipHanger.Get(shipID);
-            Owners = X4Database.Instance.Query<string>("SELECT FactionID FROM ShipOwner WHERE ShipID = :ShipID", this)
-                .Select(x => Faction.Get(x))
-                .Where(x => x != null)
-                .Select(x => x!)
-                .ToArray();
-
-
             const string sql1 = @"
 SELECT
-	ShipLoadout.LoadoutID, Equipment.EquipmentID, ShipLoadout.Count
-
+    ShipTypeID, Macro, SizeID, Mass, DragForward, DragReverse,
+    DragHorizontal, DragVertical, DragPitch, DragYaw, DragRoll, InertiaPitch, InertiaYaw, InertiaRoll,
+    Hull, People, MissileStorage, DroneStorage, CargoSize
 FROM
-	ShipLoadout, Equipment
-
+    Ship
 WHERE
-	ShipLoadout.MacroName = Equipment.MacroName AND
-	ShipLoadout.ShipID = :ShipID";
+    ShipID = :ShipID
+";
 
-            Loadouts = X4Database.Instance.Query<(string LoadoutID, string EquipmentID, long Count)>(sql1, new { ShipID })
+            string shipTypeID, sizeID;
+            (
+                shipTypeID,
+                Macro,
+                sizeID,
+                Mass,
+                DragForward,
+                DragReverse,
+                DragHorizontal,
+                DragVertical,
+                DragPitch,
+                DragYaw,
+                DragRoll,
+                InertiaPitch,
+                InertiaYaw,
+                InertiaRoll,
+                Hull,
+                People,
+                MissileStorage,
+                DroneStorage,
+                CargoSize
+            ) = X4Database.Instance.QuerySingle
+            <(
+                string, string, string, long,
+                double, double, double, double, double, double, double, double, double, double, 
+                long, long, long, long, long
+            )>(sql1, new { ShipID = id });
+
+            ShipType = ShipType.Get(shipTypeID);
+            Size = X4Size.Get(sizeID);
+            ShipHanger = X4DB.ShipHanger.Get(id);
+
+
+            Loadouts = ShipLoadout.Get(id)
                 .GroupBy(x => x.LoadoutID)
-                .ToDictionary(
-                    x => x.Key,
-                    x => x.Select(y => (Equipment.Get(y.EquipmentID), y.Count)).ToArray() as IReadOnlyList<(Equipment Equipment, long Count)>
-                );
+                .ToDictionary(x => x.Key, x => x.ToArray() as IReadOnlyList<ShipLoadout>);
         }
 
 
-        /// <summary>
-        /// 初期化
-        /// </summary>
-        public static void Init()
-        {
-            _Ships.Clear();
 
-            const string sql = @"SELECT ShipID, ShipTypeID, Name, Macro, SizeID, Mass, DragForward, DragReverse,
-                                        DragHorizontal, DragVertical, DragPitch, DragYaw, DragRoll, InertiaPitch, InertiaYaw, InertiaRoll,
-                                        Hull, People, MissileStorage, DroneStorage, CargoSize, MinPrice, AvgPrice, MaxPrice, Description
-                                FROM Ship";
-            foreach (var ship in X4Database.Instance.Query<Ship>(sql))
+        /// <summary>
+        /// 指定したコネクション名に装備可能なEquipmentを取得する
+        /// </summary>
+        /// <returns></returns>
+        public override IEnumerable<T> GetEquippableEquipment<T>(string connectionName)
+        {
+            // 指定したコネクション名に装備可能な装備は存在するか？
+            if (Equipments.TryGetValue(connectionName, out var wareEquipment))
             {
-                _Ships.Add(ship.ShipID, ship);
+                // デフォルトのロードアウトは存在するか？
+                if (Loadouts.TryGetValue("default", out var loadouts))
+                {
+                    // デフォルトのロードアウトの内、指定したコネクション名と同じグループ名を持つものは存在するか？
+                    var shipLoadout = loadouts.FirstOrDefault(x => x.GroupName == wareEquipment.GroupName);
+                    if (shipLoadout is not null)
+                    {
+                        // 同じグループ名の装備は指定した型と一致するか？
+                        if (shipLoadout.Equipment is T ret)
+                        {
+                            yield return ret;
+                        }
+                        else
+                        {
+                            yield break;
+                        }
+                    }
+                }
+
+
+                var equipments = _Wares.Values
+                    .OfType<T>()
+                    .Where(x => wareEquipment.CanEquipped(x));
+                foreach (var equipment in equipments)
+                {
+                    yield return equipment;
+                }
             }
         }
-
-
-        /// <summary>
-        /// 艦船IDに対応する艦船を取得
-        /// </summary>
-        /// <param name="shipID">艦船ID</param>
-        /// <returns>艦船IDに対応する艦船</returns>
-        public static Ship Get(string shipID) => _Ships[shipID];
-
-
-        /// <summary>
-        /// 艦船情報を全取得する
-        /// </summary>
-        /// <returns>艦船情報の列挙</returns>
-        public static IEnumerable<Ship> GetAll() => _Ships.Values;
     }
 }

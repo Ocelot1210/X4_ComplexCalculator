@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using LibX4.FileSystem;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Xml.Linq;
@@ -39,7 +40,7 @@ namespace X4_DataExporterWPF.Export
         /// 抽出処理
         /// </summary>
         /// <param name="connection"></param>
-        public void Export(IDbConnection connection)
+        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
         {
             //////////////////
             // テーブル作成 //
@@ -62,7 +63,7 @@ CREATE TABLE IF NOT EXISTS ShipPurpose
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords();
+                var items = GetRecords(progress);
 
                 connection.Execute(@"INSERT INTO ShipPurpose ( ShipID,  Type,  PurposeID) VALUES (@ShipID, @Type, @PurposeID)", items);
             }
@@ -73,10 +74,16 @@ CREATE TABLE IF NOT EXISTS ShipPurpose
         /// <summary>
         /// レコード抽出
         /// </summary>
-        private IEnumerable<ShipPurpose> GetRecords()
+        private IEnumerable<ShipPurpose> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
         {
+            var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
+            var currentStep = 0;
+
+
             foreach (var ship in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'ship')]"))
             {
+                progress.Report((currentStep++, maxSteps));
+
                 var shipID = ship.Attribute("id")?.Value;
                 if (string.IsNullOrEmpty(shipID)) continue;
 
@@ -91,6 +98,8 @@ CREATE TABLE IF NOT EXISTS ShipPurpose
                     yield return new ShipPurpose(shipID, attr.Name.LocalName, attr.Value);
                 }
             }
+
+            progress.Report((currentStep++, maxSteps));
         }
     }
 }

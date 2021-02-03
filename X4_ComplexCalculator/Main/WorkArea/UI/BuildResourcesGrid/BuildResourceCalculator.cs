@@ -1,7 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
 {
@@ -17,84 +16,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         private static BuildResourceCalculator? _SingletonInstance;
         #endregion
 
-
-        #region メンバ
-        /// <summary>
-        /// 建造リソース一覧
-        /// &lt;ModuleID, &lt;Method, (WareID, Amount)&gt;&gt;
-        /// </summary>
-        private readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, (string, long)[]>> _BuildResource;
-        #endregion
-
-
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        private BuildResourceCalculator()
-        {
-            var resources = new Dictionary<string, Dictionary<string, List<(string, long)>>>();
-
-            // モジュールの生産に必要なリソース一覧を取得
-            {
-                X4Database.Instance.ExecQuery("SELECT ModuleID, Method, WareID, Amount FROM ModuleResource", (dr, _) =>
-                {
-                    var id = (string)dr["ModuleID"];
-                    if (!resources.ContainsKey(id))
-                    {
-                        resources.Add(id, new Dictionary<string, List<(string, long)>>());
-                    }
-
-                    var method = (string)dr["Method"];
-                    if (!resources[id].ContainsKey(method))
-                    {
-                        resources[id].Add(method, new List<(string, long)>());
-                    }
-
-                    var wareID = (string)dr["WareID"];
-                    var amount = (long)dr["Amount"];
-                    resources[id][method].Add((wareID, amount));
-                });
-            }
-
-
-            // 装備の生産に必要なリソース一覧を取得
-            {
-                var query = @"
-SELECT
-    EquipmentResource.EquipmentID,
-    EquipmentResource.Method,
-    EquipmentResource.NeedWareID,
-    EquipmentResource.Amount
-FROM
-    Equipment,
-    EquipmentResource
-
-WHERE
-    Equipment.EquipmentID = EquipmentResource.EquipmentID AND
-    Equipment.EquipmentTypeID IN ('turrets', 'shields')";
-
-                X4Database.Instance.ExecQuery(query, (dr, _) =>
-                {
-                    var id = (string)dr["EquipmentID"];
-                    if (!resources.ContainsKey(id))
-                    {
-                        resources.Add(id, new Dictionary<string, List<(string, long)>>());
-                    }
-
-                    var method = (string)dr["Method"];
-                    if (!resources[id].ContainsKey(method))
-                    {
-                        resources[id].Add(method, new List<(string, long)>());
-                    }
-
-                    var wareID = (string)dr["NeedWareID"];
-                    var amount = (long)dr["Amount"];
-                    resources[id][method].Add((wareID, amount));
-                });
-            }
-
-            _BuildResource = resources.ToDictionary(x => x.Key, x => x.Value.ToDictionary(y => y.Key, y => y.Value.ToArray()) as IReadOnlyDictionary<string, (string, long)[]>);
-        }
 
 
         /// <summary>
@@ -115,50 +36,36 @@ WHERE
         }
 
 
+
         /// <summary>
         /// 建造に必要なウェアを計算
         /// </summary>
-        /// <param name="Items">モジュール/装備ID, 建造方式, ジュール/装備数</param>
-        /// <returns></returns>
-        public Dictionary<string, long> CalcResource(IEnumerable<(string ID, string Method, long Count)> Items)
+        /// <param name="items">建造対象, 建造方法, 建造個数のタプルの列挙</param>
+        /// <returns>建造に必要なウェア一覧</returns>
+        public IEnumerable<CalcResult> CalcResource(IEnumerable<(Ware Ware, string Method, long Count)> items)
         {
-            var ret = new Dictionary<string, long>();
-
-            foreach (var (id, method, count) in Items)
-            {
-                foreach (var (wareID, amount) in CalcResource(id, method))
-                {
-                    if (!ret.ContainsKey(wareID))
-                    {
-                        ret.Add(wareID, amount * count);
-                    }
-                    else
-                    {
-                        ret[wareID] += amount * count;
-                    }
-                }
-            }
-
-            return ret;
+            return items
+                .SelectMany(x => CalcResourceInternal(x.Ware, x.Method, x.Count))
+                .GroupBy(x => x.WareID)
+                .Select(x => new CalcResult(x.Key, x.Sum(y => y.Amount)));
         }
 
 
         /// <summary>
-        /// 建造に必要なウェアを計算
+        /// 1ウェア単位の建造に必要なウェアを計算
         /// </summary>
-        /// <param name="id">モジュール/装備ID</param>
-        /// <returns>建造に必要なウェアと個数</returns>
-        public IEnumerable<(string WareID, long Amount)> CalcResource(string id, string method)
+        /// <param name="ware">ウェア</param>
+        /// <param name="method">建造方法</param>
+        /// <param name="count">個数</param>
+        /// <returns></returns>
+        private IEnumerable<CalcResult> CalcResourceInternal(Ware ware, string method, long count)
         {
-            var kvp = _BuildResource[id];
+            var resources = 
+                ware.Resources.TryGetValue(method, out var ret1) ? ret1 :
+                ware.Resources.TryGetValue(method, out var ret2) ? ret2 :
+                Enumerable.Empty<WareResource>();
 
-            var b = kvp[method];
-            if (!b.Any())
-            {
-                b = kvp["default"];
-            }
-
-            return b;
+            return resources.Select(x => new CalcResult(x.NeedWareID, x.Amount * count));
         }
     }
 }

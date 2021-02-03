@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
 using System.Linq;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.EditStatus;
@@ -16,26 +15,27 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
         /// <summary>
         /// モジュール追加先
         /// </summary>
-        private ObservableRangeCollection<ModulesGridItem> ItemCollection;
+        private readonly ObservableRangeCollection<ModulesGridItem> ItemCollection;
         #endregion
+
 
         #region プロパティ
         /// <summary>
         /// モジュール種別
         /// </summary>
-        public ObservablePropertyChangedCollection<ModulesListItem> ModuleTypes { get; } = new ObservablePropertyChangedCollection<ModulesListItem>();
+        public ObservablePropertyChangedCollection<ModulesListItem> ModuleTypes { get; } = new();
 
 
         /// <summary>
         /// モジュール所有派閥
         /// </summary>
-        public ObservablePropertyChangedCollection<FactionsListItem> ModuleOwners { get; } = new ObservablePropertyChangedCollection<FactionsListItem>();
+        public ObservablePropertyChangedCollection<FactionsListItem> ModuleOwners { get; } = new();
 
 
         /// <summary>
         /// モジュール一覧
         /// </summary>
-        public ObservablePropertyChangedCollection<ModulesListItem> Modules { get; } = new ObservablePropertyChangedCollection<ModulesListItem>();
+        public ObservablePropertyChangedCollection<ModulesListItem> Modules { get; } = new();
         #endregion
 
 
@@ -71,24 +71,16 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
         /// </summary>
         private void InitModuleTypes()
         {
-            var items = new List<ModulesListItem>();
+            const string sql1 = @"SELECT ModuleTypeID, Name FROM ModuleType WHERE ModuleTypeID IN (SELECT ModuleTypeID FROM Module) ORDER BY Name";
 
-            void init(SQLiteDataReader dr, object[] args)
+            var items = new List<ModulesListItem>();
+            foreach (var (moduleTypeID, name) in X4Database.Instance.Query<(string, string)>(sql1))
             {
-                bool chked = 0 < SettingDatabase.Instance.ExecQuery($"SELECT * FROM SelectModuleCheckStateModuleTypes WHERE ID = '{dr["ModuleTypeID"]}'", (_, _) => { });
-                items.Add(new ModulesListItem((string)dr["ModuleTypeID"], (string)dr["Name"], chked));
+                const string sql2 = @"SELECT count(*) AS Count FROM SelectModuleCheckStateModuleTypes WHERE ID = :ID";
+                var @checked = 0 < SettingDatabase.Instance.QuerySingle<long>(sql2, new { ID = moduleTypeID });
+                items.Add(new ModulesListItem(moduleTypeID, name, @checked));
             }
 
-            X4Database.Instance.ExecQuery(@"
-SELECT
-    ModuleTypeID,
-    Name
-from
-    ModuleType
-WHERE
-    ModuleTypeID IN (select ModuleTypeID FROM Module)
-
-ORDER BY Name", init, "SelectModuleCheckStateTypes");
 
             ModuleTypes.AddRange(items);
         }
@@ -99,25 +91,21 @@ ORDER BY Name", init, "SelectModuleCheckStateTypes");
         /// </summary>
         private void InitModuleOwners()
         {
+            const string sql1 = @"SELECT FactionID, Name FROM Faction WHERE FactionID IN (SELECT FactionID FROM WareOwner) ORDER BY Name";
+
             var items = new List<FactionsListItem>();
 
-            void init(SQLiteDataReader dr, object[] args)
+            var factions = X4Database.Instance.Query<string>(sql1)
+                .Select(x => Faction.Get(x))
+                .Where(x => x is not null)
+                .Select(x => x!);
+
+            foreach (var faction in factions)
             {
-                bool isChecked = 0 < SettingDatabase.Instance.ExecQuery($"SELECT * FROM SelectModuleCheckStateModuleOwners WHERE ID = '{dr["FactionID"]}'", (_, _) => { });
-
-                var faction = Faction.Get((string)dr["FactionID"]);
-                if (faction is not null) items.Add(new FactionsListItem(faction, isChecked));
+                const string sql2 = @"SELECT count(*) AS Count FROM SelectModuleCheckStateModuleOwners WHERE ID = :ID";
+                var @checked = 0 < SettingDatabase.Instance.QuerySingle<long>(sql2, new { ID = faction.FactionID });
+                items.Add(new FactionsListItem(faction, @checked));
             }
-
-            X4Database.Instance.ExecQuery(@"
-SELECT
-    FactionID,
-    Name
-FROM
-    Faction
-WHERE
-    FactionID IN (SELECT FactionID FROM ModuleOwner)
-ORDER BY Name ASC", init, "SelectModuleCheckStateTypes");
 
             ModuleOwners.AddRange(items);
         }
@@ -137,35 +125,21 @@ ORDER BY Name ASC", init, "SelectModuleCheckStateTypes");
         /// </summary>
         private void UpdateModulesMain()
         {
-            var query = $@"
-SELECT
-    DISTINCT Module.ModuleID,
-	Module.Name
-FROM
-    Module,
-	ModuleOwner
-WHERE
-	Module.ModuleID = ModuleOwner.ModuleID AND
-    Module.NoBlueprint = 0 AND
-    Module.ModuleTypeID   IN ({string.Join(", ", ModuleTypes.Where(x => x.IsChecked).Select(x => $"'{x.ID}'"))}) AND
-	ModuleOwner.FactionID IN ({string.Join(", ", ModuleOwners.Where(x => x.IsChecked).Select(x => $"'{x.Faction.FactionID}'"))})";
+            var checkedModuleTypes = new HashSet<string>(ModuleTypes.Where(x => x.IsChecked).Select(x => x.ID));
 
-            var list = new List<ModulesListItem>();
-            X4Database.Instance.ExecQuery(query, SetModules, list);
-            Modules.Reset(list);
-        }
+            var checkedOwners = ModuleOwners
+                .Where(x => x.IsChecked)
+                .Select(x => x.Faction.FactionID)
+                .ToArray();
 
+            var newModules = Ware.GetAll<Module>()
+                .Where(x => 
+                    !x.Tags.Contains("noplayerblueprint") &&
+                    checkedModuleTypes.Contains(x.ModuleType.ModuleTypeID) &&
+                    checkedOwners.Intersect(x.Owners.Select(y => y.FactionID)).Any())
+                .Select(x =>new ModulesListItem(x));
 
-
-        /// <summary>
-        /// モジュール一覧用ListViewを初期化する
-        /// </summary>
-        /// <param name="dr">クエリ結果</param>
-        /// <param name="args">可変長引数</param>
-        private void SetModules(SQLiteDataReader dr, object[] args)
-        {
-            var list = (List<ModulesListItem>)args[0];
-            list.Add(new ModulesListItem((string)dr["ModuleID"], (string)dr["Name"], false));
+            Modules.Reset(newModules);
         }
 
 
@@ -176,10 +150,9 @@ WHERE
         {
             // 選択されているアイテムを追加
             var items = Modules.Where(x => x.IsChecked)
-                               .Select(x => DB.X4DB.Module.Get(x.ID))
-                               .Where(x => x is not null)
-                               .Select(x => x!)
-                               .Select(x => new ModulesGridItem(x) { EditStatus = EditStatus.Edited });
+                .Select(x =>Ware.TryGet<Module>(x.ID))
+                .Where(x => x is not null)
+                .Select(x => new ModulesGridItem(x!) { EditStatus = EditStatus.Edited });
 
             ItemCollection.AddRange(items);
         }

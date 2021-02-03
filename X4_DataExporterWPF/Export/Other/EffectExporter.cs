@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data;
 using Dapper;
@@ -10,7 +11,7 @@ namespace X4_DataExporterWPF.Export
     /// </summary>
     public class EffectExporter : IExporter
     {
-        public void Export(IDbConnection connection)
+        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
         {
             //////////////////
             // テーブル作成 //
@@ -30,7 +31,7 @@ CREATE TABLE IF NOT EXISTS Effect
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords();
+                var items = GetRecords(progress);
 
                 // レコード追加
                 connection.Execute("INSERT INTO Effect (EffectID, Name) VALUES (@EffectID, @Name)", items);
@@ -42,10 +43,22 @@ CREATE TABLE IF NOT EXISTS Effect
         /// ModuleType データを読み出す
         /// </summary>
         /// <returns>EquipmentType データ</returns>
-        private IEnumerable<Effect> GetRecords()
+        private IEnumerable<Effect> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
         {
             // TODO: 可能ならファイルから抽出する
-            yield return new Effect("work", "work");
+            (string id, string name)[] data =
+            {
+                ("work",        "work"),
+                ("sunlight",    "sunlight"),
+            };
+
+            int currentStep = 0;
+            progress.Report((currentStep++, data.Length));
+            foreach (var (id, name) in data)
+            {
+                yield return new Effect(id, name);
+                progress.Report((currentStep++, data.Length));
+            }
         }
     }
 }

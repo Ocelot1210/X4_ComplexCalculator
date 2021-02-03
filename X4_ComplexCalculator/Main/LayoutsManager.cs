@@ -82,7 +82,7 @@ namespace X4_ComplexCalculator.Main
             // プリセットが選択、または解除された場合、DB に状態を保存する
             var changeChecked = Layouts.ObserveElementObservableProperty(x => x.IsChecked);
             changeChecked.Select(x => x.Instance)
-                .Subscribe(x => SettingDatabase.Instance.ExecQuery($"UPDATE WorkAreaLayouts SET IsChecked = {(x.IsChecked.Value ? 1 : 0)} WHERE LayoutID = {x.LayoutID}"));
+                .Subscribe(x => SettingDatabase.Instance.Execute($"UPDATE WorkAreaLayouts SET IsChecked = :IsChecked WHERE LayoutID = :LayoutID", new { IsChecked = x.IsChecked.Value ? 1 : 0, x.LayoutID }));
 
             // プリセットが選択された場合、他のチェックを全部外す
             changeChecked.Where(x => x.Value)
@@ -97,10 +97,12 @@ namespace X4_ComplexCalculator.Main
         public void Init()
         {
             // レイアウト一覧読み込み
-            SettingDatabase.Instance.ExecQuery("SELECT LayoutID, LayoutName, IsChecked FROM WorkAreaLayouts", (dr, _) =>
+            const string sql = "SELECT LayoutID, LayoutName, IsChecked FROM WorkAreaLayouts";
+            var items = SettingDatabase.Instance.Query<(long LayoutID, string LayoutName, bool IsChecked)>(sql);
+            foreach (var (layoutID, layoutName, isChecked) in items)
             {
-                Layouts.Add(new LayoutMenuItem((long)dr["LayoutID"], (string)dr["LayoutName"], (bool)dr["IsChecked"]));
-            });
+                Layouts.Add(new LayoutMenuItem(layoutID, layoutName, isChecked));
+            }
 
             var checkedLayout = Layouts.FirstOrDefault(x => x.IsChecked.Value);
             if (checkedLayout is not null)
@@ -122,15 +124,12 @@ namespace X4_ComplexCalculator.Main
                 {
                     try
                     {
-                        SettingDatabase.Instance.BeginTransaction();
                         var layoutID = vm.SaveLayout(layoutName);
-                        SettingDatabase.Instance.Commit();
 
                         Layouts.Add(new LayoutMenuItem(layoutID, layoutName, false));
                     }
                     catch (Exception ex)
                     {
-                        SettingDatabase.Instance.Rollback();
                         LocalizedMessageBox.Show("Lang:LayoutSaveFailedMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, ex.Message);
                     }
 
@@ -154,15 +153,12 @@ namespace X4_ComplexCalculator.Main
 
             try
             {
-                SettingDatabase.Instance.BeginTransaction();
                 _WorkAreaManager.ActiveContent.OverwriteSaveLayout(menuItem.LayoutID);
-                SettingDatabase.Instance.Commit();
 
                 LocalizedMessageBox.Show("Lang:LayoutOverwritedMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, _WorkAreaManager.ActiveContent.Title, menuItem.LayoutName);
             }
             catch (Exception ex)
             {
-                SettingDatabase.Instance.Rollback();
                 LocalizedMessageBox.Show("Lang:LayoutOverwriteFailedMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, ex.Message);
             }
         }
@@ -178,10 +174,9 @@ namespace X4_ComplexCalculator.Main
             {
                 menuItem.LayoutName.Value = newLayoutName;
 
-                var param = new SQLiteCommandParameters(2);
-                param.Add("layoutName", System.Data.DbType.String, menuItem.LayoutName.Value);
-                param.Add("layoutID", System.Data.DbType.Int32, menuItem.LayoutID);
-                SettingDatabase.Instance.ExecQuery($"UPDATE WorkAreaLayouts SET LayoutName = :layoutName WHERE LayoutID = :layoutID", param);
+                const string sql = "UPDATE WorkAreaLayouts SET LayoutName = :LayoutName WHERE LayoutID = :LayoutID";
+
+                SettingDatabase.Instance.Execute(sql, new { LayoutName = menuItem.LayoutName.Value, LayoutID = menuItem.LayoutID });
             }
         }
 
@@ -195,7 +190,7 @@ namespace X4_ComplexCalculator.Main
 
             if (result == MessageBoxResult.Yes)
             {
-                SettingDatabase.Instance.ExecQuery($"DELETE FROM WorkAreaLayouts WHERE LayoutID = {menuItem.LayoutID}");
+                SettingDatabase.Instance.Execute("DELETE FROM WorkAreaLayouts WHERE LayoutID = :LayoutID", new { menuItem.LayoutID });
                 Layouts.Remove(menuItem);
                 _ActiveLayout.Value = null;
             }

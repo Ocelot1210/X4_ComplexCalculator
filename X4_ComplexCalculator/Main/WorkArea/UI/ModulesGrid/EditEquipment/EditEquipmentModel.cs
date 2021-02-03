@@ -1,32 +1,34 @@
-using System.Collections.Generic;
-using System.Data.SQLite;
-using System.Linq;
-using System.Windows;
 using Prism.Mvvm;
+using Reactive.Bindings;
+using System;
+using System.Linq;
+using System.Reactive.Linq;
+using System.Windows;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.Entity;
+using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
 {
     /// <summary>
     /// 装備編集画面のModel
     /// </summary>
-    class EditEquipmentModel : BindableBase
+    class EditEquipmentModel : BindableBase, IDisposable
     {
         #region メンバ
         /// <summary>
-        /// 編集対象モジュール
+        /// 編集対象の装備管理
         /// </summary>
-        private readonly Module _Module;
-
+        private readonly WareEquipmentManager _Manager;
 
         /// <summary>
-        /// 選択中のプリセット
+        /// プリセット削除中か
         /// </summary>
-        private PresetComboboxItem? _SelectedPreset;
+        private bool _RemovingPreset = false;
         #endregion
 
 
@@ -44,7 +46,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
 
 
         /// <summary>
-        /// プリセット名
+        /// プリセット一覧
         /// </summary>
         public ObservableRangeCollection<PresetComboboxItem> Presets { get; } = new();
 
@@ -52,48 +54,90 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// 選択中のプリセット
         /// </summary>
-        public PresetComboboxItem? SelectedPreset
-        {
-            get
-            {
-                return _SelectedPreset;
-            }
-            set
-            {
-                _SelectedPreset = value;
-                RaisePropertyChanged();
-            }
-        }
+        public ReactiveProperty<PresetComboboxItem?> SelectedPreset { get; } = new();
+
+
+        /// <summary>
+        /// 選択中のサイズ
+        /// </summary>
+        public ReactiveProperty<X4Size> SelectedSize { get; }
+
+
+        /// <summary>
+        /// タブアイテム一覧
+        /// </summary>
+        public ObservableRangeCollection<EquipmentListViewModel> EquipmentListViewModels { get; } = new();
         #endregion
+
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="module">編集対象モジュール</param>
-        public EditEquipmentModel(Module module)
+        /// <param name="ware">編集対象ウェア</param>
+        public EditEquipmentModel(WareEquipmentManager equipmentManager)
         {
             // 初期化
-            _Module = module;
-            InitEquipmentSizes(module.ModuleID);
+            _Manager = equipmentManager;
+            InitEquipmentSizes();
             UpdateFactions();
-            InitPreset(module.ModuleID);
+            InitPreset();
+
+            SelectedSize = new ReactiveProperty<X4Size>(EquipmentSizes.First());
+            SelectedSize.Subscribe(x =>
+            {
+                foreach (var vm in EquipmentListViewModels)
+                {
+                    vm.SelectedSize.Value = x;
+                }
+            });
+
+            SelectedPreset.Subscribe(x =>
+            {
+                if (_RemovingPreset) return;
+                foreach (var vm in EquipmentListViewModels)
+                {
+                    vm.SelectedPreset.Value = x;
+                }
+            });
+
+
+            {
+                string[] types = { "turrets", "shields" };
+
+                var viewModels = types
+                    .Select(x => EquipmentType.Get(x))
+                    .Select(x => new EquipmentListModel(equipmentManager, x, SelectedSize.Value))
+                    .Select(x => new EquipmentListViewModel(x, Factions));
+
+                EquipmentListViewModels.AddRange(viewModels);
+            }
+        }
+
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            foreach (var vm in EquipmentListViewModels)
+            {
+                vm.Dispose();
+            }
         }
 
 
         /// <summary>
         /// 装備サイズコンボボックスの内容を初期化
         /// </summary>
-        /// <param name="moduleID"></param>
-        private void InitEquipmentSizes(string moduleID)
+        private void InitEquipmentSizes()
         {
-            static void AddItem(SQLiteDataReader dr, object[] args)
-            {
-                ((ICollection<X4Size>)args[0]).Add(X4Size.Get((string)dr["SizeID"]));
-            }
+            var sizes = _Manager.Ware.Equipments.Values
+                .SelectMany(x => x.Tags)
+                .Distinct()
+                .Select(x => X4Size.TryGet(x))
+                .Where(x => x is not null)
+                .Select(x => x!)
+                .OrderBy(x => x);
 
-            var sizes = new List<X4Size>();
-            X4Database.Instance.ExecQuery($"SELECT DISTINCT ModuleShield.SizeID FROM ModuleShield, ModuleTurret WHERE ModuleShield.ModuleID = ModuleTurret.ModuleID AND ModuleShield.ModuleID = '{moduleID}'", AddItem, sizes);
             EquipmentSizes.AddRange(sizes);
         }
 
@@ -103,79 +147,57 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// </summary>
         private void UpdateFactions()
         {
-            static void AddItem(SQLiteDataReader dr, object[] args)
-            {
-                bool chkState = 0 < SettingDatabase.Instance.ExecQuery($"SELECT ID FROM SelectModuleEquipmentCheckStateFactions WHERE ID = '{dr["FactionID"]}'", (_, _) => { });
+            var checkedFactions = SettingDatabase.Instance.GetCheckedFactionsAtSelectEquipmentWindow();
 
-                var faction = Faction.Get((string)dr["FactionID"]);
-                if (faction is not null) ((ICollection<FactionsListItem>)args[0]).Add(new FactionsListItem(faction, chkState));
+            // 装備可能な装備の製造元派閥一覧を作成
+            var factions = Ware.GetAll<Equipment>()
+                .Where(x => !x.Tags.Contains("noplayerblueprint"))
+                .Where(x => _Manager.Ware.Equipments.Any(y => y.Value.CanEquipped(x)))
+                .SelectMany(x => x.Owners)
+                .Distinct()
+                .Select(x => new FactionsListItem(x, checkedFactions.Contains(x.FactionID)));
 
-            }
-
-            var query = $@"
-SELECT
-	DISTINCT FactionID
-FROM
-	EquipmentOwner
-WHERE
-	EquipmentID IN (SELECT EquipmentID FROM Equipment WHERE (EquipmentTypeID IN ('turrets', 'shields')))";
-
-            var items = new List<FactionsListItem>();
-            X4Database.Instance.ExecQuery(query, AddItem, items);
-            Factions.AddRange(items);
+            Factions.AddRange(factions);
         }
+
 
         /// <summary>
         /// プリセットを初期化
         /// </summary>
-        private void InitPreset(string moduleID)
+        private void InitPreset()
         {
-            SettingDatabase.Instance.ExecQuery($"SELECT DISTINCT PresetID, PresetName FROM ModulePresets WHERE ModuleID = '{moduleID}'", (SQLiteDataReader dr, object[] args) =>
-            {
-                Presets.Add(new PresetComboboxItem((long)dr["PresetID"], (string)dr["PresetName"]));
-            });
+            Presets.AddRange(SettingDatabase.Instance.GetModulePreset(_Manager.Ware.ID).Select(x => new PresetComboboxItem(x.ID, x.Name)));
         }
 
 
         /// <summary>
         /// チェック状態を保存
         /// </summary>
-        public void SaveCheckState() => SettingDatabase.Instance.BeginTransaction(db =>
+        public void SaveCheckState()
         {
-            // 前回値クリア
-            db.Execute("DELETE FROM SelectModuleEquipmentCheckStateFactions");
-
-            // モジュール種別のチェック状態保存
             var checkedFactions = Factions.Where(x => x.IsChecked).Select(x => x.Faction);
-            db.Execute("INSERT INTO SelectModuleEquipmentCheckStateFactions(ID) VALUES (:FactionID)", checkedFactions);
-        });
+            SettingDatabase.Instance.SetCheckedFactionsAtSelectEquipmentWindow(checkedFactions);
+        }
+
 
 
         /// <summary>
-        /// プリセット編集
+        /// プリセット名を編集
         /// </summary>
-        public void EditPreset()
+        public void EditPresetName()
         {
-            if (SelectedPreset is null)
+            if (SelectedPreset.Value is null)
             {
                 return;
             }
 
             // 新プリセット名
-            var (onOK, newPresetName) = SelectStringDialog.ShowDialog("Lang:EditPresetName", "Lang:PresetName", SelectedPreset.Name, IsValidPresetName);
+            var (onOK, newPresetName) = SelectStringDialog.ShowDialog("Lang:EditPresetName", "Lang:PresetName", SelectedPreset.Value.Name, IsValidPresetName);
             if (onOK)
             {
                 // 新プリセット名が設定された場合
-
-                var param = new SQLiteCommandParameters(3);
-                param.Add("presetName", System.Data.DbType.String, newPresetName);
-                param.Add("moduleID", System.Data.DbType.String, _Module.ModuleID);
-                param.Add("presetID", System.Data.DbType.Int64, SelectedPreset.ID);
-                SettingDatabase.Instance.ExecQuery($"UPDATE ModulePresets Set PresetName = :presetName WHERE ModuleID = :moduleID AND presetID = :presetID", param);
-
-                var newPreset = new PresetComboboxItem(SelectedPreset.ID, newPresetName);
-                Presets.Replace(SelectedPreset, newPreset);
-                SelectedPreset = newPreset;
+                SettingDatabase.Instance.UpdateModulePresetName(_Manager.Ware.ID, SelectedPreset.Value.ID, newPresetName);
+                SelectedPreset.Value.Name = newPresetName;
             }
         }
 
@@ -188,54 +210,75 @@ WHERE
             var (onOK, presetName) = SelectStringDialog.ShowDialog("Lang:EditPresetName", "Lang:PresetName", "", IsValidPresetName);
             if (onOK)
             {
-                var id = 0L;
+                var newID = SettingDatabase.Instance.GetLastModulePresetsID(_Manager.Ware.ID);
+                SettingDatabase.Instance.AddModulePreset(
+                    _Manager.Ware.ID,
+                    newID,
+                    presetName,
+                    EquipmentListViewModels.SelectMany(x => x.Equipped).Select(x => x.Equipment)
+                );
 
-                var query = @$"
-SELECT
-    ifnull(MIN( PresetID + 1 ), 0) AS PresetID
-FROM
-    ModulePresets
-WHERE
-	ModuleID = '{_Module.ModuleID}' AND
-    ( PresetID + 1 ) NOT IN ( SELECT PresetID FROM ModulePresets WHERE ModuleID = '{_Module.ModuleID}')";
-
-                SettingDatabase.Instance.ExecQuery(query, (dr, _) =>
-                {
-                    id = (long)dr["PresetID"];
-                });
-
-                var item = new PresetComboboxItem(id, presetName);
-
-                SettingDatabase.Instance.BeginTransaction();
-                SettingDatabase.Instance.ExecQuery($"INSERT INTO ModulePresets(ModuleID, PresetID, PresetName) VALUES('{_Module.ModuleID}', {item.ID}, '{item.Name}')");
+                var item = new PresetComboboxItem(newID, presetName);
                 Presets.Add(item);
-                SettingDatabase.Instance.Commit();
-
-                SelectedPreset = item;
+                SelectedPreset.Value = item;
             }
         }
+
+
 
         /// <summary>
         /// プリセットを削除
         /// </summary>
-        public void RemovePreset()
+        public void DeletePreset()
         {
-            if (SelectedPreset is null)
+            if (SelectedPreset.Value is null)
             {
                 return;
             }
 
-            var result = LocalizedMessageBox.Show("Lang:DeletePresetConfirmMessage", "Lang:Error", MessageBoxButton.YesNo, MessageBoxImage.Exclamation, MessageBoxResult.No, SelectedPreset.Name);
+            var result = LocalizedMessageBox.Show("Lang:DeletePresetConfirmMessage", "Lang:Error", MessageBoxButton.YesNo, MessageBoxImage.Exclamation, MessageBoxResult.No, SelectedPreset.Value.Name);
             if (result == MessageBoxResult.Yes)
             {
-                SettingDatabase.Instance.BeginTransaction();
-                SettingDatabase.Instance.ExecQuery($"DELETE FROM ModulePresets WHERE ModuleID = '{_Module.ModuleID}' AND PresetID = {SelectedPreset.ID}");
-                Presets.Remove(SelectedPreset);
-                SettingDatabase.Instance.Commit();
+                SettingDatabase.Instance.DeleteModulePreset(_Manager.Ware.ID, SelectedPreset.Value.ID);
 
-                SelectedPreset = Presets.FirstOrDefault();
+                _RemovingPreset = true;
+                Presets.Remove(SelectedPreset.Value);
+                SelectedPreset.Value = null;
+                _RemovingPreset = false;
             }
         }
+
+
+        /// <summary>
+        /// プリセットを上書き保存する
+        /// </summary>
+        public void OverwritePreset()
+        {
+            if (SelectedPreset.Value is not null)
+            {
+                SettingDatabase.Instance.OverwritePreset(
+                    _Manager.Ware.ID,
+                    SelectedPreset.Value.ID,
+                    EquipmentListViewModels.SelectMany(x => x.Equipped).Select(x => x.Equipment)
+                );
+            }
+        }
+
+
+
+        /// <summary>
+        /// 装備を保存する
+        /// </summary>
+        public void SaveEquipment()
+        {
+            _Manager.ResetEquipment(EquipmentListViewModels.SelectMany(x => x.Equipped.Select(y => y.Equipment)));
+            foreach (var vm in EquipmentListViewModels)
+            {
+                vm.Unsaved.Value = false;
+            }
+        }
+
+
 
         /// <summary>
         /// プリセット名が有効か判定する

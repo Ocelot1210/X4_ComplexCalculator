@@ -1,5 +1,6 @@
 ﻿using System;
 using Prism.Mvvm;
+using X4_ComplexCalculator.DB.X4DB;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 {
@@ -23,21 +24,19 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
 
         #region プロパティ
-        /// <summary>
-        /// モジュールID
-        /// </summary>
+        /// <inheritdoc/>
+        public string WareID { get; }
+
+
+        /// <inheritdoc/>
         public string ModuleID { get; }
 
 
-        /// <summary>
-        /// モジュール名
-        /// </summary>
+        /// <inheritdoc/>
         public string ModuleName { get; }
 
 
-        /// <summary>
-        /// モジュール数
-        /// </summary>
+        /// <inheritdoc/>
         public long ModuleCount
         {
             get => _ModuleCount;
@@ -51,15 +50,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         }
 
 
-        /// <summary>
-        /// 製品数
-        /// </summary>
+        /// <inheritdoc/>
         public long Amount => _Amount * ModuleCount;
 
 
-        /// <summary>
-        /// 生産性(効率)
-        /// </summary>
+        /// <inheritdoc/>
         public double Efficiency => -1.0;
         #endregion
 
@@ -67,18 +62,18 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="moduleID">モジュールID</param>
+        /// <param name="wareID">生産/消費ウェアID</param>
+        /// <param name="module">モジュール</param>
         /// <param name="moduleCount">モジュール数</param>
         /// <param name="amount">製品数</param>
-        public ProductDetailsListItemConsumption(string moduleID, long moduleCount, long amount)
+        public ProductDetailsListItemConsumption(string wareID, Module module, long moduleCount, long amount)
         {
-            ModuleID = moduleID;
+            WareID = wareID;
+            ModuleID = module.ID;
+            ModuleName = module.Name;
             ModuleCount = moduleCount;
             _Amount = amount;
-
-            ModuleName = DB.X4DB.Module.Get(moduleID)?.Name ?? throw new ArgumentException($"Invalid module ID. ({moduleID}", nameof(moduleID));
         }
-
 
 
         /// <summary>

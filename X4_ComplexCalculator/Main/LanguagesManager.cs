@@ -41,28 +41,7 @@ namespace X4_ComplexCalculator.Main
                 provider.FileName = "Lang";
             }
 
-            var config = Configuration.GetConfiguration();
-            var lang = config["AppSettings:Language"];
-
-            try
-            {
-                // 言語が設定されているか？
-                if (!string.IsNullOrWhiteSpace(lang))
-                {
-                    // 言語が設定されていればそれを使用
-                    LocalizeDictionary.Instance.Culture = CultureInfo.GetCultureInfo(lang);
-                }
-                else
-                {
-                    // 言語が設定されていない場合、システムのロケールを設定
-                    LocalizeDictionary.Instance.Culture = CultureInfo.CurrentUICulture;
-                }
-            }
-            catch (CultureNotFoundException)
-            {
-                // 無効な言語が指定されている場合はシステムのロケールを設定
-                LocalizeDictionary.Instance.Culture = CultureInfo.CurrentUICulture;
-            }
+            LocalizeDictionary.Instance.Culture = Configuration.Instance.Language;
 
             Languages = LocalizeDictionary.Instance.DefaultProvider.AvailableCultures
                 .Where(x => !string.IsNullOrEmpty(x.Name))
@@ -84,7 +63,7 @@ namespace X4_ComplexCalculator.Main
         private void ApplyLanguageChange(CultureInfo cultureInfo)
         {
             LocalizeDictionary.Instance.Culture = cultureInfo;
-            Configuration.SetValue("AppSettings.Language", cultureInfo.Name);
+            Configuration.Instance.Language = cultureInfo;
 
             foreach (var lang in Languages.Where(x => x.CultureInfo != cultureInfo))
             {

@@ -89,88 +89,87 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
 
             using var conn = new DBConnection(SaveFilePath);
 
-            conn.BeginTransaction();
-
-            // 保存用テーブル初期化
-            conn.Execute("DROP TABLE IF EXISTS Common");
-            conn.Execute("DROP TABLE IF EXISTS Modules");
-            conn.Execute("DROP TABLE IF EXISTS Equipments");
-            conn.Execute("DROP TABLE IF EXISTS Products");
-            conn.Execute("DROP TABLE IF EXISTS BuildResources");
-            conn.Execute("DROP TABLE IF EXISTS StorageAssign");
-            conn.Execute("DROP TABLE IF EXISTS StationSettings");
-            conn.Execute("CREATE TABLE Common(Item TEXT, Value INTEGER)");
-            conn.Execute("CREATE TABLE Modules(Row INTEGER, ModuleID TEXT, Count INTEGER)");
-            conn.Execute("CREATE TABLE Equipments(Row INTEGER, EquipmentID TEXT)");
-            conn.Execute("CREATE TABLE Products(WareID TEXT, Price INTEGER, NoBuy INTEGER, NoSell INTEGER)");
-            conn.Execute("CREATE TABLE BuildResources(WareID TEXT, Price INTEGER, NoBuy INTEGER)");
-            conn.Execute("CREATE TABLE StorageAssign(WareID TEXT, AllocCount INTEGER)");
-            conn.Execute("CREATE TABLE StationSettings(Key TEXT, Value TEXT)");
-
-
-            // ファイルフォーマットのバージョン保存
-            conn.Execute("INSERT INTO Common(Item, Value) VALUES('FormatVersion', 2)");
-
-            // ステーションの設定保存
-            conn.Execute("INSERT INTO StationSettings(Key, Value) VALUES('IsHeadquarters', :IsHeadquarters)", WorkArea.StationData.Settings);
-            conn.Execute("INSERT INTO StationSettings(Key, Value) VALUES('Sunlight', :Sunlight)", WorkArea.StationData.Settings);
-            conn.Execute("INSERT INTO StationSettings(Key, Value) VALUES('ActualWorkforce', :Actual)", WorkArea.StationData.Settings.Workforce);
-            conn.Execute("INSERT INTO StationSettings(Key, Value) VALUES('AlwaysMaximumWorkforce', :AlwaysMaximum)", WorkArea.StationData.Settings.Workforce);
-
-            // モジュール保存
-            foreach (var (module, i) in WorkArea.StationData.ModulesInfo.Modules.Select((module, i) => (module, i)))
+            conn.BeginTransaction(db =>
             {
-                const string sql1 = "INSERT INTO Modules(Row, ModuleID, Count) Values(:i, :ModuleID, :ModuleCount)";
-                conn.Execute(sql1, new { i, module.Module.ModuleID, module.ModuleCount });
+                // 保存用テーブル初期化
+                db.Execute("DROP TABLE IF EXISTS Common");
+                db.Execute("DROP TABLE IF EXISTS Modules");
+                db.Execute("DROP TABLE IF EXISTS Equipments");
+                db.Execute("DROP TABLE IF EXISTS Products");
+                db.Execute("DROP TABLE IF EXISTS BuildResources");
+                db.Execute("DROP TABLE IF EXISTS StorageAssign");
+                db.Execute("DROP TABLE IF EXISTS StationSettings");
+                db.Execute("CREATE TABLE Common(Item TEXT, Value INTEGER)");
+                db.Execute("CREATE TABLE Modules(Row INTEGER, ModuleID TEXT, Count INTEGER)");
+                db.Execute("CREATE TABLE Equipments(Row INTEGER, EquipmentID TEXT)");
+                db.Execute("CREATE TABLE Products(WareID TEXT, Price INTEGER, NoBuy INTEGER, NoSell INTEGER)");
+                db.Execute("CREATE TABLE BuildResources(WareID TEXT, Price INTEGER, NoBuy INTEGER)");
+                db.Execute("CREATE TABLE StorageAssign(WareID TEXT, AllocCount INTEGER)");
+                db.Execute("CREATE TABLE StationSettings(Key TEXT, Value TEXT)");
 
-                if (module.EditStatus == EditStatus.Edited)
+
+                // ファイルフォーマットのバージョン保存
+                db.Execute("INSERT INTO Common(Item, Value) VALUES('FormatVersion', 2)");
+
+                // ステーションの設定保存
+                db.Execute("INSERT INTO StationSettings(Key, Value) VALUES('IsHeadquarters', :IsHeadquarters)", new { IsHeadquarters = WorkArea.StationData.Settings.IsHeadquarters.ToString() });
+                db.Execute("INSERT INTO StationSettings(Key, Value) VALUES('Sunlight', :Sunlight)", WorkArea.StationData.Settings);
+                db.Execute("INSERT INTO StationSettings(Key, Value) VALUES('ActualWorkforce', :Actual)", WorkArea.StationData.Settings.Workforce);
+                db.Execute("INSERT INTO StationSettings(Key, Value) VALUES('AlwaysMaximumWorkforce', :AlwaysMaximum)", new { AlwaysMaximum = WorkArea.StationData.Settings.Workforce.AlwaysMaximum.ToString() });
+
+                // モジュール保存
+                foreach (var (module, i) in WorkArea.StationData.ModulesInfo.Modules.Select((module, i) => (module, i)))
                 {
-                    module.EditStatus |= EditStatus.Saved;
+                    const string sql1 = "INSERT INTO Modules(Row, ModuleID, Count) Values(:Row, :ModuleID, :ModuleCount)";
+                    db.Execute(sql1, new { Row = i, ModuleID = module.Module.ID, ModuleCount = module.ModuleCount });
+
+                    if (module.EditStatus == EditStatus.Edited)
+                    {
+                        module.EditStatus |= EditStatus.Saved;
+                    }
+
+                    const string sql2 = "INSERT INTO Equipments(Row, EquipmentID) Values(:Row, :EquipmentID)";
+                    var param2 = module.Equipments.AllEquipments.Select(e => new { Row = i, EquipmentID = e.ID });
+                    db.Execute(sql2, param2);
                 }
 
-                const string sql2 = "INSERT INTO Equipments(Row, EquipmentID) Values(:i, :EquipmentID)";
-                var param2 = module.ModuleEquipment.AllEquipments.Select(e => new { i, e.EquipmentID });
-                conn.Execute(sql2, param2);
-            }
-
-            // 価格保存
-            SqlMapper.AddTypeHandler(new WareTypeHandler());
-            foreach (var product in WorkArea.StationData.ProductsInfo.Products)
-            {
-                if (product.EditStatus == EditStatus.Edited)
+                // 価格保存
+                SqlMapper.AddTypeHandler(new WareTypeHandler());
+                foreach (var product in WorkArea.StationData.ProductsInfo.Products)
                 {
-                    product.EditStatus |= EditStatus.Saved;
+                    if (product.EditStatus == EditStatus.Edited)
+                    {
+                        product.EditStatus |= EditStatus.Saved;
+                    }
+
+                    const string sql = "INSERT INTO Products(WareID, Price, NoBuy, NoSell) Values(:Ware, :UnitPrice, :NoBuy, :NoSell)";
+                    db.Execute(sql, product);
                 }
 
-                const string sql = "INSERT INTO Products(WareID, Price, NoBuy, NoSell) Values(:Ware, :UnitPrice, :NoBuy, :NoSell)";
-                conn.Execute(sql, product);
-            }
-
-            // 建造リソース保存
-            foreach (var resource in WorkArea.StationData.BuildResourcesInfo.BuildResources)
-            {
-                const string sql = "INSERT INTO BuildResources(WareID, Price, NoBuy) Values(:Ware, :UnitPrice, :NoBuy)";
-                conn.Execute(sql, resource);
-
-                if (resource.EditStatus == EditStatus.Edited)
+                // 建造リソース保存
+                foreach (var resource in WorkArea.StationData.BuildResourcesInfo.BuildResources)
                 {
-                    resource.EditStatus |= EditStatus.Saved;
+                    const string sql = "INSERT INTO BuildResources(WareID, Price, NoBuy) Values(:Ware, :UnitPrice, :NoBuy)";
+                    db.Execute(sql, resource);
+
+                    if (resource.EditStatus == EditStatus.Edited)
+                    {
+                        resource.EditStatus |= EditStatus.Saved;
+                    }
                 }
-            }
 
-            // 保管庫割当情報保存
-            foreach (var assign in WorkArea.StationData.StorageAssignInfo.StorageAssign)
-            {
-                const string sql = "INSERT INTO StorageAssign(WareID, AllocCount) Values(:WareID, :AllocCount)";
-                conn.Execute(sql, assign);
-
-                if (assign.EditStatus == EditStatus.Edited)
+                // 保管庫割当情報保存
+                foreach (var assign in WorkArea.StationData.StorageAssignInfo.StorageAssign)
                 {
-                    assign.EditStatus |= EditStatus.Saved;
-                }
-            }
+                    const string sql = "INSERT INTO StorageAssign(WareID, AllocCount) Values(:WareID, :AllocCount)";
+                    db.Execute(sql, assign);
 
-            conn.Commit();
+                    if (assign.EditStatus == EditStatus.Edited)
+                    {
+                        assign.EditStatus |= EditStatus.Saved;
+                    }
+                }
+            });
         }
 
 
@@ -187,7 +186,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
             public override void SetValue(IDbDataParameter parameter, Ware value)
             {
                 parameter.DbType = DbType.String;
-                parameter.Value = value.WareID;
+                parameter.Value = value.ID;
             }
         }
     }

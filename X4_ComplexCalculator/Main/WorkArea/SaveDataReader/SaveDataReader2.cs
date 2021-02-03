@@ -77,11 +77,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
         protected virtual void RestoreSettings(DBConnection conn, IStationSettings settings)
         {
             // 本部か
-            const string sql1 = "SELECT Value FROM StationSettings WHERE Key = 'IsHeadquarters'";
+            const string sql1 = "SELECT Value FROM StationSettings WHERE Key = 'IsHeadquarters' UNION ALL SELECT 'False' LIMIT 1";
             settings.IsHeadquarters = conn.QuerySingle<string>(sql1) == bool.TrueString;
 
             // 日光
-            const string sql2 = "SELECT Value FROM StationSettings WHERE Key = 'Sunlight'";
+            const string sql2 = "SELECT Value FROM StationSettings WHERE Key = 'Sunlight' UNION ALL SELECT '100' LIMIT 1";
             var sunLightString = conn.QuerySingle<string>(sql2);
             if (int.TryParse(sunLightString, out var sunLight))
             {
@@ -89,7 +89,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             }
 
             // 現在の労働者数
-            const string sql3 = "SELECT Value FROM StationSettings WHERE Key = 'ActualWorkforce'";
+            const string sql3 = "SELECT Value FROM StationSettings WHERE Key = 'ActualWorkforce' UNION ALL SELECT '0' LIMIT 1";
             var actualWorkforceString = conn.QuerySingle<string>(sql3);
             if (long.TryParse(actualWorkforceString, out var actualWorkforce))
             {
@@ -97,7 +97,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             }
 
             // (労働者数を)常に最大にするか
-            const string sql4 = "SELECT Value FROM StationSettings WHERE key = 'AlwaysMaximumWorkforce'";
+            const string sql4 = "SELECT Value FROM StationSettings WHERE key = 'AlwaysMaximumWorkforce' UNION ALL SELECT 'False' LIMIT 1";
             settings.Workforce.AlwaysMaximum = conn.QuerySingle<string>(sql4) == bool.TrueString;
         }
 
@@ -111,7 +111,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             const string sql = "SELECT WareID, Price, NoBuy, NoSell FROM Products";
             foreach (var (wareID, price, noBuy, noSell) in conn.Query<(string, long, long, long)>(sql))
             {
-                var itm = _WorkArea.StationData.ProductsInfo.Products.FirstOrDefault(x => x.Ware.WareID == wareID);
+                var itm = _WorkArea.StationData.ProductsInfo.Products.FirstOrDefault(x => x.Ware.ID == wareID);
                 if (itm is not null)
                 {
                     itm.UnitPrice = price;
@@ -131,7 +131,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             const string sql = "SELECT WareID, Price, NoBuy FROM BuildResources";
             foreach (var (wareID, price, noBuy) in conn.Query<(string, long, long)>(sql))
             {
-                var itm = _WorkArea.StationData.BuildResourcesInfo.BuildResources.FirstOrDefault(x => x.Ware.WareID == wareID);
+                var itm = _WorkArea.StationData.BuildResourcesInfo.BuildResources.FirstOrDefault(x => x.Ware.ID == wareID);
                 if (itm is not null)
                 {
                     itm.UnitPrice = price;

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -39,7 +40,7 @@ namespace X4_DataExporterWPF.Export
         /// データ抽出
         /// </summary>
         /// <param name="connection"></param>
-        public void Export(IDbConnection connection)
+        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
         {
             //////////////////
             // テーブル作成 //
@@ -49,11 +50,10 @@ namespace X4_DataExporterWPF.Export
 CREATE TABLE IF NOT EXISTS Ware
 (
     WareID          TEXT    NOT NULL PRIMARY KEY,
-    WareGroupID     TEXT    NOT NULL,
-    TransportTypeID TEXT    NOT NULL,
+    WareGroupID     TEXT,
+    TransportTypeID TEXT,
     Name            TEXT    NOT NULL,
     Description     TEXT    NOT NULL,
-    FactoryName     TEXT    NOT NULL,
     Volume          INTEGER NOT NULL,
     MinPrice        INTEGER NOT NULL,
     AvgPrice        INTEGER NOT NULL,
@@ -67,9 +67,9 @@ CREATE TABLE IF NOT EXISTS Ware
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords();
+                var items = GetRecords(progress);
 
-                connection.Execute("INSERT INTO Ware (WareID, WareGroupID, TransportTypeID, Name, Description, FactoryName, Volume, MinPrice, AvgPrice, MaxPrice) VALUES (@WareID, @WareGroupID, @TransportTypeID, @Name, @Description, @FactoryName, @Volume, @MinPrice, @AvgPrice, @MaxPrice)", items);
+                connection.Execute("INSERT INTO Ware (WareID, WareGroupID, TransportTypeID, Name, Description, Volume, MinPrice, AvgPrice, MaxPrice) VALUES (@WareID, @WareGroupID, @TransportTypeID, @Name, @Description, @Volume, @MinPrice, @AvgPrice, @MaxPrice)", items);
             }
         }
 
@@ -78,33 +78,37 @@ CREATE TABLE IF NOT EXISTS Ware
         /// XML から Ware データを読み出す
         /// </summary>
         /// <returns>読み出した Ware データ</returns>
-        private IEnumerable<Ware> GetRecords()
+        private IEnumerable<Ware> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
         {
-            foreach (var ware in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'economy')]"))
+            var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware)");
+            var currentStep = 0;
+
+
+            foreach (var ware in _WaresXml.Root.XPathSelectElements("ware"))
             {
+                progress.Report((currentStep++, maxSteps));
+
                 var wareID = ware.Attribute("id")?.Value;
                 if (string.IsNullOrEmpty(wareID)) continue;
 
                 var wareGroupID = ware.Attribute("group")?.Value;
-                if (string.IsNullOrEmpty(wareGroupID)) continue;
 
                 var transportTypeID = ware.Attribute("transport")?.Value;
-                if (string.IsNullOrEmpty(transportTypeID)) continue;
 
                 var name = _Resolver.Resolve(ware.Attribute("name")?.Value ?? "");
-                if (string.IsNullOrEmpty(name)) continue;
 
                 var description = _Resolver.Resolve(ware.Attribute("description")?.Value ?? "");
-                var factoryName = _Resolver.Resolve(ware.Attribute("factoryname")?.Value ?? "");
-                var volume = ware.Attribute("volume").GetInt();
+                var volume = ware.Attribute("volume")?.GetInt() ?? 1;
 
                 var price = ware.Element("price");
-                var minPrice = price.Attribute("min").GetInt();
-                var avgPrice = price.Attribute("average").GetInt();
-                var maxPrice = price.Attribute("max").GetInt();
+                var minPrice = price?.Attribute("min")?.GetInt()     ?? 0;
+                var avgPrice = price?.Attribute("average")?.GetInt() ?? 0;
+                var maxPrice = price?.Attribute("max")?.GetInt()     ?? 0;
 
-                yield return new Ware(wareID, wareGroupID, transportTypeID, name, description, factoryName, volume, minPrice, avgPrice, maxPrice);
+                yield return new Ware(wareID, wareGroupID, transportTypeID, name, description, volume, minPrice, avgPrice, maxPrice);
             }
+
+            progress.Report((currentStep++, maxSteps));
         }
     }
 }

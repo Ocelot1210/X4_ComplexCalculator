@@ -22,12 +22,6 @@ namespace X4_DataExporterWPF.Entity
 
 
         /// <summary>
-        /// モジュール名
-        /// </summary>
-        public string Name { get; }
-
-
-        /// <summary>
         /// マクロ名
         /// </summary>
         public string Macro { get; }
@@ -66,12 +60,11 @@ namespace X4_DataExporterWPF.Entity
         /// <param name="workersCapacity">収容可能な労働者数</param>
         /// <param name="noBluePrint">設計図有無</param>
         /// <param name="thumbnail">サムネ画像</param>
-        public Module(string moduleID, string moduleTypeID, string name, string macro,
+        public Module(string moduleID, string moduleTypeID, string macro,
                       int maxWorkers, int workersCapacity, bool noBluePrint, byte[]? thumbnail)
         {
             ModuleID = moduleID;
             ModuleTypeID = moduleTypeID;
-            Name = name;
             Macro = macro;
             MaxWorkers = maxWorkers;
             WorkersCapacity = workersCapacity;
@@ -87,7 +80,7 @@ namespace X4_DataExporterWPF.Entity
         /// <returns>等価である場合は true、それ以外の場合は false</returns>
         public bool Equals(Module? module)
             => this.ModuleID == module?.ModuleID && this.ModuleTypeID == module.ModuleTypeID
-            && this.Name == module.Name && this.Macro == module.Macro
+            && this.Macro == module.Macro
             && this.MaxWorkers == module.MaxWorkers
             && this.WorkersCapacity == module.WorkersCapacity
             && this.NoBlueprint == module.NoBlueprint;
@@ -123,7 +116,7 @@ namespace X4_DataExporterWPF.Entity
         /// </summary>
         /// <returns>指定したオブジェクトのハッシュコード</returns>
         public override int GetHashCode()
-            => HashCode.Combine(this.ModuleID, this.ModuleTypeID, this.Name, this.Macro,
+            => HashCode.Combine(this.ModuleID, this.ModuleTypeID, this.Macro,
                                 this.MaxWorkers, this.WorkersCapacity, this.NoBlueprint);
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using Dapper;
 using LibX4.Lang;
@@ -33,7 +34,7 @@ namespace X4_DataExporterWPF.Export
         /// 抽出処理
         /// </summary>
         /// <param name="connection"></param>
-        public void Export(IDbConnection connection)
+        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
         {
             //////////////////
             // テーブル作成 //
@@ -52,7 +53,7 @@ CREATE TABLE IF NOT EXISTS ModuleType
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords();
+                var items = GetRecords(progress);
 
                 connection.Execute("INSERT INTO ModuleType(ModuleTypeID, Name) VALUES (@ModuleTypeID, @Name)", items);
             }
@@ -63,18 +64,31 @@ CREATE TABLE IF NOT EXISTS ModuleType
         /// ModuleType データを読み出す
         /// </summary>
         /// <returns>EquipmentType データ</returns>
-        private IEnumerable<ModuleType> GetRecords()
+        private IEnumerable<ModuleType> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
         {
             // TODO: 可能ならファイルから抽出する
-            yield return new ModuleType("buildmodule", _Resolver.Resolve("{20104,  69901}"));
-            yield return new ModuleType("connectionmodule", _Resolver.Resolve("{20104,  59901}"));
-            yield return new ModuleType("defencemodule", _Resolver.Resolve("{20104,  49901}"));
-            yield return new ModuleType("dockarea", _Resolver.Resolve("{20104,  70001}"));
-            yield return new ModuleType("habitation", _Resolver.Resolve("{20104,  39901}"));
-            yield return new ModuleType("pier", _Resolver.Resolve("{20104,  71101}"));
-            yield return new ModuleType("production", _Resolver.Resolve("{20104,  19901}"));
-            yield return new ModuleType("storage", _Resolver.Resolve("{20104,  29901}"));
-            yield return new ModuleType("ventureplatform", _Resolver.Resolve("{20104, 101901}"));
+            (string id, string name)[] data =
+            {
+                ("buildmodule",         "{20104,  69901}"),
+                ("connectionmodule",    "{20104,  59901}"),
+                ("defencemodule",       "{20104,  49901}"),
+                ("dockarea",            "{20104,  70001}"),
+                ("habitation",          "{20104,  39901}"),
+                ("pier",                "{20104,  71101}"),
+                ("production",          "{20104,  19901}"),
+                ("storage",             "{20104,  29901}"),
+                ("ventureplatform",     "{20104, 101901}"),
+            };
+
+            var currentStep = 0;
+
+            progress.Report((currentStep++, data.Length));
+
+            foreach (var (id, name) in data)
+            {
+                yield return new ModuleType(id, _Resolver.Resolve(name));
+                progress.Report((currentStep++, data.Length));
+            }
         }
     }
 }

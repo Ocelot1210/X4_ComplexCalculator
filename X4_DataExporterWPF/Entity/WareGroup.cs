@@ -22,18 +22,6 @@ namespace X4_DataExporterWPF.Entity
 
 
         /// <summary>
-        /// 工場名
-        /// </summary>
-        public string FactoryName { get; }
-
-
-        /// <summary>
-        /// アイコン名
-        /// </summary>
-        public string Icon { get; }
-
-
-        /// <summary>
         /// 階級
         /// </summary>
         public int Tier { get; }
@@ -48,12 +36,10 @@ namespace X4_DataExporterWPF.Entity
         /// <param name="factoryName">工場名</param>
         /// <param name="icon">アイコン名</param>
         /// <param name="tier">階級</param>
-        public WareGroup(string wareGroupID, string name, string factoryName, string icon, int tier)
+        public WareGroup(string wareGroupID, string name, int tier)
         {
             WareGroupID = wareGroupID;
             Name = name;
-            FactoryName = factoryName;
-            Icon = icon;
             Tier = tier;
         }
 
@@ -64,9 +50,8 @@ namespace X4_DataExporterWPF.Entity
         /// <param name="group">比較対象のオブジェクト</param>
         /// <returns>等価である場合は true、それ以外の場合は false</returns>
         public bool Equals(WareGroup? group)
-            => this.WareGroupID == group?.WareGroupID && this.Name == group.Name
-            && this.FactoryName == group.FactoryName && this.Icon == group.Icon
-            && this.Tier == group.Tier;
+            => WareGroupID == group?.WareGroupID && Name == group.Name
+            && Tier == group.Tier;
 
 
         /// <summary>
@@ -99,7 +84,6 @@ namespace X4_DataExporterWPF.Entity
         /// </summary>
         /// <returns>指定したオブジェクトのハッシュコード</returns>
         public override int GetHashCode()
-            => HashCode.Combine(this.WareGroupID, this.Name,
-                                this.FactoryName, this.Icon, this.Tier);
+            => HashCode.Combine(WareGroupID, Name, Tier);
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -42,7 +43,7 @@ namespace X4_DataExporterWPF.Export
         /// 抽出処理
         /// </summary>
         /// <param name="connection"></param>
-        public void Export(IDbConnection connection)
+        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
         {
             //////////////////
             // テーブル作成 //
@@ -66,7 +67,7 @@ CREATE TABLE IF NOT EXISTS WareProduction
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords();
+                var items = GetRecords(progress);
 
                 connection.Execute("INSERT INTO WareProduction (WareID, Method, Name, Amount, Time) VALUES (@WareID, @Method, @Name, @Amount, @Time)", items);
             }
@@ -77,17 +78,28 @@ CREATE TABLE IF NOT EXISTS WareProduction
         /// XML から WareProduction データを読み出す
         /// </summary>
         /// <returns>読み出した WareProduction データ</returns>
-        private IEnumerable<WareProduction> GetRecords()
+        private IEnumerable<WareProduction> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
         {
-            foreach (var ware in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'economy')]"))
+            var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware)");
+            var currentStep = 0;
+
+
+            foreach (var ware in _WaresXml.Root.XPathSelectElements("ware"))
             {
+                progress.Report((currentStep++, maxSteps));
+
+
                 var wareID = ware.Attribute("id")?.Value;
                 if (string.IsNullOrEmpty(wareID)) continue;
+
+                var methods = new HashSet<string>();    // 生産方式(method)が重複しないように記憶するHashSet
 
                 foreach (var prod in ware.XPathSelectElements("production"))
                 {
                     var method = prod.Attribute("method")?.Value;
-                    if (string.IsNullOrEmpty(method)) continue;
+                    if (string.IsNullOrEmpty(method) || methods.Contains(method)) continue;
+                    methods.Add(method);
+
 
                     var name = _Resolver.Resolve(prod.Attribute("name")?.Value ?? "");
                     var amount = prod.Attribute("amount").GetInt();
@@ -96,6 +108,8 @@ CREATE TABLE IF NOT EXISTS WareProduction
                     yield return new WareProduction(wareID, method, name, amount, time);
                 }
             }
+
+            progress.Report((currentStep++, maxSteps));
         }
     }
 }

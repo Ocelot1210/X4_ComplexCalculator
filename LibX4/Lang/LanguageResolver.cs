@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -15,7 +16,7 @@ namespace LibX4.Lang
         /// <summary>
         /// 読み込んだ言語 XML
         /// </summary>
-        private readonly XDocument[] _LanguagesXml;
+        private readonly IReadOnlyList<XDocument> _LanguagesXml;
 
 
         /// <summary>
@@ -55,12 +56,22 @@ namespace LibX4.Lang
         {
             var languageXmls = languageIds
                 .Where((x, i) => languageIds.Take(i).All(y => x != y))  // 順序を保証する Distinct
-                .Select(languageId => catFile.OpenXml($"t/0001-l{languageId,3:D3}.xml"));
+                .Select(languageId => catFile.OpenXml($"t/0001-l{languageId,3:D3}.xml"))
+                .ToList();
 
-            var defaultLanguageXml = catFile.TryOpenXml("t/0001.xml");
-            if (defaultLanguageXml is not null) languageXmls = languageXmls.Append(defaultLanguageXml);
+            var defaultXmlFiles = catFile.OpenXmlFiles("t/0001.xml");
+            if (defaultXmlFiles.Any())
+            {
+                foreach (var xml in defaultXmlFiles)
+                {
+                    for (var cnt = 0; cnt < languageXmls.Count; cnt++)
+                    {
+                        XMLPatcher.MergeXML(languageXmls[cnt], xml);
+                    }
+                }
+            }
 
-            _LanguagesXml = languageXmls.ToArray();
+            _LanguagesXml = languageXmls;
         }
 
 
@@ -81,7 +92,7 @@ namespace LibX4.Lang
             foreach (var languageXml in _LanguagesXml)
             {
                 var findT = languageXml.Root
-                    ?.XPathSelectElement($"./page[@id='{pageID}']/t[@id='{tID}']")
+                    ?.XPathSelectElement($"page[@id='{pageID}']/t[@id='{tID}']")
                     ?.Value;
                 if (findT is not null)
                 {

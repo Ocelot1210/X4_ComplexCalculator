@@ -93,6 +93,7 @@ Language;言語
 # Help(H) ---------------------------------------------
 Help;ヘルプ(_H)
 ReportIssue;問題を報告
+CheckUpdateAtLaunch;起動時に更新を確認する
 CheckUpdate;更新を確認...
 CheckUpdateNoUpdateDescription;X4_ComplexCalculator v{0} は最新です。
 CheckUpdateHasUpdateDescription;X4_ComplexCalculator v{0} は v{1} へ更新できます。\r\n更新しますか？

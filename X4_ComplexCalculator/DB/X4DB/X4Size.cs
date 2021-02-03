@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
@@ -32,7 +33,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <summary>
         /// 比較用の値
         /// </summary>
-        private int _CompareValue;
+        private readonly int _CompareValue;
         #endregion
 
 
@@ -64,13 +65,12 @@ namespace X4_ComplexCalculator.DB.X4DB
         public static void Init()
         {
             _Sizes.Clear();
-            X4Database.Instance.ExecQuery("SELECT SizeID, Name FROM Size", (dr, args) =>
-            {
-                var id = (string)dr["SizeID"];
-                var name = (string)dr["Name"];
 
-                _Sizes.Add(id, new X4Size(id, name));
-            });
+            const string sql = "SELECT SizeID, Name FROM Size";
+            foreach (var size in X4Database.Instance.Query<X4Size>(sql))
+            {
+                _Sizes.Add(size.SizeID, size);
+            }
         }
 
 
@@ -83,32 +83,35 @@ namespace X4_ComplexCalculator.DB.X4DB
 
 
         /// <summary>
-        /// 比較
+        /// サイズIDに対応するサイズの取得を試みる
         /// </summary>
-        /// <param name="obj">比較対象</param>
-        /// <returns></returns>
-        public override bool Equals(object? obj) => obj is X4Size tgt && tgt.SizeID == SizeID;
+        /// <param name="sizeID">サイズID</param>
+        /// <returns>サイズIDに対応するサイズ</returns>
+        public static X4Size? TryGet(string sizeID) => _Sizes.TryGetValue(sizeID, out var ret) ? ret : null;
+
+
+
+        /// <inheritdoc/>
+        public override bool Equals(object? obj) => obj is X4Size other && Equals(other);
 
 
         /// <summary>
-        /// ハッシュ値を取得
+        /// 比較
         /// </summary>
-        /// <returns>ハッシュ値</returns>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals(X4Size? other) => other is not null && SizeID == other.SizeID;
+
+
+        /// <inheritdoc/>
         public override int GetHashCode() => HashCode.Combine(SizeID);
 
 
-        /// <summary>
-        /// 文字列化
-        /// </summary>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public override string ToString() => Name;
 
 
-        /// <summary>
-        /// 大小比較
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public int CompareTo(object? obj)
         {
             if (obj is null)

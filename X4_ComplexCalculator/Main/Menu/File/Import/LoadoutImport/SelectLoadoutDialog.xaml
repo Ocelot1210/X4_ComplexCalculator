@@ -134,12 +134,12 @@
                         CanUserResize="False"
                         ClipboardContentBinding="{Binding TurretsCount, Mode=OneTime}"
                         Header="{lex:Loc Lang:Turrets}"
-                        SortMemberPath="TurretsCount">
+                        SortMemberPath="TurretInfo.Count">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock
                                     VerticalAlignment="Center"
-                                    Text="{Binding TurretsCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat='{}{0:N0}'}"
+                                    Text="{Binding TurretInfo.Count, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat='{}{0:N0}'}"
                                     TextAlignment="Right"
                                     ToolTipService.ShowDuration="1000000">
                                     <TextBlock.Style>
@@ -149,7 +149,7 @@
                                                     <ToolTip HorizontalContentAlignment="Left">
                                                         <TextBlock
                                                             HorizontalAlignment="Left"
-                                                            Text="{Binding TurretsToolTip, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                                            Text="{Binding TurretInfo.DetailsText, Mode=OneTime}"
                                                             TextAlignment="Left" />
                                                     </ToolTip>
                                                 </Setter.Value>
@@ -167,12 +167,12 @@
                         CanUserResize="False"
                         ClipboardContentBinding="{Binding ShieldsCount, Mode=OneTime}"
                         Header="{lex:Loc Lang:Shields}"
-                        SortMemberPath="ShieldsCount">
+                        SortMemberPath="ShieldInfo.Count">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock
                                     VerticalAlignment="Center"
-                                    Text="{Binding ShieldsCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat='{}{0:N0}'}"
+                                    Text="{Binding ShieldInfo.Count, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat='{}{0:N0}'}"
                                     TextAlignment="Right"
                                     ToolTipService.ShowDuration="1000000">
                                     <TextBlock.Style>
@@ -182,7 +182,7 @@
                                                     <ToolTip HorizontalContentAlignment="Left">
                                                         <TextBlock
                                                             HorizontalAlignment="Left"
-                                                            Text="{Binding ShieldsToolTip, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                                            Text="{Binding ShieldInfo.DetailsText, Mode=OneTime}"
                                                             TextAlignment="Left" />
                                                     </ToolTip>
                                                 </Setter.Value>

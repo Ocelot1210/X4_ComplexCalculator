@@ -43,13 +43,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
         /// 
         /// イベントの発火順番が前後する事を考慮したいため、集計対象のウェアの情報をここに格納しておく
         /// </remarks>
-        private readonly Dictionary<string, long> AggregateTargetProducts = new();
-
-
-        /// <summary>
-        /// 必要ウェア計算用
-        /// </summary>
-        private readonly WorkForceNeedWareCalculator _Calculator = WorkForceNeedWareCalculator.Instance;
+        private readonly Dictionary<string, long> AggregateTargetProducts;
         #endregion
 
 
@@ -76,21 +70,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
             _Products.Products.CollectionChanged += Products_CollectionChanged;
             _Products.Products.CollectionPropertyChanged += Products_CollectionPropertyChanged;
 
-            var query = @"
-SELECT
-	DISTINCT WareID
-	
-FROM
-	WorkUnitResource
-	
-WHERE
-	WorkUnitID = 'workunit_busy'";
 
             // 集計対象ウェアを取得
-            X4Database.Instance.ExecQuery(query, (dr, _) =>
-            {
-                AggregateTargetProducts.Add((string)dr["WareID"], 0);
-            });
+            AggregateTargetProducts = Ware.Get("workunit_busy")
+                .Resources
+                .SelectMany(x => x.Value.Select(y => y.NeedWareID))
+                .Distinct()
+                .ToDictionary(x => x, x => 0L);
         }
 
 
@@ -130,16 +116,17 @@ WHERE
             {
                 return;
             }
-
+            
             // 必要ウェア集計
-            Module[] modules = { module.Module };
-            var waresDict = _Calculator.Calc(modules);
-            foreach (var (method, wares) in waresDict)
+            var calcResults = ProductCalculator.Instance.Calc(module.Module, 1);
+            foreach (var calcResultGrp in calcResults.GroupBy(x => x.Method))
             {
-                foreach (var (wareID, amount) in wares)
+                foreach (var calcResult in calcResultGrp)
                 {
-                    var item = NeedWareInfoDetails.First(x => x.Method == method && x.WareID == wareID);
-                    item.NeedAmount += (ev.NewValue - ev.OldValue) * amount;
+                    foreach (var item in NeedWareInfoDetails.Where(x => x.Method == calcResult.Method && x.WareID == calcResult.WareID))
+                    {
+                        item.NeedAmount -= (ev.NewValue - ev.OldValue) * calcResult.WareAmount;
+                    }
                 }
             }
 
@@ -160,24 +147,27 @@ WHERE
             // 削除予定のウェアを集計
             if (e.OldItems is not null)
             {
-                var wares = _Calculator.Calc(e.OldItems.Cast<ModulesGridItem>().Where(x => 0 < x.Module.WorkersCapacity));
+                var calcResults = e.OldItems.Cast<ModulesGridItem>()
+                    .Where(x => 0 < x.Module.WorkersCapacity)
+                    .SelectMany(x => ProductCalculator.Instance.Calc(x.Module, 1))
+                    .GroupBy(x => x.Method);
 
-                foreach (var (method, wareArr) in wares)
+                foreach (var calcResultGrp in calcResults)
                 {
-                    if (!addWares.ContainsKey(method))
+                    if (!addWares.ContainsKey(calcResultGrp.Key))
                     {
-                        addWares.Add(method, new Dictionary<string, long>());
+                        addWares.Add(calcResultGrp.Key, new Dictionary<string, long>());
                     }
 
-                    foreach (var (wareID, amount) in wareArr)
+                    foreach (var calcResult in calcResultGrp)
                     {
-                        if (!addWares[method].ContainsKey(wareID))
+                        if (!addWares[calcResult.Method].ContainsKey(calcResult.WareID))
                         {
-                            addWares[method].Add(wareID, -amount);
+                            addWares[calcResult.Method].Add(calcResult.WareID, calcResult.WareAmount);
                         }
                         else
                         {
-                            addWares[method][wareID] += -amount;
+                            addWares[calcResult.Method][calcResult.WareID] += calcResult.WareAmount;
                         }
                     }
                 }
@@ -186,24 +176,27 @@ WHERE
             // 追加予定のウェアを集計
             if (e.NewItems is not null)
             {
-                var wares = _Calculator.Calc(e.NewItems.Cast<ModulesGridItem>().Where(x => 0 < x.Module.WorkersCapacity));
+                var calcResults = e.NewItems.Cast<ModulesGridItem>()
+                    .Where(x => 0 < x.Module.WorkersCapacity)
+                    .SelectMany(x => ProductCalculator.Instance.Calc(x.Module, 1))
+                    .GroupBy(x => x.Method);
 
-                foreach (var (method, wareArr) in wares)
+                foreach (var calcResultGrp in calcResults)
                 {
-                    if (!addWares.ContainsKey(method))
+                    if (!addWares.ContainsKey(calcResultGrp.Key))
                     {
-                        addWares.Add(method, new Dictionary<string, long>());
+                        addWares.Add(calcResultGrp.Key, new Dictionary<string, long>());
                     }
 
-                    foreach (var (wareID, amount) in wareArr)
+                    foreach (var calcResult in calcResultGrp)
                     {
-                        if (!addWares[method].ContainsKey(wareID))
+                        if (!addWares[calcResult.Method].ContainsKey(calcResult.WareID))
                         {
-                            addWares[method].Add(wareID, amount);
+                            addWares[calcResult.Method].Add(calcResult.WareID, -calcResult.WareAmount);
                         }
                         else
                         {
-                            addWares[method][wareID] += amount;
+                            addWares[calcResult.Method][calcResult.WareID] += -calcResult.WareAmount;
                         }
                     }
                 }
@@ -215,23 +208,27 @@ WHERE
                 addWares.Clear();
                 NeedWareInfoDetails.Clear();
 
-                var wares = _Calculator.Calc((sender as IEnumerable<ModulesGridItem>).Where(x => 0 < x.Module.WorkersCapacity));
-                foreach (var (method, wareArr) in wares)
+                var calcResults = (sender as IEnumerable<ModulesGridItem>)
+                    .Where(x => 0 < x.Module.WorkersCapacity)
+                    .SelectMany(x => ProductCalculator.Instance.Calc(x.Module, 1))
+                    .GroupBy(x => x.Method);
+
+                foreach (var calcResultGrp in calcResults)
                 {
-                    if (!addWares.ContainsKey(method))
+                    if (!addWares.ContainsKey(calcResultGrp.Key))
                     {
-                        addWares.Add(method, new Dictionary<string, long>());
+                        addWares.Add(calcResultGrp.Key, new Dictionary<string, long>());
                     }
 
-                    foreach (var (wareID, amount) in wareArr)
+                    foreach (var calcResult in calcResultGrp)
                     {
-                        if (!addWares[method].ContainsKey(wareID))
+                        if (!addWares[calcResult.Method].ContainsKey(calcResult.WareID))
                         {
-                            addWares[method].Add(wareID, amount);
+                            addWares[calcResult.Method].Add(calcResult.WareID, calcResult.WareAmount);
                         }
                         else
                         {
-                            addWares[method][wareID] += amount;
+                            addWares[calcResult.Method][calcResult.WareID] += calcResult.WareAmount;
                         }
                     }
                 }
@@ -271,14 +268,15 @@ WHERE
             if (removeItems.Any())
             {
                 // 居住モジュールの種族(メソッド)一覧
-                var habModuleMethods = _Modules.Modules.Where(x => 0 < x.Module.WorkersCapacity)
-                                                       .Select(x =>
-                                                        {
-                                                            var ret = x.Module.Owners.First().Race.RaceID;
-                                                            return (ret == "argon") ? "default" : ret;
-                                                        })
-                                                       .Distinct()
-                                                       .ToArray();
+                var habModuleMethods = _Modules.Modules
+                    .Where(x => 0 < x.Module.WorkersCapacity)
+                    .Select(x =>
+                    {
+                        var ret = x.Module.Owners.First().Race.RaceID;
+                        return (ret == "argon") ? "default" : ret;
+                    })
+                    .Distinct()
+                    .ToArray();
 
                 // モジュールがまだあるなら削除対象から除外する
                 removeItems.RemoveAll(x => habModuleMethods.Any(y => x.Method == y));
@@ -295,7 +293,9 @@ WHERE
         /// </summary>
         private void UpdateTotalNeedAmount()
         {
-            var totalWares = NeedWareInfoDetails.GroupBy(x => x.WareID).Select(x => (WareID: x.Key, Amount: x.Sum(y => y.NeedAmount)));
+            var totalWares = NeedWareInfoDetails
+                .GroupBy(x => x.WareID)
+                .Select(x => (WareID: x.Key, Amount: x.Sum(y => y.NeedAmount)));
             foreach (var (WareID, Amount) in totalWares)
             {
                 var items = NeedWareInfoDetails.Where(x => x.WareID == WareID);
@@ -329,7 +329,7 @@ WHERE
 
             // 同じウェアの数量更新
             var keys = AggregateTargetProducts.Keys.ToArray();
-            foreach (var wareID in keys.Where(x => x == product.Ware.WareID))
+            foreach (var wareID in keys.Where(x => x == product.Ware.ID))
             {
                 var amount = product.Details.Where(x => 0 < x.Amount).Sum(x => x.Amount);
                 AggregateTargetProducts[wareID] = amount;
@@ -360,12 +360,12 @@ WHERE
                 }
 
 
-                foreach (var prod in item.Cast<ProductsGridItem>().Where(x => AggregateTargetProducts.ContainsKey(x.Ware.WareID)))
+                foreach (var prod in item.Cast<ProductsGridItem>().Where(x => AggregateTargetProducts.ContainsKey(x.Ware.ID)))
                 {
                     var amount = prod.Details.Where(x => 0 < x.Amount).Sum(x => x.Amount);
-                    AggregateTargetProducts[prod.Ware.WareID] = amount;
+                    AggregateTargetProducts[prod.Ware.ID] = amount;
 
-                    var ware = NeedWareInfoDetails.FirstOrDefault(x => x.WareID == prod.Ware.WareID);
+                    var ware = NeedWareInfoDetails.FirstOrDefault(x => x.WareID == prod.Ware.ID);
                     if (ware is not null)
                     {
                         ware.ProductionAmount = amount;

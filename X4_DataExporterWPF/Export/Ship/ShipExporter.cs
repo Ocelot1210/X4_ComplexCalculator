@@ -2,6 +2,7 @@
 using LibX4.FileSystem;
 using LibX4.Lang;
 using LibX4.Xml;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Xml.Linq;
@@ -28,12 +29,6 @@ namespace X4_DataExporterWPF.Export
 
 
         /// <summary>
-        /// 言語解決用オブジェクト
-        /// </summary>
-        private readonly ILanguageResolver _Resolver;
-
-
-        /// <summary>
         /// サムネ画像が見つからなかった場合の画像
         /// </summary>
         private byte[]? _NotFoundThumbnail;
@@ -44,12 +39,10 @@ namespace X4_DataExporterWPF.Export
         /// </summary>
         /// <param name="catFile">catファイルオブジェクト</param>
         /// <param name="waresXml">ウェア情報xml</param>
-        /// <param name="resolver">言語解決用オブジェクト</param>
-        public ShipExporter(CatFile catFile, XDocument waresXml, ILanguageResolver resolver)
+        public ShipExporter(CatFile catFile, XDocument waresXml)
         {
             _CatFile = catFile;
             _WaresXml = waresXml;
-            _Resolver = resolver;
         }
 
 
@@ -57,7 +50,7 @@ namespace X4_DataExporterWPF.Export
         /// 抽出処理
         /// </summary>
         /// <param name="connection"></param>
-        public void Export(IDbConnection connection)
+        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
         {
             //////////////////
             // テーブル作成 //
@@ -68,7 +61,6 @@ CREATE TABLE IF NOT EXISTS Ship
 (
     ShipID          TEXT    NOT NULL PRIMARY KEY,
     ShipTypeID      TEXT    NOT NULL,
-    Name            TEXT    NOT NULL,
     Macro           TEXT    NOT NULL,
     SizeID          TEXT    NOT NULL,
     Mass            REAL    NOT NULL,
@@ -87,13 +79,10 @@ CREATE TABLE IF NOT EXISTS Ship
     MissileStorage  INTEGER NOT NULL,
     DroneStorage    INTEGER NOT NULL,
     CargoSize       INTEGER NOT NULL,
-    MinPrice        INTEGER NOT NULL,
-    AvgPrice        INTEGER NOT NULL,
-    MaxPrice        INTEGER NOT NULL,
-    Description     TEXT    NOT NULL,
     Thumbnail       BLOB,
-    FOREIGN KEY (ShipTypeID)        REFERENCES ShipType(ShipTypeID),
-    FOREIGN KEY (SizeID)            REFERENCES Size(SizeID)
+    FOREIGN KEY (ShipID)        REFERENCES Ware(WareID),
+    FOREIGN KEY (ShipTypeID)    REFERENCES ShipType(ShipTypeID),
+    FOREIGN KEY (SizeID)        REFERENCES Size(SizeID)
 ) WITHOUT ROWID");
             }
 
@@ -102,12 +91,12 @@ CREATE TABLE IF NOT EXISTS Ship
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords();
+                var items = GetRecords(progress);
 
                 connection.Execute(@"
 INSERT INTO
-Ship   ( ShipID,  ShipTypeID,  Name,  Macro,  SizeID,  Mass,  DragForward,  DragReverse,  DragHorizontal,  DragVertical,  DragPitch,  DragYaw,  DragRoll,  InertiaPitch,  InertiaYaw,  InertiaRoll,  Hull,  People,  MissileStorage,  DroneStorage,  CargoSize,  MinPrice,  AvgPrice,  MaxPrice,  Description,  Thumbnail) 
-VALUES (@ShipID, @ShipTypeID, @Name, @Macro, @SizeID, @Mass, @DragForward, @DragReverse, @DragHorizontal, @DragVertical, @DragPitch, @DragYaw, @DragRoll, @InertiaPitch, @InertiaYaw, @InertiaRoll, @Hull, @People, @MissileStorage, @DroneStorage, @CargoSize, @MinPrice, @AvgPrice, @MaxPrice, @Description, @Thumbnail)",
+Ship   ( ShipID,  ShipTypeID,  Macro,  SizeID,  Mass,  DragForward,  DragReverse,  DragHorizontal,  DragVertical,  DragPitch,  DragYaw,  DragRoll,  InertiaPitch,  InertiaYaw,  InertiaRoll,  Hull,  People,  MissileStorage,  DroneStorage,  CargoSize,  Thumbnail) 
+VALUES (@ShipID, @ShipTypeID, @Macro, @SizeID, @Mass, @DragForward, @DragReverse, @DragHorizontal, @DragVertical, @DragPitch, @DragYaw, @DragRoll, @InertiaPitch, @InertiaYaw, @InertiaRoll, @Hull, @People, @MissileStorage, @DroneStorage, @CargoSize, @Thumbnail)",
 items);
             }
         }
@@ -116,19 +105,19 @@ items);
         /// <summary>
         /// レコード抽出
         /// </summary>
-        private IEnumerable<Ship> GetRecords()
+        private IEnumerable<Ship> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
         {
+            var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
+            var currentStep = 0;
+
+
             foreach (var ship in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'ship')]"))
             {
+                progress.Report((currentStep++, maxSteps));
+
+
                 var shipID = ship.Attribute("id")?.Value;
                 if (string.IsNullOrEmpty(shipID)) continue;
-
-                var shipName = _Resolver.Resolve(ship.Attribute("name")?.Value ?? "");
-                if (string.IsNullOrEmpty(shipName)) continue;
-
-                var price = ship.Element("price");
-                if (price is null) continue;
-
 
                 var macroName = ship.XPathSelectElement("component").Attribute("ref").Value;
                 var macroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
@@ -145,7 +134,7 @@ items);
                 yield return new Ship(
                     shipID,
                     property.ShipTypeID,
-                    shipName, macroName,
+                    macroName,
                     shipSizeID,
                     property.Mass,
                     property.DragForward,
@@ -163,13 +152,11 @@ items);
                     property.MissileStorage,
                     property.DroneStorage,
                     cargoSize,
-                    price.Attribute("min").GetInt(),
-                    price.Attribute("average").GetInt(),
-                    price.Attribute("max").GetInt(),
-                    property.Description,
                     GetThumbnail(macroName)                    
                 );
             }
+
+            progress.Report((currentStep++, maxSteps));
         }
 
 
@@ -208,7 +195,7 @@ items);
             if (componentXml is null) return -1;
 
             var connName = componentXml.Root.XPathSelectElement("component/connections/connection[contains(@tags, 'storage')]")?.Attribute("name")?.Value ?? "";
-            if (string.IsNullOrEmpty(connName)) return -1;
+            if (string.IsNullOrEmpty(connName)) return 0;
 
             var storage = macroXml.Root.XPathSelectElement($"macro/connections/connection[@ref='{connName}']/macro")?.Attribute("ref")?.Value ?? "";
             if (string.IsNullOrEmpty(storage))
@@ -238,7 +225,6 @@ items);
 
             var ret = new ShipProperty();
             // 説明文を取得
-            ret.Description = _Resolver.Resolve(properties.Element("identification").Attribute("description")?.Value ?? "");
 
             // 艦船種別IDを取得
             ret.ShipTypeID = properties.Element("ship").Attribute("type")?.Value ?? "";
@@ -282,7 +268,6 @@ items);
         private class ShipProperty
         {
             public string ShipTypeID = "";
-            public string Description = "";
             public double Mass;
             public double DragForward;
             public double DragReverse;
@@ -311,7 +296,7 @@ items);
         {
             const string dir = "assets/fx/gui/textures/ships";
 
-            var ret = Util.GzDds2Png(_CatFile, dir, macroName);
+            var ret = Util.DDS2Png(_CatFile, dir, macroName);
             if (ret is not null)
             {
                 return ret;
@@ -319,7 +304,7 @@ items);
 
             if (_NotFoundThumbnail is null)
             {
-                _NotFoundThumbnail = Util.GzDds2Png(_CatFile, dir, "notfound");
+                _NotFoundThumbnail = Util.DDS2Png(_CatFile, dir, "notfound");
             }
 
             return _NotFoundThumbnail;

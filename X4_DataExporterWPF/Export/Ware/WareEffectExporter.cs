@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -31,7 +32,7 @@ namespace X4_DataExporterWPF.Export
         /// 抽出処理
         /// </summary>
         /// <param name="connection"></param>
-        public void Export(IDbConnection connection)
+        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
         {
             //////////////////
             // テーブル作成 //
@@ -55,7 +56,7 @@ CREATE TABLE IF NOT EXISTS WareEffect
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords();
+                var items = GetRecords(progress);
 
                 connection.Execute("INSERT INTO WareEffect (WareID, Method, EffectID, Product) VALUES (@WareID, @Method, @EffectID, @Product)", items);
             }
@@ -66,10 +67,16 @@ CREATE TABLE IF NOT EXISTS WareEffect
         /// XML から WareEffect データを読み出す
         /// </summary>
         /// <returns>読み出した WareEffect データ</returns>
-        internal IEnumerable<WareEffect> GetRecords()
+        internal IEnumerable<WareEffect> GetRecords(IProgress<(int currentStep, int maxSteps)>? progress = null)
         {
+            var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'economy')])");
+            var currentStep = 0;
+
+
             foreach (var ware in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'economy')]"))
             {
+                progress?.Report((currentStep++, maxSteps));
+
                 var wareID = ware.Attribute("id")?.Value;
                 if (string.IsNullOrEmpty(wareID)) continue;
 
@@ -89,6 +96,8 @@ CREATE TABLE IF NOT EXISTS WareEffect
                     }
                 }
             }
+
+            progress?.Report((currentStep++, maxSteps));
         }
     }
 }

@@ -67,13 +67,25 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// <summary>
         /// 進捗最大
         /// </summary>
-        public ReactivePropertySlim<int> MaxSteps { get; }
+        public ReactivePropertySlim<int> MaxSteps { get; } = new(1);
 
 
         /// <summary>
         /// 現在の進捗
         /// </summary>
-        public ReactivePropertySlim<int> CurrentStep { get; }
+        public ReactivePropertySlim<int> CurrentStep { get; } = new(0);
+
+
+        /// <summary>
+        /// 進捗最大(小項目)
+        /// </summary>
+        public ReactivePropertySlim<int> MaxStepsSub { get; } = new(1);
+
+
+        /// <summary>
+        /// 現在の進捗(小項目)
+        /// </summary>
+        public ReactivePropertySlim<int> CurrentStepSub { get; } = new(0);
 
 
         /// <summary>
@@ -115,9 +127,6 @@ namespace X4_DataExporterWPF.DataExportWindow
 
             Languages = new ReactiveCollection<LangComboboxItem>();
             SelectedLanguage = new ReactivePropertySlim<LangComboboxItem?>();
-
-            MaxSteps = new ReactivePropertySlim<int>(1);
-            CurrentStep = new ReactivePropertySlim<int>(0);
 
             CanOperation = _BusyNotifier.Inverse().ToReadOnlyReactivePropertySlim();
 
@@ -186,13 +195,21 @@ namespace X4_DataExporterWPF.DataExportWindow
 
             var owner = Application.Current.Windows.OfType<Window>().SingleOrDefault(x => x.IsActive);
 
-            var progless = new Progress<(int currentStep, int maxSteps)>(s =>
+            var progress = new Progress<(int currentStep, int maxSteps)>(s =>
             {
                 CurrentStep.Value = s.currentStep;
                 MaxSteps.Value = s.maxSteps;
             });
+
+            var progressSub = new Progress<(int currentStep, int maxSteps)>(s =>
+            {
+                CurrentStepSub.Value = s.currentStep;
+                MaxStepsSub.Value = s.maxSteps;
+            });
+
             await Task.Run(() => _Model.Export(
-                progless,
+                progress,
+                progressSub,
                 InDirPath.Value,
                 _OutFilePath,
                 SelectedLanguage.Value,

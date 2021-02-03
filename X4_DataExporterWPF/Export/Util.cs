@@ -25,7 +25,7 @@ namespace X4_DataExporterWPF.Export
                 return "";
             }
 
-            string[] size =
+            string[] sizes =
             {
                 "extrasmall",
                 "small",
@@ -34,7 +34,32 @@ namespace X4_DataExporterWPF.Export
                 "extralarge"
             };
 
-            return SplitTags(tags).FirstOrDefault(x => size.Contains(x));
+            var tagArr = SplitTags(tags);
+            var ret = tagArr.FirstOrDefault(x => sizes.Contains(x));
+            if (!string.IsNullOrEmpty(ret))
+            {
+                return ret;
+            }
+
+
+            (string, string)[] sizeAbbrs =
+            {
+                ("xs", "extrasmall"),
+                ("xl", "extralarge"),
+                ("m",  "medium"),
+                ("l",  "large"),
+            };
+
+            foreach (var t in tagArr.SelectMany(x => x.Split("_")))
+            {
+                var size = sizeAbbrs.FirstOrDefault(x => x.Item1 == t);
+                if (!string.IsNullOrEmpty(size.Item1))
+                {
+                    return size.Item2;
+                }
+            }
+
+            return "";
         }
 
 
@@ -51,18 +76,18 @@ namespace X4_DataExporterWPF.Export
             }
 
             // たまにtagsが[]で囲われてる場合があるため[]を削除してからSplitする
-            return tags.TrimStart('[').TrimEnd(']').Split(' ');
+            return tags.TrimStart('[').TrimEnd(']').Split(' ').Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
         }
 
 
         /// <summary>
-        /// 指定されたパスのgzipで圧縮されたDDSファイルをPNGのバイト配列として取得する
+        /// 指定されたパスのDDSファイルをPNGのバイト配列として取得する
         /// </summary>
         /// <param name="catFile">catファイルオブジェクト</param>
         /// <param name="dir">フォルダパス</param>
         /// <param name="fileName">gzipで圧縮された画像のファイル名(拡張子は除く)</param>
         /// <returns></returns>
-        public static byte[]? GzDds2Png(ICatFile catFile, string dir, string? fileName)
+        public static byte[]? DDS2Png(ICatFile catFIle, string dir, string? fileName)
         {
             if (string.IsNullOrEmpty(fileName))
             {
@@ -72,16 +97,30 @@ namespace X4_DataExporterWPF.Export
 
             try
             {
-                using var rawIconStream = catFile.OpenFile(Path.Combine(dir, $"{fileName}.gz"));
-                if (rawIconStream is not null)
+                using var rawStream = catFIle.TryOpenFile(Path.Combine(dir, $"{fileName}.gz"));
+                if (rawStream is not null)
                 {
-                    var inStream = new GZipStream(rawIconStream, CompressionMode.Decompress);
-                    return DDS2Png(inStream);
+                    Span<byte> buff = stackalloc byte[4];
+
+                    rawStream.Read(buff);
+                    rawStream.Position = 0;
+
+                    // フォーマットはgzipか？
+                    if (buff[0] == 0x1F && buff[1] == 0x8B)
+                    {
+                        var inStream = new GZipStream(rawStream, CompressionMode.Decompress);
+                        return DDS2PngMain(inStream);
+                    }
+
+                    // フォーマットはDDSか？
+                    if (buff[0] == 0x44 && buff[1] == 0x44 && buff[2] == 0x53 && buff[3] == 0x20)
+                    {
+                        return DDS2PngMain(rawStream);
+                    }
                 }
             }
-            catch (FileNotFoundException)
+            catch
             {
-                return null;
             }
 
             return null;
@@ -93,7 +132,7 @@ namespace X4_DataExporterWPF.Export
         /// </summary>
         /// <param name="stream">変換対象のDDSファイルのStream</param>
         /// <returns>バイト配列</returns>
-        private static byte[]? DDS2Png(Stream stream)
+        private static byte[]? DDS2PngMain(Stream stream)
         {
             var image = Pfim.Dds.Create(stream, new Pfim.PfimConfig());
             if (image.Compressed)

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Xml.Linq;
@@ -24,6 +25,11 @@ namespace X4_DataExporterWPF.Export
         /// </summary>
         private readonly XDocument _WaresXml;
 
+        /// <summary>
+        /// 保管庫種別一覧
+        /// </summary>
+        private readonly LinkedList<ModuleStorageType> _StorageTypes = new();
+
 
         /// <summary>
         /// コンストラクタ
@@ -41,7 +47,7 @@ namespace X4_DataExporterWPF.Export
         /// 抽出処理
         /// </summary>
         /// <param name="connection"></param>
-        public void Export(IDbConnection connection)
+        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
         {
             //////////////////
             // テーブル作成 //
@@ -50,9 +56,16 @@ namespace X4_DataExporterWPF.Export
                 connection.Execute(@"
 CREATE TABLE IF NOT EXISTS ModuleStorage
 (
+    ModuleID        TEXT    NOT NULL PRIMARY KEY,
+    Amount          INTEGER NOT NULL,
+    FOREIGN KEY (ModuleID)  REFERENCES Module(ModuleID)
+) WITHOUT ROWID");
+
+                connection.Execute(@"
+CREATE TABLE IF NOT EXISTS ModuleStorageType
+(
     ModuleID        TEXT    NOT NULL,
     TransportTypeID TEXT    NOT NULL,
-    Amount          INTEGER NOT NULL,
     PRIMARY KEY (ModuleID, TransportTypeID),
     FOREIGN KEY (ModuleID)          REFERENCES Module(ModuleID),
     FOREIGN KEY (TransportTypeID)   REFERENCES TransportType(TransportTypeID)
@@ -64,9 +77,11 @@ CREATE TABLE IF NOT EXISTS ModuleStorage
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords();
+                var items = GetRecords(progress);
 
-                connection.Execute("INSERT INTO ModuleStorage (ModuleID, TransportTypeID, Amount) VALUES (@ModuleID, @TransportTypeID, @Amount)", items);
+                connection.Execute("INSERT INTO ModuleStorage (ModuleID, Amount) VALUES (@ModuleID, @Amount)", items);
+
+                connection.Execute("INSERT INTO ModuleStorageType (ModuleID, TransportTypeID) VALUES (@ModuleID, @TransportTypeID)", _StorageTypes);
             }
         }
 
@@ -75,10 +90,17 @@ CREATE TABLE IF NOT EXISTS ModuleStorage
         /// XML から ModuleStorage データを読み出す
         /// </summary>
         /// <returns>読み出した ModuleStorage データ</returns>
-        private IEnumerable<ModuleStorage> GetRecords()
+        private IEnumerable<ModuleStorage> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
         {
+            var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'module')])");
+            var currentStep = 0;
+
+
             foreach (var module in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'module')]"))
             {
+                progress.Report((currentStep++, maxSteps));
+
+
                 var moduleID = module.Attribute("id")?.Value;
                 if (string.IsNullOrEmpty(moduleID)) continue;
 
@@ -89,14 +111,23 @@ CREATE TABLE IF NOT EXISTS ModuleStorage
                 var cargo = macroXml.Root.XPathSelectElement("macro/properties/cargo");
                 if (cargo == null) continue;
 
-                // 保管庫種別が1種類の項目のみDB登録(総合保管庫は飛ばす)
-                var transportTypeIDs = Util.SplitTags(cargo.Attribute("tags")?.Value);
-                if (transportTypeIDs.Length != 1) continue;
+                // 保管庫種別を取得する
+                var transportTypeExists = false;
+                foreach (var transportTypeID in Util.SplitTags(cargo.Attribute("tags")?.Value))
+                {
+                    transportTypeExists = true;
+                    _StorageTypes.AddLast(new ModuleStorageType(moduleID, transportTypeID));
+                }
+
+                // 保管庫種別が存在しなければ無効なデータと見なして登録しない
+                if (!transportTypeExists) continue;
 
                 var amount = cargo.Attribute("max").GetInt();
 
-                yield return new ModuleStorage(moduleID, transportTypeIDs[0], amount);
+                yield return new ModuleStorage(moduleID, amount);
             }
+
+            progress.Report((currentStep++, maxSteps));
         }
     }
 }

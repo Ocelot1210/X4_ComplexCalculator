@@ -129,7 +129,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
             if (0 < module.Module.MaxWorkers)
             {
                 // 変更があったモジュールのレコードを検索
-                var itm = WorkForceDetails.First(x => x.ModuleID == module.Module.ModuleID);
+                var itm = WorkForceDetails.First(x => x.ModuleID == module.Module.ID);
 
                 // 必要労働力を更新
                 _Settings.Workforce.Need = _Settings.Workforce.Need - Math.Abs(itm.TotalWorkforce) + module.Module.MaxWorkers * module.ModuleCount;
@@ -143,7 +143,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
             if (0 < module.Module.WorkersCapacity)
             {
                 // 変更があったモジュールのレコードを検索
-                var itm = WorkForceDetails.First(x => x.ModuleID == module.Module.ModuleID);
+                var itm = WorkForceDetails.First(x => x.ModuleID == module.Module.ID);
 
                 // 現在の労働者数を更新
                 _Settings.Workforce.Capacity = _Settings.Workforce.Capacity - Math.Abs(itm.TotalWorkforce) + module.Module.WorkersCapacity * module.ModuleCount;
@@ -198,7 +198,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
         private void OnModuleAdded(IEnumerable<ModulesGridItem> modules)
         {
             var details = modules.Where(x => 0 < x.Module.MaxWorkers || 0 < x.Module.WorkersCapacity)
-                                 .GroupBy(x => x.Module.ModuleID)
+                                 .GroupBy(x => x.Module.ID)
                                  .Select(x => (x.First().Module, ModuleCount: x.Sum(y => y.ModuleCount)))
                                  .OrderBy(x => x.Module.Name);
 
@@ -208,7 +208,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
             var addItems = new List<WorkForceModuleInfoDetailsItem>();
             foreach (var d in details)
             {
-                var itm = WorkForceDetails.FirstOrDefault(x => x.ModuleID == d.Module.ModuleID);
+                var itm = WorkForceDetails.FirstOrDefault(x => x.ModuleID == d.Module.ID);
                 if (itm is not null)
                 {
                     if (0 < itm.WorkForce)
@@ -250,7 +250,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
         private void OnModuleRemoved(IEnumerable<ModulesGridItem> modules)
         {
             var details = modules.Where(x => 0 < x.Module.MaxWorkers || 0 < x.Module.WorkersCapacity)
-                                 .GroupBy(x => x.Module.ModuleID)
+                                 .GroupBy(x => x.Module.ID)
                                  .Select(x => (x.First().Module, ModuleCount: x.Sum(y => y.ModuleCount)))
                                  .OrderBy(x => x.Module.Name);
 
@@ -259,7 +259,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
 
             foreach (var d in details)
             {
-                var itm = WorkForceDetails.FirstOrDefault(x => x.ModuleID == d.Module.ModuleID);
+                var itm = WorkForceDetails.FirstOrDefault(x => x.ModuleID == d.Module.ID);
                 if (itm is not null)
                 {
                     if (0 < itm.WorkForce)

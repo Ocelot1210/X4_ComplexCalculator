@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using Dapper;
 using LibX4.Lang;
@@ -31,7 +32,7 @@ namespace X4_DataExporterWPF.Export
         /// 抽出処理
         /// </summary>
         /// <param name="connection"></param>
-        public void Export(IDbConnection connection)
+        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
         {
             //////////////////
             // テーブル作成 //
@@ -50,7 +51,7 @@ CREATE TABLE IF NOT EXISTS EquipmentType
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords();
+                var items = GetRecords(progress);
 
                 connection.Execute("INSERT INTO EquipmentType (EquipmentTypeID, Name) VALUES (@EquipmentTypeID, @Name)", items);
             }
@@ -61,18 +62,31 @@ CREATE TABLE IF NOT EXISTS EquipmentType
         /// EquipmentType データを読み出す
         /// </summary>
         /// <returns>EquipmentType データ</returns>
-        private IEnumerable<EquipmentType> GetRecords()
+        private IEnumerable<EquipmentType> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
         {
             // TODO: 可能ならファイルから抽出する
-            yield return new EquipmentType("countermeasures", _Resolver.Resolve("{20215, 1701}"));
-            yield return new EquipmentType("drones", _Resolver.Resolve("{20215, 1601}"));
-            yield return new EquipmentType("engines", _Resolver.Resolve("{20215, 1801}"));
-            yield return new EquipmentType("missiles", _Resolver.Resolve("{20215, 1901}"));
-            yield return new EquipmentType("shields", _Resolver.Resolve("{20215, 2001}"));
-            yield return new EquipmentType("software", _Resolver.Resolve("{20215, 2101}"));
-            yield return new EquipmentType("thrusters", _Resolver.Resolve("{20215, 2201}"));
-            yield return new EquipmentType("turrets", _Resolver.Resolve("{20215, 2301}"));
-            yield return new EquipmentType("weapons", _Resolver.Resolve("{20215, 2401}"));
+            (string id, string name)[] data =
+            {
+                ("countermeasures",     "{20215, 1701}"),
+                ("drones",              "{20215, 1601}"),
+                ("engines",             "{20215, 1801}"),
+                ("missiles",            "{20215, 1901}"),
+                ("shields",             "{20215, 2001}"),
+                ("software",            "{20215, 2101}"),
+                ("thrusters",           "{20215, 2201}"),
+                ("turrets",             "{20215, 2301}"),
+                ("weapons",             "{20215, 2401}"),
+            };
+
+            var currentStep = 0;
+
+            progress.Report((currentStep++, data.Length));
+
+            foreach (var (id, name) in data)
+            {
+                yield return new EquipmentType(id, _Resolver.Resolve(name));
+                progress.Report((currentStep++, data.Length));
+            }
         }
     }
 }

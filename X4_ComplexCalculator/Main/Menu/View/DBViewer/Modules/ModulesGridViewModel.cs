@@ -16,7 +16,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Modules
         /// <summary>
         /// モジュール一覧
         /// </summary>
-        private readonly ObservableRangeCollection<ModulesGridItem> _Modules = new(Module.GetAll().Where(x => !x.NoBluePrint).Select(x => new ModulesGridItem(x)));
+        private readonly ObservableRangeCollection<ModulesGridItem> _Modules;
         #endregion
 
 
@@ -33,6 +33,12 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Modules
         /// </summary>
         public ModulesGridViewModel()
         {
+            var items = Ware.GetAll<Module>()
+                .Where(x => !x.Tags.Contains("noplayerblueprint"))
+                .Select(x => new ModulesGridItem(x));
+
+            _Modules = new(items);
+
             ModulesView = (ListCollectionView)CollectionViewSource.GetDefaultView(_Modules);
             ModulesView.SortDescriptions.Clear();
             ModulesView.SortDescriptions.Add(new SortDescription(nameof(ModulesGridItem.ModuleName), ListSortDirection.Ascending));

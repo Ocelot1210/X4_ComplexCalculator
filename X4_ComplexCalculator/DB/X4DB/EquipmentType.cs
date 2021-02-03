@@ -21,6 +21,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         public string EquipmentTypeID { get; }
 
+
         /// <summary>
         /// 装備種別名
         /// </summary>
@@ -46,13 +47,13 @@ namespace X4_ComplexCalculator.DB.X4DB
         public static void Init()
         {
             _EquipmentTypes.Clear();
-            X4Database.Instance.ExecQuery($"SELECT EquipmentTypeID, Name FROM EquipmentType", (dr, args) =>
-            {
-                var id = (string)dr["EquipmentTypeID"];
-                var name = (string)dr["Name"];
 
-                _EquipmentTypes.Add(id, new EquipmentType(id, name));
-            });
+            const string sql = "SELECT EquipmentTypeID, Name FROM EquipmentType";
+            var items = X4Database.Instance.Query<(string EquipmentTypeID, string Name)>(sql);
+            foreach (var item in items)
+            {
+                _EquipmentTypes.Add(item.EquipmentTypeID, new EquipmentType(item.EquipmentTypeID, item.Name));
+            }
         }
 
 
@@ -70,6 +71,9 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <param name="obj">比較対象</param>
         /// <returns></returns>
         public override bool Equals(object? obj) => obj is EquipmentType tgt && tgt.EquipmentTypeID == EquipmentTypeID;
+
+        public bool Equals(EquipmentType other) => other.EquipmentTypeID == EquipmentTypeID;
+
 
 
         /// <summary>
