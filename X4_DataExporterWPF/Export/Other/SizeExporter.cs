@@ -15,7 +15,7 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// 言語解決用オブジェクト
         /// </summary>
-        private readonly LanguageResolver Resolver;
+        private readonly LanguageResolver _Resolver;
 
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace X4_DataExporterWPF.Export
         /// <param name="resolver">言語解決用オブジェクト</param>
         public SizeExporter(LanguageResolver resolver)
         {
-            Resolver = resolver;
+            _Resolver = resolver;
         }
 
 
@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS Size
             progress.Report((currentStep++, data.Length));
             foreach (var (id, name) in data)
             {
-                yield return new Size(id, name);
+                yield return new Size(id, _Resolver.Resolve(name));
                 progress.Report((currentStep++, data.Length));
             }
         }

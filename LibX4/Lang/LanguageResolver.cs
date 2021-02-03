@@ -92,7 +92,7 @@ namespace LibX4.Lang
             foreach (var languageXml in _LanguagesXml)
             {
                 var findT = languageXml.Root
-                    ?.XPathSelectElement($"//page[@id='{pageID}']/t[@id='{tID}']")
+                    ?.XPathSelectElement($"page[@id='{pageID}']/t[@id='{tID}']")
                     ?.Value;
                 if (findT is not null)
                 {
