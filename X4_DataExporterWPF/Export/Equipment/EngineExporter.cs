@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS Engine
     BoostThrust         REAL    NOT NULL,
     BoostDuration       REAL    NOT NULL,
     BoostReleaseTime    REAL    NOT NULL,
-    TravelThrust        INTEGER NOT NULL,
+    TravelThrust        REAL    NOT NULL,
     TravelReleaseTime   REAL    NOT NULL,
     FOREIGN KEY (EquipmentID)   REFERENCES Equipment(EquipmentID)
 ) WITHOUT ROWID");

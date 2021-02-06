@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Prism.Mvvm;
-using X4_ComplexCalculator.DB.X4DB;
+﻿using Prism.Mvvm;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList
 {
@@ -23,7 +20,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 装備品
         /// </summary>
-        public Equipment Equipment { get; }
+        public IEquipment Equipment { get; }
 
 
         /// <summary>
@@ -41,7 +38,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// コンストラクタ
         /// </summary>
         /// <param name="equipment">装備品</param>
-        public EquipmentListItem(Equipment equipment)
+        public EquipmentListItem(IEquipment equipment)
         {
             Equipment = equipment;
             _IsSelected = false;

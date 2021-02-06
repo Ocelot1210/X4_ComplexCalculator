@@ -27,7 +27,7 @@
         /// <summary>
         /// 船体値
         /// </summary>
-        public int Hull { get; }
+        public long Hull { get; }
 
 
         /// <summary>
@@ -39,7 +39,7 @@
         /// <summary>
         /// Mk
         /// </summary>
-        public int Mk { get; }
+        public long Mk { get; }
 
 
         /// <summary>
@@ -70,9 +70,9 @@
             string equipmentID,
             string macroName,
             string equipmentTypeID,
-            int hull,
+            long hull,
             bool hullIntegrated,
-            int mk,
+            long mk,
             string? makerRace,
             byte[]? thumbnail
             )

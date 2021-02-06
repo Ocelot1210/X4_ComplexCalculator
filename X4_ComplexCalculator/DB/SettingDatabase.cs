@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.DB
 {
@@ -162,7 +163,7 @@ WHERE
         /// <param name="presetID">プリセットID</param>
         /// <param name="presetName">プリセット名</param>
         /// <param name="equipments">装備一覧</param>
-        public void AddModulePreset(string moduleID, long presetID, string presetName, IEnumerable<Equipment> equipments)
+        public void AddModulePreset(string moduleID, long presetID, string presetName, IEnumerable<IEquipment> equipments)
         {
             BeginTransaction(db =>
             {
@@ -205,7 +206,7 @@ WHERE
         /// <param name="moduleID">モジュールID</param>
         /// <param name="presetID">プリセットID</param>
         /// <param name="equipments">装備一覧</param>
-        public void OverwritePreset(string moduleID, long presetID, IEnumerable<Equipment> equipments)
+        public void OverwritePreset(string moduleID, long presetID, IEnumerable<IEquipment> equipments)
         {
             BeginTransaction(db =>
             {

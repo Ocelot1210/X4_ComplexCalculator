@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Prism.Mvvm;
+using System;
 using System.ComponentModel;
-using Prism.Mvvm;
 using X4_ComplexCalculator.Common.EditStatus;
-using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
 {
@@ -184,7 +184,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
         /// <param name="capacityInfo">保管庫容量情報</param>
         /// <param name="productPerHour">1時間あたりのウェア生産量</param>
         /// <param name="hour">指定時間</param>
-        public StorageAssignGridItem(Ware ware, StorageCapacityInfo capacityInfo, long productPerHour, long hour)
+        public StorageAssignGridItem(IWare ware, StorageCapacityInfo capacityInfo, long productPerHour, long hour)
         {
             WareID = ware.ID;
             WareName = ware.Name;

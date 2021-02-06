@@ -27,7 +27,7 @@
         /// <summary>
         /// 労働に必要なウェア数量
         /// </summary>
-        public int Amount { get; }
+        public long Amount { get; }
         #endregion
 
 
@@ -38,7 +38,7 @@
         /// <param name="method"></param>
         /// <param name="wareID"></param>
         /// <param name="amount"></param>
-        public WorkUnitResource(string workUnitID, string method, string wareID, int amount)
+        public WorkUnitResource(string workUnitID, string method, string wareID, long amount)
         {
             WorkUnitID = workUnitID;
             Method = method;

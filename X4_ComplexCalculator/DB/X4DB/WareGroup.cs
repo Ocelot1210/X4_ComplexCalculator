@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 
 namespace X4_ComplexCalculator.DB.X4DB
@@ -9,19 +8,6 @@ namespace X4_ComplexCalculator.DB.X4DB
     /// </summary>
     public class WareGroup
     {
-        #region スタティックメンバ
-        /// <summary>
-        /// ウェア種別一覧
-        /// </summary>
-        private static readonly Dictionary<string, WareGroup> _WareGroups = new();
-
-
-        /// <summary>
-        /// ダミー用ウェア種別
-        /// </summary>
-        private static readonly WareGroup _DummyWareGroup = new("", "", -1);
-        #endregion
-
         #region プロパティ
         /// <summary>
         /// ウェアグループID
@@ -48,7 +34,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <param name="wareGroupID">ウェアグループID</param>
         /// <param name="name">ウェアグループ名</param>
         /// <param name="Tier">階級</param>
-        private WareGroup(string wareGroupID, string name, long tier)
+        public WareGroup(string wareGroupID, string name, long tier)
         {
             WareGroupID = wareGroupID;
             Name = name;
@@ -57,34 +43,11 @@ namespace X4_ComplexCalculator.DB.X4DB
 
 
         /// <summary>
-        /// 初期化
-        /// </summary>
-        public static void Init()
-        {
-            _WareGroups.Clear();
-
-            const string sql = "SELECT WareGroupID, Name, Tier FROM WareGroup";
-            foreach (var item in X4Database.Instance.Query<WareGroup>(sql))
-            {
-                _WareGroups.Add(item.WareGroupID, item);
-            }
-        }
-
-
-        /// <summary>
-        /// ウェア種別IDに対応するウェア種別を取得する
-        /// </summary>
-        /// <param name="wareGroupID">ウェア種別ID</param>
-        /// <returns>ウェア種別</returns>
-        public static WareGroup Get(string wareGroupID) => _WareGroups.TryGetValue(wareGroupID, out var ret)? ret : _DummyWareGroup;
-
-
-        /// <summary>
         /// 比較
         /// </summary>
         /// <param name="obj">比較対象</param>
         /// <returns></returns>
-        public override bool Equals(object? obj) => obj is WareGroup tgt && tgt.WareGroupID == WareGroupID;
+        public override bool Equals(object? obj) => obj is WareGroup other && other.WareGroupID == WareGroupID;
 
 
         /// <summary>

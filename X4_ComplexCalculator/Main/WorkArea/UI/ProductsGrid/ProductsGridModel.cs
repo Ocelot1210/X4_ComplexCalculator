@@ -11,7 +11,9 @@ using Prism.Mvvm;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.Common.Localize;
+using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Products;
@@ -243,7 +245,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             }
 
             // 製品/消費ウェアがあるモジュールなら再計算する
-            if (module.Module.Resources.Any() || module.Module.Product.Any())
+            if (module.Module.Resources.Any() || module.Module.Products.Any())
             {
                 if (e is not PropertyChangedExtendedEventArgs<long> ev)
                 {
@@ -415,16 +417,16 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// </summary>
         /// <param name="targetModules">集計対象モジュール</param>
         /// <returns>集計結果</returns>
-        private IReadOnlyDictionary<Ware, IReadOnlyList<IProductDetailsListItem>> AggregateProduct(IEnumerable<ModulesGridItem> targetModules)
+        private IReadOnlyDictionary<IWare, IReadOnlyList<IProductDetailsListItem>> AggregateProduct(IEnumerable<ModulesGridItem> targetModules)
         {
             return targetModules
-                .Where(x => x.Module.Resources.Any() || x.Module.Product.Any())
+                .Where(x => x.Module.Resources.Any() || x.Module.Products.Any())
                 .GroupBy(x => x.Module)
                 .Select(x => (Module: x.Key, Count: x.Sum(y => y.ModuleCount)))
                 .SelectMany(x => _ProductCalculator.Calc(x.Module, x.Count))
                 .GroupBy(x => x.WareID)
                 .ToDictionary(
-                    x => Ware.Get(x.Key),
+                    x => X4Database.Instance.Ware.Get(x.Key),
                     x => x.GroupBy(x => x.Module)
                         .SelectMany(
                             x => x.Select(

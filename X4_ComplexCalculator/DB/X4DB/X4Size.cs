@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
@@ -9,14 +7,6 @@ namespace X4_ComplexCalculator.DB.X4DB
     /// </summary>
     public class X4Size : IComparable
     {
-        #region スタティックメンバ
-        /// <summary>
-        /// サイズ一覧
-        /// </summary>
-        private readonly static Dictionary<string, X4Size> _Sizes = new();
-        #endregion
-
-
         #region プロパティ
         /// <summary>
         /// サイズID
@@ -42,7 +32,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="sizeID">サイズID</param>
         /// <param name="name">サイズ名</param>
-        private X4Size(string sizeID, string name)
+        public X4Size(string sizeID, string name)
         {
             SizeID = sizeID;
             Name = name;
@@ -57,37 +47,6 @@ namespace X4_ComplexCalculator.DB.X4DB
                 _ => throw new NotSupportedException($"SizeID \"{SizeID}\" is not supported.")
             };
         }
-
-
-        /// <summary>
-        /// 初期化
-        /// </summary>
-        public static void Init()
-        {
-            _Sizes.Clear();
-
-            const string sql = "SELECT SizeID, Name FROM Size";
-            foreach (var size in X4Database.Instance.Query<X4Size>(sql))
-            {
-                _Sizes.Add(size.SizeID, size);
-            }
-        }
-
-
-        /// <summary>
-        /// サイズIDに対応するサイズを取得
-        /// </summary>
-        /// <param name="sizeID">サイズID</param>
-        /// <returns>サイズ</returns>
-        public static X4Size Get(string sizeID) => _Sizes[sizeID];
-
-
-        /// <summary>
-        /// サイズIDに対応するサイズの取得を試みる
-        /// </summary>
-        /// <param name="sizeID">サイズID</param>
-        /// <returns>サイズIDに対応するサイズ</returns>
-        public static X4Size? TryGet(string sizeID) => _Sizes.TryGetValue(sizeID, out var ret) ? ret : null;
 
 
 

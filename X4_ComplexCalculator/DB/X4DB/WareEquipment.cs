@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
@@ -70,90 +70,15 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <param name="connectionName">コネクション名</param>
         /// <param name="equipmentTypeID">装備種別ID</param>
         /// <param name="groupName">グループ名</param>
-        /// <param name="tags">タグを区切り文字で連結した文字列</param>
-        private WareEquipment(string wareID, string connectionName, string equipmentTypeID, string groupName, string tags)
+        /// <param name="tags">タグ一覧</param>
+        public WareEquipment(string wareID, string connectionName, string equipmentTypeID, string groupName, HashSet<string> tags)
         {
             ID = wareID;
             ConnectionName = connectionName;
-            EquipmentType = EquipmentType.Get(equipmentTypeID);
+            EquipmentType = X4Database.Instance.EquipmentType.Get(equipmentTypeID);
             GroupName = groupName;
-            Tags = _TagsDict[tags];
+            Tags = tags;
         }
-
-
-
-        /// <summary>
-        /// 初期化
-        /// </summary>
-        public static void Init()
-        {
-            _WareEquipments.Clear();
-            InitTagsDict();
-
-            // 単純に装備情報一覧を作成しようとすると時間がかかるため
-            // Tagsを何度も作成しないように工夫する
-            const string sql = @"
-SELECT
-	WareEquipment.WareID,
-	WareEquipment.ConnectionName,
-	WareEquipment.EquipmentTypeID,
-	WareEquipment.GroupName,
-	group_concat(Sorted_WareEquipmentTag.Tag, '彁') AS Tags
-	
-FROM
-	WareEquipment,
-	(SELECT * FROM WareEquipmentTag ORDER BY WareEquipmentTag.WareID, WareEquipmentTag.ConnectionName, WareEquipmentTag.Tag) Sorted_WareEquipmentTag
-	
-WHERE
-	WareEquipment.WareID = Sorted_WareEquipmentTag.WareID AND
-	WareEquipment.ConnectionName = Sorted_WareEquipmentTag.ConnectionName
-	
-GROUP BY
-	WareEquipment.WareID,
-	WareEquipment.ConnectionName";
-            foreach (var item in X4Database.Instance.Query<WareEquipment>(sql).GroupBy(x => x.ID))
-            {
-                _WareEquipments.Add(item.Key, item.ToArray());
-            }
-        }
-
-
-        /// <summary>
-        /// タグ一覧のディクショナリを初期化する
-        /// </summary>
-        private static void InitTagsDict()
-        {
-            _TagsDict.Clear();
-
-            // Tagのユニークな組み合わせ一覧を取得する
-            const string sql = @"
-SELECT
-	DISTINCT group_concat(TmpTagsTable.Tag, '彁') As Tags
-	
-FROM
-	(
-		SELECT
-			WareEquipmentTag.WareID,
-			WareEquipmentTag.ConnectionName,
-			WareEquipmentTag.Tag
-		FROM
-			WareEquipmentTag
-		ORDER BY
-			WareEquipmentTag.WareID,
-			WareEquipmentTag.ConnectionName,
-			WareEquipmentTag.Tag
-	) TmpTagsTable
-
-GROUP BY
-	TmpTagsTable.WareID,
-	TmpTagsTable.ConnectionName";
-
-            foreach (var tagsText in X4Database.Instance.Query<string>(sql))
-            {
-                _TagsDict.Add(tagsText, new HashSet<string>(tagsText.Split('彁')));
-            }
-        }
-
 
 
         /// <summary>
@@ -170,11 +95,11 @@ GROUP BY
         /// </summary>
         /// <param name="equipment">判定したい装備</param>
         /// <returns>指定した装備がthisに装備可能か</returns>
-        public bool CanEquipped(Equipment equipment)
+        public bool CanEquipped(IEquipment equipment)
         {
             return equipment switch
             {
-                Thruster => !equipment.EquipmentTags.Where(x => x != "component" && x != "thruster").Except(Tags).Any(),
+                IThruster => !equipment.EquipmentTags.Where(x => x != "component" && x != "thruster").Except(Tags).Any(),
                 _ => !equipment.EquipmentTags.Where(x => x != "component").Except(Tags).Any(),
             };
         }

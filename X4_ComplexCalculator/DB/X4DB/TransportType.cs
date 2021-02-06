@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 
 namespace X4_ComplexCalculator.DB.X4DB
@@ -9,14 +8,6 @@ namespace X4_ComplexCalculator.DB.X4DB
     /// </summary>
     public class TransportType
     {
-        #region スタティックメンバ
-        /// <summary>
-        /// カーゴタイプ一覧
-        /// </summary>
-        private readonly static Dictionary<string, TransportType> _TransportTypes = new();
-        #endregion
-
-
         #region プロパティ
         /// <summary>
         /// カーゴ種別ID
@@ -36,41 +27,11 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="transportTypeID">カーゴ種別ID</param>
         /// <param name="name">カーゴ種別名</param>
-        private TransportType(string transportTypeID, string name)
+        public TransportType(string transportTypeID, string name)
         {
             TransportTypeID = transportTypeID;
             Name = name;
         }
-
-
-        /// <summary>
-        /// 初期化
-        /// </summary>
-        public static void Init()
-        {
-            _TransportTypes.Clear();
-
-            const string sql = "SELECT TransportTypeID, Name FROM TransportType";
-            foreach (var item in X4Database.Instance.Query<TransportType>(sql))
-            {
-                _TransportTypes.Add(item.TransportTypeID, item);
-            }
-        }
-
-
-        /// <summary>
-        /// カーゴ種別IDに対応するカーゴ種別を取得する
-        /// </summary>
-        /// <param name="transportTypeID">カーゴ種別ID</param>
-        /// <returns>カーゴ種別</returns>
-        public static TransportType Get(string transportTypeID) => _TransportTypes[transportTypeID];
-
-
-        /// <summary>
-        /// 全カーゴ種別を取得する
-        /// </summary>
-        /// <returns></returns>
-        public static IEnumerable<TransportType> GetAll() => _TransportTypes.Values;
 
 
         /// <summary>

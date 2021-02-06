@@ -27,7 +27,7 @@
         /// <summary>
         /// 生産に必要なウェア数
         /// </summary>
-        public int Amount { get; }
+        public long Amount { get; }
         #endregion
 
 
@@ -38,7 +38,7 @@
         /// <param name="method">生産方式</param>
         /// <param name="needWareID">生産に必要なウェアID</param>
         /// <param name="amount">生産に必要なウェア数</param>
-        public WareResource(string wareID, string method, string needWareID, int amount)
+        public WareResource(string wareID, string method, string needWareID, long amount)
         {
             WareID = wareID;
             Method = method;

@@ -151,7 +151,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// コンストラクタ
         /// </summary>
         /// <param name="equipmentManager">編集対象の装備情報</param>
-        public EditEquipmentViewModel(WareEquipmentManager equipmentManager)
+        public EditEquipmentViewModel(EquippableWareEquipmentManager equipmentManager)
         {
             ModuleName = equipmentManager.Ware.Name;
 

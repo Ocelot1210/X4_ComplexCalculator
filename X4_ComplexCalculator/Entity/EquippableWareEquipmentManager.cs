@@ -3,26 +3,22 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Xml.Linq;
+using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Entity
 {
     /// <summary>
     /// ウェアの装備品管理クラス
     /// </summary>
-    public class WareEquipmentManager : INotifyCollectionChanged
+    public class EquippableWareEquipmentManager : INotifyCollectionChanged
     {
         #region メンバ
         /// <summary>
-        /// 装備可能な情報
-        /// </summary>
-        private readonly IReadOnlyList<WareEquipment> _WareEquipments;
-
-
-        /// <summary>
         /// グループ名と接続名をキーにした装備中の項目一覧
         /// </summary>
-        private readonly Dictionary<WareEquipment, Equipment> _Equipped;
+        private readonly Dictionary<WareEquipment, IEquipment> _Equipped;
         #endregion
 
 
@@ -30,19 +26,19 @@ namespace X4_ComplexCalculator.Entity
         /// <summary>
         /// 編集対象のウェア
         /// </summary>
-        public Ware Ware { get; }
+        public IEquippableWare Ware { get; }
 
 
         /// <summary>
         /// 装備中の装備一覧
         /// </summary>
-        public IEnumerable<Equipment> AllEquipments => _Equipped.Values;
+        public IEnumerable<IEquipment> AllEquipments => _Equipped.Values;
 
 
         /// <summary>
         /// 装備を持てるか
         /// </summary>
-        public bool CanEquipped => _WareEquipments.Any();
+        public bool CanEquipped => Ware.Equipments.Any();
         #endregion
 
 
@@ -56,10 +52,9 @@ namespace X4_ComplexCalculator.Entity
         /// コンストラクタ
         /// </summary>
         /// <param name="ware">ウェア</param>
-        public WareEquipmentManager(Ware ware)
+        public EquippableWareEquipmentManager(IEquippableWare ware)
         {
             Ware = ware;
-            _WareEquipments = WareEquipment.Get(ware.ID);
             _Equipped = new();
         }
 
@@ -68,10 +63,9 @@ namespace X4_ComplexCalculator.Entity
         /// コピーコンストラクタ
         /// </summary>
         /// <param name="manager">コピー元インスタンス</param>
-        public WareEquipmentManager(WareEquipmentManager manager)
+        public EquippableWareEquipmentManager(EquippableWareEquipmentManager manager)
         {
             Ware = manager.Ware;
-            _WareEquipments = WareEquipment.Get(Ware.ID);
             _Equipped = manager._Equipped.ToDictionary(x => x.Key, x => x.Value);
         }
 
@@ -81,7 +75,7 @@ namespace X4_ComplexCalculator.Entity
         /// </summary>
         /// <param name="ware">管理対象のウェア</param>
         /// <param name="element">シリアライズされたXElement</param>
-        public WareEquipmentManager(Ware ware, XElement element) : this(ware)
+        public EquippableWareEquipmentManager(IEquippableWare ware, XElement element) : this(ware)
         {
             try
             {
@@ -95,12 +89,12 @@ namespace X4_ComplexCalculator.Entity
                         continue;
                     }
 
-                    var wareEquipment = _WareEquipments
+                    var wareEquipment = Ware.Equipments.Values
                         .FirstOrDefault(x => x.GroupName == group && x.ConnectionName == conn);
 
                     if (wareEquipment is not null)
                     {
-                        _Equipped.Add(wareEquipment, Ware.Get<Equipment>(id));
+                        _Equipped.Add(wareEquipment, X4Database.Instance.Ware.Get<IEquipment>(id));
                     }
                 }
             }
@@ -115,7 +109,7 @@ namespace X4_ComplexCalculator.Entity
         /// 装備をリセットする
         /// </summary>
         /// <param name="equipments"></param>
-        public void ResetEquipment(IEnumerable<Equipment> equipments)
+        public void ResetEquipment(IEnumerable<IEquipment> equipments)
         {
             _Equipped.Clear();
 
@@ -132,9 +126,9 @@ namespace X4_ComplexCalculator.Entity
         /// 装備を削除する
         /// </summary>
         /// <param name="equipments"></param>
-        public void RemoveRange(IEnumerable<Equipment> equipments)
+        public void RemoveRange(IEnumerable<IEquipment> equipments)
         {
-            var removed = CollectionChanged is null ? null : new List<Equipment>();
+            var removed = CollectionChanged is null ? null : new List<IEquipment>();
 
             foreach (var equipment in equipments)
             {
@@ -158,9 +152,9 @@ namespace X4_ComplexCalculator.Entity
         /// 装備を追加する
         /// </summary>
         /// <param name="equipment">追加対象の列挙</param>
-        public void AddRange(IEnumerable<Equipment> equipments)
+        public void AddRange(IEnumerable<IEquipment> equipments)
         {
-            var added = CollectionChanged is null ? null : new List<Equipment>();
+            var added = CollectionChanged is null ? null : new List<IEquipment>();
 
             foreach (var equipment in equipments)
             {
@@ -182,9 +176,9 @@ namespace X4_ComplexCalculator.Entity
         /// </summary>
         /// <param name="equipment">追加対象</param>
         /// <param name="count">追加個数</param>
-        public void Add(Equipment equipment, long count = 1)
+        public void Add(IEquipment equipment, long count = 1)
         {
-            var added = CollectionChanged is null ? null : new List<Equipment>((int)count);
+            var added = CollectionChanged is null ? null : new List<IEquipment>((int)count);
             var cnt = 0L;
             while (cnt < count && AddEquipmentInternal(equipment))
             {
@@ -204,10 +198,10 @@ namespace X4_ComplexCalculator.Entity
         /// </summary>
         /// <param name="equipment">追加対象</param>
         /// <returns>追加に成功したか</returns>
-        private bool AddEquipmentInternal(Equipment equipment)
+        private bool AddEquipmentInternal(IEquipment equipment)
         {
             // 装備可能な接続情報を取得する
-            var equippableInfo = _WareEquipments
+            var equippableInfo = Ware.Equipments.Values
                 .FirstOrDefault(x => !_Equipped.ContainsKey(x) && x.CanEquipped(equipment));
 
             // 装備可能な接続がある場合、装備する
@@ -248,7 +242,7 @@ namespace X4_ComplexCalculator.Entity
         /// <param name="size">装備サイズ</param>
         /// <returns>装備IDと装備サイズに対応する装備があと何個装備できるか</returns>
         public int GetEquippableCount(EquipmentType type, X4Size size)
-            => _WareEquipments.Count(x =>
+            => Ware.Equipments.Values.Count(x =>
             !_Equipped.ContainsKey(x) &&
             x.Tags.Contains(type.EquipmentTypeID[..^1]) &&
             x.Tags.Contains(size.SizeID)
@@ -262,16 +256,16 @@ namespace X4_ComplexCalculator.Entity
         /// <param name="size">装備サイズ</param>
         /// <returns>装備IDと装備サイズに対応する装備が何個装備できるか</returns>
         public int GetMaxEquippableCount(EquipmentType type, X4Size size)
-            => _WareEquipments.Count(x => x.Tags.Contains(type.EquipmentTypeID[..^1]) && x.Tags.Contains(size.SizeID));
+            => Ware.Equipments.Values.Count(x => x.Tags.Contains(type.EquipmentTypeID[..^1]) && x.Tags.Contains(size.SizeID));
 
 
         /// <inheritdoc />
-        public bool Equals(WareEquipmentManager? other)
+        public bool Equals(EquippableWareEquipmentManager? other)
             => other is not null && Ware.Equals(other.Ware) && other._Equipped.SequenceEqual(_Equipped);
 
 
         /// <inheritdoc />
-        public override bool Equals(object? obj) => obj is WareEquipmentManager other && Equals(other);
+        public override bool Equals(object? obj) => obj is EquippableWareEquipmentManager other && Equals(other);
 
 
         /// <inheritdoc />

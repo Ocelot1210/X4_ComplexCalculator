@@ -1,5 +1,6 @@
 ﻿using Prism.Mvvm;
 using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
 {
@@ -57,7 +58,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
         /// </summary>
         /// <param name="ware">表示対象ウェア</param>
         /// <param name="isChecked">チェック状態</param>
-        public ModulesListItem(Ware ware, bool isChecked = false)
+        public ModulesListItem(IWare ware, bool isChecked = false)
         {
             ID = ware.ID;
             Name = ware.Name;

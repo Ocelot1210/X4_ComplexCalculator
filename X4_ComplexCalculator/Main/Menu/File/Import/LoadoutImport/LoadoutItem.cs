@@ -10,6 +10,7 @@ using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Entity;
 using Dapper;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
 {
@@ -41,13 +42,13 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// <summary>
         /// マクロ名に対応するモジュール
         /// </summary>
-        public Module Module { get; }
+        public IX4Module Module { get; }
 
 
         /// <summary>
         /// 装備
         /// </summary>
-        public WareEquipmentManager Equipment { get; }
+        public EquippableWareEquipmentManager Equipment { get; }
 
 
         /// <summary>
@@ -109,7 +110,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
                 return null;
             }
 
-            var module = Ware.GetAll<Module>()
+            var module = X4Database.Instance.Ware.GetAll<IX4Module>()
                 .FirstOrDefault(x => x.Macro == macro);
 
             if (module is null)
@@ -128,12 +129,12 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// </summary>
         /// <param name="elm">装備1つ分</param>
         /// <param name="module">モジュール</param>
-        private LoadoutItem(XElement elm, Module module)
+        private LoadoutItem(XElement elm, IX4Module module)
         {
             Name = elm.Attribute("name").Value;
 
             Module = module;
-            Equipment = new WareEquipmentManager(module);
+            Equipment = new EquippableWareEquipmentManager(module);
 
             AddEquipment(elm.XPathSelectElements("groups/shields"));
             AddEquipment(elm.XPathSelectElements("groups/turrets"));
@@ -153,7 +154,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
                     const string sqla = "SELECT EquipmentID FROM ModulePresetsEquipment WHERE ModuleID = :ModuleID AND PresetID = :PresetID";
 
                     var eqp = SettingDatabase.Instance.Query<string>(sqla, preset)
-                        .Select(x => Ware.TryGet<Equipment>(x))
+                        .Select(x => X4Database.Instance.Ware.TryGet<IEquipment>(x))
                         .Where(x => x is not null)
                         .Select(x => x!);
 
@@ -185,7 +186,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
                     continue;
                 }
 
-                var equipment = Ware.GetAll<Equipment>()
+                var equipment = X4Database.Instance.Ware.GetAll<IEquipment>()
                     .FirstOrDefault(x => x.Macro == macro);
 
                 var max = int.Parse(elm.Attribute("exact")?.Value ?? "1");

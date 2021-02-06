@@ -1,6 +1,8 @@
 ﻿using System;
 using Prism.Mvvm;
+using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleInfo
 {
@@ -76,7 +78,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
         /// </summary>
         /// <param name="module">モジュールオブジェクト</param>
         /// <param name="moduleCount">モジュール数</param>
-        public WorkForceModuleInfoDetailsItem(Module module, long moduleCount)
+        public WorkForceModuleInfoDetailsItem(IX4Module module, long moduleCount)
         {
             ModuleID = module.ID;
             ModuleName = module.Name;
@@ -96,7 +98,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
         public WorkForceModuleInfoDetailsItem(string moduleID, long moduleCount, long maxWorkers, long workersCapacity)
         {
             ModuleID = moduleID;
-            ModuleName = Ware.TryGet<Module>(moduleID)?.Name ?? throw new ArgumentException($"Invalid module ID. ({moduleID})", nameof(moduleID));
+            ModuleName = X4Database.Instance.Ware.Get<IX4Module>(moduleID).Name;
             _ModuleCount = moduleCount;
             MaxWorkers = maxWorkers;
             WorkersCapacity = workersCapacity;

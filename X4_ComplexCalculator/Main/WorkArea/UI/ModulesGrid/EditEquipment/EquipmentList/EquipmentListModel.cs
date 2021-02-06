@@ -7,6 +7,7 @@ using System.Windows.Input;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Entity;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList
@@ -20,7 +21,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 装備管理用(作業用)
         /// </summary>
-        private readonly WareEquipmentManager _TempManager;
+        private readonly EquippableWareEquipmentManager _TempManager;
 
 
         /// <summary>
@@ -88,13 +89,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <param name="equipmentTypeID"></param>
         /// <param name="factions"></param>
         public EquipmentListModel(
-            WareEquipmentManager manager,
+            EquippableWareEquipmentManager manager,
             EquipmentType equipmentType,
             X4Size size
         )
         {
             _EquipmentType = equipmentType;
-            _TempManager = new WareEquipmentManager(manager);
+            _TempManager = new EquippableWareEquipmentManager(manager);
 
             SelectedPreset = new ();
             SelectedPreset.Subscribe(x => PresetChanged());
@@ -109,7 +110,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
 
             // 装備可能な装備一覧を作成
             {
-                var equipments = Ware.GetAll<Equipment>()
+                var equipments = X4Database.Instance.Ware.GetAll<IEquipment>()
                     .Where(x => x.EquipmentType.Equals(equipmentType) && !x.EquipmentTags.Contains("unhittable"))
                     .Select(x => new EquipmentListItem(x));
                 Equippable.AddRange(equipments);
@@ -232,7 +233,7 @@ WHERE
             };
 
             var equipments = SettingDatabase.Instance.Query<string>(query, param)
-                .Select(x => Ware.Get<Equipment>(x))
+                .Select(x => X4Database.Instance.Ware.Get<IEquipment>(x))
                 .Select(x => new EquipmentListItem(x));
 
             Equipped.Reset(equipments);

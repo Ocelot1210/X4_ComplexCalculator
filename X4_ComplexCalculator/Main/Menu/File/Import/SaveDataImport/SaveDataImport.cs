@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Xml.XPath;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Main.WorkArea;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
@@ -132,7 +133,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
                 }
 
                 // マクロ名からモジュールを取得
-                var module = Ware.GetAll<Module>().FirstOrDefault(x => x.Macro == macro);
+                var module = X4Database.Instance.Ware.GetAll<IX4Module>().FirstOrDefault(x => x.Macro == macro);
                 if (module is null)
                 {
                     continue;
@@ -142,7 +143,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
                 var equipments = entry.XPathSelectElements("upgrades/groups/*")
                     .Select(x => (Macro: x.Attribute("macro")?.Value, Count: int.Parse(x.Attribute("exact")?.Value ?? "1")))
                     .Where(x => !string.IsNullOrEmpty(x.Macro))
-                    .Select(x => (Equipment: Ware.GetAll<Equipment>().FirstOrDefault(y => y.Macro == x.Macro), x.Count))
+                    .Select(x => (Equipment: X4Database.Instance.Ware.GetAll<IEquipment>().FirstOrDefault(y => y.Macro == x.Macro), x.Count))
                     .Where(x => x.Equipment is not null)
                     .Select(x => (Equipment: x.Equipment!, x.Count));
 
@@ -158,7 +159,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
 
 
             // 同一モジュールをマージ
-            var dict = new Dictionary<int, (int, Module, WareProduction, long)>();
+            var dict = new Dictionary<int, (int, IX4Module, WareProduction, long)>();
 
             foreach (var (module, idx) in modules.Select((x, idx) => (x, idx)))
             {

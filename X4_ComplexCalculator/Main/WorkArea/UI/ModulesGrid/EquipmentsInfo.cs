@@ -13,7 +13,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <summary>
         /// 装備管理オブジェクト
         /// </summary>
-        private readonly WareEquipmentManager _Manager;
+        private readonly EquippableWareEquipmentManager _Manager;
 
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// </summary>
         /// <param name="manager">装備管理オブジェクト</param>
         /// <param name="equipmentTypeID">表示対象の装備ID</param>
-        public EquipmentsInfo(WareEquipmentManager manager, string equipmentTypeID)
+        public EquipmentsInfo(EquippableWareEquipmentManager manager, string equipmentTypeID)
         {
             _Manager = manager;
             _EquipmentTypeID = equipmentTypeID;

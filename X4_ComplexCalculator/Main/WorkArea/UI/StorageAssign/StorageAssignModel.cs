@@ -104,7 +104,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign
 
             _StorageAssignInfo = storageAssignInfo;
 
-            _CapacityDict = TransportType.GetAll()
+            _CapacityDict = X4Database.Instance.TransportType.GetAll()
                 .ToDictionary(x => x.TransportTypeID, x => new StorageCapacityInfo());
 
             foreach (var storage in _Storages.Storages)

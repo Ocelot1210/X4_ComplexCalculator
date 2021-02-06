@@ -21,7 +21,7 @@
         /// <summary>
         /// 装備可能個数
         /// </summary>
-        public int Amount { get; }
+        public long Amount { get; }
         #endregion
 
 
@@ -31,7 +31,7 @@
         /// <param name="moduleID">モジュールID</param>
         /// <param name="sizeID">サイズID</param>
         /// <param name="amount">装備可能個数</param>
-        public ModuleShield(string moduleID, string sizeID, int amount)
+        public ModuleShield(string moduleID, string sizeID, long amount)
         {
             ModuleID = moduleID;
             SizeID = sizeID;

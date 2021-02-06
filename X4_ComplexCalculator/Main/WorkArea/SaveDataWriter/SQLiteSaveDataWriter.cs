@@ -9,6 +9,7 @@ using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
 {
@@ -174,16 +175,16 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
 
 
         /// <summary>
-        /// Dappar が Ware を WareID に変換するためのクラス
+        /// Dappar が IWare を WareID に変換するためのクラス
         /// </summary>
-        private class WareTypeHandler : SqlMapper.TypeHandler<Ware>
+        private class WareTypeHandler : SqlMapper.TypeHandler<IWare>
         {
             /// <inheritdoc />
-            public override Ware Parse(object value) => throw new NotImplementedException();
+            public override IWare Parse(object value) => throw new NotImplementedException();
 
 
             /// <inheritdoc />
-            public override void SetValue(IDbDataParameter parameter, Ware value)
+            public override void SetValue(IDbDataParameter parameter, IWare value)
             {
                 parameter.DbType = DbType.String;
                 parameter.Value = value.ID;

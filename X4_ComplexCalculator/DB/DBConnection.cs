@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SQLite;
 
 namespace X4_ComplexCalculator.DB
@@ -12,15 +13,15 @@ namespace X4_ComplexCalculator.DB
     {
         #region メンバ
         /// <summary>
-        /// SQLite接続用オブジェクト
+        /// DB接続オブジェクト
         /// </summary>
-        private readonly SQLiteConnection _Connection;
+        protected readonly IDbConnection _Connection;
 
 
         /// <summary>
         /// トランザクション用コマンド
         /// </summary>
-        private SQLiteTransaction? _Transaction;
+        private IDbTransaction? _Transaction;
         #endregion
 
 
@@ -75,6 +76,7 @@ namespace X4_ComplexCalculator.DB
             {
                 throw new InvalidOperationException("前回のトランザクションが終了せずにトランザクションが開始されました。");
             }
+            
             _Transaction = _Connection.BeginTransaction();
         }
 

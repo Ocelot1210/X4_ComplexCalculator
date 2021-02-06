@@ -1,10 +1,9 @@
 ﻿using Prism.Mvvm;
-using System.Windows.Data;
-using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.DB.X4DB;
 using System.ComponentModel;
 using System.Linq;
-
+using System.Windows.Data;
+using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.DB;
 
 namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Wares
 {
@@ -34,7 +33,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Wares
         /// </summary>
         public WaresViewModel()
         {
-            var items = Ware.GetAll()
+            var items = X4Database.Instance.Ware.GetAll()
                 .Where(x => x.Tags.Contains("economy"))
                 .Select(x => new WaresGridItem(x));
 

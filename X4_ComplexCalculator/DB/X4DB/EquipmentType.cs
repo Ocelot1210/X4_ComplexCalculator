@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
@@ -8,13 +7,6 @@ namespace X4_ComplexCalculator.DB.X4DB
     /// </summary>
     public class EquipmentType
     {
-        #region スタティックメンバ
-        /// <summary>
-        /// 装備種別一覧
-        /// </summary>
-        private readonly static Dictionary<string, EquipmentType> _EquipmentTypes = new();
-        #endregion
-
         #region プロパティ
         /// <summary>
         /// 装備種別ID
@@ -34,35 +26,11 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="equipmentTypeID"></param>
         /// <param name="name"></param>
-        private EquipmentType(string equipmentTypeID, string name)
+        public EquipmentType(string equipmentTypeID, string name)
         {
             EquipmentTypeID = equipmentTypeID;
             Name = name;
         }
-
-
-        /// <summary>
-        /// 初期化
-        /// </summary>
-        public static void Init()
-        {
-            _EquipmentTypes.Clear();
-
-            const string sql = "SELECT EquipmentTypeID, Name FROM EquipmentType";
-            var items = X4Database.Instance.Query<(string EquipmentTypeID, string Name)>(sql);
-            foreach (var item in items)
-            {
-                _EquipmentTypes.Add(item.EquipmentTypeID, new EquipmentType(item.EquipmentTypeID, item.Name));
-            }
-        }
-
-
-        /// <summary>
-        /// 装備種別IDに対応する装備種別を取得する
-        /// </summary>
-        /// <param name="equipmentTypeID">装備種別ID</param>
-        /// <returns>装備種別</returns>
-        public static EquipmentType Get(string equipmentTypeID) => _EquipmentTypes[equipmentTypeID];
 
 
         /// <summary>
@@ -72,8 +40,8 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <returns></returns>
         public override bool Equals(object? obj) => obj is EquipmentType tgt && tgt.EquipmentTypeID == EquipmentTypeID;
 
-        public bool Equals(EquipmentType other) => other.EquipmentTypeID == EquipmentTypeID;
 
+        public bool Equals(EquipmentType other) => other.EquipmentTypeID == EquipmentTypeID;
 
 
         /// <summary>

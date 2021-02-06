@@ -1,127 +1,62 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
     /// <summary>
     /// モジュール情報管理用クラス
     /// </summary>
-    public class Module : Ware, IComparable
+    public partial class Module : IX4Module
     {
-        #region スタティックメンバ
-        /// <summary>
-        /// モジュール一覧
-        /// </summary>
-        private readonly static Dictionary<string, Module> _Modules = new();
-        #endregion
-
-
-        #region プロパティ
-        /// <summary>
-        /// マクロ名
-        /// </summary>
-        public string Macro { get; }
-
-
-        /// <summary>
-        /// モジュール種別
-        /// </summary>
-        public ModuleType ModuleType { get; }
-
-
-        /// <summary>
-        /// 従業員
-        /// </summary>
-        public long MaxWorkers { get; }
-
-
-        /// <summary>
-        /// 最大収容人数
-        /// </summary>
-        public long WorkersCapacity { get; }
-
-
-        /// <summary>
-        /// 設計図が無いか
-        /// </summary>
-        public bool NoBluePrint { get; }
-
-
-        /// <summary>
-        /// モジュールの製品
-        /// </summary>
-        public IReadOnlyList<ModuleProduct> Product { get; }
-
-
-        /// <summary>
-        /// 装備可能なタレットの数
-        /// </summary>
-        public IReadOnlyDictionary<X4Size, int> TurretCapacity { get; }
-
-
-        /// <summary>
-        /// 装備可能なシールドの数
-        /// </summary>
-        public IReadOnlyDictionary<X4Size, int> ShieldCapacity { get; }
-
-
-        /// <summary>
-        /// 保管庫情報
-        /// </summary>
-        public ModuleStorage Storage { get; }
-        #endregion
-
-
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="id">ウェアID</param>
-        /// <param name="tags">タグ文字列</param>
-        public Module(string id, string tags) : base(id, tags)
+        /// <param name="ware">ウェア情報</param>
+        /// <param name="macro">マクロ名</param>
+        /// <param name="moduleType">モジュール種別</param>
+        /// <param name="maxWorkers">従業員数</param>
+        /// <param name="workersCapacity">最大収容人数</param>
+        /// <param name="noBluePrint">設計図が無いか</param>
+        /// <param name="products">モジュールの製品</param>
+        /// <param name="storage">保管庫情報</param>
+        /// <param name="equipments">装備一覧</param>
+        public Module(
+            IWare ware,
+            string macro,
+            ModuleType moduleType,
+            long maxWorkers,
+            long workersCapacity,
+            bool noBluePrint,
+            IReadOnlyList<ModuleProduct> products,
+            ModuleStorage storage,
+            IReadOnlyDictionary<string, WareEquipment> equipments
+        )
         {
-            string moduleTypeID;
-            var keyObj = new { ID = id };
+            ID = ware.ID;
+            Name = ware.Name;
+            WareGroup = ware.WareGroup;
+            TransportType = ware.TransportType;
+            Description = ware.Description;
+            Volume = ware.Volume;
+            MinPrice = ware.MinPrice;
+            AvgPrice = ware.AvgPrice;
+            MaxPrice = ware.MaxPrice;
+            Owners = ware.Owners;
+            Productions = ware.Productions;
+            Resources = ware.Resources;
+            Tags = ware.Tags;
+            WareEffects = ware.WareEffects;
 
-            const string sql1 = "SELECT Macro, ModuleTypeID, MaxWorkers, WorkersCapacity, NoBluePrint FROM Module WHERE ModuleID = :ID";
-            (
-                Macro,
-                moduleTypeID,
-                MaxWorkers,
-                WorkersCapacity,
-                NoBluePrint
-            ) = X4Database.Instance.QuerySingle<(string, string, long, long, bool)>(sql1, keyObj);
-
-
-            TurretCapacity = Equipments.Values
-                .Where(x => x.EquipmentType.EquipmentTypeID == "turrets")
-                .SelectMany(x => x.Tags.Select(y => X4Size.TryGet(y)))
-                .Where(x => x is not null)
-                .Select(x => x!)
-                .GroupBy(x => x)
-                .ToDictionary(x => x.Key, x => x.Count());
-
-            ShieldCapacity = Equipments.Values
-                .Where(x => x.EquipmentType.EquipmentTypeID == "shields")
-                .SelectMany(x => x.Tags.Select(y => X4Size.TryGet(y)))
-                .Where(x => x is not null)
-                .Select(x => x!)
-                .GroupBy(x => x)
-                .ToDictionary(x => x.Key, x => x.Count());
-
-            ModuleType = ModuleType.Get(moduleTypeID);
-
-            Product = ModuleProduct.Get(id);
-
-            Storage = ModuleStorage.Get(id);
+            Macro = macro;
+            ModuleType = moduleType;
+            MaxWorkers = maxWorkers;
+            WorkersCapacity = workersCapacity;
+            NoBluePrint = noBluePrint;
+            Products = products;
+            Storage = storage;
+            Equipments = equipments;
         }
-
-
-
-        /// <summary>
-        /// 全モジュール情報を取得する
-        /// </summary>
-        public static new IEnumerable<Module> GetAll() => _Modules.Values;
 
 
         /// <summary>
@@ -131,52 +66,36 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <returns></returns>
         public int CompareTo(object? obj)
         {
-            if (obj is not Module tgt)
+            if (obj is not IX4Module other)
             {
                 return 1;
             }
 
-            return ID.CompareTo(tgt.ID);
+            return ID.CompareTo(other.ID);
         }
-
-
-        /// <summary>
-        /// 比較
-        /// </summary>
-        /// <param name="obj">比較対象</param>
-        /// <returns></returns>
-        public override bool Equals(object? obj) => obj is Module tgt && ID == tgt.ID;
 
 
         /// <summary>
         /// ハッシュ値を取得
         /// </summary>
         /// <returns>ハッシュ値</returns>
-        public override int GetHashCode() => HashCode.Combine(ID);
+        public override int GetHashCode() => ID.GetHashCode();
+
 
 
         /// <summary>
-        /// X4 データベース内の Module テーブルのレコードを表す構造体
+        /// 指定したコネクション名に装備可能なEquipmentを取得する
         /// </summary>
-        private class ModuleTable
+        /// <returns></returns>
+        public IEnumerable<T> GetEquippableEquipment<T>(string connectionName) where T : IEquipment
         {
-            public string ModuleID { get; }
-            public string ModuleTypeID { get; }
-            public string Name { get; }
-            public long MaxWorkers { get; }
-            public long WorkersCapacity { get; }
-            public bool NoBlueprint { get; }
-
-            public ModuleTable(string moduleID, string moduleTypeID, string name,
-                               long maxWorkers, long workersCapacity, bool noBlueprint)
+            if (Equipments.TryGetValue(connectionName, out var wareEquipment))
             {
-                ModuleID = moduleID;
-                Name = name;
-                ModuleTypeID = moduleTypeID;
-                MaxWorkers = maxWorkers;
-                WorkersCapacity = workersCapacity;
-                NoBlueprint = noBlueprint;
+                return X4Database.Instance.Ware.GetAll<T>()
+                    .Where(x => !x.EquipmentTags.Except(wareEquipment.Tags).Any());
             }
+
+            return Enumerable.Empty<T>();
         }
     }
 }

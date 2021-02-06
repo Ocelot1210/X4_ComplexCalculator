@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
@@ -8,13 +7,6 @@ namespace X4_ComplexCalculator.DB.X4DB
     /// </summary>
     public class Faction
     {
-        #region スタティックメンバ
-        /// <summary>
-        /// 派閥一覧
-        /// </summary>
-        private readonly static Dictionary<string, Faction> _Factions = new();
-        #endregion
-
         #region プロパティ
         /// <summary>
         /// 派閥ID
@@ -41,7 +33,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <param name="factionID">派閥ID</param>
         /// <param name="name">派閥名</param>
         /// <param name="race">種族</param>
-        private Faction(string factionID, string name, Race race)
+        public Faction(string factionID, string name, Race race)
         {
             FactionID = factionID;
             Name = name;
@@ -50,49 +42,11 @@ namespace X4_ComplexCalculator.DB.X4DB
 
 
         /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="factionID">派閥ID</param>
-        /// <param name="name">派閥名</param>
-        /// <param name="race">種族ID</param>
-        private Faction(string factionID, string name, string raceID)
-        {
-            FactionID = factionID;
-            Name = name;
-            Race = Race.Get(raceID) ?? throw new ArgumentException();
-        }
-
-
-        /// <summary>
-        /// 初期化
-        /// </summary>
-        public static void Init()
-        {
-            _Factions.Clear();
-
-            const string sql = "SELECT FactionID, Name, RaceID FROM Faction";
-            foreach (var item in X4Database.Instance.Query<Faction>(sql))
-            {
-                _Factions.Add(item.FactionID, item);
-            }
-        }
-
-
-        /// <summary>
-        /// 派閥IDに対応する派閥を取得
-        /// </summary>
-        /// <param name="factionID">派閥ID</param>
-        /// <returns>派閥</returns>
-        public static Faction? Get(string factionID)
-            => _Factions.TryGetValue(factionID, out var faction) ? faction : null;
-
-
-        /// <summary>
         /// 比較
         /// </summary>
         /// <param name="obj">比較対象</param>
         /// <returns></returns>
-        public override bool Equals(object? obj) => obj is Faction tgt && tgt.FactionID == FactionID;
+        public override bool Equals(object? obj) => obj is Faction other && other.FactionID == FactionID;
 
 
         /// <summary>

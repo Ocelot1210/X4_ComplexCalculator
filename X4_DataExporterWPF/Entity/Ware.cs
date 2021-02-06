@@ -39,25 +39,25 @@
         /// <summary>
         /// 大きさ
         /// </summary>
-        public int Volume { get; }
+        public long Volume { get; }
 
 
         /// <summary>
         /// 最低価格
         /// </summary>
-        public int MinPrice { get; }
+        public long MinPrice { get; }
 
 
         /// <summary>
         /// 平均価格
         /// </summary>
-        public int AvgPrice { get; }
+        public long AvgPrice { get; }
 
 
         /// <summary>
         /// 最高価格
         /// </summary>
-        public int MaxPrice { get; }
+        public long MaxPrice { get; }
         #endregion
 
 
@@ -76,7 +76,7 @@
         public Ware(
             string wareID, string? wareGroupID, string? transportTypeID,
             string name, string description,
-            int volume, int minPrice, int avgPrice, int maxPrice
+            long volume, long minPrice, long avgPrice, long maxPrice
         )
         {
             WareID = wareID;

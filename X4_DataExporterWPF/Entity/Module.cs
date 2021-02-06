@@ -30,13 +30,13 @@ namespace X4_DataExporterWPF.Entity
         /// <summary>
         /// 最大労働者数
         /// </summary>
-        public int MaxWorkers { get; }
+        public long MaxWorkers { get; }
 
 
         /// <summary>
         /// 収容可能な労働者数
         /// </summary>
-        public int WorkersCapacity { get; }
+        public long WorkersCapacity { get; }
 
 
         /// <summary>
@@ -58,17 +58,17 @@ namespace X4_DataExporterWPF.Entity
         /// <param name="macro">マクロ名</param>
         /// <param name="maxWorkers">最大労働者数</param>
         /// <param name="workersCapacity">収容可能な労働者数</param>
-        /// <param name="noBluePrint">設計図有無</param>
+        /// <param name="noBlueprint">設計図有無</param>
         /// <param name="thumbnail">サムネ画像</param>
         public Module(string moduleID, string moduleTypeID, string macro,
-                      int maxWorkers, int workersCapacity, bool noBluePrint, byte[]? thumbnail)
+                      long maxWorkers, long workersCapacity, bool noBlueprint, byte[]? thumbnail)
         {
             ModuleID = moduleID;
             ModuleTypeID = moduleTypeID;
             Macro = macro;
             MaxWorkers = maxWorkers;
             WorkersCapacity = workersCapacity;
-            NoBlueprint = noBluePrint;
+            NoBlueprint = noBlueprint;
             Thumbnail = thumbnail;
         }
 

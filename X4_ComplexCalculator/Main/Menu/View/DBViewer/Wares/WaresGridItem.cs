@@ -1,6 +1,6 @@
 ﻿using Prism.Mvvm;
 using System;
-using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Wares
 {
@@ -13,7 +13,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Wares
         /// <summary>
         /// 表示対象ウェア
         /// </summary>
-        private readonly Ware _Ware;
+        private readonly IWare _Ware;
         #endregion
 
 
@@ -72,7 +72,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Wares
         /// コンストラクタ
         /// </summary>
         /// <param name="ware">表示対象ウェア</param>
-        public WaresGridItem(Ware ware)
+        public WaresGridItem(IWare ware)
         {
             _Ware = ware;
         }

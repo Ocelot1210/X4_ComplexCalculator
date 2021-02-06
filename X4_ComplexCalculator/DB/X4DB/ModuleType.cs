@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
@@ -8,13 +7,6 @@ namespace X4_ComplexCalculator.DB.X4DB
     /// </summary>
     public class ModuleType
     {
-        #region スタティックメンバ
-        /// <summary>
-        /// モジュール種別一覧
-        /// </summary>
-        static readonly Dictionary<string, ModuleType> _ModuleTypes = new();
-        #endregion
-
         #region プロパティ
         /// <summary>
         /// モジュール種別ID
@@ -34,34 +26,11 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// </summary>
         /// <param name="moduleTypeID">モジュール種別ID</param>
         /// <param name="name">モジュール種別名</param>
-        private ModuleType(string moduleTypeID, string name)
+        public ModuleType(string moduleTypeID, string name)
         {
             ModuleTypeID = moduleTypeID;
             Name = name;
         }
-
-
-        /// <summary>
-        /// 初期化
-        /// </summary>
-        public static void Init()
-        {
-            _ModuleTypes.Clear();
-
-            const string sql = "SELECT ModuleTypeID, Name FROM ModuleType";
-            foreach (var item in X4Database.Instance.Query<ModuleType>(sql))
-            {
-                _ModuleTypes.Add(item.ModuleTypeID, item);
-            }
-        }
-
-
-        /// <summary>
-        /// モジュール種別IDに対応するモジュール種別を取得
-        /// </summary>
-        /// <param name="moduleTypeID">ジュール種別ID</param>
-        /// <returns>モジュール種別</returns>
-        public static ModuleType Get(string moduleTypeID) => _ModuleTypes[moduleTypeID];
 
 
         /// <summary>

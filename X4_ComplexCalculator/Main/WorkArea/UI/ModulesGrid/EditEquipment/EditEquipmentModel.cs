@@ -9,6 +9,7 @@ using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Entity;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList;
 
@@ -23,7 +24,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// 編集対象の装備管理
         /// </summary>
-        private readonly WareEquipmentManager _Manager;
+        private readonly EquippableWareEquipmentManager _Manager;
 
         /// <summary>
         /// プリセット削除中か
@@ -75,7 +76,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// コンストラクタ
         /// </summary>
         /// <param name="ware">編集対象ウェア</param>
-        public EditEquipmentModel(WareEquipmentManager equipmentManager)
+        public EditEquipmentModel(EquippableWareEquipmentManager equipmentManager)
         {
             // 初期化
             _Manager = equipmentManager;
@@ -106,7 +107,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
                 string[] types = { "turrets", "shields" };
 
                 var viewModels = types
-                    .Select(x => EquipmentType.Get(x))
+                    .Select(x => X4Database.Instance.EquipmentType.Get(x))
                     .Select(x => new EquipmentListModel(equipmentManager, x, SelectedSize.Value))
                     .Select(x => new EquipmentListViewModel(x, Factions));
 
@@ -133,7 +134,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
             var sizes = _Manager.Ware.Equipments.Values
                 .SelectMany(x => x.Tags)
                 .Distinct()
-                .Select(x => X4Size.TryGet(x))
+                .Select(x => X4Database.Instance.X4Size.TryGet(x))
                 .Where(x => x is not null)
                 .Select(x => x!)
                 .OrderBy(x => x);
@@ -150,9 +151,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
             var checkedFactions = SettingDatabase.Instance.GetCheckedFactionsAtSelectEquipmentWindow();
 
             // 装備可能な装備の製造元派閥一覧を作成
-            var factions = Ware.GetAll<Equipment>()
+            var factions = X4Database.Instance.Ware.GetAll<IEquipment>()
                 .Where(x => !x.Tags.Contains("noplayerblueprint"))
-                .Where(x => _Manager.Ware.Equipments.Any(y => y.Value.CanEquipped(x)))
+                .Where(x => _Manager.Ware.Equipments.Values.Any(y => y.CanEquipped(x)))
                 .SelectMany(x => x.Owners)
                 .Distinct()
                 .Select(x => new FactionsListItem(x, checkedFactions.Contains(x.FactionID)));

@@ -4,6 +4,7 @@ using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 {
@@ -42,7 +43,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// 製品
         /// </summary>
-        public Ware Ware { get; }
+        public IWare Ware { get; }
 
 
         /// <summary>
@@ -194,7 +195,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <param name="wareID">ウェア</param>
         /// <param name="datails">ウェア詳細(関連モジュール等)</param>
         /// <param name="tradeOption">売買オプション</param>
-        public ProductsGridItem(Ware ware, IEnumerable<IProductDetailsListItem> datails, TradeOption tradeOption)
+        public ProductsGridItem(IWare ware, IEnumerable<IProductDetailsListItem> datails, TradeOption tradeOption)
         {
             Ware = ware;
             Details = new ObservableRangeCollection<IProductDetailsListItem>(datails);
@@ -211,7 +212,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <param name="datails">ウェア詳細(関連モジュール等)</param>
         /// <param name="tradeOption">売買オプション</param>
         /// <param name="unitPrice">単価</param>
-        public ProductsGridItem(Ware ware, IEnumerable<IProductDetailsListItem> datails, TradeOption tradeOption, long unitPrice)
+        public ProductsGridItem(IWare ware, IEnumerable<IProductDetailsListItem> datails, TradeOption tradeOption, long unitPrice)
         {
             Ware = ware;
             Details = new ObservableRangeCollection<IProductDetailsListItem>(datails);

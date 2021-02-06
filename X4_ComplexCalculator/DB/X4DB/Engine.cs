@@ -1,71 +1,56 @@
-﻿namespace X4_ComplexCalculator.DB.X4DB
+﻿using X4_ComplexCalculator.DB.X4DB.Interfaces;
+
+namespace X4_ComplexCalculator.DB.X4DB
 {
     /// <summary>
     /// エンジン情報
     /// </summary>
-    public class Engine : Equipment
+    public partial class Engine : IEngine
     {
-        #region プロパティ
-        /// <summary>
-        /// 前方推進力
-        /// </summary>
-        public double ForwardThrust { get; }
-
-
-        /// <summary>
-        /// 後方推進力
-        /// </summary>
-        public double ReverseThrust { get; }
-
-
-        /// <summary>
-        /// ブースト推進力
-        /// </summary>
-        public double BoostThrust { get; }
-
-
-        /// <summary>
-        /// ブースト持続時間
-        /// </summary>
-        public double BoostDuration { get; }
-
-
-        /// <summary>
-        /// ブースト解除時間
-        /// </summary>
-        public double BoostReleaseTime { get; }
-
-
-        /// <summary>
-        /// トラベル推進力
-        /// </summary>
-        public double TravelThrust { get; }
-
-
-        /// <summary>
-        /// トラベル解除時間
-        /// </summary>
-        public double TravelReleaseTime { get; }
-        #endregion
-
-
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="id">装備ID</param>
-        internal Engine(string id, string tags) : base(id, tags)
+        /// <param name="equipment">装備情報</param>
+        /// <param name="thrust">推進力情報</param>
+        /// <param name="boostDuration">ブースト持続時間</param>
+        /// <param name="boostReleaseTime">ブースト解除時間</param>
+        /// <param name="travelReleaseTime">トラベル解除時間</param>
+        public Engine(
+            IEquipment equipment,
+            EngineThrust thrust,
+            double boostDuration,
+            double boostReleaseTime,
+            double travelReleaseTime
+        )
         {
-            const string sql = "SELECT ForwardThrust, ReverseThrust, BoostThrust, BoostDuration, BoostReleaseTime, TravelThrust, TravelReleaseTime FROM Engine WHERE EquipmentID = :EquipmentID";
+            ID = equipment.ID;
+            Name = equipment.Name;
+            WareGroup = equipment.WareGroup;
+            TransportType = equipment.TransportType;
+            Description = equipment.Description;
+            Volume = equipment.Volume;
+            MinPrice = equipment.MinPrice;
+            AvgPrice = equipment.AvgPrice;
+            MaxPrice = equipment.MaxPrice;
+            Owners = equipment.Owners;
+            Productions = equipment.Productions;
+            Resources = equipment.Resources;
+            Tags = equipment.Tags;
+            WareEffects = equipment.WareEffects;
 
-            (
-                ForwardThrust,
-                ReverseThrust,
-                BoostThrust,
-                BoostDuration,
-                BoostReleaseTime,
-                TravelThrust,
-                TravelReleaseTime
-            ) = X4Database.Instance.QuerySingle<(double, double, double, double, double, double, double)>(sql, new { EquipmentID = id });
+            Macro = equipment.Macro;
+            EquipmentType = equipment.EquipmentType;
+            Hull = equipment.Hull;
+            HullIntegrated = equipment.HullIntegrated;
+            Mk = equipment.Mk;
+            MakerRace = equipment.MakerRace;
+            EquipmentTags = equipment.EquipmentTags;
+            Size = equipment.Size;
+
+            Thrust = thrust;
+            BoostDuration = boostDuration;
+            BoostReleaseTime = boostReleaseTime;
+            TravelReleaseTime = travelReleaseTime;
         }
     }
 }

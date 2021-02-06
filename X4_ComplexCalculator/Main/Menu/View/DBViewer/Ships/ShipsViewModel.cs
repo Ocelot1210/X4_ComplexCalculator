@@ -3,8 +3,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
 using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.DB.X4DB;
-
+using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
 {
@@ -34,7 +34,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         /// </summary>
         public ShipsViewModel()
         {
-            var items = Ware.GetAll<Ship>()
+            var items = X4Database.Instance.Ware.GetAll<IShip>()
                 .Select(x => ShipsGridItem.Create(x))
                 .Where(x => x is not null)
                 .Select(x => x!);

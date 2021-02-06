@@ -1,208 +1,87 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
     /// <summary>
     /// 艦船情報管理用クラス
     /// </summary>
-    public class Ship : Ware
+    public partial class Ship : IShip
     {
-        #region プロパティ
-        /// <summary>
-        /// 艦船種別
-        /// </summary>
-        public ShipType ShipType { get; }
-
-
-        /// <summary>
-        /// マクロ名
-        /// </summary>
-        public string Macro { get; }
-
-
-        /// <summary>
-        /// 艦船サイズ
-        /// </summary>
-        public X4Size Size { get; }
-
-
-        /// <summary>
-        /// 質量
-        /// </summary>
-        public double Mass { get; }
-
-
-        #region 抗力
-        /// <summary>
-        /// 前方抗力
-        /// </summary>
-        public double DragForward { get; }
-
-
-        /// <summary>
-        /// 後方抗力
-        /// </summary>
-        public double DragReverse { get; }
-
-
-        /// <summary>
-        /// 水平抗力
-        /// </summary>
-        public double DragHorizontal { get; }
-
-
-        /// <summary>
-        /// 垂直抗力
-        /// </summary>
-        public double DragVertical { get; }
-
-
-        /// <summary>
-        /// ピッチ抗力
-        /// </summary>
-        public double DragPitch { get; }
-
-
-        /// <summary>
-        /// ヨー抗力
-        /// </summary>
-        public double DragYaw { get; }
-
-
-        /// <summary>
-        /// ロール抗力
-        /// </summary>
-        public double DragRoll { get; }
-        #endregion
-
-
-        #region 慣性
-        /// <summary>
-        /// 慣性(ピッチ)
-        /// </summary>
-        public double InertiaPitch { get; }
-
-
-        /// <summary>
-        /// 慣性(ヨー)
-        /// </summary>
-        public double InertiaYaw { get; }
-
-
-        /// <summary>
-        /// 慣性(ロール)
-        /// </summary>
-        public double InertiaRoll { get; }
-        #endregion
-
-
-        /// <summary>
-        /// 船体強度
-        /// </summary>
-        public long Hull { get; }
-
-
-        /// <summary>
-        /// 船員数
-        /// </summary>
-        public long People { get; }
-
-
-        /// <summary>
-        /// ミサイル搭載量
-        /// </summary>
-        public long MissileStorage { get; }
-
-
-        /// <summary>
-        /// ドローン搭載量
-        /// </summary>
-        public long DroneStorage { get; }
-
-
-        /// <summary>
-        /// カーゴサイズ
-        /// </summary>
-        public long CargoSize { get; }
-
-
-        /// <summary>
-        /// 艦船のハンガー情報
-        /// </summary>
-        public IReadOnlyDictionary<string, ShipHanger> ShipHanger { get; }
-
-
-        /// <summary>
-        /// ロードアウトIDをキーにしたロードアウト情報のディクショナリ
-        /// </summary>
-        public IReadOnlyDictionary<string, IReadOnlyList<ShipLoadout>> Loadouts { get; }
-        #endregion
-
-
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="id">ウェアID</param>
-        /// <param name="tags">タグ文字列</param>
-        public Ship(string id, string tags) : base(id, tags)
+        /// <param name="ware">ウェア情報</param>
+        /// <param name="shipType">艦船種別</param>
+        /// <param name="macro">マクロ名</param>
+        /// <param name="size">サイズ</param>
+        /// <param name="mass">質量</param>
+        /// <param name="drag">抗力</param>
+        /// <param name="inertia">慣性</param>
+        /// <param name="hull">船体強度</param>
+        /// <param name="people">船員数</param>
+        /// <param name="missileStorage">ミサイル搭載量</param>
+        /// <param name="droneStorage">ドローン搭載量</param>
+        /// <param name="cargoSize">カーゴサイズ</param>
+        /// <param name="shipHanger">艦船のハンガー情報</param>
+        /// <param name="loadouts">ロードアウト情報</param>
+        /// <param name="equipments">装備一覧</param>
+        public Ship(
+            IWare ware,
+            ShipType shipType,
+            string macro,
+            X4Size size,
+            double mass,
+            Drag drag,
+            Inertia inertia,
+            long hull,
+            long people,
+            long missileStorage,
+            long droneStorage,
+            long cargoSize,
+            IReadOnlyDictionary<string, ShipHanger> shipHanger,
+            IReadOnlyDictionary<string, IReadOnlyList<ShipLoadout>> loadouts,
+            IReadOnlyDictionary<string, WareEquipment> equipments
+        )
         {
-            const string sql1 = @"
-SELECT
-    ShipTypeID, Macro, SizeID, Mass, DragForward, DragReverse,
-    DragHorizontal, DragVertical, DragPitch, DragYaw, DragRoll, InertiaPitch, InertiaYaw, InertiaRoll,
-    Hull, People, MissileStorage, DroneStorage, CargoSize
-FROM
-    Ship
-WHERE
-    ShipID = :ShipID
-";
+            ID = ware.ID;
+            Name = ware.Name;
+            WareGroup = ware.WareGroup;
+            TransportType = ware.TransportType;
+            Description = ware.Description;
+            Volume = ware.Volume;
+            MinPrice = ware.MinPrice;
+            AvgPrice = ware.AvgPrice;
+            MaxPrice = ware.MaxPrice;
+            Owners = ware.Owners;
+            Productions = ware.Productions;
+            Resources = ware.Resources;
+            Tags = ware.Tags;
+            WareEffects = ware.WareEffects;
 
-            string shipTypeID, sizeID;
-            (
-                shipTypeID,
-                Macro,
-                sizeID,
-                Mass,
-                DragForward,
-                DragReverse,
-                DragHorizontal,
-                DragVertical,
-                DragPitch,
-                DragYaw,
-                DragRoll,
-                InertiaPitch,
-                InertiaYaw,
-                InertiaRoll,
-                Hull,
-                People,
-                MissileStorage,
-                DroneStorage,
-                CargoSize
-            ) = X4Database.Instance.QuerySingle
-            <(
-                string, string, string, long,
-                double, double, double, double, double, double, double, double, double, double, 
-                long, long, long, long, long
-            )>(sql1, new { ShipID = id });
-
-            ShipType = ShipType.Get(shipTypeID);
-            Size = X4Size.Get(sizeID);
-            ShipHanger = X4DB.ShipHanger.Get(id);
-
-
-            Loadouts = ShipLoadout.Get(id)
-                .GroupBy(x => x.LoadoutID)
-                .ToDictionary(x => x.Key, x => x.ToArray() as IReadOnlyList<ShipLoadout>);
+            ShipType = shipType;
+            Macro = macro;
+            Size = size;
+            Mass = mass;
+            Drag = drag;
+            Inertia = inertia;
+            Hull = hull;
+            People = people;
+            MissileStorage = missileStorage;
+            DroneStorage = droneStorage;
+            CargoSize = cargoSize;
+            ShipHanger = shipHanger;
+            Loadouts = loadouts;
+            Equipments = equipments;
         }
-
 
 
         /// <summary>
         /// 指定したコネクション名に装備可能なEquipmentを取得する
         /// </summary>
         /// <returns></returns>
-        public override IEnumerable<T> GetEquippableEquipment<T>(string connectionName)
+        public IEnumerable<T> GetEquippableEquipment<T>(string connectionName) where T : IEquipment
         {
             // 指定したコネクション名に装備可能な装備は存在するか？
             if (Equipments.TryGetValue(connectionName, out var wareEquipment))
@@ -210,25 +89,33 @@ WHERE
                 // デフォルトのロードアウトは存在するか？
                 if (Loadouts.TryGetValue("default", out var loadouts))
                 {
-                    // デフォルトのロードアウトの内、指定したコネクション名と同じグループ名を持つものは存在するか？
-                    var shipLoadout = loadouts.FirstOrDefault(x => x.GroupName == wareEquipment.GroupName);
+                    var aaa = loadouts.Where(x => x.GroupName == wareEquipment.GroupName);
+
+                    bool matched = false;
+
+                    // デフォルトのロードアウトの内、指定したコネクション名と同じグループ名を持つもので装備可能なものを取得する
+                    var shipLoadout = loadouts.FirstOrDefault(x => 
+                        x.GroupName == wareEquipment.GroupName &&
+                        wareEquipment.CanEquipped(x.Equipment)
+                    );
                     if (shipLoadout is not null)
                     {
                         // 同じグループ名の装備は指定した型と一致するか？
                         if (shipLoadout.Equipment is T ret)
                         {
+                            matched = true;
                             yield return ret;
                         }
-                        else
-                        {
-                            yield break;
-                        }
+                    }
+
+                    if (matched)
+                    {
+                        yield break;
                     }
                 }
 
 
-                var equipments = _Wares.Values
-                    .OfType<T>()
+                var equipments = X4Database.Instance.Ware.GetAll<T>()
                     .Where(x => wareEquipment.CanEquipped(x));
                 foreach (var equipment in equipments)
                 {

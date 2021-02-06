@@ -5,6 +5,7 @@ using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
@@ -96,7 +97,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
             var items = new List<FactionsListItem>();
 
             var factions = X4Database.Instance.Query<string>(sql1)
-                .Select(x => Faction.Get(x))
+                .Select(x => X4Database.Instance.Faction.Get(x))
                 .Where(x => x is not null)
                 .Select(x => x!);
 
@@ -132,12 +133,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
                 .Select(x => x.Faction.FactionID)
                 .ToArray();
 
-            var newModules = Ware.GetAll<Module>()
+            var newModules = X4Database.Instance.Ware.GetAll<IX4Module>()
                 .Where(x => 
                     !x.Tags.Contains("noplayerblueprint") &&
                     checkedModuleTypes.Contains(x.ModuleType.ModuleTypeID) &&
                     checkedOwners.Intersect(x.Owners.Select(y => y.FactionID)).Any())
-                .Select(x =>new ModulesListItem(x));
+                .Select(x => new ModulesListItem(x));
 
             Modules.Reset(newModules);
         }
@@ -150,7 +151,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
         {
             // 選択されているアイテムを追加
             var items = Modules.Where(x => x.IsChecked)
-                .Select(x =>Ware.TryGet<Module>(x.ID))
+                .Select(x => X4Database.Instance.Ware.TryGet<IX4Module>(x.ID))
                 .Where(x => x is not null)
                 .Select(x => new ModulesGridItem(x!) { EditStatus = EditStatus.Edited });
 

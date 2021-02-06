@@ -1,6 +1,8 @@
 ﻿using Prism.Mvvm;
 using System.Linq;
 using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Modules
 {
@@ -13,12 +15,12 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Modules
         /// <summary>
         /// 表示対象モジュール
         /// </summary>
-        private readonly Module _Module;
+        private readonly IX4Module _Module;
 
         /// <summary>
         /// 製品
         /// </summary>
-        private readonly Ware? _Product;
+        private readonly IWare? _Product;
         #endregion
 
 
@@ -71,7 +73,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Modules
         /// コンストラクタ
         /// </summary>
         /// <param name="module">表示対象モジュール</param>
-        public ModulesGridItem(Module module)
+        public ModulesGridItem(IX4Module module)
         {
             _Module = module;
             
@@ -81,11 +83,11 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Modules
 
 
             // 製品がある場合、製品の情報を設定
-            if (_Module.Product.Any())
+            if (_Module.Products.Any())
             {
-                var firstWare = _Module.Product.First();
-                _Product = Ware.Get(firstWare.WareID);
-                MaxEfficiency = (long)((WareEffect.Get(_Product.ID, firstWare.Method, "work")!.Product + 1) * 100);
+                var firstWare = _Module.Products.First();
+                _Product = X4Database.Instance.Ware.Get(firstWare.WareID);
+                MaxEfficiency = (long)((_Product.WareEffects.TryGet(firstWare.Method, "work")?.Product ?? 0.0 + 1) * 100);
             }
         }
     }

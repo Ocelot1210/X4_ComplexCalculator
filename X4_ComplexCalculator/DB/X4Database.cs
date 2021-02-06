@@ -5,6 +5,7 @@ using Microsoft.Win32;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB.X4DB.Manager;
 using X4_DataExporterWPF.DataExportWindow;
 
 namespace X4_ComplexCalculator.DB
@@ -22,13 +23,91 @@ namespace X4_ComplexCalculator.DB
         #endregion
 
 
-        #region プロパティ(static)
+        #region メンバ
+        /// <summary>
+        /// サイズ情報一覧
+        /// </summary>
+        private X4SizeManager? _X4Size;
+
+
+        /// <summary>
+        /// 種族情報一覧
+        /// </summary>
+        private RaceManager? _Race;
+
+
+        /// <summary>
+        /// 派閥情報一覧
+        /// </summary>
+        private FactionManager? _Faction;
+
+
+        /// <summary>
+        /// カーゴ種別一覧
+        /// </summary>
+        private TransportTypeManager? _TransportType;
+
+
+        /// <summary>
+        /// 装備種別一覧
+        /// </summary>
+        private EquipmentTypeManager? _EquipmentType;
+
+
+        /// <summary>
+        /// ウェア一覧
+        /// </summary>
+        private WareManager? _Ware;
+        #endregion
+
+
+        #region スタティックプロパティ
         /// <summary>
         /// インスタンス
         /// </summary>
         public static X4Database Instance
             => _Instance ?? throw new InvalidOperationException();
         #endregion
+
+
+
+        #region プロパティ
+        /// <summary>
+        /// サイズ情報一覧
+        /// </summary>
+        public X4SizeManager X4Size => _X4Size ?? throw new InvalidOperationException();
+
+
+        /// <summary>
+        /// 種族情報一覧
+        /// </summary>
+        public RaceManager Race => _Race ?? throw new InvalidOperationException();
+
+
+        /// <summary>
+        /// 派閥情報一覧
+        /// </summary>
+        public FactionManager Faction => _Faction ?? throw new InvalidOperationException();
+
+
+        /// <summary>
+        /// カーゴ種別一覧
+        /// </summary>
+        public TransportTypeManager TransportType => _TransportType ?? throw new InvalidOperationException();
+
+
+        /// <summary>
+        /// 装備種別一覧
+        /// </summary>
+        public EquipmentTypeManager EquipmentType => _EquipmentType ?? throw new InvalidOperationException();
+
+
+        /// <summary>
+        /// ウェア一覧
+        /// </summary>
+        public WareManager Ware => _Ware ?? throw new InvalidOperationException();
+        #endregion
+
 
 
         /// <summary>
@@ -62,7 +141,7 @@ namespace X4_ComplexCalculator.DB
                     if (X4_DataExporterWPF.Export.CommonExporter.CURRENT_FORMAT_VERSION == _Instance.GetDBVersion())
                     {
                         // 想定するDBのフォーマットと実際のフォーマットが同じ場合
-                        InitX4DB();
+                        _Instance.Init();
                     }
                     else
                     {
@@ -154,7 +233,7 @@ namespace X4_ComplexCalculator.DB
             if (File.Exists(dbFilePath))
             {
                 _Instance = new X4Database(dbFilePath);
-                InitX4DB();
+                _Instance.Init();
                 return true;
             }
 
@@ -213,19 +292,16 @@ namespace X4_ComplexCalculator.DB
 
 
         /// <summary>
-        /// X4DBを初期化
+        /// 初期化
         /// </summary>
-        private static void InitX4DB()
+        private void Init()
         {
-            X4Size.Init();
-            ModuleType.Init();
-            Race.Init();
-            Faction.Init();
-            EquipmentType.Init();
-            TransportType.Init();
-            WareGroup.Init();
-            Ware.Init();
-            ShipLoadout.Init();
+            _X4Size  = new(_Connection);
+            _Race    = new(_Connection);
+            _Faction = new(_Connection, _Race);
+            _TransportType = new(_Connection);
+            _EquipmentType = new(_Connection);
+            _Ware = new(_Connection, _TransportType);
         }
     }
 }

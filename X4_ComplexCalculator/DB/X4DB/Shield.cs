@@ -1,44 +1,48 @@
-﻿namespace X4_ComplexCalculator.DB.X4DB
+﻿using X4_ComplexCalculator.DB.X4DB.Interfaces;
+
+namespace X4_ComplexCalculator.DB.X4DB
 {
     /// <summary>
     /// シールド情報
     /// </summary>
-    public class Shield : Equipment
+    public partial class Shield : IShield
     {
-        #region プロパティ
-        /// <summary>
-        /// 最大シールド容量
-        /// </summary>
-        public long Capacity { get; }
-
-
-        /// <summary>
-        /// 再充電率
-        /// </summary>
-        public long RechargeRate { get; }
-
-
-        /// <summary>
-        /// 再充電遅延
-        /// </summary>
-        public double RechargeDelay { get; }
-        #endregion
-
-
-
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="id">装備ID</param>
-        internal Shield(string id, string tags) : base(id, tags)
+        /// <param name="equipment"></param>
+        /// <param name="capacity">最大シールド容量</param>
+        /// <param name="rechargeRate">再充電率</param>
+        /// <param name="rechargeDelay">再充電遅延</param>
+        public Shield(IEquipment equipment, long capacity, long rechargeRate, double rechargeDelay)
         {
-            const string sql = "SELECT Capacity RechargeRate, RechargeDelay FROM Shield WHERE EquipmentID = :EquipmentID";
+            ID = equipment.ID;
+            Name = equipment.Name;
+            WareGroup = equipment.WareGroup;
+            TransportType = equipment.TransportType;
+            Description = equipment.Description;
+            Volume = equipment.Volume;
+            MinPrice = equipment.MinPrice;
+            AvgPrice = equipment.AvgPrice;
+            MaxPrice = equipment.MaxPrice;
+            Owners = equipment.Owners;
+            Productions = equipment.Productions;
+            Resources = equipment.Resources;
+            Tags = equipment.Tags;
+            WareEffects = equipment.WareEffects;
 
-            (
-                Capacity,
-                RechargeRate,
-                RechargeDelay
-            ) = X4Database.Instance.QuerySingle<(long, long, double)>(sql, new { EquipmentID = id });
+            Macro = equipment.Macro;
+            EquipmentType = equipment.EquipmentType;
+            Hull = equipment.Hull;
+            HullIntegrated = equipment.HullIntegrated;
+            Mk = equipment.Mk;
+            MakerRace = equipment.MakerRace;
+            EquipmentTags = equipment.EquipmentTags;
+            Size = equipment.Size;
+
+            Capacity = capacity;
+            RechargeRate = rechargeRate;
+            RechargeDelay = rechargeDelay;
         }
     }
 }

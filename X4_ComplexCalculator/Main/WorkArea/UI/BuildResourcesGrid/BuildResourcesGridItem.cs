@@ -1,6 +1,8 @@
 ﻿using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.EditStatus;
+using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
 {
@@ -39,7 +41,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         /// <summary>
         /// 建造に必要なウェア
         /// </summary>
-        public Ware Ware { get; }
+        public IWare Ware { get; }
 
 
         /// <summary>
@@ -156,7 +158,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         /// <param name="amount">建造に必要なウェア数</param>
         public BuildResourcesGridItem(string wareID, long amount)
         {
-            Ware = Ware.Get(wareID);
+            Ware = X4Database.Instance.Ware.Get(wareID);
             UnitPrice = (Ware.MaxPrice + Ware.MinPrice) / 2;
             Amount = amount;
         }
@@ -169,7 +171,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         /// <param name="unitPrice">単価</param>
         public BuildResourcesGridItem(string wareID, long amount, long unitPrice)
         {
-            Ware = Ware.Get(wareID);
+            Ware = X4Database.Instance.Ware.Get(wareID);
             UnitPrice = unitPrice;
             Amount = amount;
         }

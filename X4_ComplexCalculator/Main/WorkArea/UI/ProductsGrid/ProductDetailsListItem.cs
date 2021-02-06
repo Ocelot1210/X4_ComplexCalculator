@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
@@ -100,7 +101,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <param name="efficiency">効率</param>
         /// <param name="amount">製品数</param>
         /// <param name="settings">ステーションの設定</param>
-        public ProductDetailsListItem(string wareID, Module module, long moduleCount, IReadOnlyDictionary<string, WareEffect> efficiency, long amount, IStationSettings settings)
+        public ProductDetailsListItem(string wareID, IX4Module module, long moduleCount, IReadOnlyDictionary<string, WareEffect> efficiency, long amount, IStationSettings settings)
         {
             WareID = wareID;
             ModuleID = module.ID;
