@@ -4,6 +4,7 @@ using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB.X4DB;
 using System.ComponentModel;
 using X4_ComplexCalculator.DB;
+using System.Linq;
 
 namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Races
 {
@@ -16,7 +17,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Races
         /// <summary>
         /// 種族一覧
         /// </summary>
-        private readonly ObservableRangeCollection<Race> _Races = new(X4Database.Instance.Race.GetAll());
+        private readonly ObservableRangeCollection<RacesGridItem> _Races = new(X4Database.Instance.Race.GetAll().Select(x => new RacesGridItem(x)));
         #endregion
 
 

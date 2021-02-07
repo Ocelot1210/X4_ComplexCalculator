@@ -257,25 +257,28 @@
 
 
             <DataGrid.Columns>
+
+                <!--  基礎情報 ===================================================================================  -->
+
                 <!--  艦船名称  -->
                 <DataGridTextColumn
                     x:Name="Column_ShipName"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnTextFilter}"
-                    Binding="{Binding Ship.Name, Mode=OneTime}"
+                    Binding="{Binding ShipName, Mode=OneTime}"
                     Header="{lex:Loc Lang:DBViewer_Ships_BasicInfo_Name}" />
 
                 <!--  艦船種別  -->
                 <DataGridTextColumn
                     x:Name="Column_ShipType"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
-                    Binding="{Binding Ship.ShipType.Name, Mode=OneTime}"
+                    Binding="{Binding ShipTypeName, Mode=OneTime}"
                     Header="{lex:Loc Lang:DBViewer_Ships_BasicInfo_Type}" />
 
                 <!--  サイズ  -->
                 <DataGridTextColumn
                     x:Name="Column_ShipSize"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
-                    Binding="{Binding Ship.Size, Mode=OneTime}"
+                    Binding="{Binding ShipSize, Mode=OneTime}"
                     Header="{lex:Loc Lang:DBViewer_Ships_BasicInfo_Size}" />
 
                 <!--  重量  -->
@@ -291,7 +294,7 @@
                 <DataGridTextColumn
                     x:Name="Column_People"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                    Binding="{Binding Ship.People, Mode=OneTime, StringFormat='{}{0:N0}'}"
+                    Binding="{Binding People, Mode=OneTime, StringFormat='{}{0:N0}'}"
                     CellStyle="{StaticResource RightAlignedDataGridCell}"
                     Header="{lex:Loc Lang:DBViewer_Ships_BasicInfo_People}" />
 
@@ -426,7 +429,7 @@
                 <DataGridTextColumn
                     x:Name="Column_Missiles"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                    Binding="{Binding Ship.MissileStorage, Mode=OneTime, StringFormat='{}{0:N0}'}"
+                    Binding="{Binding MissileStorage, Mode=OneTime, StringFormat='{}{0:N0}'}"
                     CellStyle="{StaticResource RightAlignedDataGridCell}"
                     Header="{lex:Loc Lang:DBViewer_Ships_Armed_Missiles}" />
 
@@ -458,7 +461,7 @@
                 <DataGridTextColumn
                     x:Name="Column_CargoCapacity"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                    Binding="{Binding Ship.CargoSize, Mode=OneTime, StringFormat='{}{0:N0}'}"
+                    Binding="{Binding CargoSize, Mode=OneTime, StringFormat='{}{0:N0}'}"
                     CellStyle="{StaticResource RightAlignedDataGridCell}"
                     Header="{lex:Loc Lang:DBViewer_Ships_Cargo_Capacity}" />
 
@@ -502,7 +505,7 @@
                 <DataGridTextColumn
                     x:Name="Column_HangerCapacity_Drone"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                    Binding="{Binding Ship.DroneStorage, Mode=OneTime, StringFormat='{}{0:N0}'}"
+                    Binding="{Binding DroneStorage, Mode=OneTime, StringFormat='{}{0:N0}'}"
                     CellStyle="{StaticResource RightAlignedDataGridCell}"
                     Header="{lex:Loc Lang:DBViewer_Ships_HangerCapacity_Drone}" />
 

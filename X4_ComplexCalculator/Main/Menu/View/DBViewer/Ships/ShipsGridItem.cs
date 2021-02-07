@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
@@ -81,10 +82,36 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         public IShip Ship { get; }
 
 
+        #region 基礎情報
+        /// <summary>
+        /// 艦船名称
+        /// </summary>
+        public string ShipName => Ship.Name;
+
+
+        /// <summary>
+        /// 艦船種別名称
+        /// </summary>
+        public string ShipTypeName => Ship.ShipType.Name;
+
+
+        /// <summary>
+        /// 艦船サイズ
+        /// </summary>
+        public X4Size ShipSize => Ship.Size;
+
+
         /// <summary>
         /// 艦船重量
         /// </summary>
         public double ShipMass { get; }
+
+
+        /// <summary>
+        /// 船員数
+        /// </summary>
+        public long People => Ship.People;
+        #endregion
 
 
         #region 速度
@@ -110,14 +137,13 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         /// 最高トラベル速度
         /// </summary>
         public double MaxTravelSpeed { get; }
-        #endregion
 
 
         /// <summary>
         /// 最大加速
         /// </summary>
         public double MaxAcceleration { get; }
-
+        #endregion
 
 
         #region 平行移動速度
@@ -159,6 +185,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         public double Responsiveness { get; }
         #endregion
 
+
         #region 武装
         /// <summary>
         /// 武器
@@ -170,9 +197,13 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         /// タレット
         /// </summary>
         public int Turrets { get; }
+
+
+        /// <summary>
+        /// ミサイル搭載量
+        /// </summary>
+        public long MissileStorage => Ship.MissileStorage;
         #endregion
-
-
 
 
         #region シールド
@@ -189,28 +220,47 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         #endregion
 
 
+        #region 保管庫
+        /// <summary>
+        /// 保管庫容量
+        /// </summary>
+        public long CargoSize => Ship.CargoSize;
+
+
         /// <summary>
         /// 保管庫種別
         /// </summary>
         public IReadOnlyCollection<string> CargoTypes { get; }
+        #endregion
 
 
+        #region ドック
         /// <summary>
         /// 中型ドック数
         /// </summary>
         public int MediumDockCount { get; }
+        
 
 
         /// <summary>
         /// 小型ドック数
         /// </summary>
         public int SmallDockCount { get; }
+        #endregion
 
 
+        #region 搭載数
         /// <summary>
         /// 機体搭載量
         /// </summary>
         public int HangerCapacity { get; }
+
+
+        /// <summary>
+        /// ドローン搭載数
+        /// </summary>
+        public long DroneStorage => Ship.DroneStorage;
+        #endregion
         #endregion
 
 

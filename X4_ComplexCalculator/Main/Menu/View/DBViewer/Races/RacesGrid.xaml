@@ -29,7 +29,7 @@
             <!--  種族ID  -->
             <DataGridTextColumn
                 dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
-                Binding="{Binding RaceID, Mode=OneTime}"
+                Binding="{Binding ID, Mode=OneTime}"
                 Header="{lex:Loc Lang:DBViewer_Races_RaceID}" />
 
             <!--  種族名  -->
