@@ -48,7 +48,7 @@ namespace X4_ComplexCalculator.DB.X4DB
             Tags = ware.Tags;
             WareEffects = ware.WareEffects;
 
-            Macro = macro;
+            MacroName = macro;
             ModuleType = moduleType;
             MaxWorkers = maxWorkers;
             WorkersCapacity = workersCapacity;

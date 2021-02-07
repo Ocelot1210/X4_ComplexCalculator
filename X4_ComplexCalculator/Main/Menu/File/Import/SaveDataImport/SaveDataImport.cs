@@ -133,7 +133,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
                 }
 
                 // マクロ名からモジュールを取得
-                var module = X4Database.Instance.Ware.GetAll<IX4Module>().FirstOrDefault(x => x.Macro == macro);
+                var module = X4Database.Instance.Ware.TryGetMacro<IX4Module>(macro);
                 if (module is null)
                 {
                     continue;
@@ -141,9 +141,9 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
 
                 // モジュールの装備を取得
                 var equipments = entry.XPathSelectElements("upgrades/groups/*")
-                    .Select(x => (Macro: x.Attribute("macro")?.Value, Count: int.Parse(x.Attribute("exact")?.Value ?? "1")))
+                    .Select(x => (Macro: x.Attribute("macro")?.Value ?? "", Count: int.Parse(x.Attribute("exact")?.Value ?? "1")))
                     .Where(x => !string.IsNullOrEmpty(x.Macro))
-                    .Select(x => (Equipment: X4Database.Instance.Ware.GetAll<IEquipment>().FirstOrDefault(y => y.Macro == x.Macro), x.Count))
+                    .Select(x => (Equipment: X4Database.Instance.Ware.TryGetMacro<IEquipment>(x.Macro), x.Count))
                     .Where(x => x.Equipment is not null)
                     .Select(x => (Equipment: x.Equipment!, x.Count));
 

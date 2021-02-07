@@ -64,28 +64,37 @@ namespace X4_ComplexCalculator.DB.X4DB
 
         #region IEquipment
         /// <inheritdoc/>
-        public string Macro { get; }
-
-        /// <inheritdoc/>
         public EquipmentType EquipmentType { get; }
+
 
         /// <inheritdoc/>
         public long Hull { get; }
 
+
         /// <inheritdoc/>
         public bool HullIntegrated { get; }
+
 
         /// <inheritdoc/>
         public long Mk { get; }
 
+
         /// <inheritdoc/>
         public Race? MakerRace { get; }
+
 
         /// <inheritdoc/>
         public HashSet<string> EquipmentTags { get; }
 
+
         /// <inheritdoc/>
         public X4Size? Size { get; }
+        #endregion
+
+
+        #region IMacro
+        /// <inheritdoc/>
+        public string MacroName { get; }
         #endregion
 
 

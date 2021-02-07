@@ -3,15 +3,9 @@ using System.Collections.Generic;
 
 namespace X4_ComplexCalculator.DB.X4DB.Interfaces
 {
-    public interface IX4Module : IEquippableWare, IComparable
+    public interface IX4Module : IEquippableWare, IMacro, IComparable
     {
         #region プロパティ
-        /// <summary>
-        /// マクロ名
-        /// </summary>
-        public string Macro { get; }
-
-
         /// <summary>
         /// モジュール種別
         /// </summary>

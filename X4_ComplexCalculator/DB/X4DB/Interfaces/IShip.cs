@@ -5,19 +5,13 @@ namespace X4_ComplexCalculator.DB.X4DB.Interfaces
     /// <summary>
     /// 艦船情報用インターフェース
     /// </summary>
-    public interface IShip : IEquippableWare
+    public interface IShip : IEquippableWare, IMacro
     {
         #region プロパティ
         /// <summary>
         /// 艦船種別
         /// </summary>
         public ShipType ShipType { get; }
-
-
-        /// <summary>
-        /// マクロ名
-        /// </summary>
-        public string Macro { get; }
 
 
         /// <summary>

@@ -62,21 +62,21 @@ namespace X4_ComplexCalculator.DB.X4DB
         #endregion
 
 
-
         #region IEquippableWare
         /// <inheritdoc/>
         public IReadOnlyDictionary<string, WareEquipment> Equipments { get; }
         #endregion
 
 
+        #region IMacro
+        /// <inheritdoc/>
+        public string MacroName { get; }
+        #endregion
+
 
         #region IShip
         /// <inheritdoc/>
         public ShipType ShipType { get; }
-
-
-        /// <inheritdoc/>
-        public string Macro { get; }
 
 
         /// <inheritdoc/>

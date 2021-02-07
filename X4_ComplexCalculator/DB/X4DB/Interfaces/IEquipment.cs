@@ -5,15 +5,9 @@ namespace X4_ComplexCalculator.DB.X4DB.Interfaces
     /// <summary>
     /// 装備情報用インターフェース
     /// </summary>
-    public interface IEquipment : IWare
+    public interface IEquipment : IWare, IMacro
     {
         #region プロパティ
-        /// <summary>
-        /// マクロ名
-        /// </summary>
-        public string Macro { get; }
-
-
         /// <summary>
         /// 装備種別
         /// </summary>

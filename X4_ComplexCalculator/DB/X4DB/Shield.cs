@@ -31,7 +31,7 @@ namespace X4_ComplexCalculator.DB.X4DB
             Tags = equipment.Tags;
             WareEffects = equipment.WareEffects;
 
-            Macro = equipment.Macro;
+            MacroName = equipment.MacroName;
             EquipmentType = equipment.EquipmentType;
             Hull = equipment.Hull;
             HullIntegrated = equipment.HullIntegrated;

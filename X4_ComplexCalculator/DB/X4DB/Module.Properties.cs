@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace X4_ComplexCalculator.DB.X4DB
 {
@@ -64,12 +62,13 @@ namespace X4_ComplexCalculator.DB.X4DB
         #endregion
 
 
+        #region IMacro
+        /// <inheritdoc/>
+        public string MacroName { get; }
+        #endregion
+
 
         #region IX4Module
-        /// <inheritdoc/>
-        public string Macro { get; }
-
-
         /// <inheritdoc/>
         public ModuleType ModuleType { get; }
 
@@ -93,7 +92,6 @@ namespace X4_ComplexCalculator.DB.X4DB
         /// <inheritdoc/>
         public ModuleStorage Storage { get; }
         #endregion
-
 
 
         #region IEquippableWare

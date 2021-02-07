@@ -16,6 +16,12 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// ウェア一覧
         /// </summary>
         private readonly IReadOnlyDictionary<string, IWare> _Wares;
+
+
+        /// <summary>
+        /// マクロ名を持つウェア一覧
+        /// </summary>
+        private readonly IReadOnlyDictionary<string, IMacro> _MacroWares;
         #endregion
 
 
@@ -29,6 +35,9 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
             var builder = new WareBuilder(conn, transportTypeManager);
             _Wares = builder.BuildAll()
                 .ToDictionary(x => x.ID);
+
+            _MacroWares = _Wares.Values.OfType<IMacro>()
+                .ToDictionary(x => x.MacroName);
         }
 
 
@@ -59,6 +68,18 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// <param name="id">ウェアID</param>
         /// <returns>指定した型のウェア又はnull</returns>
         public T? TryGet<T>(string id) where T : class, IWare => _Wares.TryGetValue(id, out var ret) ? ret as T : null;
+
+
+
+        /// <summary>
+        /// <paramref name="macro"/> のマクロ名に対応する <see cref="IMacro"/> の取得を試みる(型指定版)
+        /// </summary>
+        /// <typeparam name="T"><see cref="IMacro"/> を継承した任意の型</typeparam>
+        /// <param name="macro">マクロ名</param>
+        /// <returns>指定した型のウェア又はnull</returns>
+        public T? TryGetMacro<T>(string macro) where T : class, IMacro =>
+            _MacroWares.TryGetValue(macro, out var ret) ? ret as T : null;
+
 
 
         /// <summary>

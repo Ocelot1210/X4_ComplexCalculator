@@ -61,7 +61,7 @@ namespace X4_ComplexCalculator.DB.X4DB
             WareEffects = ware.WareEffects;
 
             ShipType = shipType;
-            Macro = macro;
+            MacroName = macro;
             Size = size;
             Mass = mass;
             Drag = drag;

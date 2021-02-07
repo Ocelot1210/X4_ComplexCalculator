@@ -1,16 +1,13 @@
+using Prism.Mvvm;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using Prism.Mvvm;
 using X4_ComplexCalculator.DB;
-using X4_ComplexCalculator.DB.X4DB;
-using X4_ComplexCalculator.Entity;
-using Dapper;
-using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
+using X4_ComplexCalculator.Entity;
+using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
 {
@@ -110,8 +107,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
                 return null;
             }
 
-            var module = X4Database.Instance.Ware.GetAll<IX4Module>()
-                .FirstOrDefault(x => x.Macro == macro);
+            var module = X4Database.Instance.Ware.TryGetMacro<IX4Module>(macro);
 
             if (module is null)
             {
@@ -186,8 +182,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
                     continue;
                 }
 
-                var equipment = X4Database.Instance.Ware.GetAll<IEquipment>()
-                    .FirstOrDefault(x => x.Macro == macro);
+                var equipment = X4Database.Instance.Ware.TryGet<IEquipment>(macro);
 
                 var max = int.Parse(elm.Attribute("exact")?.Value ?? "1");
                 if (equipment is not null)
