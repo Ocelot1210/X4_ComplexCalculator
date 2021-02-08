@@ -3,11 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using X4_ComplexCalculator.DB.X4DB.Entity;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.DB.X4DB.Manager
 {
     /// <summary>
-    /// <see cref="WareEquipment"/> の一覧を管理するクラス
+    /// <see cref="IWareEquipment"/> の一覧を管理するクラス
     /// </summary>
     class WareEquipmentManager
     {
@@ -15,13 +17,13 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// <summary>
         /// 空のウェアの装備情報一覧(ダミー用)
         /// </summary>
-        private readonly IReadOnlyList<WareEquipment> _EmptyEquipments = Array.Empty<WareEquipment>();
+        private readonly IReadOnlyList<IWareEquipment> _EmptyEquipments = Array.Empty<IWareEquipment>();
 
 
         /// <summary>
         /// ウェアの装備情報一覧
         /// </summary>
-        private readonly IReadOnlyDictionary<string, IReadOnlyList<WareEquipment>> _WareEquipments;
+        private readonly IReadOnlyDictionary<string, IReadOnlyList<IWareEquipment>> _WareEquipments;
         #endregion
 
 
@@ -83,7 +85,7 @@ GROUP BY
             _WareEquipments = conn.Query<TempWareEquipment>(sql2)
                 .Select(x => new WareEquipment(x.WareID, x.ConnectionName, x.EquipmentTypeID, x.GroupName, tagsDict[x.Tags]))
                 .GroupBy(x => x.ID)
-                .ToDictionary(x => x.Key, x => x.ToArray() as IReadOnlyList<WareEquipment>);
+                .ToDictionary(x => x.Key, x => x.ToArray() as IReadOnlyList<IWareEquipment>);
             
         }
 
@@ -93,7 +95,7 @@ GROUP BY
         /// </summary>
         /// <param name="id">ウェアID</param>
         /// <returns>ウェアIDに対応するウェアの装備情報一覧</returns>
-        public IReadOnlyList<WareEquipment> Get(string id) => _WareEquipments.TryGetValue(id, out var value) ? value : _EmptyEquipments;
+        public IReadOnlyList<IWareEquipment> Get(string id) => _WareEquipments.TryGetValue(id, out var value) ? value : _EmptyEquipments;
 
 
         /// <summary>

@@ -1,6 +1,5 @@
-﻿using System;
-using Prism.Mvvm;
-using X4_ComplexCalculator.DB.X4DB;
+﻿using Prism.Mvvm;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
 {
@@ -20,7 +19,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// 派閥
         /// </summary>
-        public Faction Faction { get; }
+        public IFaction Faction { get; }
 
 
         /// <summary>
@@ -57,7 +56,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// </summary>
         /// <param name="faction">派閥</param>
         /// <param name="isChecked">チェック状態</param>
-        public FactionsListItem(Faction faction, bool isChecked)
+        public FactionsListItem(IFaction faction, bool isChecked)
         {
             Faction = faction;
             IsChecked = isChecked;

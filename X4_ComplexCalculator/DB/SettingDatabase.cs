@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using X4_ComplexCalculator.Common;
-using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.DB
@@ -129,7 +128,7 @@ WHERE
         /// 装備編集画面でチェックされた派閥一覧を設定する
         /// </summary>
         /// <param name="checkedFactions">装備編集画面でチェックされた派閥一覧</param>
-        public void SetCheckedFactionsAtSelectEquipmentWindow(IEnumerable<Faction> checkedFactions)
+        public void SetCheckedFactionsAtSelectEquipmentWindow(IEnumerable<IFaction> checkedFactions)
         {
             BeginTransaction(db =>
             {

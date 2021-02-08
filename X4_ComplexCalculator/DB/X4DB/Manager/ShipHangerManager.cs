@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-
+using X4_ComplexCalculator.DB.X4DB.Entity;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.DB.X4DB.Manager
 {
@@ -15,13 +16,13 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// <summary>
         /// 艦船のハンガー一覧
         /// </summary>
-        private readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, ShipHanger>> _ShipHangers;
+        private readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, IShipHanger>> _ShipHangers;
 
 
         /// <summary>
         /// 空のハンガー情報(ダミー用)
         /// </summary>
-        private readonly IReadOnlyDictionary<string, ShipHanger> _EmptyHanger = new Dictionary<string, ShipHanger>();
+        private readonly IReadOnlyDictionary<string, IShipHanger> _EmptyHanger = new Dictionary<string, IShipHanger>();
         #endregion
 
 
@@ -36,7 +37,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
                 .GroupBy(x => x.ShipID)
                 .ToDictionary(
                     x => x.Key,
-                    x => x.ToDictionary(y => y.Size.SizeID) as IReadOnlyDictionary<string, ShipHanger>);
+                    x => x.ToDictionary(y => y.Size.SizeID, y => y as IShipHanger) as IReadOnlyDictionary<string, IShipHanger>);
         }
 
 
@@ -45,7 +46,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// </summary>
         /// <param name="id">艦船ID</param>
         /// <returns>艦船IDに対応するハンガー情報</returns>
-        public IReadOnlyDictionary<string, ShipHanger> Get(string id) =>
+        public IReadOnlyDictionary<string, IShipHanger> Get(string id) =>
             _ShipHangers.TryGetValue(id, out var hanger) ? hanger : _EmptyHanger;
     }
 }

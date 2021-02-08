@@ -1,9 +1,8 @@
 ﻿namespace X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions.Behaviors
 {
+    using Microsoft.Xaml.Behaviors;
     using System.Windows;
     using System.Windows.Controls;
-
-    using Microsoft.Xaml.Behaviors;
 
     /// <summary>
     /// Clears the text of the <see cref="TextBox"/> when the associated button is clicked.

@@ -6,7 +6,6 @@ using System.ComponentModel;
 using System.Linq;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
-using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Products;

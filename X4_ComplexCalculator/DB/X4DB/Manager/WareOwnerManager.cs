@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.DB.X4DB.Manager
 {
@@ -12,7 +13,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// <summary>
         /// ユニークなウェア所有派閥一覧
         /// </summary>
-        private readonly IReadOnlyDictionary<string, IReadOnlyList<Faction>> _Owners;
+        private readonly IReadOnlyDictionary<string, IReadOnlyList<IFaction>> _Owners;
 
 
         /// <summary>
@@ -24,7 +25,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// <summary>
         /// 空の所有派閥一覧(ダミー用)
         /// </summary>
-        private readonly IReadOnlyList<Faction> _EmptyOwners = Array.Empty<Faction>();
+        private readonly IReadOnlyList<IFaction> _EmptyOwners = Array.Empty<IFaction>();
         #endregion
 
 
@@ -48,7 +49,7 @@ GROUP BY TmpOwner.WareID";
                             .Select(y => X4Database.Instance.Faction.Get(y))
                             .Where(y => y is not null)
                             .Select(y => y!)
-                            .ToArray() as IReadOnlyList<Faction>
+                            .ToArray() as IReadOnlyList<IFaction>
                     );
             }
 
@@ -81,7 +82,7 @@ GROUP BY
         /// </summary>
         /// <param name="wareID"></param>
         /// <returns></returns>
-        public IReadOnlyList<Faction> Get(string wareID)
+        public IReadOnlyList<IFaction> Get(string wareID)
         {
             if (_WareOwnerPair.TryGetValue(wareID, out var owners))
             {

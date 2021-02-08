@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -8,8 +10,6 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Linq;
-using Microsoft.Win32;
-using Prism.Mvvm;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Localize;
 

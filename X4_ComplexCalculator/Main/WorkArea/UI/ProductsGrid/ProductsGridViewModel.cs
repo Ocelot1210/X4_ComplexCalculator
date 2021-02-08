@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Prism.Commands;
+using Prism.Mvvm;
+using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
 using System.Windows.Input;
-using Prism.Commands;
-using Prism.Mvvm;
-using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Products;
 

@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-
+using X4_ComplexCalculator.DB.X4DB.Entity;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.DB.X4DB.Manager
 {
@@ -15,13 +16,13 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// <summary>
         /// ウェアの生産量と生産時間情報の一覧
         /// </summary>
-        private readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, WareProduction>> _WareProductions;
+        private readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, IWareProduction>> _WareProductions;
 
 
         /// <summary>
         /// ダミー用ウェア生産情報
         /// </summary>
-        private readonly IReadOnlyDictionary<string, WareProduction> _DummyWareProduction = new Dictionary<string, WareProduction>();
+        private readonly IReadOnlyDictionary<string, IWareProduction> _DummyWareProduction = new Dictionary<string, IWareProduction>();
         #endregion
 
 
@@ -38,7 +39,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
                 .GroupBy(x => x.WareID)
                 .ToDictionary(
                     x => x.Key,
-                    x => x.ToDictionary(y => y.Method) as IReadOnlyDictionary<string, WareProduction>
+                    x => x.ToDictionary(y => y.Method, y => y as IWareProduction) as IReadOnlyDictionary<string, IWareProduction>
                 );
         }
 
@@ -49,7 +50,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// </summary>
         /// <param name="id">ウェアID</param>
         /// <returns>ウェアIDに対応するウェア生産方式一覧</returns>
-        public IReadOnlyDictionary<string, WareProduction> Get(string id)
+        public IReadOnlyDictionary<string, IWareProduction> Get(string id)
             => _WareProductions.TryGetValue(id, out var ret) ? ret : _DummyWareProduction;
 
 
@@ -60,7 +61,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// <param name="id">ウェアID</param>
         /// <param name="method">生産方式</param>
         /// <returns>ウェアIDと生産方式に対応する生産情報</returns>
-        public WareProduction Get(string id, string method)
+        public IWareProduction Get(string id, string method)
         {
             var productions = Get(id);
 

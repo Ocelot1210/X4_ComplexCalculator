@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
-using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 

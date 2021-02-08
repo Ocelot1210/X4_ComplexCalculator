@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using X4_ComplexCalculator.DB.X4DB.Entity;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.DB.X4DB.Manager
 {
@@ -15,13 +17,13 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// <summary>
         /// モジュールの製品情報一覧
         /// </summary>
-        private readonly IReadOnlyDictionary<string, IReadOnlyList<ModuleProduct>> _ModuleProducts;
+        private readonly IReadOnlyDictionary<string, IReadOnlyList<IModuleProduct>> _ModuleProducts;
 
 
         /// <summary>
         /// ダミーの製品情報一覧
         /// </summary>
-        private readonly IReadOnlyList<ModuleProduct> _DummyProduct = Array.Empty<ModuleProduct>();
+        private readonly IReadOnlyList<IModuleProduct> _DummyProduct = Array.Empty<IModuleProduct>();
         #endregion
 
 
@@ -37,7 +39,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
             _ModuleProducts = conn.Query<X4_DataExporterWPF.Entity.ModuleProduct>(sql)
                 .Select(x => new ModuleProduct(x.ModuleID, x.WareID, x.Method, wareProductionManager.Get(x.WareID, x.Method)))
                 .GroupBy(x => x.ModuleID)
-                .ToDictionary(x => x.Key, x => x.ToArray() as IReadOnlyList<ModuleProduct>);
+                .ToDictionary(x => x.Key, x => x.ToArray() as IReadOnlyList<IModuleProduct>);
         }
 
 
@@ -46,7 +48,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// </summary>
         /// <param name="id">モジュールID</param>
         /// <returns>モジュールIDに対応するモジュールの製品情報一覧</returns>
-        public IReadOnlyList<ModuleProduct> Get(string id) =>
+        public IReadOnlyList<IModuleProduct> Get(string id) =>
             _ModuleProducts.TryGetValue(id, out var product) ? product : _DummyProduct;
     }
 }

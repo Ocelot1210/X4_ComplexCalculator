@@ -1,5 +1,5 @@
 ﻿using Prism.Mvvm;
-using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Races
 {
@@ -12,7 +12,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Races
         /// <summary>
         /// 種族
         /// </summary>
-        private readonly Race _Race;
+        private readonly IRace _Race;
         #endregion
 
 
@@ -40,7 +40,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Races
         /// コンストラクタ
         /// </summary>
         /// <param name="race">種族</param>
-        public RacesGridItem(Race race)
+        public RacesGridItem(IRace race)
         {
             _Race = race;
         }

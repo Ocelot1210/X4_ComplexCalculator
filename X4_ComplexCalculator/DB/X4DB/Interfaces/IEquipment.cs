@@ -11,7 +11,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Interfaces
         /// <summary>
         /// 装備種別
         /// </summary>
-        public EquipmentType EquipmentType { get; }
+        public IEquipmentType EquipmentType { get; }
 
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Interfaces
         /// <summary>
         /// 製造種族
         /// </summary>
-        public Race? MakerRace { get; }
+        public IRace? MakerRace { get; }
 
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Interfaces
         /// <summary>
         /// サイズ
         /// </summary>
-        public X4Size? Size { get; }
+        public IX4Size? Size { get; }
         #endregion
     }
 }

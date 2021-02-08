@@ -1,5 +1,5 @@
-﻿using System.Windows.Input;
-using Prism.Mvvm;
+﻿using Prism.Mvvm;
+using System.Windows.Input;
 using X4_ComplexCalculator.Main.WorkArea;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport

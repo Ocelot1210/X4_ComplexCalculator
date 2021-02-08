@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using X4_ComplexCalculator.DB.X4DB.Entity;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.DB.X4DB.Manager;
 
@@ -17,7 +18,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Builder
         /// <summary>
         /// 艦船種別一覧
         /// </summary>
-        private readonly IReadOnlyDictionary<string, ShipType> _ShipTypes;
+        private readonly IReadOnlyDictionary<string, IShipType> _ShipTypes;
 
 
         /// <summary>
@@ -63,7 +64,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Builder
             {
                 const string sql = @"SELECT ShipTypeID, Name, Description FROM ShipType";
                 _ShipTypes = conn.Query<ShipType>(sql)
-                    .ToDictionary(x => x.ShipTypeID);
+                    .ToDictionary(x => x.ShipTypeID, x => x as IShipType);
             }
 
             // 艦船情報一覧を作成

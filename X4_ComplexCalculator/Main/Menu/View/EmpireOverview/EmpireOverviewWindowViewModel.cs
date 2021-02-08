@@ -1,9 +1,9 @@
-﻿using System.Collections.ObjectModel;
+﻿using Prism.Commands;
+using Prism.Mvvm;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Data;
 using System.Windows.Input;
-using Prism.Commands;
-using Prism.Mvvm;
 using X4_ComplexCalculator.Main.WorkArea;
 
 namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview

@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Text;
+using System.Linq;
 using X4_ComplexCalculator.DB.X4DB.Builder;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
-using System.Linq;
 
 namespace X4_ComplexCalculator.DB.X4DB.Manager
 {

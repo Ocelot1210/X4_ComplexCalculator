@@ -1,7 +1,7 @@
-﻿using System;
-using System.Windows.Input;
-using Prism.Commands;
+﻿using Prism.Commands;
 using Prism.Mvvm;
+using System;
+using System.Windows.Input;
 
 namespace X4_ComplexCalculator.Common.Dialog.SelectStringDialog
 {

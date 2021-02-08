@@ -8,7 +8,6 @@ using System.Xml.Linq;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
-using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Entity;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
@@ -50,7 +49,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <summary>
         /// 選択された建造方式
         /// </summary>
-        private WareProduction _SelectedMethod;
+        private IWareProduction _SelectedMethod;
 
 
         /// <summary>
@@ -158,7 +157,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <summary>
         /// 選択中の建造方式
         /// </summary>
-        public WareProduction SelectedMethod
+        public IWareProduction SelectedMethod
         {
             get => _SelectedMethod;
             set
@@ -200,7 +199,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <param name="module">モジュール</param>
         /// <param name="selectedMethod">選択中の建造方式</param>
         /// <param name="moduleCount">モジュール数</param>
-        public ModulesGridItem(IX4Module module, WareProduction? selectedMethod = null, long moduleCount = 1)
+        public ModulesGridItem(IX4Module module, IWareProduction? selectedMethod = null, long moduleCount = 1)
         {
             Module = module;
             ModuleCount = moduleCount;

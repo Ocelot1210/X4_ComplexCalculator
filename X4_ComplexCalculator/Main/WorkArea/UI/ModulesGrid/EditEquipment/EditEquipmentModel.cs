@@ -8,7 +8,6 @@ using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
-using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Entity;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList;
@@ -37,7 +36,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// 装備サイズ一覧
         /// </summary>
-        public ObservableRangeCollection<X4Size> EquipmentSizes { get; } = new();
+        public ObservableRangeCollection<IX4Size> EquipmentSizes { get; } = new();
 
 
         /// <summary>
@@ -61,7 +60,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// 選択中のサイズ
         /// </summary>
-        public ReactiveProperty<X4Size> SelectedSize { get; }
+        public ReactiveProperty<IX4Size> SelectedSize { get; }
 
 
         /// <summary>
@@ -84,7 +83,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
             UpdateFactions();
             InitPreset();
 
-            SelectedSize = new ReactiveProperty<X4Size>(EquipmentSizes.First());
+            SelectedSize = new ReactiveProperty<IX4Size>(EquipmentSizes.First());
             SelectedSize.Subscribe(x =>
             {
                 foreach (var vm in EquipmentListViewModels)

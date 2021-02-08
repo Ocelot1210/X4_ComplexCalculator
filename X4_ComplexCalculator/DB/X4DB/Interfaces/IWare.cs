@@ -22,13 +22,13 @@ namespace X4_ComplexCalculator.DB.X4DB.Interfaces
         /// <summary>
         /// ウェア種別
         /// </summary>
-        public WareGroup WareGroup { get; }
+        public IWareGroup WareGroup { get; }
 
 
         /// <summary>
         /// カーゴ種別
         /// </summary>
-        public TransportType TransportType { get; }
+        public ITransportType TransportType { get; }
 
 
         /// <summary>
@@ -64,19 +64,19 @@ namespace X4_ComplexCalculator.DB.X4DB.Interfaces
         /// <summary>
         /// 所有派閥
         /// </summary>
-        public IReadOnlyList<Faction> Owners { get; }
+        public IReadOnlyList<IFaction> Owners { get; }
 
 
         /// <summary>
         /// 生産方式
         /// </summary>
-        public IReadOnlyDictionary<string, WareProduction> Productions { get; }
+        public IReadOnlyDictionary<string, IWareProduction> Productions { get; }
 
 
         /// <summary>
         /// 生産に必要なウェア情報
         /// </summary>
-        public IReadOnlyDictionary<string, IReadOnlyList<WareResource>> Resources { get; }
+        public IReadOnlyDictionary<string, IReadOnlyList<IWareResource>> Resources { get; }
 
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Interfaces
         /// <summary>
         /// ウェア生産時の追加効果情報
         /// </summary>
-        public WareEffects WareEffects { get; }
+        public IWareEffects WareEffects { get; }
         #endregion
 
 
@@ -106,7 +106,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Interfaces
         /// </summary>
         /// <param name="method">生産方式</param>
         /// <returns>生産情報</returns>
-        public WareProduction? TryGetProduction(string method)
+        public IWareProduction? TryGetProduction(string method)
         {
             // 生産方式に対応する生産情報を取得
             if (Productions.TryGetValue(method, out var production))

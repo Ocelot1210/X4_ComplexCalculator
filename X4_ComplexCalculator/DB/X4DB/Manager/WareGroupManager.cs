@@ -2,25 +2,27 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using X4_ComplexCalculator.DB.X4DB.Entity;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.DB.X4DB.Manager
 {
     /// <summary>
-    /// <see cref="WareGroup"/> の一覧を管理するクラス
+    /// <see cref="IWareGroup"/> の一覧を管理するクラス
     /// </summary>
     class WareGroupManager
     {
         #region メンバ
         /// <summary>
-        /// ウェア種別IDをキーにした <see cref="WareGroup"/> の一覧
+        /// ウェア種別IDをキーにした <see cref="IWareGroup"/> の一覧
         /// </summary>
-        private readonly IReadOnlyDictionary<string, WareGroup> _WareGroups;
+        private readonly IReadOnlyDictionary<string, IWareGroup> _WareGroups;
 
 
         /// <summary>
         /// ダミー用ウェア種別
         /// </summary>
-        private readonly WareGroup _DummyWareGroup = new("", "", -1);
+        private readonly IWareGroup _DummyWareGroup = new WareGroup("", "", -1);
         #endregion
 
 
@@ -32,19 +34,19 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         {
             const string sql = "SELECT WareGroupID, Name, Tier FROM WareGroup";
             _WareGroups = conn.Query<WareGroup>(sql)
-                .ToDictionary(x => x.WareGroupID);
+                .ToDictionary(x => x.WareGroupID, x => x as IWareGroup);
         }
 
 
         /// <summary>
-        /// <paramref name="wareGroupID"/> に対応する <see cref="WareGroup"/> の取得を試みる
+        /// <paramref name="wareGroupID"/> に対応する <see cref="IWareGroup"/> の取得を試みる
         /// </summary>
         /// <param name="wareGroupID">ウェア種別ID</param>
         /// <returns>
-        /// <para><paramref name="wareGroupID"/> に対応する <see cref="WareGroup"/></para>
-        /// <para>無ければ空の <see cref="WareGroup"/></para>
+        /// <para><paramref name="wareGroupID"/> に対応する <see cref="IWareGroup"/></para>
+        /// <para>無ければ空の <see cref="IWareGroup"/></para>
         /// </returns>
-        public WareGroup TryGet(string wareGroupID) =>
+        public IWareGroup TryGet(string wareGroupID) =>
             _WareGroups.TryGetValue(wareGroupID, out var ret) ? ret : _DummyWareGroup;
     }
 }

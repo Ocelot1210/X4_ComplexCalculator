@@ -1,4 +1,6 @@
-﻿using System;
+﻿using LibX4.FileSystem;
+using LibX4.Lang;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
@@ -6,8 +8,6 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Xml.XPath;
-using LibX4.FileSystem;
-using LibX4.Lang;
 using X4_DataExporterWPF.Export;
 
 namespace X4_DataExporterWPF.DataExportWindow

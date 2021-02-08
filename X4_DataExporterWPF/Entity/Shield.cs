@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace X4_DataExporterWPF.Entity
+﻿namespace X4_DataExporterWPF.Entity
 {
     /// <summary>
     /// シールド情報

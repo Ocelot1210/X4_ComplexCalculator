@@ -6,7 +6,6 @@ using System.Linq;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
-using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Entity;
 
@@ -27,7 +26,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 装備種別
         /// </summary>
-        private readonly EquipmentType _EquipmentType;
+        private readonly IEquipmentType _EquipmentType;
         #endregion
 
 
@@ -41,7 +40,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 現在のサイズ
         /// </summary>
-        public ReactiveProperty<X4Size> SelectedSize { get; }
+        public ReactiveProperty<IX4Size> SelectedSize { get; }
 
 
         /// <summary>
@@ -90,8 +89,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <param name="factions"></param>
         public EquipmentListModel(
             EquippableWareEquipmentManager manager,
-            EquipmentType equipmentType,
-            X4Size size
+            IEquipmentType equipmentType,
+            IX4Size size
         )
         {
             _EquipmentType = equipmentType;

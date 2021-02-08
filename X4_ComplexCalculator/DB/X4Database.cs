@@ -1,10 +1,9 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.IO;
 using System.Windows;
-using Microsoft.Win32;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Localize;
-using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.DB.X4DB.Manager;
 using X4_DataExporterWPF.DataExportWindow;
 

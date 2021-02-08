@@ -1,10 +1,9 @@
 ﻿namespace X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions.Behaviors
 {
+    using Microsoft.Xaml.Behaviors;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Input;
-    
-    using Microsoft.Xaml.Behaviors;
 
     /// <summary>
     /// Ctrl+Enter on a cell starts editing the cell without clearing the content.

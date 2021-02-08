@@ -1,7 +1,7 @@
-﻿using System.Globalization;
+﻿using LibX4.Xml;
+using System.Globalization;
 using System.Threading;
 using System.Xml.Linq;
-using LibX4.Xml;
 using Xunit;
 
 namespace LibX4.Tests

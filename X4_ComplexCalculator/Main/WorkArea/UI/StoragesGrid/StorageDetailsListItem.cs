@@ -1,5 +1,4 @@
 ﻿using Prism.Mvvm;
-using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
@@ -39,7 +38,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         /// <summary>
         /// 保管庫種別
         /// </summary>
-        public TransportType TransportType { get; }
+        public ITransportType TransportType { get; }
 
 
 
@@ -78,7 +77,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         /// <param name="module">モジュール</param>
         /// <param name="moduleCount">モジュール数</param>
         /// <param name="transportType">保管庫種別</param>
-        public StorageDetailsListItem(IX4Module module, long moduleCount, TransportType transportType)
+        public StorageDetailsListItem(IX4Module module, long moduleCount, ITransportType transportType)
         {
             _Module = module;
             ModuleCount = moduleCount;

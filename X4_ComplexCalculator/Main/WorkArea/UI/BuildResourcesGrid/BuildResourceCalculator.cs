@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
@@ -64,7 +63,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             var resources = 
                 ware.Resources.TryGetValue(method, out var ret1) ? ret1 :
                 ware.Resources.TryGetValue(method, out var ret2) ? ret2 :
-                Enumerable.Empty<WareResource>();
+                Enumerable.Empty<IWareResource>();
 
             return resources.Select(x => new CalcResult(x.NeedWareID, x.Amount * count));
         }

@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using X4_ComplexCalculator.DB.X4DB.Entity;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.DB.X4DB.Manager
 {
     /// <summary>
-    /// <see cref="EquipmentType"/> の一覧を管理するクラス
+    /// <see cref="IEquipmentType"/> の一覧を管理するクラス
     /// </summary>
     class EquipmentTypeManager
     {
@@ -14,7 +16,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// <summary>
         /// 装備種別一覧
         /// </summary>
-        private readonly IReadOnlyDictionary<string, EquipmentType> _EquipmentTypes;
+        private readonly IReadOnlyDictionary<string, IEquipmentType> _EquipmentTypes;
         #endregion
 
 
@@ -27,16 +29,16 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         {
             const string sql = "SELECT EquipmentTypeID, Name FROM EquipmentType";
             _EquipmentTypes = conn.Query<EquipmentType>(sql)
-                .ToDictionary(x => x.EquipmentTypeID);
+                .ToDictionary(x => x.EquipmentTypeID, x => x as IEquipmentType);
         }
 
 
         /// <summary>
-        /// <paramref name="id"/> に対応する <see cref="EquipmentType"/> を取得する
+        /// <paramref name="id"/> に対応する <see cref="IEquipmentType"/> を取得する
         /// </summary>
         /// <param name="id">装備種別ID</param>
-        /// <returns><paramref name="id"/> に対応する <see cref="EquipmentType"/></returns>
-        /// <exception cref="KeyNotFoundException"><paramref name="id"/> に対応する <see cref="EquipmentType"/> が無い場合</exception>
-        public EquipmentType Get(string id) => _EquipmentTypes[id];
+        /// <returns><paramref name="id"/> に対応する <see cref="IEquipmentType"/></returns>
+        /// <exception cref="KeyNotFoundException"><paramref name="id"/> に対応する <see cref="IEquipmentType"/> が無い場合</exception>
+        public IEquipmentType Get(string id) => _EquipmentTypes[id];
     }
 }

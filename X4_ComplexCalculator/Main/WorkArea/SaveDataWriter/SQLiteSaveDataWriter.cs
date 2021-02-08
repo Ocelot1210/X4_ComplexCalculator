@@ -1,14 +1,13 @@
-﻿using System;
+﻿using Dapper;
+using Microsoft.Win32;
+using System;
 using System.Data;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using Dapper;
-using Microsoft.Win32;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
-using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter

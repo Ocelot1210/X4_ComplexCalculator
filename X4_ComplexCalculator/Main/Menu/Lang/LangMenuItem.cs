@@ -1,7 +1,7 @@
-﻿using System.Globalization;
-using Prism.Mvvm;
+﻿using Prism.Mvvm;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
+using System.Globalization;
 
 namespace X4_ComplexCalculator.Main.Menu.Lang
 {

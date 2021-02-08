@@ -1,5 +1,5 @@
-﻿using System;
-using Prism.Mvvm;
+﻿using Prism.Mvvm;
+using System;
 
 namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings
 {

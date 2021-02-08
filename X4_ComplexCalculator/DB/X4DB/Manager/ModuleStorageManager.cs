@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using X4_ComplexCalculator.DB.X4DB.Entity;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.DB.X4DB.Manager
 {
@@ -14,25 +16,25 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// <summary>
         /// モジュールの保管庫情報一覧
         /// </summary>
-        private readonly IReadOnlyDictionary<string, ModuleStorage> _ModuleStorages;
+        private readonly IReadOnlyDictionary<string, IModuleStorage> _ModuleStorages;
 
 
         /// <summary>
         /// ダミー用の保管庫情報一覧
         /// </summary>
-        private readonly Dictionary<string, ModuleStorage> _DummyStorages = new();
+        private readonly Dictionary<string, IModuleStorage> _DummyStorages = new();
 
 
         /// <summary>
         /// ダミー用保管庫種別一覧
         /// </summary>
-        private readonly HashSet<TransportType> _DummyTypes = new();
+        private readonly HashSet<ITransportType> _DummyTypes = new();
 
 
         /// <summary>
         /// 保管庫種別の組み合わせ一覧
         /// </summary>
-        private readonly IReadOnlyDictionary<string, HashSet<TransportType>> _TransportTypeDict;
+        private readonly IReadOnlyDictionary<string, HashSet<ITransportType>> _TransportTypeDict;
         #endregion
 
 
@@ -64,7 +66,7 @@ GROUP BY
 	Sorted_TransportTypeID.ModuleID";
 
                 _TransportTypeDict = conn.Query<string>(sql)
-                    .ToDictionary(x => x, x => new HashSet<TransportType>(x.Split('彁').Select(y => transportTypeManager.Get(y))));
+                    .ToDictionary(x => x, x => new HashSet<ITransportType>(x.Split('彁').Select(y => transportTypeManager.Get(y))));
             }
 
             // モジュールの保管庫情報一覧を作成
@@ -86,7 +88,7 @@ GROUP BY
 	ModuleStorage.ModuleID";
 
                 _ModuleStorages = conn.Query<(string ID, long Amount, string transportTypes)>(sql)
-                    .ToDictionary(x => x.ID, x => new ModuleStorage(x.ID, x.Amount, _TransportTypeDict[x.transportTypes]));
+                    .ToDictionary(x => x.ID, x => new ModuleStorage(x.ID, x.Amount, _TransportTypeDict[x.transportTypes]) as IModuleStorage);
             }
         }
 
@@ -97,7 +99,7 @@ GROUP BY
         /// </summary>
         /// <param name="id">モジュールID</param>
         /// <returns>指定したモジュールIDに対応する保管庫情報</returns>
-        public ModuleStorage Get(string id)
+        public IModuleStorage Get(string id)
         {
             if (_ModuleStorages.TryGetValue(id, out var ret1))
             {

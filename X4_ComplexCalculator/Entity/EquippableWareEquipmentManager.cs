@@ -4,7 +4,6 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Xml.Linq;
 using X4_ComplexCalculator.DB;
-using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Entity
@@ -18,7 +17,7 @@ namespace X4_ComplexCalculator.Entity
         /// <summary>
         /// グループ名と接続名をキーにした装備中の項目一覧
         /// </summary>
-        private readonly Dictionary<WareEquipment, IEquipment> _Equipped;
+        private readonly Dictionary<IWareEquipment, IEquipment> _Equipped;
         #endregion
 
 
@@ -241,7 +240,7 @@ namespace X4_ComplexCalculator.Entity
         /// <param name="type">装備ID</param>
         /// <param name="size">装備サイズ</param>
         /// <returns>装備IDと装備サイズに対応する装備があと何個装備できるか</returns>
-        public int GetEquippableCount(EquipmentType type, X4Size size)
+        public int GetEquippableCount(IEquipmentType type, IX4Size size)
             => Ware.Equipments.Values.Count(x =>
             !_Equipped.ContainsKey(x) &&
             x.Tags.Contains(type.EquipmentTypeID[..^1]) &&
@@ -255,7 +254,7 @@ namespace X4_ComplexCalculator.Entity
         /// <param name="type">装備ID</param>
         /// <param name="size">装備サイズ</param>
         /// <returns>装備IDと装備サイズに対応する装備が何個装備できるか</returns>
-        public int GetMaxEquippableCount(EquipmentType type, X4Size size)
+        public int GetMaxEquippableCount(IEquipmentType type, IX4Size size)
             => Ware.Equipments.Values.Count(x => x.Tags.Contains(type.EquipmentTypeID[..^1]) && x.Tags.Contains(size.SizeID));
 
 

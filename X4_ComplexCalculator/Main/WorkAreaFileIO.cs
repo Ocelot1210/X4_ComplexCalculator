@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using Microsoft.Win32;
-using Prism.Mvvm;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Main.WorkArea;

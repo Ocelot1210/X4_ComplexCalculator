@@ -9,7 +9,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Interfaces
         /// <summary>
         /// モジュール種別
         /// </summary>
-        public ModuleType ModuleType { get; }
+        public IModuleType ModuleType { get; }
 
 
         /// <summary>
@@ -33,13 +33,13 @@ namespace X4_ComplexCalculator.DB.X4DB.Interfaces
         /// <summary>
         /// モジュールの製品
         /// </summary>
-        public IReadOnlyList<ModuleProduct> Products { get; }
+        public IReadOnlyList<IModuleProduct> Products { get; }
 
 
         /// <summary>
         /// 保管庫情報
         /// </summary>
-        public ModuleStorage Storage { get; }
+        public IModuleStorage Storage { get; }
         #endregion
     }
 }

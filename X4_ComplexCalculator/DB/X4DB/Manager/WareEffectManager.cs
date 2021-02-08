@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using X4_ComplexCalculator.DB.X4DB.Entity;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.DB.X4DB.Manager
 {
     /// <summary>
-    /// <see cref="WareEffect"/> の一覧を管理するクラス
+    /// <see cref="IWareEffect"/> の一覧を管理するクラス
     /// </summary>
     class WareEffectManager
     {
@@ -20,7 +22,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// <summary>
         /// 空のウェア生産時の追加効果情報
         /// </summary>
-        private readonly WareEffects _EmptyEffect = new(Enumerable.Empty<WareEffect>());
+        private readonly IWareEffects _EmptyEffect = new WareEffects(Enumerable.Empty<IWareEffect>());
         #endregion
 
 
@@ -44,7 +46,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// </summary>
         /// <param name="id">ウェアID</param>
         /// <returns><paramref name="id"/> に対応するウェア生産時の追加効果情報一覧</returns>
-        public WareEffects Get(string id)
+        public IWareEffects Get(string id)
         {
             if (_WareEffects.TryGetValue(id, out var effects))
             {

@@ -1,11 +1,10 @@
 ﻿using Prism.Mvvm;
-using System.Windows.Data;
-using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.DB.X4DB;
 using System.ComponentModel;
 using System.Linq;
-using X4_ComplexCalculator.DB.X4DB.Interfaces;
+using System.Windows.Data;
+using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Modules
 {

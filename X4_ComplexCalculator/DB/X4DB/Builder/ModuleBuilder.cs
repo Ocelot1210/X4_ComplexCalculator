@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using X4_ComplexCalculator.DB.X4DB.Entity;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.DB.X4DB.Manager;
 
@@ -17,7 +18,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Builder
         /// <summary>
         /// モジュール種別一覧
         /// </summary>
-        private readonly IReadOnlyDictionary<string, ModuleType> _ModuleTypes;
+        private readonly IReadOnlyDictionary<string, IModuleType> _ModuleTypes;
 
 
         /// <summary>
@@ -63,7 +64,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Builder
             {
                 const string sql = "SELECT ModuleTypeID, Name FROM ModuleType";
                 _ModuleTypes = conn.Query<ModuleType>(sql)
-                    .ToDictionary(x => x.ModuleTypeID);
+                    .ToDictionary(x => x.ModuleTypeID, x => x as IModuleType);
             }
 
 
@@ -85,7 +86,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Builder
         /// </summary>
         /// <param name="ware">ベースとなるウェア情報</param>
         /// <returns>モジュール情報</returns>
-        public Module Builld(IWare ware)
+        public IX4Module Builld(IWare ware)
         {
             if (!ware.Tags.Contains("module"))
             {

@@ -1,5 +1,6 @@
 ﻿namespace X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions.Behaviors
 {
+    using Microsoft.Xaml.Behaviors;
     using System;
     using System.Collections.Generic;
     using System.Collections.Specialized;
@@ -11,8 +12,6 @@
     using System.Windows.Data;
     using System.Windows.Input;
     using System.Windows.Threading;
-
-    using Microsoft.Xaml.Behaviors;
     using X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions.Framework;
 
     /// <summary>

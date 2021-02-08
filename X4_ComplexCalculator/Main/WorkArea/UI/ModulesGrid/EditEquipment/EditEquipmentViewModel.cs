@@ -1,3 +1,7 @@
+using Prism.Commands;
+using Prism.Mvvm;
+using Reactive.Bindings;
+using Reactive.Bindings.Extensions;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -8,12 +12,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
-using Prism.Commands;
-using Prism.Mvvm;
-using Reactive.Bindings;
-using Reactive.Bindings.Extensions;
 using X4_ComplexCalculator.Common.Localize;
-using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Entity;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList;
 
@@ -77,13 +77,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// <summary>
         /// 装備サイズ一覧
         /// </summary>
-        public ObservableCollection<X4Size> EquipmentSizes => _Model.EquipmentSizes;
+        public ObservableCollection<IX4Size> EquipmentSizes => _Model.EquipmentSizes;
 
 
         /// <summary>
         /// 選択中の装備サイズ
         /// </summary>
-        public ReactiveProperty<X4Size> SelectedSize { get; }
+        public ReactiveProperty<IX4Size> SelectedSize { get; }
 
 
         /// <summary>

@@ -1,0 +1,53 @@
+﻿using System;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
+
+namespace X4_ComplexCalculator.DB.X4DB.Entity
+{
+    /// <summary>
+    /// 派閥管理用クラス
+    /// </summary>
+    public class Faction : IFaction
+    {
+        #region IFaction
+        /// <inheritdoc/>
+        public string FactionID { get; }
+
+
+        /// <inheritdoc/>
+        public string Name { get; }
+
+
+        /// <inheritdoc/>
+        public IRace Race { get; }
+        #endregion
+
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="factionID">派閥ID</param>
+        /// <param name="name">派閥名</param>
+        /// <param name="race">種族</param>
+        public Faction(string factionID, string name, IRace race)
+        {
+            FactionID = factionID;
+            Name = name;
+            Race = race;
+        }
+
+
+        /// <summary>
+        /// 比較
+        /// </summary>
+        /// <param name="obj">比較対象</param>
+        /// <returns></returns>
+        public override bool Equals(object? obj) => obj is IFaction other && other.FactionID == FactionID;
+
+
+        /// <summary>
+        /// ハッシュ値を取得
+        /// </summary>
+        /// <returns>ハッシュ値</returns>
+        public override int GetHashCode() => HashCode.Combine(FactionID);
+    }
+}

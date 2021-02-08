@@ -1,5 +1,6 @@
 ﻿namespace X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions.Behaviors
 {
+    using Microsoft.Xaml.Behaviors;
     using System;
     using System.Collections.Generic;
     using System.Collections.Specialized;
@@ -9,10 +10,8 @@
     using System.Windows.Controls;
     using System.Windows.Data;
     using System.Windows.Threading;
-    using X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions.Framework;
-    using Microsoft.Xaml.Behaviors;
-
     using Throttle;
+    using X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions.Framework;
 
     /// <summary>
     /// A behavior to control the "ApplyInitialSorting" feature.

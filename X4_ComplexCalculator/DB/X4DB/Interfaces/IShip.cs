@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using X4_ComplexCalculator.DB.X4DB.Entity;
 
 namespace X4_ComplexCalculator.DB.X4DB.Interfaces
 {
@@ -11,13 +12,13 @@ namespace X4_ComplexCalculator.DB.X4DB.Interfaces
         /// <summary>
         /// 艦船種別
         /// </summary>
-        public ShipType ShipType { get; }
+        public IShipType ShipType { get; }
 
 
         /// <summary>
         /// 艦船サイズ
         /// </summary>
-        public X4Size Size { get; }
+        public IX4Size Size { get; }
 
 
         /// <summary>
@@ -71,13 +72,13 @@ namespace X4_ComplexCalculator.DB.X4DB.Interfaces
         /// <summary>
         /// 艦船のハンガー情報
         /// </summary>
-        public IReadOnlyDictionary<string, ShipHanger> ShipHanger { get; }
+        public IReadOnlyDictionary<string, IShipHanger> ShipHanger { get; }
 
 
         /// <summary>
         /// ロードアウトIDをキーにしたロードアウト情報のディクショナリ
         /// </summary>
-        public IReadOnlyDictionary<string, IReadOnlyList<ShipLoadout>> Loadouts { get; }
+        public IReadOnlyDictionary<string, IReadOnlyList<IShipLoadout>> Loadouts { get; }
         #endregion
     }
 }

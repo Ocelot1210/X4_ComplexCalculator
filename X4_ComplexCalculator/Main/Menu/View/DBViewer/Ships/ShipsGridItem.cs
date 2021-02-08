@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using X4_ComplexCalculator.DB;
-using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
@@ -98,7 +97,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         /// <summary>
         /// 艦船サイズ
         /// </summary>
-        public X4Size ShipSize => Ship.Size;
+        public IX4Size ShipSize => Ship.Size;
 
 
         /// <summary>

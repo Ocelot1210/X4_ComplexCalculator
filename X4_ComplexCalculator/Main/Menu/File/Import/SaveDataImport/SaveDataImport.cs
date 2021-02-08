@@ -4,7 +4,6 @@ using System.Linq;
 using System.Windows.Input;
 using System.Xml.XPath;
 using X4_ComplexCalculator.DB;
-using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Main.WorkArea;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
@@ -159,7 +158,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
 
 
             // 同一モジュールをマージ
-            var dict = new Dictionary<int, (int, IX4Module, WareProduction, long)>();
+            var dict = new Dictionary<int, (int, IX4Module, IWareProduction, long)>();
 
             foreach (var (module, idx) in modules.Select((x, idx) => (x, idx)))
             {

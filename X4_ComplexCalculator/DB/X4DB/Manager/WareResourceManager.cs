@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using X4_ComplexCalculator.DB.X4DB.Entity;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.DB.X4DB.Manager
 {
     /// <summary>
-    /// ウェア生産に必要なウェア情報一覧を管理する
+    /// <see cref="IWareResource"/> の一覧を管理する
     /// </summary>
     class WareResourceManager
     {
@@ -14,14 +16,14 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// <summary>
         /// 1サイクルのウェア生産に必要なウェア情報一覧
         /// </summary>
-        private readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, IReadOnlyList<WareResource>>> _WareResources;
+        private readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, IReadOnlyList<IWareResource>>> _WareResources;
 
 
         /// <summary>
         /// ダミー用1サイクルのウェア生産に必要なウェア情報一覧
         /// </summary>
-        private readonly IReadOnlyDictionary<string, IReadOnlyList<WareResource>> _DummyResources
-            = new Dictionary<string, IReadOnlyList<WareResource>>();
+        private readonly IReadOnlyDictionary<string, IReadOnlyList<IWareResource>> _DummyResources
+            = new Dictionary<string, IReadOnlyList<IWareResource>>();
         #endregion
 
 
@@ -39,7 +41,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
                     .GroupBy(x => x.WareID)
                     .ToDictionary(
                         x => x.Key,
-                        x => x.GroupBy(y => y.Method).ToDictionary(y => y.Key, y => y.ToArray() as IReadOnlyList<WareResource>) as IReadOnlyDictionary<string, IReadOnlyList<WareResource>>
+                        x => x.GroupBy(y => y.Method).ToDictionary(y => y.Key, y => y.ToArray() as IReadOnlyList<IWareResource>) as IReadOnlyDictionary<string, IReadOnlyList<IWareResource>>
                     );
             }
         }
@@ -50,7 +52,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// </summary>
         /// <param name="wareID">ウェアID</param>
         /// <returns>ウェアIDに対応するウェア生産に必要なウェア情報一覧</returns>
-        public IReadOnlyDictionary<string, IReadOnlyList<WareResource>> Get(string wareID)
+        public IReadOnlyDictionary<string, IReadOnlyList<IWareResource>> Get(string wareID)
             => _WareResources.TryGetValue(wareID, out var resources) ? resources : _DummyResources;
     }
 }

@@ -1,10 +1,10 @@
 ﻿using Prism.Mvvm;
+using System.ComponentModel;
+using System.Linq;
 using System.Windows.Data;
 using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.DB.X4DB;
-using System.ComponentModel;
 using X4_ComplexCalculator.DB;
-using System.Linq;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Races
 {
@@ -36,7 +36,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Races
         {
             RacesView = (ListCollectionView)CollectionViewSource.GetDefaultView(_Races);
             RacesView.SortDescriptions.Clear();
-            RacesView.SortDescriptions.Add(new SortDescription(nameof(Race.Name), ListSortDirection.Ascending));
+            RacesView.SortDescriptions.Add(new SortDescription(nameof(IRace.Name), ListSortDirection.Ascending));
         }
     }
 }

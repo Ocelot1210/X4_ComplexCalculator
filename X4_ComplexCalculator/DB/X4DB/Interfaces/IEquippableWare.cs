@@ -2,14 +2,16 @@
 
 namespace X4_ComplexCalculator.DB.X4DB.Interfaces
 {
-
+    /// <summary>
+    /// 装備スロットを持つウェアの情報用インターフェイス
+    /// </summary>
     public interface IEquippableWare : IWare
     {
         #region プロパティ
         /// <summary>
         /// 装備一覧
         /// </summary>
-        public IReadOnlyDictionary<string, WareEquipment> Equipments { get; }
+        public IReadOnlyDictionary<string, IWareEquipment> Equipments { get; }
         #endregion
 
 

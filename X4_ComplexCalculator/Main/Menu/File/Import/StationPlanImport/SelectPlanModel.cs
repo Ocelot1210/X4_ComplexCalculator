@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using Prism.Mvvm;
+using System;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -6,8 +8,6 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using Microsoft.Win32;
-using Prism.Mvvm;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Localize;
 

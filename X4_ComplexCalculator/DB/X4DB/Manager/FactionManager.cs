@@ -1,9 +1,9 @@
 ﻿using Dapper;
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-
+using X4_ComplexCalculator.DB.X4DB.Entity;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.DB.X4DB.Manager
 {
@@ -16,7 +16,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// <summary>
         /// 派閥一覧
         /// </summary>
-        private readonly IReadOnlyDictionary<string, Faction> _Factions;
+        private readonly IReadOnlyDictionary<string, IFaction> _Factions;
         #endregion
 
 
@@ -28,7 +28,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         public FactionManager(IDbConnection conn, RaceManager raceManager)
         {
             _Factions = conn.Query<X4_DataExporterWPF.Entity.Faction>("SELECT * FROM Faction")
-                .Select(x => new Faction(x.FactionID, x.Name, raceManager.Get(x.RaceID)))
+                .Select(x => new Faction(x.FactionID, x.Name, raceManager.Get(x.RaceID)) as IFaction)
                 .ToDictionary(x => x.FactionID);
         }
 
@@ -38,7 +38,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// </summary>
         /// <param name="id">種族ID</param>
         /// <returns>派閥IDに対応する派閥 派閥IDに対応する派閥が無ければnull</returns>
-        public Faction? TryGet(string id) =>
+        public IFaction? TryGet(string id) =>
             _Factions.TryGetValue(id, out var race) ? race : null;
 
 
@@ -48,13 +48,13 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// <param name="id">派閥ID</param>
         /// <returns>派閥IDに対応する派閥</returns>
         /// <exception cref="KeyNotFoundException">派閥IDに対応する派閥が無い場合</exception>
-        public Faction Get(string id) => _Factions[id];
+        public IFaction Get(string id) => _Factions[id];
 
 
         /// <summary>
         /// 全ての派閥を取得する
         /// </summary>
         /// <returns>全ての派閥情報の列挙</returns>
-        public IEnumerable<Faction> GetAll() => _Factions.Values;
+        public IEnumerable<IFaction> GetAll() => _Factions.Values;
     }
 }

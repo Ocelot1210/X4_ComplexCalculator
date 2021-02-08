@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace X4_ComplexCalculator.DB.X4DB.Interfaces
+﻿namespace X4_ComplexCalculator.DB.X4DB.Interfaces
 {
     /// <summary>
     /// シールド情報用インターフェース

@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using X4_ComplexCalculator.DB.X4DB.Entity;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.DB.X4DB.Manager
 {
@@ -15,13 +17,13 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// <summary>
         /// 艦船のロードアウト情報一覧
         /// </summary>
-        private readonly IReadOnlyDictionary<string, IReadOnlyList<ShipLoadout>> _ShipLoadouts;
+        private readonly IReadOnlyDictionary<string, IReadOnlyList<IShipLoadout>> _ShipLoadouts;
 
 
         /// <summary>
         /// ダミー用のロードアウト情報
         /// </summary>
-        private readonly IReadOnlyList<ShipLoadout> _EmptyLoadouts = Array.Empty<ShipLoadout>();
+        private readonly IReadOnlyList<IShipLoadout> _EmptyLoadouts = Array.Empty<IShipLoadout>();
         #endregion
 
 
@@ -47,7 +49,7 @@ WHERE
 	ShipLoadout.MacroName = Equipment.MacroName";
             _ShipLoadouts = conn.Query<ShipLoadout>(sql)
                 .GroupBy(x => x.ID)
-                .ToDictionary(x => x.Key, x => x.ToArray() as IReadOnlyList<ShipLoadout>);
+                .ToDictionary(x => x.Key, x => x.ToArray() as IReadOnlyList<IShipLoadout>);
         }
 
 
@@ -56,11 +58,11 @@ WHERE
         /// </summary>
         /// <param name="id">艦船ID</param>
         /// <returns>艦船IDに対応するロードアウト情報一覧</returns>
-        public IReadOnlyDictionary<string, IReadOnlyList<ShipLoadout>> Get(string id)
+        public IReadOnlyDictionary<string, IReadOnlyList<IShipLoadout>> Get(string id)
         {
             return (_ShipLoadouts.TryGetValue(id, out var loadouts) ? loadouts : _EmptyLoadouts)
                     .GroupBy(x => x.LoadoutID)
-                    .ToDictionary(x => x.Key, x => x.ToArray() as IReadOnlyList<ShipLoadout>);
+                    .ToDictionary(x => x.Key, x => x.ToArray() as IReadOnlyList<IShipLoadout>);
         }
     }
 }

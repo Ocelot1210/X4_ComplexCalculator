@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Prism.Mvvm;
+using System.Collections.Generic;
 using System.Linq;
-using Prism.Mvvm;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
 {
@@ -24,7 +24,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         /// <summary>
         /// ウェア種別
         /// </summary>
-        public TransportType TransportType { get; }
+        public ITransportType TransportType { get; }
 
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid
         /// </summary>
         /// <param name="transportType">カーゴ種別</param>
         /// <param name="details">詳細情報</param>
-        public StoragesGridItem(TransportType transportType, IEnumerable<StorageDetailsListItem> details)
+        public StoragesGridItem(ITransportType transportType, IEnumerable<StorageDetailsListItem> details)
         {
             TransportType = transportType;
             Details = new ObservableRangeCollection<StorageDetailsListItem>(details);

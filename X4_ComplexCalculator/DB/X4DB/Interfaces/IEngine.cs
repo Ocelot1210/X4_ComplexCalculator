@@ -1,4 +1,6 @@
-﻿namespace X4_ComplexCalculator.DB.X4DB.Interfaces
+﻿using X4_ComplexCalculator.DB.X4DB.Entity;
+
+namespace X4_ComplexCalculator.DB.X4DB.Interfaces
 {
     /// <summary>
     /// エンジン情報用インターフェース
