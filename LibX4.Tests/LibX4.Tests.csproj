@@ -22,4 +22,9 @@
     <ProjectReference Include="..\LibX4\LibX4.csproj" />
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="ROBOCOPY &quot;$(ProjectDir)\TestData&quot; &quot;$(TargetDir)\TestData&quot; /E /PURGE&#xD;&#xA;IF %25ERRORLEVEL%25 LSS 8 EXIT 0" />
+  </Target>
+
+
 </Project>

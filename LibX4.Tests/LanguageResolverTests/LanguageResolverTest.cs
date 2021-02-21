@@ -1,7 +1,7 @@
 ﻿using LibX4.Lang;
 using Xunit;
 
-namespace LibX4.Tests
+namespace LibX4.Tests.LanguageResolverTest
 {
     /// <summary>
     /// <see cref="LanguageResolver"/> のテストクラス
