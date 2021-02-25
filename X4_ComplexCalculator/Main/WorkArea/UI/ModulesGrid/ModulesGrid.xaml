@@ -281,7 +281,7 @@
                 </DataGridTemplateColumn>
 
                 <!--  建造方式  -->
-                <DataGridTemplateColumn
+                <x4cmn:MouseHoverEditCellColumn
                     ClipboardContentBinding="{Binding SelectedMethodName, Mode=OneWay}"
                     Header="{lex:Loc Lang:BuildMethod}"
                     SortMemberPath="SelectedMethodName">
@@ -308,7 +308,7 @@
                                 Visibility="{Binding SelectedMethodVisiblity, Mode=OneTime}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
-                </DataGridTemplateColumn>
+                </x4cmn:MouseHoverEditCellColumn>
             </DataGrid.Columns>
         </x4ccrtl:ClearSortOrderDataGrid>
     </DockPanel>
