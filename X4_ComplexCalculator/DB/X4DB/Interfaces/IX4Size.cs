@@ -40,12 +40,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Interfaces
                 return 1;
             }
 
-            if (other is not IX4Size size)
-            {
-                throw new ArgumentException();
-            }
-
-            return this.Size - size.Size;
+            return this.Size - other.Size;
         }
     }
 }

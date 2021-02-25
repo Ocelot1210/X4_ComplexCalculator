@@ -138,7 +138,7 @@
 
                 <!--  モジュール名  -->
                 <DataGridTemplateColumn
-                    ClipboardContentBinding="{Binding Module.Name}"
+                    ClipboardContentBinding="{Binding ModuleName}"
                     Header="{lex:Loc Lang:ModuleName}"
                     IsReadOnly="True"
                     SortMemberPath="Module.Name">
@@ -147,7 +147,7 @@
                             <TextBlock
                                 VerticalAlignment="Center"
                                 Style="{StaticResource ClickableTextBlockStyle}"
-                                Text="{Binding Module.Name, Mode=OneTime}">
+                                Text="{Binding ModuleName, Mode=OneTime}">
                                 <TextBlock.InputBindings>
                                     <MouseBinding
                                         Command="{Binding DataContext.ReplaceModuleCommand, Mode=OneTime, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
@@ -216,14 +216,14 @@
                 <!--  タレット数  -->
                 <DataGridTemplateColumn
                     CanUserResize="False"
-                    ClipboardContentBinding="{Binding TurretsCount, Mode=OneTime}"
+                    ClipboardContentBinding="{Binding Turrets.Count, Mode=OneTime}"
                     Header="{lex:Loc Lang:Turrets}"
                     SortMemberPath="TurretsCount">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock
                                 VerticalAlignment="Center"
-                                Text="{Binding TurretsCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat='{}{0:N0}'}"
+                                Text="{Binding Turrets.Count, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat='{}{0:N0}'}"
                                 TextAlignment="Right"
                                 ToolTipService.ShowDuration="1000000"
                                 Visibility="{Binding EditEquipmentButtonVisiblity, Mode=OneTime}">
@@ -234,7 +234,7 @@
                                                 <ToolTip HorizontalContentAlignment="Left">
                                                     <TextBlock
                                                         HorizontalAlignment="Left"
-                                                        Text="{Binding TurretsToolTip, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                                        Text="{Binding Turrets.DetailsText, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                                                         TextAlignment="Left" />
                                                 </ToolTip>
                                             </Setter.Value>
@@ -250,14 +250,14 @@
                 <!--  シールド数  -->
                 <DataGridTemplateColumn
                     CanUserResize="False"
-                    ClipboardContentBinding="{Binding ShieldsCount, Mode=OneTime}"
+                    ClipboardContentBinding="{Binding Shields.Count, Mode=OneTime}"
                     Header="{lex:Loc Lang:Shields}"
                     SortMemberPath="ShieldsCount">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock
                                 VerticalAlignment="Center"
-                                Text="{Binding ShieldsCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat='{}{0:N0}'}"
+                                Text="{Binding Shields.Count, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat='{}{0:N0}'}"
                                 TextAlignment="Right"
                                 ToolTipService.ShowDuration="1000000"
                                 Visibility="{Binding EditEquipmentButtonVisiblity, Mode=OneTime}">
@@ -268,7 +268,7 @@
                                                 <ToolTip HorizontalContentAlignment="Left">
                                                     <TextBlock
                                                         HorizontalAlignment="Left"
-                                                        Text="{Binding ShieldsToolTip, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                                        Text="{Binding Shields.DetailsText, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                                                         TextAlignment="Left" />
                                                 </ToolTip>
                                             </Setter.Value>
@@ -282,9 +282,9 @@
 
                 <!--  建造方式  -->
                 <DataGridTemplateColumn
-                    ClipboardContentBinding="{Binding SelectedMethod.Method, Mode=OneTime}"
+                    ClipboardContentBinding="{Binding SelectedMethodName, Mode=OneWay}"
                     Header="{lex:Loc Lang:BuildMethod}"
-                    SortMemberPath="SelectedMethod.Method">
+                    SortMemberPath="SelectedMethodName">
 
                     <!--  表示モード  -->
                     <DataGridTemplateColumn.CellTemplate>
@@ -292,7 +292,7 @@
                             <TextBlock
                                 VerticalAlignment="Center"
                                 Style="{StaticResource ClickableTextBlockStyle}"
-                                Text="{Binding SelectedMethod.Method, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                Text="{Binding SelectedMethodName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                 Visibility="{Binding SelectedMethodVisiblity, Mode=OneTime}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -301,9 +301,9 @@
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
                             <ComboBox
-                                DisplayMemberPath="Method"
+                                DisplayMemberPath="Name"
                                 FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
-                                ItemsSource="{Binding Module.Productions, Mode=OneTime}"
+                                ItemsSource="{Binding Productions, Mode=OneTime}"
                                 SelectedItem="{Binding SelectedMethod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 Visibility="{Binding SelectedMethodVisiblity, Mode=OneTime}" />
                         </DataTemplate>

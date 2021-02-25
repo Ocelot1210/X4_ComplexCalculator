@@ -11,11 +11,12 @@ using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Entity;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
+using System.Collections.Generic;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
 {
     /// <summary>
-    /// ModuleクラスをDataGrid表示用クラス
+    /// Module一覧DataGridの1レコード分の情報を管理するクラス
     /// </summary>
     public class ModulesGridItem : BindableBaseEx, IEditable, ISelectable, IReorderble
     {
@@ -32,18 +33,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// モジュール数
         /// </summary>
         private long _ModuleCount = 1;
-
-
-        /// <summary>
-        /// タレット用ツールチップ
-        /// </summary>
-        private readonly EquipmentsInfo _TurretToolTip;
-
-
-        /// <summary>
-        /// シールド用ツールチップ
-        /// </summary>
-        private readonly EquipmentsInfo _ShieldToolTip;
 
 
         /// <summary>
@@ -76,6 +65,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// モジュール
         /// </summary>
         public IX4Module Module { get; }
+
+
+        /// <summary>
+        /// モジュール名
+        /// </summary>
+        public string ModuleName => Module.Name;
 
 
         /// <summary>
@@ -118,28 +113,17 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             }
         }
 
-        /// <summary>
-        /// 装備中のタレットの個数
-        /// </summary>
-        public int TurretsCount => _TurretToolTip.Count;
-
 
         /// <summary>
-        /// タレットのツールチップ文字列
+        /// タレット情報
         /// </summary>
-        public string TurretsToolTip => _TurretToolTip.DetailsText;
+        public EquipmentsInfo Turrets { get; }
 
 
         /// <summary>
-        /// 装備中のシールドの個数
+        /// シールド情報
         /// </summary>
-        public int ShieldsCount => _ShieldToolTip.Count;
-
-
-        /// <summary>
-        /// シールドのツールチップ文字列
-        /// </summary>
-        public string ShieldsToolTip => _ShieldToolTip.DetailsText;
+        public EquipmentsInfo Shields { get; }
 
 
         /// <summary>
@@ -164,10 +148,24 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             {
                 if (SetPropertyEx(ref _SelectedMethod, value))
                 {
+                    RaisePropertyChanged(nameof(SelectedMethodName));
                     EditStatus = EditStatus.Edited;
                 }
             }
         }
+
+
+        /// <summary>
+        /// 選択中の建造方式名称
+        /// </summary>
+        public string SelectedMethodName => SelectedMethod.Name;
+
+
+        /// <summary>
+        /// 建造方式一覧
+        /// </summary>
+        public IEnumerable<IWareProduction> Productions => Module.Productions.Values;
+        
 
 
         /// <summary>
@@ -206,9 +204,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             EditEquipmentCommand = new DelegateCommand(EditEquipment);
             Equipments = new EquippableWareEquipmentManager(module);
             Equipments.CollectionChanged += Equipments_CollectionChanged;
-
-            _TurretToolTip = new EquipmentsInfo(Equipments, "turrets");
-            _ShieldToolTip = new EquipmentsInfo(Equipments, "shields");
+            
+            Turrets = new EquipmentsInfo(Equipments, "turrets");
+            Shields = new EquipmentsInfo(Equipments, "shields");
 
             _SelectedMethod = selectedMethod ?? Module.Productions.First().Value;
         }
@@ -230,8 +228,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
 
             _SelectedMethod = SelectedMethod;
 
-            _TurretToolTip = new EquipmentsInfo(Equipments, "turrets");
-            _ShieldToolTip = new EquipmentsInfo(Equipments, "shields");
+            Turrets = new EquipmentsInfo(Equipments, "turrets");
+            Shields = new EquipmentsInfo(Equipments, "shields");
             UpdateEquipmentInfo();
 
             EditEquipmentCommand = new DelegateCommand(EditEquipment);
@@ -271,12 +269,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         {
             if (Equipments.CanEquipped)
             {
-                _TurretToolTip.RequireUpdate();
-                _ShieldToolTip.RequireUpdate();
-                RaisePropertyChanged(nameof(TurretsCount));
-                RaisePropertyChanged(nameof(ShieldsCount));
-                RaisePropertyChanged(nameof(TurretsToolTip));
-                RaisePropertyChanged(nameof(ShieldsToolTip));
+                Turrets.RequireUpdate();
+                Shields.RequireUpdate();
             }
         }
 
@@ -307,15 +301,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             // 変更があった場合のみ通知
             if (!turretsOld.SequenceEqual(Equipments.AllEquipments.Where(x => x.EquipmentType.EquipmentTypeID == "turrets").Select(x => x.ID).OrderBy(x => x)))
             {
-                RaisePropertyChanged(nameof(TurretsCount));
-                RaisePropertyChanged(nameof(TurretsToolTip));
+                Turrets.Update();
                 equipmentChanged = true;
             }
 
             if (!shieldsOld.SequenceEqual(Equipments.AllEquipments.Where(x => x.EquipmentType.EquipmentTypeID == "shields").Select(x => x.ID).OrderBy(x => x)))
             {
-                RaisePropertyChanged(nameof(ShieldsCount));
-                RaisePropertyChanged(nameof(ShieldsToolTip));
+                Shields.Update();
                 equipmentChanged = true;
             }
 

@@ -43,7 +43,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
 
             ShipsView = (ListCollectionView)CollectionViewSource.GetDefaultView(_Ships);
             ShipsView.SortDescriptions.Clear();
-            ShipsView.SortDescriptions.Add(new SortDescription("Ship.Name", ListSortDirection.Ascending));
+            ShipsView.SortDescriptions.Add(new SortDescription(nameof(ShipsGridItem.ShipName), ListSortDirection.Ascending));
         }
     }
 }

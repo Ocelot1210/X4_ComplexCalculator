@@ -45,5 +45,8 @@ namespace X4_ComplexCalculator.DB.X4DB.Entity
             Amount = amount;
             Time = time;
         }
+
+
+        public override string ToString() => Name;
     }
 }

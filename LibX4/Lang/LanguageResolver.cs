@@ -22,7 +22,7 @@ namespace LibX4.Lang
         /// <summary>
         /// 言語フィールド文字列から pageID, tID を抽出する正規表現
         /// </summary>
-        private static readonly Regex _GetIDRegex = new(@"\{\s*(\d+)\s*,\s*(\d+)\s*\}");
+        private static readonly Regex _GetIDRegex = new(@"\{\s*(\d+)?\s*,\s*(\d+)\s*\}");
 
 
         /// <summary>
@@ -80,7 +80,17 @@ namespace LibX4.Lang
         /// </summary>
         /// <param name="target">言語フィールド文字列を含む文字列</param>
         /// <returns>言語フィールド文字列を解決し置き換えた文字列</returns>
-        public string Resolve(string target)
+        public string Resolve(string target) => ResolveInternal(target, null);
+
+
+
+        /// <summary>
+        /// 言語フィールド文字列解決用内部処理
+        /// </summary>
+        /// <param name="target">言語フィールド文字列を含む文字列</param>
+        /// <param name="currentPageID">現在のページID</param>
+        /// <returns>言語フィールド文字列を解決し置き換えた文字列</returns>
+        private string ResolveInternal(string target, string? currentPageID)
         {
             if (string.IsNullOrEmpty(target)) return target;
 
@@ -88,6 +98,12 @@ namespace LibX4.Lang
             if (matchLangField == null) return target;
             var pageID = matchLangField.Groups[1].Value;
             var tID = matchLangField.Groups[2].Value;
+
+            // ページ ID が省略されたフィールドの場合、現在のページを参照する
+            if (string.IsNullOrEmpty(pageID))
+            {
+                pageID = currentPageID ?? "";
+            }
 
             foreach (var languageXml in _LanguagesXml)
             {
@@ -100,7 +116,7 @@ namespace LibX4.Lang
                     var uncommentedT = _RemoveCommentRegex.Replace(findT, "");
                     var resolvedText = target.Replace(matchLangField.Value, uncommentedT);
                     var unescapedText = _UnescapeRegex.Replace(resolvedText, "$1");
-                    return Resolve(unescapedText);
+                    return ResolveInternal(unescapedText, pageID);
                 }
             }
 

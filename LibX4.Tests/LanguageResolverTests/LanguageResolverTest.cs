@@ -233,5 +233,24 @@ namespace LibX4.Tests.LanguageResolverTest
             ".ToXDocument()).Resolve("{1,1}");
             Assert.Equal("aaaa\nbbbb", resolve);
         }
+
+
+
+        /// <summary>
+        /// ページ ID 省略時
+        /// </summary>
+        [Fact]
+        public void OmitPageID()
+        {
+            var resolve = new LanguageResolver(@"
+            <language>
+                <page id=""1"">
+                    <t id=""1"">aaaa</t>
+                    <t id=""2"">{, 1}bbbb</t>
+                </page>
+            </language>
+            ".ToXDocument());
+            Assert.Equal("aaaabbbb", resolve.Resolve("{1,2}"));
+        }
     }
 }
