@@ -19,7 +19,7 @@
     mc:Ignorable="d">
 
     <Window.DataContext>
-        <local:SelectLoadoutViewModel />
+        <local:LoadoutImportViewModel />
     </Window.DataContext>
 
     <Window.Resources>

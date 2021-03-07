@@ -14,7 +14,10 @@ using X4_ComplexCalculator.Common.Localize;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
 {
-    class SelectLoadoutModel : BindableBase
+    /// <summary>
+    /// モジュール装備インポート画面のModel
+    /// </summary>
+    class LoadoutImportModel : BindableBase
     {
         #region メンバ
         /// <summary>
@@ -23,10 +26,12 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         string _LoadoutsFilePath = "";
         #endregion
 
+
+        #region プロパティ
         /// <summary>
         /// 計画一覧
         /// </summary>
-        public ObservableRangeCollection<LoadoutItem> Loadouts { get; } = new ObservableRangeCollection<LoadoutItem>();
+        public ObservableRangeCollection<LoadoutItem> Loadouts { get; } = new();
 
 
         /// <summary>
@@ -37,12 +42,13 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
             get => _LoadoutsFilePath;
             set => SetProperty(ref _LoadoutsFilePath, value);
         }
+        #endregion
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public SelectLoadoutModel()
+        public LoadoutImportModel()
         {
             var docDir = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
 

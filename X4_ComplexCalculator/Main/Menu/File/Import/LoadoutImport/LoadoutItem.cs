@@ -182,7 +182,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
                     continue;
                 }
 
-                var equipment = X4Database.Instance.Ware.TryGet<IEquipment>(macro);
+                var equipment = X4Database.Instance.Ware.TryGetMacro<IEquipment>(macro);
 
                 var max = int.Parse(elm.Attribute("exact")?.Value ?? "1");
                 if (equipment is not null)

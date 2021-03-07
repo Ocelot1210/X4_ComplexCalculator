@@ -6,13 +6,16 @@ using System.Windows.Input;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
 {
-    class SelectLoadoutViewModel : BindableBase
+    /// <summary>
+    /// モジュール装備インポート画面のViewModel
+    /// </summary>
+    class LoadoutImportViewModel : BindableBase
     {
         #region メンバ
         /// <summary>
         /// Model
         /// </summary>
-        private readonly SelectLoadoutModel _Model;
+        private readonly LoadoutImportModel _Model;
 
 
         /// <summary>
@@ -105,9 +108,9 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public SelectLoadoutViewModel()
+        public LoadoutImportViewModel()
         {
-            _Model = new SelectLoadoutModel();
+            _Model = new LoadoutImportModel();
             ImportButtonClickedCommand = new DelegateCommand(_Model.Import);
             CloseButtonClickedCommand  = new DelegateCommand(CloseButtonClicked);
             SelectSaveDataFileCommand  = new DelegateCommand(_Model.SelectSaveDataFile);
