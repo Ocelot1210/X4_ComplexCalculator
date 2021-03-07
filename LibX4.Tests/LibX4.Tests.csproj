@@ -22,9 +22,5 @@
     <ProjectReference Include="..\LibX4\LibX4.csproj" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="ECHO &quot;$(ProjectDir)&quot; &gt; &quot;$(TargetDir)ProjectDirPath.txt&quot;" />
-  </Target>
-
 
 </Project>

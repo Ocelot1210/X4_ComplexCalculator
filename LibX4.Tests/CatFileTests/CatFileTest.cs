@@ -1,5 +1,8 @@
 ﻿using LibX4.FileSystem;
+using System;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Xml.Linq;
 using Xunit;
 
@@ -14,8 +17,21 @@ namespace LibX4.Tests.CatFileTests
 
         public CatFileTest()
         {
-            using var sr = new StreamReader("ProjectDirPath.txt");
-            _BaseDir = Path.Combine(sr.ReadToEnd().Trim('\\', ' ', '\r', '\n', '\"'), "TestData", nameof(CatFileTest));
+            var path = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) ?? Environment.CurrentDirectory;
+
+            while (!string.IsNullOrEmpty(path) && !(Path.GetDirectoryName(path) == Path.GetPathRoot(path)))
+            {
+                var file = Directory.GetFiles(path, "LibX4.Tests.csproj").FirstOrDefault();
+                if (file is not null)
+                {
+                    path = Path.Combine(path, "TestData", nameof(CatFileTest));
+                    break;
+                }
+
+                path = Path.GetDirectoryName(path);
+            }
+
+            _BaseDir = path ?? "";
         }
 
         private string MakePath(string path)
