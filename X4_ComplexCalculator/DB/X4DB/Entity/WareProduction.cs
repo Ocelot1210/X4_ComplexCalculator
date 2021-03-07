@@ -3,7 +3,7 @@
 namespace X4_ComplexCalculator.DB.X4DB.Entity
 {
     /// <summary>
-    /// ウェアの生産量と生産時間を管理するクラス
+    /// ウェアの生産量と生産時間情報用クラス
     /// </summary>
     public class WareProduction : IWareProduction
     {

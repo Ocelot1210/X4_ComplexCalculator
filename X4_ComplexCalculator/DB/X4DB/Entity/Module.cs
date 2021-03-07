@@ -5,7 +5,7 @@ using X4_ComplexCalculator.DB.X4DB.Interfaces;
 namespace X4_ComplexCalculator.DB.X4DB.Entity
 {
     /// <summary>
-    /// モジュール情報管理用クラス
+    /// モジュール情報用クラス
     /// </summary>
     public partial class Module : IX4Module
     {

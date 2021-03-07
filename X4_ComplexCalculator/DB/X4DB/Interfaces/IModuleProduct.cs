@@ -1,5 +1,8 @@
 ﻿namespace X4_ComplexCalculator.DB.X4DB.Interfaces
 {
+    /// <summary>
+    /// モジュールの製品情報用インターフェイス
+    /// </summary>
     public interface IModuleProduct
     {
         #region プロパティ

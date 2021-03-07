@@ -9,11 +9,11 @@ using X4_ComplexCalculator.DB.X4DB.Interfaces;
 namespace X4_ComplexCalculator.DB.X4DB.Manager
 {
     /// <summary>
-    /// モジュールの製品情報一覧を管理するクラス
+    /// <see cref="IX4Module"/> に対応する <see cref="IModuleProduct"/> の一覧を管理するクラス
     /// </summary>
     class ModuleProductManager
     {
-        #region スタティックメンバ
+        #region メンバ
         /// <summary>
         /// モジュールの製品情報一覧
         /// </summary>

@@ -7,7 +7,7 @@ using X4_ComplexCalculator.DB.X4DB.Interfaces;
 namespace X4_ComplexCalculator.DB.X4DB.Manager
 {
     /// <summary>
-    /// <see cref="IEquipment.EquipmentTags"/> の一覧を管理するクラス
+    /// <see cref="IEquipment.EquipmentTags"/> のユニークな組み合わせを管理するクラス
     /// </summary>
     class EquipmentTagsManager
     {

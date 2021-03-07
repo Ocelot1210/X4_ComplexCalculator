@@ -5,7 +5,7 @@ using X4_ComplexCalculator.DB.X4DB.Interfaces;
 namespace X4_ComplexCalculator.DB.X4DB.Entity
 {
     /// <summary>
-    /// 艦船情報管理用クラス
+    /// 艦船情報情報用クラス
     /// </summary>
     public partial class Ship : IShip
     {

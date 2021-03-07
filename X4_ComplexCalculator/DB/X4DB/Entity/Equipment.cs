@@ -5,7 +5,7 @@ using X4_ComplexCalculator.DB.X4DB.Interfaces;
 namespace X4_ComplexCalculator.DB.X4DB.Entity
 {
     /// <summary>
-    /// 装備品管理用クラス
+    /// 装備品情報用クラス
     /// </summary>
     public partial class Equipment : IEquipment
     {

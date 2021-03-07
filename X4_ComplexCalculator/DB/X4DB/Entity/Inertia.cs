@@ -1,7 +1,7 @@
 ﻿namespace X4_ComplexCalculator.DB.X4DB.Entity
 {
     /// <summary>
-    /// 慣性情報
+    /// 艦船の慣性情報用クラス
     /// </summary>
     public class Inertia
     {

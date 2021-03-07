@@ -8,7 +8,7 @@ using X4_ComplexCalculator.DB.X4DB.Interfaces;
 namespace X4_ComplexCalculator.DB.X4DB.Manager
 {
     /// <summary>
-    /// 艦船のハンガー情報一覧を管理するクラス
+    /// <see cref="IShip"/> に対応する <see cref="IShipHanger"/> の一覧を管理するクラス
     /// </summary>
     class ShipHangerManager
     {
@@ -45,7 +45,10 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// 艦船IDに対応するハンガー情報を取得する
         /// </summary>
         /// <param name="id">艦船ID</param>
-        /// <returns>艦船IDに対応するハンガー情報</returns>
+        /// <returns>
+        /// <para><paramref name="id"/> に対応する <see cref="IX4Size.SizeID"/> をキーにしたハンガー情報のディクショナリ</para>
+        /// <para>ハンガー情報が無い場合、空の <see cref="IX4Size.SizeID"/> をキーにしたハンガー情報のディクショナリ</para>
+        /// </returns>
         public IReadOnlyDictionary<string, IShipHanger> Get(string id) =>
             _ShipHangers.TryGetValue(id, out var hanger) ? hanger : _EmptyHanger;
     }

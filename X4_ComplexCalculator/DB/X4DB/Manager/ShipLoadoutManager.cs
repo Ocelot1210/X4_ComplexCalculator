@@ -9,7 +9,7 @@ using X4_ComplexCalculator.DB.X4DB.Interfaces;
 namespace X4_ComplexCalculator.DB.X4DB.Manager
 {
     /// <summary>
-    /// 艦船のロードアウト情報一覧を管理するクラス
+    /// <see cref="IShipLoadout"/> の一覧を管理するクラス
     /// </summary>
     class ShipLoadoutManager
     {

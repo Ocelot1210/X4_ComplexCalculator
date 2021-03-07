@@ -8,7 +8,7 @@ using X4_ComplexCalculator.DB.X4DB.Interfaces;
 namespace X4_ComplexCalculator.DB.X4DB.Manager
 {
     /// <summary>
-    /// <see cref="IEquipmentType"/> の一覧を管理するクラス
+    /// <see cref="IEquipment"/> に対応する <see cref="IEquipmentType"/> を管理するクラス
     /// </summary>
     class EquipmentTypeManager
     {
@@ -18,7 +18,6 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// </summary>
         private readonly IReadOnlyDictionary<string, IEquipmentType> _EquipmentTypes;
         #endregion
-
 
 
         /// <summary>

@@ -14,7 +14,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
     {
         #region メンバ
         /// <summary>
-        /// ウェア生産時の追加効果情報一覧
+        /// <see cref="IWare.ID"/> をキーにしたウェア生産時の追加効果情報一覧
         /// </summary>
         private readonly IReadOnlyDictionary<string, WareEffects> _WareEffects;
 
@@ -40,20 +40,12 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         }
 
 
-
         /// <summary>
-        /// <paramref name="id"/> に対応するウェア生産時の追加効果情報一覧を取得する
+        ///<see cref="IWare.ID"/> に対応するウェア生産時の追加効果情報一覧を取得する
         /// </summary>
-        /// <param name="id">ウェアID</param>
+        /// <param name="id"><see cref="IWare.ID"/></param>
         /// <returns><paramref name="id"/> に対応するウェア生産時の追加効果情報一覧</returns>
         public IWareEffects Get(string id)
-        {
-            if (_WareEffects.TryGetValue(id, out var effects))
-            {
-                return effects;
-            }
-
-            return _EmptyEffect;
-        }
+            => _WareEffects.TryGetValue(id, out var effects) ? effects : _EmptyEffect;
     }
 }

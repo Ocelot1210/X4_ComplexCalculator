@@ -10,7 +10,7 @@ using X4_ComplexCalculator.DB.X4DB.Manager;
 namespace X4_ComplexCalculator.DB.X4DB.Builder
 {
     /// <summary>
-    /// Shipクラスのインスタンスを作成するBuilderクラス
+    /// <see cref="Ship"/> クラスのインスタンスを作成するBuilderクラス
     /// </summary>
     class ShipBuilder
     {

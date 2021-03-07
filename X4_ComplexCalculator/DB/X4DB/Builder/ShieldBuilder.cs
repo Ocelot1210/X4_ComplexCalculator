@@ -8,7 +8,7 @@ using X4_ComplexCalculator.DB.X4DB.Interfaces;
 namespace X4_ComplexCalculator.DB.X4DB.Builder
 {
     /// <summary>
-    /// Shieldクラスのインスタンスを作成するBuilderクラス
+    /// <see cref="Shield"/> クラスのインスタンスを作成するBuilderクラス
     /// </summary>
     class ShieldBuilder
     {

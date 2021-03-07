@@ -8,7 +8,7 @@ using X4_ComplexCalculator.DB.X4DB.Interfaces;
 namespace X4_ComplexCalculator.DB.X4DB.Manager
 {
     /// <summary>
-    /// モジュールの保管庫情報を管理するクラス
+    /// <see cref="IX4Module"/> に対応する <see cref="IModuleStorage"/> の一覧を管理するクラス
     /// </summary>
     class ModuleStorageManager
     {

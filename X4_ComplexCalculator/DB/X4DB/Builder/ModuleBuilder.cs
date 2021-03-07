@@ -10,7 +10,7 @@ using X4_ComplexCalculator.DB.X4DB.Manager;
 namespace X4_ComplexCalculator.DB.X4DB.Builder
 {
     /// <summary>
-    /// Moduleクラスのインスタンスを作成するBuilderクラス
+    /// <see cref="Module"/> クラスのインスタンスを作成するBuilderクラス
     /// </summary>
     class ModuleBuilder
     {

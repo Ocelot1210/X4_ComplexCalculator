@@ -8,7 +8,7 @@ using X4_ComplexCalculator.DB.X4DB.Interfaces;
 namespace X4_ComplexCalculator.DB.X4DB.Builder
 {
     /// <summary>
-    /// Thrusterクラスのインスタンスを作成するBuilderクラス
+    /// <see cref="Thruster"/> クラスのインスタンスを作成するBuilderクラス
     /// </summary>
     class ThrusterBuilder
     {

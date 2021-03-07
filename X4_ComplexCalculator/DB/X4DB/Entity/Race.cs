@@ -4,7 +4,7 @@ using X4_ComplexCalculator.DB.X4DB.Interfaces;
 namespace X4_ComplexCalculator.DB.X4DB.Entity
 {
     /// <summary>
-    /// 種族管理用クラス
+    /// 種族情報用クラス
     /// </summary>
     public class Race : IRace
     {

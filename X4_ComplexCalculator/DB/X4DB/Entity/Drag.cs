@@ -1,7 +1,7 @@
 ﻿namespace X4_ComplexCalculator.DB.X4DB.Entity
 {
     /// <summary>
-    /// 抗力情報
+    /// 艦船の抗力情報用クラス
     /// </summary>
     public class Drag
     {

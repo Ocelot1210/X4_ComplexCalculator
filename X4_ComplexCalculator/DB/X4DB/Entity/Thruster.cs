@@ -3,7 +3,7 @@
 namespace X4_ComplexCalculator.DB.X4DB.Entity
 {
     /// <summary>
-    /// スラスター情報を管理するクラス
+    /// スラスター情報用クラス
     /// </summary>
     public partial class Thruster : IThruster
     {

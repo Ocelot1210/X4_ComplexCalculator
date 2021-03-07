@@ -3,7 +3,7 @@
 namespace X4_ComplexCalculator.DB.X4DB.Entity
 {
     /// <summary>
-    /// モジュールの製品情報管理クラス
+    /// モジュールの製品情報用クラス
     /// </summary>
     public class ModuleProduct : IModuleProduct
     {

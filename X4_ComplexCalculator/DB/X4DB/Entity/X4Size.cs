@@ -4,7 +4,7 @@ using X4_ComplexCalculator.DB.X4DB.Interfaces;
 namespace X4_ComplexCalculator.DB.X4DB.Entity
 {
     /// <summary>
-    /// サイズ管理用クラス
+    /// X4のサイズ情報用クラス
     /// </summary>
     public class X4Size : IX4Size
     {

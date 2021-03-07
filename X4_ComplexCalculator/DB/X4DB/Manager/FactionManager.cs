@@ -8,7 +8,7 @@ using X4_ComplexCalculator.DB.X4DB.Interfaces;
 namespace X4_ComplexCalculator.DB.X4DB.Manager
 {
     /// <summary>
-    /// 派閥一覧を管理するクラス
+    /// <see cref="IFaction"/> の一覧を管理するクラス
     /// </summary>
     class FactionManager
     {

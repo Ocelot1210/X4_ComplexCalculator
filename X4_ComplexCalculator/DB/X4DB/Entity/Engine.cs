@@ -3,7 +3,7 @@
 namespace X4_ComplexCalculator.DB.X4DB.Entity
 {
     /// <summary>
-    /// エンジン情報
+    /// エンジン情報用クラス
     /// </summary>
     public partial class Engine : IEngine
     {

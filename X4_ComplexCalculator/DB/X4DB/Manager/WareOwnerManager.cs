@@ -7,6 +7,9 @@ using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.DB.X4DB.Manager
 {
+    /// <summary>
+    /// <see cref="IWare.Owners"/> のユニークな組み合わせを管理するクラス
+    /// </summary>
     class WareOwnerManager
     {
         #region メンバ
@@ -78,10 +81,10 @@ GROUP BY
 
 
         /// <summary>
-        /// ウェアIDに対応する所有派閥一覧を取得する
+        /// <see cref="IWare.ID"/>に対応するウェアの所有派閥一覧を取得する
         /// </summary>
-        /// <param name="wareID"></param>
-        /// <returns></returns>
+        /// <param name="wareID"><see cref="IWare.ID"/></param>
+        /// <returns><see cref="IWare.ID"/>に対応するウェアの所有派閥一覧</returns>
         public IReadOnlyList<IFaction> Get(string wareID)
         {
             if (_WareOwnerPair.TryGetValue(wareID, out var owners))

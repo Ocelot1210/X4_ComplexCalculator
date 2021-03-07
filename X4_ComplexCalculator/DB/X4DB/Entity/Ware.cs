@@ -5,7 +5,7 @@ using X4_ComplexCalculator.DB.X4DB.Interfaces;
 namespace X4_ComplexCalculator.DB.X4DB.Entity
 {
     /// <summary>
-    /// ウェア情報管理用クラス
+    /// ウェア情報用クラス
     /// </summary>
     public partial class Ware : IWare
     {

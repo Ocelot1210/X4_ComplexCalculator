@@ -7,7 +7,9 @@ using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.DB.X4DB.Manager
 {
-
+    /// <summary>
+    /// <see cref="IWare"/> の一覧を管理するクラス
+    /// </summary>
     public class WareManager
     {
         #region メンバ
@@ -69,7 +71,6 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         public T? TryGet<T>(string id) where T : class, IWare => _Wares.TryGetValue(id, out var ret) ? ret as T : null;
 
 
-
         /// <summary>
         /// <paramref name="macro"/> のマクロ名に対応する <see cref="IMacro"/> の取得を試みる(型指定版)
         /// </summary>
@@ -78,7 +79,6 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// <returns>指定した型のウェア又はnull</returns>
         public T? TryGetMacro<T>(string macro) where T : class, IMacro =>
             _MacroWares.TryGetValue(macro, out var ret) ? ret as T : null;
-
 
 
         /// <summary>

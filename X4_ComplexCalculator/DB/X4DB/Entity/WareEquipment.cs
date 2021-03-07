@@ -6,7 +6,7 @@ using X4_ComplexCalculator.DB.X4DB.Interfaces;
 namespace X4_ComplexCalculator.DB.X4DB.Entity
 {
     /// <summary>
-    /// ウェアの装備情報
+    /// ウェアの装備情報用クラス
     /// </summary>
     public class WareEquipment : IWareEquipment
     {

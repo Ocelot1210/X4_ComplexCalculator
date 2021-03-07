@@ -3,7 +3,7 @@
 namespace X4_ComplexCalculator.DB.X4DB.Entity
 {
     /// <summary>
-    /// 艦船のハンガー情報管理用クラス
+    /// 艦船のハンガー情報用クラス
     /// </summary>
     public class ShipHanger : IShipHanger
     {

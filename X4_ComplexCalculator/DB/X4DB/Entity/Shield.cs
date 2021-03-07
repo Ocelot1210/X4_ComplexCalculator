@@ -3,7 +3,7 @@
 namespace X4_ComplexCalculator.DB.X4DB.Entity
 {
     /// <summary>
-    /// シールド情報
+    /// シールド情報用クラス
     /// </summary>
     public partial class Shield : IShield
     {

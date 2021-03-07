@@ -4,7 +4,7 @@ using X4_ComplexCalculator.DB.X4DB.Interfaces;
 namespace X4_ComplexCalculator.DB.X4DB.Entity
 {
     /// <summary>
-    /// 装備種別管理用クラス
+    /// 装備種別情報用クラス
     /// </summary>
     public class EquipmentType : IEquipmentType
     {

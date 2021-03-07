@@ -1,7 +1,7 @@
 ﻿namespace X4_ComplexCalculator.DB.X4DB.Entity
 {
     /// <summary>
-    /// エンジンの推進力を表すクラス
+    /// エンジンの推進力情報用クラス
     /// </summary>
     public class EngineThrust
     {

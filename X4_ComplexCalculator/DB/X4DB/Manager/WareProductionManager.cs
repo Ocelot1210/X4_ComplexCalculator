@@ -8,7 +8,7 @@ using X4_ComplexCalculator.DB.X4DB.Interfaces;
 namespace X4_ComplexCalculator.DB.X4DB.Manager
 {
     /// <summary>
-    /// ウェアの生産量と生産時間一覧を管理するクラス
+    /// <see cref="IWare"/> に対応する <see cref="IWareProduction"/> の一覧を管理するクラス
     /// </summary>
     class WareProductionManager
     {
