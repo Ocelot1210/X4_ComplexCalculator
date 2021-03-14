@@ -418,14 +418,14 @@ namespace X4_ComplexCalculator.Main
         {
             if (_ApplicationUpdater.FinishedDownload && isUserOperation)
             {
-                LocalizedMessageBox.Show("Lang:CheckUpdateFinishedDownloadDescription",
-                                         "Lang:CheckUpdate", icon: MessageBoxImage.Information);
+                LocalizedMessageBox.Show("Lang:CheckUpdate_FinishedDownloadDescription",
+                                         "Lang:CheckUpdate_Title", icon: MessageBoxImage.Information);
                 return;
             }
             else if (_ApplicationUpdater.NowDownloading && isUserOperation)
             {
-                LocalizedMessageBox.Show("Lang:CheckUpdateStartDownloadDescription",
-                                         "Lang:CheckUpdate", icon: MessageBoxImage.Information);
+                LocalizedMessageBox.Show("Lang:CheckUpdate_StartDownloadDescription",
+                                         "Lang:CheckUpdate_Title", icon: MessageBoxImage.Information);
                 return;
             }
 
@@ -438,8 +438,8 @@ namespace X4_ComplexCalculator.Main
             {
                 if (isUserOperation)
                 {
-                    LocalizedMessageBox.Show("Lang:CheckUpdateFailedDescription",
-                                             "Lang:CheckUpdate", icon: MessageBoxImage.Error);
+                    LocalizedMessageBox.Show("Lang:CheckUpdate_FailedDescription",
+                                             "Lang:CheckUpdate_Title", icon: MessageBoxImage.Error);
                 }
                 return;
             }
@@ -447,15 +447,15 @@ namespace X4_ComplexCalculator.Main
             {
                 if (isUserOperation)
                 {
-                    LocalizedMessageBox.Show("Lang:CheckUpdateNoUpdateDescription",
-                                             "Lang:CheckUpdate", icon: MessageBoxImage.Information,
+                    LocalizedMessageBox.Show("Lang:CheckUpdate_NoUpdateDescription",
+                                             "Lang:CheckUpdate_Title", icon: MessageBoxImage.Information,
                                              param: new[] { VersionInfo.BaseVersion });
                 }
                 return;
             }
 
-            var result = LocalizedMessageBox.Show("Lang:CheckUpdateHasUpdateDescription",
-                                                  "Lang:CheckUpdate",
+            var result = LocalizedMessageBox.Show("Lang:CheckUpdate_HasUpdateDescription",
+                                                  "Lang:CheckUpdate_Title",
                                                   button: MessageBoxButton.YesNo,
                                                   icon: MessageBoxImage.Question,
                                                   param: new[] {
@@ -465,8 +465,8 @@ namespace X4_ComplexCalculator.Main
             if (result != MessageBoxResult.Yes) return;
 
             _ApplicationUpdater.StartDownloadByBackground();
-            LocalizedMessageBox.Show("Lang:CheckUpdateStartDownloadDescription",
-                                     "Lang:CheckUpdate", icon: MessageBoxImage.Information);
+            LocalizedMessageBox.Show("Lang:CheckUpdate_StartDownloadDescription",
+                                     "Lang:CheckUpdate_Title", icon: MessageBoxImage.Information);
         }
 
 
@@ -480,7 +480,7 @@ namespace X4_ComplexCalculator.Main
             const string date = ThisAssembly.Git.CommitDate;
             var dotnetVersion = Environment.Version.ToString();
 
-            LocalizedMessageBox.Show("Lang:VersionInfoDescription", "Lang:VersionInfoTitle",
+            LocalizedMessageBox.Show("Lang:MainWindow_Menu_Help_VersionInfo_MessageDescription", "Lang:MainWindow_Menu_Help_VersionInfo_MessageTitle",
                                      icon: MessageBoxImage.Information,
                                      param: new[] { version, commit, date, dotnetVersion });
         }
@@ -505,7 +505,7 @@ namespace X4_ComplexCalculator.Main
             }
             catch (Exception e)
             {
-                LocalizedMessageBox.Show("Lang:UnexpectedErrorMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message, e.StackTrace ?? "");
+                LocalizedMessageBox.Show("Lang:MainWindow_UnexpectedErrorMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message, e.StackTrace ?? "");
                 Environment.Exit(-1);
             }
         }

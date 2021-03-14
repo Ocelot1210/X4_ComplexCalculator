@@ -15,7 +15,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Export
         /// <summary>
         /// タイトル文字列
         /// </summary>
-        public string Title => "Lang:StationCalculator";
+        public string Title => "Lang:MainWindow_Menu_File_MenuItem_Import_MenuItem_StationCalculator_Header";
 
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Export
                 sb.Length -= 2;
             }
 
-            SelectStringDialog.ShowDialog("Lang:StationCalculatorExportTitle", "Lang:StationCalculatorExportDescription", sb.ToString(), hideCancelButton: true);
+            SelectStringDialog.ShowDialog("Lang:StationCalculatorExport_Title", "Lang:StationCalculatorExport_Description", sb.ToString(), hideCancelButton: true);
 
             return true;
         }

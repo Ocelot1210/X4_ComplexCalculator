@@ -1,272 +1,282 @@
 ﻿# ------------------------------------------------------
 # Common
 # ------------------------------------------------------
-WareName;ウェア名
-Tier;階級
-Price;価格
-UnitPrice;単価
-ModuleName;モジュール名
-ModuleCount;モジュール数
-Select;選択
-Close;閉じる
-SelectAll;全選択
-Save;保存
-OwnerFaction;所有派閥
-Turrets;タレット
-Shields;シールド
-SearchByEnteringText;テキストを入力して検索
-Search;検索
-Confirmation;確認
-Warning;警告
-Error;エラー
-Cancel;キャンセル
+Common_WareName;ウェア名
+Common_Tier;階級
+Common_Price;価格
+Common_UnitPrice;単価
+Common_ModuleName;モジュール名
+Common_ModuleCount;モジュール数
+Common_Select;選択
+Common_Close;閉じる
+Common_SelectAll;全選択
+Common_OwnerFaction;所有派閥
+Common_Turrets;タレット
+Common_Shields;シールド
+Common_SearchByEnteringText;テキストを入力して検索
+Common_Search;検索
+Common_MessageBoxTitle_Confirmation;確認
+Common_MessageBoxTitle_Warning;警告
+Common_MessageBoxTitle_Error;エラー
+Common_Cancel;キャンセル
+Common_NotEquippedToolTipText;何も装備していません
+Common_Expander_Expansion;展開
+Common_Expander_Collapse;折りたたむ
+Common_NoBuy;購入しない
+Common_NoSell;販売しない
+Common_Buy;購入する
+Common_Sell;販売する
+Common_Production;生産量
+Common_ProductName;製品名
 
 
 # ------------------------------------------------------
 # DB
 # ------------------------------------------------------
-OldFormatMessage;現在のDBのフォーマットが旧形式です。\r\nゲームファイルよりDBを再度抽出して下さい。
-DBUpdateRequestMessage;本アプリケーションの実行にはDBの更新が必要です。\r\n本アプリケーションを再度実行し、DBの更新を行ってください。
-DBExtractionRequestMessage;DBが存在しません。\r\nゲームファイルよりDBを抽出する必要があります。\r\nデータ抽出画面が立ち上がるまでしばらくお待ち下さい。
-DBMakeRequestMessage;本アプリケーションの実行にはDBの作成が必要です。\r\n本アプリケーションを再度実行し、DBの更新を行ってください。
-DBOpenFailMessage;DBのオープンに失敗しました。\r\nゲームファイルよりDBを抽出する事で起動可能になるかもしれません。\r\nDBを更新しますか？
+DB_OldFormatMessage;現在のDBのフォーマットが旧形式です。\r\nゲームファイルよりDBを再度抽出して下さい。
+DB_UpdateRequestMessage;本アプリケーションの実行にはDBの更新が必要です。\r\n本アプリケーションを再度実行し、DBの更新を行ってください。
+DB_ExtractionRequestMessage;DBが存在しません。\r\nゲームファイルよりDBを抽出する必要があります。\r\nデータ抽出画面が立ち上がるまでしばらくお待ち下さい。
+DB_MakeRequestMessage;本アプリケーションの実行にはDBの作成が必要です。\r\n本アプリケーションを再度実行し、DBの更新を行ってください。
+DB_OpenFailMessage;DBのオープンに失敗しました。\r\nゲームファイルよりDBを抽出する事で起動可能になるかもしれません。\r\nDBを更新しますか？
 
 
 # ------------------------------------------------------
 # Main window
 # ------------------------------------------------------
-MainWindowTitle;X4: ステーション計算機
-FaildToLoadFileMessage;ファイルの読み込みに失敗しました。\r\n\r\n■理由：\r\n{0}
-FaildToLoadFileMessageTitle;読み込み失敗
-MainWindowClosingConfirmMessage;未保存の項目があります。保存しますか？
-PlanClosingConfirmMessage;計画{0}の変更内容を保存しますか？
-SaveDataWriteFailureMessage;保存に失敗しました。\r\n■理由：\r\n{0}\r\n\r\n■スタックトレース：\r\n{1}
-ImportFailureMessage;インポートに失敗しました。\r\n■理由：\r\n{0}
-UnexpectedErrorMessage;予期しないエラーが発生しました。\r\n■エラー内容：\r\n{0}\r\n\r\n■スタックトレース：\r\n{1}
-LoadingFile;ファイルを読込中
+MainWindow_Title;X4: ステーション計算機
+MainWindow_FaildToLoadFileMessage;ファイルの読み込みに失敗しました。\r\n\r\n■理由：\r\n{0}
+MainWindow_FaildToLoadFileMessageTitle;読み込み失敗
+MainWindow_ClosingConfirmMessage;未保存の項目があります。保存しますか？
+MainWindow_PlanClosingConfirmMessage;計画{0}の変更内容を保存しますか？
+MainWindow_SaveDataWriteFailureMessage;保存に失敗しました。\r\n■理由：\r\n{0}\r\n\r\n■スタックトレース：\r\n{1}
+MainWindow_ImportFailureMessage;インポートに失敗しました。\r\n■理由：\r\n{0}
+MainWindow_UnexpectedErrorMessage;予期しないエラーが発生しました。\r\n■エラー内容：\r\n{0}\r\n\r\n■スタックトレース：\r\n{1}
+MainWindow_LoadingFile;ファイルを読込中
 
 # ------------------------------------------------------
 # Main window menu
 # ------------------------------------------------------
 
 # File(F) ----------------------------------------------
-FileMenu;ファイル(_F)
-New;新規作成
-OverwriteSave;上書き保存
-SaveAs;名前を付けて保存
-Open;開く
-Import;インポート
-ExistingPlan;既存の計画
-StationCalculator;Station Calculator
-Export;エクスポート
-UpdateDB;DB更新
-DBUpdateConfirmationMessage;DB更新画面を表示しますか？\r\n※ 画面が起動するまでしばらくお待ち下さい。
-DBUpdateRestartRequestMessage;DBの更新を適用するためには本アプリケーションの再起動を行ってください。
-DBUpdateFailureMessage;DBの更新に失敗しました。\r\nDBファイルにアクセス可能か確認後、再度実行してください。
+MainWindow_Menu_File_Header;ファイル(_F)
+MainWindow_Menu_File_MenuItem_New_Header;新規作成
+MainWindow_Menu_File_MenuItem_OverwriteSave_Header;上書き保存
+MainWindow_Menu_File_MenuItem_SaveAs_Header;名前を付けて保存
+MainWindow_Menu_File_MenuItem_Open_Header;開く
+MainWindow_Menu_File_MenuItem_Import_Header;インポート
+MainWindow_Menu_File_MenuItem_Import_MenuItem_ExistingPlan_Header;既存の計画
+MainWindow_Menu_File_MenuItem_Import_MenuItem_StationCalculator_Header;Station Calculator
+MainWindow_Menu_File_MenuItem_Import_MenuItem_Loadout_Header;モジュールの装備
+MainWindow_Menu_File_MenuItem_Export_Header;エクスポート
+MainWindow_Menu_File_MenuItem_Export_MenuItem_StationCalculator_Header;Station Calculator
+MainWindow_Menu_File_UpdateDB_Header;DB更新
+MainWindow_Menu_File_UpdateDB_DBUpdate_ConfirmationMessage;DB更新画面を表示しますか？\r\n※ 画面が起動するまでしばらくお待ち下さい。
+MainWindow_Menu_File_UpdateDB_DBUpdate_RestartRequestMessage;DBの更新を適用するためには本アプリケーションの再起動を行ってください。
+MainWindow_Menu_File_UpdateDB_DBUpdate_FailureMessage;DBの更新に失敗しました。\r\nDBファイルにアクセス可能か確認後、再度実行してください。
 
 # View(W) ----------------------------------------------
-View;表示(_V)
+MainWindow_Menu_View_Header;表示(_V)
 
 # Empire overview --------------------------------------
-EmpireOverview;帝国の概要
+MainWindow_Menu_EmpireOverview_Header;帝国の概要
+EmpireOverview_Title;帝国の概要
 
 # Layout(L) --------------------------------------------
-Layout;レイアウト(_L)
-SaveLayout;レイアウト保存
-LayoutList;レイアウト一覧
-LayoutSaveButtonToolTip;レイアウトを上書き
-LayoutEditButtonToolTip;名前を変更
-LayoutRemoveButtonToolTip;削除
-EditLayoutName;レイアウト名編集
-LayoutName;レイアウト名
-LayoutSavedMessage;計画「{0}」のレイアウトを「{1}」として保存しました。
-LayoutSaveFailedMessage;レイアウトの保存に失敗しました。\r\n\r\n■理由：\r\n{0}
-LayoutOverwritedMessage;計画「{0}」のレイアウトを「{1}」として上書き保存しました。
-LayoutOverwriteFailedMessage;レイアウトの上書き保存に失敗しました。\r\n\r\n■理由：\r\n{0}
-TabDoesNotSelectedMessage;レイアウト保存対象のタブが選択されていません。\r\n保存対象のタブを選択後、再度実行して下さい。
-DeleteLayoutConfirmMessage;レイアウト「{0}」を本当に削除しますか？
-InvalidLayoutNameMessage;レイアウト名が無効です。\r\n空白文字以外の文字を1文字以上入力して下さい。
+MainWindow_Menu_Layout_Header;レイアウト(_L)
+MainWindow_Menu_Layout_MenuItem_SaveLayout_Header;レイアウト保存
+MainWindow_Menu_Layout_MenuItem_SaveLayout_Title;レイアウト保存
+MainWindow_Menu_Layout_MenuItem_SaveLayout_Description;保存するレイアウトの名称を入力して下さい
+MainWindow_Menu_Layout_MenuItem_SaveLayout_SucceededMessage;計画「{0}」のレイアウトを「{1}」として保存しました。
+MainWindow_Menu_Layout_MenuItem_SaveLayout_TabDoesNotSelectedMessage;レイアウト保存対象のタブが選択されていません。\r\n保存対象のタブを選択後、再度実行して下さい。
+MainWindow_Menu_Layout_MenuItem_SaveLayout_FailedMessage;レイアウトの保存に失敗しました。\r\n\r\n■理由：\r\n{0}
+MainWindow_Menu_Layout_MenuItem_LayoutList_Header;レイアウト一覧
+MainWindow_Menu_Layout_MenuItem_LayoutList_Overwrite_Button_ToolTip;レイアウトを上書き
+MainWindow_Menu_Layout_MenuItem_LayoutList_Overwrite_SuccessMessage;計画「{0}」のレイアウトを「{1}」として上書き保存しました。
+MainWindow_Menu_Layout_MenuItem_LayoutList_Overwrite_FailedMessage;レイアウトの上書き保存に失敗しました。\r\n\r\n■理由：\r\n{0}
+MainWindow_Menu_Layout_MenuItem_LayoutList_Rename_Button_ToolTip;名前を変更
+MainWindow_Menu_Layout_MenuItem_LayoutList_Rename_Title;レイアウト名編集
+MainWindow_Menu_Layout_MenuItem_LayoutList_Rename_Description;新しいレイアウト名を入力して下さい
+MainWindow_Menu_Layout_MenuItem_LayoutList_DeleteLayoutButton_ToolTip;削除
+MainWindow_Menu_Layout_MenuItem_LayoutList_DeleteLayoutButton_ConfirmMessage;レイアウト「{0}」を本当に削除しますか？
+MainWindow_Menu_Layout_InvalidLayoutNameMessage;レイアウト名が無効です。\r\n空白文字以外の文字を1文字以上入力して下さい。
 
 # Language ---------------------------------------------
-Language;言語
+MainWindow_Menu_Language_Title;言語
 
 # Help(H) ---------------------------------------------
-Help;ヘルプ(_H)
-ReportIssue;問題を報告
-CheckUpdateAtLaunch;起動時に更新を確認する
-CheckUpdate;更新を確認...
-CheckUpdateNoUpdateDescription;X4_ComplexCalculator v{0} は最新です。
-CheckUpdateHasUpdateDescription;X4_ComplexCalculator v{0} は v{1} へ更新できます。\r\n更新しますか？
-CheckUpdateFailedDescription;更新の確認に失敗しました。\r\n時間をおいて再試行して下さい。
-CheckUpdateStartDownloadDescription;更新ファイルのダウンロード中です。\r\nアプリケーションの終了後に更新が適用されます。
-CheckUpdateFinishedDownloadDescription;更新ファイルのダウンロードが完了しました。アプリケーションの終了後に更新が適用されます。
-CheckUpdateNowDownloading;ダウンロード中...
-VersionInfo;バージョン情報
-VersionInfoTitle;X4_ComplexCalculator
-VersionInfoDescription;X4_ComplexCalculator\r\n\r\nバージョン: {0}\r\nコミット: {1}\r\n日付: {2}\r\n.NET Core: {3}
+MainWindow_Menu_Help_Title;ヘルプ(_H)
+MainWindow_Menu_Help_ReportIssue;問題を報告
+MainWindow_Menu_Help_CheckUpdateAtLaunch;起動時に更新を確認する
+MainWindow_Menu_Help_CheckUpdate_Title;更新を確認...
+MainWindow_Menu_Help_VersionInfo_Title;バージョン情報
+MainWindow_Menu_Help_VersionInfo_MessageTitle;X4_ComplexCalculator
+MainWindow_Menu_Help_VersionInfo_MessageDescription;X4_ComplexCalculator\r\n\r\nバージョン: {0}\r\nコミット: {1}\r\n日付: {2}\r\n.NET Core: {3}
+
+
+# Check update -----------------------------------------
+CheckUpdate_Title;更新を確認...
+CheckUpdate_NoUpdateDescription;X4_ComplexCalculator v{0} は最新です。
+CheckUpdate_HasUpdateDescription;X4_ComplexCalculator v{0} は v{1} へ更新できます。\r\n更新しますか？
+CheckUpdate_FailedDescription;更新の確認に失敗しました。\r\n時間をおいて再試行して下さい。
+CheckUpdate_StartDownloadDescription;更新ファイルのダウンロード中です。\r\nアプリケーションの終了後に更新が適用されます。
+CheckUpdate_FinishedDownloadDescription;更新ファイルのダウンロードが完了しました。アプリケーションの終了後に更新が適用されます。
+CheckUpdate_NowDownloading;ダウンロード中...
 
 
 # ------------------------------------------------------
 # Station Calculator import/export dialog
 # ------------------------------------------------------
-StationCalculatorExportTitle;Station Calculatorへエクスポート
-StationCalculatorExportDescription;URLをコピーして下さい\r\n注) 以下のモジュールは除外しています。\r\n・接続モジュール\r\n・探検モジュール
-StationCalculatorImportTitle;Station Calculatorからインポート
-StationCalculatorImportDescription;Station Calculator上部のShareボタンをクリックした時に\r\n表示されるURLを入力してください
+StationCalculatorExport_Title;Station Calculatorへエクスポート
+StationCalculatorExport_Description;URLをコピーして下さい\r\n注) 以下のモジュールは除外しています。\r\n・接続モジュール\r\n・探検モジュール
+StationCalculatorImport_Title;Station Calculatorからインポート
+StationCalculatorImport_Description;Station Calculator上部のShareボタンをクリックした時に\r\n表示されるURLを入力してください
 
 
 # ------------------------------------------------------
 # Select plan dialog
 # ------------------------------------------------------
-SelectPlanWindowTitle;計画を選択
-X4PlanFilePathDescription;X4 建造計画ファイルパス
-ImportPlanDescription;インポートする計画を選択
+SelectPlan_Title;計画を選択
+SelectPlan_X4PlanFilePathDescription;X4 建造計画ファイルパス
+SelectPlan_ImportPlanDescription;インポートする計画を選択
 
 
 # ------------------------------------------------------
 # Import loadouts
 # ------------------------------------------------------
-LoadoutImportTitle;モジュールの装備
-LoadoutImportWindowTitle;モジュールの装備をインポート
-LoadoutFilePathDescription;X4 装備ファイルパス
-PresetListDescription;インポートするプリセットを選択
-PresetImportSucceededMessage;プリセットのインポートに成功しました。\r\nインポート件数 = {0}
-PresetImportFailedMessage;プリセットのインポートに失敗しました。\r\n成功：{0}\r\n失敗：{1}
-NoPresetSelectedMessage;プリセットが選択されていません。\r\nプリセットを選択した後、再度実行してください。
-ImportButton;インポート
-Remarks;備考
-PresetImported;インポート済み
+ImportLoadout_Title;モジュールの装備をインポート
+ImportLoadout_LoadoutFilePathDescription;X4 装備ファイルパス
+ImportLoadout_PresetListDescription;インポートするプリセットを選択
+ImportLoadout_ImportSucceededMessage;プリセットのインポートに成功しました。\r\nインポート件数 = {0}
+ImportLoadout_ImportFailedMessage;プリセットのインポートに失敗しました。\r\n成功：{0}\r\n失敗：{1}
+ImportLoadout_NoPresetSelectedMessage;プリセットが選択されていません。\r\nプリセットを選択した後、再度実行してください。
+ImportLoadout_Button_Import_Content;インポート
+ImportLoadout_Remarks;備考
+ImportLoadout_Imported;インポート済み
 
 
 # ------------------------------------------------------
 # Plan
 # ------------------------------------------------------
-Tab;タブ
-ModuleList;モジュール
-Products;製品
-Summary;概要
-BuildResources;建造
-Storages;保管庫
-StorageAssign;保管庫割当
+PlanArea_Tab;タブ
+PlanArea_ModuleList;モジュール
+PlanArea_Products;製品
+PlanArea_Summary;概要
+PlanArea_BuildResources;建造
+PlanArea_Storages;保管庫
+PlanArea_StorageAssign;保管庫割当
+PlanArea_Settings;設定
 
 
 # ------------------------------------------------------
 # Modules
 # ------------------------------------------------------
-Copy;コピー
-Paste;ペースト
-Delete;削除
-ClearSelection;選択解除
-MoveUpTheSelection;選択項目を上に移動
-MoveDownTheSelection;選択項目を下に移動
-ResetSortOrder;ソート順を初期化
-Add;追加
-AutoAdd;自動追加
-Merge;マージ
-ModuleEquipment;装備
-Edit;編集
-BuildMethod;建造方式
-MergeModulesConfirmMessage;重複するモジュールをマージしますか？
-NoMergeModulesMessage;重複したモジュールはありませんでした。
-MergeModulesMessage;{0}モジュール、{1}レコードをマージしました。
-AutoAddConfirm;不足している製品を生産するモジュールを追加しますか？
-NoAddedModulesAutomaticallyMessage;不足している製品が無いためモジュールは追加されませんでした。
-AddedModulesAutomaticallyMessage;{0}レコード、{1}モジュール追加されました。
-NotEquippedToolTipText;何も装備していません
+Modules_ContextMenu_MenuItem_Copy_Header;コピー
+Modules_ContextMenu_MenuItem_Paste_Header;ペースト
+Modules_ContextMenu_MenuItem_Delete_Header;削除
+Modules_ContextMenu_MenuItem_ClearSelection_Header;選択解除
+Modules_ContextMenu_MenuItem_MoveUpTheSelection_Header;選択項目を上に移動
+Modules_ContextMenu_MenuItem_MoveDownTheSelection_Header;選択項目を下に移動
+Modules_ContextMenu_MenuItem_ResetSortOrder_Header;ソート順を初期化
+Modules_Button_Add_Content;追加
+Modules_Button_AutoAdd_Content;自動追加
+Modules_Button_AutoAdd_ConfirmMessage;不足している製品を生産するモジュールを追加しますか？
+Modules_Button_AutoAdd_AddedModulesMessage;{0}レコード、{1}モジュール追加されました。
+Modules_Button_AutoAdd_NoAddedModulesMessage;不足している製品が無いためモジュールは追加されませんでした。
+Modules_Button_Merge_Content;マージ
+Modules_Button_Merge_ConfirmMessage;重複するモジュールをマージしますか？
+Modules_Button_Merge_MergeModulesMessage;{0}モジュール、{1}レコードをマージしました。
+Modules_Button_Merge_NoMergeModulesMessage;重複したモジュールはありませんでした。
+Modules_Column_Equipment_Header;装備
+Modules_Column_Equipment_Edit_Text;編集
+Modules_Column_BuildMethod_Header;建造方式
 
 
 # ------------------------------------------------------
 # Products
 # ------------------------------------------------------
-Expansion;展開
-Collapse;折りたたむ
-Efficiency;生産性
-Production;生産量
-ProductName;製品名
-AmountPerHour;個数/h
-NoBuy;購入しない
-NoSell;販売しない
-Buy;購入する
-Sell;販売する
+Products_Efficiency;生産性
+Products_AmountPerHour;個数/h
 
 
 # ------------------------------------------------------
 # Build
 # ------------------------------------------------------
-NeedWare;建造に必要なウェア
-NeedWareAmount;個数
+BuildResources_NeedWare;建造に必要なウェア
+BuildResources_NeedWareAmount;個数
 
 
 # ------------------------------------------------------
 # Storage
 # ------------------------------------------------------
-Capacity;容量
-TotalCapacity;容量(合計)
-StorageType;保管庫種別
+Storage_Capacity;容量
+Storage_TotalCapacity;容量(合計)
+Storage_StorageType;保管庫種別
 
 
 # ------------------------------------------------------
 # Storage assign
 # ------------------------------------------------------
-StorageConditionAfterHour;{0}時間後の保管庫状態
-MaximumSliderValue;スライダー最大値
-Allocated;割当個数
-Allocable;割当可能個数
-NumberAfterTheSpecifiedTime;指定時間後の数量
-StorageAssignGroupHeader;{0} = {1:N0}/{2:N0}
+StorageAssign_StorageConditionAfterHour;{0}時間後の保管庫状態
+StorageAssign_MaximumSliderValue;スライダー最大値
+StorageAssign_Allocated;割当個数
+StorageAssign_Allocable;割当可能個数
+StorageAssign_NumberAfterTheSpecifiedTime;指定時間後の数量
+StorageAssign_StorageAssignGroupHeader;{0} = {1:N0}/{2:N0}
 
 
 # ------------------------------------------------------
 # Summary
 # ------------------------------------------------------
-Workforce;労働力 = [{0:N0}/{1:N0}]
-NecessaryWareInfo;必要ウェア情報
-ModuleInfo;モジュール情報
-ProfitPerHour;1時間あたりの損益 = {0:N0} cr
-BuildCost;建造コスト = {0:N0} cr
-Workers;労働者数
-TotalWorkers;総労働者数
-NecessaryAmount;必要数
-Diff;差
-Quantity;数量
+Summary_Workforce;労働力 = [{0:N0}/{1:N0}]
+Summary_NecessaryWareInfo;必要ウェア情報
+Summary_ModuleInfo;モジュール情報
+Summary_ProfitPerHour;1時間あたりの損益 = {0:N0} cr
+Summary_BuildCost;建造コスト = {0:N0} cr
+Summary_Workers;労働者数
+Summary_TotalWorkers;総労働者数
+Summary_NecessaryAmount;必要数
+Summary_Diff;差
+Summary_Quantity;数量
 
 
 # ------------------------------------------------------
 # Settings
 # ------------------------------------------------------
-Settings;設定
-Station;ステーション
-Headquarters;本部
-ActualWorkforce;現在の労働者数 = 
-AlwaysMaximun;常に最大
-Sector;セクター
-Sunlight;日光 =
+Settings_GroupBox_Station_Header;ステーション
+Settings_CheckBox_Headquarters_Content;本部
+Settings_TextBlock_ActualWorkforce_Text;現在の労働者数 = 
+Settings_CheckBox_AlwaysMaximun_Content;常に最大
+Settings_GroupBox_Sector_Header;セクター
+Settings_TextBlock_Sunlight_Text;日光 =
 
 
 # ------------------------------------------------------
 # Select module window
 # ------------------------------------------------------
-SelectModuleWindowTitle;モジュール選択画面
-ModuleNameBeforeChange;変更前モジュール名：
-ModuleType;モジュール種別
+SelectModuleWindow_Title;モジュール選択画面
+SelectModuleWindow_ModuleNameBeforeChange;変更前モジュール名：
+SelectModuleWindow_ModuleType;モジュール種別
 
 
 # ------------------------------------------------------
 # Edit equipment window
 # ------------------------------------------------------
-EditEquipmentWindowTitle;兵装編集画面
-EquipmentSize;装備サイズ
-Preset;プリセット
-PresetRemoveButtonToolTip;削除
-PresetAddButtonToolTip;新規セーブ
-PresetEditButtonToolTip;名前を変更
-PresetSaveButtonToolTip;兵装を上書き
-List;一覧
-Equiped;装備中 = [{0}/{1}]
-EquipmentAddButtonToolTip;左Shiftキーを押しながらクリックで選択項目を一気に追加できます
-EditEquipmentWindowCloseConfirmMessage;変更内容を保存しますか？
-EditPresetName;プリセット名編集
-PresetName;プリセット名
+EditEquipmentWindow_Title;兵装編集画面
+EditEquipmentWindow_Label_EquipmentSize_Content;装備サイズ
+EditEquipmentWindow_Label_Preset_Content;プリセット
+EditEquipmentWindow_Button_DeletePreset_ToolTip;削除
+EditEquipmentWindow_Button_AddPreset_ToolTip;新規セーブ
+EditEquipmentWindow_Button_RenamePreset_ToolTip;名前を変更
+EditEquipmentWindow_Button_OverwritePreset_ToolTip;兵装を上書き
+EditEquipmentWindow_TextBlock_List_Text;一覧 : 
+EditEquipmentWindow_TextBlock_Equipped_Text;装備中 = [{0}/{1}]
+EditEquipmentWindow_Button_Add_ToolTip;左Shiftキーを押しながらクリックで選択項目を一気に追加できます
+EditEquipmentWindow_Button_Save_Content;保存
+EditEquipmentWindow_CloseConfirmMessage;変更内容を保存しますか？
+SaveNewPreset_Title;新規プリセット保存
+SaveNewPreset_Description;プリセット名を入力して下さい
+RenamePreset_Title;プリセット名編集
+RenamePreset_Description;新しいプリセット名を入力して下さい
 DeletePresetConfirmMessage;プリセット「{0}」を本当に削除しますか？
 InvalidPresetNameMessage;プリセット名が無効です。\r\n空白文字以外の文字を1文字以上入力して下さい。
 

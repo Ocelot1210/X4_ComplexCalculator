@@ -113,7 +113,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
                 {
                     Dispatcher.CurrentDispatcher.BeginInvoke(() =>
                     {
-                        LocalizedMessageBox.Show("Lang:FaildToLoadFileMessage", "Lang:FaildToLoadFileMessageTitle", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
+                        LocalizedMessageBox.Show("Lang:MainWindow_FaildToLoadFileMessage", "Lang:MainWindow_FaildToLoadFileMessageTitle", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
                     });
                 }
                 finally
@@ -143,19 +143,19 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
             // プリセットが何も選択されなかったか？
             if (cnt == 0)
             {
-                LocalizedMessageBox.Show("Lang:NoPresetSelectedMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                LocalizedMessageBox.Show("Lang:ImportLoadout_NoPresetSelectedMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             // プリセットの全件インポート成功したか？
             if (cnt == succeeded)
             {
-                LocalizedMessageBox.Show("Lang:PresetImportSucceededMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, succeeded);
+                LocalizedMessageBox.Show("Lang:ImportLoadout_ImportSucceededMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, succeeded);
                 return;
             }
 
             // 1件以上のインポートに失敗
-            LocalizedMessageBox.Show("Lang:PresetImportSucceededMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, succeeded, cnt - succeeded);
+            LocalizedMessageBox.Show("Lang:ImportLoadout_ImportFailedMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, succeeded, cnt - succeeded);
         }
 
 

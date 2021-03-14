@@ -107,7 +107,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport
                 {
                     Dispatcher.CurrentDispatcher.BeginInvoke(() =>
                     {
-                        LocalizedMessageBox.Show("Lang:FaildToLoadFileMessage", "Lang:FaildToLoadFileMessageTitle", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
+                        LocalizedMessageBox.Show("Lang:MainWindow_FaildToLoadFileMessage", "Lang:MainWindow_FaildToLoadFileMessageTitle", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
                     });
                 }
                 finally

@@ -372,13 +372,13 @@ namespace X4_ComplexCalculator.Main.WorkArea
             // コンテンツIDと言語IDのペア
             var titleDict = new Dictionary<string, string>()
             {
-                { "Modules",        "Lang:ModuleList" },        // モジュール一覧
-                { "Products",       "Lang:Products" },          // 製品一覧
-                { "BuildResources", "Lang:BuildResources" },    // 建造リソース一覧
-                { "Storages",       "Lang:Storages" },          // 保管庫一覧
-                { "StorageAssign",  "Lang:StorageAssign" },     // 保管庫割当
-                { "Summary",        "Lang:Summary" },           // 概要
-                { "Settings",       "Lang:Settings" },          // 設定
+                { "Modules",        "Lang:PlanArea_ModuleList" },        // モジュール一覧
+                { "Products",       "Lang:PlanArea_Products" },          // 製品一覧
+                { "BuildResources", "Lang:PlanArea_BuildResources" },    // 建造リソース一覧
+                { "Storages",       "Lang:PlanArea_Storages" },          // 保管庫一覧
+                { "StorageAssign",  "Lang:PlanArea_StorageAssign" },     // 保管庫割当
+                { "Summary",        "Lang:PlanArea_Summary" },           // 概要
+                { "Settings",       "Lang:PlanArea_Settings" },          // 設定
             };
 
             // タイトル再設定

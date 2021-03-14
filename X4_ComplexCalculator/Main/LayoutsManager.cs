@@ -119,7 +119,7 @@ namespace X4_ComplexCalculator.Main
         {
             if (vm is not null)
             {
-                var (onOK, layoutName) = SelectStringDialog.ShowDialog("Lang:EditLayoutName", "Lang:LayoutName", "", IsValidLayoutName);
+                var (onOK, layoutName) = SelectStringDialog.ShowDialog("Lang:MainWindow_Menu_Layout_MenuItem_SaveLayout_Title", "Lang:MainWindow_Menu_Layout_MenuItem_SaveLayout_Description", "", IsValidLayoutName);
                 if (onOK)
                 {
                     try
@@ -130,15 +130,15 @@ namespace X4_ComplexCalculator.Main
                     }
                     catch (Exception ex)
                     {
-                        LocalizedMessageBox.Show("Lang:LayoutSaveFailedMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, ex.Message);
+                        LocalizedMessageBox.Show("Lang:MainWindow_Menu_Layout_MenuItem_SaveLayout_FailedMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, ex.Message);
                     }
 
-                    LocalizedMessageBox.Show("Lang:LayoutSavedMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, vm.Title, layoutName);
+                    LocalizedMessageBox.Show("Lang:MainWindow_Menu_Layout_MenuItem_SaveLayout_SucceededMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, vm.Title, layoutName);
                 }
             }
             else
             {
-                LocalizedMessageBox.Show("Lang:TabDoesNotSelectedMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                LocalizedMessageBox.Show("Lang:MainWindow_Menu_Layout_MenuItem_SaveLayout_TabDoesNotSelectedMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -155,11 +155,11 @@ namespace X4_ComplexCalculator.Main
             {
                 _WorkAreaManager.ActiveContent.OverwriteSaveLayout(menuItem.LayoutID);
 
-                LocalizedMessageBox.Show("Lang:LayoutOverwritedMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, _WorkAreaManager.ActiveContent.Title, menuItem.LayoutName);
+                LocalizedMessageBox.Show("Lang:MainWindow_Menu_Layout_MenuItem_LayoutList_Overwrite_SuccessMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, _WorkAreaManager.ActiveContent.Title, menuItem.LayoutName);
             }
             catch (Exception ex)
             {
-                LocalizedMessageBox.Show("Lang:LayoutOverwriteFailedMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, ex.Message);
+                LocalizedMessageBox.Show("Lang:MainWindow_Menu_Layout_MenuItem_LayoutList_Overwrite_FailedMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, ex.Message);
             }
         }
 
@@ -169,7 +169,7 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         private void EditLayoutName(LayoutMenuItem menuItem)
         {
-            var (onOK, newLayoutName) = SelectStringDialog.ShowDialog("Lang:EditLayoutName", "Lang:LayoutName", menuItem.LayoutName.Value, IsValidLayoutName);
+            var (onOK, newLayoutName) = SelectStringDialog.ShowDialog("Lang:MainWindow_Menu_Layout_MenuItem_LayoutList_Rename_Title", "Lang:MainWindow_Menu_Layout_MenuItem_LayoutList_Rename_Description", menuItem.LayoutName.Value, IsValidLayoutName);
             if (onOK && menuItem.LayoutName.Value != newLayoutName)
             {
                 menuItem.LayoutName.Value = newLayoutName;
@@ -186,7 +186,7 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         private void DeleteLayout(LayoutMenuItem menuItem)
         {
-            var result = LocalizedMessageBox.Show("Lang:DeleteLayoutConfirmMessage", "Lang:Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No, menuItem.LayoutName);
+            var result = LocalizedMessageBox.Show("Lang:MainWindow_Menu_Layout_MenuItem_LayoutList_DeleteLayoutButton_ConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No, menuItem.LayoutName);
 
             if (result == MessageBoxResult.Yes)
             {
@@ -208,7 +208,7 @@ namespace X4_ComplexCalculator.Main
 
             if (string.IsNullOrWhiteSpace(layoutName))
             {
-                LocalizedMessageBox.Show("Lang:InvalidLayoutNameMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                LocalizedMessageBox.Show("Lang:MainWindow_Menu_Layout_InvalidLayoutNameMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Warning);
                 ret = false;
             }
 

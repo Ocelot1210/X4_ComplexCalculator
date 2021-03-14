@@ -7,7 +7,7 @@
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:X4_ComplexCalculator.Main"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="{lex:Loc Lang:MainWindowTitle}"
+    Title="{lex:Loc Lang:MainWindow_Title}"
     Width="420"
     Height="Auto"
     d:DataContext="{d:DesignInstance local:UpdateDownloadProgressViewModel}"
@@ -21,7 +21,7 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <StackPanel Margin="10">
-        <Label Margin="3" Content="{lex:Loc Lang:CheckUpdateNowDownloading}" />
+        <Label Margin="3" Content="{lex:Loc Lang:CheckUpdate_NowDownloading}" />
         <ProgressBar
             Height="18"
             Margin="3"
@@ -33,7 +33,7 @@
             Margin="3"
             HorizontalAlignment="Right"
             Command="{Binding CancelCommand, Mode=OneTime}"
-            Content="{lex:Loc Lang:Cancel}">
+            Content="{lex:Loc Lang:Common_Cancel}">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="Click">
                     <i:CallMethodAction MethodName="Close" TargetObject="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Mode=OneTime}" />

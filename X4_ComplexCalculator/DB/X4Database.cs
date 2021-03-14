@@ -147,12 +147,12 @@ namespace X4_ComplexCalculator.DB
                         // 想定するDBのフォーマットと実際のフォーマットが異なる場合
                         // DB更新を要求
 
-                        LocalizedMessageBox.Show("Lang:OldFormatMessage", "Lang:Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        LocalizedMessageBox.Show("Lang:DB_OldFormatMessage", "Lang:Common_MessageBoxTitle_Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                         if (!UpdateDB() || _Instance.GetDBVersion() != X4_DataExporterWPF.Export.CommonExporter.CURRENT_FORMAT_VERSION)
                         {
                             // DB更新を要求してもフォーマットが変わらない場合
 
-                            LocalizedMessageBox.Show("Lang:DBUpdateRequestMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                            LocalizedMessageBox.Show("Lang:DB_UpdateRequestMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error);
                             Environment.Exit(-1);
                         }
                     }
@@ -162,10 +162,10 @@ namespace X4_ComplexCalculator.DB
                     // X4DBが存在しない場合
 
                     // X4DBの作成を要求する
-                    LocalizedMessageBox.Show("Lang:DBExtractionRequestMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);
+                    LocalizedMessageBox.Show("Lang:DB_ExtractionRequestMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);
                     if (!UpdateDB())
                     {
-                        LocalizedMessageBox.Show("Lang:DBMakeRequestMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        LocalizedMessageBox.Show("Lang:DB_MakeRequestMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         Environment.Exit(-1);
                     }
                 }
@@ -173,20 +173,20 @@ namespace X4_ComplexCalculator.DB
             catch
             {
                 // X4DBを開く際にエラーがあった場合、DB更新を提案する
-                if (LocalizedMessageBox.Show("Lang:DBOpenFailMessage", "Lang:Error", MessageBoxButton.YesNo, MessageBoxImage.Error) == MessageBoxResult.Yes)
+                if (LocalizedMessageBox.Show("Lang:DB_OpenFailMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.YesNo, MessageBoxImage.Error) == MessageBoxResult.Yes)
                 {
                     // 提案が受け入れられた場合、DB更新
                     if (!UpdateDB())
                     {
                         // DB更新失敗
-                        LocalizedMessageBox.Show("Lang:DBUpdateRequestMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        LocalizedMessageBox.Show("Lang:DB_UpdateRequestMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         Environment.Exit(-1);
                     }
                 }
                 else
                 {
                     // 提案が受け入れられなかった場合
-                    LocalizedMessageBox.Show("Lang:DBUpdateRequestMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    LocalizedMessageBox.Show("Lang:DB_UpdateRequestMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     Environment.Exit(-1);
                 }
             }

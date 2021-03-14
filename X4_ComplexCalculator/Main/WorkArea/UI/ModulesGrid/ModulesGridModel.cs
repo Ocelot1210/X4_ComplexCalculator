@@ -163,7 +163,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
                 return;
             }
 
-            var result = LocalizedMessageBox.Show("Lang:MergeModulesConfirmMessage", "Lang:Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
+            var result = LocalizedMessageBox.Show("Lang:Modules_Button_Merge_ConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
             if (result != MessageBoxResult.Yes)
             {
                 return;
@@ -195,11 +195,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             if (prevCnt != dict.Count)
             {
                 _ModulesInfo.Modules.Reset(dict.OrderBy(x => x.Value.idx).Select(x => x.Value.Module));
-                LocalizedMessageBox.Show("Lang:MergeModulesMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, mergedModules, prevCnt - dict.Count);
+                LocalizedMessageBox.Show("Lang:Modules_Button_Merge_MergeModulesMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, mergedModules, prevCnt - dict.Count);
             }
             else
             {
-                LocalizedMessageBox.Show("Lang:NoMergeModulesMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);
+                LocalizedMessageBox.Show("Lang:Modules_Button_Merge_NoMergeModulesMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
     }

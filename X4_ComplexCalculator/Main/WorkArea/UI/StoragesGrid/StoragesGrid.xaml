@@ -31,11 +31,11 @@
                     <!--  モジュール名  -->
                     <DataGridInline:InlineGridViewColumn
                         DisplayMemberBinding="{Binding ModuleName, Mode=OneTime}"
-                        Header="{lex:Loc Lang:ModuleName}"
+                        Header="{lex:Loc Lang:Common_ModuleName}"
                         SortTargetPropertyName="ModuleName" />
 
                     <!--  モジュール数  -->
-                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:ModuleCount}" SortTargetPropertyName="ModuleCount">
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Common_ModuleCount}" SortTargetPropertyName="ModuleCount">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding ModuleCount, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
@@ -45,7 +45,7 @@
 
 
                     <!--  容量  -->
-                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Capacity}" SortTargetPropertyName="Capacity">
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Storage_Capacity}" SortTargetPropertyName="Capacity">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Capacity, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
@@ -55,7 +55,7 @@
 
 
                     <!--  容量(合計)  -->
-                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:TotalCapacity}" SortTargetPropertyName="TotalCapacity">
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Storage_TotalCapacity}" SortTargetPropertyName="TotalCapacity">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding TotalCapacity, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
@@ -74,13 +74,13 @@
             <MenuItem
                 Command="{Binding SetSelectedExpandedCommand, Mode=OneTime}"
                 CommandParameter="{StaticResource True}"
-                Header="{lex:Loc X4_ComplexCalculator:Lang:Expansion}" />
+                Header="{lex:Loc X4_ComplexCalculator:Lang:Common_Expander_Expansion}" />
 
             <!--  折りたたみ  -->
             <MenuItem
                 Command="{Binding SetSelectedExpandedCommand, Mode=OneTime}"
                 CommandParameter="{StaticResource False}"
-                Header="{lex:Loc X4_ComplexCalculator:Lang:Collapse}" />
+                Header="{lex:Loc X4_ComplexCalculator:Lang:Common_Expander_Collapse}" />
         </ContextMenu>
 
     </UserControl.Resources>
@@ -94,13 +94,13 @@
         <DataGrid.Columns>
 
             <!--  保管庫種別  -->
-            <DataGridTextColumn Binding="{Binding TransportType.Name}" Header="{lex:Loc Lang:StorageType}" />
+            <DataGridTextColumn Binding="{Binding TransportType.Name}" Header="{lex:Loc Lang:Storage_StorageType}" />
 
             <!--  容量  -->
             <DataGridTextColumn
                 Binding="{Binding Capacity, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}"
                 CellStyle="{StaticResource RightAlignedDataGridCell}"
-                Header="{lex:Loc Lang:Capacity}" />
+                Header="{lex:Loc Lang:Storage_Capacity}" />
 
         </DataGrid.Columns>
 

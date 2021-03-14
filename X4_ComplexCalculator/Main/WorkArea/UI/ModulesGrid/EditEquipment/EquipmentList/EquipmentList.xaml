@@ -32,10 +32,11 @@
         </Grid.RowDefinitions>
 
         <DockPanel Grid.Row="0" Grid.Column="0">
-            <TextBlock Margin="5,0,0,0" VerticalAlignment="Center">
-                <Run Text="{lex:Loc Lang:List}" />
-                ：</TextBlock>
-            <x4ccrtl:ClearableWaterMarkTextBox Text="{Binding SearchEquipmentName.Value, UpdateSourceTrigger=PropertyChanged}" Watermark="{lex:Loc Lang:SearchByEnteringText}" />
+            <TextBlock
+                Margin="5,0,0,0"
+                VerticalAlignment="Center"
+                Text="{lex:Loc Lang:EditEquipmentWindow_TextBlock_List_Text}" />
+            <x4ccrtl:ClearableWaterMarkTextBox Text="{Binding SearchEquipmentName.Value, UpdateSourceTrigger=PropertyChanged}" Watermark="{lex:Loc Lang:Common_SearchByEnteringText}" />
         </DockPanel>
 
         <TextBlock
@@ -44,7 +45,7 @@
             VerticalAlignment="Center">
             <TextBlock.Text>
                 <MultiBinding Converter="{StaticResource FormatStringConverter}">
-                    <lex:BLoc Key="Lang:Equiped" />
+                    <lex:BLoc Key="Lang:EditEquipmentWindow_TextBlock_Equipped_Text" />
                     <Binding
                         Mode="OneWay"
                         Path="EquippedCount.Value"
@@ -73,7 +74,7 @@
                 Command="{Binding AddButtonClickedCommand}"
                 Content="➡"
                 FontSize="18"
-                ToolTip="{lex:Loc Lang:EquipmentAddButtonToolTip}" />
+                ToolTip="{lex:Loc Lang:EditEquipmentWindow_Button_Add_ToolTip}" />
 
             <!--  削除ボタン  -->
             <Button

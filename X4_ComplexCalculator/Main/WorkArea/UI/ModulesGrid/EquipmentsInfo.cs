@@ -118,7 +118,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             if (!equipments.Any())
             {
                 _Count = 0;
-                DetailsText = (string)WPFLocalizeExtension.Engine.LocalizeDictionary.Instance.GetLocalizedObject("Lang:NotEquippedToolTipText", null, null);
+                DetailsText = (string)WPFLocalizeExtension.Engine.LocalizeDictionary.Instance.GetLocalizedObject("Lang:Common_NotEquippedToolTipText", null, null);
                 _UpdateNeeded = false;
                 return;
             }

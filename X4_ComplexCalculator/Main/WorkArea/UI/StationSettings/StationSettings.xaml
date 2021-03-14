@@ -26,11 +26,11 @@
             <GroupBox
                 Margin="5"
                 BorderBrush="Gray"
-                Header="{lex:Loc Lang:Station}">
+                Header="{lex:Loc Lang:Settings_GroupBox_Station_Header}">
                 <StackPanel Margin="5">
                     <CheckBox
                         Margin="0,0,0,20"
-                        Content="{lex:Loc Lang:Headquarters}"
+                        Content="{lex:Loc Lang:Settings_CheckBox_Headquarters_Content}"
                         IsChecked="{Binding IsHeadquarters, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                     <Grid HorizontalAlignment="Left">
@@ -43,7 +43,7 @@
                         </Grid.RowDefinitions>
 
                         <StackPanel Grid.Row="0" Orientation="Horizontal">
-                            <TextBlock Text="{lex:Loc Lang:ActualWorkforce}" />
+                            <TextBlock Text="{lex:Loc Lang:Settings_TextBlock_ActualWorkforce_Text}" />
                             <xctk:LongUpDown
                                 Width="100"
                                 FormatString="{StaticResource DefaultNumericFormat}"
@@ -63,7 +63,7 @@
 
                         <CheckBox
                             Grid.Row="2"
-                            Content="{lex:Loc Lang:AlwaysMaximun}"
+                            Content="{lex:Loc Lang:Settings_CheckBox_AlwaysMaximun_Content}"
                             IsChecked="{Binding Workforce.AlwaysMaximum}" />
                     </Grid>
 
@@ -74,13 +74,13 @@
             <GroupBox
                 Margin="5"
                 BorderBrush="Gray"
-                Header="{lex:Loc Lang:Sector}">
+                Header="{lex:Loc Lang:Settings_GroupBox_Sector_Header}">
                 <StackPanel Margin="5">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock
                             Margin="0,0,5,0"
                             VerticalAlignment="Center"
-                            Text="{lex:Loc Lang:Sunlight}" />
+                            Text="{lex:Loc Lang:Settings_TextBlock_Sunlight_Text}" />
 
                         <xctk:IntegerUpDown
                             Width="100"

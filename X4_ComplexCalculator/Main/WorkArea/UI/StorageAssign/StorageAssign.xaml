@@ -85,7 +85,7 @@
                 <TextBlock>
                     <TextBlock.Text>
                         <MultiBinding Converter="{StaticResource FormatStringConverter}">
-                            <lex:BLoc Key="Lang:StorageConditionAfterHour" />
+                            <lex:BLoc Key="Lang:StorageAssign_StorageConditionAfterHour" />
                             <Binding
                                 ElementName="HourSlider"
                                 Mode="OneWay"
@@ -104,7 +104,7 @@
             </StackPanel>
 
             <StackPanel Grid.Column="1">
-                <TextBlock Text="{lex:Loc Lang:MaximumSliderValue}" />
+                <TextBlock Text="{lex:Loc Lang:StorageAssign_MaximumSliderValue}" />
                 <xctk:IntegerUpDown
                     x:Name="MaxHourUpDown"
                     ClipValueToMinMax="True"
@@ -139,7 +139,7 @@
                                                         <TextBlock.Text>
                                                             <MultiBinding Converter="{StaticResource FormatStringConverter}">
 
-                                                                <lex:BLoc Key="Lang:StorageAssignGroupHeader" />
+                                                                <lex:BLoc Key="Lang:StorageAssign_StorageAssignGroupHeader" />
 
                                                                 <Binding Path="Items.CurrentItem.TransportTypeName" />
 
@@ -169,7 +169,7 @@
                 <!--  階級  -->
                 <DataGridTemplateColumn
                     ClipboardContentBinding="{Binding Tier, Mode=OneTime}"
-                    Header="{lex:Loc Lang:Tier}"
+                    Header="{lex:Loc Lang:Common_Tier}"
                     SortMemberPath="Tier">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
@@ -185,7 +185,7 @@
                 <!--  ウェア名  -->
                 <DataGridTemplateColumn
                     ClipboardContentBinding="{Binding WareName, Mode=OneTime}"
-                    Header="{lex:Loc Lang:WareName}"
+                    Header="{lex:Loc Lang:Common_WareName}"
                     SortMemberPath="WareName">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
@@ -198,7 +198,7 @@
                 <!--  割当個数  -->
                 <x4cmn:MouseHoverEditCellColumn
                     ClipboardContentBinding="{Binding AllocCount, Mode=OneTime}"
-                    Header="{lex:Loc Lang:Allocated}"
+                    Header="{lex:Loc Lang:StorageAssign_Allocated}"
                     SortMemberPath="AllocCount">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
@@ -225,7 +225,7 @@
                 <!--  割当可能個数  -->
                 <DataGridTemplateColumn
                     ClipboardContentBinding="{Binding AllocableCount, Mode=OneTime}"
-                    Header="{lex:Loc Lang:Allocable}"
+                    Header="{lex:Loc Lang:StorageAssign_Allocable}"
                     SortMemberPath="AllocableCount">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
@@ -242,7 +242,7 @@
                 <DataGridTemplateColumn
                     CellStyle="{StaticResource CapacityEmphasisStyle}"
                     ClipboardContentBinding="{Binding AllocableCount, Mode=OneTime}"
-                    Header="{lex:Loc Lang:NumberAfterTheSpecifiedTime}"
+                    Header="{lex:Loc Lang:StorageAssign_NumberAfterTheSpecifiedTime}"
                     SortMemberPath="AfterCount">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>

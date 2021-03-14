@@ -192,7 +192,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
             }
 
             // 新プリセット名
-            var (onOK, newPresetName) = SelectStringDialog.ShowDialog("Lang:EditPresetName", "Lang:PresetName", SelectedPreset.Value.Name, IsValidPresetName);
+            var (onOK, newPresetName) = SelectStringDialog.ShowDialog("Lang:RenamePreset_Title", "Lang:RenamePreset_Description", SelectedPreset.Value.Name, IsValidPresetName);
             if (onOK)
             {
                 // 新プリセット名が設定された場合
@@ -207,7 +207,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
         /// </summary>
         public void AddPreset()
         {
-            var (onOK, presetName) = SelectStringDialog.ShowDialog("Lang:EditPresetName", "Lang:PresetName", "", IsValidPresetName);
+            var (onOK, presetName) = SelectStringDialog.ShowDialog("Lang:SaveNewPreset_Title", "Lang:SaveNewPreset_Description", "", IsValidPresetName);
             if (onOK)
             {
                 var newID = SettingDatabase.Instance.GetLastModulePresetsID(_Manager.Ware.ID);
@@ -236,7 +236,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
                 return;
             }
 
-            var result = LocalizedMessageBox.Show("Lang:DeletePresetConfirmMessage", "Lang:Error", MessageBoxButton.YesNo, MessageBoxImage.Exclamation, MessageBoxResult.No, SelectedPreset.Value.Name);
+            var result = LocalizedMessageBox.Show("Lang:DeletePresetConfirmMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.YesNo, MessageBoxImage.Exclamation, MessageBoxResult.No, SelectedPreset.Value.Name);
             if (result == MessageBoxResult.Yes)
             {
                 SettingDatabase.Instance.DeleteModulePreset(_Manager.Ware.ID, SelectedPreset.Value.ID);
@@ -291,7 +291,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment
 
             if (string.IsNullOrWhiteSpace(presetName))
             {
-                LocalizedMessageBox.Show("Lang:InvalidPresetNameMessage", "Lang:Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                LocalizedMessageBox.Show("Lang:InvalidPresetNameMessage", "Lang:Common_MessageBoxTitle_Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                 ret = false;
             }
 

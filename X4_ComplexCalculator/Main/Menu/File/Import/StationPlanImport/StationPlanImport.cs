@@ -33,7 +33,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
         /// <summary>
         /// メニュー表示用タイトル
         /// </summary>
-        public string Title => "Lang:ExistingPlan";
+        public string Title => "Lang:MainWindow_Menu_File_MenuItem_Import_MenuItem_ExistingPlan_Header";
 
 
         /// <summary>

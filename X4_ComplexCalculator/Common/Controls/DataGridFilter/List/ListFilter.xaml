@@ -90,13 +90,13 @@
                                     x:Name="PART_ListSearchTextBox"
                                     DockPanel.Dock="Top"
                                     Text="{Binding ElementName=Control, Path=ListBoxSearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                    Watermark="{lex:Loc Lang:Search}" />
+                                    Watermark="{lex:Loc Lang:Common_Search}" />
                                 <xctk:CheckListBox
                                     x:Name="PART_ListBox"
                                     DisplayMemberPath="Text"
                                     IsSelectAllActive="True"
                                     ItemsSource="{Binding ElementName=Control, Path=ListBoxItems, Mode=OneTime}"
-                                    SelectAllContent="{lex:Loc Lang:SelectAll}"
+                                    SelectAllContent="{lex:Loc Lang:Common_SelectAll}"
                                     SelectedMemberPath="IsChecked" />
                             </DockPanel>
                         </GroupBox>

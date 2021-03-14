@@ -13,7 +13,7 @@
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:x4vcvt="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-    Title="{lex:Loc Lang:MainWindowTitle}"
+    Title="{lex:Loc Lang:MainWindow_Title}"
     Width="1000"
     Height="600"
     lex:LocalizeDictionary.DefaultProvider="{StaticResource CSVLocalizationProvider}"
@@ -59,37 +59,37 @@
         <Menu Grid.Row="0">
 
             <!--  ファイル(F)  -->
-            <MenuItem Header="{lex:Loc Lang:FileMenu}">
+            <MenuItem Header="{lex:Loc Lang:MainWindow_Menu_File_Header}">
 
                 <!--  新規  -->
                 <MenuItem
                     Command="{Binding CreateNewCommand, Mode=OneTime}"
-                    Header="{lex:Loc Lang:New}"
+                    Header="{lex:Loc Lang:MainWindow_Menu_File_MenuItem_New_Header}"
                     InputGestureText="Ctrl+N" />
 
                 <!--  上書き保存  -->
                 <MenuItem
                     Command="{Binding SaveCommand, Mode=OneTime}"
-                    Header="{lex:Loc Lang:OverwriteSave}"
+                    Header="{lex:Loc Lang:MainWindow_Menu_File_MenuItem_OverwriteSave_Header}"
                     InputGestureText="Ctrl+S" />
 
                 <!--  名前を付けて保存  -->
                 <MenuItem
                     Command="{Binding SaveAsCommand, Mode=OneTime}"
-                    Header="{lex:Loc Lang:SaveAs}"
+                    Header="{lex:Loc Lang:MainWindow_Menu_File_MenuItem_SaveAs_Header}"
                     InputGestureText="Shift+Ctrl+S" />
 
                 <!--  開く  -->
                 <MenuItem
                     Command="{Binding OpenCommand, Mode=OneTime}"
-                    Header="{lex:Loc Lang:Open}"
+                    Header="{lex:Loc Lang:MainWindow_Menu_File_MenuItem_Open_Header}"
                     InputGestureText="Ctrl+O" />
 
                 <Separator />
 
                 <!--  インポート  -->
                 <MenuItem
-                    Header="{lex:Loc Lang:Import}"
+                    Header="{lex:Loc Lang:MainWindow_Menu_File_MenuItem_Import_Header}"
                     InputGestureText="Ctrl+I"
                     ItemsSource="{Binding Imports}">
                     <MenuItem.ItemContainerStyle>
@@ -113,7 +113,7 @@
 
                 <!--  エクスポート  -->
                 <MenuItem
-                    Header="{lex:Loc Lang:Export}"
+                    Header="{lex:Loc Lang:MainWindow_Menu_File_MenuItem_Export_Header}"
                     InputGestureText="Ctrl+E"
                     ItemsSource="{Binding Exports}">
                     <MenuItem.ItemContainerStyle>
@@ -140,16 +140,16 @@
                 <!--  DB更新  -->
                 <MenuItem
                     Command="{Binding UpdateDBCommand, Mode=OneTime}"
-                    Header="{lex:Loc Lang:UpdateDB}"
+                    Header="{lex:Loc Lang:MainWindow_Menu_File_UpdateDB_Header}"
                     InputGestureText="Ctrl+U" />
 
             </MenuItem>
 
 
             <!--  表示(V)  -->
-            <MenuItem Header="{lex:Loc Lang:View}">
+            <MenuItem Header="{lex:Loc Lang:MainWindow_Menu_View_Header}">
                 <!--  帝国の概要  -->
-                <MenuItem Command="{Binding OpenEmpireOverviewWindowCommand, Mode=OneTime}" Header="{lex:Loc Lang:EmpireOverview}" />
+                <MenuItem Command="{Binding OpenEmpireOverviewWindowCommand, Mode=OneTime}" Header="{lex:Loc Lang:MainWindow_Menu_EmpireOverview_Header}" />
 
                 <!--  DBビュワー  -->
                 <MenuItem Command="{Binding OpenDBViewerWindowCommand, Mode=OneTime}" Header="{lex:Loc Lang:DBViewer}" />
@@ -157,13 +157,13 @@
             </MenuItem>
 
             <!--  レイアウト(L)  -->
-            <MenuItem Header="{lex:Loc Lang:Layout}">
+            <MenuItem Header="{lex:Loc Lang:MainWindow_Menu_Layout_Header}">
                 <!--  レイアウト保存  -->
-                <MenuItem Command="{Binding SaveLayout, Mode=OneTime}" Header="{lex:Loc Lang:SaveLayout}" />
+                <MenuItem Command="{Binding SaveLayout, Mode=OneTime}" Header="{lex:Loc Lang:MainWindow_Menu_Layout_MenuItem_SaveLayout_Header}" />
 
                 <!--  レイアウト一覧  -->
                 <MenuItem
-                    Header="{lex:Loc Lang:LayoutList}"
+                    Header="{lex:Loc Lang:MainWindow_Menu_Layout_MenuItem_LayoutList_Header}"
                     ItemsSource="{Binding Layouts}"
                     ToolBar.OverflowMode="Always">
                     <MenuItem.ItemContainerStyle>
@@ -179,7 +179,7 @@
 
             <!--  言語  -->
             <MenuItem
-                Header="{lex:Loc Lang:Language}"
+                Header="{lex:Loc Lang:MainWindow_Menu_Language_Title}"
                 ItemsSource="{Binding Languages, Mode=OneTime}"
                 ToolBar.OverflowMode="Always">
                 <MenuItem.ItemContainerStyle>
@@ -192,23 +192,23 @@
             </MenuItem>
 
             <!--  ヘルプ(H)  -->
-            <MenuItem Header="{lex:Loc Lang:Help}">
+            <MenuItem Header="{lex:Loc Lang:MainWindow_Menu_Help_Title}">
 
                 <!--  問題を報告  -->
-                <MenuItem Command="{Binding ReportIssueCommand, Mode=OneTime}" Header="{lex:Loc Lang:ReportIssue}" />
+                <MenuItem Command="{Binding ReportIssueCommand, Mode=OneTime}" Header="{lex:Loc Lang:MainWindow_Menu_Help_ReportIssue}" />
 
                 <Separator />
 
                 <!--  起動時に更新を確認する  -->
                 <MenuItem
                     Command="{Binding SetCheckUpdateAtLaunchCommand, Mode=OneTime}"
-                    Header="{lex:Loc Lang:CheckUpdateAtLaunch}"
+                    Header="{lex:Loc Lang:MainWindow_Menu_Help_CheckUpdateAtLaunch}"
                     IsCheckable="True"
                     IsChecked="{Binding CheckUpdateAtLaunch.Value, Mode=TwoWay}" />
 
 
                 <!--  更新を確認...  -->
-                <MenuItem Command="{Binding CheckUpdateCommand, Mode=OneTime}" Header="{lex:Loc Lang:CheckUpdate}">
+                <MenuItem Command="{Binding CheckUpdateCommand, Mode=OneTime}" Header="{lex:Loc Lang:CheckUpdate_Title}">
                     <MenuItem.CommandParameter>
                         <sys:Boolean>true</sys:Boolean>
                     </MenuItem.CommandParameter>
@@ -217,7 +217,7 @@
                 <Separator />
 
                 <!--  X4_ComplexCalculator について  -->
-                <MenuItem Command="{Binding VersionInfoCommand, Mode=OneTime}" Header="{lex:Loc Lang:VersionInfo}" />
+                <MenuItem Command="{Binding VersionInfoCommand, Mode=OneTime}" Header="{lex:Loc Lang:MainWindow_Menu_Help_VersionInfo_Title}" />
 
             </MenuItem>
         </Menu>
@@ -274,7 +274,7 @@
                         <TextBlock
                             HorizontalAlignment="Center"
                             FontWeight="Bold"
-                            Text="{lex:Loc Lang:LoadingFile}" />
+                            Text="{lex:Loc Lang:MainWindow_LoadingFile}" />
                         <StackPanel Margin="0,4,4,4">
                             <TextBlock HorizontalAlignment="Center" Text="{Binding DataContext.LoadingFileName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" />
                             <ProgressBar

@@ -41,7 +41,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
             }
             catch (Exception e)
             {
-                LocalizedMessageBox.Show("Lang:SaveDataWriteFailureMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message, e.StackTrace ?? "");
+                LocalizedMessageBox.Show("Lang:MainWindow_SaveDataWriteFailureMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message, e.StackTrace ?? "");
             }
 
             return false;
@@ -69,7 +69,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
                 }
                 catch (Exception e)
                 {
-                    LocalizedMessageBox.Show("Lang:SaveDataWriteFailureMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message, e.StackTrace ?? "");
+                    LocalizedMessageBox.Show("Lang:MainWindow_SaveDataWriteFailureMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message, e.StackTrace ?? "");
                 }
             }
 

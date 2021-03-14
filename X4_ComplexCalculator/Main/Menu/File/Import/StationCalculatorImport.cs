@@ -32,7 +32,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
         /// <summary>
         /// メニュー表示用タイトル
         /// </summary>
-        public string Title => "Lang:StationCalculator";
+        public string Title => "Lang:MainWindow_Menu_File_MenuItem_Import_MenuItem_StationCalculator_Header";
 
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
             var ret = 0;
             var onOK = false;
 
-            (onOK, _InputUrl) = SelectStringDialog.ShowDialog("Lang:StationCalculatorImportTitle", "Lang:StationCalculatorImportDescription");
+            (onOK, _InputUrl) = SelectStringDialog.ShowDialog("Lang:StationCalculatorImport_Title", "Lang:StationCalculatorImport_Description");
             if (onOK)
             {
                 ret = 1;
@@ -123,7 +123,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
             }
             catch (Exception e)
             {
-                LocalizedMessageBox.Show("Lang:ImportFailureMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
+                LocalizedMessageBox.Show("Lang:MainWindow_ImportFailureMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
             }
 
             return ret;

@@ -7,7 +7,7 @@
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:X4_ComplexCalculator.Main.Menu.View.EmpireOverview"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="{lex:Loc Lang:EmpireOverview}"
+    Title="{lex:Loc Lang:EmpireOverview_Title}"
     Width="400"
     Height="450"
     Style="{StaticResource DefaultWindowBackgroundStyle}"
@@ -35,7 +35,7 @@
                 <DataGridTemplateColumn
                     CellStyle="{StaticResource RightAlignedDataGridCell}"
                     ClipboardContentBinding="{Binding Ware.WareGroup.Tier, Mode=OneTime}"
-                    Header="{lex:Loc Lang:Tier}"
+                    Header="{lex:Loc Lang:Common_Tier}"
                     SortMemberPath="Ware.WareGroup.Tier">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
@@ -48,7 +48,7 @@
                 <!--  製品名  -->
                 <DataGridTemplateColumn
                     ClipboardContentBinding="{Binding Ware.Name, Mode=OneTime}"
-                    Header="{lex:Loc Lang:ProductName}"
+                    Header="{lex:Loc Lang:Common_ProductName}"
                     SortMemberPath="Ware.Name">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
@@ -62,7 +62,7 @@
                 <DataGridTemplateColumn
                     CellStyle="{StaticResource LossEmphasisStyle}"
                     ClipboardContentBinding="{Binding Count, Mode=OneTime}"
-                    Header="{lex:Loc Lang:AmountPerHour}"
+                    Header="{lex:Loc Lang:Products_AmountPerHour}"
                     SortMemberPath="Count">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
