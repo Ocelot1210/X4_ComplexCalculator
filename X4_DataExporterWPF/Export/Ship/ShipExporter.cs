@@ -227,7 +227,7 @@ items);
             // 説明文を取得
 
             // 艦船種別IDを取得
-            ret.ShipTypeID = properties.Element("ship").Attribute("type")?.Value ?? "";
+            ret.ShipTypeID = properties.Element("ship")?.Attribute("type")?.Value ?? "";
             if (string.IsNullOrEmpty(ret.ShipTypeID)) return null;
 
 
@@ -236,13 +236,13 @@ items);
                 var drag = properties.XPathSelectElement("physics/drag");
                 if (drag is null) return null;
 
-                ret.DragForward = drag.Attribute("forward").GetDouble();
-                ret.DragReverse = drag.Attribute("reverse").GetDouble();
-                ret.DragHorizontal = drag.Attribute("horizontal").GetDouble();
-                ret.DragVertical = drag.Attribute("vertical").GetDouble();
-                ret.DragPitch = drag.Attribute("pitch").GetDouble();
-                ret.DragYaw = drag.Attribute("yaw").GetDouble();
-                ret.DragRoll = drag.Attribute("roll").GetDouble();
+                ret.DragForward = drag.Attribute("forward")?.GetDouble() ?? 0.0;
+                ret.DragReverse = drag.Attribute("reverse")?.GetDouble() ?? 0.0;
+                ret.DragHorizontal = drag.Attribute("horizontal")?.GetDouble() ?? 0.0;
+                ret.DragVertical = drag.Attribute("vertical")?.GetDouble() ?? 0.0;
+                ret.DragPitch = drag.Attribute("pitch")?.GetDouble() ?? 0.0;
+                ret.DragYaw = drag.Attribute("yaw")?.GetDouble() ?? 0.0;
+                ret.DragRoll = drag.Attribute("roll")?.GetDouble() ?? 0.0;
             }
 
             // 慣性を取得
@@ -250,14 +250,14 @@ items);
                 var inertia = properties.XPathSelectElement("physics/inertia");
                 if (inertia is null) return null;
 
-                ret.InertiaPitch = inertia.Attribute("pitch").GetDouble();
-                ret.InertiaYaw = inertia.Attribute("yaw").GetDouble();
-                ret.InertiaRoll = inertia.Attribute("roll").GetDouble();
+                ret.InertiaPitch = inertia.Attribute("pitch")?.GetDouble() ?? 0.0;
+                ret.InertiaYaw = inertia.Attribute("yaw")?.GetDouble() ?? 0.0;
+                ret.InertiaRoll = inertia.Attribute("roll")?.GetDouble() ?? 0.0;
             }
 
-            ret.Hull = properties.Element("hull").Attribute("max").GetInt();
-            ret.Mass = properties.Element("physics").Attribute("mass").GetDouble();
-            ret.People = properties.Element("people").Attribute("capacity").GetInt();
+            ret.Hull = properties.Element("hull")?.Attribute("max").GetInt() ?? 0;
+            ret.Mass = properties.Element("physics")?.Attribute("mass").GetDouble() ?? 0;
+            ret.People = properties.Element("people")?.Attribute("capacity").GetInt() ?? 0;
             ret.MissileStorage = properties.Element("storage")?.Attribute("missile")?.GetInt() ?? 0;    // ミサイル搭載不能なら搭載量は0
             ret.DroneStorage = properties.Element("storage")?.Attribute("unit")?.GetInt() ?? 0;         // ドローン搭載不能なら搭載量は0
 

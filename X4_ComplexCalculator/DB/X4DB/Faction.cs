@@ -70,7 +70,7 @@ namespace X4_ComplexCalculator.DB.X4DB
         {
             _Factions.Clear();
 
-            const string sql = "SELECT FactionID, Name, RaceID FROM Faction";
+            const string sql = "SELECT FactionID, Name, RaceID FROM Faction WHERE RaceID IN (SELECT RaceID FROM Race)";
             foreach (var item in X4Database.Instance.Query<Faction>(sql))
             {
                 _Factions.Add(item.FactionID, item);
