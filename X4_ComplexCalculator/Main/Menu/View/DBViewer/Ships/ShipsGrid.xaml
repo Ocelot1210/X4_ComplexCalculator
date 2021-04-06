@@ -278,7 +278,7 @@
                 <DataGridTextColumn
                     x:Name="Column_ShipSize"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
-                    Binding="{Binding ShipSize, Mode=OneTime}"
+                    Binding="{Binding ShipSize.Name, Mode=OneTime}"
                     Header="{lex:Loc Lang:DBViewer_Ships_BasicInfo_Size}" />
 
                 <!--  重量  -->

@@ -95,8 +95,8 @@ namespace X4_ComplexCalculator.DB.X4DB.Entity
 
                     // デフォルトのロードアウトの内、指定したコネクション名と同じグループ名を持つもので装備可能なものを取得する
                     var shipLoadout = loadouts.FirstOrDefault(x => 
-                        x.GroupName == wareEquipment.GroupName &&
-                        wareEquipment.CanEquipped(x.Equipment)
+                        (x.GroupName == wareEquipment.GroupName && wareEquipment.CanEquipped(x.Equipment)) ||
+                        (string.IsNullOrEmpty(x.GroupName) && wareEquipment.CanEquipped(x.Equipment))
                     );
                     if (shipLoadout is not null)
                     {
