@@ -89,8 +89,6 @@ namespace X4_ComplexCalculator.DB.X4DB.Entity
                 // デフォルトのロードアウトは存在するか？
                 if (Loadouts.TryGetValue("default", out var loadouts))
                 {
-                    var aaa = loadouts.Where(x => x.GroupName == wareEquipment.GroupName);
-
                     bool matched = false;
 
                     // デフォルトのロードアウトの内、指定したコネクション名と同じグループ名を持つもので装備可能なものを取得する
