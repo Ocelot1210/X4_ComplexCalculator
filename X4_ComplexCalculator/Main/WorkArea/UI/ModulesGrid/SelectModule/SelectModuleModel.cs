@@ -96,7 +96,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule
             var items = new List<FactionsListItem>();
 
             var factions = X4Database.Instance.Query<string>(sql1)
-                .Select(x => X4Database.Instance.Faction.Get(x))
+                .Select(x => X4Database.Instance.Faction.TryGet(x))
                 .Where(x => x is not null)
                 .Select(x => x!);
 

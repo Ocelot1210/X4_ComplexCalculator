@@ -40,21 +40,5 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// <returns>派閥IDに対応する派閥 派閥IDに対応する派閥が無ければnull</returns>
         public IFaction? TryGet(string id) =>
             _Factions.TryGetValue(id, out var race) ? race : null;
-
-
-        /// <summary>
-        /// 派閥IDに対応する派閥を取得する
-        /// </summary>
-        /// <param name="id">派閥ID</param>
-        /// <returns>派閥IDに対応する派閥</returns>
-        /// <exception cref="KeyNotFoundException">派閥IDに対応する派閥が無い場合</exception>
-        public IFaction Get(string id) => _Factions[id];
-
-
-        /// <summary>
-        /// 全ての派閥を取得する
-        /// </summary>
-        /// <returns>全ての派閥情報の列挙</returns>
-        public IEnumerable<IFaction> GetAll() => _Factions.Values;
     }
 }
