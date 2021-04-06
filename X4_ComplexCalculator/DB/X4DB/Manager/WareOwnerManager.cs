@@ -49,7 +49,7 @@ GROUP BY TmpOwner.WareID";
                     .ToDictionary(
                         x => x,
                         x => x.Split('彁')
-                            .Select(y => X4Database.Instance.Faction.Get(y))
+                            .Select(y => X4Database.Instance.Faction.TryGet(y))
                             .Where(y => y is not null)
                             .Select(y => y!)
                             .ToArray() as IReadOnlyList<IFaction>

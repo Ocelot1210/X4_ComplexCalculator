@@ -27,7 +27,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// <param name="raceManager">種族情報</param>
         public FactionManager(IDbConnection conn, RaceManager raceManager)
         {
-            _Factions = conn.Query<X4_DataExporterWPF.Entity.Faction>("SELECT * FROM Faction")
+            _Factions = conn.Query<X4_DataExporterWPF.Entity.Faction>("SELECT * FROM Faction WHERE RaceID IN (SELECT RaceID FROM Race)")
                 .Select(x => new Faction(x.FactionID, x.Name, raceManager.Get(x.RaceID)) as IFaction)
                 .ToDictionary(x => x.FactionID);
         }
