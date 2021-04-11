@@ -83,7 +83,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             // 日光
             const string sql2 = "SELECT Value FROM StationSettings WHERE Key = 'Sunlight' UNION ALL SELECT '100' LIMIT 1";
             var sunLightString = conn.QuerySingle<string>(sql2);
-            if (int.TryParse(sunLightString, out var sunLight))
+            if (double.TryParse(sunLightString, out var sunLight))
             {
                 settings.Sunlight = sunLight;
             }

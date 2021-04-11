@@ -82,13 +82,13 @@
                             VerticalAlignment="Center"
                             Text="{lex:Loc Lang:Settings_TextBlock_Sunlight_Text}" />
 
-                        <xctk:IntegerUpDown
+                        <xctk:DoubleUpDown
                             Width="100"
                             HorizontalAlignment="Left"
                             ClipValueToMinMax="True"
                             DefaultValue="100"
-                            FormatString="{}{0}%"
-                            Increment="10"
+                            FormatString="{}{0:F3} %"
+                            Increment="0.001"
                             Maximum="1000"
                             Minimum="0"
                             Value="{Binding Sunlight, Mode=TwoWay}" />
