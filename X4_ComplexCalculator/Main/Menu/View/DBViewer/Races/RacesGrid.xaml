@@ -30,18 +30,21 @@
             <DataGridTextColumn
                 dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
                 Binding="{Binding ID, Mode=OneTime}"
+                CellStyle="{StaticResource DataGridCellDefaultStyle}"
                 Header="{lex:Loc Lang:DBViewer_Races_RaceID}" />
 
             <!--  種族名  -->
             <DataGridTextColumn
                 dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
                 Binding="{Binding Name, Mode=OneTime}"
+                CellStyle="{StaticResource DataGridCellDefaultStyle}"
                 Header="{lex:Loc Lang:DBViewer_Races_RaceName}" />
 
             <!--  種族略称  -->
             <DataGridTextColumn
                 dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
                 Binding="{Binding ShortName, Mode=OneTime}"
+                CellStyle="{StaticResource DataGridCellDefaultStyle}"
                 Header="{lex:Loc Lang:DBViewer_Races_ShortName}" />
 
         </DataGrid.Columns>
