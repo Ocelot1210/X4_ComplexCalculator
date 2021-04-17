@@ -9,7 +9,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Data;
 using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList
 {
@@ -99,7 +99,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
         /// <summary>
         /// 選択中の装備サイズ
         /// </summary>
-        public ReactiveProperty<X4Size> SelectedSize { get; }
+        public ReactiveProperty<IX4Size> SelectedSize { get; }
 
 
         /// <summary>

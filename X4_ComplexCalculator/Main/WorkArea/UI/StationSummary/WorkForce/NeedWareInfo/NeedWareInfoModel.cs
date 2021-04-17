@@ -1,14 +1,13 @@
-﻿using System;
+﻿using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
-using Prism.Mvvm;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
-using X4_ComplexCalculator.DB.X4DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
@@ -72,7 +71,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
 
 
             // 集計対象ウェアを取得
-            AggregateTargetProducts = Ware.Get("workunit_busy")
+            AggregateTargetProducts = X4Database.Instance.Ware.Get("workunit_busy")
                 .Resources
                 .SelectMany(x => x.Value.Select(y => y.NeedWareID))
                 .Distinct()
@@ -255,7 +254,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
                     }
                     else
                     {
-                        var race = (method == "default") ? Race.Get("argon") : Race.Get(method);
+                        var race = X4Database.Instance.Race.TryGet((method == "default") ? "argon" : method);
                         if (race is not null)
                         {
                             NeedWareInfoDetails.Add(new NeedWareInfoDetailsItem(race, method, wareID, amount, AggregateTargetProducts[wareID]));

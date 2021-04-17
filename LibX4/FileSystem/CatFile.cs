@@ -56,10 +56,17 @@ namespace LibX4.FileSystem
 
         #region プロパティ
         /// <summary>
+        /// X4のバージョン
+        /// </summary>
+        public string Version { get; }
+
+
+        /// <summary>
         /// Modが導入されているか
         /// </summary>
         public bool IsModInstalled => 0 < _LoadedMods.Count;
         #endregion
+
 
         /// <summary>
         /// コンストラクタ
@@ -67,6 +74,20 @@ namespace LibX4.FileSystem
         /// <param name="gameRoot">X4インストール先ディレクトリパス</param>
         public CatFile(string gameRoot)
         {
+            // X4のバージョンを取得
+            {
+                var versionDatPath = Path.Combine(gameRoot, "version.dat");
+                if (File.Exists(versionDatPath))
+                {
+                    Version = File.ReadLines(versionDatPath).First();
+                }
+                else
+                {
+                    Version = "";
+                }
+            }
+
+
             var entensionsPath = Path.Combine(gameRoot, "extensions");
 
             var modPaths = Directory.Exists(entensionsPath)
@@ -97,7 +118,7 @@ namespace LibX4.FileSystem
 
         /// <inheritdoc/>
         public MemoryStream OpenFile(string filePath)
-            => TryOpenFile(filePath) ?? throw new FileNotFoundException(nameof(filePath), filePath);
+            => TryOpenFile(filePath) ?? throw new FileNotFoundException(null, filePath);
 
 
         /// <inheritdoc/>

@@ -1,5 +1,5 @@
 ﻿using Prism.Mvvm;
-using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
 {
@@ -20,7 +20,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
         /// <summary>
         /// ウェア
         /// </summary>
-        public Ware Ware { get; }
+        public IWare Ware { get; }
 
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview
         /// </summary>
         /// <param name="ware">表示対象ウェア</param>
         /// <param name="count">生産量</param>
-        public EmpireOverViewProductsGridItem(Ware ware, long count)
+        public EmpireOverViewProductsGridItem(IWare ware, long count)
         {
             Ware = ware;
             Count = count;

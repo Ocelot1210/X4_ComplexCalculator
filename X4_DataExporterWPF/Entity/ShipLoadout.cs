@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace X4_DataExporterWPF.Entity
+﻿namespace X4_DataExporterWPF.Entity
 {
     /// <summary>
     /// 艦船のロードアウト情報
@@ -35,7 +31,7 @@ namespace X4_DataExporterWPF.Entity
         /// <summary>
         /// 個数
         /// </summary>
-        public int Count { get; }
+        public long Count { get; }
 
 
         /// <summary>
@@ -51,7 +47,7 @@ namespace X4_DataExporterWPF.Entity
             string loadoutID,
             string macroName,
             string groupName,
-            int count)
+            long count)
         {
             ShipID = shipID;
             LoadoutID = loadoutID;

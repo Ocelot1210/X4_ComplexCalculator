@@ -110,7 +110,7 @@ namespace X4_ComplexCalculator.Main
             // 変更があったか？
             if (vm.HasChanged)
             {
-                var result = LocalizedMessageBox.Show("Lang:PlanClosingConfirmMessage", "Lang:Confirmation", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Cancel, vm.Title);
+                var result = LocalizedMessageBox.Show("Lang:MainWindow_PlanClosingConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Cancel, vm.Title);
 
                 switch (result)
                 {

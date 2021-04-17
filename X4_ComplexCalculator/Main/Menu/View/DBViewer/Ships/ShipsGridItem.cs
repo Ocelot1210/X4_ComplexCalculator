@@ -1,12 +1,9 @@
 ﻿using Prism.Mvvm;
-using System.Windows.Data;
-using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.DB.X4DB;
-using System.ComponentModel;
-using System.Linq;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
 {
@@ -17,63 +14,9 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
     {
         #region メンバ
         /// <summary>
-        /// 最高速度のエンジンと個数のペア
-        /// </summary>
-        private readonly IReadOnlyList<(Engine, int)> _MaxForwardEngines;
-
-
-        /// <summary>
-        /// 最高後退速度のエンジンと個数のペア
-        /// </summary>
-        private readonly IReadOnlyList<(Engine, int)> _MaxReverseEngines;
-
-
-        /// <summary>
-        /// 最高ブースト速度のエンジンと個数のペア
-        /// </summary>
-        private readonly IReadOnlyList<(Engine, int)> _MaxBoostEngines;
-
-
-        /// <summary>
-        /// 最高トラベル速度のエンジンと個数のペア
-        /// </summary>
-        private readonly IReadOnlyList<(Engine, int)> _MaxTravelEngines;
-
-
-        /// <summary>
-        /// 最大加速のエンジン
-        /// </summary>
-        private readonly IReadOnlyList<(Engine, int)> _MaxAccelerateEngines;
-
-
-        /// <summary>
         /// 装備したシールド一覧
         /// </summary>
-        private readonly IReadOnlyList<(Shield, int)> _EquippedShields;
-
-
-        /// <summary>
-        /// 平行移動が最大のスラスターと個数のペア
-        /// </summary>
-        private readonly IReadOnlyList<(Thruster, int)> _MaxTranslationThrusters;
-
-
-        /// <summary>
-        /// ピッチ推進力が最大のスラスター
-        /// </summary>
-        private readonly IReadOnlyList<(Thruster, int)> _MaxPitchThruster;
-
-
-        /// <summary>
-        /// ヨー推進力が最大のスラスター
-        /// </summary>
-        private readonly IReadOnlyList<(Thruster, int)> _MaxYawThruster;
-
-
-        /// <summary>
-        /// ロール推進力が最大のスラスター
-        /// </summary>
-        private readonly IReadOnlyList<(Thruster, int)> _MaxRollThruster;
+        private readonly IReadOnlyList<(IShield, int)> _EquippedShields;
         #endregion
 
 
@@ -81,7 +24,26 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         /// <summary>
         /// 艦船情報
         /// </summary>
-        public Ship Ship { get; }
+        public IShip Ship { get; }
+
+
+        #region 基礎情報
+        /// <summary>
+        /// 艦船名称
+        /// </summary>
+        public string ShipName => Ship.Name;
+
+
+        /// <summary>
+        /// 艦船種別名称
+        /// </summary>
+        public string ShipTypeName => Ship.ShipType.Name;
+
+
+        /// <summary>
+        /// 艦船サイズ
+        /// </summary>
+        public IX4Size ShipSize => Ship.Size;
 
 
         /// <summary>
@@ -90,50 +52,56 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         public double ShipMass { get; }
 
 
+        /// <summary>
+        /// 船員数
+        /// </summary>
+        public long People => Ship.People;
+        #endregion
+
+
         #region 速度
         /// <summary>
         /// 最高速度
         /// </summary>
-        public double MaxForwardSpeed { get; }
+        public EquipmentInfo<IEngine> MaxForwardSpeed { get; }
 
 
         /// <summary>
         /// 最高後退速度
         /// </summary>
-        public double MaxReverseSpeed { get; }
+        public EquipmentInfo<IEngine> MaxReverseSpeed { get; }
 
 
         /// <summary>
         /// 最高ブースト速度
         /// </summary>
-        public double MaxBoostSpeed { get; }
+        public EquipmentInfo<IEngine> MaxBoostSpeed { get; }
 
 
         /// <summary>
         /// 最高トラベル速度
         /// </summary>
-        public double MaxTravelSpeed { get; }
-        #endregion
+        public EquipmentInfo<IEngine> MaxTravelSpeed { get; }
 
 
         /// <summary>
         /// 最大加速
         /// </summary>
-        public double MaxAcceleration { get; }
-
+        public EquipmentInfo<IEngine> MaxAcceleration { get; }
+        #endregion
 
 
         #region 平行移動速度
         /// <summary>
         /// 垂直移動速度
         /// </summary>
-        public double VerticalMovementSpeed { get; }
+        public EquipmentInfo<IThruster> VerticalMovementSpeed { get; }
 
 
         /// <summary>
         /// 水平移動速度
         /// </summary>
-        public double HorizontalMovementSpeed { get; }
+        public EquipmentInfo<IThruster> HorizontalMovementSpeed { get; }
         #endregion
 
 
@@ -141,19 +109,19 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         /// <summary>
         /// ピッチ
         /// </summary>
-        public double PitchRate { get; }
+        public EquipmentInfo<IThruster> PitchRate { get; }
 
 
         /// <summary>
         /// ヨー
         /// </summary>
-        public double YawRate { get; }
+        public EquipmentInfo<IThruster> YawRate { get; }
 
 
         /// <summary>
         /// ロール
         /// </summary>
-        public double RollRate { get; }
+        public EquipmentInfo<IThruster> RollRate { get; }
 
 
         /// <summary>
@@ -161,6 +129,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         /// </summary>
         public double Responsiveness { get; }
         #endregion
+
 
         #region 武装
         /// <summary>
@@ -173,9 +142,13 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         /// タレット
         /// </summary>
         public int Turrets { get; }
+
+
+        /// <summary>
+        /// ミサイル搭載量
+        /// </summary>
+        public long MissileStorage => Ship.MissileStorage;
         #endregion
-
-
 
 
         #region シールド
@@ -192,32 +165,51 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         #endregion
 
 
+        #region 保管庫
+        /// <summary>
+        /// 保管庫容量
+        /// </summary>
+        public long CargoSize => Ship.CargoSize;
+
+
         /// <summary>
         /// 保管庫種別
         /// </summary>
         public IReadOnlyCollection<string> CargoTypes { get; }
+        #endregion
 
 
+        #region ドック
         /// <summary>
         /// 中型ドック数
         /// </summary>
         public int MediumDockCount { get; }
+        
 
 
         /// <summary>
         /// 小型ドック数
         /// </summary>
         public int SmallDockCount { get; }
+        #endregion
 
 
+        #region 搭載数
         /// <summary>
         /// 機体搭載量
         /// </summary>
         public int HangerCapacity { get; }
+
+
+        /// <summary>
+        /// ドローン搭載数
+        /// </summary>
+        public long DroneStorage => Ship.DroneStorage;
+        #endregion
         #endregion
 
 
-        public static ShipsGridItem? Create(Ship ship)
+        public static ShipsGridItem? Create(IShip ship)
         {
             try
             {
@@ -234,22 +226,20 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
         /// コンストラクタ
         /// </summary>
         /// <param name="ship">艦船情報</param>
-        public ShipsGridItem(Ship ship)
+        public ShipsGridItem(IShip ship)
         {
             Ship = ship;
             
-            var equipment = WareEquipment.Get(ship.ID);
-
             // xaml上のStringFormatで丸めるとフィルターの挙動がおかしくなるため
             // あらかじめ丸めた艦船重量を作成しておく
             ShipMass = Math.Round(ship.Mass, 1);
 
             // エンジンを設定
             {
-                var maxForwardEngines = new List<Engine>();
-                var maxReverseEngines = new List<Engine>();
-                var maxBoostEngines   = new List<Engine>();
-                var maxTravelEngines  = new List<Engine>();
+                var maxForwardEngines = new List<IEngine>();
+                var maxReverseEngines = new List<IEngine>();
+                var maxBoostEngines   = new List<IEngine>();
+                var maxTravelEngines  = new List<IEngine>();
 
                 var conNames = ship.Equipments
                     .Where(x => x.Value.EquipmentType.EquipmentTypeID == "engines")
@@ -257,54 +247,32 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
                 foreach (var conName in conNames)
                 {
                     // 現在のコネクションに装備可能なエンジン一覧
-                    var engines = ship.GetEquippableEquipment<Engine>(conName).ToArray();
+                    var engines = ship.GetEquippableEquipment<IEngine>(conName).ToArray();
                     if (!engines.Any())
                     {
                         continue;
                     }
 
-                    maxForwardEngines.Add(engines.OrderByDescending(x => x.ForwardThrust).First());
-                    maxReverseEngines.Add(engines.OrderByDescending(x => x.ReverseThrust).First());
-                    maxBoostEngines.Add(engines.OrderByDescending(x => x.BoostThrust).First());
-                    maxTravelEngines.Add(engines.OrderByDescending(x => x.TravelThrust).First());
+                    maxForwardEngines.Add(engines.OrderByDescending(x => x.Thrust.Forward).First());
+                    maxReverseEngines.Add(engines.OrderByDescending(x => x.Thrust.Reverse).First());
+                    maxBoostEngines.Add(engines.OrderByDescending(x => x.Thrust.Boost).First());
+                    maxTravelEngines.Add(engines.OrderByDescending(x => x.Thrust.Travel).First());
                 }
 
                 // 最高速度
-                _MaxForwardEngines = maxForwardEngines
-                    .GroupBy(x => x)
-                    .Select(x => (x.Key, x.Count()))
-                    .OrderBy(x => x.Key.Name)
-                    .ToArray();
-                MaxForwardSpeed = Math.Round(_MaxForwardEngines.Sum(x => x.Item1.ForwardThrust * x.Item2) / ship.DragForward, 1);
+                MaxForwardSpeed = new EquipmentInfo<IEngine>(maxForwardEngines, ship.Drag.Forward, (x) => x.Thrust.Forward);
 
                 // 最高後退速度
-                _MaxReverseEngines = maxReverseEngines
-                    .GroupBy(x => x)
-                    .Select(x => (x.Key, x.Count()))
-                    .OrderBy(x => x.Key.Name)
-                    .ToArray();
-                MaxReverseSpeed = Math.Round(_MaxReverseEngines.Sum(x => x.Item1.ReverseThrust * x.Item2) / ship.DragReverse, 1);
+                MaxReverseSpeed = new EquipmentInfo<IEngine>(maxReverseEngines, ship.Drag.Reverse, (x) => x.Thrust.Reverse);
 
                 // 最高ブースト速度
-                _MaxBoostEngines = maxBoostEngines
-                    .GroupBy(x => x)
-                    .Select(x => (x.Key, x.Count()))
-                    .OrderBy(x => x.Key.Name)
-                    .ToArray();
-                MaxBoostSpeed = Math.Round(_MaxBoostEngines.Sum(x => x.Item1.BoostThrust * x.Item2) / ship.DragForward, 1);
+                MaxBoostSpeed = new EquipmentInfo<IEngine>(maxReverseEngines, ship.Drag.Forward, (x) => x.Thrust.Boost);
 
                 // 最高トラベル速度
-                _MaxTravelEngines = maxTravelEngines
-                    .GroupBy(x => x)
-                    .Select(x => (x.Key, x.Count()))
-                    .OrderBy(x => x.Key.Name)
-                    .ToArray();
-                MaxTravelSpeed = Math.Round(_MaxTravelEngines.Sum(x => x.Item1.TravelThrust * x.Item2) / ship.DragForward, 1);
-
+                MaxTravelSpeed = new EquipmentInfo<IEngine>(maxReverseEngines, ship.Drag.Forward, (x) => x.Thrust.Travel);
 
                 // 最大加速
-                _MaxAccelerateEngines = _MaxForwardEngines;
-                MaxAcceleration = Math.Round(_MaxAccelerateEngines.Sum(x => x.Item1.ForwardThrust * x.Item2) / ship.Mass, 1);
+                MaxAcceleration = new EquipmentInfo<IEngine>(MaxForwardSpeed, ship.Mass);
             }
 
 
@@ -312,7 +280,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
             {
                 _EquippedShields = ship.Equipments
                     .Where(x => x.Value.EquipmentType.EquipmentTypeID == "shields")
-                    .Select(x => ship.GetEquippableEquipment<Shield>(x.Key)
+                    .Select(x => ship.GetEquippableEquipment<IShield>(x.Key)
                         .OrderByDescending(y => y.Capacity)
                         .FirstOrDefault()
                     )
@@ -330,10 +298,10 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
 
             // スラスターを設定
             {
-                var maxTranslationThrusters = new List<Thruster>();
-                var maxPitchThruster        = new List<Thruster>();
-                var maxYawThruster          = new List<Thruster>();
-                var maxRollThruster         = new List<Thruster>();
+                var maxTranslationThrusters = new List<IThruster>();
+                var maxPitchThruster        = new List<IThruster>();
+                var maxYawThruster          = new List<IThruster>();
+                var maxRollThruster         = new List<IThruster>();
 
                 var conNames = ship.Equipments
                     .Where(x => x.Value.EquipmentType.EquipmentTypeID == "thrusters")
@@ -341,7 +309,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
                 foreach (var conName in conNames)
                 {
                     // 現在のコネクションに装備可能なスラスター一覧
-                    var thrusters = ship.GetEquippableEquipment<Thruster>(conName).ToArray();
+                    var thrusters = ship.GetEquippableEquipment<IThruster>(conName).ToArray();
                     if (!thrusters.Any())
                     {
                         continue;
@@ -355,54 +323,36 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
 
 
                 // 平行移動が最大のスラスター
-                _MaxTranslationThrusters = maxTranslationThrusters
-                    .GroupBy(x => x)
-                    .Select(x => (x.Key, x.Count()))
-                    .OrderBy(x => x.Key.Name)
-                    .ToArray();
                 {
-                    var totalThrust = _MaxTranslationThrusters.Sum(x => x.Item1.ThrustStrafe * x.Item2);
-                    VerticalMovementSpeed = Math.Round(totalThrust / ship.DragVertical, 1);
-                    HorizontalMovementSpeed = Math.Round(totalThrust / ship.DragHorizontal, 1);
+                    var tmpThrusters = maxTranslationThrusters
+                        .GroupBy(x => x)
+                        .Select(x => (x.Key, x.Count()))
+                        .OrderBy(x => x.Key.Name)
+                        .ToArray();
+
+                    VerticalMovementSpeed = new EquipmentInfo<IThruster>(tmpThrusters, ship.Drag.Vertical);
+                    HorizontalMovementSpeed = new EquipmentInfo<IThruster>(tmpThrusters, ship.Drag.Horizontal);
                 }
 
 
                 // ピッチ
-                _MaxPitchThruster = maxPitchThruster
-                    .GroupBy(x => x)
-                    .Select(x => (x.Key, x.Count()))
-                    .OrderBy(x => x.Key.Name)
-                    .ToArray();
-                PitchRate = Math.Round(_MaxPitchThruster.Sum(x => x.Item1.ThrustPitch * x.Item2) / ship.DragPitch, 1);
-
+                PitchRate = new EquipmentInfo<IThruster>(maxPitchThruster, ship.Drag.Pitch, (x) => x.ThrustPitch);
 
                 // ヨー
-                _MaxYawThruster = maxYawThruster
-                    .GroupBy(x => x)
-                    .Select(x => (x.Key, x.Count()))
-                    .OrderBy(x => x.Key.Name)
-                    .ToArray();
-                YawRate = Math.Round(_MaxYawThruster.Sum(x => x.Item1.ThrustYaw * x.Item2) / ship.DragYaw, 1);
-
+                YawRate = new EquipmentInfo<IThruster>(maxYawThruster, ship.Drag.Yaw, (x) => x.ThrustYaw);
 
                 // ロール
-                _MaxRollThruster = maxRollThruster
-                    .GroupBy(x => x)
-                    .Select(x => (x.Key, x.Count()))
-                    .OrderBy(x => x.Key.Name)
-                    .ToArray();
-                RollRate = Math.Round(_MaxRollThruster.Sum(x => x.Item1.ThrustRoll * x.Item2) / ship.DragRoll, 1);
-
+                RollRate = new EquipmentInfo<IThruster>(maxRollThruster, ship.Drag.Roll, (x) => x.ThrustRoll);
 
                 // 反応性
-                Responsiveness = Math.Round(ship.DragYaw / ship.InertiaYaw, 3);
+                Responsiveness = Math.Round(ship.Drag.Yaw / ship.Inertia.Yaw, 3);
             }
 
 
             // 武装
             {
-                Weapons = equipment.Count(x => x.EquipmentType.EquipmentTypeID == "weapons");
-                Turrets = equipment.Count(x => x.EquipmentType.EquipmentTypeID == "turrets");
+                Weapons = ship.Equipments.Values.Count(x => x.EquipmentType.EquipmentTypeID == "weapons");
+                Turrets = ship.Equipments.Values.Count(x => x.EquipmentType.EquipmentTypeID == "turrets");
             }
 
 

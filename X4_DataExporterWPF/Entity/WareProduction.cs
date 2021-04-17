@@ -27,7 +27,7 @@
         /// <summary>
         /// 生産量
         /// </summary>
-        public int Amount { get; }
+        public long Amount { get; }
 
 
         /// <summary>
@@ -45,7 +45,7 @@
         /// <param name="name">ウェア生産方式名</param>
         /// <param name="amount">生産量</param>
         /// <param name="time">生産にかかる時間</param>
-        public WareProduction(string wareID, string method, string name, int amount, double time)
+        public WareProduction(string wareID, string method, string name, long amount, double time)
         {
             WareID = wareID;
             Method = method;

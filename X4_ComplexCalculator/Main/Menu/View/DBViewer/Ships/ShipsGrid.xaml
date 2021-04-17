@@ -257,25 +257,31 @@
 
 
             <DataGrid.Columns>
+
+                <!--  基礎情報 ===================================================================================  -->
+
                 <!--  艦船名称  -->
                 <DataGridTextColumn
                     x:Name="Column_ShipName"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnTextFilter}"
-                    Binding="{Binding Ship.Name, Mode=OneTime}"
+                    Binding="{Binding ShipName, Mode=OneTime}"
+                    CellStyle="{StaticResource DataGridCellDefaultStyle}"
                     Header="{lex:Loc Lang:DBViewer_Ships_BasicInfo_Name}" />
 
                 <!--  艦船種別  -->
                 <DataGridTextColumn
                     x:Name="Column_ShipType"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
-                    Binding="{Binding Ship.ShipType.Name, Mode=OneTime}"
+                    Binding="{Binding ShipTypeName, Mode=OneTime}"
+                    CellStyle="{StaticResource DataGridCellDefaultStyle}"
                     Header="{lex:Loc Lang:DBViewer_Ships_BasicInfo_Type}" />
 
                 <!--  サイズ  -->
                 <DataGridTextColumn
                     x:Name="Column_ShipSize"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
-                    Binding="{Binding Ship.Size, Mode=OneTime}"
+                    Binding="{Binding ShipSize.Name, Mode=OneTime}"
+                    CellStyle="{StaticResource DataGridCellDefaultStyle}"
                     Header="{lex:Loc Lang:DBViewer_Ships_BasicInfo_Size}" />
 
                 <!--  重量  -->
@@ -291,7 +297,7 @@
                 <DataGridTextColumn
                     x:Name="Column_People"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                    Binding="{Binding Ship.People, Mode=OneTime, StringFormat='{}{0:N0}'}"
+                    Binding="{Binding People, Mode=OneTime, StringFormat='{}{0:N0}'}"
                     CellStyle="{StaticResource RightAlignedDataGridCell}"
                     Header="{lex:Loc Lang:DBViewer_Ships_BasicInfo_People}" />
 
@@ -303,45 +309,70 @@
                 <DataGridTextColumn
                     x:Name="Column_MaxForwardSpeed"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                    Binding="{Binding MaxForwardSpeed, Mode=OneTime, StringFormat='{}{0:N1} m/s'}"
-                    CellStyle="{StaticResource RightAlignedDataGridCell}"
-                    Header="{lex:Loc Lang:DBViewer_Ships_MaxForwardSpeed}" />
+                    Binding="{Binding MaxForwardSpeed.Value, Mode=OneTime, StringFormat='{}{0:N1} m/s'}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_MaxForwardSpeed}">
+                    <DataGridTextColumn.CellStyle>
+                        <Style BasedOn="{StaticResource RightAlignedDataGridCell}" TargetType="{x:Type DataGridCell}">
+                            <Setter Property="ToolTip" Value="{Binding MaxForwardSpeed.ToolTipText, Mode=OneTime}" />
+                        </Style>
+                    </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
 
 
                 <!--  後退速度  -->
                 <DataGridTextColumn
                     x:Name="Column_MaxReverseSpeed"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                    Binding="{Binding MaxReverseSpeed, Mode=OneTime, StringFormat='{}{0:N1} m/s'}"
-                    CellStyle="{StaticResource RightAlignedDataGridCell}"
-                    Header="{lex:Loc Lang:DBViewer_Ships_MaxReverseSpeed}" />
+                    Binding="{Binding MaxReverseSpeed.Value, Mode=OneTime, StringFormat='{}{0:N1} m/s'}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_MaxReverseSpeed}">
+                    <DataGridTextColumn.CellStyle>
+                        <Style BasedOn="{StaticResource RightAlignedDataGridCell}" TargetType="{x:Type DataGridCell}">
+                            <Setter Property="ToolTip" Value="{Binding MaxReverseSpeed.ToolTipText, Mode=OneTime}" />
+                        </Style>
+                    </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
 
 
                 <!--  ブースト速度  -->
                 <DataGridTextColumn
                     x:Name="Column_MaxBoostSpeed"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                    Binding="{Binding MaxBoostSpeed, Mode=OneTime, StringFormat='{}{0:N1} m/s'}"
-                    CellStyle="{StaticResource RightAlignedDataGridCell}"
-                    Header="{lex:Loc Lang:DBViewer_Ships_MaxBoostSpeed}" />
+                    Binding="{Binding MaxBoostSpeed.Value, Mode=OneTime, StringFormat='{}{0:N1} m/s'}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_MaxBoostSpeed}">
+                    <DataGridTextColumn.CellStyle>
+                        <Style BasedOn="{StaticResource RightAlignedDataGridCell}" TargetType="{x:Type DataGridCell}">
+                            <Setter Property="ToolTip" Value="{Binding MaxBoostSpeed.ToolTipText, Mode=OneTime}" />
+                        </Style>
+                    </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
 
 
                 <!--  トラベル速度  -->
                 <DataGridTextColumn
                     x:Name="Column_MaxTravelSpeed"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                    Binding="{Binding MaxTravelSpeed, Mode=OneTime, StringFormat='{}{0:N1} m/s'}"
-                    CellStyle="{StaticResource RightAlignedDataGridCell}"
-                    Header="{lex:Loc Lang:DBViewer_Ships_MaxTravelSpeed}" />
+                    Binding="{Binding MaxTravelSpeed.Value, Mode=OneTime, StringFormat='{}{0:N1} m/s'}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_MaxTravelSpeed}">
+                    <DataGridTextColumn.CellStyle>
+                        <Style BasedOn="{StaticResource RightAlignedDataGridCell}" TargetType="{x:Type DataGridCell}">
+                            <Setter Property="ToolTip" Value="{Binding MaxTravelSpeed.ToolTipText, Mode=OneTime}" />
+                        </Style>
+                    </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
 
 
                 <!--  最大加速  -->
                 <DataGridTextColumn
                     x:Name="Column_MaxAcceleration"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                    Binding="{Binding MaxAcceleration, Mode=OneTime, StringFormat='{}{0:N1} m/s'}"
-                    CellStyle="{StaticResource RightAlignedDataGridCell}"
-                    Header="{lex:Loc Lang:DBViewer_Ships_MaxAcceleration}" />
+                    Binding="{Binding MaxAcceleration.Value, Mode=OneTime, StringFormat='{}{0:N1} m/s'}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_MaxAcceleration}">
+                    <DataGridTextColumn.CellStyle>
+                        <Style BasedOn="{StaticResource RightAlignedDataGridCell}" TargetType="{x:Type DataGridCell}">
+                            <Setter Property="ToolTip" Value="{Binding MaxAcceleration.ToolTipText, Mode=OneTime}" />
+                        </Style>
+                    </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
 
 
                 <!--  平行移動速度 ===================================================================================  -->
@@ -351,18 +382,28 @@
                 <DataGridTextColumn
                     x:Name="Column_VerticalMovementSpeed"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                    Binding="{Binding VerticalMovementSpeed, Mode=OneTime, StringFormat='{}{0:N1} m/s'}"
-                    CellStyle="{StaticResource RightAlignedDataGridCell}"
-                    Header="{lex:Loc Lang:DBViewer_Ships_VerticalMovementSpeed}" />
+                    Binding="{Binding VerticalMovementSpeed.Value, Mode=OneTime, StringFormat='{}{0:N1} m/s'}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_VerticalMovementSpeed}">
+                    <DataGridTextColumn.CellStyle>
+                        <Style BasedOn="{StaticResource RightAlignedDataGridCell}" TargetType="{x:Type DataGridCell}">
+                            <Setter Property="ToolTip" Value="{Binding VerticalMovementSpeed.ToolTipText, Mode=OneTime}" />
+                        </Style>
+                    </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
 
 
                 <!--  水平速度  -->
                 <DataGridTextColumn
                     x:Name="Column_HorizontalMovementSpeed"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                    Binding="{Binding HorizontalMovementSpeed, Mode=OneTime, StringFormat='{}{0:N1} m/s'}"
-                    CellStyle="{StaticResource RightAlignedDataGridCell}"
-                    Header="{lex:Loc Lang:DBViewer_Ships_HorizontalMovementSpeed}" />
+                    Binding="{Binding HorizontalMovementSpeed.Value, Mode=OneTime, StringFormat='{}{0:N1} m/s'}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_HorizontalMovementSpeed}">
+                    <DataGridTextColumn.CellStyle>
+                        <Style BasedOn="{StaticResource RightAlignedDataGridCell}" TargetType="{x:Type DataGridCell}">
+                            <Setter Property="ToolTip" Value="{Binding HorizontalMovementSpeed.ToolTipText, Mode=OneTime}" />
+                        </Style>
+                    </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
 
 
                 <!--  操舵性能 ===================================================================================  -->
@@ -372,27 +413,42 @@
                 <DataGridTextColumn
                     x:Name="Column_MaxPitchRate"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                    Binding="{Binding PitchRate, Mode=OneTime, StringFormat='{}{0:N1} ˚/s'}"
-                    CellStyle="{StaticResource RightAlignedDataGridCell}"
-                    Header="{lex:Loc Lang:DBViewer_Ships_Steering_Pitch}" />
+                    Binding="{Binding PitchRate.Value, Mode=OneTime, StringFormat='{}{0:N1} ˚/s'}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_Steering_Pitch}">
+                    <DataGridTextColumn.CellStyle>
+                        <Style BasedOn="{StaticResource RightAlignedDataGridCell}" TargetType="{x:Type DataGridCell}">
+                            <Setter Property="ToolTip" Value="{Binding PitchRate.ToolTipText, Mode=OneTime}" />
+                        </Style>
+                    </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
 
 
                 <!--  ヨー  -->
                 <DataGridTextColumn
                     x:Name="Column_MaxYawRate"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                    Binding="{Binding YawRate, Mode=OneTime, StringFormat='{}{0:N1} ˚/s'}"
-                    CellStyle="{StaticResource RightAlignedDataGridCell}"
-                    Header="{lex:Loc Lang:DBViewer_Ships_Steering_Yaw}" />
+                    Binding="{Binding YawRate.Value, Mode=OneTime, StringFormat='{}{0:N1} ˚/s'}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_Steering_Yaw}">
+                    <DataGridTextColumn.CellStyle>
+                        <Style BasedOn="{StaticResource RightAlignedDataGridCell}" TargetType="{x:Type DataGridCell}">
+                            <Setter Property="ToolTip" Value="{Binding YawRate.ToolTipText, Mode=OneTime}" />
+                        </Style>
+                    </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
 
 
                 <!--  ロール  -->
                 <DataGridTextColumn
                     x:Name="Column_MaxRollRate"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                    Binding="{Binding RollRate, Mode=OneTime, StringFormat='{}{0:N1} ˚/s'}"
-                    CellStyle="{StaticResource RightAlignedDataGridCell}"
-                    Header="{lex:Loc Lang:DBViewer_Ships_Steering_Roll}" />
+                    Binding="{Binding RollRate.Value, Mode=OneTime, StringFormat='{}{0:N1} ˚/s'}"
+                    Header="{lex:Loc Lang:DBViewer_Ships_Steering_Roll}">
+                    <DataGridTextColumn.CellStyle>
+                        <Style BasedOn="{StaticResource RightAlignedDataGridCell}" TargetType="{x:Type DataGridCell}">
+                            <Setter Property="ToolTip" Value="{Binding RollRate.ToolTipText, Mode=OneTime}" />
+                        </Style>
+                    </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
 
 
                 <!--  反応性  -->
@@ -400,7 +456,7 @@
                     x:Name="Column_Responsiveness"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
                     Binding="{Binding Responsiveness, Mode=OneTime, StringFormat='{}{0:N3}'}"
-                    CellStyle="{StaticResource RightAlignedDataGridCell}"
+                    CellStyle="{StaticResource DataGridCellDefaultStyle}"
                     Header="{lex:Loc Lang:DBViewer_Ships_Steering_Responsiveness}" />
 
 
@@ -426,7 +482,7 @@
                 <DataGridTextColumn
                     x:Name="Column_Missiles"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                    Binding="{Binding Ship.MissileStorage, Mode=OneTime, StringFormat='{}{0:N0}'}"
+                    Binding="{Binding MissileStorage, Mode=OneTime, StringFormat='{}{0:N0}'}"
                     CellStyle="{StaticResource RightAlignedDataGridCell}"
                     Header="{lex:Loc Lang:DBViewer_Ships_Armed_Missiles}" />
 
@@ -458,7 +514,7 @@
                 <DataGridTextColumn
                     x:Name="Column_CargoCapacity"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                    Binding="{Binding Ship.CargoSize, Mode=OneTime, StringFormat='{}{0:N0}'}"
+                    Binding="{Binding CargoSize, Mode=OneTime, StringFormat='{}{0:N0}'}"
                     CellStyle="{StaticResource RightAlignedDataGridCell}"
                     Header="{lex:Loc Lang:DBViewer_Ships_Cargo_Capacity}" />
 
@@ -467,6 +523,7 @@
                     x:Name="Column_CargoType"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnMultiListFilter}"
                     Binding="{Binding CargoTypes, Mode=OneTime, Converter={StaticResource Array2StringConverter}, ConverterParameter='/'}"
+                    CellStyle="{StaticResource DataGridCellDefaultStyle}"
                     Header="{lex:Loc Lang:DBViewer_Ships_Cargo_Type}" />
 
                 <!--  ドック ===================================================================================  -->
@@ -502,7 +559,7 @@
                 <DataGridTextColumn
                     x:Name="Column_HangerCapacity_Drone"
                     dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnNumericalFilter}"
-                    Binding="{Binding Ship.DroneStorage, Mode=OneTime, StringFormat='{}{0:N0}'}"
+                    Binding="{Binding DroneStorage, Mode=OneTime, StringFormat='{}{0:N0}'}"
                     CellStyle="{StaticResource RightAlignedDataGridCell}"
                     Header="{lex:Loc Lang:DBViewer_Ships_HangerCapacity_Drone}" />
 

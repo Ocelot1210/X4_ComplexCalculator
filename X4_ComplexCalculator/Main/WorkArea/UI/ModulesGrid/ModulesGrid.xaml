@@ -27,41 +27,41 @@
             <!--  コピー  -->
             <MenuItem
                 Command="{Binding ContextMenu.CopyModulesCommand, Mode=OneTime}"
-                Header="{lex:Loc X4_ComplexCalculator:Lang:Copy}"
+                Header="{lex:Loc X4_ComplexCalculator:Lang:Modules_ContextMenu_MenuItem_Copy_Header}"
                 InputGestureText="Alt+C" />
 
             <!--  貼り付け  -->
             <MenuItem
                 Command="{Binding ContextMenu.PasteModulesCommand, Mode=OneTime}"
                 CommandParameter="{x:Reference Name=moduleGrid}"
-                Header="{lex:Loc X4_ComplexCalculator:Lang:Paste}"
+                Header="{lex:Loc X4_ComplexCalculator:Lang:Modules_ContextMenu_MenuItem_Paste_Header}"
                 InputGestureText="Alt+V" />
 
             <!--  削除  -->
             <MenuItem
                 Command="{Binding ContextMenu.DeleteModulesCommand, Mode=OneTime}"
                 CommandParameter="{x:Reference Name=moduleGrid}"
-                Header="{lex:Loc X4_ComplexCalculator:Lang:Delete}"
+                Header="{lex:Loc X4_ComplexCalculator:Lang:Modules_ContextMenu_MenuItem_Delete_Header}"
                 InputGestureText="Delete" />
 
             <Separator />
 
             <!--  選択  -->
-            <MenuItem Command="{Binding ContextMenu.SelectModulesCommand, Mode=OneTime}" Header="{lex:Loc X4_ComplexCalculator:Lang:Select}" />
+            <MenuItem Command="{Binding ContextMenu.SelectModulesCommand, Mode=OneTime}" Header="{lex:Loc X4_ComplexCalculator:Lang:Common_Select}" />
 
             <!--  選択解除  -->
-            <MenuItem Command="{Binding ContextMenu.ClearSelectionCommand, Mode=OneTime}" Header="{lex:Loc X4_ComplexCalculator:Lang:ClearSelection}" />
+            <MenuItem Command="{Binding ContextMenu.ClearSelectionCommand, Mode=OneTime}" Header="{lex:Loc X4_ComplexCalculator:Lang:Modules_ContextMenu_MenuItem_ClearSelection_Header}" />
 
             <!--  選択項目を上に移動  -->
-            <MenuItem Command="{Binding ContextMenu.MoveUpTheSelectionCommand, Mode=OneTime}" Header="{lex:Loc X4_ComplexCalculator:Lang:MoveUpTheSelection}" />
+            <MenuItem Command="{Binding ContextMenu.MoveUpTheSelectionCommand, Mode=OneTime}" Header="{lex:Loc X4_ComplexCalculator:Lang:Modules_ContextMenu_MenuItem_MoveUpTheSelection_Header}" />
 
             <!--  選択項目を下に移動  -->
-            <MenuItem Command="{Binding ContextMenu.MoveDownTheSelectionCommand, Mode=OneTime}" Header="{lex:Loc X4_ComplexCalculator:Lang:MoveDownTheSelection}" />
+            <MenuItem Command="{Binding ContextMenu.MoveDownTheSelectionCommand, Mode=OneTime}" Header="{lex:Loc X4_ComplexCalculator:Lang:Modules_ContextMenu_MenuItem_MoveDownTheSelection_Header}" />
 
             <Separator />
 
             <!--  ソート順を初期化  -->
-            <MenuItem Command="{Binding ContextMenu.ResetSortOrderCommand, Mode=OneTime}" Header="{lex:Loc X4_ComplexCalculator:Lang:ResetSortOrder}" />
+            <MenuItem Command="{Binding ContextMenu.ResetSortOrderCommand, Mode=OneTime}" Header="{lex:Loc X4_ComplexCalculator:Lang:Modules_ContextMenu_MenuItem_ResetSortOrder_Header}" />
 
         </ContextMenu>
 
@@ -77,25 +77,25 @@
             <Button
                 MinWidth="65"
                 Command="{Binding AddModuleCommand, Mode=OneTime}"
-                Content="{lex:Loc Lang:Add}"
+                Content="{lex:Loc Lang:Modules_Button_Add_Content}"
                 DockPanel.Dock="Right" />
 
             <!--  モジュール自動追加ボタン  -->
             <Button
                 MinWidth="65"
                 Command="{Binding AutoAddModuleCommand, Mode=OneTime}"
-                Content="{lex:Loc Lang:AutoAdd}"
+                Content="{lex:Loc Lang:Modules_Button_AutoAdd_Content}"
                 DockPanel.Dock="Right" />
 
             <!--  モジュールマージボタン  -->
             <Button
                 MinWidth="65"
                 Command="{Binding MergeModuleCommand, Mode=OneTime}"
-                Content="{lex:Loc Lang:Merge}"
+                Content="{lex:Loc Lang:Modules_Button_Merge_Content}"
                 DockPanel.Dock="Right" />
 
             <!--  検索ボックス  -->
-            <x4ccrtl:ClearableWaterMarkTextBox Text="{Binding SearchModuleName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Watermark="{lex:Loc Lang:SearchByEnteringText}" />
+            <x4ccrtl:ClearableWaterMarkTextBox Text="{Binding SearchModuleName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Watermark="{lex:Loc Lang:Common_SearchByEnteringText}" />
         </DockPanel>
 
         <!--  モジュール表示用DataGrid  -->
@@ -138,8 +138,8 @@
 
                 <!--  モジュール名  -->
                 <DataGridTemplateColumn
-                    ClipboardContentBinding="{Binding Module.Name}"
-                    Header="{lex:Loc Lang:ModuleName}"
+                    ClipboardContentBinding="{Binding ModuleName}"
+                    Header="{lex:Loc Lang:Common_ModuleName}"
                     IsReadOnly="True"
                     SortMemberPath="Module.Name">
                     <DataGridTemplateColumn.CellTemplate>
@@ -147,7 +147,7 @@
                             <TextBlock
                                 VerticalAlignment="Center"
                                 Style="{StaticResource ClickableTextBlockStyle}"
-                                Text="{Binding Module.Name, Mode=OneTime}">
+                                Text="{Binding ModuleName, Mode=OneTime}">
                                 <TextBlock.InputBindings>
                                     <MouseBinding
                                         Command="{Binding DataContext.ReplaceModuleCommand, Mode=OneTime, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
@@ -163,7 +163,7 @@
                 <!--  モジュール数  -->
                 <x4cmn:MouseHoverEditCellColumn
                     ClipboardContentBinding="{Binding ModuleCount}"
-                    Header="{lex:Loc Lang:ModuleCount}"
+                    Header="{lex:Loc Lang:Common_ModuleCount}"
                     SortMemberPath="ModuleCount">
                     <!--  表示モード  -->
                     <DataGridTemplateColumn.CellTemplate>
@@ -193,7 +193,7 @@
                 <!--  装備編集  -->
                 <DataGridTemplateColumn
                     CanUserResize="False"
-                    Header="{lex:Loc Lang:ModuleEquipment}"
+                    Header="{lex:Loc Lang:Modules_Column_Equipment_Header}"
                     IsReadOnly="True"
                     SortMemberPath="EditEquipmentButtonVisiblity">
                     <DataGridTemplateColumn.CellTemplate>
@@ -201,7 +201,7 @@
                             <TextBlock
                                 VerticalAlignment="Center"
                                 Style="{StaticResource ClickableTextBlockStyle}"
-                                Text="{lex:Loc Lang:Edit}"
+                                Text="{lex:Loc Lang:Modules_Column_Equipment_Edit_Text}"
                                 TextAlignment="Center"
                                 Visibility="{Binding EditEquipmentButtonVisiblity, Mode=OneTime}">
                                 <TextBlock.InputBindings>
@@ -216,14 +216,14 @@
                 <!--  タレット数  -->
                 <DataGridTemplateColumn
                     CanUserResize="False"
-                    ClipboardContentBinding="{Binding TurretsCount, Mode=OneTime}"
-                    Header="{lex:Loc Lang:Turrets}"
+                    ClipboardContentBinding="{Binding Turrets.Count, Mode=OneTime}"
+                    Header="{lex:Loc Lang:Common_Turrets}"
                     SortMemberPath="TurretsCount">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock
                                 VerticalAlignment="Center"
-                                Text="{Binding TurretsCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat='{}{0:N0}'}"
+                                Text="{Binding Turrets.Count, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat='{}{0:N0}'}"
                                 TextAlignment="Right"
                                 ToolTipService.ShowDuration="1000000"
                                 Visibility="{Binding EditEquipmentButtonVisiblity, Mode=OneTime}">
@@ -234,7 +234,7 @@
                                                 <ToolTip HorizontalContentAlignment="Left">
                                                     <TextBlock
                                                         HorizontalAlignment="Left"
-                                                        Text="{Binding TurretsToolTip, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                                        Text="{Binding Turrets.DetailsText, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                                                         TextAlignment="Left" />
                                                 </ToolTip>
                                             </Setter.Value>
@@ -250,14 +250,14 @@
                 <!--  シールド数  -->
                 <DataGridTemplateColumn
                     CanUserResize="False"
-                    ClipboardContentBinding="{Binding ShieldsCount, Mode=OneTime}"
-                    Header="{lex:Loc Lang:Shields}"
+                    ClipboardContentBinding="{Binding Shields.Count, Mode=OneTime}"
+                    Header="{lex:Loc Lang:Common_Shields}"
                     SortMemberPath="ShieldsCount">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock
                                 VerticalAlignment="Center"
-                                Text="{Binding ShieldsCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat='{}{0:N0}'}"
+                                Text="{Binding Shields.Count, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat='{}{0:N0}'}"
                                 TextAlignment="Right"
                                 ToolTipService.ShowDuration="1000000"
                                 Visibility="{Binding EditEquipmentButtonVisiblity, Mode=OneTime}">
@@ -268,7 +268,7 @@
                                                 <ToolTip HorizontalContentAlignment="Left">
                                                     <TextBlock
                                                         HorizontalAlignment="Left"
-                                                        Text="{Binding ShieldsToolTip, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                                        Text="{Binding Shields.DetailsText, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                                                         TextAlignment="Left" />
                                                 </ToolTip>
                                             </Setter.Value>
@@ -281,10 +281,10 @@
                 </DataGridTemplateColumn>
 
                 <!--  建造方式  -->
-                <DataGridTemplateColumn
-                    ClipboardContentBinding="{Binding SelectedMethod.Method, Mode=OneTime}"
-                    Header="{lex:Loc Lang:BuildMethod}"
-                    SortMemberPath="SelectedMethod.Method">
+                <x4cmn:MouseHoverEditCellColumn
+                    ClipboardContentBinding="{Binding SelectedMethodName, Mode=OneWay}"
+                    Header="{lex:Loc Lang:Modules_Column_BuildMethod_Header}"
+                    SortMemberPath="SelectedMethodName">
 
                     <!--  表示モード  -->
                     <DataGridTemplateColumn.CellTemplate>
@@ -292,7 +292,7 @@
                             <TextBlock
                                 VerticalAlignment="Center"
                                 Style="{StaticResource ClickableTextBlockStyle}"
-                                Text="{Binding SelectedMethod.Method, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                Text="{Binding SelectedMethodName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                 Visibility="{Binding SelectedMethodVisiblity, Mode=OneTime}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -301,14 +301,14 @@
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
                             <ComboBox
-                                DisplayMemberPath="Method"
+                                DisplayMemberPath="Name"
                                 FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
-                                ItemsSource="{Binding Module.Productions, Mode=OneTime}"
+                                ItemsSource="{Binding Productions, Mode=OneTime}"
                                 SelectedItem="{Binding SelectedMethod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 Visibility="{Binding SelectedMethodVisiblity, Mode=OneTime}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
-                </DataGridTemplateColumn>
+                </x4cmn:MouseHoverEditCellColumn>
             </DataGrid.Columns>
         </x4ccrtl:ClearSortOrderDataGrid>
     </DockPanel>

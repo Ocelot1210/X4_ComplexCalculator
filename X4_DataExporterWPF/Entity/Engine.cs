@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace X4_DataExporterWPF.Entity
+﻿namespace X4_DataExporterWPF.Entity
 {
     /// <summary>
     /// エンジン情報
@@ -68,7 +64,16 @@ namespace X4_DataExporterWPF.Entity
         /// <param name="boostReleaseTime">ブースト解除時間</param>
         /// <param name="travelThrust">トラベル推進力</param>
         /// <param name="travelReleaseTime">トラベル解除時間</param>
-        public Engine(string equipmentID, double forwardThrust, double reverseThrust, double boostThrust, double boostDuration, double boostReleaseTime, double travelThrust, double travelReleaseTime)
+        public Engine(
+            string equipmentID,
+            double forwardThrust,
+            double reverseThrust,
+            double boostThrust,
+            double boostDuration,
+            double boostReleaseTime,
+            double travelThrust,
+            double travelReleaseTime
+        )
         {
             EquipmentID = equipmentID;
             ForwardThrust = forwardThrust;

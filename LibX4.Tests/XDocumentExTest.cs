@@ -1,7 +1,7 @@
-﻿using System.IO;
+﻿using LibX4.Xml;
+using System.IO;
 using System.Linq;
 using System.Text;
-using LibX4.Xml;
 using Xunit;
 
 namespace LibX4.Tests

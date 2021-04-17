@@ -103,31 +103,31 @@
         /// <summary>
         /// 船体強度
         /// </summary>
-        public int Hull { get; }
+        public long Hull { get; }
 
 
         /// <summary>
         /// 船員数
         /// </summary>
-        public int People { get; }
+        public long People { get; }
 
 
         /// <summary>
         /// ミサイル搭載量
         /// </summary>
-        public int MissileStorage { get; }
+        public long MissileStorage { get; }
 
 
         /// <summary>
         /// ドローン搭載量
         /// </summary>
-        public int DroneStorage { get; }
+        public long DroneStorage { get; }
 
 
         /// <summary>
         /// カーゴサイズ
         /// </summary>
-        public int CargoSize { get; }
+        public long CargoSize { get; }
 
 
         /// <summary>
@@ -160,7 +160,7 @@
         /// <param name="people">船員数</param>
         /// <param name="missileStorage">ミサイル搭載量</param>
         /// <param name="droneStorage">ドローン搭載量</param>
-        /// <param name="cagoSize">カーゴサイズ</param>
+        /// <param name="cargoSize">カーゴサイズ</param>
         /// <param name="minPrice">最安値</param>
         /// <param name="avgPrice">平均値</param>
         /// <param name="maxPrice">最高値</param>
@@ -182,11 +182,11 @@
             double inertiaPitch,
             double inertiaYaw,
             double inertiaRoll,
-            int hull,
-            int people,
-            int missileStorage,
-            int droneStorage,
-            int cagoSize,
+            long hull,
+            long people,
+            long missileStorage,
+            long droneStorage,
+            long cargoSize,
             byte[]? thumbnail)
         {
             ShipID = shipID;
@@ -208,7 +208,7 @@
             People = people;
             MissileStorage = missileStorage;
             DroneStorage = droneStorage;
-            CargoSize = cagoSize;
+            CargoSize = cargoSize;
             Thumbnail = thumbnail;
         }
     }

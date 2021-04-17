@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Prism.Commands;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
-using Prism.Commands;
 
 namespace X4_ComplexCalculator.Common.Behavior
 {

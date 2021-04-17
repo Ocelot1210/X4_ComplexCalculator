@@ -1,13 +1,13 @@
 ﻿using Dapper;
 using LibX4.FileSystem;
+using LibX4.Xml;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
-using LibX4.Xml;
-using System;
 
 namespace X4_DataExporterWPF.Export
 {
@@ -99,13 +99,14 @@ CREATE TABLE IF NOT EXISTS ShipLoadout
                     if (string.IsNullOrEmpty(loadoutID)) continue;
 
                     // 抽出要素一覧
-                    string[] xpathes = { "macros/engine", "macros/shield", "groups/shields", "groups/turrets" };
+                    string[] xpathes = { "macros", "groups", "virtualmacros" };
 
                     foreach (var xpath in xpathes)
                     {
                         var equipments = loadout.XPathSelectElements(xpath)
+                            .SelectMany(x => x.Elements())
                             .Select(x => (Macro: x.Attribute("macro")?.Value ?? "", GroupName: x.Attribute("group")?.Value ?? "", Exact: x.Attribute("exact")?.GetInt() ?? 1))
-                            .Where(x => !string.IsNullOrEmpty(x.Macro) && !string.IsNullOrEmpty(x.GroupName));
+                            .Where(x => !string.IsNullOrEmpty(x.Macro));
                         foreach (var (macro, groupName, exact) in equipments)
                         {
                             yield return new ShipLoadout(shipID, loadoutID, macro, groupName, exact);

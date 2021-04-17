@@ -1,8 +1,8 @@
-﻿using System.Collections.ObjectModel;
+﻿using Prism.Mvvm;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
-using Prism.Mvvm;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Products;

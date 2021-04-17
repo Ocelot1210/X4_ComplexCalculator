@@ -1,272 +1,282 @@
 ﻿# ------------------------------------------------------
 # Common
 # ------------------------------------------------------
-WareName;Ware name
-Tier;Tier
-Price;Price
-UnitPrice;Unit price
-ModuleName;Module name
-ModuleCount;Module count
-Select;Select
-Close;Close
-SelectAll;Select all
-Save;Save
-OwnerFaction;Owner faction
-Turrets;Turrets
-Shields;Shields
-SearchByEnteringText;Search by entering text
-Search;Search
-Confirmation;Confirmation
-Warning;Warning
-Error;Error
-Cancel;Cancel
+Common_WareName;Ware name
+Common_Tier;Tier
+Common_Price;Price
+Common_UnitPrice;Unit price
+Common_ModuleName;Module name
+Common_ModuleCount;Module count
+Common_Select;Select
+Common_Close;Close
+Common_SelectAll;Select all
+Common_OwnerFaction;Owner faction
+Common_Turrets;Turrets
+Common_Shields;Shields
+Common_SearchByEnteringText;Search by entering text
+Common_Search;Search
+Common_MessageBoxTitle_Confirmation;Confirmation
+Common_MessageBoxTitle_Warning;Warning
+Common_MessageBoxTitle_Error;Error
+Common_Cancel;Cancel
+Common_NotEquippedToolTipText;Not equipped with anything.
+Common_Expander_Expansion;Expansion
+Common_Expander_Collapse;Collapse
+Common_NoBuy;No buy
+Common_NoSell;No sell
+Common_Buy;Buy
+Common_Sell;Sell
+Common_Production;Production
+Common_ProductName;Product name
 
 
 # ------------------------------------------------------
 # DB
 # ------------------------------------------------------
-OldFormatMessage;The current DB format is the old format. \r\nPlease extract the DB from the game file again.
-DBUpdateRequestMessage;You need to update the DB to run this application. Please run this application again to update the DB.
-DBExtractionRequestMessage;The DB does not exist. It is necessary to extract the DB from the game file. Please wait for a while until the data extraction screen starts up.
-DBMakeRequestMessage;You need to create a DB to run this application. Please run this application again to update the DB.
-DBOpenFailMessage;Failed to open the DB. It may be possible to start it by extracting the DB from the game file. Do you want to update the DB?
+DB_OldFormatMessage;The current DB format is the old format. \r\nPlease extract the DB from the game file again.
+DB_UpdateRequestMessage;You need to update the DB to run this application. Please run this application again to update the DB.
+DB_ExtractionRequestMessage;The DB does not exist. It is necessary to extract the DB from the game file. Please wait for a while until the data extraction screen starts up.
+DB_MakeRequestMessage;You need to create a DB to run this application. Please run this application again to update the DB.
+DB_OpenFailMessage;Failed to open the DB. It may be possible to start it by extracting the DB from the game file. Do you want to update the DB?
 
 
 # ------------------------------------------------------
 # Main window
 # ------------------------------------------------------
-MainWindowTitle;X4: Complex Calculator
-FaildToLoadFileMessage;Failed to load the file.\r\n\r\n■Reason：\r\n{0}
-FaildToLoadFileMessageTitle;Read failure
-MainWindowClosingConfirmMessage;There are some unsaved items. Do you want to save it?
-PlanClosingConfirmMessage;Do you want to save the changes to your plan "{0}"?
-SaveDataWriteFailureMessage;Failed to save.\r\n\r\n■Reason：\r\n{0}\r\n\r\n■Stack trace：\r\n{1}
-ImportFailureMessage;Failed to import.\r\n■Reason：\r\n{0}
-UnexpectedErrorMessage;Unexpected error occurred.\r\n■Error contents：\r\n{0}\r\n\r\n■Stack trace：\r\n{1}
-LoadingFile;Loading file.
+MainWindow_Title;X4: Complex Calculator
+MainWindow_FaildToLoadFileMessage;Failed to load the file.\r\n\r\n■Reason：\r\n{0}
+MainWindow_FaildToLoadFileMessageTitle;Read failure
+MainWindow_ClosingConfirmMessage;There are some unsaved items. Do you want to save it?
+MainWindow_PlanClosingConfirmMessage;Do you want to save the changes to your plan "{0}"?
+MainWindow_SaveDataWriteFailureMessage;Failed to save.\r\n\r\n■Reason：\r\n{0}\r\n\r\n■Stack trace：\r\n{1}
+MainWindow_ImportFailureMessage;Failed to import.\r\n■Reason：\r\n{0}
+MainWindow_UnexpectedErrorMessage;Unexpected error occurred.\r\n■Error contents：\r\n{0}\r\n\r\n■Stack trace：\r\n{1}
+MainWindow_LoadingFile;Loading file.
 
 # ------------------------------------------------------
 # Main window menu
 # ------------------------------------------------------
 
 # File(F) ----------------------------------------------
-FileMenu;File(_F)
-New;New
-OverwriteSave;Save
-SaveAs;Save as
-Open;Open
-Import;Import
-ExistingPlan;Existing plan
-StationCalculator;Station Calculator
-Export;Export
-UpdateDB;Update DB
-DBUpdateConfirmationMessage;Do you want to display the DB update screen? \r\nPlease wait for a moment until the screen starts.
-DBUpdateRestartRequestMessage;Please restart the application to apply the DB update.
-DBUpdateFailureMessage;Failed to update the DB, \r\nplease check if the DB file is accessible and try again.
+MainWindow_Menu_File_Header;File(_F)
+MainWindow_Menu_File_MenuItem_New_Header;New
+MainWindow_Menu_File_MenuItem_OverwriteSave_Header;Save
+MainWindow_Menu_File_MenuItem_SaveAs_Header;Save as
+MainWindow_Menu_File_MenuItem_Open_Header;Open
+MainWindow_Menu_File_MenuItem_Import_Header;Import
+MainWindow_Menu_File_MenuItem_Import_MenuItem_ExistingPlan_Header;Existing plan
+MainWindow_Menu_File_MenuItem_Import_MenuItem_StationCalculator_Header;Station Calculator
+MainWindow_Menu_File_MenuItem_Import_MenuItem_Loadout_Header;Module equipments
+MainWindow_Menu_File_MenuItem_Export_Header;Export
+MainWindow_Menu_File_MenuItem_Export_MenuItem_StationCalculator_Header;Station Calculator
+MainWindow_Menu_File_UpdateDB_Header;Update DB
+MainWindow_Menu_File_UpdateDB_DBUpdate_ConfirmationMessage;Do you want to display the DB update screen? \r\nPlease wait for a moment until the screen starts.
+MainWindow_Menu_File_UpdateDB_DBUpdate_RestartRequestMessage;Please restart the application to apply the DB update.
+MainWindow_Menu_File_UpdateDB_DBUpdate_FailureMessage;Failed to update the DB, \r\nplease check if the DB file is accessible and try again.
 
 # View(W) ----------------------------------------------
-View;View(_V)
+MainWindow_Menu_View_Header;View(_V)
 
 # Empire overview --------------------------------------
-EmpireOverview;Empire overview
+MainWindow_Menu_EmpireOverview_Header;Empire overview
+EmpireOverview_Title;Empire overview
 
 # Layout(L) --------------------------------------------
-Layout;Layout(_L)
-SaveLayout;Save layout
-LayoutList;Layout list
-LayoutSaveButtonToolTip;Overwrite Layout
-LayoutEditButtonToolTip;Rename Layout
-LayoutRemoveButtonToolTip;Delete Layout
-EditLayoutName;Edit layout name
-LayoutName;Layout name
-LayoutSavedMessage;Saved the layout of plan "{0}" as "{1}".
-LayoutSaveFailedMessage;Failed to save the layout.\r\n\r\n■Reason：\r\n{0}
-LayoutOverwritedMessage;Saved the layout of plan "{0}" as "{1}" overwriting it.
-LayoutOverwriteFailedMessage;Failed to save the layout overwrite.\r\n\r\n■Reason：\r\n{0}
-TabDoesNotSelectedMessage;No tab is selected to save the layout.\r\nSelect the tab you want to save, and run it again.
-DeleteLayoutConfirmMessage;Do you really want to delete the layout "{0}"?
-InvalidLayoutNameMessage;Invalid layout name. Please enter at least one non-whitespace character.
+MainWindow_Menu_Layout_Header;Layout(_L)
+MainWindow_Menu_Layout_MenuItem_SaveLayout_Header;Save layout
+MainWindow_Menu_Layout_MenuItem_SaveLayout_Title;Save layout
+MainWindow_Menu_Layout_MenuItem_SaveLayout_Description;Please enter the name of the layout to be saved
+MainWindow_Menu_Layout_MenuItem_SaveLayout_SucceededMessage;Saved the layout of plan "{0}" as "{1}".
+MainWindow_Menu_Layout_MenuItem_SaveLayout_TabDoesNotSelectedMessage;No tab is selected to save the layout.\r\nSelect the tab you want to save, and run it again.
+MainWindow_Menu_Layout_MenuItem_SaveLayout_FailedMessage;Failed to save the layout.\r\n\r\n■Reason：\r\n{0}
+MainWindow_Menu_Layout_MenuItem_LayoutList_Header;Layout list
+MainWindow_Menu_Layout_MenuItem_LayoutList_Overwrite_Button_ToolTip;Overwrite Layout
+MainWindow_Menu_Layout_MenuItem_LayoutList_Overwrite_SuccessMessage;Saved the layout of plan "{0}" as "{1}" overwriting it.
+MainWindow_Menu_Layout_MenuItem_LayoutList_Overwrite_FailedMessage;Failed to save the layout overwrite.\r\n\r\n■Reason：\r\n{0}
+MainWindow_Menu_Layout_MenuItem_LayoutList_Rename_Button_ToolTip;Rename Layout
+MainWindow_Menu_Layout_MenuItem_LayoutList_Rename_Title;Edit layout name
+MainWindow_Menu_Layout_MenuItem_LayoutList_Rename_Description;Please enter a new layout name
+MainWindow_Menu_Layout_MenuItem_LayoutList_DeleteLayoutButton_ToolTip;Delete Layout
+MainWindow_Menu_Layout_MenuItem_LayoutList_DeleteLayoutButton_ConfirmMessage;Do you really want to delete the layout "{0}"?
+MainWindow_Menu_Layout_InvalidLayoutNameMessage;Invalid layout name. Please enter at least one non-whitespace character.
 
 # Language ---------------------------------------------
-Language;Language
+MainWindow_Menu_Language_Title;Language
 
 # Help(H) ---------------------------------------------
-Help;Help(_H)
-ReportIssue;Report Issue
-CheckUpdate;Check Update...
-CheckUpdateAtLaunch;Check Update At Launch
-CheckUpdateNoUpdateDescription;X4_ComplexCalculator v{0} is up to date.
-CheckUpdateHasUpdateDescription;X4_ComplexCalculator v{0} can be update to v{1}.\r\nDo you want to update now?
-CheckUpdateFailedDescription;Failed to check for updates.\r\nPlease try again later.
-CheckUpdateStartDownloadDescription;Downloading the update file.\r\nThe update is applied after the application is quit.
-CheckUpdateFinishedDownloadDescription;Download of the update file has been finished.\r\nThe update is applied after the application is quit.
-CheckUpdateNowDownloading;Downloading the update...
-VersionInfo;Version Information
-VersionInfoTitle;X4_ComplexCalculator
-VersionInfoDescription;X4_ComplexCalculator\r\n\r\nVersion: {0}\r\nCommit: {1}\r\nDate: {2}\r\n.NET Core: {3}
+MainWindow_Menu_Help_Title;Help(_H)
+MainWindow_Menu_Help_ReportIssue;Report Issue
+MainWindow_Menu_Help_CheckUpdateAtLaunch;Check Update At Launch
+MainWindow_Menu_Help_CheckUpdate_Title;Check Update...
+MainWindow_Menu_Help_VersionInfo_Title;Version Information
+MainWindow_Menu_Help_VersionInfo_MessageTitle;X4_ComplexCalculator
+MainWindow_Menu_Help_VersionInfo_MessageDescription;X4_ComplexCalculator\r\n\r\nVersion: {0}\r\nCommit: {1}\r\nDate: {2}\r\n.NET Core: {3}
+
+
+# Check update -----------------------------------------
+CheckUpdate_Title;Check Update...
+CheckUpdate_NoUpdateDescription;X4_ComplexCalculator v{0} is up to date.
+CheckUpdate_HasUpdateDescription;X4_ComplexCalculator v{0} can be update to v{1}.\r\nDo you want to update now?
+CheckUpdate_FailedDescription;Failed to check for updates.\r\nPlease try again later.
+CheckUpdate_StartDownloadDescription;Downloading the update file.\r\nThe update is applied after the application is quit.
+CheckUpdate_FinishedDownloadDescription;Download of the update file has been finished.\r\nThe update is applied after the application is quit.
+CheckUpdate_NowDownloading;Downloading the update...
 
 
 # ------------------------------------------------------
 # Station Calculator import/export dialog
 # ------------------------------------------------------
-StationCalculatorExportTitle;Export to Station Calculator
-StationCalculatorExportDescription;Please copy the URL.\r\nNote: The following modules are excluded.\r\n・Connection module\r\n・Venture module
-StationCalculatorImportTitle;Importing from Station Calculator
-StationCalculatorImportDescription;Please enter the URL displayed when you click the \r\nShare button at the top of Station Calculator.
+StationCalculatorExport_Title;Export to Station Calculator
+StationCalculatorExport_Description;Please copy the URL.\r\nNote: The following modules are excluded.\r\n・Connection module\r\n・Venture module
+StationCalculatorImport_Title;Importing from Station Calculator
+StationCalculatorImport_Description;Please enter the URL displayed when you click the \r\nShare button at the top of Station Calculator.
 
 
 # ------------------------------------------------------
 # Select plan dialog
 # ------------------------------------------------------
-SelectPlanWindowTitle;Select plan
-X4PlanFilePathDescription;X4 Construction plan file path
-ImportPlanDescription;Select a plan to import
+SelectPlan_Title;Select plan
+SelectPlan_X4PlanFilePathDescription;X4 Construction plan file path
+SelectPlan_ImportPlanDescription;Select a plan to import
 
 
 # ------------------------------------------------------
 # Import loadouts
 # ------------------------------------------------------
-LoadoutImportTitle;Module equipment
-LoadoutImportWindowTitle;Import module equipment
-LoadoutFilePathDescription;X4 loadout file path
-PresetListDescription;Select a preset to import
-PresetImportSucceededMessage;The presets have been successfully imported.\r\nNumber of imports = {0}
-PresetImportFailedMessage;The import of the preset failed.\r\nSuccess：{0}\r\nFailure：{1}
-NoPresetSelectedMessage;No presets are selected.\r\nPlease selecting a preset and run it again.
-ImportButton;Import
-Remarks;Remarks
-PresetImported;Imported.
+ImportLoadout_Title;Import module equipment
+ImportLoadout_LoadoutFilePathDescription;X4 loadout file path
+ImportLoadout_PresetListDescription;Select a preset to import
+ImportLoadout_ImportSucceededMessage;The presets have been successfully imported.\r\nNumber of imports = {0}
+ImportLoadout_ImportFailedMessage;The import of the preset failed.\r\nSuccess：{0}\r\nFailure：{1}
+ImportLoadout_NoPresetSelectedMessage;No presets are selected.\r\nPlease selecting a preset and run it again.
+ImportLoadout_Button_Import_Content;Import
+ImportLoadout_Remarks;Remarks
+ImportLoadout_Imported;Imported.
 
 
 # ------------------------------------------------------
 # Plan
 # ------------------------------------------------------
-Tab;Tab
-ModuleList;Modules
-Products;Products
-Summary;Summary
-BuildResources;Build resources
-Storages;Storages
-StorageAssign;Storage assign
+PlanArea_Tab;Tab
+PlanArea_ModuleList;Modules
+PlanArea_Products;Products
+PlanArea_Summary;Summary
+PlanArea_BuildResources;Build resources
+PlanArea_Storages;Storages
+PlanArea_StorageAssign;Storage assign
+PlanArea_Settings;Settings
 
 
 # ------------------------------------------------------
 # Modules
 # ------------------------------------------------------
-Copy;Copy
-Paste;Paste
-Delete;Delete
-ClearSelection;Clear selection
-MoveUpTheSelection;Move up the selection
-MoveDownTheSelection;Move down the selection
-ResetSortOrder;Reset sort order
-Add;Add
-AutoAdd;Auto add
-Merge;Merge
-ModuleEquipment;EQP
-Edit;Edit
-BuildMethod;Build method
-MergeModulesConfirmMessage;Do you want to merge duplicate modules?
-NoMergeModulesMessage;No duplicate modules were found.
-MergeModulesMessage;Merged {0} modules, {1} records.
-AutoAddConfirm;Do you want to add a module to produce the missing product?
-NoAddedModulesAutomaticallyMessage;The module was not added because there is no missing product.
-AddedModulesAutomaticallyMessage;{0} records, {1} modules added.
-NotEquippedToolTipText;Not equipped with anything.
+Modules_ContextMenu_MenuItem_Copy_Header;Copy
+Modules_ContextMenu_MenuItem_Paste_Header;Paste
+Modules_ContextMenu_MenuItem_Delete_Header;Delete
+Modules_ContextMenu_MenuItem_ClearSelection_Header;Clear selection
+Modules_ContextMenu_MenuItem_MoveUpTheSelection_Header;Move up the selection
+Modules_ContextMenu_MenuItem_MoveDownTheSelection_Header;Move down the selection
+Modules_ContextMenu_MenuItem_ResetSortOrder_Header;Reset sort order
+Modules_Button_Add_Content;Add
+Modules_Button_AutoAdd_Content;Auto add
+Modules_Button_AutoAdd_ConfirmMessage;Do you want to add a module to produce the missing product?
+Modules_Button_AutoAdd_AddedModulesMessage;{0} records, {1} modules added.
+Modules_Button_AutoAdd_NoAddedModulesMessage;The module was not added because there is no missing product.
+Modules_Button_Merge_Content;Merge
+Modules_Button_Merge_ConfirmMessage;Do you want to merge duplicate modules?
+Modules_Button_Merge_MergeModulesMessage;Merged {0} modules, {1} records.
+Modules_Button_Merge_NoMergeModulesMessage;No duplicate modules were found.
+Modules_Column_Equipment_Header;EQP
+Modules_Column_Equipment_Edit_Text;Edit
+Modules_Column_BuildMethod_Header;Build method
 
 
 # ------------------------------------------------------
 # Products
 # ------------------------------------------------------
-Expansion;Expansion
-Collapse;Collapse
-Efficiency;Efficiency
-Production;Production
-ProductName;Product name
-AmountPerHour;Amount/h
-NoBuy;No buy
-NoSell;No sell
-Buy;Buy
-Sell;Sell
+Products_Efficiency;Efficiency
+Products_AmountPerHour;Amount/h
 
 
 # ------------------------------------------------------
 # Build
 # ------------------------------------------------------
-NeedWare;Need ware
-NeedWareAmount;Amount
+BuildResources_NeedWare;Need ware
+BuildResources_NeedWareAmount;Amount
 
 
 # ------------------------------------------------------
 # Storage
 # ------------------------------------------------------
-Capacity;Capacity
-TotalCapacity;Total capacity
-StorageType;Storage type
+Storage_Capacity;Capacity
+Storage_TotalCapacity;Total capacity
+Storage_StorageType;Storage type
 
 
 # ------------------------------------------------------
 # Storage assign
 # ------------------------------------------------------
-StorageConditionAfterHour;Storage condition after {0} hour
-MaximumSliderValue; Maximum slider value
-Allocated;Allocated
-Allocable;Allocable
-NumberAfterTheSpecifiedTime;Number after the specified time
-StorageAssignGroupHeader;{0} = {1:N0}/{2:N0}
+StorageAssign_StorageConditionAfterHour;Storage condition after {0} hour
+StorageAssign_MaximumSliderValue; Maximum slider value
+StorageAssign_Allocated;Allocated
+StorageAssign_Allocable;Allocable
+StorageAssign_NumberAfterTheSpecifiedTime;Number after the specified time
+StorageAssign_StorageAssignGroupHeader;{0} = {1:N0}/{2:N0}
 
 
 # ------------------------------------------------------
 # Summary
 # ------------------------------------------------------
-Workforce;Workforce = [{0:N0}/{1:N0}]
-NecessaryWareInfo;Necessary ware info
-ModuleInfo;Module info
-ProfitPerHour;Profit per hour = {0:N0} cr
-BuildCost;Build cost = {0:N0} cr
-Workers;Workers
-TotalWorkers;Total workers
-NecessaryAmount;Necessary amount
-Diff;Diff
-Quantity;Quantity
+Summary_Workforce;Workforce = [{0:N0}/{1:N0}]
+Summary_NecessaryWareInfo;Necessary ware info
+Summary_ModuleInfo;Module info
+Summary_ProfitPerHour;Profit per hour = {0:N0} cr
+Summary_BuildCost;Build cost = {0:N0} cr
+Summary_Workers;Workers
+Summary_TotalWorkers;Total workers
+Summary_NecessaryAmount;Necessary amount
+Summary_Diff;Diff
+Summary_Quantity;Quantity
 
 
 # ------------------------------------------------------
 # Settings
 # ------------------------------------------------------
-Settings;Settings
-Station;Station
-Headquarters;Headquarters
-ActualWorkforce;Actual workforce = 
-AlwaysMaximun;Always maximum
-Sector;Sector
-Sunlight;Sunlight =
+Settings_GroupBox_Station_Header;Station
+Settings_CheckBox_Headquarters_Content;Headquarters
+Settings_TextBlock_ActualWorkforce_Text;Actual workforce = 
+Settings_CheckBox_AlwaysMaximun_Content;Always maximum
+Settings_GroupBox_Sector_Header;Sector
+Settings_TextBlock_Sunlight_Text;Sunlight =
 
 
 # ------------------------------------------------------
 # Select module window
 # ------------------------------------------------------
-SelectModuleWindowTitle;Select module window
-ModuleNameBeforeChange;Module name before change：
-ModuleType;Module type
+SelectModuleWindow_Title;Select module window
+SelectModuleWindow_ModuleNameBeforeChange;Module name before change：
+SelectModuleWindow_ModuleType;Module type
 
 
 # ------------------------------------------------------
 # Edit equipment window
 # ------------------------------------------------------
-EditEquipmentWindowTitle;Edit equipment window
-EquipmentSize;Equipment size
-Preset;Preset
-PresetRemoveButtonToolTip;Delete Loadout
-PresetAddButtonToolTip;Save as New
-PresetEditButtonToolTip;Rename Loadout
-PresetSaveButtonToolTip;Overwrite Loadout
-List;List
-Equiped;Equiped = [{0}/{1}]
-EquipmentAddButtonToolTip;You can add a selection at once by clicking while holding down the left Shift key.
-EditEquipmentWindowCloseConfirmMessage;Do you want to save your changes?
-EditPresetName;Edit preset name
-PresetName;Preset name
+EditEquipmentWindow_Title;Edit equipment window
+EditEquipmentWindow_Label_EquipmentSize_Content;Equipment size
+EditEquipmentWindow_Label_Preset_Content;Preset
+EditEquipmentWindow_Button_DeletePreset_ToolTip;Delete Loadout
+EditEquipmentWindow_Button_AddPreset_ToolTip;Save as New
+EditEquipmentWindow_Button_RenamePreset_ToolTip;Rename Loadout
+EditEquipmentWindow_Button_OverwritePreset_ToolTip;Overwrite Loadout
+EditEquipmentWindow_TextBlock_List_Text;List : 
+EditEquipmentWindow_TextBlock_Equipped_Text;Equipped = [{0}/{1}]
+EditEquipmentWindow_Button_Add_ToolTip;You can add a selection at once by clicking while holding down the left Shift key.
+EditEquipmentWindow_Button_Save_Content;Save
+EditEquipmentWindow_CloseConfirmMessage;Do you want to save your changes?
+SaveNewPreset_Title;Save new preset
+SaveNewPreset_Description;Please enter a preset name
+RenamePreset_Title;Rename preset name
+RenamePreset_Description;Please enter a new preset name
 DeletePresetConfirmMessage;Do you really want to remove the preset "{0}"?
 InvalidPresetNameMessage;Invalid preset name. Please enter at least one non-whitespace character.
 

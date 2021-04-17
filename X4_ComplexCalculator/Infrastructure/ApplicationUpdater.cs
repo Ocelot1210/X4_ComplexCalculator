@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Onova;
+using Onova.Services;
+using Reactive.Bindings;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using Onova;
-using Onova.Services;
-using Reactive.Bindings;
 
 namespace X4_ComplexCalculator.Infrastructure
 {

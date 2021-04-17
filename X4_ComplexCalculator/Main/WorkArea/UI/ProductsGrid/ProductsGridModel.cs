@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -7,11 +8,11 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using Prism.Mvvm;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.Common.Localize;
-using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Products;
@@ -152,7 +153,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// </summary>
         public void AutoAddModule()
         {
-            var result = LocalizedMessageBox.Show("Lang:AutoAddConfirm", "Lang:Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
+            var result = LocalizedMessageBox.Show("Lang:Modules_Button_AutoAdd_ConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
             if (result != MessageBoxResult.Yes)
             {
                 return;
@@ -210,11 +211,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 
             if (addedRecords == 0)
             {
-                LocalizedMessageBox.Show("Lang:NoAddedModulesAutomaticallyMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);
+                LocalizedMessageBox.Show("Lang:Modules_Button_AutoAdd_NoAddedModulesMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else
             {
-                LocalizedMessageBox.Show("Lang:AddedModulesAutomaticallyMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, addedRecords, addedModules);
+                LocalizedMessageBox.Show("Lang:Modules_Button_AutoAdd_AddedModulesMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, addedRecords, addedModules);
             }
 
             autoAddedModules.Clear();
@@ -243,7 +244,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
             }
 
             // 製品/消費ウェアがあるモジュールなら再計算する
-            if (module.Module.Resources.Any() || module.Module.Product.Any())
+            if (module.Module.Resources.Any() || module.Module.Products.Any())
             {
                 if (e is not PropertyChangedExtendedEventArgs<long> ev)
                 {
@@ -415,16 +416,16 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// </summary>
         /// <param name="targetModules">集計対象モジュール</param>
         /// <returns>集計結果</returns>
-        private IReadOnlyDictionary<Ware, IReadOnlyList<IProductDetailsListItem>> AggregateProduct(IEnumerable<ModulesGridItem> targetModules)
+        private IReadOnlyDictionary<IWare, IReadOnlyList<IProductDetailsListItem>> AggregateProduct(IEnumerable<ModulesGridItem> targetModules)
         {
             return targetModules
-                .Where(x => x.Module.Resources.Any() || x.Module.Product.Any())
+                .Where(x => x.Module.Resources.Any() || x.Module.Products.Any())
                 .GroupBy(x => x.Module)
                 .Select(x => (Module: x.Key, Count: x.Sum(y => y.ModuleCount)))
                 .SelectMany(x => _ProductCalculator.Calc(x.Module, x.Count))
                 .GroupBy(x => x.WareID)
                 .ToDictionary(
-                    x => Ware.Get(x.Key),
+                    x => X4Database.Instance.Ware.Get(x.Key),
                     x => x.GroupBy(x => x.Module)
                         .SelectMany(
                             x => x.Select(

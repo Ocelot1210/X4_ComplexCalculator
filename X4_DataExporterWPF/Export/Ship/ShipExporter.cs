@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using LibX4.FileSystem;
-using LibX4.Lang;
 using LibX4.Xml;
 using System;
 using System.Collections.Generic;

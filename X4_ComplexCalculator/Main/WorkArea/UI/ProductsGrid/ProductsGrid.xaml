@@ -41,38 +41,38 @@
             <MenuItem
                 Command="{Binding SetSelectedExpandedCommand, Mode=OneTime}"
                 CommandParameter="{StaticResource True}"
-                Header="{lex:Loc X4_ComplexCalculator:Lang:Expansion}" />
+                Header="{lex:Loc X4_ComplexCalculator:Lang:Common_Expander_Expansion}" />
 
             <!--  折りたたみ  -->
             <MenuItem
                 Command="{Binding SetSelectedExpandedCommand, Mode=OneTime}"
                 CommandParameter="{StaticResource False}"
-                Header="{lex:Loc X4_ComplexCalculator:Lang:Collapse}" />
+                Header="{lex:Loc X4_ComplexCalculator:Lang:Common_Expander_Collapse}" />
 
             <Separator />
             <!--  購入する  -->
             <MenuItem
                 Command="{Binding SetNoBuyToSelectedItemCommand, Mode=OneTime}"
                 CommandParameter="{StaticResource False}"
-                Header="{lex:Loc X4_ComplexCalculator:Lang:Buy}" />
+                Header="{lex:Loc X4_ComplexCalculator:Lang:Common_Buy}" />
             <!--  購入しない  -->
             <MenuItem
                 Command="{Binding SetNoBuyToSelectedItemCommand, Mode=OneTime}"
                 CommandParameter="{StaticResource True}"
-                Header="{lex:Loc X4_ComplexCalculator:Lang:NoBuy}" />
+                Header="{lex:Loc X4_ComplexCalculator:Lang:Common_NoBuy}" />
             <Separator />
 
             <!--  販売する  -->
             <MenuItem
                 Command="{Binding SetNoSellToSelectedItemCommand, Mode=OneTime}"
                 CommandParameter="{StaticResource False}"
-                Header="{lex:Loc X4_ComplexCalculator:Lang:Sell}" />
+                Header="{lex:Loc X4_ComplexCalculator:Lang:Common_Sell}" />
 
             <!--  販売しない  -->
             <MenuItem
                 Command="{Binding SetNoSellToSelectedItemCommand, Mode=OneTime}"
                 CommandParameter="{StaticResource True}"
-                Header="{lex:Loc X4_ComplexCalculator:Lang:NoSell}" />
+                Header="{lex:Loc X4_ComplexCalculator:Lang:Common_NoSell}" />
         </ContextMenu>
 
         <!--  子要素のListView  -->
@@ -90,11 +90,11 @@
                     <!--  モジュール名  -->
                     <DataGridInline:InlineGridViewColumn
                         DisplayMemberBinding="{Binding ModuleName, Mode=OneTime}"
-                        Header="{lex:Loc Lang:ModuleName}"
+                        Header="{lex:Loc Lang:Common_ModuleName}"
                         SortTargetPropertyName="ModuleName" />
 
                     <!--  モジュール数  -->
-                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:ModuleCount}" SortTargetPropertyName="ModuleCount">
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Common_ModuleCount}" SortTargetPropertyName="ModuleCount">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding ModuleCount, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
@@ -103,7 +103,7 @@
                     </DataGridInline:InlineGridViewColumn>
 
                     <!--  生産性  -->
-                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Efficiency}" SortTargetPropertyName="Efficiency">
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Products_Efficiency}" SortTargetPropertyName="Efficiency">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Efficiency, Mode=OneWay, Converter={StaticResource Efficiency2TextConverter}}" TextAlignment="Right" />
@@ -112,7 +112,7 @@
                     </DataGridInline:InlineGridViewColumn>
 
                     <!--  生産量  -->
-                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Production}" SortTargetPropertyName="Amount">
+                    <DataGridInline:InlineGridViewColumn Header="{lex:Loc Lang:Common_Production}" SortTargetPropertyName="Amount">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Amount, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" TextAlignment="Right" />
@@ -143,7 +143,7 @@
             <DataGridTemplateColumn
                 CellStyle="{StaticResource RightAlignedDataGridCell}"
                 ClipboardContentBinding="{Binding Ware.WareGroup.Tier, Mode=OneTime}"
-                Header="{lex:Loc Lang:Tier}"
+                Header="{lex:Loc Lang:Common_Tier}"
                 SortMemberPath="Ware.WareGroup.Tier">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
@@ -156,7 +156,7 @@
             <!--  製品名  -->
             <DataGridTemplateColumn
                 ClipboardContentBinding="{Binding Ware.Name, Mode=OneTime}"
-                Header="{lex:Loc Lang:ProductName}"
+                Header="{lex:Loc Lang:Common_ProductName}"
                 SortMemberPath="Ware.Name">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
@@ -170,7 +170,7 @@
             <DataGridTemplateColumn
                 CellStyle="{StaticResource LossEmphasisStyle}"
                 ClipboardContentBinding="{Binding Count, Mode=OneTime}"
-                Header="{lex:Loc Lang:AmountPerHour}"
+                Header="{lex:Loc Lang:Products_AmountPerHour}"
                 SortMemberPath="Count">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
@@ -183,7 +183,7 @@
             <!--  金額  -->
             <DataGridTemplateColumn
                 ClipboardContentBinding="{Binding Price, Mode=OneTime}"
-                Header="{lex:Loc Lang:Price}"
+                Header="{lex:Loc Lang:Common_Price}"
                 IsReadOnly="True"
                 SortMemberPath="Price">
                 <DataGridTemplateColumn.CellTemplate>
@@ -200,7 +200,7 @@
             <!--  単価  -->
             <x4cmn:MouseHoverEditCellColumn
                 ClipboardContentBinding="{Binding UnitPrice, Mode=OneTime}"
-                Header="{lex:Loc Lang:UnitPrice}"
+                Header="{lex:Loc Lang:Common_UnitPrice}"
                 SortMemberPath="UnitPrice">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
@@ -225,7 +225,7 @@
 
 
             <!--  単価(スライダー)  -->
-            <DataGridTemplateColumn CanUserResize="False">
+            <x4cmn:MouseHoverEditCellColumn CanUserResize="False">
                 <!--  ヘッダのスタイル定義  -->
                 <DataGridTemplateColumn.HeaderStyle>
                     <Style TargetType="DataGridColumnHeader">
@@ -254,7 +254,8 @@
                             Value="{Binding UnitPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
-            </DataGridTemplateColumn>
+
+            </x4cmn:MouseHoverEditCellColumn>
 
 
             <!--  購入しない  -->
@@ -263,7 +264,7 @@
                 <!--  ヘッダの内容定義  -->
                 <DataGridTemplateColumn.Header>
                     <CheckBox
-                        Content="{lex:Loc X4_ComplexCalculator:Lang:NoBuy}"
+                        Content="{lex:Loc X4_ComplexCalculator:Lang:Common_NoBuy}"
                         DockPanel.Dock="Left"
                         IsChecked="{Binding Data, Source={StaticResource ProxyNoBuy}}" />
                 </DataGridTemplateColumn.Header>
@@ -286,7 +287,7 @@
                 <!--  ヘッダの内容定義  -->
                 <DataGridTemplateColumn.Header>
                     <CheckBox
-                        Content="{lex:Loc X4_ComplexCalculator:Lang:NoSell}"
+                        Content="{lex:Loc X4_ComplexCalculator:Lang:Common_NoSell}"
                         DockPanel.Dock="Left"
                         IsChecked="{Binding Data, Source={StaticResource ProxyNoSell}}" />
                 </DataGridTemplateColumn.Header>

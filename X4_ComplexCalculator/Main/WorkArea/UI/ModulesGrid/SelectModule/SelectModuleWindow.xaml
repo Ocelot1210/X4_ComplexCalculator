@@ -10,7 +10,7 @@
     xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
     xmlns:x4ccrtl="clr-namespace:X4_ComplexCalculator_CustomControlLibrary;assembly=X4_ComplexCalculator_CustomControlLibrary"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-    Title="{lex:Loc Lang:SelectModuleWindowTitle}"
+    Title="{lex:Loc Lang:SelectModuleWindow_Title}"
     Width="800"
     Height="500"
     lex:LocalizeDictionary.DefaultProvider="{StaticResource CSVLocalizationProvider}"
@@ -48,7 +48,7 @@
             VerticalAlignment="Center"
             Orientation="Horizontal"
             Visibility="{Binding PrevModuleVisiblity}">
-            <TextBlock Margin="10" Text="{lex:Loc Lang:ModuleNameBeforeChange}" />
+            <TextBlock Margin="10" Text="{lex:Loc Lang:SelectModuleWindow_ModuleNameBeforeChange}" />
             <TextBox
                 Width="250"
                 Margin="10"
@@ -65,13 +65,13 @@
                 Width="75"
                 Margin="10"
                 Command="{Binding OKButtonClickedCommand, Mode=OneTime}"
-                Content="{lex:Loc Lang:Select}" />
+                Content="{lex:Loc Lang:Common_Select}" />
 
             <Button
                 Width="75"
                 Margin="10"
                 Command="{Binding CloseButtonClickedCommand, Mode=OneTime}"
-                Content="{lex:Loc Lang:Close}" />
+                Content="{lex:Loc Lang:Common_Close}" />
         </StackPanel>
         <!--#endregion-->
 
@@ -87,7 +87,7 @@
                         <avdk:LayoutAnchorablePane>
                             <!--  モジュール種別  -->
                             <avdk:LayoutAnchorable
-                                Title="{lex:Loc Lang:ModuleType}"
+                                Title="{lex:Loc Lang:SelectModuleWindow_ModuleType}"
                                 CanClose="False"
                                 CanHide="False">
                                 <xctk:CheckListBox
@@ -96,7 +96,7 @@
                                     ItemsSource="{Binding ModuleTypes}"
                                     ScrollViewer.HorizontalScrollBarVisibility="Visible"
                                     ScrollViewer.VerticalScrollBarVisibility="Visible"
-                                    SelectAllContent="{lex:Loc Lang:SelectAll}"
+                                    SelectAllContent="{lex:Loc Lang:Common_SelectAll}"
                                     SelectedMemberPath="IsChecked" />
                             </avdk:LayoutAnchorable>
                         </avdk:LayoutAnchorablePane>
@@ -104,7 +104,7 @@
                         <avdk:LayoutAnchorablePane>
                             <!--  所有派閥  -->
                             <avdk:LayoutAnchorable
-                                Title="{lex:Loc Lang:OwnerFaction}"
+                                Title="{lex:Loc Lang:Common_OwnerFaction}"
                                 CanClose="False"
                                 CanHide="False">
                                 <xctk:CheckListBox
@@ -113,7 +113,7 @@
                                     ItemsSource="{Binding ModuleOwnersView}"
                                     ScrollViewer.HorizontalScrollBarVisibility="Visible"
                                     ScrollViewer.VerticalScrollBarVisibility="Visible"
-                                    SelectAllContent="{lex:Loc Lang:SelectAll}"
+                                    SelectAllContent="{lex:Loc Lang:Common_SelectAll}"
                                     SelectedMemberPath="IsChecked">
                                     <xctk:CheckListBox.GroupStyle>
                                         <GroupStyle>
@@ -136,7 +136,7 @@
 
                     <avdk:LayoutAnchorablePane>
                         <avdk:LayoutAnchorable
-                            Title="{lex:Loc Lang:ModuleName}"
+                            Title="{lex:Loc Lang:Common_ModuleName}"
                             CanClose="False"
                             CanHide="False">
                             <DockPanel>
@@ -144,7 +144,7 @@
                                 <x4ccrtl:ClearableWaterMarkTextBox
                                     DockPanel.Dock="Top"
                                     Text="{Binding SearchModuleName, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"
-                                    Watermark="{lex:Loc Lang:SearchByEnteringText}" />
+                                    Watermark="{lex:Loc Lang:Common_SearchByEnteringText}" />
 
                                 <!--  モジュール一覧  -->
                                 <ListBox

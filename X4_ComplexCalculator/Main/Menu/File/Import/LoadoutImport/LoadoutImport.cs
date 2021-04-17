@@ -1,5 +1,5 @@
-﻿using System.Windows.Input;
-using Prism.Mvvm;
+﻿using Prism.Mvvm;
+using System.Windows.Input;
 using X4_ComplexCalculator.Main.WorkArea;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
@@ -12,7 +12,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
         /// <summary>
         /// メニュー表示用タイトル
         /// </summary>
-        public string Title => "Lang:LoadoutImportTitle";
+        public string Title => "Lang:MainWindow_Menu_File_MenuItem_Import_MenuItem_Loadout_Header";
 
 
         /// <summary>

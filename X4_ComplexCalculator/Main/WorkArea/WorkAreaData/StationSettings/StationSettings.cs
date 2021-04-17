@@ -1,5 +1,5 @@
-﻿using System;
-using Prism.Mvvm;
+﻿using Prism.Mvvm;
+using System;
 
 namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings
 {
@@ -18,7 +18,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings
         /// <summary>
         /// 日光[%]
         /// </summary>
-        private int _Sunlight = 100;
+        private double _Sunlight = 100;
         #endregion
 
 
@@ -48,17 +48,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings
         /// <summary>
         /// 日光[%]
         /// </summary>
-        public int Sunlight
+        public double Sunlight
         {
             get => _Sunlight;
-            set
-            {
-                const int digit = 1;
-
-                var tmp = Math.Pow(10.0, digit);
-
-                SetProperty(ref _Sunlight, (int)(Math.Round(value / tmp, 0, MidpointRounding.AwayFromZero) * tmp));
-            }
+            set => SetProperty(ref _Sunlight, value);
         }
         #endregion
     }

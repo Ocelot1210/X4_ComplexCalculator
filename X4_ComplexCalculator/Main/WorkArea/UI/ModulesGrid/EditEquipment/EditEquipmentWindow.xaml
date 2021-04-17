@@ -11,7 +11,7 @@
     xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
     xmlns:xctk="clr-namespace:Xceed.Wpf.Toolkit;assembly=DotNetProjects.Wpf.Extended.Toolkit"
     x:Name="window"
-    Title="{lex:Loc Lang:EditEquipmentWindowTitle}"
+    Title="{lex:Loc Lang:EditEquipmentWindow_Title}"
     Width="800"
     Height="450"
     lex:LocalizeDictionary.DefaultProvider="{StaticResource CSVLocalizationProvider}"
@@ -60,7 +60,7 @@
             Margin="5">
             <Label
                 Name="moduleNameLabel"
-                Content="{lex:Loc Lang:ModuleName}"
+                Content="{lex:Loc Lang:Common_ModuleName}"
                 Style="{StaticResource DefaultTextStyle}" />
             <TextBox
                 IsReadOnly="True"
@@ -73,7 +73,7 @@
             Grid.Row="0"
             Grid.Column="1"
             Margin="5">
-            <Label Content="{lex:Loc Lang:EquipmentSize}" Style="{StaticResource DefaultTextStyle}" />
+            <Label Content="{lex:Loc Lang:EditEquipmentWindow_Label_EquipmentSize_Content}" Style="{StaticResource DefaultTextStyle}" />
             <ComboBox
                 Name="SizeComboBox"
                 DisplayMemberPath="Name"
@@ -87,35 +87,35 @@
             Grid.Row="0"
             Grid.Column="2"
             Margin="5">
-            <Label Content="{lex:Loc Lang:Preset}" Style="{StaticResource DefaultTextStyle}" />
+            <Label Content="{lex:Loc Lang:EditEquipmentWindow_Label_Preset_Content}" Style="{StaticResource DefaultTextStyle}" />
             <DockPanel>
                 <Button
                     Width="20"
                     Command="{Binding DeletePresetCommand, Mode=OneTime}"
                     Content="🗑️"
                     DockPanel.Dock="Right"
-                    ToolTip="{lex:Loc Lang:PresetRemoveButtonToolTip}" />
+                    ToolTip="{lex:Loc Lang:EditEquipmentWindow_Button_DeletePreset_ToolTip}" />
 
                 <Button
                     Width="20"
                     Command="{Binding AddPresetCommand, Mode=OneTime}"
                     Content="➕"
                     DockPanel.Dock="Right"
-                    ToolTip="{lex:Loc Lang:PresetAddButtonToolTip}" />
+                    ToolTip="{lex:Loc Lang:EditEquipmentWindow_Button_AddPreset_ToolTip}" />
 
                 <Button
                     Width="20"
                     Command="{Binding EditPresetNameCommand, Mode=OneTime}"
                     Content="✏"
                     DockPanel.Dock="Right"
-                    ToolTip="{lex:Loc Lang:PresetEditButtonToolTip}" />
+                    ToolTip="{lex:Loc Lang:EditEquipmentWindow_Button_RenamePreset_ToolTip}" />
 
                 <Button
                     Width="20"
                     Command="{Binding OverwritePresetCommand, Mode=OneTime}"
                     Content="💾"
                     DockPanel.Dock="Right"
-                    ToolTip="{lex:Loc Lang:PresetSaveButtonToolTip}" />
+                    ToolTip="{lex:Loc Lang:EditEquipmentWindow_Button_OverwritePreset_ToolTip}" />
 
                 <ComboBox
                     x:Name="presetCombobox"
@@ -132,7 +132,7 @@
             </DockPanel>
         </StackPanel>
 
-        <!--  保存/キャンセル  -->
+        <!--  保存/閉じる  -->
         <Grid
             Grid.Row="0"
             Grid.Column="3"
@@ -149,7 +149,7 @@
                 Height="20"
                 Command="{Binding SaveButtonClickedCommand}"
                 CommandParameter="{Binding ElementName=window}"
-                Content="{lex:Loc Lang:Save}" />
+                Content="{lex:Loc Lang:EditEquipmentWindow_Button_Save_Content}" />
 
             <Button
                 Grid.Column="1"
@@ -157,7 +157,7 @@
                 Height="{Binding ElementName=SaveButton, Path=Height}"
                 Command="{Binding CloseWindowCommand}"
                 CommandParameter="{Binding ElementName=window}"
-                Content="{lex:Loc Lang:Close}" />
+                Content="{lex:Loc Lang:Common_Close}" />
         </Grid>
 
         <!--  絞り込み用チェックリストボックス  -->
@@ -168,13 +168,13 @@
             <Label
                 Height="28"
                 VerticalAlignment="Bottom"
-                Content="{lex:Loc Lang:OwnerFaction}"
+                Content="{lex:Loc Lang:Common_OwnerFaction}"
                 DockPanel.Dock="Top" />
             <xctk:CheckListBox
                 DisplayMemberPath="FactionName"
                 IsSelectAllActive="True"
                 ItemsSource="{Binding FactionsView}"
-                SelectAllContent="{lex:Loc Lang:SelectAll}"
+                SelectAllContent="{lex:Loc Lang:Common_SelectAll}"
                 SelectedMemberPath="IsChecked">
                 <xctk:CheckListBox.GroupStyle>
                     <GroupStyle>

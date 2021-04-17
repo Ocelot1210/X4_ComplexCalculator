@@ -24,7 +24,7 @@ namespace X4_DataExporterWPF.Entity
         /// <summary>
         /// 階級
         /// </summary>
-        public int Tier { get; }
+        public long Tier { get; }
         #endregion
 
 
@@ -36,7 +36,7 @@ namespace X4_DataExporterWPF.Entity
         /// <param name="factoryName">工場名</param>
         /// <param name="icon">アイコン名</param>
         /// <param name="tier">階級</param>
-        public WareGroup(string wareGroupID, string name, int tier)
+        public WareGroup(string wareGroupID, string name, long tier)
         {
             WareGroupID = wareGroupID;
             Name = name;

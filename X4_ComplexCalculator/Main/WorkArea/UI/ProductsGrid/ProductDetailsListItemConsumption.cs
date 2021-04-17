@@ -1,6 +1,5 @@
-﻿using System;
-using Prism.Mvvm;
-using X4_ComplexCalculator.DB.X4DB;
+﻿using Prism.Mvvm;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 {
@@ -66,7 +65,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <param name="module">モジュール</param>
         /// <param name="moduleCount">モジュール数</param>
         /// <param name="amount">製品数</param>
-        public ProductDetailsListItemConsumption(string wareID, Module module, long moduleCount, long amount)
+        public ProductDetailsListItemConsumption(string wareID, IX4Module module, long moduleCount, long amount)
         {
             WareID = wareID;
             ModuleID = module.ID;

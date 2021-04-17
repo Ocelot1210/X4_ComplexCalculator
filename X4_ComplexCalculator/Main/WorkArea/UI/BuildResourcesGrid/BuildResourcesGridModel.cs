@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.EditStatus;
-using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.BuildResources;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
@@ -121,7 +122,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
                 // 建造方式変更の場合
                 case nameof(ModulesGridItem.SelectedMethod):
                     {
-                        if (e is PropertyChangedExtendedEventArgs<WareProduction> ev)
+                        if (e is PropertyChangedExtendedEventArgs<IWareProduction> ev)
                         {
                             OnModuleSelectedMethodChanged(module, ev.OldValue.Method);
                         }
@@ -198,7 +199,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         /// <param name="prevModuleCount">モジュール数前回値</param>
         private void OnModuleCountChanged(ModulesGridItem module, long prevModuleCount)
         {
-            (Ware Ware, string Method, long Count)[] wares = 
+            (IWare Ware, string Method, long Count)[] wares = 
             {
                 (module.Module, module.SelectedMethod.Method, 1)
             };
@@ -210,7 +211,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
                 .Equipments.AllEquipments
                 .Select(x => (Ware: x, Count: 1))
                 .GroupBy(x => x)
-                .Select(x => (x.Key.Ware as Ware, Method: "default", Count: x.LongCount()));
+                .Select(x => (x.Key.Ware as IWare, Method: "default", Count: x.LongCount()));
 
             IEnumerable<CalcResult> resources = _Calculator.CalcResource(wares.Concat(equipments));
 
@@ -232,7 +233,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         /// <param name="buildMethod"></param>
         private void OnModuleSelectedMethodChanged(ModulesGridItem module, string buildMethod)
         {
-            (Ware Ware, string Method, long ModuleCount)[] modules =
+            (IWare Ware, string Method, long ModuleCount)[] modules =
             {
                 (module.Module, buildMethod, -1),                   // 変更前のため -1
                 (module.Module, module.SelectedMethod.Method, 1)    // 変更後のため +1
@@ -271,12 +272,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
             // 新しい装備一覧
             var newEquipments = module.Equipments.AllEquipments
                 .GroupBy(x => x)
-                .Select(x => (x.Key as Ware, "default", (long)x.Count()));
+                .Select(x => (x.Key as IWare, "default", (long)x.Count()));
 
             // 古い装備一覧
             var oldEquipments = prevEquipments
                 .GroupBy(x => x)
-                .Select(x => (Ware.Get(x.Key), "default", -(long)x.Count()));
+                .Select(x => (X4Database.Instance.Ware.Get(x.Key), "default", -(long)x.Count()));
 
             // リソース集計
             IEnumerable<CalcResult> resources = _Calculator.CalcResource(newEquipments.Concat(oldEquipments));
@@ -359,10 +360,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid
         private IEnumerable<CalcResult> AggregateModules(IEnumerable<ModulesGridItem> modules)
         {
             // モジュール一覧
-            var moduleList = modules.Select(x => (x.Module as Ware, x.SelectedMethod.Method, x.ModuleCount));
+            var moduleList = modules.Select(x => (x.Module as IWare, x.SelectedMethod.Method, x.ModuleCount));
 
             var equipments = modules
-                .SelectMany(x => x.Equipments.AllEquipments.Select(y => (Ware: y as Ware, Count: x.ModuleCount)))
+                .SelectMany(x => x.Equipments.AllEquipments.Select(y => (Ware: y as IWare, Count: x.ModuleCount)))
                 .GroupBy(x => x.Ware)
                 .Select(x => (Ware: x.Key, Method: "default", Count: x.Sum(y => y.Count)));
 

@@ -93,8 +93,8 @@ CREATE TABLE IF NOT EXISTS ShipType
 
                 // 大型
                 ("destroyer",        4001, 4002),       // 駆逐艦
-                ("largeminer",       4011, 4012),       // 採掘船
-                ("freighter",        4021, 4022),       // 貨物船
+                ("freighter",        4011, 4012),       // 貨物船
+                ("largeminer",       4021, 4022),       // 採掘船
 
                 // 特大型
                 ("carrier",          5001, 5002),       // 空母

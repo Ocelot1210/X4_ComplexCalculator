@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace X4_ComplexCalculator.Common
+﻿namespace X4_ComplexCalculator.Common
 {
     /// <summary>
     /// 選択可能アイテム用インターフェイス

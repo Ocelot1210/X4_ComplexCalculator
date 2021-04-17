@@ -72,19 +72,19 @@ namespace X4_ComplexCalculator.Main
         /// </summary>
         public void UpdateDB()
         {
-            var result = LocalizedMessageBox.Show("Lang:DBUpdateConfirmationMessage", "Lang:Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            var result = LocalizedMessageBox.Show("Lang:MainWindow_Menu_File_UpdateDB_DBUpdate_ConfirmationMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
             if (result == MessageBoxResult.Yes)
             {
                 if (X4Database.UpdateDB())
                 {
                     // DB更新成功
-                    LocalizedMessageBox.Show("Lang:DBUpdateRestartRequestMessage", "Lang:Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);
+                    LocalizedMessageBox.Show("Lang:MainWindow_Menu_File_UpdateDB_DBUpdate_RestartRequestMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
                     // DB更新失敗
-                    LocalizedMessageBox.Show("Lang:DBUpdateFailureMessage", "Lang:Error", MessageBoxButton.YesNo, MessageBoxImage.Error);
+                    LocalizedMessageBox.Show("Lang:MainWindow_Menu_File_UpdateDB_DBUpdate_FailureMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.YesNo, MessageBoxImage.Error);
                 }
             }
         }
@@ -101,7 +101,7 @@ namespace X4_ComplexCalculator.Main
             // 未保存の内容が存在するか？
             if (_WorkAreaManager.Documents.Any(x => x.HasChanged))
             {
-                var result = LocalizedMessageBox.Show("Lang:MainWindowClosingConfirmMessage", "Lang:Confirmation", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                var result = LocalizedMessageBox.Show("Lang:MainWindow_ClosingConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 
                 switch (result)
                 {

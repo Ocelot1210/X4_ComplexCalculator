@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
-using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
 namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
@@ -99,7 +99,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             const string sql1 = "SELECT ModuleID, Count FROM Modules ORDER BY Row ASC";
             foreach (var (moduleID, count) in conn.Query<(string, long)>(sql1))
             {
-                var module = Ware.TryGet<Module>(moduleID);
+                var module = X4Database.Instance.Ware.TryGet<IX4Module>(moduleID);
                 if (module is not null)
                 {
                     var mod = new ModulesGridItem(module, null, count) { EditStatus = EditStatus.Unedited };
@@ -112,7 +112,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
             const string sql2 = "SELECT Row, EquipmentID FROM Equipments";
             foreach (var (row, equipmentID) in conn.Query<(int, string)>(sql2))
             {
-                var eqp = Ware.TryGet<Equipment>(equipmentID);
+                var eqp = X4Database.Instance.Ware.TryGet<IEquipment>(equipmentID);
                 if (eqp is not null)
                 {
                     modules[row].AddEquipment(eqp);

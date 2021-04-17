@@ -20,13 +20,13 @@
         /// <summary>
         /// 発着パッド数
         /// </summary>
-        public int Count { get; }
+        public long Count { get; }
 
         
         /// <summary>
         /// 機体格納数
         /// </summary>
-        public int Capacity { get; }
+        public long Capacity { get; }
 
 
         /// <summary>
@@ -36,7 +36,7 @@
         /// <param name="sizeID">発着パッドのサイズID</param>
         /// <param name="count">発着パッド数</param>
         /// <param name="capacity">機体格納数</param>
-        public ShipHanger(string shipID, string sizeID, int count, int capacity)
+        public ShipHanger(string shipID, string sizeID, long count, long capacity)
         {
             ShipID = shipID;
             SizeID = sizeID;

@@ -1,19 +1,20 @@
 ﻿using System.Linq;
 using System.Text;
 using X4_ComplexCalculator.Entity;
+using Prism.Mvvm;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
 {
     /// <summary>
     /// 装備情報
     /// </summary>
-    public class EquipmentsInfo
+    public class EquipmentsInfo : BindableBase
     {
         #region メンバ 
         /// <summary>
         /// 装備管理オブジェクト
         /// </summary>
-        private readonly WareEquipmentManager _Manager;
+        private readonly EquippableWareEquipmentManager _Manager;
 
 
         /// <summary>
@@ -31,7 +32,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// <summary>
         /// 詳細表示文字列
         /// </summary>
-        private string _Text = "";
+        private string _DetailsText = "";
 
 
         /// <summary>
@@ -53,7 +54,11 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
                 {
                     Update();
                 }
-                return _Text;
+                return _DetailsText;
+            }
+            set
+            {
+                SetProperty(ref _DetailsText, value);
             }
         }
 
@@ -71,6 +76,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
                 }
                 return _Count;
             }
+            set
+            {
+                SetProperty(ref _Count, value);
+            }
         }
         #endregion
 
@@ -81,7 +90,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// </summary>
         /// <param name="manager">装備管理オブジェクト</param>
         /// <param name="equipmentTypeID">表示対象の装備ID</param>
-        public EquipmentsInfo(WareEquipmentManager manager, string equipmentTypeID)
+        public EquipmentsInfo(EquippableWareEquipmentManager manager, string equipmentTypeID)
         {
             _Manager = manager;
             _EquipmentTypeID = equipmentTypeID;
@@ -101,7 +110,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
         /// 表示内容を更新
         /// </summary>
         /// <returns></returns>
-        private void Update()
+        public void Update()
         {
             var equipments = _Manager.AllEquipments
                 .Where(x => x.EquipmentType.EquipmentTypeID == _EquipmentTypeID);
@@ -109,7 +118,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             if (!equipments.Any())
             {
                 _Count = 0;
-                _Text = (string)WPFLocalizeExtension.Engine.LocalizeDictionary.Instance.GetLocalizedObject("Lang:NotEquippedToolTipText", null, null);
+                DetailsText = (string)WPFLocalizeExtension.Engine.LocalizeDictionary.Instance.GetLocalizedObject("Lang:Common_NotEquippedToolTipText", null, null);
                 _UpdateNeeded = false;
                 return;
             }
@@ -143,8 +152,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
             // 最後の改行を消す
             sb.Length -= 2;
 
-            _Text = sb.ToString();
-            _Count = total;
+            DetailsText = sb.ToString();
+            Count = total;
             _UpdateNeeded = false;
         }
     }

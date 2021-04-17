@@ -1,5 +1,6 @@
 ﻿using Prism.Mvvm;
-using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWareInfo
 {
@@ -32,7 +33,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
         /// <summary>
         /// 種族
         /// </summary>
-        public Race Race { get; }
+        public IRace Race { get; }
 
 
         /// <summary>
@@ -110,12 +111,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
         /// <param name="wareID">ウェアID</param>
         /// <param name="needAmount">必要数量</param>
         /// <param name="productionAmount">生産数量</param>
-        public NeedWareInfoDetailsItem(Race race, string method, string wareID, long needAmount = 0, long productionAmount = 0)
+        public NeedWareInfoDetailsItem(IRace race, string method, string wareID, long needAmount = 0, long productionAmount = 0)
         {
             Race             = race;
             Method           = method;
             WareID           = wareID;
-            WareName         = Ware.Get(wareID).Name;
+            WareName         = X4Database.Instance.Ware.Get(wareID).Name;
             NeedAmount       = needAmount;
             ProductionAmount = productionAmount;
         }

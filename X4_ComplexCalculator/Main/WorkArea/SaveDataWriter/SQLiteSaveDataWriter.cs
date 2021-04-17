@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Dapper;
+using Microsoft.Win32;
+using System;
 using System.Data;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using Dapper;
-using Microsoft.Win32;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
-using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
 {
@@ -41,7 +41,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
             }
             catch (Exception e)
             {
-                LocalizedMessageBox.Show("Lang:SaveDataWriteFailureMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message, e.StackTrace ?? "");
+                LocalizedMessageBox.Show("Lang:MainWindow_SaveDataWriteFailureMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message, e.StackTrace ?? "");
             }
 
             return false;
@@ -69,7 +69,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
                 }
                 catch (Exception e)
                 {
-                    LocalizedMessageBox.Show("Lang:SaveDataWriteFailureMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message, e.StackTrace ?? "");
+                    LocalizedMessageBox.Show("Lang:MainWindow_SaveDataWriteFailureMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message, e.StackTrace ?? "");
                 }
             }
 
@@ -174,16 +174,16 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter
 
 
         /// <summary>
-        /// Dappar が Ware を WareID に変換するためのクラス
+        /// Dappar が IWare を WareID に変換するためのクラス
         /// </summary>
-        private class WareTypeHandler : SqlMapper.TypeHandler<Ware>
+        private class WareTypeHandler : SqlMapper.TypeHandler<IWare>
         {
             /// <inheritdoc />
-            public override Ware Parse(object value) => throw new NotImplementedException();
+            public override IWare Parse(object value) => throw new NotImplementedException();
 
 
             /// <inheritdoc />
-            public override void SetValue(IDbDataParameter parameter, Ware value)
+            public override void SetValue(IDbDataParameter parameter, IWare value)
             {
                 parameter.DbType = DbType.String;
                 parameter.Value = value.ID;

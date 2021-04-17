@@ -33,12 +33,14 @@
             <DataGridTextColumn
                 dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnTextFilter}"
                 Binding="{Binding ModuleName, Mode=OneTime}"
+                CellStyle="{StaticResource DataGridCellDefaultStyle}"
                 Header="{lex:Loc Lang:DBViewer_Modules_ModuleName}" />
 
             <!--  モジュール種別  -->
             <DataGridTextColumn
                 dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
                 Binding="{Binding ModuleType, Mode=OneTime}"
+                CellStyle="{StaticResource DataGridCellDefaultStyle}"
                 Header="{lex:Loc Lang:DBViewer_Modules_ModuleType}" />
 
 
@@ -46,6 +48,7 @@
             <DataGridTextColumn
                 dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnListFilter}"
                 Binding="{Binding Race, Mode=OneTime}"
+                CellStyle="{StaticResource DataGridCellDefaultStyle}"
                 Header="{lex:Loc Lang:DBViewer_Modules_OwnerRace}" />
 
 
@@ -71,6 +74,7 @@
             <DataGridTextColumn
                 dgx:DataGridFilterColumn.Template="{StaticResource ResourceKey=DataGridColumnTextFilter}"
                 Binding="{Binding Product, Mode=OneTime}"
+                CellStyle="{StaticResource DataGridCellDefaultStyle}"
                 Header="{lex:Loc Lang:DBViewer_Modules_Product}" />
 
 

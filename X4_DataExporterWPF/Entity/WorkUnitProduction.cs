@@ -15,13 +15,13 @@
         /// <summary>
         /// 労働時間
         /// </summary>
-        public int Time { get; }
+        public long Time { get; }
 
 
         /// <summary>
         /// 労働者数(計算用基準値)
         /// </summary>
-        public int Amount { get; }
+        public long Amount { get; }
 
 
         /// <summary>
@@ -38,7 +38,7 @@
         /// <param name="time">労働時間</param>
         /// <param name="amount">労働時間に対して必要なウェア数量</param>
         /// <param name="method">労働方式</param>
-        public WorkUnitProduction(string workUnitID, int time, int amount, string method)
+        public WorkUnitProduction(string workUnitID, long time, long amount, string method)
         {
             WorkUnitID = workUnitID;
             Time = time;

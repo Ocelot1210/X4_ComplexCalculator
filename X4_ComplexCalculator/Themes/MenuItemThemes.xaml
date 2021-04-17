@@ -81,19 +81,19 @@
                     Margin="2"
                     Command="{Binding SaveButtonClickedCommand, Mode=OneTime}"
                     Content="💾"
-                    ToolTip="{lex:Loc Lang:LayoutSaveButtonToolTip}" />
+                    ToolTip="{lex:Loc Lang:MainWindow_Menu_Layout_MenuItem_LayoutList_Overwrite_Button_ToolTip}" />
                 <Button
                     Grid.Column="7"
                     Margin="2"
                     Command="{Binding EditButtonClickedCommand, Mode=OneTime}"
                     Content="✏"
-                    ToolTip="{lex:Loc Lang:LayoutEditButtonToolTip}" />
+                    ToolTip="{lex:Loc Lang:MainWindow_Menu_Layout_MenuItem_LayoutList_Rename_Button_ToolTip}" />
                 <Button
                     Grid.Column="8"
                     Margin="2"
                     Command="{Binding DeleteButtonClickedCommand, Mode=OneTime}"
                     Content="🗑️"
-                    ToolTip="{lex:Loc Lang:LayoutRemoveButtonToolTip}" />
+                    ToolTip="{lex:Loc Lang:MainWindow_Menu_Layout_MenuItem_LayoutList_DeleteLayoutButton_ToolTip}" />
             </Grid>
         </Border>
         <ControlTemplate.Triggers>

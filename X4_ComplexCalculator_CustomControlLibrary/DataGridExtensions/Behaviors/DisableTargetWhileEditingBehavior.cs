@@ -1,9 +1,8 @@
 ﻿namespace X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions.Behaviors
 {
+    using Microsoft.Xaml.Behaviors;
     using System.Windows;
     using System.Windows.Controls;
-
-    using Microsoft.Xaml.Behaviors;
 
     /// <summary>
     /// This behavior disables the specified <see cref="Target"/> element while the

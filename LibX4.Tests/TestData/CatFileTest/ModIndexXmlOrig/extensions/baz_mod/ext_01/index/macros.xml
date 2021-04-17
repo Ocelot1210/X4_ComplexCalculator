@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+	<add sel="/index">
+	    <entry name="baz_macro" value="assets\fx\macros\baz_macro"/>
+	</add>
+</diff>

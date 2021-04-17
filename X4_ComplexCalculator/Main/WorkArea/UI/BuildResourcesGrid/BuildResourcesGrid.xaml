@@ -29,11 +29,11 @@
             <MenuItem
                 Command="{Binding SetNoBuyToSelectedItemCommand, Mode=OneTime}"
                 CommandParameter="{StaticResource False}"
-                Header="{lex:Loc X4_ComplexCalculator:Lang:Buy}" />
+                Header="{lex:Loc X4_ComplexCalculator:Lang:Common_Buy}" />
             <MenuItem
                 Command="{Binding SetNoBuyToSelectedItemCommand, Mode=OneTime}"
                 CommandParameter="{StaticResource True}"
-                Header="{lex:Loc X4_ComplexCalculator:Lang:NoBuy}" />
+                Header="{lex:Loc X4_ComplexCalculator:Lang:Common_NoBuy}" />
         </ContextMenu>
 
     </UserControl.Resources>
@@ -53,7 +53,7 @@
             <!--  建造に必要なウェア  -->
             <DataGridTemplateColumn
                 ClipboardContentBinding="{Binding Ware.Name, Mode=OneTime}"
-                Header="{lex:Loc Lang:NeedWare}"
+                Header="{lex:Loc Lang:BuildResources_NeedWare}"
                 SortMemberPath="Ware.Name">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
@@ -66,7 +66,7 @@
             <!--  個数  -->
             <DataGridTemplateColumn
                 ClipboardContentBinding="{Binding Amount, Mode=OneTime}"
-                Header="{lex:Loc Lang:NeedWareAmount}"
+                Header="{lex:Loc Lang:BuildResources_NeedWareAmount}"
                 SortMemberPath="Amount">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
@@ -82,7 +82,7 @@
             <!--  金額  -->
             <DataGridTemplateColumn
                 ClipboardContentBinding="{Binding Price, Mode=OneTime}"
-                Header="{lex:Loc Lang:Price}"
+                Header="{lex:Loc Lang:Common_Price}"
                 SortMemberPath="Price">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
@@ -98,7 +98,7 @@
             <!--  単価  -->
             <x4cmn:MouseHoverEditCellColumn
                 ClipboardContentBinding="{Binding UnitPrice, Mode=OneTime}"
-                Header="{lex:Loc Lang:UnitPrice}"
+                Header="{lex:Loc Lang:Common_UnitPrice}"
                 SortMemberPath="UnitPrice">
                 <!--  通常表示時のスタイル  -->
                 <DataGridTemplateColumn.CellTemplate>
@@ -126,7 +126,7 @@
 
 
             <!--  単価(スライダー)  -->
-            <DataGridTemplateColumn CanUserResize="False">
+            <x4cmn:MouseHoverEditCellColumn CanUserResize="False">
                 <!--  ヘッダのスタイル定義  -->
                 <DataGridTemplateColumn.HeaderStyle>
                     <Style TargetType="DataGridColumnHeader">
@@ -155,7 +155,7 @@
                             Value="{Binding UnitPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
-            </DataGridTemplateColumn>
+            </x4cmn:MouseHoverEditCellColumn>
 
 
             <!--  購入しない  -->
@@ -164,7 +164,7 @@
                 <!--  ヘッダの内容定義  -->
                 <DataGridTemplateColumn.Header>
                     <CheckBox
-                        Content="{lex:Loc X4_ComplexCalculator:Lang:NoBuy}"
+                        Content="{lex:Loc X4_ComplexCalculator:Lang:Common_NoBuy}"
                         DockPanel.Dock="Left"
                         IsChecked="{Binding Data, Source={StaticResource ProxyNoBuy}}" />
                 </DataGridTemplateColumn.Header>

@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using Microsoft.Win32;
-using Prism.Mvvm;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Main.WorkArea;
@@ -168,7 +168,7 @@ namespace X4_ComplexCalculator.Main
             }
             catch (Exception e)
             {
-                LocalizedMessageBox.Show("Lang:FaildToLoadFileMessage", "Lang:FaildToLoadFileMessageTitle", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
+                LocalizedMessageBox.Show("Lang:MainWindow_FaildToLoadFileMessage", "Lang:MainWindow_FaildToLoadFileMessageTitle", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
             }
             finally
             {

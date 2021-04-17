@@ -8,7 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
     xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
-    Title="{lex:Loc Lang:LoadoutImportWindowTitle}"
+    Title="{lex:Loc Lang:ImportLoadout_Title}"
     Width="600"
     Height="400"
     x4bhv:CloseWindowBehavior.Close="{Binding CloseDialogProperty, Mode=OneWay}"
@@ -19,7 +19,7 @@
     mc:Ignorable="d">
 
     <Window.DataContext>
-        <local:SelectLoadoutViewModel />
+        <local:LoadoutImportViewModel />
     </Window.DataContext>
 
     <Window.Resources>
@@ -36,7 +36,7 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0">
-            <TextBlock Text="{lex:Loc Lang:LoadoutFilePathDescription}" />
+            <TextBlock Text="{lex:Loc Lang:ImportLoadout_LoadoutFilePathDescription}" />
             <DockPanel>
                 <Button
                     Width="25"
@@ -54,7 +54,7 @@
             Grid.Row="1"
             Margin="0,10,0,0"
             LastChildFill="True">
-            <TextBlock DockPanel.Dock="Top" Text="{lex:Loc Lang:PresetListDescription}" />
+            <TextBlock DockPanel.Dock="Top" Text="{lex:Loc Lang:ImportLoadout_PresetListDescription}" />
 
             <DataGrid
                 AutoGenerateColumns="False"
@@ -106,7 +106,7 @@
                     <!--  モジュール名  -->
                     <DataGridTemplateColumn
                         ClipboardContentBinding="{Binding Module.Name, Mode=OneTime}"
-                        Header="{lex:Loc Lang:ModuleName}"
+                        Header="{lex:Loc Lang:Common_ModuleName}"
                         IsReadOnly="True"
                         SortMemberPath="Module.Name">
                         <DataGridTemplateColumn.CellTemplate>
@@ -133,7 +133,7 @@
                     <DataGridTemplateColumn
                         CanUserResize="False"
                         ClipboardContentBinding="{Binding TurretsCount, Mode=OneTime}"
-                        Header="{lex:Loc Lang:Turrets}"
+                        Header="{lex:Loc Lang:Common_Turrets}"
                         SortMemberPath="TurretInfo.Count">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -166,7 +166,7 @@
                     <DataGridTemplateColumn
                         CanUserResize="False"
                         ClipboardContentBinding="{Binding ShieldsCount, Mode=OneTime}"
-                        Header="{lex:Loc Lang:Shields}"
+                        Header="{lex:Loc Lang:Common_Shields}"
                         SortMemberPath="ShieldInfo.Count">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -194,7 +194,7 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTemplateColumn Header="{lex:Loc Lang:Remarks}" SortMemberPath="Imported">
+                    <DataGridTemplateColumn Header="{lex:Loc Lang:ImportLoadout_Remarks}" SortMemberPath="Imported">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock>
@@ -202,7 +202,7 @@
                                         <Style TargetType="{x:Type TextBlock}">
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding Imported, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="True">
-                                                    <Setter Property="Text" Value="{lex:Loc Lang:PresetImported}" />
+                                                    <Setter Property="Text" Value="{lex:Loc Lang:ImportLoadout_Imported}" />
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
@@ -222,14 +222,14 @@
                 Height="20"
                 Margin="5"
                 Command="{Binding ImportButtonClickedCommand, Mode=OneTime}"
-                Content="{lex:Loc Lang:ImportButton}" />
+                Content="{lex:Loc Lang:ImportLoadout_Button_Import_Content}" />
 
             <Button
                 Width="75"
                 Height="20"
                 Margin="5"
                 Command="{Binding CloseButtonClickedCommand, Mode=OneTime}"
-                Content="{lex:Loc Lang:Close}" />
+                Content="{lex:Loc Lang:Common_Close}" />
         </DockPanel>
 
     </Grid>

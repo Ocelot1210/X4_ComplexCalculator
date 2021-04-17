@@ -15,7 +15,7 @@
         /// <summary>
         /// 保管庫容量
         /// </summary>
-        public int Amount { get; }
+        public long Amount { get; }
         #endregion
 
 
@@ -24,7 +24,7 @@
         /// </summary>
         /// <param name="moduleID">モジュールID</param>
         /// <param name="amount">保管庫容量</param>
-        public ModuleStorage(string moduleID, int amount)
+        public ModuleStorage(string moduleID, long amount)
         {
             ModuleID = moduleID;
             Amount = amount;

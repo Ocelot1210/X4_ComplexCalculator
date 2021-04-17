@@ -74,7 +74,7 @@
                         <GroupBox Header="{lex:Loc Lang:TextFilter_GroupBoxTitle}">
                             <StackPanel Orientation="Vertical">
 
-                                <xctk:WatermarkTextBox Text="{Binding ElementName=Control, Path=FilterText}" Watermark="{lex:Loc Lang:Search}" />
+                                <xctk:WatermarkTextBox Text="{Binding ElementName=Control, Path=FilterText}" Watermark="{lex:Loc Lang:Common_Search}" />
                                 <GroupBox Header="{lex:Loc Lang:DataGridColumnsFilter_Conditions}">
                                     <StackPanel Orientation="Vertical">
                                         <RadioButton Content="{lex:Loc Lang:TextFilter_Contains}" IsChecked="{Binding ElementName=Control, Path=Conditions, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Contains, UpdateSourceTrigger=PropertyChanged}" />

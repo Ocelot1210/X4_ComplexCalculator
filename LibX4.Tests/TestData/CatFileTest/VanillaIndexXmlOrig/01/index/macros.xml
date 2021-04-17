@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<index>
+	<entry name="foo_macro" value="assets\fx\macros\foo_macro"/>
+	<entry name="bar_macro" value="assets\fx\macros\bar_macro"/>
+</index>

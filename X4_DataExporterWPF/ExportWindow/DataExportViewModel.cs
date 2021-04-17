@@ -1,3 +1,8 @@
+using Microsoft.WindowsAPICodePack.Dialogs;
+using Prism.Mvvm;
+using Reactive.Bindings;
+using Reactive.Bindings.Extensions;
+using Reactive.Bindings.Notifiers;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -6,12 +11,6 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Interop;
-using Microsoft.WindowsAPICodePack.Dialogs;
-using Prism.Mvvm;
-using Reactive.Bindings;
-using Reactive.Bindings.Extensions;
-using Reactive.Bindings.Notifiers;
 
 namespace X4_DataExporterWPF.DataExportWindow
 {

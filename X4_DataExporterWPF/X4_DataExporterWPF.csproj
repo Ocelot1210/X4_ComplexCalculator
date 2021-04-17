@@ -18,10 +18,10 @@
     <PackageReference Include="Dapper" Version="2.0.78" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.4" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />
-    <PackageReference Include="Pfim" Version="0.9.1" />
+    <PackageReference Include="Pfim" Version="0.10.0" />
     <PackageReference Include="Prism.Core" Version="8.0.0.1909" />
-    <PackageReference Include="ReactiveProperty" Version="7.7.0" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.2" />
+    <PackageReference Include="ReactiveProperty" Version="7.8.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.3" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.113.7" />
   </ItemGroup>
 

@@ -1,6 +1,6 @@
-﻿using System.Windows;
+﻿using Microsoft.Xaml.Behaviors;
+using System.Windows;
 using System.Windows.Controls;
-using Microsoft.Xaml.Behaviors;
 using X4_ComplexCalculator.Common.Behavior;
 
 namespace X4_ComplexCalculator.Common

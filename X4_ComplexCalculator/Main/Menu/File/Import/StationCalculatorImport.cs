@@ -1,14 +1,15 @@
-﻿using System;
+﻿using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
-using Prism.Mvvm;
 using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.Common.Localize;
-using X4_ComplexCalculator.DB.X4DB;
+using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Main.WorkArea;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
@@ -31,7 +32,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
         /// <summary>
         /// メニュー表示用タイトル
         /// </summary>
-        public string Title => "Lang:StationCalculator";
+        public string Title => "Lang:MainWindow_Menu_File_MenuItem_Import_MenuItem_StationCalculator_Header";
 
 
         /// <summary>
@@ -63,7 +64,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
             var ret = 0;
             var onOK = false;
 
-            (onOK, _InputUrl) = SelectStringDialog.ShowDialog("Lang:StationCalculatorImportTitle", "Lang:StationCalculatorImportDescription");
+            (onOK, _InputUrl) = SelectStringDialog.ShowDialog("Lang:StationCalculatorImport_Title", "Lang:StationCalculatorImport_Description");
             if (onOK)
             {
                 ret = 1;
@@ -100,7 +101,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
                 var moduleParser = new Regex(@"\$module-(.*?),count:(.*)");
                 var modules = paramDict["l"].Split(";,")
                                             .Select(x => moduleParser.Match(x))
-                                            .Select(x => (Module: Ware.TryGet<Module>(x.Groups[1].Value), Count: long.Parse(x.Groups[2].Value)))
+                                            .Select(x => (Module: X4Database.Instance.Ware.TryGet<IX4Module>(x.Groups[1].Value), Count: long.Parse(x.Groups[2].Value)))
                                             .Where(x => x.Module is not null)
                                             .Select(x => (Module: x.Module!, x.Count))
                                             .Select(x => new ModulesGridItem(x.Module, null, x.Count) { EditStatus = EditStatus.Unedited });
@@ -122,7 +123,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import
             }
             catch (Exception e)
             {
-                LocalizedMessageBox.Show("Lang:ImportFailureMessage", "Lang:Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
+                LocalizedMessageBox.Show("Lang:MainWindow_ImportFailureMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
             }
 
             return ret;

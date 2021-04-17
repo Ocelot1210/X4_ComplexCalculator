@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace X4_DataExporterWPF.Entity
+﻿namespace X4_DataExporterWPF.Entity
 {
     /// <summary>
     /// シールド情報
@@ -19,13 +15,13 @@ namespace X4_DataExporterWPF.Entity
         /// <summary>
         /// 最大シールド容量
         /// </summary>
-        public int Capacity { get; }
+        public long Capacity { get; }
 
 
         /// <summary>
         /// 再充電率
         /// </summary>
-        public int RechargeRate { get; }
+        public long RechargeRate { get; }
 
 
         /// <summary>
@@ -43,7 +39,7 @@ namespace X4_DataExporterWPF.Entity
         /// <param name="capacity">最大シールド容量</param>
         /// <param name="rechargeRate">再充電率</param>
         /// <param name="rechargeDelay">再充電遅延</param>
-        public Shield(string equipmentID, int capacity, int rechargeRate, double rechargeDelay)
+        public Shield(string equipmentID, long capacity, long rechargeRate, double rechargeDelay)
         {
             EquipmentID = equipmentID;
             Capacity = capacity;

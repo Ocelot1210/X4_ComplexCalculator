@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using X4_ComplexCalculator.DB.X4DB;
+﻿using System.Collections.Generic;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
 {
@@ -32,7 +30,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// 生産/消費ウェアを生産/消費するモジュール
         /// </summary>
-        public Module Module { get; }
+        public IX4Module Module { get; }
         
 
         /// <summary>
@@ -44,7 +42,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <summary>
         /// ウェア生産の追加効果
         /// </summary>
-        public IReadOnlyDictionary<string, WareEffect>? Efficiency { get; }
+        public IReadOnlyDictionary<string, IWareEffect>? Efficiency { get; }
         #endregion
 
 
@@ -57,7 +55,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         /// <param name="module">生産/消費ウェアを生産/消費するモジュール</param>
         /// <param name="moduleCount">生産/消費ウェアを生産/消費するモジュールの数</param>
         /// <param name="efficiency">ウェア生産の追加効果</param>
-        public CalcResult(string wareID, long wareAmount, string method, Module module, long moduleCount, IReadOnlyDictionary<string, WareEffect>? efficiency = null)
+        public CalcResult(string wareID, long wareAmount, string method, IX4Module module, long moduleCount, IReadOnlyDictionary<string, IWareEffect>? efficiency = null)
         {
             WareID = wareID;
             WareAmount = wareAmount;

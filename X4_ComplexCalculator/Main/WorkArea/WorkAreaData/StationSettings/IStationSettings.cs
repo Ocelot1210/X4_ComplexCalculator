@@ -28,6 +28,6 @@ namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings
         /// <summary>
         /// 日光[%]
         /// </summary>
-        public int Sunlight { get; set; }
+        public double Sunlight { get; set; }
     }
 }

@@ -1,8 +1,8 @@
-﻿using System;
+﻿using LibX4.FileSystem;
+using LibX4.Lang;
+using System;
 using System.IO;
 using System.Xml.Linq;
-using LibX4.FileSystem;
-using LibX4.Lang;
 using X4_DataExporterWPF.Entity;
 using X4_DataExporterWPF.Export;
 using Xunit;
@@ -41,7 +41,7 @@ namespace X4_DataExporterWPF.Tests
                 macro: "hab_arg_l_01_macro",
                 maxWorkers: 0,
                 workersCapacity: 1000,
-                noBluePrint: false,
+                noBlueprint: false,
                 thumbnail: null
             )});
         }
@@ -77,7 +77,7 @@ namespace X4_DataExporterWPF.Tests
                 macro: "prod_arg_foodrations_macro",
                 maxWorkers: 90,
                 workersCapacity: 0,
-                noBluePrint: false,
+                noBlueprint: false,
                 thumbnail: null
             )});
         }
