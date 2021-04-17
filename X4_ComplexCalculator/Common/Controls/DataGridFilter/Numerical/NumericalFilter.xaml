@@ -76,12 +76,10 @@
                                 <xctk:WatermarkTextBox
                                     x:Name="PART_FilterText"
                                     Text="{Binding ElementName=Control, Path=FilterText1}"
-                                    TextAlignment="Right"
                                     Watermark="{Binding ElementName=Control, Path=FilterText1_WaterMark}" />
 
                                 <xctk:WatermarkTextBox
                                     Text="{Binding ElementName=Control, Path=FilterText2}"
-                                    TextAlignment="Right"
                                     Visibility="{Binding Path=IsChecked, ElementName=PART_BetweenRadioButton, Converter={StaticResource BooleanToVisibilityConverter}}"
                                     Watermark="{lex:Loc Lang:NumericalFilter_EnterAMaxValue}" />
 
