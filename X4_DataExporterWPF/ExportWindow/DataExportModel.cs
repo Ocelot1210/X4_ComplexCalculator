@@ -7,6 +7,7 @@ using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Export;
 
@@ -76,6 +77,7 @@ namespace X4_DataExporterWPF.DataExportWindow
                 var resolver = new LanguageResolver(catFile, language.ID, 44);
 
                 var waresXml = catFile.OpenXml("libraries/wares.xml");
+                RemoveDuplicateWares(waresXml);
                 //var mapXml = catFile.OpenXml("libraries/mapdefaults.xml");
                 
 
@@ -164,6 +166,28 @@ Please report the following content to the developer.
             {
                 progress.Report((0, 1));
                 progressSub.Report((0, 1));
+            }
+        }
+
+
+        /// <summary>
+        /// wares.xml から重複する要素を削除する(前の要素を消す)
+        /// </summary>
+        /// <param name="waresXml">削除対象</param>
+        private void RemoveDuplicateWares(XDocument waresXml)
+        {
+            // 見つかったウェアID一覧
+            var wareIds = new HashSet<string>();
+
+            // 後の要素が優先されるため、 Reverse() する
+            foreach (var ware in waresXml.Root.XPathSelectElements("ware").Reverse())
+            {
+                // ウェアIDが無い又は重複があれば削除する
+                var id = ware.Attribute("id")?.Value;
+                if (string.IsNullOrEmpty(id) || !wareIds.Add(id))
+                {
+                    ware.Remove();
+                }
             }
         }
 

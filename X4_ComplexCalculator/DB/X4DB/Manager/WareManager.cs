@@ -38,6 +38,8 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
                 .ToDictionary(x => x.ID);
 
             _MacroWares = _Wares.Values.OfType<IMacro>()
+                .GroupBy(x => x.MacroName)
+                .Select(x => x.FirstOrDefault())
                 .ToDictionary(x => x.MacroName);
         }
 
