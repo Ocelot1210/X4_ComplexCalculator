@@ -21,7 +21,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.0.78" />
+    <PackageReference Include="Dapper" Version="2.0.90" />
     <PackageReference Include="Dirkster.AvalonDock" Version="4.50.2" />
     <PackageReference Include="DotNetProjects.Extended.Wpf.Toolkit" Version="4.6.96" />
     <PackageReference Include="GitInfo" Version="2.1.2">
