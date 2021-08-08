@@ -14,7 +14,7 @@ namespace LibX4.FileSystem
         /// ファイルを開く
         /// </summary>
         /// <param name="filePath">ファイルパス</param>
-        /// <returns>ファイルのMemoryStream、該当ファイルが無かった場合はnull</returns>
-        public MemoryStream? OpenFile(string filePath);
+        /// <returns>ファイルのStream、該当ファイルが無かった場合はnull</returns>
+        public Stream? OpenFile(string filePath);
     }
 }

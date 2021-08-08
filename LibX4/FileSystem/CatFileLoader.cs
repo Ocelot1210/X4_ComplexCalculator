@@ -66,7 +66,7 @@ namespace LibX4.FileSystem
         /// <param name="filePath">開きたいファイルのパス</param>
         /// <exception cref="IOException">読み込んだCatファイルの書式が不正な場合</exception>
         /// <returns>ファイルのMemoryStream、該当ファイルが無かった場合はnull</returns>
-        public MemoryStream? OpenFile(string filePath)
+        public Stream? OpenFile(string filePath)
         {
             var entry = GetCatEntry(filePath);
             if (entry != null)

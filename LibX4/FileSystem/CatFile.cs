@@ -117,12 +117,12 @@ namespace LibX4.FileSystem
 
 
         /// <inheritdoc/>
-        public MemoryStream OpenFile(string filePath)
+        public Stream OpenFile(string filePath)
             => TryOpenFile(filePath) ?? throw new FileNotFoundException(null, filePath);
 
 
         /// <inheritdoc/>
-        public MemoryStream? TryOpenFile(string filePath)
+        public Stream? TryOpenFile(string filePath)
         {
             filePath = PathCanonicalize(filePath);
 
@@ -159,7 +159,7 @@ namespace LibX4.FileSystem
         /// </summary>
         /// <param name="filePath">ファイルパス</param>
         /// <returns>ファイルの内容の列挙</returns>
-        public IEnumerable<MemoryStream> OpenFiles(string filePath)
+        public IEnumerable<Stream> OpenFiles(string filePath)
         {
             filePath = PathCanonicalize(filePath);
 

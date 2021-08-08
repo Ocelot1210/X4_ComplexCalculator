@@ -14,7 +14,7 @@ namespace LibX4.FileSystem
         /// <param name="filePath">ファイルパス</param>
         /// <exception cref="FileNotFoundException">該当ファイルが無い</exception>
         /// <returns>ファイルの内容</returns>
-        public MemoryStream OpenFile(string filePath);
+        public Stream OpenFile(string filePath);
 
 
         /// <summary>
@@ -22,7 +22,7 @@ namespace LibX4.FileSystem
         /// </summary>
         /// <param name="filePath">ファイルパス</param>
         /// <returns>ファイルの内容又はnull</returns>
-        public MemoryStream? TryOpenFile(string filePath);
+        public Stream? TryOpenFile(string filePath);
 
 
         /// <summary>
