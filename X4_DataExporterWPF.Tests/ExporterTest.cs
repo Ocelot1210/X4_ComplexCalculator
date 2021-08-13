@@ -181,11 +181,11 @@ namespace X4_DataExporterWPF.Tests
             internal DummyCat(XDocument xml) => _Xml = xml;
 
 
-            public MemoryStream OpenFile(string filePath)
+            public Stream OpenFile(string filePath)
                 => throw new NotSupportedException();
 
 
-            public MemoryStream? TryOpenFile(string filePath)
+            public Stream? TryOpenFile(string filePath)
                 => null;
 
 

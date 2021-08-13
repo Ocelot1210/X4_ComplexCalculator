@@ -97,7 +97,7 @@ namespace LibX4.FileSystem
             var fileLoader = new List<CatFileLoader>(modPaths.Length + 1);
             var modInfos = new List<ModInfo>(modPaths.Length);
 
-            fileLoader.Add(new CatFileLoader(gameRoot));
+            fileLoader.Add(CatFileLoader.CreateFromDirectory(gameRoot));
 
             foreach (var path in modPaths)
             {
@@ -106,7 +106,7 @@ namespace LibX4.FileSystem
 
                 var modPath = $"extensions/{Path.GetFileName(path)}".Replace('\\', '/');
 
-                fileLoader.Add(new CatFileLoader(path));
+                fileLoader.Add(CatFileLoader.CreateFromDirectory(path));
                 modInfos.Add(new ModInfo(path));
                 _LoadedMods.Add(modPath);
             }
@@ -117,12 +117,12 @@ namespace LibX4.FileSystem
 
 
         /// <inheritdoc/>
-        public MemoryStream OpenFile(string filePath)
+        public Stream OpenFile(string filePath)
             => TryOpenFile(filePath) ?? throw new FileNotFoundException(null, filePath);
 
 
         /// <inheritdoc/>
-        public MemoryStream? TryOpenFile(string filePath)
+        public Stream? TryOpenFile(string filePath)
         {
             filePath = PathCanonicalize(filePath);
 
@@ -159,7 +159,7 @@ namespace LibX4.FileSystem
         /// </summary>
         /// <param name="filePath">ファイルパス</param>
         /// <returns>ファイルの内容の列挙</returns>
-        public IEnumerable<MemoryStream> OpenFiles(string filePath)
+        public IEnumerable<Stream> OpenFiles(string filePath)
         {
             filePath = PathCanonicalize(filePath);
 
