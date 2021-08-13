@@ -97,7 +97,7 @@ namespace LibX4.FileSystem
             var fileLoader = new List<CatFileLoader>(modPaths.Length + 1);
             var modInfos = new List<ModInfo>(modPaths.Length);
 
-            fileLoader.Add(new CatFileLoader(gameRoot));
+            fileLoader.Add(CatFileLoader.CreateFromDirectory(gameRoot));
 
             foreach (var path in modPaths)
             {
@@ -106,7 +106,7 @@ namespace LibX4.FileSystem
 
                 var modPath = $"extensions/{Path.GetFileName(path)}".Replace('\\', '/');
 
-                fileLoader.Add(new CatFileLoader(path));
+                fileLoader.Add(CatFileLoader.CreateFromDirectory(path));
                 modInfos.Add(new ModInfo(path));
                 _LoadedMods.Add(modPath);
             }
