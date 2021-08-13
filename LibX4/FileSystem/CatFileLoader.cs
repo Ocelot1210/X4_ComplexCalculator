@@ -96,7 +96,7 @@ namespace LibX4.FileSystem
             Debug.Assert(bytes is not null);
 
             // その行に出現したスペースの位置をスタック形式で記憶
-            Span<int> stack = stackalloc int[16];
+            Span<int> stack = stackalloc int[8];
             int ptr = 0;
 
             int lineStart = 0;
@@ -106,6 +106,11 @@ namespace LibX4.FileSystem
                 switch (bytes[i])
                 {
                     case (byte)' ': // 0x20
+                        if (stack.Length <= ptr) // スタックがあふれる場合、最新3つ以外削除
+                        {
+                            stack[^3..].CopyTo(stack);
+                            ptr = 3;
+                        }
                         stack[ptr++] = i;
                         continue;
 
