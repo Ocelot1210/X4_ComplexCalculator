@@ -200,7 +200,7 @@ namespace LibX4.FileSystem
 
 
     /// <summary>
-    /// Catファイルの読み込み宙にスローされる例外
+    /// Catファイルの読み込み中にスローされる例外
     /// </summary>
     [Serializable]
     public class XrCatalogParseException : Exception
