@@ -36,13 +36,13 @@ namespace X4_DataExporterWPF.Tests
             var exporter = new ModuleExporter(new DummyCat(macroXml), wareXml);
 
             Assert.Equal(exporter.GetRecords(), new[] { new Module(
-                moduleID: "module_arg_hab_l_01",
-                moduleTypeID: "habitation",
-                macro: "hab_arg_l_01_macro",
-                maxWorkers: 0,
-                workersCapacity: 1000,
-                noBlueprint: false,
-                thumbnail: null
+                ModuleID: "module_arg_hab_l_01",
+                ModuleTypeID: "habitation",
+                Macro: "hab_arg_l_01_macro",
+                MaxWorkers: 0,
+                WorkersCapacity: 1000,
+                NoBlueprint: false,
+                Thumbnail: null
             )});
         }
 
@@ -72,13 +72,13 @@ namespace X4_DataExporterWPF.Tests
             var exporter = new ModuleExporter(new DummyCat(macroXml), wareXml);
 
             Assert.Equal(exporter.GetRecords(), new[] { new Module(
-                moduleID: "module_arg_prod_foodrations_01",
-                moduleTypeID: "production",
-                macro: "prod_arg_foodrations_macro",
-                maxWorkers: 90,
-                workersCapacity: 0,
-                noBlueprint: false,
-                thumbnail: null
+                ModuleID: "module_arg_prod_foodrations_01",
+                ModuleTypeID: "production",
+                Macro: "prod_arg_foodrations_macro",
+                MaxWorkers: 90,
+                WorkersCapacity: 0,
+                NoBlueprint: false,
+                Thumbnail: null
             )});
         }
 
@@ -101,8 +101,8 @@ namespace X4_DataExporterWPF.Tests
             var exporter = new WareOwnerExporter(xml);
 
             Assert.Equal(exporter.GetRecords(), new[] { new WareOwner(
-                wareID: "module_arg_conn_base_01",
-                factionID: "antigone"
+                WareID: "module_arg_conn_base_01",
+                FactionID: "antigone"
             )});
         }
 
@@ -129,10 +129,10 @@ namespace X4_DataExporterWPF.Tests
             var exporter = new WareEffectExporter(xml);
 
             Assert.Equal(exporter.GetRecords(), new[] { new WareEffect(
-                wareID: "advancedcomposites",
-                method: "default",
-                effectID: "work",
-                product: 0.0
+                WareID: "advancedcomposites",
+                Method: "default",
+                EffectID: "work",
+                Product: 0.0
             )});
         }
 
@@ -156,9 +156,9 @@ namespace X4_DataExporterWPF.Tests
             var exporter = new WareGroupExporter(new DummyCat(xml), new DummyLanguageResolver());
 
             Assert.Equal(exporter.GetRecords(), new[] { new WareGroup(
-                wareGroupID: "gases",
-                name: "{20215,401}",
-                tier: 0
+                WareGroupID: "gases",
+                Name: "{20215,401}",
+                Tier: 0
             )});
         }
 
