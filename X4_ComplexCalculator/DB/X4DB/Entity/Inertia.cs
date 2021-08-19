@@ -3,39 +3,8 @@
     /// <summary>
     /// 艦船の慣性情報用クラス
     /// </summary>
-    public class Inertia
-    {
-        #region プロパティ
-        /// <summary>
-        /// ピッチ
-        /// </summary>
-        public double Pitch { get; }
-
-
-        /// <summary>
-        /// ヨー
-        /// </summary>
-        public double Yaw { get; }
-
-
-        /// <summary>
-        /// ロール
-        /// </summary>
-        public double Roll { get; }
-        #endregion
-
-
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="pitch">ピッチ</param>
-        /// <param name="yaw">ヨー</param>
-        /// <param name="roll">ロール</param>
-        public Inertia(double pitch, double yaw, double roll)
-        {
-            Pitch = pitch;
-            Yaw = yaw;
-            Roll = roll;
-        }
-    }
+    /// <param name="Pitch">ピッチ</param>
+    /// <param name="Yaw">ヨー</param>
+    /// <param name="Roll">ロール</param>
+    public sealed record Inertia(double Pitch, double Yaw, double Roll);
 }
