@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS WareEquipmentTag
                         if (string.IsNullOrEmpty(name)) continue;
 
                         equipmentTags.AddRange(Util.SplitTags(connection.Attribute("tags")?.Value).Select(x => new WareEquipmentTag(wareID, name, x)));
-                        yield return new WareEquipment(wareID, name, equipmentTypeID, connection.Attribute("group")?.Value ?? "");
+                        yield return new WareEquipment(wareID, name.Trim(), equipmentTypeID, connection.Attribute("group")?.Value.Trim() ?? "");
                     }
                 }
 
