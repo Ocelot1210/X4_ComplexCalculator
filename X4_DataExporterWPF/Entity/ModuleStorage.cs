@@ -3,31 +3,7 @@
     /// <summary>
     /// モジュールの保管容量
     /// </summary>
-    public class ModuleStorage
-    {
-        #region プロパティ
-        /// <summary>
-        /// モジュールID
-        /// </summary>
-        public string ModuleID { get; }
-
-
-        /// <summary>
-        /// 保管庫容量
-        /// </summary>
-        public long Amount { get; }
-        #endregion
-
-
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="moduleID">モジュールID</param>
-        /// <param name="amount">保管庫容量</param>
-        public ModuleStorage(string moduleID, long amount)
-        {
-            ModuleID = moduleID;
-            Amount = amount;
-        }
-    }
+    /// <param name="ModuleID">モジュールID</param>
+    /// <param name="Amount">保管庫容量</param>
+    public sealed record ModuleStorage(string ModuleID, long Amount);
 }

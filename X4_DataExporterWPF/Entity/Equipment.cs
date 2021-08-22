@@ -3,88 +3,22 @@
     /// <summary>
     /// 装備
     /// </summary>
-    public class Equipment
-    {
-        #region プロパティ
-        /// <summary>
-        /// 装備ID
-        /// </summary>
-        public string EquipmentID { get; }
-
-
-        /// <summary>
-        /// マクロ名
-        /// </summary>
-        public string MacroName { get; }
-
-
-        /// <summary>
-        /// 装備種別ID
-        /// </summary>
-        public string EquipmentTypeID { get; }
-
-
-        /// <summary>
-        /// 船体値
-        /// </summary>
-        public long Hull { get; }
-
-
-        /// <summary>
-        /// 船体値が統合されているか
-        /// </summary>
-        public bool HullIntegrated { get; }
-
-
-        /// <summary>
-        /// Mk
-        /// </summary>
-        public long Mk { get; }
-
-
-        /// <summary>
-        /// 作成種族
-        /// </summary>
-        public string? MakerRace { get; }
-
-
-        /// <summary>
-        /// サムネ画像
-        /// </summary>
-        public byte[]? Thumbnail { get; }
-        #endregion
-
-
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="equipmentID">装備ID</param>
-        /// <param name="macroName">マクロ名</param>
-        /// <param name="equipmentTypeID">装備種別ID</param>
-        /// <param name="hull"></param>
-        /// <param name="hullIntegrated"></param>
-        /// <param name="mk">Mk</param>
-        /// <param name="makerRace">作成種族</param>
-        /// <param name="thumbnail">サムネ画像</param>
-        public Equipment(
-            string equipmentID,
-            string macroName,
-            string equipmentTypeID,
-            long hull,
-            bool hullIntegrated,
-            long mk,
-            string? makerRace,
-            byte[]? thumbnail
-            )
-        {
-            EquipmentID = equipmentID;
-            MacroName = macroName;
-            EquipmentTypeID = equipmentTypeID;
-            Hull = hull;
-            HullIntegrated = hullIntegrated;
-            Mk = mk;
-            MakerRace = makerRace;
-            Thumbnail = thumbnail;
-        }
-    }
+    /// <param name="EquipmentID">装備ID</param>
+    /// <param name="MacroName">マクロ名</param>
+    /// <param name="EquipmentTypeID">装備種別ID</param>
+    /// <param name="Hull">船体値</param>
+    /// <param name="HullIntegrated">船体値が統合されているか</param>
+    /// <param name="Mk">Mk</param>
+    /// <param name="MakerRace">作成種族</param>
+    /// <param name="Thumbnail">サムネ画像</param>
+    public sealed record Equipment(
+        string EquipmentID,
+        string MacroName,
+        string EquipmentTypeID,
+        long Hull,
+        bool HullIntegrated,
+        long Mk,
+        string? MakerRace,
+        byte[]? Thumbnail
+    );
 }

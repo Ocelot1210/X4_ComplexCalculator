@@ -24,7 +24,17 @@ namespace LibX4.FileSystem
         /// <summary>
         /// ファイルメタデータ
         /// </summary>
-        private readonly Dictionary<string, CatEntry> _entries;
+        private readonly Dictionary<string, Entry> _entries;
+
+
+        /// <summary>
+        /// catファイルの1レコード分の情報
+        /// </summary>
+        /// <param name="datFilePath">ファイルの実体があるdatファイルパス</param>
+        /// <param name="filename">ファイル名</param>
+        /// <param name="fileSize">ファイルサイズ</param>
+        /// <param name="offset">datファイル上のオフセット</param>
+        sealed record Entry(string DatFilePath, string FileName, int FileSize, long Offset);
         #endregion
 
 
@@ -39,7 +49,7 @@ namespace LibX4.FileSystem
             Debug.Assert(rootDir is not null);
 
             RootDir = rootDir;
-            _entries = new Dictionary<string, CatEntry>(capacity, StringComparer.OrdinalIgnoreCase);
+            _entries = new Dictionary<string, Entry>(capacity, StringComparer.OrdinalIgnoreCase);
         }
 
 
