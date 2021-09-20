@@ -117,6 +117,18 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
                     continue;
                 }
 
+                // 本部モジュールなら本部にチェック入
+                if (module.ID == "module_player_prod_hq_01_macro")
+                {
+                    WorkArea.StationData.Settings.IsHeadquarters = true;
+                }
+
+                // 製造不可なモジュールはインポートしない
+                if (module.Productions.Count == 0)
+                {
+                    continue;
+                }
+
                 // モジュールの装備を取得
                 var equipments = entry.XPathSelectElements("upgrades/groups/*")
                     .Select(x => (Macro: x.Attribute("macro")?.Value ?? "", Count: int.Parse(x.Attribute("exact")?.Value ?? "1")))
