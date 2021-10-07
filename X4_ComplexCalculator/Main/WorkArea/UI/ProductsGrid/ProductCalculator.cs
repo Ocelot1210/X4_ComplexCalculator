@@ -143,7 +143,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                         foreach (var resource in resources)
                         {
                             // ウェア消費量
-                            var amount = (long)Math.Floor(-3600 / prod.Time * resource.Amount);
+                            var amount = (long)Math.Floor((-3600 / prod.Time) * (resource.Amount / prod.Amount) * module.WorkersCapacity);
                             yield return new CalcResult(resource.NeedWareID, amount, method, module, moduleCount);
                         }
                     }
