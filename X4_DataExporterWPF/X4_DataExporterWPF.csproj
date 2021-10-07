@@ -21,7 +21,7 @@
     <PackageReference Include="Pfim" Version="0.10.1" />
     <PackageReference Include="Prism.Core" Version="8.0.0.1909" />
     <PackageReference Include="ReactiveProperty" Version="7.11.0" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.3" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.115" />
   </ItemGroup>
 
