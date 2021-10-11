@@ -39,7 +39,7 @@
     <PackageReference Include="Prism.Core" Version="8.1.97" />
     <PackageReference Include="ReactiveProperty" Version="7.12.0" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.115" />
-    <PackageReference Include="WPFLocalizeExtension" Version="3.8.0" />
+    <PackageReference Include="WPFLocalizeExtension" Version="3.9.0" />
   </ItemGroup>
 
   <ItemGroup>
