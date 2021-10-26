@@ -148,7 +148,20 @@ namespace LibX4.FileSystem
         {
             foreach (var ms in OpenFiles(filePath))
             {
-                yield return XDocument.Load(ms);
+                XDocument? ret = null;
+                try
+                {
+                    ret = XDocument.Load(ms);
+                }
+                catch (System.Xml.XmlException)
+                {
+                }
+
+                if (ret is not null)
+                {
+                    yield return ret;
+                }
+                
                 ms.Dispose();
             }
         }
@@ -189,13 +202,20 @@ namespace LibX4.FileSystem
                     continue;
                 }
 
-                if (ret == null)
+                try
                 {
-                    ret = XDocument.Load(ms);
+                    if (ret == null)
+                    {
+                        ret = XDocument.Load(ms);
+                    }
+                    else
+                    {
+                        ret.MergeXML(XDocument.Load(ms));
+                    }
                 }
-                else
+                catch (System.Xml.XmlException)
                 {
-                    ret.MergeXML(XDocument.Load(ms));
+                    // XMLのパースに失敗した場合、何もしない扱いにする(X4の動作に合わせたつもり)
                 }
             }
 
