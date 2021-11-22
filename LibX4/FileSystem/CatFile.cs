@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LibX4.Xml;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -90,24 +91,31 @@ namespace LibX4.FileSystem
 
             var entensionsPath = Path.Combine(gameRoot, "extensions");
 
-            var modPaths = Directory.Exists(entensionsPath)
+            var modDirPaths = Directory.Exists(entensionsPath)
                 ? Directory.GetDirectories(entensionsPath)
-                : new string[0];
+                : Array.Empty<string>();
 
-            var fileLoader = new List<CatFileLoader>(modPaths.Length + 1);
-            var modInfos = new List<ModInfo>(modPaths.Length);
+            var fileLoader = new List<CatFileLoader>(modDirPaths.Length + 1);
+            var modInfos = new List<ModInfo>(modDirPaths.Length);
 
             fileLoader.Add(CatFileLoader.CreateFromDirectory(gameRoot));
 
-            foreach (var path in modPaths)
+            // ユーザフォルダにある content.xml を開く
+            XDocumentEx.TryLoad(Path.Combine(X4Path.GetUserDirectory(), "content.xml"), out var userContentXml);
+
+            foreach (var modDirPath in modDirPaths)
             {
-                // content.xmlが存在するフォルダのみ読み込む
-                if (!File.Exists(Path.Combine(path, "content.xml"))) continue;
+                // 無効化された/無効な Mod なら読み込まないようにする
+                var modInfo = new ModInfo(userContentXml, modDirPath);
+                if (!modInfo.Enabled)
+                {
+                    continue;
+                }
 
-                var modPath = $"extensions/{Path.GetFileName(path)}".Replace('\\', '/');
+                var modPath = $"extensions/{Path.GetFileName(modDirPath)}".Replace('\\', '/');
 
-                fileLoader.Add(CatFileLoader.CreateFromDirectory(path));
-                modInfos.Add(new ModInfo(path));
+                fileLoader.Add(CatFileLoader.CreateFromDirectory(modDirPath));
+                modInfos.Add(modInfo);
                 _LoadedMods.Add(modPath);
             }
 

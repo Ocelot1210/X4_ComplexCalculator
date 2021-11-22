@@ -86,14 +86,17 @@ namespace X4_ComplexCalculator.DB.X4DB.Builder
         /// </summary>
         /// <param name="ware">ベースとなるウェア情報</param>
         /// <returns>モジュール情報</returns>
-        public IX4Module Builld(IWare ware)
+        public IWare Builld(IWare ware)
         {
             if (!ware.Tags.Contains("module"))
             {
                 throw new ArgumentException();
             }
 
-            var item = _Modules[ware.ID];
+            if (!_Modules.TryGetValue(ware.ID, out var item))
+            {
+                return ware;
+            }
 
             return new Module(
                 ware,

@@ -80,14 +80,17 @@ namespace X4_ComplexCalculator.DB.X4DB.Builder
         /// </summary>
         /// <param name="ware">ベースとなるウェア情報</param>
         /// <returns>艦船情報</returns>
-        public IShip Build(IWare ware)
+        public IWare Build(IWare ware)
         {
             if (!ware.Tags.Contains("ship"))
             {
                 throw new ArgumentException();
             }
 
-            var item = _Ships[ware.ID];
+            if (!_Ships.TryGetValue(ware.ID, out var item))
+            {
+                return ware;
+            }
 
             return new Ship(
                 ware,

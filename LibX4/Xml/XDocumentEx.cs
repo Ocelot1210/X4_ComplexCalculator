@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Xml.Linq;
@@ -25,6 +26,27 @@ namespace LibX4.Xml
         {
             using var stream = new FileStream(url, FileMode.Open, FileAccess.Read);
             return Load(stream);
+        }
+
+
+        /// <summary>
+        /// 絶対パスから XDocument の生成を試みる
+        /// </summary>
+        /// <param name="url">ファイル名</param>
+        /// <returns>生成した XDocument</returns>
+        public static bool TryLoad(string url, [NotNullWhen(true)]out XDocument? xDocument)
+        {
+            try
+            {
+                using var stream = new FileStream(url, FileMode.Open, FileAccess.Read);
+                xDocument = Load(stream);
+                return true;
+            }
+            catch
+            {
+                xDocument = null;
+                return false;
+            }
         }
 
 
