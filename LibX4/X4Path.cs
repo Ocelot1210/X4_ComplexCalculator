@@ -66,6 +66,11 @@ namespace LibX4
             // C:\Users\(UserName)\Documents\Egosoft\X4
             var x4Dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Egosoft", "X4");
 
+            if (!Directory.Exists(x4Dir))
+            {
+                return "";
+            }
+
             // Steam 版のユーザフォルダを検索
             foreach (var dir in Directory.GetDirectories(x4Dir))
             {
