@@ -47,7 +47,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
         public SelectPlanModel()
         {
             // ファイルが見つかった場合、そのファイルで初期化する
-            var path = $"{GetInitialDirectory()}\\constructionplans.xml";
+            var path = Path.Combine(LibX4.X4Path.GetUserDirectory(), "constructionplans.xml");
             if (System.IO.File.Exists(path))
             {
                 try
@@ -68,19 +68,6 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
             }
         }
 
-        /// <summary>
-        /// 初期フォルダを取得する
-        /// </summary>
-        /// <returns></returns>
-        private string GetInitialDirectory()
-        {
-            var docDir = System.Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-
-            var x4Dir = Path.Combine(docDir, "Egosoft\\X4");
-
-            return Directory.GetDirectories(x4Dir).FirstOrDefault() ?? x4Dir;
-        }
-
 
         /// <summary>
         /// 建造計画ファイルを選択
@@ -89,7 +76,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
         {
             var dlg = new OpenFileDialog();
 
-            dlg.InitialDirectory = GetInitialDirectory();
+            dlg.InitialDirectory = LibX4.X4Path.GetUserDirectory();
             dlg.RestoreDirectory = true;
             dlg.Filter = "X4 Construction planes file (*.xml)|*.xml";
             dlg.Multiselect = true;

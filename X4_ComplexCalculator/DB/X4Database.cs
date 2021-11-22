@@ -1,5 +1,4 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.IO;
 using System.Windows;
 using X4_ComplexCalculator.Common;
@@ -226,8 +225,8 @@ namespace X4_ComplexCalculator.DB
                 var exeDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? "";
                 dbFilePath = Path.GetFullPath(Path.Combine(exeDir, Configuration.Instance.X4DBPath));
             }
-
-            DataExportWindow.ShowDialog(GetX4InstallDirectory(), dbFilePath);
+            
+            DataExportWindow.ShowDialog(LibX4.X4Path.GetX4InstallDirectory(), dbFilePath);
 
             if (File.Exists(dbFilePath))
             {
@@ -237,56 +236,6 @@ namespace X4_ComplexCalculator.DB
             }
 
             return false;
-        }
-
-
-        /// <summary>
-        /// X4のインストール先フォルダを取得する
-        /// </summary>
-        /// <returns>X4のインストール先フォルダパス</returns>
-        private static string GetX4InstallDirectory()
-        {
-            // アプリケーションのアンインストール情報が保存されている場所
-            const string location = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
-
-            // レジストリ情報の取得を試みる
-            RegistryKey? parent = Registry.LocalMachine.OpenSubKey(location, false);
-            if (parent is null)
-            {
-                // だめだった場合諦める
-                return "";
-            }
-
-            var ret = "";
-
-            // 子のレジストリの名前の数だけ処理をする
-            // Steam以外(GOG等)からインストールされる事を考慮してレジストリのキーを決め打ちにしないで全部探す
-            foreach (var subKeyName in parent.GetSubKeyNames())
-            {
-                // 子のレジストリの情報を取得する
-                RegistryKey? child = Registry.LocalMachine.OpenSubKey(@$"{location}\{subKeyName}", false);
-                if (child is null)
-                {
-                    // 取得に失敗したら次のレジストリを見に行く
-                    continue;
-                }
-
-                // 表示名を保持しているオブジェクトを取得する
-                var value = child.GetValue("DisplayName");
-                if (value is null)
-                {
-                    // 取得に失敗したら次のレジストリを見に行く
-                    continue;
-                }
-
-                if (value.ToString() == "X4: Foundations")
-                {
-                    ret = child.GetValue("InstallLocation")?.ToString() ?? "";
-                    break;
-                }
-            }
-
-            return ret;
         }
 
 
