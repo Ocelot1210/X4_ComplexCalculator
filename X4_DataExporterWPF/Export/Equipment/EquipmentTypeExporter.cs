@@ -1,8 +1,11 @@
 ﻿using Dapper;
+using LibX4.FileSystem;
 using LibX4.Lang;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Xml.Linq;
+using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
 
 namespace X4_DataExporterWPF.Export
@@ -13,6 +16,12 @@ namespace X4_DataExporterWPF.Export
     public class EquipmentTypeExporter : IExporter
     {
         /// <summary>
+        /// ウェア情報xml
+        /// </summary>
+        private readonly XDocument _WaresXml;
+
+
+        /// <summary>
         /// 言語解決用オブジェクト
         /// </summary>
         private readonly ILanguageResolver _Resolver;
@@ -21,9 +30,11 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// コンストラクタ
         /// </summary>
+        /// <param name="waresXml">ウェア情報xml</param>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public EquipmentTypeExporter(LanguageResolver resolver)
+        public EquipmentTypeExporter(XDocument waresXml, LanguageResolver resolver)
         {
+            _WaresXml = waresXml;
             _Resolver = resolver;
         }
 
@@ -65,28 +76,41 @@ CREATE TABLE IF NOT EXISTS EquipmentType
         private IEnumerable<EquipmentType> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
         {
             // TODO: 可能ならファイルから抽出する
-            (string id, string name)[] data =
+            var names = new Dictionary<string, string>
             {
-                ("countermeasures",     "{20215, 1701}"),
-                ("drones",              "{20215, 1601}"),
-                ("engines",             "{20215, 1801}"),
-                ("missiles",            "{20215, 1901}"),
-                ("shields",             "{20215, 2001}"),
-                ("software",            "{20215, 2101}"),
-                ("thrusters",           "{20215, 2201}"),
-                ("turrets",             "{20215, 2301}"),
-                ("weapons",             "{20215, 2401}"),
+                {"countermeasures",     "{20215, 1701}"},
+                {"drones",              "{20215, 1601}"},
+                {"engines",             "{20215, 1801}"},
+                {"missiles",            "{20215, 1901}"},
+                {"shields",             "{20215, 2001}"},
+                {"software",            "{20215, 2101}"},
+                {"thrusters",           "{20215, 2201}"},
+                {"turrets",             "{20215, 2301}"},
+                {"weapons",             "{20215, 2401}"},
             };
 
+            var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[@transport='equipment'])");
             var currentStep = 0;
+            var added = new HashSet<string>();
 
-            progress.Report((currentStep++, data.Length));
-
-            foreach (var (id, name) in data)
+            foreach (var equipment in _WaresXml.Root.XPathSelectElements("ware[@transport='equipment']"))
             {
-                yield return new EquipmentType(id, _Resolver.Resolve(name));
-                progress.Report((currentStep++, data.Length));
+                progress?.Report((currentStep++, maxSteps));
+
+                var equipmentTypeID = equipment.Attribute("group")?.Value;
+                if (string.IsNullOrEmpty(equipmentTypeID) || added.Contains(equipmentTypeID)) continue;
+
+                var name = equipmentTypeID;
+                if (names.TryGetValue(equipmentTypeID, out var nameID))
+                {
+                    name = _Resolver.Resolve(nameID);
+                }
+
+                yield return new EquipmentType(equipmentTypeID, name);
+                added.Add(equipmentTypeID);
             }
+
+            progress?.Report((currentStep++, maxSteps));
         }
     }
 }
