@@ -87,10 +87,10 @@ namespace X4_DataExporterWPF.DataExportWindow
                     new CommonExporter(),                                       // 共通情報
                     new EffectExporter(),                                       // 追加効果情報
                     new SizeExporter(resolver),                                 // サイズ情報
-                    new TransportTypeExporter(resolver),                        // カーゴ種別情報
+                    new TransportTypeExporter(waresXml, resolver),              // カーゴ種別情報
                     new RaceExporter(catFile, resolver),                        // 種族情報
                     new FactionExporter(catFile, resolver),                     // 派閥情報
-                    new PurposeExporter(resolver),                              // 用途情報
+                    new PurposeExporter(catFile, waresXml, resolver),           // 用途情報
                     //new MapExporter(mapXml, resolver),                        // マップ
 
                     // ウェア関連
@@ -104,13 +104,13 @@ namespace X4_DataExporterWPF.DataExportWindow
                     new WareTagsExporter(waresXml),                             // ウェアのタグ情報
 
                     // モジュール関連
-                    new ModuleTypeExporter(resolver),                           // モジュール種別情報
+                    new ModuleTypeExporter(catFile, waresXml, resolver),        // モジュール種別情報
                     new ModuleExporter(catFile, waresXml),                      // モジュール情報
                     new ModuleProductExporter(catFile, waresXml),               // モジュールの生産品情報
                     new ModuleStorageExporter(catFile, waresXml),               // モジュールの保管容量情報
 
                     // 装備関連
-                    new EquipmentTypeExporter(resolver),                        // 装備種別情報
+                    new EquipmentTypeExporter(waresXml, resolver),              // 装備種別情報
                     new EquipmentExporter(catFile, waresXml),                   // 装備情報
                     new ShieldExporter(catFile, waresXml),                      // シールド情報
                     new EngineExporter(catFile, waresXml),                      // エンジン情報
@@ -118,7 +118,7 @@ namespace X4_DataExporterWPF.DataExportWindow
 
 
                     // 艦船関連
-                    new ShipTypeExporter(resolver),                             // 艦船種別情報
+                    new ShipTypeExporter(catFile, waresXml, resolver),          // 艦船種別情報
                     new ShipExporter(catFile, waresXml),                        // 艦船情報
                     new ShipPurposeExporter(catFile, waresXml),                 // 艦船用途情報
                     new ShipHangerExporter(catFile, waresXml),                  // 艦船ハンガー(機体格納庫)情報

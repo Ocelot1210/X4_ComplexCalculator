@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS Effect
 
 
         /// <summary>
-        /// ModuleType データを読み出す
+        /// Effect データを読み出す
         /// </summary>
         /// <returns>EquipmentType データ</returns>
         private IEnumerable<Effect> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)

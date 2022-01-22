@@ -3,6 +3,9 @@ using LibX4.Lang;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
+using System.Xml.Linq;
+using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
 
 namespace X4_DataExporterWPF.Export
@@ -13,18 +16,25 @@ namespace X4_DataExporterWPF.Export
     class TransportTypeExporter : IExporter
     {
         /// <summary>
+        /// ウェア情報xml
+        /// </summary>
+        private readonly XDocument _WaresXml;
+
+
+        /// <summary>
         /// 言語解決用オブジェクト
         /// </summary>
-        private readonly LanguageResolver Resolver;
+        private readonly ILanguageResolver _Resolver;
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public TransportTypeExporter(LanguageResolver resolver)
+        public TransportTypeExporter(XDocument waresXml, ILanguageResolver resolver)
         {
-            Resolver = resolver;
+            _WaresXml = waresXml;
+            _Resolver = resolver;
         }
 
 
@@ -66,26 +76,47 @@ CREATE TABLE IF NOT EXISTS TransportType
         private IEnumerable<TransportType> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
         {
             // TODO: 可能ならファイルから抽出する
-            (string ID, int Code)[] data =
+            var names = new Dictionary<string, string>()
             {
-                ("container",   100),
-                ("solid",       200),
-                ("liquid",      300),
-                ("passenger",   400),
-                ("equipment",   500),
-                ("inventory",   600),
-                ("software",    700),
-                ("workunit",    800),
-                ("ship",        900),
-                ("research",   1000),
+                {"container",  "{20205,  100}"},
+                {"solid",      "{20205,  200}"},
+                {"liquid",     "{20205,  300}"},
+                {"passenger",  "{20205,  400}"},
+                {"equipment",  "{20205,  500}"},
+                {"inventory",  "{20205,  600}"},
+                {"software",   "{20205,  700}"},
+                {"workunit",   "{20205,  800}"},
+                {"ship",       "{20205,  900}"},
+                {"research",   "{20205, 1000}"},
+                {"condensate", "{20205, 1100}"},
             };
 
-            int currentStep = 0;
-            progress.Report((currentStep++, data.Length));
-            foreach (var (id, code) in data)
+            var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware)");
+            var currentStep = 0;
+
+            var added = new HashSet<string>();
+            foreach (var ware in _WaresXml.Root.Elements("ware"))
             {
-                yield return new TransportType(id, Resolver.Resolve($"{{20205, {code}}}"));
-                progress.Report((currentStep++, data.Length));
+                progress.Report((currentStep++, maxSteps));
+
+                var transportTypeID = ware.Attribute("transport")?.Value;
+                if (string.IsNullOrEmpty(transportTypeID) || added.Contains(transportTypeID)) continue;
+
+                var name = transportTypeID;
+                if (names.TryGetValue(transportTypeID, out var nameID))
+                {
+                    name = _Resolver.Resolve(nameID);
+                }
+
+                yield return new TransportType(transportTypeID, name);
+                added.Add(transportTypeID);
+            }
+
+            progress.Report((currentStep++, maxSteps));
+
+            foreach (var key in names.Keys.Except(added))
+            {
+                yield return new TransportType(key, _Resolver.Resolve(names[key]));
             }
         }
     }
