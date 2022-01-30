@@ -31,7 +31,7 @@ jobs:
       - name: Compress archive
         run: |
           New-Item artifacts\X4_ComplexCalculator -ItemType Directory
-          Move-Item X4_ComplexCalculator\bin\Release\netcoreapp3.1\win-x64 artifacts\X4_ComplexCalculator\bin
+          Move-Item X4_ComplexCalculator\bin\Release\net6.0-windows\win-x64 artifacts\X4_ComplexCalculator\bin
           $WshShell = New-Object -comObject WScript.Shell
           $Shortcut = $WshShell.CreateShortcut("$PWD\artifacts\X4_ComplexCalculator\X4_ComplexCalculator.exe.lnk")
           $Shortcut.TargetPath = 'explorer'

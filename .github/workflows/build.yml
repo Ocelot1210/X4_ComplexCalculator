@@ -40,4 +40,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: X4_ComplexCalculator-${{ matrix.Configuration }}-${{ github.sha }}
-          path: X4_ComplexCalculator/bin/${{ matrix.Configuration }}/netcoreapp3.1
+          path: X4_ComplexCalculator/bin/${{ matrix.Configuration }}/net6.0-windows
