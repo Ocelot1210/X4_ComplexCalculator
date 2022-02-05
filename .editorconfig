@@ -3,3 +3,10 @@ root = true
 [.cs]
 charset = utf-8-bom
 end_of_line = crlf
+
+csharp_style_namespace_declarations=file_scoped:suggestion
+dotnet_sort_system_directives_first = false
+
+[*.{csproj,props}]
+indent_size = 2
+indent_style = space
