@@ -15,7 +15,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup .Net Core 3.1
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v2
         with:
           dotnet-version: 3.1.x
 
