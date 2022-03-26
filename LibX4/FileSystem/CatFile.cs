@@ -256,7 +256,13 @@ namespace LibX4.FileSystem
 
             if (path == null) throw new FileNotFoundException();
 
-            return OpenXml($"{path}.xml");
+            // 拡張子が設定されていない場合、xml をデフォルトにする
+            if (string.IsNullOrEmpty(Path.GetExtension(path)))
+            {
+                path = $"{path}.xml";
+            }
+
+            return OpenXml(path);
         }
 
 
