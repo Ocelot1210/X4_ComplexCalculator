@@ -262,6 +262,11 @@ namespace LibX4.FileSystem
                 path = $"{path}.xml";
             }
 
+            if (path[0] == '/' || path[0] == '\\')
+            {
+                path = path[1..];
+            }
+
             return OpenXml(path);
         }
 
