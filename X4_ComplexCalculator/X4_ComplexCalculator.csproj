@@ -12,8 +12,6 @@
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <AllowedReferenceRelatedFileExtensions>none</AllowedReferenceRelatedFileExtensions>
-    <DebugType>none</DebugType>
-    <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(SelfContained)'=='true'">
