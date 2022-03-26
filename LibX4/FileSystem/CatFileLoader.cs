@@ -176,6 +176,12 @@ namespace LibX4.FileSystem
         {
             if (_entries.TryGetValue(filePath, out var entry))
             {
+                // ファイルサイズが空なら空の MemoryStream を返す
+                if (entry.FileSize == 0)
+                {
+                    return new MemoryStream(0);
+                }
+
                 using var fs = new FileStream(
                     entry.DatFilePath,
                     FileMode.Open,

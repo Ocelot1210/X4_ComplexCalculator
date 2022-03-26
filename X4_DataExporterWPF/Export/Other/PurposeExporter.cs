@@ -118,7 +118,9 @@ CREATE TABLE IF NOT EXISTS Purpose
                 var shipID = ship.Attribute("id")?.Value;
                 if (string.IsNullOrEmpty(shipID)) continue;
 
-                var macroName = ship.XPathSelectElement("component").Attribute("ref").Value;
+                var macroName = ship.XPathSelectElement("component")?.Attribute("ref")?.Value;
+                if (string.IsNullOrEmpty(macroName)) continue;
+
                 var macroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
 
                 foreach (var elm in macroXml.Root.XPathSelectElements("macro/properties/purpose"))

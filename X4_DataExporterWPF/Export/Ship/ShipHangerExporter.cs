@@ -115,7 +115,9 @@ CREATE TABLE IF NOT EXISTS ShipHanger
 
                 XDocument? shipMacroXml;
                 {
-                    var macroName = ship.XPathSelectElement("component").Attribute("ref").Value;
+                    var macroName = ship.XPathSelectElement("component")?.Attribute("ref")?.Value;
+                    if (string.IsNullOrEmpty(macroName)) continue;
+
                     shipMacroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
                     if (shipMacroXml is null) continue;
                 }
