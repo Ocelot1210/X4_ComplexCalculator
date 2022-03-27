@@ -92,34 +92,45 @@ namespace LibX4.FileSystem
             var entensionsPath = Path.Combine(gameRoot, "extensions");
 
             var modDirPaths = Directory.Exists(entensionsPath)
-                ? Directory.GetDirectories(entensionsPath)
-                : Array.Empty<string>();
+                ? Directory.GetDirectories(entensionsPath).ToList()
+                : new List<string>();
 
-            var fileLoader = new List<CatFileLoader>(modDirPaths.Length + 1);
-            var modInfos = new List<ModInfo>(modDirPaths.Length);
-
-            fileLoader.Add(CatFileLoader.CreateFromDirectory(gameRoot));
+            var modInfos = new List<ModInfo>(modDirPaths.Count);
 
             // ユーザフォルダにある content.xml を開く
             XDocumentEx.TryLoad(Path.Combine(X4Path.GetUserDirectory(), "content.xml"), out var userContentXml);
 
-            foreach (var modDirPath in modDirPaths)
+            var loadedModIds = new HashSet<string>();
+            while (modDirPaths.Any())
             {
-                // 無効化された/無効な Mod なら読み込まないようにする
-                var modInfo = new ModInfo(userContentXml, modDirPath);
-                if (!modInfo.Enabled)
+                for (var i = 0; i < modDirPaths.Count; i++)
                 {
-                    continue;
+                    // 無効化された/無効な Mod なら読み込まないようにする
+                    var modInfo = new ModInfo(userContentXml, modDirPaths[i].ToLower());
+                    if (!modInfo.Enabled)
+                    {
+                        modDirPaths.RemoveAt(i);
+                        i--;
+                        continue;
+                    }
+
+                    // 依存関係にある Mod が読み込まれているか？
+                    if (modInfo.Dependencies.Where(x => !x.Optional).All(x => modInfos.Any(y => x.ID == y.ID)))
+                    {
+                        modInfos.Add(modInfo);
+                        modDirPaths.RemoveAt(i);
+                        i--;
+                    }
                 }
-
-                var modPath = $"extensions/{Path.GetFileName(modDirPath)}".Replace('\\', '/');
-
-                fileLoader.Add(CatFileLoader.CreateFromDirectory(modDirPath));
-                modInfos.Add(modInfo);
-                _LoadedMods.Add(modPath);
             }
 
+            _LoadedMods = new HashSet<string>(modInfos.Select(x => $"extensions/{Path.GetFileName(x.Directory)}".Replace('\\', '/')));
+
+            var fileLoader = new List<CatFileLoader>(modInfos.Count + 1);
+            fileLoader.Add(CatFileLoader.CreateFromDirectory(gameRoot));
+            fileLoader.AddRange(modInfos.Select(x => CatFileLoader.CreateFromDirectory(x.Directory)));
             _FileLoaders = fileLoader;
+
             _ModInfo = modInfos;
         }
 
@@ -303,7 +314,7 @@ namespace LibX4.FileSystem
         /// </remarks>
         private string PathCanonicalize(string path)
         {
-            path = path.Replace('\\', '/');
+            path = path.Replace('\\', '/').ToLower();
 
             var modPath = _ParseModRegex.Match(path).Groups[1].Value;
 
