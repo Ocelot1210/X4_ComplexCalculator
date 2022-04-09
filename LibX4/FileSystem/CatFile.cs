@@ -73,6 +73,7 @@ namespace LibX4.FileSystem
         /// コンストラクタ
         /// </summary>
         /// <param name="gameRoot">X4インストール先ディレクトリパス</param>
+        /// <exception cref="DependencyResolutionException">Mod の依存関係の解決に失敗した場合</exception>
         public CatFile(string gameRoot)
         {
             // X4のバージョンを取得
@@ -88,50 +89,71 @@ namespace LibX4.FileSystem
                 }
             }
 
+            var modInfo = GetModInfo(gameRoot);
 
+            _LoadedMods = new HashSet<string>(modInfo.Select(x => $"extensions/{Path.GetFileName(x.Directory)}".Replace('\\', '/')));
+
+            var fileLoader = new List<CatFileLoader>(modInfo.Count + 1);
+            fileLoader.Add(CatFileLoader.CreateFromDirectory(gameRoot));
+            fileLoader.AddRange(modInfo.Select(x => CatFileLoader.CreateFromDirectory(x.Directory)));
+            _FileLoaders = fileLoader;
+
+            _ModInfo = modInfo;
+        }
+
+
+        /// <summary>
+        /// Mod の情報を <see cref="IReadOnlyList{ModInfo}"/> で返す
+        /// </summary>
+        /// <param name="gameRoot">X4 インストール先ディレクトリパス</param>
+        /// <returns>Mod の情報を表す <see cref="IReadOnlyList{ModInfo}"/></returns>
+        private IReadOnlyList<ModInfo> GetModInfo(string gameRoot)
+        {
             var entensionsPath = Path.Combine(gameRoot, "extensions");
 
-            var modDirPaths = Directory.Exists(entensionsPath)
-                ? Directory.GetDirectories(entensionsPath).ToList()
-                : new List<string>();
-
-            var modInfos = new List<ModInfo>(modDirPaths.Count);
+            // extensions フォルダが無い場合、Mod が無いと見なす
+            if (!Directory.Exists(entensionsPath))
+            {
+                return new List<ModInfo>();
+            }
 
             // ユーザフォルダにある content.xml を開く
-            XDocumentEx.TryLoad(Path.Combine(X4Path.GetUserDirectory(), "content.xml"), out var userContentXml);
+            _ = XDocumentEx.TryLoad(Path.Combine(X4Path.GetUserDirectory(), "content.xml"), out var userContentXml);
 
-            var loadedModIds = new HashSet<string>();
-            while (modDirPaths.Any())
+            var unloadedMods = Directory.GetDirectories(entensionsPath)
+                .Select(x => new ModInfo(userContentXml, x))
+                .Where(x => x.Enabled)
+                .OrderBy(x => x.Name)
+                .ToList();
+
+            var modInfos = new List<ModInfo>(unloadedMods.Count);
+
+            while (unloadedMods.Any())
             {
-                for (var i = 0; i < modDirPaths.Count; i++)
+                var prevUnloadModsCount = unloadedMods.Count;
+                for (var i = 0; i < unloadedMods.Count; i++)
                 {
-                    // 無効化された/無効な Mod なら読み込まないようにする
-                    var modInfo = new ModInfo(userContentXml, modDirPaths[i].ToLower());
-                    if (!modInfo.Enabled)
-                    {
-                        modDirPaths.RemoveAt(i);
-                        i--;
-                        continue;
-                    }
+                    var modInfo = unloadedMods[i];
 
-                    // 依存関係にある Mod が読み込まれているか？
-                    if (modInfo.Dependencies.Where(x => !x.Optional).All(x => modInfos.Any(y => x.ID == y.ID)))
+                    // 必須 Mod がロード済みかつ任意 Mod が未ロードでないか？
+                    var dependencies = modInfo.Dependencies;
+                    if (dependencies.Where(x => !x.Optional).All(x => modInfos.Any(y => x.ID == y.ID)) &&
+                        !dependencies.Where(x => x.Optional).Any(x => unloadedMods.Any(y => x.ID == y.ID)))
                     {
                         modInfos.Add(modInfo);
-                        modDirPaths.RemoveAt(i);
+                        unloadedMods.RemoveAt(i);
                         i--;
                     }
                 }
+
+                // 未ロードの Mod 数に変化が無ければ依存関係を満たせていないと見なす
+                if (prevUnloadModsCount == unloadedMods.Count)
+                {
+                    throw new DependencyResolutionException();
+                }
             }
 
-            _LoadedMods = new HashSet<string>(modInfos.Select(x => $"extensions/{Path.GetFileName(x.Directory)}".Replace('\\', '/')));
-
-            var fileLoader = new List<CatFileLoader>(modInfos.Count + 1);
-            fileLoader.Add(CatFileLoader.CreateFromDirectory(gameRoot));
-            fileLoader.AddRange(modInfos.Select(x => CatFileLoader.CreateFromDirectory(x.Directory)));
-            _FileLoaders = fileLoader;
-
-            _ModInfo = modInfos;
+            return modInfos;
         }
 
 
