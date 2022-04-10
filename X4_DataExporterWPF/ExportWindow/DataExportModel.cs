@@ -42,7 +42,6 @@ namespace X4_DataExporterWPF.DataExportWindow
                     var title = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_Title", null, null);
                     MessageBox.Show(owner, msg, title, MessageBoxButton.OK, MessageBoxImage.Error);
                 }));
-
                 return (false, Enumerable.Empty<LangComboboxItem>());
             }
             catch (Exception)
