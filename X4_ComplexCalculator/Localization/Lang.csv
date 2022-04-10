@@ -387,3 +387,7 @@ DataExporter_Export;Export
 DataExporter_Close;Close
 DataExporter_FailedToResolveModDependencyMessage;Failed to resolve Mod dependencies.\r\nIt is possible that the Mod required by a Mod is not installed or has been disabled.\r\n.Please execute again with X4 running properly.
 DataExporter_FailedToExportMessage;Sorry, Data export failed.\r\nPlease report the following content to the developer.\r\n\r\n1. Selected language.\r\n2. Crash report file.\r\n3. Version of X4.
+DataExporter_ExportOption;Export option
+DataExporter_ExportAllData;Export Vanilla / DLC / Mod data
+DataExporter_ExportOfficialData;Export Vanilla / DLC data
+DataExporter_ExportVanillaData;Export Vanilla data

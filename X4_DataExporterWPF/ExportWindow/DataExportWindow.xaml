@@ -81,34 +81,28 @@
             Margin="10"
             BorderBrush="DarkGray"
             Header="{lex:Loc Lang:DataExporter_Output}">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="1*" />
-                    <RowDefinition Height="1*" />
-                </Grid.RowDefinitions>
-
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="20" />
-                </Grid.ColumnDefinitions>
-
-
-                <Label
-                    Grid.Row="0"
-                    Grid.Column="0"
-                    Margin="0,0,0,0"
-                    Content="{lex:Loc Lang:DataExporter_Output_Language}" />
+            <StackPanel>
+                <Label Content="{lex:Loc Lang:DataExporter_Output_Language}" />
 
                 <ComboBox
-                    Grid.Row="1"
-                    Grid.Column="0"
-                    Grid.ColumnSpan="2"
                     Background="WhiteSmoke"
                     DisplayMemberPath="Name"
                     IsEnabled="{Binding CanOperation.Value, Mode=OneWay}"
                     ItemsSource="{Binding Languages}"
                     SelectedItem="{Binding SelectedLanguage.Value, Mode=OneWayToSource}" />
-            </Grid>
+
+                <GroupBox
+                    Margin="5"
+                    Padding="5"
+                    BorderBrush="DarkGray"
+                    Header="{lex:Loc Lang:DataExporter_ExportOption}">
+                    <StackPanel>
+                        <RadioButton Content="{lex:Loc Lang:DataExporter_ExportAllData}" GroupName="DataExportOption" />
+                        <RadioButton Content="{lex:Loc Lang:DataExporter_ExportOfficialData}" GroupName="DataExportOption" />
+                        <RadioButton Content="{lex:Loc Lang:DataExporter_ExportVanillaData}" GroupName="DataExportOption" />
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
         </GroupBox>
 
         <Grid Grid.Row="2" Margin="10">

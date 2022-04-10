@@ -386,3 +386,7 @@ DataExporter_Export;抽出
 DataExporter_Close;閉じる
 DataExporter_FailedToResolveModDependencyMessage;Mod の依存関係の解決に失敗しました。\r\nある Mod が要求する Mod がインストールされていない又は無効化されている可能性があります。\r\nX4 が正常に起動する事を確認後に実行下さい。
 DataExporter_FailedToExportMessage;データ抽出に失敗しました。申し訳ございません。\r\n以下の内容を開発者にご報告頂けると幸いです。\r\n\r\n1. 選択中の言語\r\n2. クラッシュレポートファイル\r\n3. X4 のバージョン
+DataExporter_ExportOption;抽出オプション
+DataExporter_ExportAllData;バニラ / DLC / Mod のデータを抽出する
+DataExporter_ExportOfficialData;バニラ / DLC のデータを抽出する
+DataExporter_ExportVanillaData;バニラのデータを抽出する
