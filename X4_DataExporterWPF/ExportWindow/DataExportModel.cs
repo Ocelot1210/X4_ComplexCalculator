@@ -9,6 +9,7 @@ using System.Linq;
 using System.Windows;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using WPFLocalizeExtension.Engine;
 using X4_DataExporterWPF.Export;
 
 namespace X4_DataExporterWPF.DataExportWindow
@@ -36,8 +37,8 @@ namespace X4_DataExporterWPF.DataExportWindow
             catch (DependencyResolutionException)
             {
                 MessageBox.Show(
-                    "Failed to resolve Mod dependencies.\r\nPlease execute again with X4 running normally.",
-                    "X4 DataExporter",
+                    (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_FailedToResolveModDependencyMessage", null, null),
+                    (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_Title", null, null),
                     MessageBoxButton.OK,
                     MessageBoxImage.Error
                 );
@@ -159,16 +160,12 @@ namespace X4_DataExporterWPF.DataExportWindow
 
                 DumpCrashReport(dumpPath, catFile, e);
 
-                var msg = @$"Sorry, Data export failed.
-Please report the following content to the developer.
-
-1. Selected language.
-2. Crash report file.
-3. Version of X4.";
-
                 owner.Dispatcher.BeginInvoke((Action)(() =>
                 {
-                    MessageBox.Show(owner, msg, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    var msg = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_FailedToExportMessage", null, null);
+                    var title = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_Title", null, null);
+
+                    MessageBox.Show(owner, msg, title, MessageBoxButton.OK, MessageBoxImage.Error);
                     System.Diagnostics.Process.Start("explorer.exe", $@"/select,""{dumpPath}""");
                 }));
             }

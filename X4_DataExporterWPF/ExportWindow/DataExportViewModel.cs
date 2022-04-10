@@ -11,6 +11,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using WPFLocalizeExtension.Engine;
 
 namespace X4_DataExporterWPF.DataExportWindow
 {

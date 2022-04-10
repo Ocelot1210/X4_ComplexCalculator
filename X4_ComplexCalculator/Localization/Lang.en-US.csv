@@ -373,3 +373,17 @@ DBViewer_Ships_Dock_Small;S
 DBViewer_Ships_HangerCapacity;Hanger
 DBViewer_Ships_HangerCapacity_Aircraft;Aircraft
 DBViewer_Ships_HangerCapacity_Drone;Drone
+
+
+# ------------------------------------------------------
+# Data Exporter
+# ------------------------------------------------------
+DataExporter_Title;X4: Foundations data exporter
+DataExporter_Input;Input
+DataExporter_Input_RootDirectory;X4: Foundations root directory(Install directory)
+DataExporter_Output;Output
+DataExporter_Output_Language;Language
+DataExporter_Export;Export
+DataExporter_Close;Close
+DataExporter_FailedToResolveModDependencyMessage;Failed to resolve Mod dependencies.\r\nIt is possible that the Mod required by a Mod is not installed or has been disabled.\r\n.Please execute again with X4 running properly.
+DataExporter_FailedToExportMessage;Sorry, Data export failed.\r\nPlease report the following content to the developer.\r\n\r\n1. Selected language.\r\n2. Crash report file.\r\n3. Version of X4.

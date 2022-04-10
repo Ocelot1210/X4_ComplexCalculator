@@ -4,10 +4,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:X4_DataExporterWPF"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     x:Name="Window"
-    Title="X4:Foundations data exporter"
+    Title="{lex:Loc Lang:DataExporter_Title}"
     Width="420"
     Height="Auto"
     Background="WhiteSmoke"
@@ -46,7 +47,7 @@
             Grid.Row="0"
             Margin="10"
             BorderBrush="DarkGray"
-            Header="Input">
+            Header="{lex:Loc Lang:DataExporter_Input}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="1*" />
@@ -58,7 +59,7 @@
                     <ColumnDefinition Width="20" />
                 </Grid.ColumnDefinitions>
 
-                <Label Grid.Row="0" Content="X4:Foundations root directory" />
+                <Label Grid.Row="0" Content="{lex:Loc Lang:DataExporter_Input_RootDirectory}" />
 
                 <TextBox
                     Grid.Row="1"
@@ -79,7 +80,7 @@
             Grid.Row="1"
             Margin="10"
             BorderBrush="DarkGray"
-            Header="Output">
+            Header="{lex:Loc Lang:DataExporter_Output}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="1*" />
@@ -96,7 +97,7 @@
                     Grid.Row="0"
                     Grid.Column="0"
                     Margin="0,0,0,0"
-                    Content="Language" />
+                    Content="{lex:Loc Lang:DataExporter_Output_Language}" />
 
                 <ComboBox
                     Grid.Row="1"
@@ -134,12 +135,12 @@
                 Grid.Column="1"
                 Margin="3"
                 Command="{Binding ExportCommand, Mode=OneTime}"
-                Content="Export" />
+                Content="{lex:Loc Lang:DataExporter_Export}" />
 
             <Button
                 Grid.Column="2"
                 Margin="3"
-                Content="Close"
+                Content="{lex:Loc Lang:DataExporter_Close}"
                 IsEnabled="{Binding CanOperation.Value, Mode=OneWay}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="Click">
