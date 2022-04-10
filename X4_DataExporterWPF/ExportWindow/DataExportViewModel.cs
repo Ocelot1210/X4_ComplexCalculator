@@ -41,6 +41,12 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// 処理状態管理
         /// </summary>
         private readonly BusyNotifier _BusyNotifier = new();
+
+
+        /// <summary>
+        /// 親ウィンドウ(メッセージボックス表示用)
+        /// </summary>
+        private readonly Window _OwnerWindow;
         #endregion
 
 
@@ -115,8 +121,10 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public DataExportViewModel(string inDirPath, string outFilePath)
+        public DataExportViewModel(string inDirPath, string outFilePath, Window window)
         {
+            _OwnerWindow = window;
+
             InDirPath = new ReactiveProperty<string>(inDirPath,
                 mode: ReactivePropertyMode.RaiseLatestValueOnSubscribe);
             _UnableToGetLanguages = new ReactivePropertySlim<bool>(false);
@@ -147,7 +155,7 @@ namespace X4_DataExporterWPF.DataExportWindow
                 _UnableToGetLanguages.Value = false;
                 Languages.ClearOnScheduler();
 
-                var (success, languages) = _Model.GetLanguages(path);
+                var (success, languages) = _Model.GetLanguages(path, _OwnerWindow);
                 _UnableToGetLanguages.Value = !success;
                 Languages.AddRangeOnScheduler(languages);
             });
@@ -192,8 +200,6 @@ namespace X4_DataExporterWPF.DataExportWindow
                 return;
             }
 
-            var owner = Application.Current.Windows.OfType<Window>().SingleOrDefault(x => x.IsActive);
-
             var progress = new Progress<(int currentStep, int maxSteps)>(s =>
             {
                 CurrentStep.Value = s.currentStep;
@@ -212,7 +218,7 @@ namespace X4_DataExporterWPF.DataExportWindow
                 InDirPath.Value,
                 _OutFilePath,
                 SelectedLanguage.Value,
-                owner
+                _OwnerWindow
             ));
             CurrentStep.Value = 0;
         }
