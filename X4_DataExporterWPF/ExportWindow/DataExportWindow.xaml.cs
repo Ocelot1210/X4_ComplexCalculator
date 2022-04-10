@@ -17,7 +17,7 @@ namespace X4_DataExporterWPF.DataExportWindow
         {
             InitializeComponent();
 
-            DataContext = new DataExportViewModel(inDirPath, outFilePath);
+            DataContext = new DataExportViewModel(inDirPath, outFilePath, Window);
         }
 
 

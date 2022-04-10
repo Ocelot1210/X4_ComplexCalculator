@@ -22,7 +22,7 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// <summary>
         /// 言語一覧を更新
         /// </summary>
-        public (bool success, IEnumerable<LangComboboxItem> languages) GetLanguages(string inDirPath)
+        public (bool success, IEnumerable<LangComboboxItem> languages) GetLanguages(string inDirPath, Window owner)
         {
             try
             {
@@ -36,12 +36,13 @@ namespace X4_DataExporterWPF.DataExportWindow
             }
             catch (DependencyResolutionException)
             {
-                MessageBox.Show(
-                    (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_FailedToResolveModDependencyMessage", null, null),
-                    (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_Title", null, null),
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error
-                );
+                owner.Dispatcher.BeginInvoke((Action)(() =>
+                {
+                    var msg = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_FailedToResolveModDependencyMessage", null, null);
+                    var title = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_Title", null, null);
+                    MessageBox.Show(owner, msg, title, MessageBoxButton.OK, MessageBoxImage.Error);
+                }));
+
                 return (false, Enumerable.Empty<LangComboboxItem>());
             }
             catch (Exception)
