@@ -4,6 +4,8 @@ using System.IO;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace LibX4.FileSystem
 {
@@ -56,6 +58,18 @@ namespace LibX4.FileSystem
 
 
         /// <summary>
+        /// Mod のフォルダパス
+        /// </summary>
+        public string Directory { get; } = "";
+
+
+        /// <summary>
+        /// この Mod が必要とする(依存する) Mod 一覧
+        /// </summary>
+        public IReadOnlyList<DependencyInfo> Dependencies { get; } = Array.Empty<DependencyInfo>();
+
+
+        /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="userContentXml">X4 のユーザフォルダ内の content.xml</param>
@@ -68,6 +82,8 @@ namespace LibX4.FileSystem
             {
                 return;
             }
+
+            Directory = modDirPath;
 
             // Mod フォルダ内の content.xml から ID を取得
             ID = modContentXml.Root?.Attribute("id")?.Value ?? "";
@@ -83,6 +99,7 @@ namespace LibX4.FileSystem
             Date    = modContentXml.Root?.Attribute("date")?.Value    ?? "";
             Save    = modContentXml.Root?.Attribute("save")?.Value    ?? "";
             Enabled = GetIsModEnabled(userContentXml, modContentXml);
+            Dependencies = DependencyInfo.CreateFromContentXml(modContentXml);
         }
 
 

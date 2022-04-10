@@ -33,6 +33,16 @@ namespace X4_DataExporterWPF.DataExportWindow
 
                 return (true, languages);
             }
+            catch (DependencyResolutionException)
+            {
+                MessageBox.Show(
+                    "Failed to resolve Mod dependencies.\r\nPlease execute again with X4 running normally.",
+                    "X4 DataExporter",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
+                return (false, Enumerable.Empty<LangComboboxItem>());
+            }
             catch (Exception)
             {
                 return (false, Enumerable.Empty<LangComboboxItem>());
