@@ -8,52 +8,52 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
 
-namespace X4_DataExporterWPF.Export
+namespace X4_DataExporterWPF.Export;
+
+/// <summary>
+/// モジュールの保管容量情報抽出用クラス
+/// </summary>
+class ModuleStorageExporter : IExporter
 {
     /// <summary>
-    /// モジュールの保管容量情報抽出用クラス
+    /// catファイルオブジェクト
     /// </summary>
-    class ModuleStorageExporter : IExporter
+    private readonly IIndexResolver _CatFile;
+
+    /// <summary>
+    /// ウェア情報xml
+    /// </summary>
+    private readonly XDocument _WaresXml;
+
+    /// <summary>
+    /// 保管庫種別一覧
+    /// </summary>
+    private readonly LinkedList<ModuleStorageType> _StorageTypes = new();
+
+
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    /// <param name="catFile">catファイルオブジェクト</param>
+    /// <param name="waresXml">ウェア情報xml</param>
+    public ModuleStorageExporter(IIndexResolver catFile, XDocument waresXml)
     {
-        /// <summary>
-        /// catファイルオブジェクト
-        /// </summary>
-        private readonly IIndexResolver _CatFile;
-
-        /// <summary>
-        /// ウェア情報xml
-        /// </summary>
-        private readonly XDocument _WaresXml;
-
-        /// <summary>
-        /// 保管庫種別一覧
-        /// </summary>
-        private readonly LinkedList<ModuleStorageType> _StorageTypes = new();
+        _CatFile = catFile;
+        _WaresXml = waresXml;
+    }
 
 
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="catFile">catファイルオブジェクト</param>
-        /// <param name="waresXml">ウェア情報xml</param>
-        public ModuleStorageExporter(IIndexResolver catFile, XDocument waresXml)
+    /// <summary>
+    /// 抽出処理
+    /// </summary>
+    /// <param name="connection"></param>
+    public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
+    {
+        //////////////////
+        // テーブル作成 //
+        //////////////////
         {
-            _CatFile = catFile;
-            _WaresXml = waresXml;
-        }
-
-
-        /// <summary>
-        /// 抽出処理
-        /// </summary>
-        /// <param name="connection"></param>
-        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
-        {
-            //////////////////
-            // テーブル作成 //
-            //////////////////
-            {
-                connection.Execute(@"
+            connection.Execute(@"
 CREATE TABLE IF NOT EXISTS ModuleStorage
 (
     ModuleID        TEXT    NOT NULL PRIMARY KEY,
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS ModuleStorage
     FOREIGN KEY (ModuleID)  REFERENCES Module(ModuleID)
 ) WITHOUT ROWID");
 
-                connection.Execute(@"
+            connection.Execute(@"
 CREATE TABLE IF NOT EXISTS ModuleStorageType
 (
     ModuleID        TEXT    NOT NULL,
@@ -70,64 +70,63 @@ CREATE TABLE IF NOT EXISTS ModuleStorageType
     FOREIGN KEY (ModuleID)          REFERENCES Module(ModuleID),
     FOREIGN KEY (TransportTypeID)   REFERENCES TransportType(TransportTypeID)
 ) WITHOUT ROWID");
-            }
-
-
-            ////////////////
-            // データ抽出 //
-            ////////////////
-            {
-                var items = GetRecords(progress);
-
-                connection.Execute("INSERT INTO ModuleStorage (ModuleID, Amount) VALUES (@ModuleID, @Amount)", items);
-
-                connection.Execute("INSERT INTO ModuleStorageType (ModuleID, TransportTypeID) VALUES (@ModuleID, @TransportTypeID)", _StorageTypes);
-            }
         }
 
 
-        /// <summary>
-        /// XML から ModuleStorage データを読み出す
-        /// </summary>
-        /// <returns>読み出した ModuleStorage データ</returns>
-        private IEnumerable<ModuleStorage> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
+        ////////////////
+        // データ抽出 //
+        ////////////////
         {
-            var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'module')])");
-            var currentStep = 0;
+            var items = GetRecords(progress);
+
+            connection.Execute("INSERT INTO ModuleStorage (ModuleID, Amount) VALUES (@ModuleID, @Amount)", items);
+
+            connection.Execute("INSERT INTO ModuleStorageType (ModuleID, TransportTypeID) VALUES (@ModuleID, @TransportTypeID)", _StorageTypes);
+        }
+    }
 
 
-            foreach (var module in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'module')]"))
+    /// <summary>
+    /// XML から ModuleStorage データを読み出す
+    /// </summary>
+    /// <returns>読み出した ModuleStorage データ</returns>
+    private IEnumerable<ModuleStorage> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
+    {
+        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'module')])");
+        var currentStep = 0;
+
+
+        foreach (var module in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'module')]"))
+        {
+            progress.Report((currentStep++, maxSteps));
+
+
+            var moduleID = module.Attribute("id")?.Value;
+            if (string.IsNullOrEmpty(moduleID)) continue;
+
+            var macroName = module.XPathSelectElement("component").Attribute("ref").Value;
+            var macroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
+
+            // 容量が記載されている箇所を抽出
+            var cargo = macroXml.Root.XPathSelectElement("macro/properties/cargo");
+            if (cargo == null) continue;
+
+            // 保管庫種別を取得する
+            var transportTypeExists = false;
+            foreach (var transportTypeID in Util.SplitTags(cargo.Attribute("tags")?.Value))
             {
-                progress.Report((currentStep++, maxSteps));
-
-
-                var moduleID = module.Attribute("id")?.Value;
-                if (string.IsNullOrEmpty(moduleID)) continue;
-
-                var macroName = module.XPathSelectElement("component").Attribute("ref").Value;
-                var macroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
-
-                // 容量が記載されている箇所を抽出
-                var cargo = macroXml.Root.XPathSelectElement("macro/properties/cargo");
-                if (cargo == null) continue;
-
-                // 保管庫種別を取得する
-                var transportTypeExists = false;
-                foreach (var transportTypeID in Util.SplitTags(cargo.Attribute("tags")?.Value))
-                {
-                    transportTypeExists = true;
-                    _StorageTypes.AddLast(new ModuleStorageType(moduleID, transportTypeID));
-                }
-
-                // 保管庫種別が存在しなければ無効なデータと見なして登録しない
-                if (!transportTypeExists) continue;
-
-                var amount = cargo.Attribute("max").GetInt();
-
-                yield return new ModuleStorage(moduleID, amount);
+                transportTypeExists = true;
+                _StorageTypes.AddLast(new ModuleStorageType(moduleID, transportTypeID));
             }
 
-            progress.Report((currentStep++, maxSteps));
+            // 保管庫種別が存在しなければ無効なデータと見なして登録しない
+            if (!transportTypeExists) continue;
+
+            var amount = cargo.Attribute("max").GetInt();
+
+            yield return new ModuleStorage(moduleID, amount);
         }
+
+        progress.Report((currentStep++, maxSteps));
     }
 }

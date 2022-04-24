@@ -17,43 +17,42 @@ using X4_ComplexCalculator;
 )]
 
 
-namespace X4_ComplexCalculator
+namespace X4_ComplexCalculator;
+
+/// <summary>
+/// アプリケーションのバージョン情報を提供するクラス
+/// </summary>
+public static class VersionInfo
 {
     /// <summary>
-    /// アプリケーションのバージョン情報を提供するクラス
+    /// バージョン名
+    /// ex: 1.4.1
     /// </summary>
-    public static class VersionInfo
-    {
-        /// <summary>
-        /// バージョン名
-        /// ex: 1.4.1
-        /// </summary>
-        internal const string BaseVersion = ThisAssembly.Git.BaseVersion.Major + "."
-            + ThisAssembly.Git.BaseVersion.Minor + "." + ThisAssembly.Git.BaseVersion.Patch;
+    internal const string BaseVersion = ThisAssembly.Git.BaseVersion.Major + "."
+        + ThisAssembly.Git.BaseVersion.Minor + "." + ThisAssembly.Git.BaseVersion.Patch;
 
 
-        /// <summary>
-        /// より詳細なバージョン名
-        /// ex: v1.4.1-4-g306b97d+dirty (Debug)
-        /// </summary>
-        internal const string DetailVersion = ThisAssembly.Git.Tag == ""
-            ? "Unknown version" + " (" + Config + ")"
-            : ThisAssembly.Git.Tag + Dirty + " (" + Config + ")";
+    /// <summary>
+    /// より詳細なバージョン名
+    /// ex: v1.4.1-4-g306b97d+dirty (Debug)
+    /// </summary>
+    internal const string DetailVersion = ThisAssembly.Git.Tag == ""
+        ? "Unknown version" + " (" + Config + ")"
+        : ThisAssembly.Git.Tag + Dirty + " (" + Config + ")";
 
 
-        /// <summary>
-        /// コミットされていない変更がある場合 +dirty になる
-        /// </summary>
-        private const string Dirty = ThisAssembly.Git.IsDirty ? "+dirty" : "";
+    /// <summary>
+    /// コミットされていない変更がある場合 +dirty になる
+    /// </summary>
+    private const string Dirty = ThisAssembly.Git.IsDirty ? "+dirty" : "";
 
 
-        /// <summary>
-        /// ビルド時の構成名
-        /// </summary>
+    /// <summary>
+    /// ビルド時の構成名
+    /// </summary>
 #if DEBUG
-        private const string Config = "Debug";
+    private const string Config = "Debug";
 #else
-        private const string Config = "Release";
+    private const string Config = "Release";
 #endif
-    }
 }

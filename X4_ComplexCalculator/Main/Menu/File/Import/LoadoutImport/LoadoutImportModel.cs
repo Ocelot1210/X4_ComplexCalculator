@@ -12,179 +12,178 @@ using System.Xml.Linq;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Localize;
 
-namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport
+namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport;
+
+/// <summary>
+/// モジュール装備インポート画面のModel
+/// </summary>
+class LoadoutImportModel : BindableBase
 {
+    #region メンバ
     /// <summary>
-    /// モジュール装備インポート画面のModel
+    /// 装備プリセットファイルパス
     /// </summary>
-    class LoadoutImportModel : BindableBase
+    string _LoadoutsFilePath = "";
+    #endregion
+
+
+    #region プロパティ
+    /// <summary>
+    /// 計画一覧
+    /// </summary>
+    public ObservableRangeCollection<LoadoutItem> Loadouts { get; } = new();
+
+
+    /// <summary>
+    /// 装備プリセットファイルパス
+    /// </summary>
+    public string LoadoutsFilePath
     {
-        #region メンバ
-        /// <summary>
-        /// 装備プリセットファイルパス
-        /// </summary>
-        string _LoadoutsFilePath = "";
-        #endregion
+        get => _LoadoutsFilePath;
+        set => SetProperty(ref _LoadoutsFilePath, value);
+    }
+    #endregion
 
 
-        #region プロパティ
-        /// <summary>
-        /// 計画一覧
-        /// </summary>
-        public ObservableRangeCollection<LoadoutItem> Loadouts { get; } = new();
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    public LoadoutImportModel()
+    {
+        var docDir = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
 
+        var x4Dir = Path.Combine(docDir, "Egosoft\\X4");
 
-        /// <summary>
-        /// 装備プリセットファイルパス
-        /// </summary>
-        public string LoadoutsFilePath
+        var dirs = Directory.GetDirectories(x4Dir);
+        if (dirs.Any())
         {
-            get => _LoadoutsFilePath;
-            set => SetProperty(ref _LoadoutsFilePath, value);
+            LoadoutsFilePath = Path.Combine(dirs.First(), "loadouts.xml");
         }
-        #endregion
 
-
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        public LoadoutImportModel()
+        try
         {
-            var docDir = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+            Read(LoadoutsFilePath);
+        }
+        catch
+        {
 
-            var x4Dir = Path.Combine(docDir, "Egosoft\\X4");
+        }
+    }
 
-            var dirs = Directory.GetDirectories(x4Dir);
-            if (dirs.Any())
-            {
-                LoadoutsFilePath = Path.Combine(dirs.First(), "loadouts.xml");
-            }
 
+    /// <summary>
+    /// 初期フォルダを取得する
+    /// </summary>
+    /// <returns></returns>
+    private string GetInitialDirectory()
+    {
+        var docDir = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+
+        var x4Dir = Path.Combine(docDir, "Egosoft\\X4");
+
+        var dirs = Directory.GetDirectories(x4Dir);
+        if (dirs.Any())
+        {
+            return Path.Combine(dirs.First(), "save");
+        }
+
+        return x4Dir;
+    }
+
+
+    /// <summary>
+    /// セーブデータを選択
+    /// </summary>
+    public void SelectSaveDataFile()
+    {
+        var dlg = new OpenFileDialog();
+
+        dlg.InitialDirectory = GetInitialDirectory();
+        dlg.RestoreDirectory = true;
+        dlg.Filter = "X4 Loadouts data file (loadouts.xml)|loadouts.xml|All files (*.*)|*.*";
+        if (dlg.ShowDialog() == true)
+        {
+            Mouse.OverrideCursor = Cursors.Wait;
             try
             {
-                Read(LoadoutsFilePath);
+                Read(dlg.FileName);
+                LoadoutsFilePath = dlg.FileName;
             }
-            catch
+            catch (Exception e)
             {
-
+                Dispatcher.CurrentDispatcher.BeginInvoke(() =>
+                {
+                    LocalizedMessageBox.Show("Lang:MainWindow_FaildToLoadFileMessage", "Lang:MainWindow_FaildToLoadFileMessageTitle", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
+                });
+            }
+            finally
+            {
+                Mouse.OverrideCursor = null;
             }
         }
+    }
 
 
-        /// <summary>
-        /// 初期フォルダを取得する
-        /// </summary>
-        /// <returns></returns>
-        private string GetInitialDirectory()
+    /// <summary>
+    /// インポート実行
+    /// </summary>
+    public void Import()
+    {
+        var cnt = 0;
+        var succeeded = 0;
+        foreach (var loadout in Loadouts.Where(x => x.IsChecked))
         {
-            var docDir = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-
-            var x4Dir = Path.Combine(docDir, "Egosoft\\X4");
-
-            var dirs = Directory.GetDirectories(x4Dir);
-            if (dirs.Any())
+            if (loadout.Import())
             {
-                return Path.Combine(dirs.First(), "save");
+                succeeded++;
             }
-
-            return x4Dir;
+            cnt++;
         }
 
-
-        /// <summary>
-        /// セーブデータを選択
-        /// </summary>
-        public void SelectSaveDataFile()
+        // プリセットが何も選択されなかったか？
+        if (cnt == 0)
         {
-            var dlg = new OpenFileDialog();
-
-            dlg.InitialDirectory = GetInitialDirectory();
-            dlg.RestoreDirectory = true;
-            dlg.Filter = "X4 Loadouts data file (loadouts.xml)|loadouts.xml|All files (*.*)|*.*";
-            if (dlg.ShowDialog() == true)
-            {
-                Mouse.OverrideCursor = Cursors.Wait;
-                try
-                {
-                    Read(dlg.FileName);
-                    LoadoutsFilePath = dlg.FileName;
-                }
-                catch (Exception e)
-                {
-                    Dispatcher.CurrentDispatcher.BeginInvoke(() =>
-                    {
-                        LocalizedMessageBox.Show("Lang:MainWindow_FaildToLoadFileMessage", "Lang:MainWindow_FaildToLoadFileMessageTitle", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
-                    });
-                }
-                finally
-                {
-                    Mouse.OverrideCursor = null;
-                }
-            }
+            LocalizedMessageBox.Show("Lang:ImportLoadout_NoPresetSelectedMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
         }
 
-
-        /// <summary>
-        /// インポート実行
-        /// </summary>
-        public void Import()
+        // プリセットの全件インポート成功したか？
+        if (cnt == succeeded)
         {
-            var cnt = 0;
-            var succeeded = 0;
-            foreach (var loadout in Loadouts.Where(x => x.IsChecked))
-            {
-                if (loadout.Import())
-                {
-                    succeeded++;
-                }
-                cnt++;
-            }
-
-            // プリセットが何も選択されなかったか？
-            if (cnt == 0)
-            {
-                LocalizedMessageBox.Show("Lang:ImportLoadout_NoPresetSelectedMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            // プリセットの全件インポート成功したか？
-            if (cnt == succeeded)
-            {
-                LocalizedMessageBox.Show("Lang:ImportLoadout_ImportSucceededMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, succeeded);
-                return;
-            }
-
-            // 1件以上のインポートに失敗
-            LocalizedMessageBox.Show("Lang:ImportLoadout_ImportFailedMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, succeeded, cnt - succeeded);
+            LocalizedMessageBox.Show("Lang:ImportLoadout_ImportSucceededMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, succeeded);
+            return;
         }
 
+        // 1件以上のインポートに失敗
+        LocalizedMessageBox.Show("Lang:ImportLoadout_ImportFailedMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, succeeded, cnt - succeeded);
+    }
 
-        /// <summary>
-        /// ファイル読み込みメイン処理
-        /// </summary>
-        /// <param name="path">読み込み対象ファイルパス</param>
-        private void Read(string path)
+
+    /// <summary>
+    /// ファイル読み込みメイン処理
+    /// </summary>
+    /// <param name="path">読み込み対象ファイルパス</param>
+    private void Read(string path)
+    {
+        using var sr = new StreamReader(path);
+        var reader = XmlReader.Create(sr);
+
+        var addItems = new List<LoadoutItem>();
+
+        while (reader.Read())
         {
-            using var sr = new StreamReader(path);
-            var reader = XmlReader.Create(sr);
-
-            var addItems = new List<LoadoutItem>();
-
-            while (reader.Read())
+            if (reader.Name != "loadout")
             {
-                if (reader.Name != "loadout")
-                {
-                    continue;
-                }
-
-                var itm = LoadoutItem.Create(XElement.Parse(reader.ReadOuterXml()));
-                if (itm is not null)
-                {
-                    addItems.Add(itm);
-                }
+                continue;
             }
 
-            Loadouts.Reset(addItems);
+            var itm = LoadoutItem.Create(XElement.Parse(reader.ReadOuterXml()));
+            if (itm is not null)
+            {
+                addItems.Add(itm);
+            }
         }
+
+        Loadouts.Reset(addItems);
     }
 }

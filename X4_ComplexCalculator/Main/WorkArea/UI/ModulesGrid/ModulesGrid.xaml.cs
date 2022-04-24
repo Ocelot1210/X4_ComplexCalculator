@@ -1,18 +1,17 @@
 ﻿using System.Windows.Controls;
 
-namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid
+namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
+
+/// <summary>
+/// ModuleListGridView.xaml の相互作用ロジック
+/// </summary>
+public partial class ModulesGrid : UserControl
 {
     /// <summary>
-    /// ModuleListGridView.xaml の相互作用ロジック
+    /// コンストラクタ
     /// </summary>
-    public partial class ModulesGrid : UserControl
+    public ModulesGrid()
     {
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        public ModulesGrid()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

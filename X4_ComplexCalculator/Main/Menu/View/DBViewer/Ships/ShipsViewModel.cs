@@ -6,44 +6,43 @@ using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
-namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships
+namespace X4_ComplexCalculator.Main.Menu.View.DBViewer.Ships;
+
+/// <summary>
+/// 艦船情報用ViewModel
+/// </summary>
+class ShipsViewModel : BindableBase
 {
+    #region メンバ
     /// <summary>
-    /// 艦船情報用ViewModel
+    /// ウェア一覧
     /// </summary>
-    class ShipsViewModel : BindableBase
+    private readonly ObservableRangeCollection<ShipsGridItem> _Ships = new();
+    #endregion
+
+
+    #region プロパティ
+    /// <summary>
+    /// 表示用データ
+    /// </summary>
+    public ListCollectionView ShipsView { get; }
+    #endregion
+
+
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    public ShipsViewModel()
     {
-        #region メンバ
-        /// <summary>
-        /// ウェア一覧
-        /// </summary>
-        private readonly ObservableRangeCollection<ShipsGridItem> _Ships = new();
-        #endregion
+        var items = X4Database.Instance.Ware.GetAll<IShip>()
+            .Select(x => ShipsGridItem.Create(x))
+            .Where(x => x is not null)
+            .Select(x => x!);
 
+        _Ships = new(items);
 
-        #region プロパティ
-        /// <summary>
-        /// 表示用データ
-        /// </summary>
-        public ListCollectionView ShipsView { get; }
-        #endregion
-
-
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        public ShipsViewModel()
-        {
-            var items = X4Database.Instance.Ware.GetAll<IShip>()
-                .Select(x => ShipsGridItem.Create(x))
-                .Where(x => x is not null)
-                .Select(x => x!);
-
-            _Ships = new(items);
-
-            ShipsView = (ListCollectionView)CollectionViewSource.GetDefaultView(_Ships);
-            ShipsView.SortDescriptions.Clear();
-            ShipsView.SortDescriptions.Add(new SortDescription(nameof(ShipsGridItem.ShipName), ListSortDirection.Ascending));
-        }
+        ShipsView = (ListCollectionView)CollectionViewSource.GetDefaultView(_Ships);
+        ShipsView.SortDescriptions.Clear();
+        ShipsView.SortDescriptions.Add(new SortDescription(nameof(ShipsGridItem.ShipName), ListSortDirection.Ascending));
     }
 }

@@ -1,16 +1,15 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace X4_ComplexCalculator_CustomControlLibrary
+namespace X4_ComplexCalculator_CustomControlLibrary;
+
+/// <summary>
+/// ×マークボタン
+/// </summary>
+public class CrossButton : Button
 {
-    /// <summary>
-    /// ×マークボタン
-    /// </summary>
-    public class CrossButton : Button
+    static CrossButton()
     {
-        static CrossButton()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(CrossButton), new FrameworkPropertyMetadata(typeof(CrossButton)));
-        }
+        DefaultStyleKeyProperty.OverrideMetadata(typeof(CrossButton), new FrameworkPropertyMetadata(typeof(CrossButton)));
     }
 }
