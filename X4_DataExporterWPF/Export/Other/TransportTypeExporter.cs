@@ -8,116 +8,115 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
 
-namespace X4_DataExporterWPF.Export
+namespace X4_DataExporterWPF.Export;
+
+/// <summary>
+/// カーゴ種別抽出用クラス
+/// </summary>
+class TransportTypeExporter : IExporter
 {
     /// <summary>
-    /// カーゴ種別抽出用クラス
+    /// ウェア情報xml
     /// </summary>
-    class TransportTypeExporter : IExporter
+    private readonly XDocument _WaresXml;
+
+
+    /// <summary>
+    /// 言語解決用オブジェクト
+    /// </summary>
+    private readonly ILanguageResolver _Resolver;
+
+
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    /// <param name="resolver">言語解決用オブジェクト</param>
+    public TransportTypeExporter(XDocument waresXml, ILanguageResolver resolver)
     {
-        /// <summary>
-        /// ウェア情報xml
-        /// </summary>
-        private readonly XDocument _WaresXml;
+        _WaresXml = waresXml;
+        _Resolver = resolver;
+    }
 
 
-        /// <summary>
-        /// 言語解決用オブジェクト
-        /// </summary>
-        private readonly ILanguageResolver _Resolver;
-
-
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="resolver">言語解決用オブジェクト</param>
-        public TransportTypeExporter(XDocument waresXml, ILanguageResolver resolver)
+    /// <summary>
+    /// 抽出処理
+    /// </summary>
+    /// <param name="connection"></param>
+    public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
+    {
+        //////////////////
+        // テーブル作成 //
+        //////////////////
         {
-            _WaresXml = waresXml;
-            _Resolver = resolver;
-        }
-
-
-        /// <summary>
-        /// 抽出処理
-        /// </summary>
-        /// <param name="connection"></param>
-        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
-        {
-            //////////////////
-            // テーブル作成 //
-            //////////////////
-            {
-                connection.Execute(@"
+            connection.Execute(@"
 CREATE TABLE IF NOT EXISTS TransportType
 (
     TransportTypeID TEXT    NOT NULL PRIMARY KEY,
     Name            TEXT    NOT NULL
 ) WITHOUT ROWID");
-            }
-
-
-            ////////////////
-            // データ抽出 //
-            ////////////////
-            {
-                var items = GetRecords(progress);
-
-                // レコード追加
-                connection.Execute("INSERT INTO TransportType (TransportTypeID, Name) VALUES (@TransportTypeID, @Name)", items);
-            }
         }
 
 
-        /// <summary>
-        /// XML から TransportType データを読み出す
-        /// </summary>
-        /// <returns>読み出した TransportType データ</returns>
-        private IEnumerable<TransportType> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
+        ////////////////
+        // データ抽出 //
+        ////////////////
         {
-            // TODO: 可能ならファイルから抽出する
-            var names = new Dictionary<string, string>()
-            {
-                {"container",  "{20205,  100}"},
-                {"solid",      "{20205,  200}"},
-                {"liquid",     "{20205,  300}"},
-                {"passenger",  "{20205,  400}"},
-                {"equipment",  "{20205,  500}"},
-                {"inventory",  "{20205,  600}"},
-                {"software",   "{20205,  700}"},
-                {"workunit",   "{20205,  800}"},
-                {"ship",       "{20205,  900}"},
-                {"research",   "{20205, 1000}"},
-                {"condensate", "{20205, 1100}"},
-            };
+            var items = GetRecords(progress);
 
-            var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware)");
-            var currentStep = 0;
+            // レコード追加
+            connection.Execute("INSERT INTO TransportType (TransportTypeID, Name) VALUES (@TransportTypeID, @Name)", items);
+        }
+    }
 
-            var added = new HashSet<string>();
-            foreach (var ware in _WaresXml.Root.Elements("ware"))
-            {
-                progress.Report((currentStep++, maxSteps));
 
-                var transportTypeID = ware.Attribute("transport")?.Value;
-                if (string.IsNullOrEmpty(transportTypeID) || added.Contains(transportTypeID)) continue;
+    /// <summary>
+    /// XML から TransportType データを読み出す
+    /// </summary>
+    /// <returns>読み出した TransportType データ</returns>
+    private IEnumerable<TransportType> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
+    {
+        // TODO: 可能ならファイルから抽出する
+        var names = new Dictionary<string, string>()
+        {
+            {"container",  "{20205,  100}"},
+            {"solid",      "{20205,  200}"},
+            {"liquid",     "{20205,  300}"},
+            {"passenger",  "{20205,  400}"},
+            {"equipment",  "{20205,  500}"},
+            {"inventory",  "{20205,  600}"},
+            {"software",   "{20205,  700}"},
+            {"workunit",   "{20205,  800}"},
+            {"ship",       "{20205,  900}"},
+            {"research",   "{20205, 1000}"},
+            {"condensate", "{20205, 1100}"},
+        };
 
-                var name = transportTypeID;
-                if (names.TryGetValue(transportTypeID, out var nameID))
-                {
-                    name = _Resolver.Resolve(nameID);
-                }
+        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware)");
+        var currentStep = 0;
 
-                yield return new TransportType(transportTypeID, name);
-                added.Add(transportTypeID);
-            }
-
+        var added = new HashSet<string>();
+        foreach (var ware in _WaresXml.Root.Elements("ware"))
+        {
             progress.Report((currentStep++, maxSteps));
 
-            foreach (var key in names.Keys.Except(added))
+            var transportTypeID = ware.Attribute("transport")?.Value;
+            if (string.IsNullOrEmpty(transportTypeID) || added.Contains(transportTypeID)) continue;
+
+            var name = transportTypeID;
+            if (names.TryGetValue(transportTypeID, out var nameID))
             {
-                yield return new TransportType(key, _Resolver.Resolve(names[key]));
+                name = _Resolver.Resolve(nameID);
             }
+
+            yield return new TransportType(transportTypeID, name);
+            added.Add(transportTypeID);
+        }
+
+        progress.Report((currentStep++, maxSteps));
+
+        foreach (var key in names.Keys.Except(added))
+        {
+            yield return new TransportType(key, _Resolver.Resolve(names[key]));
         }
     }
 }

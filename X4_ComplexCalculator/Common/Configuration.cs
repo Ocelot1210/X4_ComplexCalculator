@@ -7,212 +7,211 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 
-namespace X4_ComplexCalculator.Common
+namespace X4_ComplexCalculator.Common;
+
+/// <summary>
+/// 設定ファイル読み込み用
+/// </summary>
+public class Configuration
 {
+    #region スタティックプロパティ
     /// <summary>
-    /// 設定ファイル読み込み用
+    /// シングルトンインスタンス
     /// </summary>
-    public class Configuration
+    public static Configuration Instance { get; } = new("App.config.json");
+    #endregion
+
+
+    #region メンバ
+    /// <summary>
+    /// 設定ファイルオブジェクト
+    /// </summary>
+    private readonly IConfigurationRoot _Config;
+    #endregion
+
+
+    #region プロパティ
+    /// <summary>
+    /// X4DBのファイルパス
+    /// </summary>
+    public string X4DBPath => _Config["AppSettings:X4DBPath"];
+
+
+    /// <summary>
+    /// CommonDBのファイルパス
+    /// </summary>
+    public string CommonDBPath => _Config["AppSettings:CommonDBPath"];
+
+
+
+    /// <summary>
+    /// 言語
+    /// </summary>
+    public CultureInfo Language
     {
-        #region スタティックプロパティ
-        /// <summary>
-        /// シングルトンインスタンス
-        /// </summary>
-        public static Configuration Instance { get; } = new("App.config.json");
-        #endregion
-
-
-        #region メンバ
-        /// <summary>
-        /// 設定ファイルオブジェクト
-        /// </summary>
-        private readonly IConfigurationRoot _Config;
-        #endregion
-
-
-        #region プロパティ
-        /// <summary>
-        /// X4DBのファイルパス
-        /// </summary>
-        public string X4DBPath => _Config["AppSettings:X4DBPath"];
-
-
-        /// <summary>
-        /// CommonDBのファイルパス
-        /// </summary>
-        public string CommonDBPath => _Config["AppSettings:CommonDBPath"];
-
-
-
-        /// <summary>
-        /// 言語
-        /// </summary>
-        public CultureInfo Language
+        get
         {
-            get
-            {
-                var lang = _Config["AppSettings:Language"];
+            var lang = _Config["AppSettings:Language"];
 
-                try
+            try
+            {
+                // 言語が設定されているか？
+                if (!string.IsNullOrWhiteSpace(lang))
                 {
-                    // 言語が設定されているか？
-                    if (!string.IsNullOrWhiteSpace(lang))
-                    {
-                        // 言語が設定されていればそれを使用
-                        return CultureInfo.GetCultureInfo(lang);
-                    }
-                    else
-                    {
-                        // 言語が設定されていない場合、システムのロケールを設定
-                        return CultureInfo.CurrentUICulture;
-                    }
+                    // 言語が設定されていればそれを使用
+                    return CultureInfo.GetCultureInfo(lang);
                 }
-                catch (CultureNotFoundException)
+                else
                 {
-                    // 無効な言語が指定されている場合はシステムのロケールを設定
+                    // 言語が設定されていない場合、システムのロケールを設定
                     return CultureInfo.CurrentUICulture;
                 }
             }
-            set
+            catch (CultureNotFoundException)
             {
-                SetValue("AppSettings.Language", value.Name);
+                // 無効な言語が指定されている場合はシステムのロケールを設定
+                return CultureInfo.CurrentUICulture;
             }
         }
-
-
-        /// <summary>
-        /// 起動時に更新を確認するか
-        /// </summary>
-        public bool CheckUpdateAtLaunch
+        set
         {
-            get => _Config["AppSettings:CheckUpdateAtLaunch"] != bool.FalseString;
-            set => SetValue("AppSettings.CheckUpdateAtLaunch", value.ToString());
+            SetValue("AppSettings.Language", value.Name);
         }
-        #endregion
+    }
+
+
+    /// <summary>
+    /// 起動時に更新を確認するか
+    /// </summary>
+    public bool CheckUpdateAtLaunch
+    {
+        get => _Config["AppSettings:CheckUpdateAtLaunch"] != bool.FalseString;
+        set => SetValue("AppSettings.CheckUpdateAtLaunch", value.ToString());
+    }
+    #endregion
 
 
 
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="path">設定ファイルのパス</param>
-        private Configuration(string path)
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    /// <param name="path">設定ファイルのパス</param>
+    private Configuration(string path)
+    {
+        // 設定ファイルが無効なら修復する
+        if (!IsValidSettingFile(path))
         {
-            // 設定ファイルが無効なら修復する
-            if (!IsValidSettingFile(path))
-            {
-                FixSettingFile(path);
-            }
+            FixSettingFile(path);
+        }
 
-            _Config = new ConfigurationBuilder()
+        _Config = new ConfigurationBuilder()
+            .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+            .AddJsonFile(path)
+            .Build();
+    }
+
+
+    /// <summary>
+    /// 設定ファイルが有効か判定する
+    /// </summary>
+    /// <param name="path">判定対象のファイルパス</param>
+    /// <returns></returns>
+    private static bool IsValidSettingFile(string path)
+    {
+        var ret = true;
+
+        try
+        {
+            var conf = new ConfigurationBuilder()
+                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                .AddJsonFile(path)
+                .Build();
+
+            // 値が入っているかチェック
+            string[] keys =
+            {
+                "AppSettings:X4DBPath",
+                "AppSettings:CommonDBPath",
+                "AppSettings:Language",
+                "AppSettings:CheckUpdateAtLaunch"
+            };
+
+            ret = keys.All(x => conf[x] is not null);
+        }
+        catch
+        {
+            ret = false;
+        }
+
+        return ret;
+    }
+
+
+    /// <summary>
+    /// 設定ファイルを修復する
+    /// </summary>
+    /// <param name="path">修復対象の設定ファイルパス</param>
+    private static void FixSettingFile(string path)
+    {
+        IConfigurationRoot? conf = null;
+
+        try
+        {
+            conf = new ConfigurationBuilder()
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile(path)
                 .Build();
         }
-
-
-        /// <summary>
-        /// 設定ファイルが有効か判定する
-        /// </summary>
-        /// <param name="path">判定対象のファイルパス</param>
-        /// <returns></returns>
-        private static bool IsValidSettingFile(string path)
+        catch
         {
-            var ret = true;
 
-            try
-            {
-                var conf = new ConfigurationBuilder()
-                    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                    .AddJsonFile(path)
-                    .Build();
-
-                // 値が入っているかチェック
-                string[] keys =
-                {
-                    "AppSettings:X4DBPath",
-                    "AppSettings:CommonDBPath",
-                    "AppSettings:Language",
-                    "AppSettings:CheckUpdateAtLaunch"
-                };
-
-                ret = keys.All(x => conf[x] is not null);
-            }
-            catch
-            {
-                ret = false;
-            }
-
-            return ret;
         }
 
 
-        /// <summary>
-        /// 設定ファイルを修復する
-        /// </summary>
-        /// <param name="path">修復対象の設定ファイルパス</param>
-        private static void FixSettingFile(string path)
+        var json = new JObject(
+            new JProperty(
+                "AppSettings",
+                new JObject(
+                    new JProperty("X4DBPath", conf?["AppSettings:X4DBPath"] ?? ".\\db\\x4.db"),
+                    new JProperty("CommonDBPath", conf?["AppSettings:CommonDBPath"] ?? ".\\db\\common.db"),
+                    new JProperty("Language", conf?["AppSettings:Language"] ?? ""),
+                    new JProperty("CheckUpdateAtLaunch", conf?["AppSettings:Language"] ?? "True")
+                )));
+
+        var text = JsonConvert.SerializeObject(json, Formatting.Indented);
+        File.WriteAllText(path, text);
+    }
+
+
+
+    /// <summary>
+    /// App.config.jsonに値を設定する
+    /// </summary>
+    /// <param name="key">キー</param>
+    /// <param name="value">設定値</param>
+    private void SetValue(string key, string value)
+    {
+        var provider = _Config.Providers.OfType<JsonConfigurationProvider>().First();
+
+        var path = provider.Source.FileProvider.GetFileInfo(provider.Source.Path).PhysicalPath;
+
+        var jsonText = File.ReadAllText(path);
+        var jsonObj = (JObject?)JsonConvert.DeserializeObject(jsonText) ?? throw new InvalidOperationException();
+        
+
+        var token = jsonObj.SelectToken(key) ?? throw new InvalidOperationException();
+        if (token is JValue jValue)
         {
-            IConfigurationRoot? conf = null;
+            jValue.Value = value;
 
-            try
-            {
-                conf = new ConfigurationBuilder()
-                    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                    .AddJsonFile(path)
-                    .Build();
-            }
-            catch
-            {
+            string output = JsonConvert.SerializeObject(jsonObj, Formatting.Indented);
+            File.WriteAllText(path, output);
 
-            }
-
-
-            var json = new JObject(
-                new JProperty(
-                    "AppSettings",
-                    new JObject(
-                        new JProperty("X4DBPath", conf?["AppSettings:X4DBPath"] ?? ".\\db\\x4.db"),
-                        new JProperty("CommonDBPath", conf?["AppSettings:CommonDBPath"] ?? ".\\db\\common.db"),
-                        new JProperty("Language", conf?["AppSettings:Language"] ?? ""),
-                        new JProperty("CheckUpdateAtLaunch", conf?["AppSettings:Language"] ?? "True")
-                    )));
-
-            var text = JsonConvert.SerializeObject(json, Formatting.Indented);
-            File.WriteAllText(path, text);
+            _Config.Reload();
         }
-
-
-
-        /// <summary>
-        /// App.config.jsonに値を設定する
-        /// </summary>
-        /// <param name="key">キー</param>
-        /// <param name="value">設定値</param>
-        private void SetValue(string key, string value)
+        else
         {
-            var provider = _Config.Providers.OfType<JsonConfigurationProvider>().First();
-
-            var path = provider.Source.FileProvider.GetFileInfo(provider.Source.Path).PhysicalPath;
-
-            var jsonText = File.ReadAllText(path);
-            var jsonObj = (JObject?)JsonConvert.DeserializeObject(jsonText) ?? throw new InvalidOperationException();
-            
-
-            var token = jsonObj.SelectToken(key) ?? throw new InvalidOperationException();
-            if (token is JValue jValue)
-            {
-                jValue.Value = value;
-
-                string output = JsonConvert.SerializeObject(jsonObj, Formatting.Indented);
-                File.WriteAllText(path, output);
-
-                _Config.Reload();
-            }
-            else
-            {
-                throw new InvalidOperationException();
-            }
+            throw new InvalidOperationException();
         }
     }
 }
