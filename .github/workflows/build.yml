@@ -37,7 +37,7 @@ jobs:
         run: dotnet test
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: X4_ComplexCalculator-${{ matrix.Configuration }}-${{ github.sha }}
           path: X4_ComplexCalculator/bin/${{ matrix.Configuration }}/net6.0-windows
