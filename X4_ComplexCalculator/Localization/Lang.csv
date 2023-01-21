@@ -380,7 +380,7 @@ DBViewer_Ships_HangerCapacity_Drone;Drone
 # ------------------------------------------------------
 DataExporter_Title;X4: Foundations data exporter
 DataExporter_Input;Input
-DataExporter_Input_RootDirectory;X4: Foundations root directory(Install directory)
+DataExporter_Input_RootDirectory;X4: Foundations Install directory
 DataExporter_Output;Output
 DataExporter_Output_Language;Language
 DataExporter_Export;Export
