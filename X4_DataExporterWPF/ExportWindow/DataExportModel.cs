@@ -79,7 +79,8 @@ namespace X4_DataExporterWPF.DataExportWindow
                 var waresXml = catFile.OpenXml("libraries/wares.xml");
                 RemoveDuplicateWares(waresXml);
                 //var mapXml = catFile.OpenXml("libraries/mapdefaults.xml");
-                
+
+                var defaultXml = catFile.OpenXml("libraries/defaults.xml");
 
                 IExporter[] exporters =
                 {
@@ -106,7 +107,7 @@ namespace X4_DataExporterWPF.DataExportWindow
                     // モジュール関連
                     new ModuleTypeExporter(catFile, waresXml, resolver),        // モジュール種別情報
                     new ModuleExporter(catFile, waresXml),                      // モジュール情報
-                    new ModuleProductExporter(catFile, waresXml),               // モジュールの生産品情報
+                    new ModuleProductExporter(catFile, waresXml, defaultXml),   // モジュールの生産品情報
                     new ModuleStorageExporter(catFile, waresXml),               // モジュールの保管容量情報
 
                     // 装備関連
