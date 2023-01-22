@@ -167,14 +167,7 @@ namespace X4_DataExporterWPF.DataExportWindow
             // 抽出オプションが変化した際、言語一覧を更新する
             CatLoadOption.Subscribe(async option =>
             {
-                var prevLangID = SelectedLanguage.Value?.ID ?? -1;
-                if (await UpdateLangList(InDirPath.Value))
-                {
-                    ReactivePropertyScheduler.Default.Schedule(() =>
-                    {
-                        SelectedLanguage.Value = Languages.FirstOrDefault(x => x.ID == prevLangID);
-                    });
-                }
+                await UpdateLangList(InDirPath.Value);
             });
         }
 
@@ -184,10 +177,12 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// </summary>
         /// <param name="x4InstallDirectory">X4 のインストール先フォルダパス</param>
         /// <returns>言語一覧が更新された場合、<c>true;</c>。それ以外の場合 <c>false;</c></returns>
-        private async Task<bool> UpdateLangList(string x4InstallDirectory)
+        private async Task UpdateLangList(string x4InstallDirectory)
         {
-            if (_BusyNotifier.IsBusy) return false;
+            if (_BusyNotifier.IsBusy) return;
             using var _ = _BusyNotifier.ProcessStart();
+
+            var prevLangID = SelectedLanguage.Value?.ID ?? -1;
 
             _UnableToGetLanguages.Value = false;
             Languages.ClearOnScheduler();
@@ -196,7 +191,12 @@ namespace X4_DataExporterWPF.DataExportWindow
             _UnableToGetLanguages.Value = !success;
             Languages.AddRangeOnScheduler(languages);
 
-            return true;
+            ReactivePropertyScheduler.Default.Schedule(() =>
+            {
+                SelectedLanguage.Value = Languages.FirstOrDefault(x => x.ID == prevLangID);
+            });
+
+            return;
         }
 
 

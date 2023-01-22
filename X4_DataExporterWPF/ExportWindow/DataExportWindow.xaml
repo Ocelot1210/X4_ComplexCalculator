@@ -93,8 +93,6 @@
                     SelectedItem="{Binding SelectedLanguage.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                 <GroupBox
-                    Margin="5"
-                    Padding="5"
                     BorderBrush="DarkGray"
                     Header="{lex:Loc Lang:DataExporter_ExportOption}">
                     <StackPanel>
