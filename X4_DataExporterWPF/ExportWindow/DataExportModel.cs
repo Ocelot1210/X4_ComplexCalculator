@@ -39,13 +39,13 @@ namespace X4_DataExporterWPF.DataExportWindow
             }
             catch (DependencyResolutionException)
             {
-                owner.Dispatcher.BeginInvoke((Action)(() =>
+                await owner.Dispatcher.BeginInvoke((Action)(() =>
                 {
                     var msg = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_FailedToResolveModDependencyMessage", null, null);
                     var title = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_Title", null, null);
                     MessageBox.Show(owner, msg, title, MessageBoxButton.OK, MessageBoxImage.Error);
                 }));
-                return (false, Enumerable.Empty<LangComboboxItem>());
+                return (false, Array.Empty<LangComboboxItem>());
             }
             catch (Exception)
             {
@@ -165,7 +165,7 @@ namespace X4_DataExporterWPF.DataExportWindow
 
 
 
-                owner.Dispatcher.BeginInvoke((Action)(() =>
+                await owner.Dispatcher.BeginInvoke((Action)(() =>
                 {
                     var msg = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_FailedToExportMessage", null, null);
                     var title = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_Title", null, null);
