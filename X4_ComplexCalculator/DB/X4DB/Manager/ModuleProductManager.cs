@@ -34,10 +34,10 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         /// <param name="wareProductionManager">ウェアの生産量と生産時間一覧</param>
         public ModuleProductManager(IDbConnection conn, WareProductionManager wareProductionManager)
         {
-            const string sql = @"SELECT ModuleID, WareID, Method FROM ModuleProduct";
+            const string sql = @"SELECT ModuleID, WareID, Method, Amount FROM ModuleProduct";
 
             _ModuleProducts = conn.Query<X4_DataExporterWPF.Entity.ModuleProduct>(sql)
-                .Select(x => new ModuleProduct(x.ModuleID, x.WareID, x.Method, wareProductionManager.Get(x.WareID, x.Method)))
+                .Select(x => new ModuleProduct(x.ModuleID, x.WareID, x.Method, x.Amount, wareProductionManager.Get(x.WareID, x.Method)))
                 .GroupBy(x => x.ModuleID)
                 .ToDictionary(x => x.Key, x => x.ToArray() as IReadOnlyList<IModuleProduct>);
         }

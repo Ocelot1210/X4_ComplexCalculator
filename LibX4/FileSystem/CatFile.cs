@@ -3,7 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
@@ -158,18 +161,18 @@ namespace LibX4.FileSystem
 
 
         /// <inheritdoc/>
-        public Stream OpenFile(string filePath)
-            => TryOpenFile(filePath) ?? throw new FileNotFoundException(null, filePath);
+        public async Task<Stream> OpenFileAsync(string filePath, CancellationToken cancellationToken = default)
+            => await TryOpenFileAsync(filePath, cancellationToken) ?? throw new FileNotFoundException(null, filePath);
 
 
         /// <inheritdoc/>
-        public Stream? TryOpenFile(string filePath)
+        public async Task<Stream?> TryOpenFileAsync(string filePath, CancellationToken cancellationToken = default)
         {
             filePath = PathCanonicalize(filePath);
 
             foreach (var loader in _FileLoaders)
             {
-                var ms = loader.OpenFile(filePath);
+                var ms = await loader.OpenFileAsync(filePath, cancellationToken);
                 if (ms is not null)
                 {
                     return ms;
@@ -185,14 +188,14 @@ namespace LibX4.FileSystem
         /// </summary>
         /// <param name="filePath">ファイルパス</param>
         /// <returns>XDocumentの列挙</returns>
-        public IEnumerable<XDocument> OpenXmlFiles(string filePath)
+        public async IAsyncEnumerable<XDocument> OpenXmlFilesAsync(string filePath, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
-            foreach (var ms in OpenFiles(filePath))
+            await foreach(var ms in OpenFilesAsync(filePath, cancellationToken))
             {
                 XDocument? ret = null;
                 try
                 {
-                    ret = XDocument.Load(ms);
+                    ret = await XDocument.LoadAsync(ms, LoadOptions.None, cancellationToken);
                 }
                 catch (System.Xml.XmlException)
                 {
@@ -213,13 +216,13 @@ namespace LibX4.FileSystem
         /// </summary>
         /// <param name="filePath">ファイルパス</param>
         /// <returns>ファイルの内容の列挙</returns>
-        public IEnumerable<Stream> OpenFiles(string filePath)
+        public async IAsyncEnumerable<Stream> OpenFilesAsync(string filePath, [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             filePath = PathCanonicalize(filePath);
 
             foreach (var loader in _FileLoaders)
             {
-                var ms = loader.OpenFile(filePath);
+                var ms = await loader.OpenFileAsync(filePath, cancellationToken);
                 if (ms is not null)
                 {
                     yield return ms;
@@ -230,28 +233,28 @@ namespace LibX4.FileSystem
 
 
         /// <inheritdoc/>
-        public XDocument? TryOpenXml(string filePath)
+        public async Task<XDocument?> TryOpenXmlAsync(string filePath, CancellationToken cancellationToken = default)
         {
             filePath = PathCanonicalize(filePath);
 
             XDocument? ret = null;
             foreach (var fileLoader in _FileLoaders)
             {
-                using var ms = fileLoader.OpenFile(filePath);
-                if (ms == null)
+                using var ms = await fileLoader.OpenFileAsync(filePath, cancellationToken);
+                if (ms is null)
                 {
                     continue;
                 }
 
                 try
                 {
-                    if (ret == null)
+                    if (ret is null)
                     {
-                        ret = XDocument.Load(ms);
+                        ret = await XDocument.LoadAsync(ms, LoadOptions.None, cancellationToken);
                     }
                     else
                     {
-                        ret.MergeXML(XDocument.Load(ms));
+                        ret.MergeXML(await XDocument.LoadAsync(ms, LoadOptions.None, cancellationToken));
                     }
                 }
                 catch (System.Xml.XmlException)
@@ -265,21 +268,23 @@ namespace LibX4.FileSystem
 
 
         /// <inheritdoc/>
-        public XDocument OpenXml(string filePath)
-            => TryOpenXml(filePath) ?? throw new FileNotFoundException(filePath);
+        public async Task<XDocument> OpenXmlAsync(string filePath, CancellationToken cancellationToken = default)
+            => await TryOpenXmlAsync(filePath, cancellationToken) ?? throw new FileNotFoundException(filePath);
 
 
         /// <inheritdoc/>
-        public XDocument OpenIndexXml(string indexFilePath, string name)
+        public async Task<XDocument> OpenIndexXmlAsync(string indexFilePath, string name, CancellationToken cancellationToken = default)
         {
             if (!_LoadedIndex.Contains(indexFilePath))
             {
-                foreach (var entry in OpenXml(indexFilePath).XPathSelectElements("/index/entry"))
+                foreach (var entry in (await OpenXmlAsync(indexFilePath, cancellationToken)).XPathSelectElements("/index/entry"))
                 {
                     var entryName = entry.Attribute("name")?.Value;
-                    if (entryName == null) continue;
+                    if (entryName is null) continue;
+
                     var entryValue = entry.Attribute("value")?.Value.Replace(@"\\", @"\");
-                    if (entryValue == null) continue;
+                    if (entryValue is null) continue;
+
                     if (!_Index.TryAdd(entryName, entryValue)) _Index[entryName] = entryValue;
                 }
                 _LoadedIndex.Add(indexFilePath);
@@ -287,7 +292,7 @@ namespace LibX4.FileSystem
 
             var path = _Index.GetValueOrDefault(name) ?? throw new FileNotFoundException();
 
-            if (path == null) throw new FileNotFoundException();
+            if (path is null) throw new FileNotFoundException();
 
             // 拡張子が設定されていない場合、xml をデフォルトにする
             if (string.IsNullOrEmpty(Path.GetExtension(path)))
@@ -300,7 +305,7 @@ namespace LibX4.FileSystem
                 path = path[1..];
             }
 
-            return OpenXml(path);
+            return await OpenXmlAsync(path, cancellationToken);
         }
 
 
@@ -341,7 +346,7 @@ namespace LibX4.FileSystem
             var modPath = _ParseModRegex.Match(path).Groups[1].Value;
 
             return _LoadedMods.Contains(modPath)
-                ? path.Substring(modPath.Length + 1)
+                ? path[(modPath.Length + 1)..]
                 : path;
         }
     }

@@ -68,7 +68,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
         public IEnumerable<CalcResult> Calc(IX4Module module, long moduleCount)
         {
             return CalcProductAndResources(module, moduleCount)
-                .Concat(CalcHabitationModuleResources(module, moduleCount));
+                .Concat(CalcHabitationModuleResources(module, moduleCount))
+                .GroupBy(x => x.WareID)
+                .Select(x => new CalcResult(x.Key, x.Sum(y => y.WareAmount), x.First().Method, x.First().Module, x.First().ModuleCount, x.First().Efficiency));
         }
 
 
@@ -97,7 +99,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                     var effects = prodWare.WareEffects.TryGet(product.Method);
 
                     // ウェア生産量
-                    var amount = (long)Math.Floor(wareProduction.Amount * (3600 / wareProduction.Time));
+                    var amount = (long)Math.Floor(wareProduction.Amount * (3600 / wareProduction.Time) * product.Amount);
 
                     yield return new CalcResult(product.WareID, amount, method, module, moduleCount, effects);
                 }
@@ -109,7 +111,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid
                     foreach (var resource in resources)
                     {
                         // ウェア消費量
-                        var amount = (long)Math.Floor(-3600 / wareProduction.Time * resource.Amount);
+                        var amount = (long)Math.Floor(-3600 / wareProduction.Time * resource.Amount * product.Amount);
                         yield return new CalcResult(resource.NeedWareID, amount, method, module, moduleCount);
                     }
                 }

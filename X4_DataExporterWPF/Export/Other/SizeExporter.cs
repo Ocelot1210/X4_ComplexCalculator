@@ -3,7 +3,10 @@ using LibX4.Lang;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Threading;
+using System.Threading.Tasks;
 using X4_DataExporterWPF.Entity;
+using X4_DataExporterWPF.Internal;
 
 namespace X4_DataExporterWPF.Export
 {
@@ -15,30 +18,27 @@ namespace X4_DataExporterWPF.Export
         /// <summary>
         /// 言語解決用オブジェクト
         /// </summary>
-        private readonly LanguageResolver _Resolver;
+        private readonly ILanguageResolver _Resolver;
 
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         /// <param name="resolver">言語解決用オブジェクト</param>
-        public SizeExporter(LanguageResolver resolver)
+        public SizeExporter(ILanguageResolver resolver)
         {
             _Resolver = resolver;
         }
 
 
-        /// <summary>
-        /// 抽出処理
-        /// </summary>
-        /// <param name="connection"></param>
-        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
+        /// <inheritdoc/>
+        public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
         {
             //////////////////
             // テーブル作成 //
             //////////////////
             {
-                connection.Execute(@"
+                await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS Size
 (
     SizeID  TEXT    NOT NULL PRIMARY KEY,
@@ -51,9 +51,9 @@ CREATE TABLE IF NOT EXISTS Size
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords(progress);
+                var items = GetRecords(progress, cancellationToken);
 
-                connection.Execute("INSERT INTO Size (SizeID, Name) VALUES (@SizeID, @Name)", items);
+                await connection.ExecuteAsync("INSERT INTO Size (SizeID, Name) VALUES (@SizeID, @Name)", items);
             }
         }
 
@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS Size
         /// XML から Size データを読み出す
         /// </summary>
         /// <returns>読み出した Size データ</returns>
-        private IEnumerable<Size> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
+        private IEnumerable<Size> GetRecords(IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
         {
             // TODO: 可能ならファイルから抽出する
             (string id, string name)[] data =
@@ -78,6 +78,7 @@ CREATE TABLE IF NOT EXISTS Size
             progress.Report((currentStep++, data.Length));
             foreach (var (id, name) in data)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 yield return new Size(id, _Resolver.Resolve(name));
                 progress.Report((currentStep++, data.Length));
             }

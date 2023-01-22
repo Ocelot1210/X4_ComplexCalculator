@@ -4,9 +4,13 @@ using LibX4.Xml;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
+using X4_DataExporterWPF.Internal;
 
 namespace X4_DataExporterWPF.Export
 {
@@ -44,17 +48,14 @@ namespace X4_DataExporterWPF.Export
         }
 
 
-        /// <summary>
-        /// 抽出処理
-        /// </summary>
-        /// <param name="connection"></param>
-        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
+        /// <inheritdoc/>
+        public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
         {
             //////////////////
             // テーブル作成 //
             //////////////////
             {
-                connection.Execute(@"
+                await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS Module
 (
     ModuleID        TEXT    NOT NULL PRIMARY KEY,
@@ -73,9 +74,9 @@ CREATE TABLE IF NOT EXISTS Module
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords(progress);
+                var items = GetRecordsAsync(progress, cancellationToken);
 
-                connection.Execute("INSERT INTO Module (ModuleID, ModuleTypeID, Macro, MaxWorkers, WorkersCapacity, NoBlueprint, Thumbnail) VALUES (@ModuleID, @ModuleTypeID, @Macro, @MaxWorkers, @WorkersCapacity, @NoBlueprint, @Thumbnail)", items);
+                await connection.ExecuteAsync("INSERT INTO Module (ModuleID, ModuleTypeID, Macro, MaxWorkers, WorkersCapacity, NoBlueprint, Thumbnail) VALUES (@ModuleID, @ModuleTypeID, @Macro, @MaxWorkers, @WorkersCapacity, @NoBlueprint, @Thumbnail)", items);
             }
         }
 
@@ -84,7 +85,7 @@ CREATE TABLE IF NOT EXISTS Module
         /// XML から Module データを読み出す
         /// </summary>
         /// <returns>読み出した Module データ</returns>
-        internal IEnumerable<Module> GetRecords(IProgress<(int currentStep, int maxSteps)>? progress = null)
+        internal async IAsyncEnumerable<Module> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)>? progress, [EnumeratorCancellation] CancellationToken cancellationToken)
         {
             var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'module')])");
             var currentStep = 0;
@@ -92,6 +93,7 @@ CREATE TABLE IF NOT EXISTS Module
 
             foreach (var module in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'module')]"))
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 progress?.Report((currentStep++, maxSteps));
 
 
@@ -101,7 +103,7 @@ CREATE TABLE IF NOT EXISTS Module
                 var macroName = module.XPathSelectElement("component").Attribute("ref").Value;
                 if (string.IsNullOrEmpty(macroName)) continue;
 
-                var macroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
+                var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName);
                 var moduleTypeID = macroXml.Root.XPathSelectElement("macro").Attribute("class").Value;
                 if (string.IsNullOrEmpty(moduleTypeID)) continue;
 
@@ -112,7 +114,7 @@ CREATE TABLE IF NOT EXISTS Module
 
                 var noBluePrint = module.Attribute("tags").Value.Contains("noblueprint");
 
-                yield return new Module(moduleID, moduleTypeID, macroName, maxWorkers, capacity, noBluePrint, GetThumbnail(macroName));
+                yield return new Module(moduleID, moduleTypeID, macroName, maxWorkers, capacity, noBluePrint, await GetThumbnailAsync(macroName, cancellationToken));
             }
 
             progress?.Report((currentStep++, maxSteps));
@@ -124,10 +126,10 @@ CREATE TABLE IF NOT EXISTS Module
         /// </summary>
         /// <param name="macroName">マクロ名</param>
         /// <returns>サムネ画像のバイト配列</returns>
-        private byte[]? GetThumbnail(string macroName)
+        private async Task<byte[]?> GetThumbnailAsync(string macroName, CancellationToken cancellationToken)
         {
             const string dir = "assets/fx/gui/textures/stationmodules";
-            var thumb = Util.DDS2Png(_CatFile, dir, macroName);
+            var thumb = await Util.DDS2PngAsync(_CatFile, dir, macroName, cancellationToken);
             if (thumb is not null)
             {
                 return thumb;
@@ -135,7 +137,7 @@ CREATE TABLE IF NOT EXISTS Module
 
             if (_NotFoundThumb is null)
             {
-                _NotFoundThumb = Util.DDS2Png(_CatFile, dir, "notfound");
+                _NotFoundThumb = await Util.DDS2PngAsync(_CatFile, dir, "notfound", cancellationToken);
             }
 
             return _NotFoundThumb;

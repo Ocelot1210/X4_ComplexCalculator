@@ -5,9 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
+using X4_DataExporterWPF.Internal;
 
 namespace X4_DataExporterWPF.Export
 {
@@ -52,17 +56,14 @@ namespace X4_DataExporterWPF.Export
         }
 
 
-        /// <summary>
-        /// 抽出処理
-        /// </summary>
-        /// <param name="connection"></param>
-        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
+        /// <inheritdoc/>
+        public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
         {
             //////////////////
             // テーブル作成 //
             //////////////////
             {
-                connection.Execute(@"
+                await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS Equipment
 (
     EquipmentID     TEXT    NOT NULL PRIMARY KEY,
@@ -78,7 +79,8 @@ CREATE TABLE IF NOT EXISTS Equipment
     FOREIGN KEY (MakerRace)         REFERENCES Race(RaceID)
 ) WITHOUT ROWID");
 
-                connection.Execute(@"
+
+                await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS EquipmentTag
 (
     EquipmentID     TEXT    NOT NULL,
@@ -92,13 +94,13 @@ CREATE TABLE IF NOT EXISTS EquipmentTag
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords(progress);
+                var items = GetRecordsAsync(progress, cancellationToken);
 
-                connection.Execute(@"
+                await connection.ExecuteAsync(@"
 INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  Hull,  HullIntegrated,  Mk,  MakerRace,  Thumbnail)
             VALUES    (@EquipmentID, @MacroName, @EquipmentTypeID, @Hull, @HullIntegrated, @Mk, @MakerRace, @Thumbnail)", items);
 
-                connection.Execute("INSERT INTO EquipmentTag (EquipmentID, Tag) VALUES (@EquipmentID, @Tag)", _EquipmentTags.SelectMany(x => x));
+                await connection.ExecuteAsync("INSERT INTO EquipmentTag (EquipmentID, Tag) VALUES (@EquipmentID, @Tag)", _EquipmentTags.SelectMany(x => x));
             }
         }
 
@@ -107,7 +109,7 @@ INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  Hull,  HullI
         /// XML から Equipment データを読み出す
         /// </summary>
         /// <returns>読み出した Equipment データ</returns>
-        private IEnumerable<Equipment> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
+        private async IAsyncEnumerable<Equipment> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
         {
             var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[@transport='equipment'])");
             var currentStep = 0;
@@ -115,6 +117,7 @@ INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  Hull,  HullI
 
             foreach (var equipment in _WaresXml.Root.XPathSelectElements("ware[@transport='equipment']"))
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 progress?.Report((currentStep++, maxSteps));
 
                 var equipmentID = equipment.Attribute("id")?.Value;
@@ -127,11 +130,11 @@ INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  Hull,  HullI
                 if (string.IsNullOrEmpty(equipmentTypeID)) continue;
 
                 
-                var macroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
+                var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
                 XDocument componentXml;
                 try
                 {
-                    componentXml = _CatFile.OpenIndexXml("index/components.xml", macroXml.Root.XPathSelectElement("macro/component").Attribute("ref").Value);
+                    componentXml = await _CatFile.OpenIndexXmlAsync("index/components.xml", macroXml.Root.XPathSelectElement("macro/component").Attribute("ref").Value, cancellationToken);
                 }
                 catch
                 {
@@ -159,7 +162,7 @@ INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  Hull,  HullI
                     (macroXml.Root.XPathSelectElement("macro/properties/hull")?.Attribute("integrated")?.GetInt() ?? 0) == 1,
                     idElm.Attribute("mk")?.GetInt() ?? 0,
                     idElm.Attribute("makerrace")?.Value,
-                    GetThumbnail(macroName)
+                    await GetThumbnailAsync(macroName, cancellationToken)
                 );
             }
 
@@ -172,10 +175,10 @@ INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  Hull,  HullI
         /// </summary>
         /// <param name="macroName">マクロ名</param>
         /// <returns>サムネ画像のバイト配列</returns>
-        private byte[]? GetThumbnail(string macroName)
+        private async Task<byte[]?> GetThumbnailAsync(string macroName, CancellationToken cancellationToken)
         {
             const string dir = "assets/fx/gui/textures/upgrades";
-            var thumb = Util.DDS2Png(_CatFile, dir, macroName);
+            var thumb = await Util.DDS2PngAsync(_CatFile, dir, macroName, cancellationToken);
             if (thumb is not null)
             {
                 return thumb;
@@ -183,7 +186,7 @@ INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  Hull,  HullI
 
             if (_NotFoundThumb is null)
             {
-                _NotFoundThumb = Util.DDS2Png(_CatFile, dir, "notfound");
+                _NotFoundThumb = await Util.DDS2PngAsync(_CatFile, dir, "notfound", cancellationToken);
             }
 
             return _NotFoundThumb;

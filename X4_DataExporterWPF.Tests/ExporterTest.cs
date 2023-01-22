@@ -2,6 +2,8 @@
 using LibX4.Lang;
 using System;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using X4_DataExporterWPF.Entity;
 using X4_DataExporterWPF.Export;
@@ -11,6 +13,9 @@ namespace X4_DataExporterWPF.Tests
 {
     public class ExporterTest
     {
+        private static readonly IProgress<(int, int)>? pg = null;
+        private static readonly CancellationToken ct = default;
+
         /// <summary>
         /// モジュールの最大収容人数が省略されている場合、0 として扱う。
         /// </summary>
@@ -35,7 +40,7 @@ namespace X4_DataExporterWPF.Tests
             ".ToXDocument();
             var exporter = new ModuleExporter(new DummyCat(macroXml), wareXml);
 
-            Assert.Equal(exporter.GetRecords(), new[] { new Module(
+            Assert.Equal(exporter.GetRecordsAsync(pg, ct).ToEnumerable(), new[] { new Module(
                 ModuleID: "module_arg_hab_l_01",
                 ModuleTypeID: "habitation",
                 Macro: "hab_arg_l_01_macro",
@@ -71,7 +76,7 @@ namespace X4_DataExporterWPF.Tests
             ".ToXDocument();
             var exporter = new ModuleExporter(new DummyCat(macroXml), wareXml);
 
-            Assert.Equal(exporter.GetRecords(), new[] { new Module(
+            Assert.Equal(exporter.GetRecordsAsync(pg, ct).ToEnumerable(), new[] { new Module(
                 ModuleID: "module_arg_prod_foodrations_01",
                 ModuleTypeID: "production",
                 Macro: "prod_arg_foodrations_macro",
@@ -128,7 +133,7 @@ namespace X4_DataExporterWPF.Tests
             ".ToXDocument();
             var exporter = new WareEffectExporter(xml);
 
-            Assert.Equal(exporter.GetRecords(), new[] { new WareEffect(
+            Assert.Equal(exporter.GetRecords(pg, ct), new[] { new WareEffect(
                 WareID: "advancedcomposites",
                 Method: "default",
                 EffectID: "work",
@@ -155,7 +160,7 @@ namespace X4_DataExporterWPF.Tests
             ".ToXDocument();
             var exporter = new WareGroupExporter(new DummyCat(xml), new DummyLanguageResolver());
 
-            Assert.Equal(exporter.GetRecords(), new[] { new WareGroup(
+            Assert.Equal(exporter.GetRecordsAsync(pg, ct).ToEnumerable(), new[] { new WareGroup(
                 WareGroupID: "gases",
                 Name: "{20215,401}",
                 Tier: 0
@@ -181,25 +186,25 @@ namespace X4_DataExporterWPF.Tests
             internal DummyCat(XDocument xml) => _Xml = xml;
 
 
-            public Stream OpenFile(string filePath)
+            public Task<Stream> OpenFileAsync(string filePath, CancellationToken cancellationToken)
                 => throw new NotSupportedException();
 
 
-            public Stream? TryOpenFile(string filePath)
-                => null;
+            public Task<Stream?> TryOpenFileAsync(string filePath, CancellationToken cancellationToken)
+                => Task.FromResult<Stream?>(null);
 
 
             /// <summary>
             /// インデックスの解決を行う代わりに、コンストラクタに渡された XML を返す
             /// </summary>
             /// <returns>コンストラクタで与えられた XML</returns>
-            public XDocument OpenIndexXml(string indexFilePath, string name) => _Xml;
+            public Task<XDocument> OpenIndexXmlAsync(string indexFilePath, string name, CancellationToken cancellationToken = default) => Task.FromResult(_Xml);
 
 
-            public XDocument OpenXml(string filePath) => _Xml;
+            public Task<XDocument> OpenXmlAsync(string filePath, CancellationToken cancellationToken = default) => Task.FromResult(_Xml);
 
 
-            public XDocument? TryOpenXml(string filePath) => _Xml;
+            public Task<XDocument?> TryOpenXmlAsync(string filePath, CancellationToken cancellationToken = default) => Task.FromResult<XDocument?>(_Xml);
         }
 
 

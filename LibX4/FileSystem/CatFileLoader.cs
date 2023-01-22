@@ -6,6 +6,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace LibX4.FileSystem
 {
@@ -172,7 +174,7 @@ namespace LibX4.FileSystem
         /// <param name="filePath">開きたいファイルのパス</param>
         /// <exception cref="IOException">読み込んだCatファイルの書式が不正な場合</exception>
         /// <returns>ファイルのMemoryStream、該当ファイルが無かった場合はnull</returns>
-        public Stream? OpenFile(string filePath)
+        public async Task<Stream?> OpenFileAsync(string filePath, CancellationToken cancellationToken = default)
         {
             if (_entries.TryGetValue(filePath, out var entry))
             {
@@ -191,7 +193,7 @@ namespace LibX4.FileSystem
                 );
                 var buff = new byte[entry.FileSize];
                 fs.Seek(entry.Offset, SeekOrigin.Begin);
-                fs.Read(buff, 0, buff.Length);
+                await fs.ReadAsync(buff, 0, buff.Length, cancellationToken);
 
                 return new MemoryStream(buff, false);
             }
@@ -206,7 +208,7 @@ namespace LibX4.FileSystem
                 using var fs = new FileStream(path, FileMode.Open, FileAccess.Read);
 
                 var buff = new byte[fs.Length];
-                fs.Read(buff, 0, buff.Length);
+                await fs.ReadAsync(buff, 0, buff.Length, cancellationToken);
 
                 return new MemoryStream(buff, false);
             }

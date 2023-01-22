@@ -4,9 +4,13 @@ using LibX4.Xml;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
+using X4_DataExporterWPF.Internal;
 
 namespace X4_DataExporterWPF.Export
 {
@@ -43,23 +47,21 @@ namespace X4_DataExporterWPF.Export
         }
 
 
-        /// <summary>
-        /// 抽出処理
-        /// </summary>
-        /// <param name="connection"></param>
-        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
+        /// <inheritdoc/>
+        public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
         {
             //////////////////
             // テーブル作成 //
             //////////////////
             {
-                connection.Execute(@"
+                await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS ModuleStorage
 (
     ModuleID        TEXT    NOT NULL PRIMARY KEY,
     Amount          INTEGER NOT NULL,
     FOREIGN KEY (ModuleID)  REFERENCES Module(ModuleID)
 ) WITHOUT ROWID");
+
 
                 connection.Execute(@"
 CREATE TABLE IF NOT EXISTS ModuleStorageType
@@ -77,11 +79,11 @@ CREATE TABLE IF NOT EXISTS ModuleStorageType
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords(progress);
+                var items = GetRecordsAsync(progress, cancellationToken);
 
-                connection.Execute("INSERT INTO ModuleStorage (ModuleID, Amount) VALUES (@ModuleID, @Amount)", items);
+                await connection.ExecuteAsync("INSERT INTO ModuleStorage (ModuleID, Amount) VALUES (@ModuleID, @Amount)", items);
 
-                connection.Execute("INSERT INTO ModuleStorageType (ModuleID, TransportTypeID) VALUES (@ModuleID, @TransportTypeID)", _StorageTypes);
+                await connection.ExecuteAsync("INSERT INTO ModuleStorageType (ModuleID, TransportTypeID) VALUES (@ModuleID, @TransportTypeID)", _StorageTypes);
             }
         }
 
@@ -90,7 +92,7 @@ CREATE TABLE IF NOT EXISTS ModuleStorageType
         /// XML から ModuleStorage データを読み出す
         /// </summary>
         /// <returns>読み出した ModuleStorage データ</returns>
-        private IEnumerable<ModuleStorage> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
+        private async IAsyncEnumerable<ModuleStorage> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
         {
             var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'module')])");
             var currentStep = 0;
@@ -98,6 +100,7 @@ CREATE TABLE IF NOT EXISTS ModuleStorageType
 
             foreach (var module in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'module')]"))
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 progress.Report((currentStep++, maxSteps));
 
 
@@ -105,7 +108,7 @@ CREATE TABLE IF NOT EXISTS ModuleStorageType
                 if (string.IsNullOrEmpty(moduleID)) continue;
 
                 var macroName = module.XPathSelectElement("component").Attribute("ref").Value;
-                var macroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
+                var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
 
                 // 容量が記載されている箇所を抽出
                 var cargo = macroXml.Root.XPathSelectElement("macro/properties/cargo");

@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using X4_DataExporterWPF.Entity;
+using System.Threading.Tasks;
+using System.Threading;
+using X4_DataExporterWPF.Internal;
 
 namespace X4_DataExporterWPF.Export
 {
@@ -11,14 +14,15 @@ namespace X4_DataExporterWPF.Export
     /// </summary>
     public class EffectExporter : IExporter
     {
-        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
+        /// <inheritdoc/>
+        public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
         {
             //////////////////
             // テーブル作成 //
             //////////////////
             {
                 // テーブル作成
-                connection.Execute(@"
+                await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS Effect
 (
     EffectID    TEXT    NOT NULL PRIMARY KEY,
@@ -31,10 +35,10 @@ CREATE TABLE IF NOT EXISTS Effect
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords(progress);
+                var items = GetRecords(progress, cancellationToken);
 
                 // レコード追加
-                connection.Execute("INSERT INTO Effect (EffectID, Name) VALUES (@EffectID, @Name)", items);
+                await connection.ExecuteAsync("INSERT INTO Effect (EffectID, Name) VALUES (@EffectID, @Name)", items);
             }
         }
 
@@ -43,7 +47,7 @@ CREATE TABLE IF NOT EXISTS Effect
         /// Effect データを読み出す
         /// </summary>
         /// <returns>EquipmentType データ</returns>
-        private IEnumerable<Effect> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
+        private IEnumerable<Effect> GetRecords(IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
         {
             // TODO: 可能ならファイルから抽出する
             (string id, string name)[] data =
@@ -56,6 +60,7 @@ CREATE TABLE IF NOT EXISTS Effect
             progress.Report((currentStep++, data.Length));
             foreach (var (id, name) in data)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 yield return new Effect(id, name);
                 progress.Report((currentStep++, data.Length));
             }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
@@ -46,32 +47,31 @@ namespace LibX4.Lang
         internal LanguageResolver(params XDocument[] languageXml) => _LanguagesXml = languageXml;
 
 
+
         /// <summary>
         /// 指定された言語 ID のファイルを読み込み、LanguageResolver インスタンスを初期化する。
         /// 複数の言語 ID が指定された場合、先に指定された物を優先する。
         /// </summary>
         /// <param name="catFile">catファイルオブジェクト</param>
         /// <param name="languageIds">読み込む言語 ID の配列</param>
-        public LanguageResolver(CatFile catFile, params int[] languageIds)
+        public static async Task<LanguageResolver> CreateAsync(CatFile catFile, params int[] languageIds)
         {
-            var languageXmls = languageIds
+            var tasks = languageIds
                 .Where((x, i) => languageIds.Take(i).All(y => x != y))  // 順序を保証する Distinct
-                .Select(languageId => catFile.OpenXml($"t/0001-l{languageId,3:D3}.xml"))
-                .ToList();
+                .Select(async languageId => await catFile.OpenXmlAsync($"t/0001-l{languageId,3:D3}.xml"));
 
-            var defaultXmlFiles = catFile.OpenXmlFiles("t/0001.xml");
-            if (defaultXmlFiles.Any())
+            var languageXmls = await Task.WhenAll(tasks);
+
+            var defaultXmlFiles = catFile.OpenXmlFilesAsync("t/0001.xml");
+            await foreach (var xml in defaultXmlFiles)
             {
-                foreach (var xml in defaultXmlFiles)
+                for (var cnt = 0; cnt < languageXmls.Length; cnt++)
                 {
-                    for (var cnt = 0; cnt < languageXmls.Count; cnt++)
-                    {
-                        XMLPatcher.MergeXML(languageXmls[cnt], xml);
-                    }
+                    XMLPatcher.MergeXML(languageXmls[cnt], xml);
                 }
             }
 
-            _LanguagesXml = languageXmls;
+            return new LanguageResolver(languageXmls);
         }
 
 
@@ -95,7 +95,8 @@ namespace LibX4.Lang
             if (string.IsNullOrEmpty(target)) return target;
 
             var matchLangField = _GetIDRegex.Match(target);
-            if (matchLangField == null) return target;
+            if (matchLangField is null) return target;
+
             var pageID = matchLangField.Groups[1].Value;
             var tID = matchLangField.Groups[2].Value;
 

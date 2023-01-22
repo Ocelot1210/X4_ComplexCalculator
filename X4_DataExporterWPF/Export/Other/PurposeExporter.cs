@@ -4,10 +4,13 @@ using LibX4.Lang;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
-using System.Linq;
+using X4_DataExporterWPF.Internal;
 
 namespace X4_DataExporterWPF.Export
 {
@@ -48,18 +51,14 @@ namespace X4_DataExporterWPF.Export
         }
 
 
-
-        /// <summary>
-        /// 抽出処理
-        /// </summary>
-        /// <param name="connection"></param>
-        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
+        /// <inheritdoc/>
+        public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
         {
             //////////////////
             // テーブル作成 //
             //////////////////
             {
-                connection.Execute(@"
+                await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS Purpose
 (
     PurposeID   TEXT    NOT NULL PRIMARY KEY,
@@ -72,14 +71,18 @@ CREATE TABLE IF NOT EXISTS Purpose
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords(progress);
+                var items = GetRecordsAsync(progress, cancellationToken);
 
-                connection.Execute("INSERT INTO Purpose (PurposeID, Name) VALUES (@PurposeID, @Name)", items);
+                await connection.ExecuteAsync("INSERT INTO Purpose (PurposeID, Name) VALUES (@PurposeID, @Name)", items);
             }
         }
 
 
-        private IEnumerable<Purpose> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
+        /// <summary>
+        /// XML から Purpose データを読み出す
+        /// </summary>
+        /// <returns>読み出した Purpose データ</returns>
+        private async IAsyncEnumerable<Purpose> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
         {
             // TODO: 可能ならファイルから抽出する
             // 注) 「IDは仮」と記載されている項目は 0001-l044.xml を参考にした
@@ -113,6 +116,7 @@ CREATE TABLE IF NOT EXISTS Purpose
 
             foreach (var ship in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'ship')]"))
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 progress?.Report((currentStep++, maxSteps));
 
                 var shipID = ship.Attribute("id")?.Value;
@@ -121,12 +125,14 @@ CREATE TABLE IF NOT EXISTS Purpose
                 var macroName = ship.XPathSelectElement("component")?.Attribute("ref")?.Value;
                 if (string.IsNullOrEmpty(macroName)) continue;
 
-                var macroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
+                var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName);
 
                 foreach (var elm in macroXml.Root.XPathSelectElements("macro/properties/purpose"))
                 {
                     foreach (var attr in elm.Attributes())
                     {
+                        cancellationToken.ThrowIfCancellationRequested();
+
                         var purpose = attr.Value;
                         if (!string.IsNullOrEmpty(purpose) && !added.Contains(attr.Value))
                         {

@@ -4,9 +4,13 @@ using LibX4.Xml;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
+using X4_DataExporterWPF.Internal;
 
 namespace X4_DataExporterWPF.Export
 {
@@ -39,17 +43,14 @@ namespace X4_DataExporterWPF.Export
         }
 
 
-        /// <summary>
-        /// 抽出処理
-        /// </summary>
-        /// <param name="connection"></param>
-        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
+        /// <inheritdoc/>
+        public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
         {
             //////////////////
             // テーブル作成 //
             //////////////////
             {
-                connection.Execute(@"
+                await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS Thruster
 (
     EquipmentID     TEXT    NOT NULL PRIMARY KEY,
@@ -68,9 +69,9 @@ CREATE TABLE IF NOT EXISTS Thruster
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords(progress);
+                var items = GetRecords(progress, cancellationToken);
 
-                connection.Execute(@"
+                await connection.ExecuteAsync(@"
 INSERT INTO Thruster ( EquipmentID,  ThrustStrafe,  ThrustPitch,  ThrustYaw,  ThrustRoll,  AngularRoll,  AngularPitch)
             VALUES   (@EquipmentID, @ThrustStrafe, @ThrustPitch, @ThrustYaw, @ThrustRoll, @AngularRoll, @AngularPitch)", items);
             }
@@ -78,10 +79,10 @@ INSERT INTO Thruster ( EquipmentID,  ThrustStrafe,  ThrustPitch,  ThrustYaw,  Th
 
 
         /// <summary>
-        /// XML から Engine データを読み出す
+        /// XML から Thruster データを読み出す
         /// </summary>
-        /// <returns>読み出した Engine データ</returns>
-        private IEnumerable<Thruster> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
+        /// <returns>読み出した Thruster データ</returns>
+        private async IAsyncEnumerable<Thruster> GetRecords(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
         {
             var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[@transport='equipment'][@group='thrusters'])");
             var currentStep = 0;
@@ -89,6 +90,7 @@ INSERT INTO Thruster ( EquipmentID,  ThrustStrafe,  ThrustPitch,  ThrustYaw,  Th
 
             foreach (var equipment in _WaresXml.Root.XPathSelectElements("ware[@transport='equipment'][@group='thrusters']"))
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 progress.Report((currentStep++, maxSteps));
 
 
@@ -98,7 +100,7 @@ INSERT INTO Thruster ( EquipmentID,  ThrustStrafe,  ThrustPitch,  ThrustYaw,  Th
                 var macroName = equipment.XPathSelectElement("component")?.Attribute("ref")?.Value;
                 if (string.IsNullOrEmpty(macroName)) continue;
 
-                var macroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
+                var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
                 if (macroXml is null) continue;
 
 

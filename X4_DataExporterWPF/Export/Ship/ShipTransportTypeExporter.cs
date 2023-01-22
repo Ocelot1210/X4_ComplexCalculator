@@ -3,10 +3,13 @@ using LibX4.FileSystem;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
+using X4_DataExporterWPF.Internal;
 
 namespace X4_DataExporterWPF.Export
 {
@@ -40,17 +43,14 @@ namespace X4_DataExporterWPF.Export
         }
 
 
-        /// <summary>
-        /// 抽出処理
-        /// </summary>
-        /// <param name="connection"></param>
-        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
+        /// <inheritdoc/>
+        public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
         {
             //////////////////
             // テーブル作成 //
             //////////////////
             {
-                connection.Execute(@"
+                await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS ShipTransportType
 (
     ShipID          TEXT    NOT NULL,
@@ -65,9 +65,9 @@ CREATE TABLE IF NOT EXISTS ShipTransportType
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords(progress);
+                var items = GetRecordsAsync(progress, cancellationToken);
 
-                connection.Execute(@"INSERT INTO ShipTransportType(ShipID, TransportTypeID) VALUES(@ShipID, @TransportTypeID)", items);
+                await connection.ExecuteAsync(@"INSERT INTO ShipTransportType(ShipID, TransportTypeID) VALUES(@ShipID, @TransportTypeID)", items);
             }
         }
 
@@ -75,13 +75,14 @@ CREATE TABLE IF NOT EXISTS ShipTransportType
         /// <summary>
         /// レコード抽出
         /// </summary>
-        private IEnumerable<ShipTransportType> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
+        private async IAsyncEnumerable<ShipTransportType> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
         {
             var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
             var currentStep = 0;
 
             foreach (var ship in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'ship')]"))
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 progress.Report((currentStep++, maxSteps));
 
                 var shipID = ship.Attribute("id")?.Value;
@@ -90,9 +91,9 @@ CREATE TABLE IF NOT EXISTS ShipTransportType
                 var macroName = ship.XPathSelectElement("component")?.Attribute("ref")?.Value;
                 if (string.IsNullOrEmpty(macroName)) continue;
 
-                var macroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
+                var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
 
-                foreach (var type in EnumerateCargoTypes(macroXml))
+                foreach (var type in await GetCargoTypesAsync(macroXml, cancellationToken))
                 {
                     yield return new ShipTransportType(shipID, type);
                 }
@@ -103,35 +104,34 @@ CREATE TABLE IF NOT EXISTS ShipTransportType
 
 
         /// <summary>
-        /// カーゴ種別を列挙する
+        /// カーゴ種別を取得する
         /// </summary>
         /// <param name="macroXml">マクロxml</param>
         /// <returns>該当艦船のカーゴ種別</returns>
-        private IEnumerable<string> EnumerateCargoTypes(XDocument macroXml)
+        private async Task<IReadOnlyList<string>> GetCargoTypesAsync(XDocument macroXml, CancellationToken cancellationToken)
         {
             var componentName = macroXml.Root.XPathSelectElement("macro/component")?.Attribute("ref")?.Value ?? "";
-            if (string.IsNullOrEmpty(componentName)) return Enumerable.Empty<string>();
+            if (string.IsNullOrEmpty(componentName)) return Array.Empty<string>();
 
-            var componentXml = _CatFile.OpenIndexXml("index/components.xml", componentName);
-            if (componentXml is null) return Enumerable.Empty<string>();
+            var componentXml = await _CatFile.OpenIndexXmlAsync("index/components.xml", componentName, cancellationToken);
+            if (componentXml is null) return Array.Empty<string>();
 
             var connName = componentXml.Root.XPathSelectElement("component/connections/connection[contains(@tags, 'storage')]")?.Attribute("name")?.Value ?? "";
-            if (string.IsNullOrEmpty(connName)) return Enumerable.Empty<string>();
+            if (string.IsNullOrEmpty(connName)) return Array.Empty<string>();
 
             var storage = macroXml.Root.XPathSelectElement($"macro/connections/connection[@ref='{connName}']/macro")?.Attribute("ref")?.Value ?? "";
             if (string.IsNullOrEmpty(storage))
             {
                 // カーゴが無い船(ゼノンの艦船等)を考慮
-                return Enumerable.Empty<string>();
+                return Array.Empty<string>();
             }
 
-
-            var storageXml = _CatFile.OpenIndexXml("index/macros.xml", storage);
-            if (storageXml is null) return Enumerable.Empty<string>();
+            var storageXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", storage, cancellationToken);
+            if (storageXml is null) return Array.Empty<string>();
 
             var tags = storageXml.Root.XPathSelectElement("macro/properties/cargo")?.Attribute("tags")?.Value ?? "";
 
-            return tags.Trim(' ').Split(" ");
+            return Util.SplitTags(tags);
         }
     }
 }
