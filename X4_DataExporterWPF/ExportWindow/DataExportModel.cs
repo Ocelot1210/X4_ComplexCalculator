@@ -76,10 +76,7 @@ namespace X4_DataExporterWPF.DataExportWindow
             // 抽出に失敗した場合、例外設定で「Common Languate Runtime Exceptions」にチェックを入れるとどこで例外が発生したか分かる
             try
             {
-                if (File.Exists(outFilePath))
-                {
-                    File.Delete(outFilePath);
-                }
+                using var backupper = new DbBackupper(outFilePath);
 
                 var consb = new SQLiteConnectionStringBuilder { DataSource = outFilePath };
                 using var conn = new SQLiteConnection(consb.ToString());
@@ -151,9 +148,21 @@ namespace X4_DataExporterWPF.DataExportWindow
                 }
 
                 trans.Commit();
+                backupper.Commit();
+
                 await owner.Dispatcher.BeginInvoke((Action)(() =>
                 {
                     MessageBox.Show("Data export completed.", "X4 DataExporter", MessageBoxButton.OK, MessageBoxImage.Information);
+                }));
+            }
+            catch (DbBackupException)
+            {
+                await owner.Dispatcher.BeginInvoke((Action)(() =>
+                {
+                    var msg = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_FailedToBackupDb", null, null);
+                    var title = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_Title", null, null);
+
+                    MessageBox.Show(owner, msg, title, MessageBoxButton.OK, MessageBoxImage.Error);
                 }));
             }
             catch (Exception e)
@@ -162,8 +171,6 @@ namespace X4_DataExporterWPF.DataExportWindow
                 var dumpPath = Path.Combine(Path.GetTempPath(), "X4_ComplexCalculator_CrashReport.txt");
 
                 DumpCrashReport(dumpPath, catFile, e);
-
-
 
                 await owner.Dispatcher.BeginInvoke((Action)(() =>
                 {
