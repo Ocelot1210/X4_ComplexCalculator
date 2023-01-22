@@ -152,7 +152,10 @@ namespace X4_DataExporterWPF.DataExportWindow
 
                 await owner.Dispatcher.BeginInvoke((Action)(() =>
                 {
-                    MessageBox.Show("Data export completed.", "X4 DataExporter", MessageBoxButton.OK, MessageBoxImage.Information);
+                    var msg = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_ExportCompleted", null, null);
+                    var title = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_Title", null, null);
+
+                    MessageBox.Show(owner, msg, title, MessageBoxButton.OK, MessageBoxImage.Information);
                 }));
             }
             catch (DbBackupException)

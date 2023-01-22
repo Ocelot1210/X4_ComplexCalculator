@@ -297,14 +297,13 @@ NumericalFilter_GreaterThanOrEqualTo;≧ Greater than or equal to
 NumericalFilter_LessThan;＜ Less than
 NumericalFilter_LessThanOrEqualTo;≦ Less than or equal to
 NumericalFilter_Between;～ Between
+TextFilter_GroupBoxTitle;Search by text
 TextFilter_Contains;Contains
 TextFilter_NotContains;Not contains
 TextFilter_Equals;Equals
 TextFilter_NotEqulas;Not equals
 TextFilter_StartWith;Start with
 TextFilter_EndWith;End with
-
-
 
 
 # ------------------------------------------------------
@@ -385,6 +384,7 @@ DataExporter_Output;Output
 DataExporter_Output_Language;Language
 DataExporter_Export;Export
 DataExporter_Close;Close
+DataExporter_ExportCompleted;Data export completed.
 DataExporter_FailedToResolveModDependencyMessage;Failed to resolve Mod dependencies.\r\nIt is possible that the Mod required by a Mod is not installed or has been disabled.\r\n.Please execute again with X4 running properly.
 DataExporter_FailedToBackupDb;Backup of DB file failed.\r\nPlease make sure that no other process is opening the x4.db file and run it again.
 DataExporter_FailedToExportMessage;Sorry, Data export failed.\r\nPlease report the following content to the developer.\r\n\r\n1. Selected language.\r\n2. Crash report file.\r\n3. Version of X4.
