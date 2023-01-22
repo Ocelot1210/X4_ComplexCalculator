@@ -161,36 +161,42 @@ namespace X4_DataExporterWPF.DataExportWindow
             // 入力元フォルダパスに値が代入された時、言語一覧を更新する
             InDirPath.Subscribe(async path =>
             {
-                if (_BusyNotifier.IsBusy) return;
-                using var _ = _BusyNotifier.ProcessStart();             // ■■■■ 落ちる
-
-                _UnableToGetLanguages.Value = false;
-                Languages.ClearOnScheduler();
-
-                var (success, languages) = await _Model.GetLanguages(path, _OwnerWindow);
-                _UnableToGetLanguages.Value = !success;
-                Languages.AddRangeOnScheduler(languages);
+                await UpdateLangList(path);
             });
             
             // 抽出オプションが変化した際、言語一覧を更新する
-            CatLoadOption.ObserveOn(ThreadPoolScheduler.Instance).Subscribe(option =>
+            CatLoadOption.Subscribe(async option =>
             {
-                if (_BusyNotifier.IsBusy) return;
-                using var _ = _BusyNotifier.ProcessStart();             // ■■■■ 落ちる
-
-                _UnableToGetLanguages.Value = false;
                 var prevLangID = SelectedLanguage.Value?.ID ?? -1;
-                Languages.ClearOnScheduler();
-
-                var (success, languages) = _Model.GetLanguages(InDirPath.Value, _OwnerWindow);
-                _UnableToGetLanguages.Value = !success;
-                Languages.AddRangeOnScheduler(languages);
-                ReactivePropertyScheduler.Default.Schedule(() =>
+                if (await UpdateLangList(InDirPath.Value))
                 {
-                    SelectedLanguage.Value = languages.FirstOrDefault(x => x.ID == prevLangID);
-                });
-                //SelectedLanguage.Value = Languages.FirstOrDefault(x => x.ID == prevLangID);
+                    ReactivePropertyScheduler.Default.Schedule(() =>
+                    {
+                        SelectedLanguage.Value = Languages.FirstOrDefault(x => x.ID == prevLangID);
+                    });
+                }
             });
+        }
+
+
+        /// <summary>
+        /// 指定したパスを X4 のインストール先と見なして言語一覧を初期化する
+        /// </summary>
+        /// <param name="x4InstallDirectory">X4 のインストール先フォルダパス</param>
+        /// <returns>言語一覧が更新された場合、<c>true;</c>。それ以外の場合 <c>false;</c></returns>
+        private async Task<bool> UpdateLangList(string x4InstallDirectory)
+        {
+            if (_BusyNotifier.IsBusy) return false;
+            using var _ = _BusyNotifier.ProcessStart();
+
+            _UnableToGetLanguages.Value = false;
+            Languages.ClearOnScheduler();
+
+            var (success, languages) = await Task.Run(async () => await _Model.GetLanguages(x4InstallDirectory, _OwnerWindow));
+            _UnableToGetLanguages.Value = !success;
+            Languages.AddRangeOnScheduler(languages);
+
+            return true;
         }
 
 

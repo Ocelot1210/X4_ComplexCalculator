@@ -90,7 +90,7 @@
                     DisplayMemberPath="Name"
                     IsEnabled="{Binding CanOperation.Value, Mode=OneWay}"
                     ItemsSource="{Binding Languages}"
-                    SelectedItem="{Binding SelectedLanguage.Value, Mode=OneWayToSource}" />
+                    SelectedItem="{Binding SelectedLanguage.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                 <GroupBox
                     Margin="5"
