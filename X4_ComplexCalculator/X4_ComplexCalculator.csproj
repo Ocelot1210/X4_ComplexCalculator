@@ -67,9 +67,6 @@
     <None Update="Localization\Lang.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Localization\Lang.en-US.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Localization\Lang.ja-JP.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
