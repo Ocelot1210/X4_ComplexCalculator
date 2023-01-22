@@ -1,3 +1,4 @@
+using LibX4.FileSystem;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Prism.Mvvm;
 using Reactive.Bindings;
@@ -70,6 +71,12 @@ namespace X4_DataExporterWPF.DataExportWindow
 
 
         /// <summary>
+        /// 読み込みオプション
+        /// </summary>
+        public ReactivePropertySlim<CatLoadOption> CatLoadOption { get; }
+
+
+        /// <summary>
         /// 進捗最大
         /// </summary>
         public ReactivePropertySlim<int> MaxSteps { get; } = new(1);
@@ -96,7 +103,7 @@ namespace X4_DataExporterWPF.DataExportWindow
         /// <summary>
         /// ユーザが操作可能か
         /// </summary>
-        public ReadOnlyReactivePropertySlim<bool> CanOperation { get; }
+        public ReadOnlyReactiveProperty<bool> CanOperation { get; }
 
 
         /// <summary>
@@ -125,6 +132,8 @@ namespace X4_DataExporterWPF.DataExportWindow
         {
             _OwnerWindow = window;
 
+            CatLoadOption = new ReactivePropertySlim<CatLoadOption>(LibX4.FileSystem.CatLoadOption.All);
+
             InDirPath = new ReactiveProperty<string>(inDirPath,
                 mode: ReactivePropertyMode.RaiseLatestValueOnSubscribe);
             _UnableToGetLanguages = new ReactivePropertySlim<bool>(false);
@@ -135,7 +144,7 @@ namespace X4_DataExporterWPF.DataExportWindow
             Languages = new ReactiveCollection<LangComboboxItem>();
             SelectedLanguage = new ReactivePropertySlim<LangComboboxItem?>();
 
-            CanOperation = _BusyNotifier.Inverse().ToReadOnlyReactivePropertySlim();
+            CanOperation = _BusyNotifier.Inverse().ToReadOnlyReactiveProperty();
 
             // 操作可能かつ入力項目に不備がない場合に true にする
             var canExport = new[]{
@@ -148,16 +157,39 @@ namespace X4_DataExporterWPF.DataExportWindow
             ExportCommand = new AsyncReactiveCommand(canExport).WithSubscribe(Export);
             ClosingCommand = new ReactiveCommand<CancelEventArgs>().WithSubscribe(Closing);
 
+
             // 入力元フォルダパスに値が代入された時、言語一覧を更新する
             InDirPath.Subscribe(async path =>
             {
-                using var _ = _BusyNotifier.ProcessStart();
+                if (_BusyNotifier.IsBusy) return;
+                using var _ = _BusyNotifier.ProcessStart();             // ■■■■ 落ちる
+
                 _UnableToGetLanguages.Value = false;
                 Languages.ClearOnScheduler();
 
                 var (success, languages) = await _Model.GetLanguages(path, _OwnerWindow);
                 _UnableToGetLanguages.Value = !success;
                 Languages.AddRangeOnScheduler(languages);
+            });
+            
+            // 抽出オプションが変化した際、言語一覧を更新する
+            CatLoadOption.ObserveOn(ThreadPoolScheduler.Instance).Subscribe(option =>
+            {
+                if (_BusyNotifier.IsBusy) return;
+                using var _ = _BusyNotifier.ProcessStart();             // ■■■■ 落ちる
+
+                _UnableToGetLanguages.Value = false;
+                var prevLangID = SelectedLanguage.Value?.ID ?? -1;
+                Languages.ClearOnScheduler();
+
+                var (success, languages) = _Model.GetLanguages(InDirPath.Value, _OwnerWindow);
+                _UnableToGetLanguages.Value = !success;
+                Languages.AddRangeOnScheduler(languages);
+                ReactivePropertyScheduler.Default.Schedule(() =>
+                {
+                    SelectedLanguage.Value = languages.FirstOrDefault(x => x.ID == prevLangID);
+                });
+                //SelectedLanguage.Value = Languages.FirstOrDefault(x => x.ID == prevLangID);
             });
         }
 

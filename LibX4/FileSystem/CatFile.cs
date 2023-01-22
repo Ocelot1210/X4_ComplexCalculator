@@ -77,7 +77,7 @@ namespace LibX4.FileSystem
         /// </summary>
         /// <param name="gameRoot">X4インストール先ディレクトリパス</param>
         /// <exception cref="DependencyResolutionException">Mod の依存関係の解決に失敗した場合</exception>
-        public CatFile(string gameRoot)
+        public CatFile(string gameRoot, CatLoadOption option = CatLoadOption.All)
         {
             // X4のバージョンを取得
             {
