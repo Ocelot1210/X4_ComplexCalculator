@@ -3,9 +3,12 @@ using LibX4.Lang;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
+using X4_DataExporterWPF.Internal;
 
 namespace X4_DataExporterWPF.Export
 {
@@ -35,17 +38,14 @@ namespace X4_DataExporterWPF.Export
         }
 
 
-        /// <summary>
-        /// データ抽出
-        /// </summary>
-        /// <param name="connection"></param>
-        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
+        /// <inheritdoc/>
+        public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
         {
             //////////////////
             // テーブル作成 //
             //////////////////
             {
-                connection.Execute(@"
+                await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS Map
 (
     Macro       TEXT    NOT NULL PRIMARY KEY,
@@ -55,7 +55,6 @@ CREATE TABLE IF NOT EXISTS Map
             }
 
 
-
             ////////////////
             // データ抽出 //
             ////////////////
@@ -63,15 +62,9 @@ CREATE TABLE IF NOT EXISTS Map
                 var items = GetRecords();
 
 
-                connection.Execute("INSERT INTO Map (Macro, Name, Description) VALUES (@Macro, @Name, @Description)", items);
-            }
+                await connection.ExecuteAsync("INSERT INTO Map (Macro, Name, Description) VALUES (@Macro, @Name, @Description)", items);
 
-
-            ///////////////
-            // Index作成 //
-            ///////////////
-            {
-                connection.Execute("CREATE INDEX MapIndex ON Ware(Macro)");
+                await connection.ExecuteAsync("CREATE INDEX MapIndex ON Ware(Macro)");
             }
         }
 

@@ -4,9 +4,13 @@ using LibX4.Lang;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
+using X4_DataExporterWPF.Internal;
 
 namespace X4_DataExporterWPF.Export
 {
@@ -45,17 +49,14 @@ namespace X4_DataExporterWPF.Export
         }
 
 
-        /// <summary>
-        /// 抽出処理
-        /// </summary>
-        /// <param name="connection"></param>
-        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
+        /// <inheritdoc/>
+        public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
         {
             //////////////////
             // テーブル作成 //
             //////////////////
             {
-                connection.Execute(@"
+                await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS ShipType
 (
     ShipTypeID  TEXT    NOT NULL PRIMARY KEY,
@@ -69,14 +70,14 @@ CREATE TABLE IF NOT EXISTS ShipType
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords(progress);
+                var items = GetRecordsAsync(progress, cancellationToken);
 
-                connection.Execute("INSERT INTO ShipType (ShipTypeID, Name, Description) VALUES (@ShipTypeID, @Name, @Description)", items);
+                await connection.ExecuteAsync("INSERT INTO ShipType (ShipTypeID, Name, Description) VALUES (@ShipTypeID, @Name, @Description)", items);
             }
         }
 
 
-        private IEnumerable<ShipType> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
+        private async IAsyncEnumerable<ShipType> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
         {
             // TODO: 可能ならファイルから抽出する
             var names = new Dictionary<string, (int name, int descr)>
@@ -109,18 +110,16 @@ CREATE TABLE IF NOT EXISTS ShipType
                 {"tug",              (5051, 5052)},         // 曳船
 
                 // 大型
-                {"destroyer",        (4001, 4002)},          // 駆逐艦
-                {"freighter",        (4011, 4012)},          // 貨物船
-                {"largeminer",       (4021, 4022)},          // 採掘船
+                {"destroyer",        (4001, 4002)},         // 駆逐艦
+                {"freighter",        (4011, 4012)},         // 貨物船
+                {"largeminer",       (4021, 4022)},         // 採掘船
+                {"compactor",        (5061, 5062)},         // 圧縮作業船 (IDは仮)
 
                 // 特大型
                 {"carrier",          (5001, 5002)},         // 空母
                 {"resupplier",       (5011, 5012)},         // 補助艦船
                 {"builder",          (5021, 5022)},         // 建築船
                 {"battleship",       (5031, 5032)},         // 戦艦
-
-                // ?
-                {"compactor",        (5061, 5062)},         // 圧縮作業船 (IDは仮)
             };
 
             var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
@@ -129,6 +128,7 @@ CREATE TABLE IF NOT EXISTS ShipType
 
             foreach (var ship in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'ship')]"))
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 progress?.Report((currentStep++, maxSteps));
 
                 var shipID = ship.Attribute("id")?.Value;
@@ -137,7 +137,7 @@ CREATE TABLE IF NOT EXISTS ShipType
                 var macroName = ship.XPathSelectElement("component")?.Attribute("ref")?.Value;
                 if (string.IsNullOrEmpty(macroName)) continue;
 
-                var macroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
+                var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
 
                 var properties = macroXml.Root.XPathSelectElement("macro/properties");
                 if (properties is null) continue;

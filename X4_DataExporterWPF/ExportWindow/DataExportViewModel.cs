@@ -141,13 +141,13 @@ namespace X4_DataExporterWPF.DataExportWindow
             ClosingCommand = new ReactiveCommand<CancelEventArgs>().WithSubscribe(Closing);
 
             // 入力元フォルダパスに値が代入された時、言語一覧を更新する
-            InDirPath.ObserveOn(ThreadPoolScheduler.Instance).Subscribe(path =>
+            InDirPath.Subscribe(async path =>
             {
                 using var _ = _BusyNotifier.ProcessStart();
                 _UnableToGetLanguages.Value = false;
                 Languages.ClearOnScheduler();
 
-                var (success, languages) = _Model.GetLanguages(path);
+                var (success, languages) = await _Model.GetLanguagesAsync(path);
                 _UnableToGetLanguages.Value = !success;
                 Languages.AddRangeOnScheduler(languages);
             });

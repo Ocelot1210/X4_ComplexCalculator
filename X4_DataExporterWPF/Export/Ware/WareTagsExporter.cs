@@ -3,9 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
+using X4_DataExporterWPF.Internal;
 
 namespace X4_DataExporterWPF.Export
 {
@@ -30,13 +33,14 @@ namespace X4_DataExporterWPF.Export
         }
 
 
-        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
+        /// <inheritdoc/>
+        public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
         {
             //////////////////
             // テーブル作成 //
             //////////////////
             {
-                connection.Execute(@"
+                await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS WareTags
 (
     WareID  TEXT    NOT NULL,
@@ -53,7 +57,7 @@ CREATE TABLE IF NOT EXISTS WareTags
             {
                 var items = GetRecords(progress);
 
-                connection.Execute("INSERT INTO WareTags (WareID, Tag) VALUES (@WareID, @Tag)", items);
+                await connection.ExecuteAsync("INSERT INTO WareTags (WareID, Tag) VALUES (@WareID, @Tag)", items);
             }
         }
 

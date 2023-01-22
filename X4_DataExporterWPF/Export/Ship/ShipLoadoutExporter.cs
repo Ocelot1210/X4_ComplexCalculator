@@ -5,9 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
+using X4_DataExporterWPF.Internal;
 
 namespace X4_DataExporterWPF.Export
 {
@@ -40,17 +44,14 @@ namespace X4_DataExporterWPF.Export
         }
 
 
-        /// <summary>
-        /// 抽出処理
-        /// </summary>
-        /// <param name="connection"></param>
-        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
+        /// <inheritdoc/>
+        public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
         {
             //////////////////
             // テーブル作成 //
             //////////////////
             {
-                connection.Execute(@"
+                await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS ShipLoadout
 (
     ShipID      TEXT    NOT NULL,
@@ -66,9 +67,9 @@ CREATE TABLE IF NOT EXISTS ShipLoadout
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords(progress);
+                var items = GetRecordsAsync(progress, cancellationToken);
 
-                connection.Execute(@"INSERT INTO ShipLoadout(ShipID, LoadoutID, MacroName, GroupName, Count) VALUES (@ShipID, @LoadoutID, @MacroName, @GroupName, @Count)", items);
+                await connection.ExecuteAsync(@"INSERT INTO ShipLoadout(ShipID, LoadoutID, MacroName, GroupName, Count) VALUES (@ShipID, @LoadoutID, @MacroName, @GroupName, @Count)", items);
             }
         }
 
@@ -76,7 +77,7 @@ CREATE TABLE IF NOT EXISTS ShipLoadout
         /// <summary>
         /// レコード抽出
         /// </summary>
-        private IEnumerable<ShipLoadout> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
+        private async IAsyncEnumerable<ShipLoadout> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
         {
             var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
             var currentStep = 0;
@@ -84,6 +85,7 @@ CREATE TABLE IF NOT EXISTS ShipLoadout
 
             foreach (var ship in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'ship')]"))
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 progress.Report((currentStep++, maxSteps));
 
                 var shipID = ship.Attribute("id")?.Value;
@@ -92,7 +94,7 @@ CREATE TABLE IF NOT EXISTS ShipLoadout
                 var macroName = ship.XPathSelectElement("component")?.Attribute("ref")?.Value;
                 if (string.IsNullOrEmpty(macroName)) continue;
 
-                var macroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
+                var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
                 if (macroXml is null) continue;
 
                 foreach (var loadout in macroXml.Root.XPathSelectElements("macro/properties/loadouts/loadout"))

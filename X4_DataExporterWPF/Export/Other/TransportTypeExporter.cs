@@ -4,9 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
+using X4_DataExporterWPF.Internal;
 
 namespace X4_DataExporterWPF.Export
 {
@@ -42,13 +45,13 @@ namespace X4_DataExporterWPF.Export
         /// 抽出処理
         /// </summary>
         /// <param name="connection"></param>
-        public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
+        public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
         {
             //////////////////
             // テーブル作成 //
             //////////////////
             {
-                connection.Execute(@"
+                await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS TransportType
 (
     TransportTypeID TEXT    NOT NULL PRIMARY KEY,
@@ -61,10 +64,10 @@ CREATE TABLE IF NOT EXISTS TransportType
             // データ抽出 //
             ////////////////
             {
-                var items = GetRecords(progress);
+                var items = GetRecords(progress, cancellationToken);
 
                 // レコード追加
-                connection.Execute("INSERT INTO TransportType (TransportTypeID, Name) VALUES (@TransportTypeID, @Name)", items);
+                await connection.ExecuteAsync("INSERT INTO TransportType (TransportTypeID, Name) VALUES (@TransportTypeID, @Name)", items);
             }
         }
 
@@ -73,7 +76,7 @@ CREATE TABLE IF NOT EXISTS TransportType
         /// XML から TransportType データを読み出す
         /// </summary>
         /// <returns>読み出した TransportType データ</returns>
-        private IEnumerable<TransportType> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
+        private IEnumerable<TransportType> GetRecords(IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
         {
             // TODO: 可能ならファイルから抽出する
             var names = new Dictionary<string, string>()
@@ -97,6 +100,7 @@ CREATE TABLE IF NOT EXISTS TransportType
             var added = new HashSet<string>();
             foreach (var ware in _WaresXml.Root.Elements("ware"))
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 progress.Report((currentStep++, maxSteps));
 
                 var transportTypeID = ware.Attribute("transport")?.Value;
@@ -116,6 +120,7 @@ CREATE TABLE IF NOT EXISTS TransportType
 
             foreach (var key in names.Keys.Except(added))
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 yield return new TransportType(key, _Resolver.Resolve(names[key]));
             }
         }
