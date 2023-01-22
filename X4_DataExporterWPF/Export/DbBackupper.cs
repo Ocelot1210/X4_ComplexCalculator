@@ -69,6 +69,8 @@ namespace X4_DataExporterWPF.Export
         {
             try
             {
+                _File?.Dispose();
+
                 // 不要になったバックアップファイルを削除する
                 if (!string.IsNullOrEmpty(_BakFilePath) && File.Exists(_BakFilePath))
                 {
