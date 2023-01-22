@@ -13,6 +13,9 @@ namespace X4_DataExporterWPF.Tests
 {
     public class ExporterTest
     {
+        private static readonly IProgress<(int, int)>? pg = null;
+        private static readonly CancellationToken ct = default;
+
         /// <summary>
         /// モジュールの最大収容人数が省略されている場合、0 として扱う。
         /// </summary>
@@ -37,7 +40,7 @@ namespace X4_DataExporterWPF.Tests
             ".ToXDocument();
             var exporter = new ModuleExporter(new DummyCat(macroXml), wareXml);
 
-            Assert.Equal(exporter.GetRecordsAsync(), new[] { new Module(
+            Assert.Equal(exporter.GetRecordsAsync(pg, ct).ToEnumerable(), new[] { new Module(
                 ModuleID: "module_arg_hab_l_01",
                 ModuleTypeID: "habitation",
                 Macro: "hab_arg_l_01_macro",
@@ -73,7 +76,7 @@ namespace X4_DataExporterWPF.Tests
             ".ToXDocument();
             var exporter = new ModuleExporter(new DummyCat(macroXml), wareXml);
 
-            Assert.Equal(exporter.GetRecordsAsync(), new[] { new Module(
+            Assert.Equal(exporter.GetRecordsAsync(pg, ct).ToEnumerable(), new[] { new Module(
                 ModuleID: "module_arg_prod_foodrations_01",
                 ModuleTypeID: "production",
                 Macro: "prod_arg_foodrations_macro",
@@ -130,7 +133,7 @@ namespace X4_DataExporterWPF.Tests
             ".ToXDocument();
             var exporter = new WareEffectExporter(xml);
 
-            Assert.Equal(exporter.GetRecords(), new[] { new WareEffect(
+            Assert.Equal(exporter.GetRecords(pg, ct), new[] { new WareEffect(
                 WareID: "advancedcomposites",
                 Method: "default",
                 EffectID: "work",
@@ -157,7 +160,7 @@ namespace X4_DataExporterWPF.Tests
             ".ToXDocument();
             var exporter = new WareGroupExporter(new DummyCat(xml), new DummyLanguageResolver());
 
-            Assert.Equal(exporter.GetRecordsAsync(), new[] { new WareGroup(
+            Assert.Equal(exporter.GetRecordsAsync(pg, ct).ToEnumerable(), new[] { new WareGroup(
                 WareGroupID: "gases",
                 Name: "{20215,401}",
                 Tier: 0
