@@ -46,7 +46,7 @@ namespace X4_DataExporterWPF.Export
         {
             _CatFile = catFile;
             _WaresXml = waresXml;
-            _ThumbnailManager = new ThumbnailManager(catFile, "assets/fx/gui/textures/ships", "notfound");
+            _ThumbnailManager = new(catFile, "assets/fx/gui/textures/ships", "notfound");
         }
 
 

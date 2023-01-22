@@ -33,9 +33,9 @@ namespace X4_DataExporterWPF.Export
 
 
         /// <summary>
-        /// サムネが見つからない場合のサムネ
+        /// サムネ画像管理クラス
         /// </summary>
-        private byte[]? _NotFoundThumb;
+        private readonly ThumbnailManager _ThumbnailManager;
 
 
         /// <summary>
@@ -53,6 +53,7 @@ namespace X4_DataExporterWPF.Export
         {
             _CatFile = catFile;
             _WaresXml = waresXml;
+            _ThumbnailManager = new(catFile, "assets/fx/gui/textures/upgrades", "notfound");
         }
 
 
@@ -162,34 +163,11 @@ INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  Hull,  HullI
                     (macroXml.Root.XPathSelectElement("macro/properties/hull")?.Attribute("integrated")?.GetInt() ?? 0) == 1,
                     idElm.Attribute("mk")?.GetInt() ?? 0,
                     idElm.Attribute("makerrace")?.Value,
-                    await GetThumbnailAsync(macroName, cancellationToken)
+                    await _ThumbnailManager.GetThumbnailAsync(macroName, cancellationToken)
                 );
             }
 
             progress?.Report((currentStep++, maxSteps));
-        }
-
-
-        /// <summary>
-        /// サムネ画像を取得する
-        /// </summary>
-        /// <param name="macroName">マクロ名</param>
-        /// <returns>サムネ画像のバイト配列</returns>
-        private async Task<byte[]?> GetThumbnailAsync(string macroName, CancellationToken cancellationToken)
-        {
-            const string dir = "assets/fx/gui/textures/upgrades";
-            var thumb = await Util.DDS2PngAsync(_CatFile, dir, macroName, cancellationToken);
-            if (thumb is not null)
-            {
-                return thumb;
-            }
-
-            if (_NotFoundThumb is null)
-            {
-                _NotFoundThumb = await Util.DDS2PngAsync(_CatFile, dir, "notfound", cancellationToken);
-            }
-
-            return _NotFoundThumb;
         }
     }
 }
