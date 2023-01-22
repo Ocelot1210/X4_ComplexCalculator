@@ -35,7 +35,7 @@ Common_ProductName;Product name
 # ------------------------------------------------------
 DB_OldFormatMessage;The current DB format is the old format. \r\nPlease extract the DB from the game file again.
 DB_UpdateRequestMessage;You need to update the DB to run this application. Please run this application again to update the DB.
-DB_ExtractionRequestMessage;The DB does not exist. It is necessary to extract the DB from the game file. Please wait for a while until the data extraction screen starts up.
+DB_ExtractionRequestMessage;The DB does not exist. It is necessary to extract the DB from the game file.
 DB_MakeRequestMessage;You need to create a DB to run this application. Please run this application again to update the DB.
 DB_OpenFailMessage;Failed to open the DB. It may be possible to start it by extracting the DB from the game file. Do you want to update the DB?
 
@@ -70,7 +70,7 @@ MainWindow_Menu_File_MenuItem_Import_MenuItem_Loadout_Header;Module equipments
 MainWindow_Menu_File_MenuItem_Export_Header;Export
 MainWindow_Menu_File_MenuItem_Export_MenuItem_StationCalculator_Header;Station Calculator
 MainWindow_Menu_File_UpdateDB_Header;Update DB
-MainWindow_Menu_File_UpdateDB_DBUpdate_ConfirmationMessage;Do you want to display the DB update screen? \r\nPlease wait for a moment until the screen starts.
+MainWindow_Menu_File_UpdateDB_DBUpdate_ConfirmationMessage;Do you want to display the DB update screen?
 MainWindow_Menu_File_UpdateDB_DBUpdate_RestartRequestMessage;Please restart the application to apply the DB update.
 MainWindow_Menu_File_UpdateDB_DBUpdate_FailureMessage;Failed to update the DB, \r\nplease check if the DB file is accessible and try again.
 
