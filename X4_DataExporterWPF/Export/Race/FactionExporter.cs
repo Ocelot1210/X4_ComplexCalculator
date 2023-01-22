@@ -1,12 +1,14 @@
 ﻿using Dapper;
 using LibX4.FileSystem;
 using LibX4.Lang;
+using LibX4.Xml;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
 using X4_DataExporterWPF.Internal;
@@ -57,6 +59,7 @@ CREATE TABLE IF NOT EXISTS Faction
     RaceID      TEXT    NOT NULL,
     ShortName   TEXT    NOT NULL,
     Description TEXT    NOT NULL,
+    Color       INTEGER,
     Icon        BLOB,
     FOREIGN KEY (RaceID)   REFERENCES Race(RaceID)
 ) WITHOUT ROWID");
@@ -69,7 +72,7 @@ CREATE TABLE IF NOT EXISTS Faction
             {
                 var items = GetRecordsAsync(progress, cancellationToken);
 
-                await connection.ExecuteAsync("INSERT INTO Faction (FactionID, Name, RaceID, ShortName, Description, Icon) VALUES (@FactionID, @Name, @RaceID, @ShortName, @Description, @Icon)", items);
+                await connection.ExecuteAsync("INSERT INTO Faction (FactionID, Name, RaceID, ShortName, Description, Color, Icon) VALUES (@FactionID, @Name, @RaceID, @ShortName, @Description, @Color, @Icon)", items);
             }
         }
 
@@ -105,11 +108,30 @@ CREATE TABLE IF NOT EXISTS Faction
                     raceID,
                     shortName,
                     _Resolver.Resolve(faction.Attribute("description")?.Value ?? ""),
+                    GetFactionColor(faction),
                     await Util.DDS2PngAsync(_CatFile, "assets/fx/gui/textures/factions", faction.Element("icon")?.Attribute("active")?.Value)
                 );
             }
 
             progress.Report((currentStep++, maxSteps));
+        }
+
+
+        /// <summary>
+        /// 派閥の色を取得する
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        private int GetFactionColor(XElement element)
+        {
+            var colorElm = element.Element("color");
+            if (colorElm is null) return 0;
+
+            var r = colorElm.Attribute("r")?.GetInt() ?? 0;
+            var g = colorElm.Attribute("g")?.GetInt() ?? 0;
+            var b = colorElm.Attribute("b")?.GetInt() ?? 0;
+
+            return System.Drawing.Color.FromArgb(255, r, g, b).ToArgb();
         }
     }
 }

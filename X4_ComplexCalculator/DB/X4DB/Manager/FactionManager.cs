@@ -28,7 +28,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         public FactionManager(IDbConnection conn, RaceManager raceManager)
         {
             _Factions = conn.Query<X4_DataExporterWPF.Entity.Faction>("SELECT * FROM Faction WHERE RaceID IN (SELECT RaceID FROM Race)")
-                .Select(x => new Faction(x.FactionID, x.Name, raceManager.Get(x.RaceID)) as IFaction)
+                .Select(x => new Faction(x.FactionID, x.Name, raceManager.Get(x.RaceID), (int)x.Color) as IFaction)
                 .ToDictionary(x => x.FactionID);
         }
 

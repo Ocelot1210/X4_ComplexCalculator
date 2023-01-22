@@ -1,4 +1,6 @@
-﻿namespace X4_ComplexCalculator.DB.X4DB.Interfaces
+﻿using System.Drawing;
+
+namespace X4_ComplexCalculator.DB.X4DB.Interfaces
 {
     /// <summary>
     /// 派閥情報用インターフェイス
@@ -22,6 +24,12 @@
         /// 派閥の種族
         /// </summary>
         public IRace Race { get; }
+
+
+        /// <summary>
+        /// 派閥の色
+        /// </summary>
+        public Color Color { get; }
         #endregion
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.DB.X4DB.Entity
@@ -19,6 +20,10 @@ namespace X4_ComplexCalculator.DB.X4DB.Entity
 
         /// <inheritdoc/>
         public IRace Race { get; }
+
+
+        /// <inheritdoc/>
+        public Color Color { get; }
         #endregion
 
 
@@ -28,11 +33,12 @@ namespace X4_ComplexCalculator.DB.X4DB.Entity
         /// <param name="factionID">派閥ID</param>
         /// <param name="name">派閥名</param>
         /// <param name="race">種族</param>
-        public Faction(string factionID, string name, IRace race)
+        public Faction(string factionID, string name, IRace race, int color)
         {
             FactionID = factionID;
             Name = name;
             Race = race;
+            Color = Color.FromArgb(color);
         }
 
 
