@@ -10,14 +10,14 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Setup .Net Core 3.1
-        uses: actions/setup-dotnet@v1
+      - name: Setup .Net Core 6
+        uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: 3.1.x
+          dotnet-version: 6.x.x
 
       - name: Clean
         run: dotnet clean X4_ComplexCalculator.sln --configuration Release && dotnet nuget locals all --clear
@@ -31,7 +31,7 @@ jobs:
       - name: Compress archive
         run: |
           New-Item artifacts\X4_ComplexCalculator -ItemType Directory
-          Move-Item X4_ComplexCalculator\bin\Release\netcoreapp3.1\win-x64 artifacts\X4_ComplexCalculator\bin
+          Move-Item X4_ComplexCalculator\bin\Release\net6.0-windows\win-x64 artifacts\X4_ComplexCalculator\bin
           $WshShell = New-Object -comObject WScript.Shell
           $Shortcut = $WshShell.CreateShortcut("$PWD\artifacts\X4_ComplexCalculator\X4_ComplexCalculator.exe.lnk")
           $Shortcut.TargetPath = 'explorer'

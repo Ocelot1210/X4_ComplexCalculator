@@ -13,45 +13,45 @@ using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
 using X4_DataExporterWPF.Internal;
 
-namespace X4_DataExporterWPF.Export
+namespace X4_DataExporterWPF.Export;
+
+/// <summary>
+/// 派閥情報抽出用クラス
+/// </summary>
+public class FactionExporter : IExporter
 {
     /// <summary>
-    /// 派閥情報抽出用クラス
+    /// catファイルオブジェクト
     /// </summary>
-    public class FactionExporter : IExporter
+    private readonly CatFile _CatFile;
+
+
+    /// <summary>
+    /// 言語解決用オブジェクト
+    /// </summary>
+    private readonly ILanguageResolver _Resolver;
+
+
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    /// <param name="catFile">catファイルオブジェクト</param>
+    /// <param name="resolver">言語解決用オブジェクト</param>
+    public FactionExporter(CatFile catFile, ILanguageResolver resolver)
     {
-        /// <summary>
-        /// catファイルオブジェクト
-        /// </summary>
-        private readonly CatFile _CatFile;
+        _CatFile = catFile;
+        _Resolver = resolver;
+    }
 
 
-        /// <summary>
-        /// 言語解決用オブジェクト
-        /// </summary>
-        private readonly ILanguageResolver _Resolver;
-
-
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="catFile">catファイルオブジェクト</param>
-        /// <param name="resolver">言語解決用オブジェクト</param>
-        public FactionExporter(CatFile catFile, ILanguageResolver resolver)
+    /// <inheritdoc/>
+    public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
+    {
+        //////////////////
+        // テーブル作成 //
+        //////////////////
         {
-            _CatFile = catFile;
-            _Resolver = resolver;
-        }
-
-
-        /// <inheritdoc/>
-        public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
-        {
-            //////////////////
-            // テーブル作成 //
-            //////////////////
-            {
-                await connection.ExecuteAsync(@"
+            await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS Faction
 (
     FactionID   TEXT    NOT NULL PRIMARY KEY,
@@ -63,75 +63,74 @@ CREATE TABLE IF NOT EXISTS Faction
     Icon        BLOB,
     FOREIGN KEY (RaceID)   REFERENCES Race(RaceID)
 ) WITHOUT ROWID");
-            }
-
-
-            ////////////////
-            // データ抽出 //
-            ////////////////
-            {
-                var items = GetRecordsAsync(progress, cancellationToken);
-
-                await connection.ExecuteAsync("INSERT INTO Faction (FactionID, Name, RaceID, ShortName, Description, Color, Icon) VALUES (@FactionID, @Name, @RaceID, @ShortName, @Description, @Color, @Icon)", items);
-            }
         }
 
 
-        /// <summary>
-        /// XML から Faction データを読み出す
-        /// </summary>
-        /// <returns>読み出した Faction データ</returns>
-        private async IAsyncEnumerable<Faction> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
+        ////////////////
+        // データ抽出 //
+        ////////////////
         {
-            var factionsXml = await _CatFile.OpenXmlAsync("libraries/factions.xml");
+            var items = GetRecordsAsync(progress, cancellationToken);
 
-            var maxSteps = (int)(double)factionsXml.Root.XPathEvaluate("count(faction[@name])");
-            var currentStep = 0;
-            
-            foreach (var faction in factionsXml.Root.XPathSelectElements("faction[@name]"))
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                progress.Report((currentStep++, maxSteps));
+            await connection.ExecuteAsync("INSERT INTO Faction (FactionID, Name, RaceID, ShortName, Description, Color, Icon) VALUES (@FactionID, @Name, @RaceID, @ShortName, @Description, @Color, @Icon)", items);
+        }
+    }
 
-                var factionID = faction.Attribute("id")?.Value;
-                if (string.IsNullOrEmpty(factionID)) continue;
 
-                var name = _Resolver.Resolve(faction.Attribute("name")?.Value ?? "");
-                if (string.IsNullOrEmpty(name)) continue;
+    /// <summary>
+    /// XML から Faction データを読み出す
+    /// </summary>
+    /// <returns>読み出した Faction データ</returns>
+    private async IAsyncEnumerable<Faction> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        var factionsXml = await _CatFile.OpenXmlAsync("libraries/factions.xml");
 
-                var raceID = faction.Attribute("primaryrace")?.Value ?? "";
-                var shortName = _Resolver.Resolve(faction.Attribute("shortname")?.Value ?? "");
+        var maxSteps = (int)(double)factionsXml.Root.XPathEvaluate("count(faction[@name])");
+        var currentStep = 0;
 
-                yield return new Faction(
-                    factionID,
-                    name,
-                    raceID,
-                    shortName,
-                    _Resolver.Resolve(faction.Attribute("description")?.Value ?? ""),
-                    GetFactionColor(faction),
-                    await Util.DDS2PngAsync(_CatFile, "assets/fx/gui/textures/factions", faction.Element("icon")?.Attribute("active")?.Value)
-                );
-            }
-
+        foreach (var faction in factionsXml.Root.XPathSelectElements("faction[@name]"))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
             progress.Report((currentStep++, maxSteps));
+
+            var factionID = faction.Attribute("id")?.Value;
+            if (string.IsNullOrEmpty(factionID)) continue;
+
+            var name = _Resolver.Resolve(faction.Attribute("name")?.Value ?? "");
+            if (string.IsNullOrEmpty(name)) continue;
+
+            var raceID = faction.Attribute("primaryrace")?.Value ?? "";
+            var shortName = _Resolver.Resolve(faction.Attribute("shortname")?.Value ?? "");
+
+            yield return new Faction(
+                factionID,
+                name,
+                raceID,
+                shortName,
+                _Resolver.Resolve(faction.Attribute("description")?.Value ?? ""),
+                GetFactionColor(faction),
+                await Util.DDS2PngAsync(_CatFile, "assets/fx/gui/textures/factions", faction.Element("icon")?.Attribute("active")?.Value)
+            );
         }
 
+        progress.Report((currentStep++, maxSteps));
+    }
 
-        /// <summary>
-        /// 派閥の色を取得する
-        /// </summary>
-        /// <param name="element"></param>
-        /// <returns></returns>
-        private int GetFactionColor(XElement element)
-        {
-            var colorElm = element.Element("color");
-            if (colorElm is null) return 0;
 
-            var r = colorElm.Attribute("r")?.GetInt() ?? 0;
-            var g = colorElm.Attribute("g")?.GetInt() ?? 0;
-            var b = colorElm.Attribute("b")?.GetInt() ?? 0;
+    /// <summary>
+    /// 派閥の色を取得する
+    /// </summary>
+    /// <param name="element"></param>
+    /// <returns></returns>
+    private int GetFactionColor(XElement element)
+    {
+        var colorElm = element.Element("color");
+        if (colorElm is null) return 0;
 
-            return System.Drawing.Color.FromArgb(255, r, g, b).ToArgb();
-        }
+        var r = colorElm.Attribute("r")?.GetInt() ?? 0;
+        var g = colorElm.Attribute("g")?.GetInt() ?? 0;
+        var b = colorElm.Attribute("b")?.GetInt() ?? 0;
+
+        return System.Drawing.Color.FromArgb(255, r, g, b).ToArgb();
     }
 }

@@ -1,47 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace X4_ComplexCalculator.Common
+namespace X4_ComplexCalculator.Common;
+
+class ProgressEx<T> : IProgress<T>
 {
-    class ProgressEx<T> : IProgress<T>
+    /// <summary>
+    /// 現在値
+    /// </summary>
+    private T _Current;
+
+
+    /// <summary>
+    /// 進捗変更時に呼ばれるイベント
+    /// </summary>
+    public event EventHandler<T>? ProgressChanged;
+
+
+
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    /// <param name="firstValue">初期値</param>
+    public ProgressEx(T firstValue)
     {
-        /// <summary>
-        /// 現在値
-        /// </summary>
-        private T _Current;
+        _Current = firstValue;
+    }
 
 
-        /// <summary>
-        /// 進捗変更時に呼ばれるイベント
-        /// </summary>
-        public event EventHandler<T>? ProgressChanged;
-
-
-
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="firstValue">初期値</param>
-        public ProgressEx(T firstValue)
+    /// <summary>
+    /// 進捗変更
+    /// </summary>
+    /// <param name="value">変更後</param>
+    public void Report(T value)
+    {
+        // 同じ値なら何もしない
+        if (EqualityComparer<T>.Default.Equals(_Current, value))
         {
-            _Current = firstValue;
+            return;
         }
 
-
-        /// <summary>
-        /// 進捗変更
-        /// </summary>
-        /// <param name="value">変更後</param>
-        public void Report(T value)
-        {
-            // 同じ値なら何もしない
-            if (EqualityComparer<T>.Default.Equals(_Current, value))
-            {
-                return;
-            }
-
-            _Current = value;
-            ProgressChanged?.Invoke(this, _Current);
-        }
+        _Current = value;
+        ProgressChanged?.Invoke(this, _Current);
     }
 }

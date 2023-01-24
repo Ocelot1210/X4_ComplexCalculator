@@ -11,106 +11,105 @@ using System.Xml.XPath;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Localize;
 
-namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport
+namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport;
+
+class SelectPlanModel : BindableBase
 {
-    class SelectPlanModel : BindableBase
+    #region メンバ
+    /// <summary>
+    /// 計画ファイルパス
+    /// </summary>
+    string _PlanFilePath = "";
+    #endregion
+
+
+    #region プロパティ
+    /// <summary>
+    /// 計画一覧
+    /// </summary>
+    public ObservableRangeCollection<StationPlanItem> Planes { get; } = new ObservableRangeCollection<StationPlanItem>();
+
+
+    /// <summary>
+    /// 計画ファイルパス
+    /// </summary>
+    public string PlanFilePath
     {
-        #region メンバ
-        /// <summary>
-        /// 計画ファイルパス
-        /// </summary>
-        string _PlanFilePath = "";
-        #endregion
+        get => _PlanFilePath;
+        set => SetProperty(ref _PlanFilePath, value);
+    }
+    #endregion
 
 
-        #region プロパティ
-        /// <summary>
-        /// 計画一覧
-        /// </summary>
-        public ObservableRangeCollection<StationPlanItem> Planes { get; } = new ObservableRangeCollection<StationPlanItem>();
-
-
-        /// <summary>
-        /// 計画ファイルパス
-        /// </summary>
-        public string PlanFilePath
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    public SelectPlanModel()
+    {
+        // ファイルが見つかった場合、そのファイルで初期化する
+        var path = Path.Combine(LibX4.X4Path.GetUserDirectory(), "constructionplans.xml");
+        if (System.IO.File.Exists(path))
         {
-            get => _PlanFilePath;
-            set => SetProperty(ref _PlanFilePath, value);
-        }
-        #endregion
-
-
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        public SelectPlanModel()
-        {
-            // ファイルが見つかった場合、そのファイルで初期化する
-            var path = Path.Combine(LibX4.X4Path.GetUserDirectory(), "constructionplans.xml");
-            if (System.IO.File.Exists(path))
+            try
             {
-                try
-                {
-                    var xml = XDocument.Load(path);
+                var xml = XDocument.Load(path);
 
-                    Planes.Reset(xml.Root.XPathSelectElements("plan").Select(x => new StationPlanItem(x)));
-                    PlanFilePath = path;
-                }
-                catch
-                {
+                Planes.Reset(xml.Root.XPathSelectElements("plan").Select(x => new StationPlanItem(x)));
+                PlanFilePath = path;
+            }
+            catch
+            {
 
-                }
-                finally
-                {
-                    Mouse.OverrideCursor = null;
-                }
+            }
+            finally
+            {
+                Mouse.OverrideCursor = null;
             }
         }
+    }
 
 
-        /// <summary>
-        /// 建造計画ファイルを選択
-        /// </summary>
-        public void SelectPlanFile()
+    /// <summary>
+    /// 建造計画ファイルを選択
+    /// </summary>
+    public void SelectPlanFile()
+    {
+        var dlg = new OpenFileDialog();
+
+        dlg.InitialDirectory = LibX4.X4Path.GetUserDirectory();
+        dlg.RestoreDirectory = true;
+        dlg.Filter = "X4 Construction planes file (*.xml)|*.xml";
+        dlg.Multiselect = true;
+
+        if (dlg.ShowDialog() == true)
         {
-            var dlg = new OpenFileDialog();
-
-            dlg.InitialDirectory = LibX4.X4Path.GetUserDirectory();
-            dlg.RestoreDirectory = true;
-            dlg.Filter = "X4 Construction planes file (*.xml)|*.xml";
-            dlg.Multiselect = true;
-
-            if (dlg.ShowDialog() == true)
+            Mouse.OverrideCursor = Cursors.Wait;
+            try
             {
-                Mouse.OverrideCursor = Cursors.Wait;
-                try
+                Planes.Clear();
+
+                foreach (var fileName in dlg.FileNames)
                 {
-                    Planes.Clear();
+                    var xml = XDocument.Load(fileName);
 
-                    foreach (var fileName in dlg.FileNames)
-                    {
-                        var xml = XDocument.Load(fileName);
-
-                        Planes.AddRange(xml.Root.XPathSelectElements("plan").Select(x => new StationPlanItem(x)));
-                    }
-
-                    // 複数選択されたら親フォルダパスを表示
-                    // 1つだけ選択されたらそのファイルパスを表示
-                    PlanFilePath = (1 < dlg.FileNames.Length) ? Path.GetDirectoryName(dlg.FileName) ?? "" : dlg.FileName;
-
+                    Planes.AddRange(xml.Root.XPathSelectElements("plan").Select(x => new StationPlanItem(x)));
                 }
-                catch (Exception e)
+
+                // 複数選択されたら親フォルダパスを表示
+                // 1つだけ選択されたらそのファイルパスを表示
+                PlanFilePath = (1 < dlg.FileNames.Length) ? Path.GetDirectoryName(dlg.FileName) ?? "" : dlg.FileName;
+
+            }
+            catch (Exception e)
+            {
+                Dispatcher.CurrentDispatcher.BeginInvoke(() =>
                 {
-                    Dispatcher.CurrentDispatcher.BeginInvoke(() =>
-                    {
-                        LocalizedMessageBox.Show("Lang:MainWindow_FaildToLoadFileMessage", "Lang:MainWindow_FaildToLoadFileMessageTitle", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
-                    });
-                }
-                finally
-                {
-                    Mouse.OverrideCursor = null;
-                }
+                    LocalizedMessageBox.Show("Lang:MainWindow_FaildToLoadFileMessage", "Lang:MainWindow_FaildToLoadFileMessageTitle", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
+                });
+            }
+            finally
+            {
+                Mouse.OverrideCursor = null;
             }
         }
     }

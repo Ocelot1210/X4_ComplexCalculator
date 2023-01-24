@@ -15,14 +15,14 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Setup .Net Core 3.1
-        uses: actions/setup-dotnet@v1
+      - name: Setup .Net Core 6
+        uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: 3.1.x
+          dotnet-version: 6.x.x
 
       - name: Clean
         run: dotnet clean X4_ComplexCalculator.sln --configuration ${{ matrix.Configuration }} && dotnet nuget locals all --clear
@@ -37,7 +37,7 @@ jobs:
         run: dotnet test
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: X4_ComplexCalculator-${{ matrix.Configuration }}-${{ github.sha }}
-          path: X4_ComplexCalculator/bin/${{ matrix.Configuration }}/netcoreapp3.1
+          path: X4_ComplexCalculator/bin/${{ matrix.Configuration }}/net6.0-windows

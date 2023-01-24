@@ -10,82 +10,81 @@ using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
 using X4_DataExporterWPF.Internal;
 
-namespace X4_DataExporterWPF.Export
+namespace X4_DataExporterWPF.Export;
+
+class MapExporter : IExporter
 {
-    class MapExporter : IExporter
+    /// <summary>
+    /// マップ情報xml
+    /// </summary>
+    private readonly XDocument _MapXml;
+
+
+    /// <summary>
+    /// 言語解決用オブジェクト
+    /// </summary>
+    private readonly ILanguageResolver _Resolver;
+
+
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    /// <param name="mapXml">'libraries/mapdefaults.xml' の XDocument</param>
+    /// <param name="resolver">言語解決用オブジェクト</param>
+    public MapExporter(XDocument mapXml, ILanguageResolver resolver)
     {
-        /// <summary>
-        /// マップ情報xml
-        /// </summary>
-        private readonly XDocument _MapXml;
+        _MapXml = mapXml;
+        _Resolver = resolver;
+    }
 
 
-        /// <summary>
-        /// 言語解決用オブジェクト
-        /// </summary>
-        private readonly ILanguageResolver _Resolver;
-
-
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        /// <param name="mapXml">'libraries/mapdefaults.xml' の XDocument</param>
-        /// <param name="resolver">言語解決用オブジェクト</param>
-        public MapExporter(XDocument mapXml, ILanguageResolver resolver)
+    /// <inheritdoc/>
+    public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
+    {
+        //////////////////
+        // テーブル作成 //
+        //////////////////
         {
-            _MapXml = mapXml;
-            _Resolver = resolver;
-        }
-
-
-        /// <inheritdoc/>
-        public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
-        {
-            //////////////////
-            // テーブル作成 //
-            //////////////////
-            {
-                await connection.ExecuteAsync(@"
+            await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS Map
 (
     Macro       TEXT    NOT NULL PRIMARY KEY,
     Name        TEXT    NOT NULL,
     Description TEXT    NOT NULL
 )");
-            }
-
-
-            ////////////////
-            // データ抽出 //
-            ////////////////
-            {
-                var items = GetRecords();
-
-
-                await connection.ExecuteAsync("INSERT INTO Map (Macro, Name, Description) VALUES (@Macro, @Name, @Description)", items);
-
-                await connection.ExecuteAsync("CREATE INDEX MapIndex ON Ware(Macro)");
-            }
         }
 
 
-        /// <summary>
-        /// XML から Map データを読み出す
-        /// </summary>
-        /// <returns>読み出した Map データ</returns>
-        private IEnumerable<Map> GetRecords()
+        ////////////////
+        // データ抽出 //
+        ////////////////
         {
-            foreach (var dataset in _MapXml.Root.XPathSelectElements("dataset[not(starts-with(@macro, 'demo'))]/properties/identification/../.."))
-            {
-                var macro = dataset.Attribute("macro").Value;
+            var items = GetRecords();
 
-                var id = dataset.XPathSelectElement("properties/identification");
 
-                var name = _Resolver.Resolve(id.Attribute("name").Value);
-                var description = _Resolver.Resolve(id.Attribute("description").Value);
+            await connection.ExecuteAsync("INSERT INTO Map (Macro, Name, Description) VALUES (@Macro, @Name, @Description)", items);
 
-                yield return new Map(macro, name, description);
-            }
+            await connection.ExecuteAsync("CREATE INDEX MapIndex ON Ware(Macro)");
+        }
+    }
+
+
+    /// <summary>
+    /// XML から Map データを読み出す
+    /// </summary>
+    /// <returns>読み出した Map データ</returns>
+    private IEnumerable<Map> GetRecords()
+    {
+        foreach (var dataset in _MapXml.Root.XPathSelectElements("dataset[not(starts-with(@macro, 'demo'))]/properties/identification/../.."))
+        {
+            var macro = dataset.Attribute("macro").Value;
+
+            var id = dataset.XPathSelectElement("properties/identification");
+
+            var name = _Resolver.Resolve(id.Attribute("name").Value);
+            var description = _Resolver.Resolve(id.Attribute("description").Value);
+
+            yield return new Map(macro, name, description);
         }
     }
 }

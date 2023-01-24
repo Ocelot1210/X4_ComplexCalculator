@@ -5,19 +5,19 @@ using System.Linq;
 using X4_ComplexCalculator.DB.X4DB.Entity;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
-namespace X4_ComplexCalculator.DB.X4DB.Manager
+namespace X4_ComplexCalculator.DB.X4DB.Manager;
+
+/// <summary>
+/// <see cref="IFaction"/> の一覧を管理するクラス
+/// </summary>
+class FactionManager
 {
+    #region メンバ
     /// <summary>
-    /// <see cref="IFaction"/> の一覧を管理するクラス
+    /// 派閥一覧
     /// </summary>
-    class FactionManager
-    {
-        #region メンバ
-        /// <summary>
-        /// 派閥一覧
-        /// </summary>
-        private readonly IReadOnlyDictionary<string, IFaction> _Factions;
-        #endregion
+    private readonly IReadOnlyDictionary<string, IFaction> _Factions;
+    #endregion
 
 
         /// <summary>
@@ -33,12 +33,11 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager
         }
 
 
-        /// <summary>
-        /// 派閥IDに対応する派閥の取得を試みる
-        /// </summary>
-        /// <param name="id">種族ID</param>
-        /// <returns>派閥IDに対応する派閥 派閥IDに対応する派閥が無ければnull</returns>
-        public IFaction? TryGet(string id) =>
-            _Factions.TryGetValue(id, out var race) ? race : null;
-    }
+    /// <summary>
+    /// 派閥IDに対応する派閥の取得を試みる
+    /// </summary>
+    /// <param name="id">種族ID</param>
+    /// <returns>派閥IDに対応する派閥 派閥IDに対応する派閥が無ければnull</returns>
+    public IFaction? TryGet(string id) =>
+        _Factions.TryGetValue(id, out var race) ? race : null;
 }
