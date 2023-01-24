@@ -32,6 +32,12 @@ Common_PresetName;Preseet name
 
 
 # ------------------------------------------------------
+# Systen
+# ------------------------------------------------------
+System_InvalidConfigFile;There is a problem with the contents of the configuration file. Please re-download the software.
+
+
+# ------------------------------------------------------
 # DB
 # ------------------------------------------------------
 DB_OldFormatMessage;The current DB format is the old format. \r\nPlease extract the DB from the game file again.

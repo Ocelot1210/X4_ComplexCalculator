@@ -34,13 +34,15 @@ public class Configuration
     /// <summary>
     /// X4DBのファイルパス
     /// </summary>
-    public string X4DBPath => _Config["AppSettings:X4DBPath"];
+    public string X4DBPath => _Config["AppSettings:X4DBPath"] ?? 
+        throw new InvalidDataException((string)WPFLocalizeExtension.Engine.LocalizeDictionary.Instance.GetLocalizedObject("Lang:System_InvalidConfigFile", null, null));
 
 
     /// <summary>
     /// CommonDBのファイルパス
     /// </summary>
-    public string CommonDBPath => _Config["AppSettings:CommonDBPath"];
+    public string CommonDBPath => _Config["AppSettings:CommonDBPath"] ?? 
+        throw new InvalidDataException((string)WPFLocalizeExtension.Engine.LocalizeDictionary.Instance.GetLocalizedObject("Lang:System_InvalidConfigFile", null, null));
 
 
 
@@ -192,8 +194,11 @@ public class Configuration
     private void SetValue(string key, string value)
     {
         var provider = _Config.Providers.OfType<JsonConfigurationProvider>().First();
+        if (provider.Source.FileProvider is null) return;
+        if (provider.Source.Path is null) return;
 
         var path = provider.Source.FileProvider.GetFileInfo(provider.Source.Path).PhysicalPath;
+        if (path is null) return;
 
         var jsonText = File.ReadAllText(path);
         var jsonObj = (JObject?)JsonConvert.DeserializeObject(jsonText) ?? throw new InvalidOperationException();
