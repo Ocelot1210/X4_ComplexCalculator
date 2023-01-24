@@ -4,9 +4,13 @@ using LibX4.Xml;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
+using X4_DataExporterWPF.Internal;
 
 namespace X4_DataExporterWPF.Export;
 
@@ -18,7 +22,7 @@ public class ShipExporter : IExporter
     /// <summary>
     /// catファイルオブジェクト
     /// </summary>
-    private readonly CatFile _CatFile;
+    private readonly ICatFile _CatFile;
 
 
     /// <summary>
@@ -28,9 +32,9 @@ public class ShipExporter : IExporter
 
 
     /// <summary>
-    /// サムネ画像が見つからなかった場合の画像
+    /// サムネ画像管理クラス
     /// </summary>
-    private byte[]? _NotFoundThumbnail;
+    private readonly ThumbnailManager _ThumbnailManager;
 
 
     /// <summary>
@@ -38,24 +42,24 @@ public class ShipExporter : IExporter
     /// </summary>
     /// <param name="catFile">catファイルオブジェクト</param>
     /// <param name="waresXml">ウェア情報xml</param>
-    public ShipExporter(CatFile catFile, XDocument waresXml)
+    public ShipExporter(ICatFile catFile, XDocument waresXml)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
+
         _CatFile = catFile;
         _WaresXml = waresXml;
+        _ThumbnailManager = new(catFile, "assets/fx/gui/textures/ships", "notfound");
     }
 
 
-    /// <summary>
-    /// 抽出処理
-    /// </summary>
-    /// <param name="connection"></param>
-    public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
+    /// <inheritdoc/>
+    public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
     {
         //////////////////
         // テーブル作成 //
         //////////////////
         {
-            connection.Execute(@"
+            await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS Ship
 (
     ShipID          TEXT    NOT NULL PRIMARY KEY,
@@ -90,9 +94,9 @@ CREATE TABLE IF NOT EXISTS Ship
         // データ抽出 //
         ////////////////
         {
-            var items = GetRecords(progress);
+            var items = GetRecordsAsync(progress, cancellationToken);
 
-            connection.Execute(@"
+            await connection.ExecuteAsync(@"
 INSERT INTO
 Ship   ( ShipID,  ShipTypeID,  Macro,  SizeID,  Mass,  DragForward,  DragReverse,  DragHorizontal,  DragVertical,  DragPitch,  DragYaw,  DragRoll,  InertiaPitch,  InertiaYaw,  InertiaRoll,  Hull,  People,  MissileStorage,  DroneStorage,  CargoSize,  Thumbnail) 
 VALUES (@ShipID, @ShipTypeID, @Macro, @SizeID, @Mass, @DragForward, @DragReverse, @DragHorizontal, @DragVertical, @DragPitch, @DragYaw, @DragRoll, @InertiaPitch, @InertiaYaw, @InertiaRoll, @Hull, @People, @MissileStorage, @DroneStorage, @CargoSize, @Thumbnail)",
@@ -104,14 +108,15 @@ items);
     /// <summary>
     /// レコード抽出
     /// </summary>
-    private IEnumerable<Ship> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
+    private async IAsyncEnumerable<Ship> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
         var currentStep = 0;
 
 
-        foreach (var ship in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'ship')]"))
+        foreach (var ship in _WaresXml.Root!.XPathSelectElements("ware[contains(@tags, 'ship')]"))
         {
+            cancellationToken.ThrowIfCancellationRequested();
             progress.Report((currentStep++, maxSteps));
 
 
@@ -121,7 +126,7 @@ items);
             var macroName = ship.XPathSelectElement("component")?.Attribute("ref")?.Value;
             if (string.IsNullOrEmpty(macroName)) continue;
 
-            var macroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
+            var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
 
             var shipSizeID = GetShipSizeID(macroXml);
             if (string.IsNullOrEmpty(shipSizeID)) continue;
@@ -129,7 +134,7 @@ items);
             var property = GetProperty(macroXml);
             if (property is null) continue;
 
-            var cargoSize = GetCargoSize(macroXml);
+            var cargoSize = await GetCargoSizeAsync(macroXml, cancellationToken);
             if (cargoSize < 0) continue;
 
             yield return new Ship(
@@ -153,7 +158,7 @@ items);
                 property.MissileStorage,
                 property.DroneStorage,
                 cargoSize,
-                GetThumbnail(macroName)                    
+                await _ThumbnailManager.GetThumbnailAsync(macroName, cancellationToken)
             );
         }
 
@@ -166,9 +171,9 @@ items);
     /// </summary>
     /// <param name="macroXml">マクロxml</param>
     /// <returns>該当するサイズID　該当なしならnull</returns>
-    private string? GetShipSizeID(XDocument macroXml)
+    private static string? GetShipSizeID(XDocument macroXml)
     {
-        var shipClass = macroXml.Root.Element("macro").Attribute("class").Value ?? "";
+        var shipClass = macroXml.Root?.Element("macro")?.Attribute("class")?.Value ?? "";
 
         return shipClass switch
         {
@@ -187,18 +192,18 @@ items);
     /// </summary>
     /// <param name="macroXml">マクロxml</param>
     /// <returns>該当艦船のカーゴサイズ</returns>
-    private int GetCargoSize(XDocument macroXml)
+    private async Task<int> GetCargoSizeAsync(XDocument macroXml, CancellationToken cancellationToken)
     {
-        var componentName = macroXml.Root.XPathSelectElement("macro/component")?.Attribute("ref")?.Value ?? "";
+        var componentName = macroXml.Root?.XPathSelectElement("macro/component")?.Attribute("ref")?.Value ?? "";
         if (string.IsNullOrEmpty(componentName)) return -1;
 
-        var componentXml = _CatFile.OpenIndexXml("index/components.xml", componentName);
+        var componentXml = await _CatFile.OpenIndexXmlAsync("index/components.xml", componentName, cancellationToken);
         if (componentXml is null) return -1;
 
-        var connName = componentXml.Root.XPathSelectElement("component/connections/connection[contains(@tags, 'storage')]")?.Attribute("name")?.Value ?? "";
+        var connName = componentXml.Root?.XPathSelectElement("component/connections/connection[contains(@tags, 'storage')]")?.Attribute("name")?.Value ?? "";
         if (string.IsNullOrEmpty(connName)) return 0;
 
-        var storage = macroXml.Root.XPathSelectElement($"macro/connections/connection[@ref='{connName}']/macro")?.Attribute("ref")?.Value ?? "";
+        var storage = macroXml.Root?.XPathSelectElement($"macro/connections/connection[@ref='{connName}']/macro")?.Attribute("ref")?.Value ?? "";
         if (string.IsNullOrEmpty(storage))
         {
             // カーゴが無い船(ゼノンの艦船等)を考慮
@@ -206,10 +211,10 @@ items);
         }
 
 
-        var storageXml = _CatFile.OpenIndexXml("index/macros.xml", storage);
+        var storageXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", storage, cancellationToken);
         if (storageXml is null) return -1;
 
-        return storageXml.Root.XPathSelectElement("macro/properties/cargo").Attribute("max").GetInt();
+        return storageXml.Root?.XPathSelectElement("macro/properties/cargo")?.Attribute("max").GetInt() ?? 0;
     }
 
 
@@ -220,7 +225,7 @@ items);
     /// <returns></returns>
     private ShipProperty? GetProperty(XDocument macroXml)
     {
-        var properties = macroXml.Root.XPathSelectElement("macro/properties");
+        var properties = macroXml.Root?.XPathSelectElement("macro/properties");
         if (properties is null) return null;
 
 
@@ -284,30 +289,5 @@ items);
         public int People;
         public int MissileStorage;
         public int DroneStorage;
-    }
-
-
-    
-    /// <summary>
-    /// サムネ画像を取得する
-    /// </summary>
-    /// <param name="macroName">マクロ名</param>
-    /// <returns>サムネ画像のbyte配列</returns>
-    private byte[]? GetThumbnail(string macroName)
-    {
-        const string dir = "assets/fx/gui/textures/ships";
-
-        var ret = Util.DDS2Png(_CatFile, dir, macroName);
-        if (ret is not null)
-        {
-            return ret;
-        }
-
-        if (_NotFoundThumbnail is null)
-        {
-            _NotFoundThumbnail = Util.DDS2Png(_CatFile, dir, "notfound");
-        }
-
-        return _NotFoundThumbnail;
     }
 }

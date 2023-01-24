@@ -4,6 +4,8 @@ using System.IO;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace LibX4.FileSystem;
 
@@ -55,6 +57,18 @@ class ModInfo
 
 
     /// <summary>
+    /// Mod のフォルダパス
+    /// </summary>
+    public string Directory { get; } = "";
+
+
+    /// <summary>
+    /// この Mod が必要とする(依存する) Mod 一覧
+    /// </summary>
+    public IReadOnlyList<DependencyInfo> Dependencies { get; } = Array.Empty<DependencyInfo>();
+
+
+    /// <summary>
     /// コンストラクタ
     /// </summary>
     /// <param name="userContentXml">X4 のユーザフォルダ内の content.xml</param>
@@ -67,6 +81,8 @@ class ModInfo
         {
             return;
         }
+
+        Directory = modDirPath;
 
         // Mod フォルダ内の content.xml から ID を取得
         ID = modContentXml.Root?.Attribute("id")?.Value ?? "";
@@ -82,6 +98,7 @@ class ModInfo
         Date    = modContentXml.Root?.Attribute("date")?.Value    ?? "";
         Save    = modContentXml.Root?.Attribute("save")?.Value    ?? "";
         Enabled = GetIsModEnabled(userContentXml, modContentXml);
+        Dependencies = DependencyInfo.CreateFromContentXml(modContentXml);
     }
 
 
@@ -93,7 +110,7 @@ class ModInfo
     /// <returns></returns>
     private bool GetIsModEnabled(XDocument? userContentXml, XDocument modContentXml)
     {
-        var modElm = userContentXml?.Root.XPathSelectElement($"extension[@id='{ID}']");
+        var modElm = userContentXml?.Root?.XPathSelectElement($"extension[@id='{ID}']");
         if (modElm is null)
         {
             var enabledText = modContentXml.Root?.Attribute("enabled")?.Value ?? "";

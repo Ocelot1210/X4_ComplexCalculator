@@ -218,10 +218,10 @@ public class ModulesGridItem : BindableBaseEx, IEditable, ISelectable, IReorderb
     /// <param name="element">モジュール情報が記載されたxml</param>
     public ModulesGridItem(XElement element)
     {
-        Module = X4Database.Instance.Ware.TryGet<IX4Module>(element.Attribute("id").Value) ?? throw new ArgumentException("Invalid XElement.", nameof(element));
+        Module = X4Database.Instance.Ware.TryGet<IX4Module>(element.Attribute("id")!.Value) ?? throw new ArgumentException("Invalid XElement.", nameof(element));
         Equipments = new EquippableWareEquipmentManager(Module, element.Element("equipments"));
 
-        ModuleCount = long.Parse(element.Attribute("count").Value);
+        ModuleCount = long.Parse(element.Attribute("count")?.Value ?? "1");
 
         SelectedMethod = 
             Module.Productions.TryGetValue(element.Attribute("method")?.Value ?? "default", out var method) ? method : Module.Productions.Values.First();
@@ -329,7 +329,7 @@ public class ModulesGridItem : BindableBaseEx, IEditable, ISelectable, IReorderb
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void Equipments_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    private void Equipments_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         var addedTurretCount = 0;
         var addedShieldCount = 0;

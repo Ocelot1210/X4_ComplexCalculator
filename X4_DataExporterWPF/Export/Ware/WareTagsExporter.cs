@@ -3,9 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
+using X4_DataExporterWPF.Internal;
 
 namespace X4_DataExporterWPF.Export;
 
@@ -26,17 +29,19 @@ class WareTagsExporter : IExporter
     /// <param name="waresXml">ウェア情報xml</param>
     public WareTagsExporter(XDocument waresXml)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
         _WaresXml = waresXml;
     }
 
 
-    public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
+    /// <inheritdoc/>
+    public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
     {
         //////////////////
         // テーブル作成 //
         //////////////////
         {
-            connection.Execute(@"
+            await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS WareTags
 (
     WareID  TEXT    NOT NULL,
@@ -53,7 +58,7 @@ CREATE TABLE IF NOT EXISTS WareTags
         {
             var items = GetRecords(progress);
 
-            connection.Execute("INSERT INTO WareTags (WareID, Tag) VALUES (@WareID, @Tag)", items);
+            await connection.ExecuteAsync("INSERT INTO WareTags (WareID, Tag) VALUES (@WareID, @Tag)", items);
         }
     }
 
@@ -61,11 +66,11 @@ CREATE TABLE IF NOT EXISTS WareTags
 
     private IEnumerable<WareTag> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
     {
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware)");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware)");
         var currentStep = 0;
 
 
-        foreach (var ware in _WaresXml.Root.XPathSelectElements("ware"))
+        foreach (var ware in _WaresXml.Root!.XPathSelectElements("ware"))
         {
             progress.Report((currentStep++, maxSteps));
 

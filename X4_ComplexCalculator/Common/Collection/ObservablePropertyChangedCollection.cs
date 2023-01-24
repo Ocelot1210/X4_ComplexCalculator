@@ -134,6 +134,8 @@ public class ObservablePropertyChangedCollection<INotifyPropertyChanged> : Obser
         {
             // 置換の場合
             case NotifyCollectionChangedAction.Replace:
+                ArgumentNullException.ThrowIfNull(e.OldItems);
+                ArgumentNullException.ThrowIfNull(e.NewItems);
                 foreach (var item in e.OldItems.OfType<INotifyPropertyChanged>())
                 {
                     WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.RemoveHandler(item, "PropertyChanged", OnPropertyChanged);
@@ -146,6 +148,7 @@ public class ObservablePropertyChangedCollection<INotifyPropertyChanged> : Obser
 
             // 新規追加の場合
             case NotifyCollectionChangedAction.Add:
+                ArgumentNullException.ThrowIfNull(e.NewItems);
                 foreach (var item in Items.Skip(e.NewStartingIndex).Take(e.NewItems.Count).OfType<INotifyPropertyChanged>())
                 {
                     WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.AddHandler(item, "PropertyChanged", OnPropertyChanged);
@@ -154,6 +157,7 @@ public class ObservablePropertyChangedCollection<INotifyPropertyChanged> : Obser
 
             // 削除の場合
             case NotifyCollectionChangedAction.Remove:
+                ArgumentNullException.ThrowIfNull(e.OldItems);
                 foreach (var item in e.OldItems.OfType<INotifyPropertyChanged>())
                 {
                     WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.RemoveHandler(item, "PropertyChanged", OnPropertyChanged);

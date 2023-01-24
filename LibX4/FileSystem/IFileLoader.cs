@@ -1,4 +1,6 @@
 ﻿using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace LibX4.FileSystem;
 
@@ -11,9 +13,10 @@ interface IFileLoader
 
 
     /// <summary>
-    /// ファイルを開く
+    /// 非同期にファイルを開く
     /// </summary>
     /// <param name="filePath">ファイルパス</param>
+    /// <param name="cancellationToken">キャンセル トークン</param>
     /// <returns>ファイルのStream、該当ファイルが無かった場合はnull</returns>
-    public Stream? OpenFile(string filePath);
+    public Task<Stream?> OpenFileAsync(string filePath, CancellationToken cancellationToken = default);
 }

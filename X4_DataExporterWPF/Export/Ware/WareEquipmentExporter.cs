@@ -4,9 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
+using X4_DataExporterWPF.Internal;
 
 namespace X4_DataExporterWPF.Export;
 
@@ -40,22 +44,21 @@ public class WareEquipmentExporter : IExporter
     /// <param name="waresXml">ウェア情報xml</param>
     public WareEquipmentExporter(IIndexResolver catFile, XDocument waresXml)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
+
         _CatFile = catFile;
         _WaresXml = waresXml;
     }
 
 
-    /// <summary>
-    /// 抽出処理
-    /// </summary>
-    /// <param name="connection"></param>
-    public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
+    /// <inheritdoc/>
+    public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
     {
         //////////////////
         // テーブル作成 //
         //////////////////
         {
-            connection.Execute(@"
+            await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS WareEquipment
 (
     WareID          TEXT    NOT NULL,
@@ -67,7 +70,7 @@ CREATE TABLE IF NOT EXISTS WareEquipment
     FOREIGN KEY (EquipmentTypeID)   REFERENCES EquipmentType(EquipmentTypeID)
 ) WITHOUT ROWID");
 
-            connection.Execute(@"
+            await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS WareEquipmentTag
 (
     WareID          TEXT    NOT NULL,
@@ -83,18 +86,22 @@ CREATE TABLE IF NOT EXISTS WareEquipmentTag
         // データ抽出 //
         ////////////////
         {
-            var items = GetRecords2(progress);
+            var items = GetUniqueRecordsAsync(progress, cancellationToken);
 
-            connection.Execute(@"INSERT INTO WareEquipment (WareID, GroupName, ConnectionName, EquipmentTypeID) VALUES (@WareID, @GroupName, @ConnectionName, @EquipmentTypeID)", items);
+            await connection.ExecuteAsync(@"INSERT INTO WareEquipment (WareID, GroupName, ConnectionName, EquipmentTypeID) VALUES (@WareID, @GroupName, @ConnectionName, @EquipmentTypeID)", items);
 
-            connection.Execute(@"INSERT INTO WareEquipmentTag (WareID, ConnectionName, Tag) VALUES (@WareID, @ConnectionName, @Tag)", _EquipmentTags.SelectMany(x => x));
+            await connection.ExecuteAsync(@"INSERT INTO WareEquipmentTag (WareID, ConnectionName, Tag) VALUES (@WareID, @ConnectionName, @Tag)", _EquipmentTags.SelectMany(x => x));
         }
     }
 
-    private IEnumerable<WareEquipment> GetRecords2(IProgress<(int currentStep, int maxSteps)> progress)
+
+    /// <summary>
+    /// ユニークなレコード抽出
+    /// </summary>
+    private async IAsyncEnumerable<WareEquipment> GetUniqueRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         var hash = new HashSet<(string, string)>();
-        foreach (var item in GetRecords(progress))
+        await foreach (var item in GetRecordsAsync(progress, cancellationToken))
         {
             if (hash.Contains((item.WareID, item.ConnectionName)))
             {
@@ -109,14 +116,15 @@ CREATE TABLE IF NOT EXISTS WareEquipmentTag
     /// <summary>
     /// レコード抽出
     /// </summary>
-    private IEnumerable<WareEquipment> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
+    private async IAsyncEnumerable<WareEquipment> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware)");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware)");
         var currentStep = 0;
 
 
-        foreach (var ware in _WaresXml.Root.XPathSelectElements("ware"))
+        foreach (var ware in _WaresXml.Root!.XPathSelectElements("ware"))
         {
+            cancellationToken.ThrowIfCancellationRequested();
             progress.Report((currentStep++, maxSteps));
 
 
@@ -126,11 +134,14 @@ CREATE TABLE IF NOT EXISTS WareEquipmentTag
             var macroName = ware.XPathSelectElement("component")?.Attribute("ref")?.Value;
             if (string.IsNullOrEmpty(macroName)) continue;
 
-            var macroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
-            if (macroXml is null) continue;
+            var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
+            if (macroXml?.Root is null) continue;
 
-            var componentXml = _CatFile.OpenIndexXml("index/components.xml", macroXml.Root.XPathSelectElement("macro/component").Attribute("ref").Value);
-            if (componentXml is null) continue;
+            var componentName = macroXml.Root.XPathSelectElement("macro/component")?.Attribute("ref")?.Value;
+            if (string.IsNullOrEmpty(componentName)) continue;  
+
+            var componentXml = await _CatFile.OpenIndexXmlAsync("index/components.xml", componentName, cancellationToken);
+            if (componentXml?.Root is null) continue;
 
             var equipmentTags = new List<WareEquipmentTag>();
 

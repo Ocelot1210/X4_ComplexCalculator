@@ -20,17 +20,17 @@ class FactionManager
     #endregion
 
 
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    /// <param name="conn">DB接続情報</param>
-    /// <param name="raceManager">種族情報</param>
-    public FactionManager(IDbConnection conn, RaceManager raceManager)
-    {
-        _Factions = conn.Query<X4_DataExporterWPF.Entity.Faction>("SELECT * FROM Faction WHERE RaceID IN (SELECT RaceID FROM Race)")
-            .Select(x => new Faction(x.FactionID, x.Name, raceManager.Get(x.RaceID)) as IFaction)
-            .ToDictionary(x => x.FactionID);
-    }
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="conn">DB接続情報</param>
+        /// <param name="raceManager">種族情報</param>
+        public FactionManager(IDbConnection conn, RaceManager raceManager)
+        {
+            _Factions = conn.Query<X4_DataExporterWPF.Entity.Faction>("SELECT * FROM Faction WHERE RaceID IN (SELECT RaceID FROM Race)")
+                .Select(x => new Faction(x.FactionID, x.Name, raceManager.Get(x.RaceID), (int)x.Color) as IFaction)
+                .ToDictionary(x => x.FactionID);
+        }
 
 
     /// <summary>

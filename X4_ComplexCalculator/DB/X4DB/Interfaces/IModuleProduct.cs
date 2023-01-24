@@ -25,6 +25,12 @@ public interface IModuleProduct
 
 
     /// <summary>
+    /// 生産量
+    /// </summary>
+    public long Amount { get; }
+
+
+    /// <summary>
     /// 生産情報
     /// </summary>
     public IWareProduction WareProduction { get; }

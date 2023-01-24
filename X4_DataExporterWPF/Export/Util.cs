@@ -5,6 +5,8 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace X4_DataExporterWPF.Export;
 
@@ -87,7 +89,7 @@ public static class Util
     /// <param name="dir">フォルダパス</param>
     /// <param name="fileName">gzipで圧縮された画像のファイル名(拡張子は除く)</param>
     /// <returns></returns>
-    public static byte[]? DDS2Png(ICatFile catFIle, string dir, string? fileName)
+    public static async Task<byte[]?> DDS2PngAsync(ICatFile catFile, string dir, string? fileName, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(fileName))
         {
@@ -97,25 +99,22 @@ public static class Util
 
         try
         {
-            using var rawStream = catFIle.TryOpenFile(Path.Combine(dir, $"{fileName}.gz"));
+            using var rawStream = await catFile.TryOpenFileAsync(Path.Combine(dir, $"{fileName}.gz"), cancellationToken);
             if (rawStream is not null)
             {
-                Span<byte> buff = stackalloc byte[4];
-
-                rawStream.Read(buff);
-                rawStream.Position = 0;
-
-                // フォーマットはgzipか？
-                if (buff[0] == 0x1F && buff[1] == 0x8B)
+                switch (JudgeFormat(rawStream))
                 {
-                    var inStream = new GZipStream(rawStream, CompressionMode.Decompress);
-                    return DDS2PngMain(inStream);
-                }
+                    case PictureFormat.Gzip:
+                        {
+                            using var inStream = new GZipStream(rawStream, CompressionMode.Decompress);
+                            return await DDS2PngMainAsync(inStream, cancellationToken);
+                        }
 
-                // フォーマットはDDSか？
-                if (buff[0] == 0x44 && buff[1] == 0x44 && buff[2] == 0x53 && buff[3] == 0x20)
-                {
-                    return DDS2PngMain(rawStream);
+                    case PictureFormat.DDS:
+                        return await DDS2PngMainAsync(rawStream, cancellationToken);
+
+                    default:
+                        break;
                 }
             }
         }
@@ -126,13 +125,48 @@ public static class Util
         return null;
     }
 
+    enum PictureFormat
+    {
+        Unknown = 0,
+        Gzip = 1,
+        DDS = 2
+    }
+
+    /// <summary>
+    /// <paramref name="stream"/> の内容からフォーマットを判定する
+    /// </summary>
+    /// <param name="stream">判定対象のデータを表す <see cref="Stream"/></param>
+    /// <returns>
+    /// <para>gzip の場合 1</para>
+    /// <para>DDS の場合 2</para>
+    /// <para>それ以外の場合 -1</para>
+    /// </returns>
+    private static PictureFormat JudgeFormat(Stream stream)
+    {
+        Span<byte> buff = stackalloc byte[4];
+        stream.Read(buff);
+        stream.Position = 0;
+
+        if (buff[0] == 0x1F && buff[1] == 0x8B)
+        {
+            return PictureFormat.Gzip;
+        }
+
+        if (buff[0] == 0x44 && buff[1] == 0x44 && buff[2] == 0x53 && buff[3] == 0x20)
+        {
+            return PictureFormat.DDS;
+        }
+
+        return PictureFormat.Unknown;
+    }
+
 
     /// <summary>
     /// DDSファイルのStreamをPNGのバイト配列に変換する
     /// </summary>
     /// <param name="stream">変換対象のDDSファイルのStream</param>
     /// <returns>バイト配列</returns>
-    private static byte[]? DDS2PngMain(Stream stream)
+    private static async Task<byte[]?> DDS2PngMainAsync(Stream stream, CancellationToken cancellationToken)
     {
         var image = Pfim.Dds.Create(stream, new Pfim.PfimConfig());
         if (image.Compressed)
@@ -144,14 +178,18 @@ public static class Util
         {
             var img = Image.LoadPixelData<Bgra32>(image.Data, image.Width, image.Height);
             using var ms = new MemoryStream();
-            img.SaveAsPng(ms);
+
+            await img.SaveAsPngAsync(ms, cancellationToken);
+
             return ms.ToArray();
         }
         else if (image.Format == Pfim.ImageFormat.Rgb24)
         {
             var img = Image.LoadPixelData<Bgr24>(image.Data, image.Width, image.Height);
             using var ms = new MemoryStream();
-            img.SaveAsPng(ms);
+
+            await img.SaveAsPngAsync(ms, cancellationToken);
+
             return ms.ToArray();
         }
 

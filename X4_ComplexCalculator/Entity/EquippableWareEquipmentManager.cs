@@ -74,8 +74,10 @@ public class EquippableWareEquipmentManager : INotifyCollectionChanged
     /// </summary>
     /// <param name="ware">管理対象のウェア</param>
     /// <param name="element">シリアライズされたXElement</param>
-    public EquippableWareEquipmentManager(IEquippableWare ware, XElement element) : this(ware)
+    public EquippableWareEquipmentManager(IEquippableWare ware, XElement? element) : this(ware)
     {
+        if (element is null) return;
+
         try
         {
             foreach (var elm in element.Elements())

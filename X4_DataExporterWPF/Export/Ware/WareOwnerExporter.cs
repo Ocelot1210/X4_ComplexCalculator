@@ -3,9 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
+using X4_DataExporterWPF.Internal;
 
 namespace X4_DataExporterWPF.Export;
 
@@ -26,21 +29,19 @@ public class WareOwnerExporter : IExporter
     /// <param name="waresXml">ウェア情報xml</param>
     public WareOwnerExporter(XDocument waresXml)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
         _WaresXml = waresXml;
     }
 
 
-    /// <summary>
-    /// 抽出処理
-    /// </summary>
-    /// <param name="connection"></param>
-    public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
+    /// <inheritdoc/>
+    public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
     {
         //////////////////
         // テーブル作成 //
         //////////////////
         {
-            connection.Execute(@"
+            await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS WareOwner
 (
     WareID      TEXT    NOT NULL,
@@ -59,7 +60,7 @@ CREATE TABLE IF NOT EXISTS WareOwner
             var items = GetRecords(progress);
 
 
-            connection.Execute("INSERT INTO WareOwner (WareID, FactionID) VALUES (@WareID, @FactionID)", items);
+            await connection.ExecuteAsync("INSERT INTO WareOwner (WareID, FactionID) VALUES (@WareID, @FactionID)", items);
         }
     }
 
@@ -70,11 +71,11 @@ CREATE TABLE IF NOT EXISTS WareOwner
     /// <returns>読み出した WareOwner データ</returns>
     internal IEnumerable<WareOwner> GetRecords(IProgress<(int currentStep, int maxSteps)>? progress = null)
     {
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware)");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware)");
         var currentStep = 0;
 
 
-        foreach (var ware in _WaresXml.Root.XPathSelectElements("ware"))
+        foreach (var ware in _WaresXml.Root!.XPathSelectElements("ware"))
         {
             progress?.Report((currentStep++, maxSteps));
 

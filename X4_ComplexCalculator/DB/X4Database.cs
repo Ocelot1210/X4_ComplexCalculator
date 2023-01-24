@@ -124,12 +124,12 @@ class X4Database : DBConnection
         if (_Instance is not null) return;
 
         var basePath = AppDomain.CurrentDomain.BaseDirectory ?? "";
-        var dbPath = Path.Combine(basePath, Configuration.Instance.X4DBPath);
+        var dbPath = Path.Join(basePath, Configuration.Instance.X4DBPath);
 
         try
         {
             // DB格納先フォルダが無ければ作る
-            Directory.CreateDirectory(Path.GetDirectoryName(dbPath));
+            Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
 
             if (File.Exists(dbPath))
             {
@@ -147,7 +147,7 @@ class X4Database : DBConnection
                     // DB更新を要求
 
                     LocalizedMessageBox.Show("Lang:DB_OldFormatMessage", "Lang:Common_MessageBoxTitle_Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    if (!UpdateDB() || _Instance.GetDBVersion() != X4_DataExporterWPF.Export.CommonExporter.CURRENT_FORMAT_VERSION)
+                    if (UpdateDB() != UpdateDbStatus.Succeeded)
                     {
                         // DB更新を要求してもフォーマットが変わらない場合
 
@@ -162,7 +162,7 @@ class X4Database : DBConnection
 
                 // X4DBの作成を要求する
                 LocalizedMessageBox.Show("Lang:DB_ExtractionRequestMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);
-                if (!UpdateDB())
+                if (UpdateDB() != UpdateDbStatus.Succeeded)
                 {
                     LocalizedMessageBox.Show("Lang:DB_MakeRequestMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     Environment.Exit(-1);
@@ -175,7 +175,7 @@ class X4Database : DBConnection
             if (LocalizedMessageBox.Show("Lang:DB_OpenFailMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.YesNo, MessageBoxImage.Error) == MessageBoxResult.Yes)
             {
                 // 提案が受け入れられた場合、DB更新
-                if (!UpdateDB())
+                if (UpdateDB() != UpdateDbStatus.Succeeded)
                 {
                     // DB更新失敗
                     LocalizedMessageBox.Show("Lang:DB_UpdateRequestMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -211,10 +211,21 @@ class X4Database : DBConnection
 
 
     /// <summary>
+    /// DB 更新結果
+    /// </summary>
+    internal enum UpdateDbStatus
+    {
+        NoChange = 0,
+        Succeeded = 1,
+        Failed = 2,
+    }
+
+
+    /// <summary>
     /// DBを更新
     /// </summary>
     /// <returns></returns>
-    public static bool UpdateDB()
+    public static UpdateDbStatus UpdateDB()
     {
         _Instance?.Dispose();
 
@@ -225,27 +236,31 @@ class X4Database : DBConnection
             var exeDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? "";
             dbFilePath = Path.GetFullPath(Path.Combine(exeDir, Configuration.Instance.X4DBPath));
         }
-        
+
+        var prevTimestamp = File.Exists(dbFilePath) ? File.GetLastWriteTime(dbFilePath) : DateTime.MinValue;
+
         DataExportWindow.ShowDialog(LibX4.X4Path.GetX4InstallDirectory(), dbFilePath);
 
         if (File.Exists(dbFilePath))
         {
             _Instance = new X4Database(dbFilePath);
             _Instance.Init();
-            return true;
+
+            return (File.GetLastWriteTime(dbFilePath) == prevTimestamp) ? UpdateDbStatus.NoChange : UpdateDbStatus.Succeeded; ;
         }
 
-        return false;
+        return UpdateDbStatus.Failed;
     }
 
 
     /// <summary>
     /// 初期化
     /// </summary>
+    /// </summary>
     private void Init()
     {
-        _X4Size  = new(_Connection);
-        _Race    = new(_Connection);
+        _X4Size = new(_Connection);
+        _Race = new(_Connection);
         _Faction = new(_Connection, _Race);
         _TransportType = new(_Connection);
         _EquipmentType = new(_Connection);

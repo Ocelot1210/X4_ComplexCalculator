@@ -5,9 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
+using X4_DataExporterWPF.Internal;
 
 namespace X4_DataExporterWPF.Export;
 
@@ -60,18 +64,14 @@ class ShipHangerExporter : IExporter
     }
 
 
-
-    /// <summary>
-    /// 抽出処理
-    /// </summary>
-    /// <param name="connection"></param>
-    public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
+    /// <inheritdoc/>
+    public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
     {
         //////////////////
         // テーブル作成 //
         //////////////////
         {
-            connection.Execute(@"
+            await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS ShipHanger
 (
     ShipID      TEXT    NOT NULL,
@@ -89,25 +89,25 @@ CREATE TABLE IF NOT EXISTS ShipHanger
         // データ抽出 //
         ////////////////
         {
-            var items = GetRecords(progress);
+            var items = GetRecordsAsync(progress, cancellationToken);
 
-            connection.Execute(@"INSERT INTO ShipHanger(ShipID, SizeID, Count, Capacity) VALUES (@ShipID, @SizeID, @Count, @Capacity)", items);
+            await connection.ExecuteAsync(@"INSERT INTO ShipHanger(ShipID, SizeID, Count, Capacity) VALUES (@ShipID, @SizeID, @Count, @Capacity)", items);
         }
     }
-
 
 
     /// <summary>
     /// レコード抽出
     /// </summary>
-    private IEnumerable<ShipHanger> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
+    private async IAsyncEnumerable<ShipHanger> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
         var currentStep = 0;
 
 
-        foreach (var ship in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'ship')]"))
+        foreach (var ship in _WaresXml.Root!.XPathSelectElements("ware[contains(@tags, 'ship')]"))
         {
+            cancellationToken.ThrowIfCancellationRequested();
             progress.Report((currentStep++, maxSteps));
 
             var shipID = ship.Attribute("id")?.Value;
@@ -118,12 +118,15 @@ CREATE TABLE IF NOT EXISTS ShipHanger
                 var macroName = ship.XPathSelectElement("component")?.Attribute("ref")?.Value;
                 if (string.IsNullOrEmpty(macroName)) continue;
 
-                shipMacroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
-                if (shipMacroXml is null) continue;
+                shipMacroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
+                if (shipMacroXml?.Root is null) continue;
             }
 
-            var componentXml = _CatFile.OpenIndexXml("index/components.xml", shipMacroXml.Root.XPathSelectElement("macro/component").Attribute("ref").Value);
-            if (componentXml is null) continue;
+            var componentName = shipMacroXml.Root.XPathSelectElement("macro/component")?.Attribute("ref")?.Value;
+            if (string.IsNullOrEmpty(componentName)) continue;
+
+            var componentXml = await _CatFile.OpenIndexXmlAsync("index/components.xml", componentName, cancellationToken);
+            if (componentXml?.Root is null) continue;
 
             // 集計用辞書
             var aggregateDict = new Dictionary<string, HangerInfo>();
@@ -131,7 +134,7 @@ CREATE TABLE IF NOT EXISTS ShipHanger
             // ドックエリア数ループ
             foreach (var conName in componentXml.Root.XPathSelectElements("component/connections/connection[contains(@tags, 'dockarea')]").Select(x => x.Attribute("name")?.Value).OfType<string>())
             {
-                foreach (var (size, count) in CountDockArea(shipMacroXml, conName))
+                foreach (var (size, count) in await CountDockAreaAsync(shipMacroXml, conName, cancellationToken))
                 {
                     if (!aggregateDict.ContainsKey(size))
                     {
@@ -146,7 +149,7 @@ CREATE TABLE IF NOT EXISTS ShipHanger
             // ドッキングベイ数ループ
             foreach (var conName in componentXml.Root.XPathSelectElements("component/connections/connection[contains(@tags, 'dockingbay')]").Select(x => x.Attribute("name")?.Value).OfType<string>())
             {
-                var dockingBay = GetDockingBayCapacity(shipMacroXml, conName);
+                var dockingBay = await GetDockingBayCapacityAsync(shipMacroXml, conName, cancellationToken);
                 if (dockingBay is null) continue;
 
                 if (!aggregateDict.ContainsKey(dockingBay.Value.Item1))
@@ -174,9 +177,9 @@ CREATE TABLE IF NOT EXISTS ShipHanger
     /// <param name="shipMacroXml"></param>
     /// <param name="dockingBayName"></param>
     /// <returns></returns>
-    private (string, int)? GetDockingBayCapacity(XDocument shipMacroXml, string dockingBayName)
+    private async Task<(string, int)?> GetDockingBayCapacityAsync(XDocument shipMacroXml, string dockingBayName, CancellationToken cancellationToken)
     {
-        var macroName = shipMacroXml.Root.XPathSelectElement($"macro/connections/connection[@ref='{dockingBayName}']/macro")?.Attribute("ref")?.Value ?? "";
+        var macroName = shipMacroXml.Root?.XPathSelectElement($"macro/connections/connection[@ref='{dockingBayName}']/macro")?.Attribute("ref")?.Value ?? "";
         if (string.IsNullOrEmpty(macroName))
         {
             return null;
@@ -188,15 +191,15 @@ CREATE TABLE IF NOT EXISTS ShipHanger
             return registerdCapacity;
         }
 
-        var dockingBayXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
+        var dockingBayXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
         if (dockingBayXml is null)
         {
             _DockingBayDict.TryAdd(macroName, null);
             return null;
         }
 
-        var capacity = dockingBayXml.Root.XPathSelectElement("macro/properties/dock")?.Attribute("capacity")?.GetInt() ?? 0;
-        var tags = dockingBayXml.Root.XPathSelectElement("macro/properties/docksize")?.Attribute("tags")?.Value ?? "";
+        var capacity = dockingBayXml.Root?.XPathSelectElement("macro/properties/dock")?.Attribute("capacity")?.GetInt() ?? 0;
+        var tags = dockingBayXml.Root?.XPathSelectElement("macro/properties/docksize")?.Attribute("tags")?.Value ?? "";
         var size = DockSize2SizeID(tags);
 
         // 容量が1未満 又は 無効なドックサイズの場合、空の要素を登録
@@ -207,6 +210,7 @@ CREATE TABLE IF NOT EXISTS ShipHanger
         }
 
         _DockingBayDict.Add(macroName, (size, capacity));
+
         return (size, capacity);
     }
 
@@ -219,9 +223,9 @@ CREATE TABLE IF NOT EXISTS ShipHanger
     /// <param name="shipMacroXml">艦船マクロ</param>
     /// <param name="dockName">ドック名</param>
     /// <returns></returns>
-    private IReadOnlyDictionary<string, int> CountDockArea(XDocument shipMacroXml, string dockName)
+    private async Task<IReadOnlyDictionary<string, int>> CountDockAreaAsync(XDocument shipMacroXml, string dockName, CancellationToken cancellationToken)
     {
-        var macroName = shipMacroXml.Root.XPathSelectElement($"macro/connections/connection[@ref='{dockName}']/macro")?.Attribute("ref")?.Value ?? "";
+        var macroName = shipMacroXml.Root?.XPathSelectElement($"macro/connections/connection[@ref='{dockName}']/macro")?.Attribute("ref")?.Value ?? "";
         if (string.IsNullOrEmpty(macroName))
         {
             return new Dictionary<string, int>();
@@ -235,7 +239,7 @@ CREATE TABLE IF NOT EXISTS ShipHanger
 
 
 
-        var dockMacroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
+        var dockMacroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
         if (dockMacroXml is null)
         {
             var ret = new Dictionary<string, int>();
@@ -253,10 +257,9 @@ CREATE TABLE IF NOT EXISTS ShipHanger
             { "extralarge", 0 }
         };
 
-
-        foreach (var dockingBayName in dockMacroXml.Root.XPathSelectElements("macro/connections/connection/macro").Attributes("ref").Select(x => x.Value))
+        foreach (var dockingBayName in dockMacroXml.Root?.XPathSelectElements("macro/connections/connection/macro").Attributes("ref").Select(x => x.Value) ?? Enumerable.Empty<string>())
         {
-            var size = GetDockingBaysSize(dockingBayName) ?? "";
+            var size = await GetDockingBaysSizeAsync(dockingBayName, cancellationToken) ?? "";
             if (sizeDict.ContainsKey(size))
             {
                 sizeDict[size]++;
@@ -277,7 +280,7 @@ CREATE TABLE IF NOT EXISTS ShipHanger
     /// </summary>
     /// <param name="dockingBayMacroName">ドッキングベイのマクロ名</param>
     /// <returns>ドッキングベイのサイズID</returns>
-    private string? GetDockingBaysSize(string dockingBayMacroName)
+    private async Task<string?> GetDockingBaysSizeAsync(string dockingBayMacroName, CancellationToken cancellationToken)
     {
         // メモに残っていればそれを返す
         if (_DockingBaySizeDict.TryGetValue(dockingBayMacroName, out var size))
@@ -285,14 +288,14 @@ CREATE TABLE IF NOT EXISTS ShipHanger
             return size;
         }
 
-        var dockingMacroXml = _CatFile.OpenIndexXml("index/macros.xml", dockingBayMacroName);
+        var dockingMacroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", dockingBayMacroName, cancellationToken);
         if (dockingMacroXml is null)
         {
             _DockingBaySizeDict.Add(dockingBayMacroName, null);
             return null;
         }
 
-        var tag = dockingMacroXml.Root.XPathSelectElement("macro/properties/docksize")?.Attribute("tags")?.Value ?? "";
+        var tag = dockingMacroXml.Root?.XPathSelectElement("macro/properties/docksize")?.Attribute("tags")?.Value ?? "";
 
         size = DockSize2SizeID(tag);
 

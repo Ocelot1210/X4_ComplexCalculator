@@ -5,7 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using X4_DataExporterWPF.Entity;
+using X4_DataExporterWPF.Internal;
 
 namespace X4_DataExporterWPF.Export;
 
@@ -38,17 +42,14 @@ public class RaceExporter : IExporter
     }
 
 
-    /// <summary>
-    /// データ抽出
-    /// </summary>
-    /// <param name="connection"></param>
-    public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
+    /// <inheritdoc/>
+    public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
     {
         //////////////////
         // テーブル作成 //
         //////////////////
         {
-            connection.Execute(@"
+            await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS Race
 (
     RaceID      TEXT    NOT NULL PRIMARY KEY,
@@ -64,9 +65,9 @@ CREATE TABLE IF NOT EXISTS Race
         // データ抽出 //
         ////////////////
         {
-            var items = GetRecords(progress);
+            var items = GetRecords(progress, cancellationToken);
 
-            connection.Execute("INSERT INTO Race (RaceID, Name, ShortName, Description, Icon) VALUES (@RaceID, @Name, @ShortName, @Description, @Icon)", items);
+            await connection.ExecuteAsync("INSERT INTO Race (RaceID, Name, ShortName, Description, Icon) VALUES (@RaceID, @Name, @ShortName, @Description, @Icon)", items);
         }
     }
 
@@ -75,15 +76,17 @@ CREATE TABLE IF NOT EXISTS Race
     /// XML から Race データを読み出す
     /// </summary>
     /// <returns>読み出した Race データ</returns>
-    private IEnumerable<Race> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
+    private async IAsyncEnumerable<Race> GetRecords(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var raceXml = _CatFile.OpenXml("libraries/races.xml");
+        var raceXml = await _CatFile.OpenXmlAsync("libraries/races.xml", cancellationToken);
+        if (raceXml?.Root is null) yield break;
 
         var maxSteps = raceXml.Root.Elements().Count();
         int currentStep = 0;
 
         foreach (var race in raceXml.Root.Elements())
         {
+            cancellationToken.ThrowIfCancellationRequested();
             progress.Report((currentStep++, maxSteps));
 
             var raceID = race.Attribute("id")?.Value;
@@ -93,7 +96,7 @@ CREATE TABLE IF NOT EXISTS Race
             if (string.IsNullOrEmpty(name)) continue;
 
             var shortName = _Resolver.Resolve(race.Attribute("shortname")?.Value ?? "");
-            
+
             var description = _Resolver.Resolve(race.Attribute("description")?.Value ?? "");
 
             yield return new Race(
@@ -101,7 +104,7 @@ CREATE TABLE IF NOT EXISTS Race
                 name,
                 shortName,
                 description,
-                Util.DDS2Png(_CatFile, "assets/fx/gui/textures/races", race.Element("icon")?.Attribute("active")?.Value)
+                await Util.DDS2PngAsync(_CatFile, "assets/fx/gui/textures/races", race.Element("icon")?.Attribute("active")?.Value, cancellationToken)
             );
         }
 

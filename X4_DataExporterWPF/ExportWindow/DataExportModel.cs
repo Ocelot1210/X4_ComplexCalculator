@@ -6,9 +6,12 @@ using System.Data;
 using System.Data.SQLite;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using WPFLocalizeExtension.Engine;
 using X4_DataExporterWPF.Export;
 
 namespace X4_DataExporterWPF.DataExportWindow;
@@ -21,21 +24,34 @@ class DataExportModel
     /// <summary>
     /// 言語一覧を更新
     /// </summary>
-    public (bool success, IEnumerable<LangComboboxItem> languages) GetLanguages(string inDirPath)
+    public async Task<(bool success, IReadOnlyList<LangComboboxItem> languages)> GetLanguages(string inDirPath, Window owner)
     {
         try
         {
             var catFiles = new CatFile(inDirPath);
-            var xml = catFiles.OpenXml("libraries/languages.xml");
+            var xml = await catFiles.OpenXmlAsync("libraries/languages.xml", CancellationToken.None);
             var languages = xml.XPathSelectElements("/languages/language")
-                .Select(x => new LangComboboxItem(int.Parse(x.Attribute("id").Value), x.Attribute("name").Value))
-                .OrderBy(x => x.ID);
+                .Select(x => (ID: x.Attribute("id")?.Value, Name: x.Attribute("name")?.Value))
+                .Where(x => (!string.IsNullOrEmpty(x.ID)) && x.Name is not null)
+                .Select(x => new LangComboboxItem(int.Parse(x.ID!), x.Name!))
+                .OrderBy(x => x.ID)
+                .ToArray();
 
             return (true, languages);
         }
+        catch (DependencyResolutionException)
+        {
+            await owner.Dispatcher.BeginInvoke((Action)(() =>
+            {
+                var msg = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_FailedToResolveModDependencyMessage", null, null);
+                var title = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_Title", null, null);
+                MessageBox.Show(owner, msg, title, MessageBoxButton.OK, MessageBoxImage.Error);
+            }));
+            return (false, Array.Empty<LangComboboxItem>());
+        }
         catch (Exception)
         {
-            return (false, Enumerable.Empty<LangComboboxItem>());
+            return (false, Array.Empty<LangComboboxItem>());
         }
     }
 
@@ -48,8 +64,8 @@ class DataExportModel
     /// <param name="language">選択された言語</param>
     /// <param name="owner">親ウィンドウハンドル(メッセージボックス表示用)</param>
     /// <returns>現在数と合計数のタプルのイテレータ</returns>
-    public void Export(
-        IProgress<(int currentStep, int maxSteps)> progress, 
+    public async Task Export(
+        IProgress<(int currentStep, int maxSteps)> progress,
         IProgress<(int currentStep, int maxSteps)> progressSub,
         string inDirPath,
         string outFilePath,
@@ -62,10 +78,7 @@ class DataExportModel
         // 抽出に失敗した場合、例外設定で「Common Languate Runtime Exceptions」にチェックを入れるとどこで例外が発生したか分かる
         try
         {
-            if (File.Exists(outFilePath))
-            {
-                File.Delete(outFilePath);
-            }
+            using var backupper = new DbBackupper(outFilePath);
 
             var consb = new SQLiteConnectionStringBuilder { DataSource = outFilePath };
             using var conn = new SQLiteConnection(consb.ToString());
@@ -74,12 +87,12 @@ class DataExportModel
             using var trans = conn.BeginTransaction();
 
             // 英語をデフォルトにする
-            var resolver = new LanguageResolver(catFile, language.ID, 44);
+            var resolver = await LanguageResolver.CreateAsync(catFile, language.ID, 44);
 
-            var waresXml = catFile.OpenXml("libraries/wares.xml");
+            var waresXml = await catFile.OpenXmlAsync("libraries/wares.xml");
             RemoveDuplicateWares(waresXml);
-            //var mapXml = catFile.OpenXml("libraries/mapdefaults.xml");
-            
+
+            var defaultXml = await catFile.OpenXmlAsync("libraries/defaults.xml");
 
             IExporter[] exporters =
             {
@@ -106,7 +119,7 @@ class DataExportModel
                 // モジュール関連
                 new ModuleTypeExporter(catFile, waresXml, resolver),        // モジュール種別情報
                 new ModuleExporter(catFile, waresXml),                      // モジュール情報
-                new ModuleProductExporter(catFile, waresXml),               // モジュールの生産品情報
+                new ModuleProductExporter(catFile, waresXml, defaultXml),   // モジュールの生産品情報
                 new ModuleStorageExporter(catFile, waresXml),               // モジュールの保管容量情報
 
                 // 装備関連
@@ -131,15 +144,30 @@ class DataExportModel
             var currentStep = 0;
             foreach (var exporter in exporters)
             {
-                exporter.Export(conn, progressSub);
+                await exporter.ExportAsync(conn, progressSub, CancellationToken.None);
                 currentStep++;
                 progress.Report((currentStep, maxSteps));
             }
 
             trans.Commit();
-            owner.Dispatcher.BeginInvoke((Action)(() =>
+            backupper.Commit();
+
+            await owner.Dispatcher.BeginInvoke((Action)(() =>
             {
-                MessageBox.Show("Data export completed.", "X4 DataExporter", MessageBoxButton.OK, MessageBoxImage.Information);
+                var msg = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_ExportCompleted", null, null);
+                var title = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_Title", null, null);
+
+                MessageBox.Show(owner, msg, title, MessageBoxButton.OK, MessageBoxImage.Information);
+            }));
+        }
+        catch (DbBackupException)
+        {
+            await owner.Dispatcher.BeginInvoke((Action)(() =>
+            {
+                var msg = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_FailedToBackupDb", null, null);
+                var title = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_Title", null, null);
+
+                MessageBox.Show(owner, msg, title, MessageBoxButton.OK, MessageBoxImage.Error);
             }));
         }
         catch (Exception e)
@@ -149,16 +177,12 @@ class DataExportModel
 
             DumpCrashReport(dumpPath, catFile, e);
 
-            var msg = @$"Sorry, Data export failed.
-Please report the following content to the developer.
-
-1. Selected language.
-2. Crash report file.
-3. Version of X4.";
-
-            owner.Dispatcher.BeginInvoke((Action)(() =>
+            await owner.Dispatcher.BeginInvoke((Action)(() =>
             {
-                MessageBox.Show(owner, msg, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                var msg = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_FailedToExportMessage", null, null);
+                var title = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_Title", null, null);
+
+                MessageBox.Show(owner, msg, title, MessageBoxButton.OK, MessageBoxImage.Error);
                 System.Diagnostics.Process.Start("explorer.exe", $@"/select,""{dumpPath}""");
             }));
         }
@@ -174,8 +198,10 @@ Please report the following content to the developer.
     /// wares.xml から重複する要素を削除する(前の要素を消す)
     /// </summary>
     /// <param name="waresXml">削除対象</param>
-    private void RemoveDuplicateWares(XDocument waresXml)
+    private static void RemoveDuplicateWares(XDocument waresXml)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
+
         // 見つかったウェアID一覧
         var wareIds = new HashSet<string>();
 

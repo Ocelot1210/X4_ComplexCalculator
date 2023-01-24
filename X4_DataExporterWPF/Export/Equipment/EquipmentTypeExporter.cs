@@ -4,9 +4,12 @@ using LibX4.Lang;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
+using X4_DataExporterWPF.Internal;
 
 namespace X4_DataExporterWPF.Export;
 
@@ -34,22 +37,21 @@ public class EquipmentTypeExporter : IExporter
     /// <param name="resolver">言語解決用オブジェクト</param>
     public EquipmentTypeExporter(XDocument waresXml, LanguageResolver resolver)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
+
         _WaresXml = waresXml;
         _Resolver = resolver;
     }
 
 
-    /// <summary>
-    /// 抽出処理
-    /// </summary>
-    /// <param name="connection"></param>
-    public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
+    /// <inheritdoc/>
+    public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
     {
         //////////////////
         // テーブル作成 //
         //////////////////
         {
-            connection.Execute(@"
+            await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS EquipmentType
 (
     EquipmentTypeID TEXT    NOT NULL PRIMARY KEY,
@@ -64,7 +66,7 @@ CREATE TABLE IF NOT EXISTS EquipmentType
         {
             var items = GetRecords(progress);
 
-            connection.Execute("INSERT INTO EquipmentType (EquipmentTypeID, Name) VALUES (@EquipmentTypeID, @Name)", items);
+            await connection.ExecuteAsync("INSERT INTO EquipmentType (EquipmentTypeID, Name) VALUES (@EquipmentTypeID, @Name)", items);
         }
     }
 
@@ -89,11 +91,11 @@ CREATE TABLE IF NOT EXISTS EquipmentType
             {"weapons",             "{20215, 2401}"},
         };
 
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[@transport='equipment'])");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[@transport='equipment'])");
         var currentStep = 0;
         var added = new HashSet<string>();
 
-        foreach (var equipment in _WaresXml.Root.XPathSelectElements("ware[@transport='equipment']"))
+        foreach (var equipment in _WaresXml.Root!.XPathSelectElements("ware[@transport='equipment']"))
         {
             progress?.Report((currentStep++, maxSteps));
 

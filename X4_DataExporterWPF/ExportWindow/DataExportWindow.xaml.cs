@@ -17,7 +17,7 @@ public partial class DataExportWindow : Window
     {
         InitializeComponent();
 
-        DataContext = new DataExportViewModel(inDirPath, outFilePath);
+        DataContext = new DataExportViewModel(inDirPath, outFilePath, Window);
     }
 
 

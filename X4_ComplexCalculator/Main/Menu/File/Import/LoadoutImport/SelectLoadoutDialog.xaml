@@ -119,7 +119,7 @@
                     <!--  プリセット名  -->
                     <DataGridTemplateColumn
                         ClipboardContentBinding="{Binding Name, Mode=OneTime}"
-                        Header="{lex:Loc Lang:PresetName}"
+                        Header="{lex:Loc Lang:Common_PresetName}"
                         IsReadOnly="True"
                         SortMemberPath="Name">
                         <DataGridTemplateColumn.CellTemplate>

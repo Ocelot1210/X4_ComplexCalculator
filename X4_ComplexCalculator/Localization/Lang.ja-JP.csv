@@ -28,6 +28,13 @@ Common_Buy;購入する
 Common_Sell;販売する
 Common_Production;生産量
 Common_ProductName;製品名
+Common_PresetName;プリセット名
+
+
+# ------------------------------------------------------
+# Systen
+# ------------------------------------------------------
+System_InvalidConfigFile;設定ファイルの内容に問題があります。お手数ですが、本ソフトを再ダウンロード下さい。
 
 
 # ------------------------------------------------------
@@ -35,7 +42,7 @@ Common_ProductName;製品名
 # ------------------------------------------------------
 DB_OldFormatMessage;現在のDBのフォーマットが旧形式です。\r\nゲームファイルよりDBを再度抽出して下さい。
 DB_UpdateRequestMessage;本アプリケーションの実行にはDBの更新が必要です。\r\n本アプリケーションを再度実行し、DBの更新を行ってください。
-DB_ExtractionRequestMessage;DBが存在しません。\r\nゲームファイルよりDBを抽出する必要があります。\r\nデータ抽出画面が立ち上がるまでしばらくお待ち下さい。
+DB_ExtractionRequestMessage;DBが存在しません。\r\nゲームファイルよりDBを抽出する必要があります。
 DB_MakeRequestMessage;本アプリケーションの実行にはDBの作成が必要です。\r\n本アプリケーションを再度実行し、DBの更新を行ってください。
 DB_OpenFailMessage;DBのオープンに失敗しました。\r\nゲームファイルよりDBを抽出する事で起動可能になるかもしれません。\r\nDBを更新しますか？
 
@@ -70,7 +77,7 @@ MainWindow_Menu_File_MenuItem_Import_MenuItem_Loadout_Header;モジュールの�
 MainWindow_Menu_File_MenuItem_Export_Header;エクスポート
 MainWindow_Menu_File_MenuItem_Export_MenuItem_StationCalculator_Header;Station Calculator
 MainWindow_Menu_File_UpdateDB_Header;DB更新
-MainWindow_Menu_File_UpdateDB_DBUpdate_ConfirmationMessage;DB更新画面を表示しますか？\r\n※ 画面が起動するまでしばらくお待ち下さい。
+MainWindow_Menu_File_UpdateDB_DBUpdate_ConfirmationMessage;DB更新画面を表示しますか？
 MainWindow_Menu_File_UpdateDB_DBUpdate_RestartRequestMessage;DBの更新を適用するためには本アプリケーションの再起動を行ってください。
 MainWindow_Menu_File_UpdateDB_DBUpdate_FailureMessage;DBの更新に失敗しました。\r\nDBファイルにアクセス可能か確認後、再度実行してください。
 
@@ -127,7 +134,7 @@ CheckUpdate_NowDownloading;ダウンロード中...
 # Station Calculator import/export dialog
 # ------------------------------------------------------
 StationCalculatorExport_Title;Station Calculatorへエクスポート
-StationCalculatorExport_Description;URLをコピーして下さい\r\n注) 以下のモジュールは除外しています。\r\n・接続モジュール\r\n・探検モジュール
+StationCalculatorExport_Description;URLをコピーして下さい\r\n注) 以下のモジュールは除外しています。\r\n・探検モジュール
 StationCalculatorImport_Title;Station Calculatorからインポート
 StationCalculatorImport_Description;Station Calculator上部のShareボタンをクリックした時に\r\n表示されるURLを入力してください
 
@@ -372,3 +379,23 @@ DBViewer_Ships_Dock_Small;小型
 DBViewer_Ships_HangerCapacity;搭載量
 DBViewer_Ships_HangerCapacity_Aircraft;機体
 DBViewer_Ships_HangerCapacity_Drone;ドローン
+
+
+# ------------------------------------------------------
+# Data Exporter
+# ------------------------------------------------------
+DataExporter_Title;X4: Foundations データ抽出機
+DataExporter_Input;入力
+DataExporter_Input_RootDirectory;X4: Foundations インストール先フォルダ
+DataExporter_Output;出力
+DataExporter_Output_Language;言語
+DataExporter_Export;抽出
+DataExporter_Close;閉じる
+DataExporter_ExportCompleted;データ抽出完了
+DataExporter_FailedToResolveModDependencyMessage;Mod の依存関係の解決に失敗しました。\r\nある Mod が要求する Mod がインストールされていない又は無効化されている可能性があります。\r\nX4 が正常に起動する事を確認後に実行下さい。
+DataExporter_FailedToBackupDb;DB ファイルのバックアップに失敗しました。\r\n他のプロセスが x4.db ファイルを開いていないか確認の上、再度実行下さい。
+DataExporter_FailedToExportMessage;データ抽出に失敗しました。申し訳ございません。\r\n以下の内容を開発者にご報告頂けると幸いです。\r\n\r\n1. 選択中の言語\r\n2. クラッシュレポートファイル\r\n3. X4 のバージョン
+DataExporter_ExportOption;抽出オプション
+DataExporter_ExportAllData;バニラ / DLC / Mod のデータを抽出する
+DataExporter_ExportOfficialData;バニラ / DLC のデータを抽出する
+DataExporter_ExportVanillaData;バニラのデータを抽出する

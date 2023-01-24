@@ -28,6 +28,13 @@ Common_Buy;Buy
 Common_Sell;Sell
 Common_Production;Production
 Common_ProductName;Product name
+Common_PresetName;Preseet name
+
+
+# ------------------------------------------------------
+# Systen
+# ------------------------------------------------------
+System_InvalidConfigFile;There is a problem with the contents of the configuration file. Please re-download the software.
 
 
 # ------------------------------------------------------
@@ -35,7 +42,7 @@ Common_ProductName;Product name
 # ------------------------------------------------------
 DB_OldFormatMessage;The current DB format is the old format. \r\nPlease extract the DB from the game file again.
 DB_UpdateRequestMessage;You need to update the DB to run this application. Please run this application again to update the DB.
-DB_ExtractionRequestMessage;The DB does not exist. It is necessary to extract the DB from the game file. Please wait for a while until the data extraction screen starts up.
+DB_ExtractionRequestMessage;The DB does not exist. It is necessary to extract the DB from the game file.
 DB_MakeRequestMessage;You need to create a DB to run this application. Please run this application again to update the DB.
 DB_OpenFailMessage;Failed to open the DB. It may be possible to start it by extracting the DB from the game file. Do you want to update the DB?
 
@@ -70,7 +77,7 @@ MainWindow_Menu_File_MenuItem_Import_MenuItem_Loadout_Header;Module equipments
 MainWindow_Menu_File_MenuItem_Export_Header;Export
 MainWindow_Menu_File_MenuItem_Export_MenuItem_StationCalculator_Header;Station Calculator
 MainWindow_Menu_File_UpdateDB_Header;Update DB
-MainWindow_Menu_File_UpdateDB_DBUpdate_ConfirmationMessage;Do you want to display the DB update screen? \r\nPlease wait for a moment until the screen starts.
+MainWindow_Menu_File_UpdateDB_DBUpdate_ConfirmationMessage;Do you want to display the DB update screen?
 MainWindow_Menu_File_UpdateDB_DBUpdate_RestartRequestMessage;Please restart the application to apply the DB update.
 MainWindow_Menu_File_UpdateDB_DBUpdate_FailureMessage;Failed to update the DB, \r\nplease check if the DB file is accessible and try again.
 
@@ -127,7 +134,7 @@ CheckUpdate_NowDownloading;Downloading the update...
 # Station Calculator import/export dialog
 # ------------------------------------------------------
 StationCalculatorExport_Title;Export to Station Calculator
-StationCalculatorExport_Description;Please copy the URL.\r\nNote: The following modules are excluded.\r\n・Connection module\r\n・Venture module
+StationCalculatorExport_Description;Please copy the URL.\r\nNote: The following modules are excluded.\r\n・Venture module
 StationCalculatorImport_Title;Importing from Station Calculator
 StationCalculatorImport_Description;Please enter the URL displayed when you click the \r\nShare button at the top of Station Calculator.
 
@@ -297,14 +304,13 @@ NumericalFilter_GreaterThanOrEqualTo;≧ Greater than or equal to
 NumericalFilter_LessThan;＜ Less than
 NumericalFilter_LessThanOrEqualTo;≦ Less than or equal to
 NumericalFilter_Between;～ Between
+TextFilter_GroupBoxTitle;Search by text
 TextFilter_Contains;Contains
 TextFilter_NotContains;Not contains
 TextFilter_Equals;Equals
 TextFilter_NotEqulas;Not equals
 TextFilter_StartWith;Start with
 TextFilter_EndWith;End with
-
-
 
 
 # ------------------------------------------------------
@@ -373,3 +379,23 @@ DBViewer_Ships_Dock_Small;S
 DBViewer_Ships_HangerCapacity;Hanger
 DBViewer_Ships_HangerCapacity_Aircraft;Aircraft
 DBViewer_Ships_HangerCapacity_Drone;Drone
+
+
+# ------------------------------------------------------
+# Data Exporter
+# ------------------------------------------------------
+DataExporter_Title;X4: Foundations data exporter
+DataExporter_Input;Input
+DataExporter_Input_RootDirectory;X4: Foundations Install directory
+DataExporter_Output;Output
+DataExporter_Output_Language;Language
+DataExporter_Export;Export
+DataExporter_Close;Close
+DataExporter_ExportCompleted;Data export completed.
+DataExporter_FailedToResolveModDependencyMessage;Failed to resolve Mod dependencies.\r\nIt is possible that the Mod required by a Mod is not installed or has been disabled.\r\n.Please execute again with X4 running properly.
+DataExporter_FailedToBackupDb;Backup of DB file failed.\r\nPlease make sure that no other process is opening the x4.db file and run it again.
+DataExporter_FailedToExportMessage;Sorry, Data export failed.\r\nPlease report the following content to the developer.\r\n\r\n1. Selected language.\r\n2. Crash report file.\r\n3. Version of X4.
+DataExporter_ExportOption;Export option
+DataExporter_ExportAllData;Export Vanilla / DLC / Mod data
+DataExporter_ExportOfficialData;Export Vanilla / DLC data
+DataExporter_ExportVanillaData;Export Vanilla data

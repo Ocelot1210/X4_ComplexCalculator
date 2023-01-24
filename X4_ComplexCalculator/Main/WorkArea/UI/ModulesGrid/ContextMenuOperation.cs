@@ -171,6 +171,7 @@ public class ContextMenuOperation : BindableBase, IDisposable
         try
         {
             var clipboardXml = XDocument.Parse(Clipboard.GetText());
+            if (clipboardXml.Root is null) return;
 
             // xmlの内容に問題がないか確認するため、ここでToArray()する
             var modules = clipboardXml.Root.Elements().Select(x => new ModulesGridItem(x) { EditStatus = EditStatus.Edited }).ToArray();

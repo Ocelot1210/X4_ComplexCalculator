@@ -4,9 +4,12 @@ using LibX4.Xml;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
+using X4_DataExporterWPF.Internal;
 
 namespace X4_DataExporterWPF.Export;
 
@@ -34,22 +37,20 @@ public class WareProductionExporter : IExporter
     /// <param name="resolver">言語解決用オブジェクト</param>
     public WareProductionExporter(XDocument waresXml, ILanguageResolver resolver)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
         _WaresXml = waresXml;
         _Resolver = resolver;
     }
 
 
-    /// <summary>
-    /// 抽出処理
-    /// </summary>
-    /// <param name="connection"></param>
-    public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
+    /// <inheritdoc/>
+    public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
     {
         //////////////////
         // テーブル作成 //
         //////////////////
         {
-            connection.Execute(@"
+            await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS WareProduction
 (
     WareID  TEXT    NOT NULL,
@@ -67,9 +68,9 @@ CREATE TABLE IF NOT EXISTS WareProduction
         // データ抽出 //
         ////////////////
         {
-            var items = GetRecords(progress);
+            var items = GetRecords(progress, cancellationToken);
 
-            connection.Execute("INSERT INTO WareProduction (WareID, Method, Name, Amount, Time) VALUES (@WareID, @Method, @Name, @Amount, @Time)", items);
+            await connection.ExecuteAsync("INSERT INTO WareProduction (WareID, Method, Name, Amount, Time) VALUES (@WareID, @Method, @Name, @Amount, @Time)", items);
         }
     }
 
@@ -78,14 +79,15 @@ CREATE TABLE IF NOT EXISTS WareProduction
     /// XML から WareProduction データを読み出す
     /// </summary>
     /// <returns>読み出した WareProduction データ</returns>
-    private IEnumerable<WareProduction> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
+    private IEnumerable<WareProduction> GetRecords(IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware)");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware)");
         var currentStep = 0;
 
 
-        foreach (var ware in _WaresXml.Root.XPathSelectElements("ware"))
+        foreach (var ware in _WaresXml.Root!.XPathSelectElements("ware"))
         {
+            cancellationToken.ThrowIfCancellationRequested();
             progress.Report((currentStep++, maxSteps));
 
 
@@ -99,7 +101,6 @@ CREATE TABLE IF NOT EXISTS WareProduction
                 var method = prod.Attribute("method")?.Value;
                 if (string.IsNullOrEmpty(method) || methods.Contains(method)) continue;
                 methods.Add(method);
-
 
                 var name = _Resolver.Resolve(prod.Attribute("name")?.Value ?? "");
                 var amount = prod.Attribute("amount").GetInt();

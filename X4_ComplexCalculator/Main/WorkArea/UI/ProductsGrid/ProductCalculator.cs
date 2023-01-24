@@ -24,7 +24,13 @@ class ProductCalculator
     /// <summary>
     /// ウェアとウェアを生産するモジュールを対応付けたディクショナリ
     /// </summary>
-    private readonly Dictionary<IWare, IX4Module> _Ware2ModuleDict;
+    private readonly IReadOnlyDictionary<IWare, IX4Module> _Ware2ModuleDict;
+
+
+    /// <summary>
+    /// モジュールをキーにした総生産時間のディクショナリ
+    /// </summary>
+    private readonly IReadOnlyDictionary<IX4Module, double> _Module2TotalProductionTimeDict;
     #endregion
 
 
@@ -38,6 +44,38 @@ class ProductCalculator
             .Where(x => x.Products.Any())
             .GroupBy(x => X4Database.Instance.Ware.Get((x.Products.FirstOrDefault(y => y.Method == "default") ?? x.Products.First()).WareID))
             .ToDictionary(x => x.Key, x => x.First());
+
+        _Module2TotalProductionTimeDict = X4Database.Instance.Ware.GetAll<IX4Module>()
+            .Where(x => x.Products.Any())
+            .ToDictionary(x => x, x => GetTotalWareProductionTime(x));
+    }
+
+
+    /// <summary>
+    /// モジュールの総生産時間を取得する
+    /// </summary>
+    /// <param name="module">取得対象のモジュール</param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    private static double GetTotalWareProductionTime(IX4Module module)
+    {
+        var ret = 0.0;
+
+        foreach (var product in module.Products)
+        {
+            // 生産品IDに対応するウェアを取得
+            var prodWare = X4Database.Instance.Ware.Get(product.WareID);
+
+            // ウェア生産方式を取得
+            var method = prodWare.Resources.ContainsKey(product.Method) ? product.Method : "default";
+
+            // ウェア生産情報を取得
+            var wareProduction = prodWare.TryGetProduction(product.Method) ?? throw new ArgumentException();
+
+            ret += wareProduction.Time;
+        }
+
+        return ret;
     }
 
 
@@ -68,7 +106,9 @@ class ProductCalculator
     public IEnumerable<CalcResult> Calc(IX4Module module, long moduleCount)
     {
         return CalcProductAndResources(module, moduleCount)
-            .Concat(CalcHabitationModuleResources(module, moduleCount));
+            .Concat(CalcHabitationModuleResources(module, moduleCount))
+            .GroupBy(x => x.WareID)
+            .Select(x => new CalcResult(x.Key, x.Sum(y => y.WareAmount), x.First().Method, x.First().Module, x.First().ModuleCount, x.First().Efficiency));
     }
 
 
@@ -80,6 +120,14 @@ class ProductCalculator
     /// <returns>製品と必要ウェアの列挙</returns>
     private IEnumerable<CalcResult> CalcProductAndResources(IX4Module module, long moduleCount)
     {
+        if (!module.Products.Any())
+        {
+            yield break;
+        }
+
+        // モジュールの総生産時間を取得
+        var totalProductionTime = _Module2TotalProductionTimeDict[module];
+
         // モジュールの生産品を取得
         foreach (var product in module.Products)
         {
@@ -89,15 +137,19 @@ class ProductCalculator
             // ウェア生産方式を取得
             var method = prodWare.Resources.ContainsKey(product.Method) ? product.Method : "default";
 
-
             // ウェア生産情報を取得
             var wareProduction = prodWare.TryGetProduction(product.Method) ?? throw new ArgumentException();
+
+            // スクラップ再利用機などはウェアを交互に生産する(複数のウェアを同時に生産はしない)
+            // → すべてのウェアの生産時間から対象のウェアの生産時間の割合を算出する必要がある
+            var productionPerHour = 3600 / ((totalProductionTime / wareProduction.Time) * wareProduction.Time);
+
             {
                 // ウェア生産時の追加効果一覧をウェア生産方式別に抽出
                 var effects = prodWare.WareEffects.TryGet(product.Method);
 
                 // ウェア生産量
-                var amount = (long)Math.Floor(wareProduction.Amount * (3600 / wareProduction.Time));
+                var amount = (long)Math.Floor(productionPerHour * wareProduction.Amount * product.Amount);
 
                 yield return new CalcResult(product.WareID, amount, method, module, moduleCount, effects);
             }
@@ -109,7 +161,7 @@ class ProductCalculator
                 foreach (var resource in resources)
                 {
                     // ウェア消費量
-                    var amount = (long)Math.Floor(-3600 / wareProduction.Time * resource.Amount);
+                    var amount = (long)Math.Floor(-productionPerHour * resource.Amount * product.Amount);
                     yield return new CalcResult(resource.NeedWareID, amount, method, module, moduleCount);
                 }
             }
@@ -150,9 +202,6 @@ class ProductCalculator
             }
         }
     }
-
-
-
 
 
     /// <summary>

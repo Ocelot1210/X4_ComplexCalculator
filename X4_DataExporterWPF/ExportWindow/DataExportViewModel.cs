@@ -1,3 +1,4 @@
+using LibX4.FileSystem;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Prism.Mvvm;
 using Reactive.Bindings;
@@ -41,6 +42,12 @@ class DataExportViewModel : BindableBase
     /// 処理状態管理
     /// </summary>
     private readonly BusyNotifier _BusyNotifier = new();
+
+
+    /// <summary>
+    /// 親ウィンドウ(メッセージボックス表示用)
+    /// </summary>
+    private readonly Window _OwnerWindow;
     #endregion
 
 
@@ -61,6 +68,12 @@ class DataExportViewModel : BindableBase
     /// 選択された言語
     /// </summary>
     public ReactivePropertySlim<LangComboboxItem?> SelectedLanguage { get; }
+
+
+    /// <summary>
+    /// 読み込みオプション
+    /// </summary>
+    public ReactivePropertySlim<CatLoadOption> CatLoadOption { get; }
 
 
     /// <summary>
@@ -90,7 +103,7 @@ class DataExportViewModel : BindableBase
     /// <summary>
     /// ユーザが操作可能か
     /// </summary>
-    public ReadOnlyReactivePropertySlim<bool> CanOperation { get; }
+    public ReadOnlyReactiveProperty<bool> CanOperation { get; }
 
 
     /// <summary>
@@ -115,8 +128,12 @@ class DataExportViewModel : BindableBase
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public DataExportViewModel(string inDirPath, string outFilePath)
+    public DataExportViewModel(string inDirPath, string outFilePath, Window window)
     {
+        _OwnerWindow = window;
+
+        CatLoadOption = new ReactivePropertySlim<CatLoadOption>(LibX4.FileSystem.CatLoadOption.All);
+
         InDirPath = new ReactiveProperty<string>(inDirPath,
             mode: ReactivePropertyMode.RaiseLatestValueOnSubscribe);
         _UnableToGetLanguages = new ReactivePropertySlim<bool>(false);
@@ -127,7 +144,7 @@ class DataExportViewModel : BindableBase
         Languages = new ReactiveCollection<LangComboboxItem>();
         SelectedLanguage = new ReactivePropertySlim<LangComboboxItem?>();
 
-        CanOperation = _BusyNotifier.Inverse().ToReadOnlyReactivePropertySlim();
+        CanOperation = _BusyNotifier.Inverse().ToReadOnlyReactiveProperty();
 
         // 操作可能かつ入力項目に不備がない場合に true にする
         var canExport = new[]{
@@ -140,17 +157,46 @@ class DataExportViewModel : BindableBase
         ExportCommand = new AsyncReactiveCommand(canExport).WithSubscribe(Export);
         ClosingCommand = new ReactiveCommand<CancelEventArgs>().WithSubscribe(Closing);
 
-        // 入力元フォルダパスに値が代入された時、言語一覧を更新する
-        InDirPath.ObserveOn(ThreadPoolScheduler.Instance).Subscribe(path =>
-        {
-            using var _ = _BusyNotifier.ProcessStart();
-            _UnableToGetLanguages.Value = false;
-            Languages.ClearOnScheduler();
 
-            var (success, languages) = _Model.GetLanguages(path);
-            _UnableToGetLanguages.Value = !success;
-            Languages.AddRangeOnScheduler(languages);
+        // 入力元フォルダパスに値が代入された時、言語一覧を更新する
+        InDirPath.Subscribe(async path =>
+        {
+            await UpdateLangList(path);
         });
+
+        // 抽出オプションが変化した際、言語一覧を更新する
+        CatLoadOption.Subscribe(async option =>
+        {
+            await UpdateLangList(InDirPath.Value);
+        });
+    }
+
+
+    /// <summary>
+    /// 指定したパスを X4 のインストール先と見なして言語一覧を初期化する
+    /// </summary>
+    /// <param name="x4InstallDirectory">X4 のインストール先フォルダパス</param>
+    /// <returns>言語一覧が更新された場合、<c>true;</c>。それ以外の場合 <c>false;</c></returns>
+    private async Task UpdateLangList(string x4InstallDirectory)
+    {
+        if (_BusyNotifier.IsBusy) return;
+        using var _ = _BusyNotifier.ProcessStart();
+
+        var prevLangID = SelectedLanguage.Value?.ID ?? -1;
+
+        _UnableToGetLanguages.Value = false;
+        Languages.ClearOnScheduler();
+
+        var (success, languages) = await Task.Run(async () => await _Model.GetLanguages(x4InstallDirectory, _OwnerWindow));
+        _UnableToGetLanguages.Value = !success;
+        Languages.AddRangeOnScheduler(languages);
+
+        ReactivePropertyScheduler.Default.Schedule(() =>
+        {
+            SelectedLanguage.Value = Languages.FirstOrDefault(x => x.ID == prevLangID);
+        });
+
+        return;
     }
 
 
@@ -192,8 +238,6 @@ class DataExportViewModel : BindableBase
             return;
         }
 
-        var owner = Application.Current.Windows.OfType<Window>().SingleOrDefault(x => x.IsActive);
-
         var progress = new Progress<(int currentStep, int maxSteps)>(s =>
         {
             CurrentStep.Value = s.currentStep;
@@ -212,7 +256,7 @@ class DataExportViewModel : BindableBase
             InDirPath.Value,
             _OutFilePath,
             SelectedLanguage.Value,
-            owner
+            _OwnerWindow
         ));
         CurrentStep.Value = 0;
     }

@@ -20,7 +20,7 @@ public class XDocumentExTest
     /// <summary>
     /// テスト用の XML 文字列の配列
     /// </summary>
-    public static string[][] TestXmls => new[] {
+    public static object[][] TestXmls => new[] {
         new [] { "<root></root>" },
         new [] { @"<?xml version=""1.1""?><root></root>" },
         new [] { @"<?xml version=""1.1"" encoding=""UTF-8""?><root></root>" },

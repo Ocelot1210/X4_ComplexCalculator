@@ -8,10 +8,12 @@ namespace X4_ComplexCalculator.DB.X4DB.Entity;
 /// <param name="ModuleID">モジュールID</param>
 /// <param name="WareID">生産対象のウェアID</param>
 /// <param name="Method">製造方式</param>
+/// <param name="Amount">生産量</param>
 /// <param name="WareProduction">生産情報</param>
 public sealed record ModuleProduct(
     string ModuleID,
     string WareID,
     string Method,
+    long Amount,
     IWareProduction WareProduction
 ) : IModuleProduct;

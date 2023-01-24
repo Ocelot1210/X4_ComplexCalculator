@@ -4,9 +4,13 @@ using LibX4.Xml;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
+using X4_DataExporterWPF.Internal;
 
 namespace X4_DataExporterWPF.Export;
 
@@ -27,9 +31,9 @@ public class ModuleExporter : IExporter
 
 
     /// <summary>
-    /// サムネが見つからなかった場合のサムネ
+    /// サムネ画像管理クラス
     /// </summary>
-    private byte[]? _NotFoundThumb;
+    private readonly ThumbnailManager _ThumbnailManager;
 
 
     /// <summary>
@@ -39,22 +43,22 @@ public class ModuleExporter : IExporter
     /// <param name="waresXml">ウェア情報xml</param>
     public ModuleExporter(ICatFile catFile, XDocument waresXml)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
+
         _CatFile = catFile;
         _WaresXml = waresXml;
+        _ThumbnailManager = new(catFile, "assets/fx/gui/textures/stationmodules", "notfound");
     }
 
 
-    /// <summary>
-    /// 抽出処理
-    /// </summary>
-    /// <param name="connection"></param>
-    public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
+    /// <inheritdoc/>
+    public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
     {
         //////////////////
         // テーブル作成 //
         //////////////////
         {
-            connection.Execute(@"
+            await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS Module
 (
     ModuleID        TEXT    NOT NULL PRIMARY KEY,
@@ -73,9 +77,9 @@ CREATE TABLE IF NOT EXISTS Module
         // データ抽出 //
         ////////////////
         {
-            var items = GetRecords(progress);
+            var items = GetRecordsAsync(progress, cancellationToken);
 
-            connection.Execute("INSERT INTO Module (ModuleID, ModuleTypeID, Macro, MaxWorkers, WorkersCapacity, NoBlueprint, Thumbnail) VALUES (@ModuleID, @ModuleTypeID, @Macro, @MaxWorkers, @WorkersCapacity, @NoBlueprint, @Thumbnail)", items);
+            await connection.ExecuteAsync("INSERT INTO Module (ModuleID, ModuleTypeID, Macro, MaxWorkers, WorkersCapacity, NoBlueprint, Thumbnail) VALUES (@ModuleID, @ModuleTypeID, @Macro, @MaxWorkers, @WorkersCapacity, @NoBlueprint, @Thumbnail)", items);
         }
     }
 
@@ -84,25 +88,27 @@ CREATE TABLE IF NOT EXISTS Module
     /// XML から Module データを読み出す
     /// </summary>
     /// <returns>読み出した Module データ</returns>
-    internal IEnumerable<Module> GetRecords(IProgress<(int currentStep, int maxSteps)>? progress = null)
+    internal async IAsyncEnumerable<Module> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)>? progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'module')])");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'module')])");
         var currentStep = 0;
 
-
-        foreach (var module in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'module')]"))
+        foreach (var module in _WaresXml.Root!.XPathSelectElements("ware[contains(@tags, 'module')]"))
         {
+            cancellationToken.ThrowIfCancellationRequested();
             progress?.Report((currentStep++, maxSteps));
 
 
-            var moduleID = module.Attribute("id").Value;
+            var moduleID = module.Attribute("id")?.Value;
             if (string.IsNullOrEmpty(moduleID)) continue;
 
-            var macroName = module.XPathSelectElement("component").Attribute("ref").Value;
+            var macroName = module.XPathSelectElement("component")?.Attribute("ref")?.Value;
             if (string.IsNullOrEmpty(macroName)) continue;
 
-            var macroXml = _CatFile.OpenIndexXml("index/macros.xml", macroName);
-            var moduleTypeID = macroXml.Root.XPathSelectElement("macro").Attribute("class").Value;
+            var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName);
+            if (macroXml?.Root is null) continue;
+
+            var moduleTypeID = macroXml.Root.XPathSelectElement("macro")?.Attribute("class")?.Value;
             if (string.IsNullOrEmpty(moduleTypeID)) continue;
 
             // 従業員数/最大収容人数取得
@@ -110,34 +116,11 @@ CREATE TABLE IF NOT EXISTS Module
             var maxWorkers = workForce?.Attribute("max")?.GetInt() ?? 0;
             var capacity = workForce?.Attribute("capacity")?.GetInt() ?? 0;
 
-            var noBluePrint = module.Attribute("tags").Value.Contains("noblueprint");
+            var noBluePrint = module.Attribute("tags")?.Value.Contains("noblueprint") ?? false;
 
-            yield return new Module(moduleID, moduleTypeID, macroName, maxWorkers, capacity, noBluePrint, GetThumbnail(macroName));
+            yield return new Module(moduleID, moduleTypeID, macroName, maxWorkers, capacity, noBluePrint, await _ThumbnailManager.GetThumbnailAsync(macroName, cancellationToken));
         }
 
         progress?.Report((currentStep++, maxSteps));
-    }
-
-
-    /// <summary>
-    /// サムネ画像を取得する
-    /// </summary>
-    /// <param name="macroName">マクロ名</param>
-    /// <returns>サムネ画像のバイト配列</returns>
-    private byte[]? GetThumbnail(string macroName)
-    {
-        const string dir = "assets/fx/gui/textures/stationmodules";
-        var thumb = Util.DDS2Png(_CatFile, dir, macroName);
-        if (thumb is not null)
-        {
-            return thumb;
-        }
-
-        if (_NotFoundThumb is null)
-        {
-            _NotFoundThumb = Util.DDS2Png(_CatFile, dir, "notfound");
-        }
-
-        return _NotFoundThumb;
     }
 }

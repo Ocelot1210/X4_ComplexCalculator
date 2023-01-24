@@ -127,7 +127,7 @@ public class LoadoutItem : BindableBase
     /// <param name="module">モジュール</param>
     private LoadoutItem(XElement elm, IX4Module module)
     {
-        Name = elm.Attribute("name").Value;
+        Name = elm.Attribute("name")?.Value ?? "";
 
         Module = module;
         Equipment = new EquippableWareEquipmentManager(module);

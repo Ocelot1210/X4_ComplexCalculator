@@ -5,8 +5,12 @@ using LibX4.Xml;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.XPath;
 using X4_DataExporterWPF.Entity;
+using X4_DataExporterWPF.Internal;
 
 namespace X4_DataExporterWPF.Export;
 
@@ -39,17 +43,14 @@ public class WareGroupExporter : IExporter
     }
 
 
-    /// <summary>
-    /// 抽出処理
-    /// </summary>
-    /// <param name="connection"></param>
-    public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
+    /// <inheritdoc/>
+    public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
     {
         //////////////////
         // テーブル作成 //
         //////////////////
         {
-            connection.Execute(@"
+            await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS WareGroup
 (
     WareGroupID TEXT    NOT NULL PRIMARY KEY,
@@ -62,9 +63,9 @@ CREATE TABLE IF NOT EXISTS WareGroup
         // データ抽出 //
         ////////////////
         {
-            var items = GetRecords(progress);
+            var items = GetRecordsAsync(progress, cancellationToken);
 
-            connection.Execute("INSERT INTO WareGroup (WareGroupID, Name, Tier) VALUES (@WareGroupID, @Name, @Tier)", items);
+            await connection.ExecuteAsync("INSERT INTO WareGroup (WareGroupID, Name, Tier) VALUES (@WareGroupID, @Name, @Tier)", items);
         }
     }
 
@@ -73,15 +74,17 @@ CREATE TABLE IF NOT EXISTS WareGroup
     /// XML から WareGroup データを読み出す
     /// </summary>
     /// <returns>読み出した WareGroup データ</returns>
-    internal IEnumerable<WareGroup> GetRecords(IProgress<(int currentStep, int maxSteps)>? progress = null)
+    internal async IAsyncEnumerable<WareGroup> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)>? progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var wareGroupXml = _CatFile.OpenXml("libraries/waregroups.xml");
+        var wareGroupXml = await _CatFile.OpenXmlAsync("libraries/waregroups.xml", cancellationToken);
+        if (wareGroupXml?.Root is null) yield break;
 
         var maxSteps = (int)(double)wareGroupXml.Root.XPathEvaluate("count(group)");
         var currentStep = 0;
-        
+
         foreach (var wareGroup in wareGroupXml.Root.XPathSelectElements("group"))
         {
+            cancellationToken.ThrowIfCancellationRequested();
             progress?.Report((currentStep++, maxSteps));
 
             var wareGroupID = wareGroup.Attribute("id")?.Value;

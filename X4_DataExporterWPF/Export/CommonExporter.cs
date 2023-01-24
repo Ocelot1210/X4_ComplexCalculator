@@ -2,29 +2,33 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Threading;
+using System.Threading.Tasks;
 using X4_DataExporterWPF.Entity;
+using X4_DataExporterWPF.Internal;
 
 namespace X4_DataExporterWPF.Export;
 
 /// <summary>
-/// ウェア生産時の追加効果抽出用クラス
+/// DBメタ情報抽出用クラス
 /// </summary>
 public class CommonExporter : IExporter
 {
     /// <summary>
     /// 現在のDBフォーマットバージョン
     /// </summary>
-    public const int CURRENT_FORMAT_VERSION = 3;
+    public const int CURRENT_FORMAT_VERSION = 4;
 
 
-    public void Export(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress)
+    /// <inheritdoc/>
+    public async Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
     {
         //////////////////
         // テーブル作成 //
         //////////////////
         {
             // テーブル作成
-            connection.Execute(@"
+            await connection.ExecuteAsync(@"
 CREATE TABLE IF NOT EXISTS Common
 (
     Item    TEXT    NOT NULL PRIMARY KEY,
@@ -37,9 +41,9 @@ CREATE TABLE IF NOT EXISTS Common
         // データ抽出 //
         ////////////////
         {
-            var items = GetRecords(progress);
+            var items = GetRecords(progress, cancellationToken);
 
-            connection.Execute($"INSERT INTO Common (Item, Value) VALUES (@Item, @Value)", items);
+            await connection.ExecuteAsync($"INSERT INTO Common (Item, Value) VALUES (@Item, @Value)", items);
         }
     }
 
@@ -48,7 +52,7 @@ CREATE TABLE IF NOT EXISTS Common
     /// Common データを返す
     /// </summary>
     /// <returns>Common データ</returns>
-    private IEnumerable<Common> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
+    private IEnumerable<Common> GetRecords(IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
     {
         (string item, int value)[] data =
         {
@@ -60,6 +64,7 @@ CREATE TABLE IF NOT EXISTS Common
 
         foreach (var (item, value) in data)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             yield return new Common(item, value);
             progress.Report((currentStep++, data.Length));
         }

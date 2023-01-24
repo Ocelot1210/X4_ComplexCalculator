@@ -3,7 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
@@ -73,7 +76,8 @@ public class CatFile : ICatFile
     /// コンストラクタ
     /// </summary>
     /// <param name="gameRoot">X4インストール先ディレクトリパス</param>
-    public CatFile(string gameRoot)
+    /// <exception cref="DependencyResolutionException">Mod の依存関係の解決に失敗した場合</exception>
+    public CatFile(string gameRoot, CatLoadOption option = CatLoadOption.All)
     {
         // X4のバージョンを取得
         {
@@ -88,55 +92,87 @@ public class CatFile : ICatFile
             }
         }
 
+        var modInfo = GetModInfo(gameRoot);
 
+        _LoadedMods = new HashSet<string>(modInfo.Select(x => $"extensions/{Path.GetFileName(x.Directory)}".Replace('\\', '/')));
+
+        var fileLoader = new List<CatFileLoader>(modInfo.Count + 1);
+        fileLoader.Add(CatFileLoader.CreateFromDirectory(gameRoot));
+        fileLoader.AddRange(modInfo.Select(x => CatFileLoader.CreateFromDirectory(x.Directory)));
+        _FileLoaders = fileLoader;
+
+        _ModInfo = modInfo;
+    }
+
+
+    /// <summary>
+    /// Mod の情報を <see cref="IReadOnlyList{ModInfo}"/> で返す
+    /// </summary>
+    /// <param name="gameRoot">X4 インストール先ディレクトリパス</param>
+    /// <returns>Mod の情報を表す <see cref="IReadOnlyList{ModInfo}"/></returns>
+    private static IReadOnlyList<ModInfo> GetModInfo(string gameRoot)
+    {
         var entensionsPath = Path.Combine(gameRoot, "extensions");
 
-        var modDirPaths = Directory.Exists(entensionsPath)
-            ? Directory.GetDirectories(entensionsPath)
-            : Array.Empty<string>();
-
-        var fileLoader = new List<CatFileLoader>(modDirPaths.Length + 1);
-        var modInfos = new List<ModInfo>(modDirPaths.Length);
-
-        fileLoader.Add(CatFileLoader.CreateFromDirectory(gameRoot));
-
-        // ユーザフォルダにある content.xml を開く
-        XDocumentEx.TryLoad(Path.Combine(X4Path.GetUserDirectory(), "content.xml"), out var userContentXml);
-
-        foreach (var modDirPath in modDirPaths)
+        // extensions フォルダが無い場合、Mod が無いと見なす
+        if (!Directory.Exists(entensionsPath))
         {
-            // 無効化された/無効な Mod なら読み込まないようにする
-            var modInfo = new ModInfo(userContentXml, modDirPath);
-            if (!modInfo.Enabled)
-            {
-                continue;
-            }
-
-            var modPath = $"extensions/{Path.GetFileName(modDirPath)}".Replace('\\', '/');
-
-            fileLoader.Add(CatFileLoader.CreateFromDirectory(modDirPath));
-            modInfos.Add(modInfo);
-            _LoadedMods.Add(modPath);
+            return new List<ModInfo>();
         }
 
-        _FileLoaders = fileLoader;
-        _ModInfo = modInfos;
+        // ユーザフォルダにある content.xml を開く
+        _ = XDocumentEx.TryLoad(Path.Combine(X4Path.GetUserDirectory(), "content.xml"), out var userContentXml);
+
+        var unloadedMods = Directory.GetDirectories(entensionsPath)
+            .Select(x => new ModInfo(userContentXml, x))
+            .Where(x => x.Enabled)
+            .OrderBy(x => x.Name)
+            .ToList();
+
+        var modInfos = new List<ModInfo>(unloadedMods.Count);
+
+        while (unloadedMods.Any())
+        {
+            var prevUnloadModsCount = unloadedMods.Count;
+            for (var i = 0; i < unloadedMods.Count; i++)
+            {
+                var modInfo = unloadedMods[i];
+
+                // 必須 Mod がロード済みかつ任意 Mod が未ロードでないか？
+                var dependencies = modInfo.Dependencies;
+                if (dependencies.Where(x => !x.Optional).All(x => modInfos.Any(y => x.ID == y.ID)) &&
+                    !dependencies.Where(x => x.Optional).Any(x => unloadedMods.Any(y => x.ID == y.ID)))
+                {
+                    modInfos.Add(modInfo);
+                    unloadedMods.RemoveAt(i);
+                    i--;
+                }
+            }
+
+            // 未ロードの Mod 数に変化が無ければ依存関係を満たせていないと見なす
+            if (prevUnloadModsCount == unloadedMods.Count)
+            {
+                throw new DependencyResolutionException();
+            }
+        }
+
+        return modInfos;
     }
 
 
     /// <inheritdoc/>
-    public Stream OpenFile(string filePath)
-        => TryOpenFile(filePath) ?? throw new FileNotFoundException(null, filePath);
+    public async Task<Stream> OpenFileAsync(string filePath, CancellationToken cancellationToken = default)
+        => await TryOpenFileAsync(filePath, cancellationToken) ?? throw new FileNotFoundException(null, filePath);
 
 
     /// <inheritdoc/>
-    public Stream? TryOpenFile(string filePath)
+    public async Task<Stream?> TryOpenFileAsync(string filePath, CancellationToken cancellationToken = default)
     {
         filePath = PathCanonicalize(filePath);
 
         foreach (var loader in _FileLoaders)
         {
-            var ms = loader.OpenFile(filePath);
+            var ms = await loader.OpenFileAsync(filePath, cancellationToken);
             if (ms is not null)
             {
                 return ms;
@@ -152,14 +188,14 @@ public class CatFile : ICatFile
     /// </summary>
     /// <param name="filePath">ファイルパス</param>
     /// <returns>XDocumentの列挙</returns>
-    public IEnumerable<XDocument> OpenXmlFiles(string filePath)
+    public async IAsyncEnumerable<XDocument> OpenXmlFilesAsync(string filePath, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        foreach (var ms in OpenFiles(filePath))
+        await foreach(var ms in OpenFilesAsync(filePath, cancellationToken))
         {
             XDocument? ret = null;
             try
             {
-                ret = XDocument.Load(ms);
+                ret = await XDocument.LoadAsync(ms, LoadOptions.None, cancellationToken);
             }
             catch (System.Xml.XmlException)
             {
@@ -180,13 +216,13 @@ public class CatFile : ICatFile
     /// </summary>
     /// <param name="filePath">ファイルパス</param>
     /// <returns>ファイルの内容の列挙</returns>
-    public IEnumerable<Stream> OpenFiles(string filePath)
+    public async IAsyncEnumerable<Stream> OpenFilesAsync(string filePath, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         filePath = PathCanonicalize(filePath);
 
         foreach (var loader in _FileLoaders)
         {
-            var ms = loader.OpenFile(filePath);
+            var ms = await loader.OpenFileAsync(filePath, cancellationToken);
             if (ms is not null)
             {
                 yield return ms;
@@ -197,28 +233,28 @@ public class CatFile : ICatFile
 
 
     /// <inheritdoc/>
-    public XDocument? TryOpenXml(string filePath)
+    public async Task<XDocument?> TryOpenXmlAsync(string filePath, CancellationToken cancellationToken = default)
     {
         filePath = PathCanonicalize(filePath);
 
         XDocument? ret = null;
         foreach (var fileLoader in _FileLoaders)
         {
-            using var ms = fileLoader.OpenFile(filePath);
-            if (ms == null)
+            using var ms = await fileLoader.OpenFileAsync(filePath, cancellationToken);
+            if (ms is null)
             {
                 continue;
             }
 
             try
             {
-                if (ret == null)
+                if (ret is null)
                 {
-                    ret = XDocument.Load(ms);
+                    ret = await XDocument.LoadAsync(ms, LoadOptions.None, cancellationToken);
                 }
                 else
                 {
-                    ret.MergeXML(XDocument.Load(ms));
+                    ret.MergeXML(await XDocument.LoadAsync(ms, LoadOptions.None, cancellationToken));
                 }
             }
             catch (System.Xml.XmlException)
@@ -232,21 +268,23 @@ public class CatFile : ICatFile
 
 
     /// <inheritdoc/>
-    public XDocument OpenXml(string filePath)
-        => TryOpenXml(filePath) ?? throw new FileNotFoundException(filePath);
+    public async Task<XDocument> OpenXmlAsync(string filePath, CancellationToken cancellationToken = default)
+        => await TryOpenXmlAsync(filePath, cancellationToken) ?? throw new FileNotFoundException(filePath);
 
 
     /// <inheritdoc/>
-    public XDocument OpenIndexXml(string indexFilePath, string name)
+    public async Task<XDocument> OpenIndexXmlAsync(string indexFilePath, string name, CancellationToken cancellationToken = default)
     {
         if (!_LoadedIndex.Contains(indexFilePath))
         {
-            foreach (var entry in OpenXml(indexFilePath).XPathSelectElements("/index/entry"))
+            foreach (var entry in (await OpenXmlAsync(indexFilePath, cancellationToken)).XPathSelectElements("/index/entry"))
             {
                 var entryName = entry.Attribute("name")?.Value;
-                if (entryName == null) continue;
+                if (entryName is null) continue;
+
                 var entryValue = entry.Attribute("value")?.Value.Replace(@"\\", @"\");
-                if (entryValue == null) continue;
+                if (entryValue is null) continue;
+
                 if (!_Index.TryAdd(entryName, entryValue)) _Index[entryName] = entryValue;
             }
             _LoadedIndex.Add(indexFilePath);
@@ -254,7 +292,7 @@ public class CatFile : ICatFile
 
         var path = _Index.GetValueOrDefault(name) ?? throw new FileNotFoundException();
 
-        if (path == null) throw new FileNotFoundException();
+        if (path is null) throw new FileNotFoundException();
 
         // 拡張子が設定されていない場合、xml をデフォルトにする
         if (string.IsNullOrEmpty(Path.GetExtension(path)))
@@ -267,7 +305,7 @@ public class CatFile : ICatFile
             path = path[1..];
         }
 
-        return OpenXml(path);
+        return await OpenXmlAsync(path, cancellationToken);
     }
 
 
@@ -303,12 +341,12 @@ public class CatFile : ICatFile
     /// </remarks>
     private string PathCanonicalize(string path)
     {
-        path = path.Replace('\\', '/');
+        path = path.Replace('\\', '/').ToLower();
 
         var modPath = _ParseModRegex.Match(path).Groups[1].Value;
 
         return _LoadedMods.Contains(modPath)
-            ? path.Substring(modPath.Length + 1)
+            ? path[(modPath.Length + 1)..]
             : path;
     }
 }
