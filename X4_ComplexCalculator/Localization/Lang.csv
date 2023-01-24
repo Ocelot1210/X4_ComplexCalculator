@@ -128,7 +128,7 @@ CheckUpdate_NowDownloading;Downloading the update...
 # Station Calculator import/export dialog
 # ------------------------------------------------------
 StationCalculatorExport_Title;Export to Station Calculator
-StationCalculatorExport_Description;Please copy the URL.\r\nNote: The following modules are excluded.\r\n・Connection module\r\n・Venture module
+StationCalculatorExport_Description;Please copy the URL.\r\nNote: The following modules are excluded.\r\n・Venture module
 StationCalculatorImport_Title;Importing from Station Calculator
 StationCalculatorImport_Description;Please enter the URL displayed when you click the \r\nShare button at the top of Station Calculator.
 

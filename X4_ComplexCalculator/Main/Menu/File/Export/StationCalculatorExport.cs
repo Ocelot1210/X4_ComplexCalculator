@@ -50,8 +50,7 @@ class StationCalculatorExport : BindableBase, IExport
         sb.Append("l=@");
 
         var modules = WorkArea.StationData.ModulesInfo.Modules
-            .Where(x => x.Module.ModuleType.ModuleTypeID != "connectionmodule"
-                     && x.Module.ModuleType.ModuleTypeID != "ventureplatform"
+            .Where(x => x.Module.ModuleType.ModuleTypeID != "ventureplatform"
                      && x.Module.ID != "module_gen_dock_m_venturer_01");
 
         foreach (var module in modules)
