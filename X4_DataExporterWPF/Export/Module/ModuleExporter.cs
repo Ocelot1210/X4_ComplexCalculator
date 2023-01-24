@@ -121,4 +121,3 @@ CREATE TABLE IF NOT EXISTS Module
         progress?.Report((currentStep++, maxSteps));
     }
 }
-}

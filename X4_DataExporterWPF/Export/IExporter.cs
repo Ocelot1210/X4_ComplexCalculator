@@ -19,4 +19,3 @@ interface IExporter
     /// <returns></returns>
     Task ExportAsync(IDbConnection connection, IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken);
 }
-}
