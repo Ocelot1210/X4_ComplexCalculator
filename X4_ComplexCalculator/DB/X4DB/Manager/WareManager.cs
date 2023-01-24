@@ -39,7 +39,7 @@ public class WareManager
 
         _MacroWares = _Wares.Values.OfType<IMacro>()
             .GroupBy(x => x.MacroName)
-            .Select(x => x.FirstOrDefault())
+            .Select(x => x.First())
             .ToDictionary(x => x.MacroName);
     }
 

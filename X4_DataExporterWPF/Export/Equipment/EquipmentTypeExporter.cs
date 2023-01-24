@@ -37,6 +37,8 @@ public class EquipmentTypeExporter : IExporter
     /// <param name="resolver">言語解決用オブジェクト</param>
     public EquipmentTypeExporter(XDocument waresXml, LanguageResolver resolver)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
+
         _WaresXml = waresXml;
         _Resolver = resolver;
     }
@@ -89,11 +91,11 @@ CREATE TABLE IF NOT EXISTS EquipmentType
             {"weapons",             "{20215, 2401}"},
         };
 
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[@transport='equipment'])");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[@transport='equipment'])");
         var currentStep = 0;
         var added = new HashSet<string>();
 
-        foreach (var equipment in _WaresXml.Root.XPathSelectElements("ware[@transport='equipment']"))
+        foreach (var equipment in _WaresXml.Root!.XPathSelectElements("ware[@transport='equipment']"))
         {
             progress?.Report((currentStep++, maxSteps));
 

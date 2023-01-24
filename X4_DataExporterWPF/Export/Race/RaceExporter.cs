@@ -79,6 +79,7 @@ CREATE TABLE IF NOT EXISTS Race
     private async IAsyncEnumerable<Race> GetRecords(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         var raceXml = await _CatFile.OpenXmlAsync("libraries/races.xml", cancellationToken);
+        if (raceXml?.Root is null) yield break;
 
         var maxSteps = raceXml.Root.Elements().Count();
         int currentStep = 0;

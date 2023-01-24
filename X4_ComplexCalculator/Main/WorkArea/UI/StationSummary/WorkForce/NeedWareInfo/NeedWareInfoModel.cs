@@ -207,7 +207,7 @@ class NeedWareInfoModel : BindableBase, IDisposable
             addWares.Clear();
             NeedWareInfoDetails.Clear();
 
-            var calcResults = (sender as IEnumerable<ModulesGridItem>)
+            var calcResults = ((sender as IEnumerable<ModulesGridItem>) ?? throw new ArgumentException())
                 .Where(x => 0 < x.Module.WorkersCapacity)
                 .SelectMany(x => ProductCalculator.Instance.Calc(x.Module, 1))
                 .GroupBy(x => x.Method);
@@ -349,7 +349,7 @@ class NeedWareInfoModel : BindableBase, IDisposable
     /// <param name="e"></param>
     private void Products_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        System.Collections.IList[] items = { e.NewItems, e.OldItems };
+        System.Collections.IList?[] items = { e.NewItems, e.OldItems };
 
         foreach (var item in items)
         {

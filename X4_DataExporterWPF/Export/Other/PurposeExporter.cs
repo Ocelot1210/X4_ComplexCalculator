@@ -45,6 +45,8 @@ public class PurposeExporter : IExporter
     /// <param name="resolver">言語解決用オブジェクト</param>
     public PurposeExporter(ICatFile catFile, XDocument waresXml, ILanguageResolver resolver)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
+
         _CatFile = catFile;
         _WaresXml = waresXml;
         _Resolver = resolver;
@@ -110,11 +112,11 @@ CREATE TABLE IF NOT EXISTS Purpose
         };
 
 
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
         var currentStep = 0;
         var added = new HashSet<string>();
 
-        foreach (var ship in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'ship')]"))
+        foreach (var ship in _WaresXml.Root!.XPathSelectElements("ware[contains(@tags, 'ship')]"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress?.Report((currentStep++, maxSteps));
@@ -125,7 +127,8 @@ CREATE TABLE IF NOT EXISTS Purpose
             var macroName = ship.XPathSelectElement("component")?.Attribute("ref")?.Value;
             if (string.IsNullOrEmpty(macroName)) continue;
 
-            var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName);
+            var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
+            if (macroXml.Root is null) continue;
 
             foreach (var elm in macroXml.Root.XPathSelectElements("macro/properties/purpose"))
             {

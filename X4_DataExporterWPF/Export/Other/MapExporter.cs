@@ -33,6 +33,8 @@ class MapExporter : IExporter
     /// <param name="resolver">言語解決用オブジェクト</param>
     public MapExporter(XDocument mapXml, ILanguageResolver resolver)
     {
+        ArgumentNullException.ThrowIfNull(mapXml.Root);
+
         _MapXml = mapXml;
         _Resolver = resolver;
     }
@@ -75,14 +77,16 @@ CREATE TABLE IF NOT EXISTS Map
     /// <returns>読み出した Map データ</returns>
     private IEnumerable<Map> GetRecords()
     {
-        foreach (var dataset in _MapXml.Root.XPathSelectElements("dataset[not(starts-with(@macro, 'demo'))]/properties/identification/../.."))
+        foreach (var dataset in _MapXml.Root!.XPathSelectElements("dataset[not(starts-with(@macro, 'demo'))]/properties/identification/../.."))
         {
-            var macro = dataset.Attribute("macro").Value;
+            var macro = dataset.Attribute("macro")?.Value;
+            if (string.IsNullOrEmpty(macro)) continue;
 
             var id = dataset.XPathSelectElement("properties/identification");
+            if (id is null) continue;
 
-            var name = _Resolver.Resolve(id.Attribute("name").Value);
-            var description = _Resolver.Resolve(id.Attribute("description").Value);
+            var name = _Resolver.Resolve(id.Attribute("name")?.Value ?? macro);
+            var description = _Resolver.Resolve(id.Attribute("description")?.Value ?? "");
 
             yield return new Map(macro, name, description);
         }

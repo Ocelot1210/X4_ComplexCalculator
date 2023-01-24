@@ -44,6 +44,8 @@ public class WareEquipmentExporter : IExporter
     /// <param name="waresXml">ウェア情報xml</param>
     public WareEquipmentExporter(IIndexResolver catFile, XDocument waresXml)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
+
         _CatFile = catFile;
         _WaresXml = waresXml;
     }
@@ -116,11 +118,11 @@ CREATE TABLE IF NOT EXISTS WareEquipmentTag
     /// </summary>
     private async IAsyncEnumerable<WareEquipment> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware)");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware)");
         var currentStep = 0;
 
 
-        foreach (var ware in _WaresXml.Root.XPathSelectElements("ware"))
+        foreach (var ware in _WaresXml.Root!.XPathSelectElements("ware"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress.Report((currentStep++, maxSteps));
@@ -133,10 +135,13 @@ CREATE TABLE IF NOT EXISTS WareEquipmentTag
             if (string.IsNullOrEmpty(macroName)) continue;
 
             var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
-            if (macroXml is null) continue;
+            if (macroXml?.Root is null) continue;
 
-            var componentXml = await _CatFile.OpenIndexXmlAsync("index/components.xml", macroXml.Root.XPathSelectElement("macro/component").Attribute("ref").Value, cancellationToken);
-            if (componentXml is null) continue;
+            var componentName = macroXml.Root.XPathSelectElement("macro/component")?.Attribute("ref")?.Value;
+            if (string.IsNullOrEmpty(componentName)) continue;  
+
+            var componentXml = await _CatFile.OpenIndexXmlAsync("index/components.xml", componentName, cancellationToken);
+            if (componentXml?.Root is null) continue;
 
             var equipmentTags = new List<WareEquipmentTag>();
 

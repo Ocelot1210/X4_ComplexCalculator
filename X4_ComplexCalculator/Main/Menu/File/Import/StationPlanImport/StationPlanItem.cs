@@ -49,12 +49,13 @@ public class StationPlanItem : BindableBase
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    /// <param name="plan">計画xml</param>
-    public StationPlanItem(XElement plan)
+    /// <param name="planID">計画ID</param>
+    /// <param name="planName">計画名</param>
+    /// <param name="plan">計画を表す <see cref="XElement"/></param>
+    public StationPlanItem(string planID, string planName, XElement plan)
     {
-        PlanID = plan.Attribute("id").Value;
-        PlanName = plan.Attribute("name").Value;
-
+        PlanID = planID;
+        PlanName = planName;
         Plan = plan;
     }
 }

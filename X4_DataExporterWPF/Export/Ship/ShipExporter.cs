@@ -44,6 +44,8 @@ public class ShipExporter : IExporter
     /// <param name="waresXml">ウェア情報xml</param>
     public ShipExporter(ICatFile catFile, XDocument waresXml)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
+
         _CatFile = catFile;
         _WaresXml = waresXml;
         _ThumbnailManager = new(catFile, "assets/fx/gui/textures/ships", "notfound");
@@ -108,11 +110,11 @@ items);
     /// </summary>
     private async IAsyncEnumerable<Ship> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
         var currentStep = 0;
 
 
-        foreach (var ship in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'ship')]"))
+        foreach (var ship in _WaresXml.Root!.XPathSelectElements("ware[contains(@tags, 'ship')]"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress.Report((currentStep++, maxSteps));
@@ -169,9 +171,9 @@ items);
     /// </summary>
     /// <param name="macroXml">マクロxml</param>
     /// <returns>該当するサイズID　該当なしならnull</returns>
-    private string? GetShipSizeID(XDocument macroXml)
+    private static string? GetShipSizeID(XDocument macroXml)
     {
-        var shipClass = macroXml.Root.Element("macro").Attribute("class").Value ?? "";
+        var shipClass = macroXml.Root?.Element("macro")?.Attribute("class")?.Value ?? "";
 
         return shipClass switch
         {
@@ -192,16 +194,16 @@ items);
     /// <returns>該当艦船のカーゴサイズ</returns>
     private async Task<int> GetCargoSizeAsync(XDocument macroXml, CancellationToken cancellationToken)
     {
-        var componentName = macroXml.Root.XPathSelectElement("macro/component")?.Attribute("ref")?.Value ?? "";
+        var componentName = macroXml.Root?.XPathSelectElement("macro/component")?.Attribute("ref")?.Value ?? "";
         if (string.IsNullOrEmpty(componentName)) return -1;
 
         var componentXml = await _CatFile.OpenIndexXmlAsync("index/components.xml", componentName, cancellationToken);
         if (componentXml is null) return -1;
 
-        var connName = componentXml.Root.XPathSelectElement("component/connections/connection[contains(@tags, 'storage')]")?.Attribute("name")?.Value ?? "";
+        var connName = componentXml.Root?.XPathSelectElement("component/connections/connection[contains(@tags, 'storage')]")?.Attribute("name")?.Value ?? "";
         if (string.IsNullOrEmpty(connName)) return 0;
 
-        var storage = macroXml.Root.XPathSelectElement($"macro/connections/connection[@ref='{connName}']/macro")?.Attribute("ref")?.Value ?? "";
+        var storage = macroXml.Root?.XPathSelectElement($"macro/connections/connection[@ref='{connName}']/macro")?.Attribute("ref")?.Value ?? "";
         if (string.IsNullOrEmpty(storage))
         {
             // カーゴが無い船(ゼノンの艦船等)を考慮
@@ -212,7 +214,7 @@ items);
         var storageXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", storage, cancellationToken);
         if (storageXml is null) return -1;
 
-        return storageXml.Root.XPathSelectElement("macro/properties/cargo").Attribute("max").GetInt();
+        return storageXml.Root?.XPathSelectElement("macro/properties/cargo")?.Attribute("max").GetInt() ?? 0;
     }
 
 
@@ -223,7 +225,7 @@ items);
     /// <returns></returns>
     private ShipProperty? GetProperty(XDocument macroXml)
     {
-        var properties = macroXml.Root.XPathSelectElement("macro/properties");
+        var properties = macroXml.Root?.XPathSelectElement("macro/properties");
         if (properties is null) return null;
 
 

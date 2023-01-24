@@ -365,7 +365,7 @@ public class WorkAreaViewModel : BindableBase, IDisposable
     /// <remarks>
     /// ここでタイトルを再設定しないと言語を切り替えてもそれぞれのタブのタイトルが変更されない
     /// </remarks>
-    private byte[] SetTitle(Stream stream)
+    private static byte[] SetTitle(Stream stream)
     {
         var xml = XDocument.Load(stream);
 
@@ -384,9 +384,16 @@ public class WorkAreaViewModel : BindableBase, IDisposable
         // タイトル再設定
         foreach (var elm in xml.XPathSelectElements("LayoutRoot//LayoutAnchorable"))
         {
-            if (titleDict.TryGetValue(elm.Attribute("ContentId").Value, out var langID))
+            var contentId = elm.Attribute("ContentId")?.Value;
+            if (string.IsNullOrEmpty(contentId)) continue;
+
+            if (titleDict.TryGetValue(contentId, out var langID))
             {
-                elm.Attribute("Title").Value = (string)LocalizeDictionary.Instance.GetLocalizedObject(langID, null, null);
+                var titleElm = elm.Attribute("Title");
+                if (titleElm is not null)
+                {
+                    titleElm.Value = (string)LocalizeDictionary.Instance.GetLocalizedObject(langID, null, null);
+                }
             }
         }
 

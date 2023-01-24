@@ -43,6 +43,8 @@ public class ModuleExporter : IExporter
     /// <param name="waresXml">ウェア情報xml</param>
     public ModuleExporter(ICatFile catFile, XDocument waresXml)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
+
         _CatFile = catFile;
         _WaresXml = waresXml;
         _ThumbnailManager = new(catFile, "assets/fx/gui/textures/stationmodules", "notfound");
@@ -88,24 +90,25 @@ CREATE TABLE IF NOT EXISTS Module
     /// <returns>読み出した Module データ</returns>
     internal async IAsyncEnumerable<Module> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)>? progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'module')])");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'module')])");
         var currentStep = 0;
 
-
-        foreach (var module in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'module')]"))
+        foreach (var module in _WaresXml.Root!.XPathSelectElements("ware[contains(@tags, 'module')]"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress?.Report((currentStep++, maxSteps));
 
 
-            var moduleID = module.Attribute("id").Value;
+            var moduleID = module.Attribute("id")?.Value;
             if (string.IsNullOrEmpty(moduleID)) continue;
 
-            var macroName = module.XPathSelectElement("component").Attribute("ref").Value;
+            var macroName = module.XPathSelectElement("component")?.Attribute("ref")?.Value;
             if (string.IsNullOrEmpty(macroName)) continue;
 
             var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName);
-            var moduleTypeID = macroXml.Root.XPathSelectElement("macro").Attribute("class").Value;
+            if (macroXml?.Root is null) continue;
+
+            var moduleTypeID = macroXml.Root.XPathSelectElement("macro")?.Attribute("class")?.Value;
             if (string.IsNullOrEmpty(moduleTypeID)) continue;
 
             // 従業員数/最大収容人数取得
@@ -113,7 +116,7 @@ CREATE TABLE IF NOT EXISTS Module
             var maxWorkers = workForce?.Attribute("max")?.GetInt() ?? 0;
             var capacity = workForce?.Attribute("capacity")?.GetInt() ?? 0;
 
-            var noBluePrint = module.Attribute("tags").Value.Contains("noblueprint");
+            var noBluePrint = module.Attribute("tags")?.Value.Contains("noblueprint") ?? false;
 
             yield return new Module(moduleID, moduleTypeID, macroName, maxWorkers, capacity, noBluePrint, await _ThumbnailManager.GetThumbnailAsync(macroName, cancellationToken));
         }

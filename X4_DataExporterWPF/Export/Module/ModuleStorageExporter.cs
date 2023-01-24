@@ -42,6 +42,8 @@ class ModuleStorageExporter : IExporter
     /// <param name="waresXml">ウェア情報xml</param>
     public ModuleStorageExporter(IIndexResolver catFile, XDocument waresXml)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
+
         _CatFile = catFile;
         _WaresXml = waresXml;
     }
@@ -94,11 +96,11 @@ CREATE TABLE IF NOT EXISTS ModuleStorageType
     /// <returns>読み出した ModuleStorage データ</returns>
     private async IAsyncEnumerable<ModuleStorage> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'module')])");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'module')])");
         var currentStep = 0;
 
 
-        foreach (var module in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'module')]"))
+        foreach (var module in _WaresXml.Root!.XPathSelectElements("ware[contains(@tags, 'module')]"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress.Report((currentStep++, maxSteps));
@@ -107,12 +109,15 @@ CREATE TABLE IF NOT EXISTS ModuleStorageType
             var moduleID = module.Attribute("id")?.Value;
             if (string.IsNullOrEmpty(moduleID)) continue;
 
-            var macroName = module.XPathSelectElement("component").Attribute("ref").Value;
+            var macroName = module.XPathSelectElement("component")?.Attribute("ref")?.Value;
+            if (string.IsNullOrEmpty(macroName)) continue;
+
             var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
+            if (macroXml?.Root is null) continue;
 
             // 容量が記載されている箇所を抽出
             var cargo = macroXml.Root.XPathSelectElement("macro/properties/cargo");
-            if (cargo == null) continue;
+            if (cargo is null) continue;
 
             // 保管庫種別を取得する
             var transportTypeExists = false;

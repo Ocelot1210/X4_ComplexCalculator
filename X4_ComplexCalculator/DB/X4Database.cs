@@ -124,12 +124,12 @@ class X4Database : DBConnection
         if (_Instance is not null) return;
 
         var basePath = AppDomain.CurrentDomain.BaseDirectory ?? "";
-        var dbPath = Path.Combine(basePath, Configuration.Instance.X4DBPath);
+        var dbPath = Path.Join(basePath, Configuration.Instance.X4DBPath);
 
         try
         {
             // DB格納先フォルダが無ければ作る
-            Directory.CreateDirectory(Path.GetDirectoryName(dbPath));
+            Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
 
             if (File.Exists(dbPath))
             {

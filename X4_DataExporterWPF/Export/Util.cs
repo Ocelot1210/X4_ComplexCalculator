@@ -89,7 +89,7 @@ public static class Util
     /// <param name="dir">フォルダパス</param>
     /// <param name="fileName">gzipで圧縮された画像のファイル名(拡張子は除く)</param>
     /// <returns></returns>
-    public static async Task<byte[]?> DDS2PngAsync(ICatFile catFIle, string dir, string? fileName, CancellationToken cancellationToken = default)
+    public static async Task<byte[]?> DDS2PngAsync(ICatFile catFile, string dir, string? fileName, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(fileName))
         {
@@ -99,7 +99,7 @@ public static class Util
 
         try
         {
-            using var rawStream = await catFIle.TryOpenFileAsync(Path.Combine(dir, $"{fileName}.gz"));
+            using var rawStream = await catFile.TryOpenFileAsync(Path.Combine(dir, $"{fileName}.gz"), cancellationToken);
             if (rawStream is not null)
             {
                 switch (JudgeFormat(rawStream))

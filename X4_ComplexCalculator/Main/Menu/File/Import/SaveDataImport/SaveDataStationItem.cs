@@ -54,7 +54,7 @@ public class SaveDataStationItem : BindableBase
     public SaveDataStationItem(string sectorName, XElement xElement)
     {
         SectorName = sectorName;
-        StationName = xElement.Attribute("name").Value;
+        StationName = xElement.Attribute("name")?.Value ?? "";
         XElement = xElement;
     }
 }

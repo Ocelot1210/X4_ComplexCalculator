@@ -31,7 +31,9 @@ class DataExportModel
             var catFiles = new CatFile(inDirPath);
             var xml = await catFiles.OpenXmlAsync("libraries/languages.xml", CancellationToken.None);
             var languages = xml.XPathSelectElements("/languages/language")
-                .Select(x => new LangComboboxItem(int.Parse(x.Attribute("id").Value), x.Attribute("name").Value))
+                .Select(x => (ID: x.Attribute("id")?.Value, Name: x.Attribute("name")?.Value))
+                .Where(x => (!string.IsNullOrEmpty(x.ID)) && x.Name is not null)
+                .Select(x => new LangComboboxItem(int.Parse(x.ID!), x.Name!))
                 .OrderBy(x => x.ID)
                 .ToArray();
 
@@ -196,8 +198,10 @@ class DataExportModel
     /// wares.xml から重複する要素を削除する(前の要素を消す)
     /// </summary>
     /// <param name="waresXml">削除対象</param>
-    private void RemoveDuplicateWares(XDocument waresXml)
+    private static void RemoveDuplicateWares(XDocument waresXml)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
+
         // 見つかったウェアID一覧
         var wareIds = new HashSet<string>();
 

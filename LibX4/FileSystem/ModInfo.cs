@@ -110,7 +110,7 @@ class ModInfo
     /// <returns></returns>
     private bool GetIsModEnabled(XDocument? userContentXml, XDocument modContentXml)
     {
-        var modElm = userContentXml?.Root.XPathSelectElement($"extension[@id='{ID}']");
+        var modElm = userContentXml?.Root?.XPathSelectElement($"extension[@id='{ID}']");
         if (modElm is null)
         {
             var enabledText = modContentXml.Root?.Attribute("enabled")?.Value ?? "";

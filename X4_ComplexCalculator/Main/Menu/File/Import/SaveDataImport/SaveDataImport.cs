@@ -201,7 +201,8 @@ class SaveDataImport : IImport
             var prod = WorkArea.StationData.ProductsInfo.Products.FirstOrDefault(x => x.Ware.ID == wareID);
             if (prod is not null)
             {
-                prod.UnitPrice = long.Parse(ware.Attribute("price").Value);
+                var priceText = ware.Attribute("price")?.Value;
+                prod.UnitPrice = (string.IsNullOrEmpty(priceText)) ? X4Database.Instance.Ware.Get(wareID).AvgPrice : long.Parse(priceText);
             }
         }
     }
@@ -225,9 +226,11 @@ class SaveDataImport : IImport
             var storage = WorkArea.StationData.StorageAssignInfo.StorageAssign.FirstOrDefault(x => x.WareID == wareID);
             if (storage is not null)
             {
-                var amount = long.Parse(ware.Attribute("amount").Value);
-
-                storage.AllocCount = amount;
+                var amountText = ware.Attribute("amount")?.Value;
+                if (!string.IsNullOrEmpty(amountText))
+                {
+                    storage.AllocCount = long.Parse(amountText);
+                }
             }
         }
     }

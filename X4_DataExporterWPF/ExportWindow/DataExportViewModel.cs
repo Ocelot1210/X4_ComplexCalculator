@@ -238,8 +238,6 @@ class DataExportViewModel : BindableBase
             return;
         }
 
-        var owner = Application.Current.Windows.OfType<Window>().SingleOrDefault(x => x.IsActive);
-
         var progress = new Progress<(int currentStep, int maxSteps)>(s =>
         {
             CurrentStep.Value = s.currentStep;
@@ -258,7 +256,7 @@ class DataExportViewModel : BindableBase
             InDirPath.Value,
             _OutFilePath,
             SelectedLanguage.Value,
-            owner
+            _OwnerWindow
         ));
         CurrentStep.Value = 0;
     }

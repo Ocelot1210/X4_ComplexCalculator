@@ -38,6 +38,8 @@ class ShieldExporter : IExporter
     /// <param name="waresXml">ウェア情報xml</param>
     public ShieldExporter(IIndexResolver catFile, XDocument waresXml)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
+
         _CatFile = catFile;
         _WaresXml = waresXml;
     }
@@ -79,11 +81,11 @@ CREATE TABLE IF NOT EXISTS Shield
     /// <returns>読み出した Shield データ</returns>
     private async IAsyncEnumerable<Shield> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[@transport='equipment'][@group='shields'])");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[@transport='equipment'][@group='shields'])");
         var currentStep = 0;
 
 
-        foreach (var equipment in _WaresXml.Root.XPathSelectElements("ware[@transport='equipment'][@group='shields']"))
+        foreach (var equipment in _WaresXml.Root!.XPathSelectElements("ware[@transport='equipment'][@group='shields']"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress.Report((currentStep++, maxSteps));
@@ -96,10 +98,15 @@ CREATE TABLE IF NOT EXISTS Shield
             if (string.IsNullOrEmpty(macroName)) continue;
 
             var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
+            if (macroXml?.Root is null) continue;
+
             XDocument componentXml;
             try
             {
-                componentXml = await _CatFile.OpenIndexXmlAsync("index/components.xml", macroXml.Root.XPathSelectElement("macro/component").Attribute("ref").Value, cancellationToken);
+                var componentName = macroXml.Root.XPathSelectElement("macro/component")?.Attribute("ref")?.Value;
+                if (string.IsNullOrEmpty(componentName)) continue;
+
+                componentXml = await _CatFile.OpenIndexXmlAsync("index/components.xml", componentName, cancellationToken);
             }
             catch
             {

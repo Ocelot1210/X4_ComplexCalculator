@@ -28,6 +28,7 @@ public class WareEffectExporter : IExporter
     /// <param name="waresXml">ウェア情報xml</param>
     public WareEffectExporter(XDocument waresXml)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
         _WaresXml = waresXml;
     }
 
@@ -70,11 +71,11 @@ CREATE TABLE IF NOT EXISTS WareEffect
     /// <returns>読み出した WareEffect データ</returns>
     internal IEnumerable<WareEffect> GetRecords(IProgress<(int currentStep, int maxSteps)>? progress, CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'economy')])");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'economy')])");
         var currentStep = 0;
 
 
-        foreach (var ware in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'economy')]"))
+        foreach (var ware in _WaresXml.Root!.XPathSelectElements("ware[contains(@tags, 'economy')]"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress?.Report((currentStep++, maxSteps));

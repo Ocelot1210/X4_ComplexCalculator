@@ -77,6 +77,7 @@ CREATE TABLE IF NOT EXISTS WareGroup
     internal async IAsyncEnumerable<WareGroup> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)>? progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         var wareGroupXml = await _CatFile.OpenXmlAsync("libraries/waregroups.xml", cancellationToken);
+        if (wareGroupXml?.Root is null) yield break;
 
         var maxSteps = (int)(double)wareGroupXml.Root.XPathEvaluate("count(group)");
         var currentStep = 0;

@@ -29,6 +29,8 @@ public class WareResourceExporter : IExporter
     /// <param name="waresXml">ウェア情報xml</param>
     public WareResourceExporter(XDocument waresXml)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
+
         _WaresXml = waresXml;
     }
 
@@ -71,11 +73,11 @@ CREATE TABLE IF NOT EXISTS WareResource
     /// <returns>読み出した WareResource データ</returns>
     private IEnumerable<WareResource> GetRecords(IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware)");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware)");
         var currentStep = 0;
 
 
-        foreach (var ware in _WaresXml.Root.XPathSelectElements("ware"))
+        foreach (var ware in _WaresXml.Root!.XPathSelectElements("ware"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress.Report((currentStep++, maxSteps));

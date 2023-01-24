@@ -43,6 +43,8 @@ public class ModuleTypeExporter : IExporter
     /// <param name="resolver">言語解決用オブジェクト</param>
     public ModuleTypeExporter(ICatFile catFile, XDocument waresXml, LanguageResolver resolver)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
+
         _CatFile = catFile;
         _WaresXml = waresXml;
         _Resolver = resolver;
@@ -99,24 +101,26 @@ CREATE TABLE IF NOT EXISTS ModuleType
             {"welfaremodule",       "{1001,    9620}"},
         };
 
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'module')])");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'module')])");
         var currentStep = 0;
 
         var added = new HashSet<string>();
 
-        foreach (var module in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'module')]"))
+        foreach (var module in _WaresXml.Root!.XPathSelectElements("ware[contains(@tags, 'module')]"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress?.Report((currentStep++, maxSteps));
 
-            var moduleID = module.Attribute("id").Value;
+            var moduleID = module.Attribute("id")?.Value;
             if (string.IsNullOrEmpty(moduleID)) continue;
 
-            var macroName = module.XPathSelectElement("component").Attribute("ref").Value;
+            var macroName = module.XPathSelectElement("component")?.Attribute("ref")?.Value;
             if (string.IsNullOrEmpty(macroName)) continue;
 
             var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
-            var moduleTypeID = macroXml.Root.XPathSelectElement("macro").Attribute("class").Value;
+            if (macroXml?.Root is null) continue;
+
+            var moduleTypeID = macroXml.Root.XPathSelectElement("macro")?.Attribute("class")?.Value;
             if (string.IsNullOrEmpty(moduleTypeID) || added.Contains(moduleTypeID)) continue;
 
             // モジュール種別 ID の名称を表すキーの取得を試みる

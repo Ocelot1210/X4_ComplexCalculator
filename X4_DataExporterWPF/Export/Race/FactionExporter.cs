@@ -83,7 +83,8 @@ CREATE TABLE IF NOT EXISTS Faction
     /// <returns>読み出した Faction データ</returns>
     private async IAsyncEnumerable<Faction> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var factionsXml = await _CatFile.OpenXmlAsync("libraries/factions.xml");
+        var factionsXml = await _CatFile.OpenXmlAsync("libraries/factions.xml", cancellationToken);
+        if (factionsXml?.Root is null) yield break;
 
         var maxSteps = (int)(double)factionsXml.Root.XPathEvaluate("count(faction[@name])");
         var currentStep = 0;

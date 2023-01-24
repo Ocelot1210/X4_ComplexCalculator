@@ -53,8 +53,14 @@ class SelectPlanModel : BindableBase
             try
             {
                 var xml = XDocument.Load(path);
+                if (xml.Root is null) return;
 
-                Planes.Reset(xml.Root.XPathSelectElements("plan").Select(x => new StationPlanItem(x)));
+                var plans = xml.Root.XPathSelectElements("plan")
+                    .Select(x => (ID: x.Attribute("id")?.Value, Name: x.Attribute("name")?.Value ?? "", Element: x))
+                    .Where(x => !string.IsNullOrEmpty(x.ID))
+                    .Select(x => new StationPlanItem(x.ID!, x.Name, x.Element));
+
+                Planes.Reset(plans);
                 PlanFilePath = path;
             }
             catch
@@ -91,8 +97,14 @@ class SelectPlanModel : BindableBase
                 foreach (var fileName in dlg.FileNames)
                 {
                     var xml = XDocument.Load(fileName);
+                    if (xml.Root is null) return;
 
-                    Planes.AddRange(xml.Root.XPathSelectElements("plan").Select(x => new StationPlanItem(x)));
+                    var plans = xml.Root.XPathSelectElements("plan")
+                        .Select(x => (ID: x.Attribute("id")?.Value, Name: x.Attribute("name")?.Value ?? "", Element: x))
+                        .Where(x => !string.IsNullOrEmpty(x.ID))
+                        .Select(x => new StationPlanItem(x.ID!, x.Name, x.Element));
+
+                    Planes.AddRange(plans);
                 }
 
                 // 複数選択されたら親フォルダパスを表示

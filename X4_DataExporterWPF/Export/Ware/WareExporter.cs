@@ -34,6 +34,7 @@ public class WareExporter : IExporter
     /// <param name="resolver">言語解決用オブジェクト</param>
     public WareExporter(XDocument waresXml, ILanguageResolver resolver)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
         _WaresXml = waresXml;
         _Resolver = resolver;
     }
@@ -80,11 +81,11 @@ CREATE TABLE IF NOT EXISTS Ware
     /// <returns>読み出した Ware データ</returns>
     private IEnumerable<Ware> GetRecords(IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware)");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware)");
         var currentStep = 0;
 
 
-        foreach (var ware in _WaresXml.Root.XPathSelectElements("ware"))
+        foreach (var ware in _WaresXml.Root!.XPathSelectElements("ware"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress.Report((currentStep++, maxSteps));

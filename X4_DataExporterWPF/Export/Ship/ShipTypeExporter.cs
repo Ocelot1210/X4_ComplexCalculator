@@ -43,6 +43,8 @@ public class ShipTypeExporter : IExporter
     /// <param name="resolver">言語解決用オブジェクト</param>
     public ShipTypeExporter(CatFile catFile, XDocument waresXml, LanguageResolver resolver)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
+
         _CatFile = catFile;
         _WaresXml = waresXml;
         _Resolver = resolver;
@@ -122,11 +124,11 @@ CREATE TABLE IF NOT EXISTS ShipType
             {"battleship",       (5031, 5032)},         // 戦艦
         };
 
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
         var currentStep = 0;
         var added = new HashSet<string>();
 
-        foreach (var ship in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'ship')]"))
+        foreach (var ship in _WaresXml.Root!.XPathSelectElements("ware[contains(@tags, 'ship')]"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress?.Report((currentStep++, maxSteps));
@@ -139,7 +141,7 @@ CREATE TABLE IF NOT EXISTS ShipType
 
             var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
 
-            var properties = macroXml.Root.XPathSelectElement("macro/properties");
+            var properties = macroXml.Root?.XPathSelectElement("macro/properties");
             if (properties is null) continue;
 
             var shipTypeID = properties.Element("ship")?.Attribute("type")?.Value ?? "";

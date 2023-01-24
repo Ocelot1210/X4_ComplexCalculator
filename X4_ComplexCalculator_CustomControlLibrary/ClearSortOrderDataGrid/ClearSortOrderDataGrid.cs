@@ -71,7 +71,7 @@ public class ClearSortOrderDataGrid : DataGrid
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void SortDescription_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    private void SortDescription_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (sender is not SortDescriptionCollection collection)
         {

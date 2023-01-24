@@ -38,6 +38,8 @@ class ThrusterExporter : IExporter
     /// <param name="waresXml">ウェア情報xml</param>
     public ThrusterExporter(IIndexResolver catFile, XDocument waresXml)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
+
         _CatFile = catFile;
         _WaresXml = waresXml;
     }
@@ -84,11 +86,11 @@ INSERT INTO Thruster ( EquipmentID,  ThrustStrafe,  ThrustPitch,  ThrustYaw,  Th
     /// <returns>読み出した Thruster データ</returns>
     private async IAsyncEnumerable<Thruster> GetRecords(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[@transport='equipment'][@group='thrusters'])");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[@transport='equipment'][@group='thrusters'])");
         var currentStep = 0;
 
 
-        foreach (var equipment in _WaresXml.Root.XPathSelectElements("ware[@transport='equipment'][@group='thrusters']"))
+        foreach (var equipment in _WaresXml.Root!.XPathSelectElements("ware[@transport='equipment'][@group='thrusters']"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress.Report((currentStep++, maxSteps));
@@ -101,7 +103,7 @@ INSERT INTO Thruster ( EquipmentID,  ThrustStrafe,  ThrustPitch,  ThrustYaw,  Th
             if (string.IsNullOrEmpty(macroName)) continue;
 
             var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
-            if (macroXml is null) continue;
+            if (macroXml?.Root is null) continue;
 
 
             var thrust = macroXml.Root.XPathSelectElement("macro/properties/thrust");

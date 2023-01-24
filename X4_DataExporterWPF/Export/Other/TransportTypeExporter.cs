@@ -36,6 +36,8 @@ class TransportTypeExporter : IExporter
     /// <param name="resolver">言語解決用オブジェクト</param>
     public TransportTypeExporter(XDocument waresXml, ILanguageResolver resolver)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
+
         _WaresXml = waresXml;
         _Resolver = resolver;
     }
@@ -94,11 +96,11 @@ CREATE TABLE IF NOT EXISTS TransportType
             {"condensate", "{20205, 1100}"},
         };
 
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware)");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware)");
         var currentStep = 0;
 
         var added = new HashSet<string>();
-        foreach (var ware in _WaresXml.Root.Elements("ware"))
+        foreach (var ware in _WaresXml.Root!.Elements("ware"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress.Report((currentStep++, maxSteps));

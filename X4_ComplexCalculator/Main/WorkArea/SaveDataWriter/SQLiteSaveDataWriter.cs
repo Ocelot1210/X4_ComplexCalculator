@@ -85,7 +85,7 @@ class SQLiteSaveDataWriter : ISaveDataWriter
     private void SaveMain(IWorkArea WorkArea)
     {
         // フォルダが無ければ作る
-        Directory.CreateDirectory(Path.GetDirectoryName(SaveFilePath));
+        Directory.CreateDirectory(Path.GetDirectoryName(SaveFilePath)!);
 
         using var conn = new DBConnection(SaveFilePath);
 

@@ -34,6 +34,8 @@ public class ShipPurposeExporter : IExporter
     /// <param name="waresXml">ウェア情報xml</param>
     public ShipPurposeExporter(IIndexResolver catFile, XDocument waresXml)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
+
         _CatFile = catFile;
         _WaresXml = waresXml;
     }
@@ -76,11 +78,11 @@ CREATE TABLE IF NOT EXISTS ShipPurpose
     /// </summary>
     private async IAsyncEnumerable<ShipPurpose> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
         var currentStep = 0;
 
 
-        foreach (var ship in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'ship')]"))
+        foreach (var ship in _WaresXml.Root!.XPathSelectElements("ware[contains(@tags, 'ship')]"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress.Report((currentStep++, maxSteps));
@@ -92,6 +94,7 @@ CREATE TABLE IF NOT EXISTS ShipPurpose
             if (string.IsNullOrEmpty(macroName)) continue;
 
             var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
+            if (macroXml?.Root is null) continue;
 
             var purpose = macroXml.Root.XPathSelectElement("macro/properties/purpose");
             if (purpose is null) continue;

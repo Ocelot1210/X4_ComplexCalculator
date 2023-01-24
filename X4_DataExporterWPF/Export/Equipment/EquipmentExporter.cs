@@ -51,6 +51,8 @@ class EquipmentExporter : IExporter
     /// <param name="waresXml">ウェア情報xml</param>
     public EquipmentExporter(ICatFile catFile, XDocument waresXml)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
+
         _CatFile = catFile;
         _WaresXml = waresXml;
         _ThumbnailManager = new(catFile, "assets/fx/gui/textures/upgrades", "notfound");
@@ -112,11 +114,11 @@ INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  Hull,  HullI
     /// <returns>読み出した Equipment データ</returns>
     private async IAsyncEnumerable<Equipment> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[@transport='equipment'])");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[@transport='equipment'])");
         var currentStep = 0;
 
 
-        foreach (var equipment in _WaresXml.Root.XPathSelectElements("ware[@transport='equipment']"))
+        foreach (var equipment in _WaresXml.Root!.XPathSelectElements("ware[@transport='equipment']"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress?.Report((currentStep++, maxSteps));
@@ -132,10 +134,15 @@ INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  Hull,  HullI
 
 
             var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
+            if (macroXml?.Root is null) continue;
+
             XDocument componentXml;
             try
             {
-                componentXml = await _CatFile.OpenIndexXmlAsync("index/components.xml", macroXml.Root.XPathSelectElement("macro/component").Attribute("ref").Value, cancellationToken);
+                var componentName = macroXml.Root?.XPathSelectElement("macro/component")?.Attribute("ref")?.Value;
+                if (string.IsNullOrEmpty(componentName)) continue;
+
+                componentXml = await _CatFile.OpenIndexXmlAsync("index/components.xml", componentName, cancellationToken);
             }
             catch
             {
@@ -143,7 +150,7 @@ INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  Hull,  HullI
             }
 
             // 装備が記載されているタグを取得する
-            var component = componentXml.Root.XPathSelectElement("component/connections/connection[contains(@tags, 'component')]");
+            var component = componentXml.Root?.XPathSelectElement("component/connections/connection[contains(@tags, 'component')]");
 
             // タグがあれば格納する
             var tags = Util.SplitTags(component?.Attribute("tags")?.Value).Distinct();
@@ -152,15 +159,15 @@ INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  Hull,  HullI
                 _EquipmentTags.AddLast(tags.Select(x => new EquipmentTag(equipmentID, x)).ToArray());
             }
 
-            var idElm = macroXml.Root.XPathSelectElement("macro/properties/identification");
+            var idElm = macroXml.Root?.XPathSelectElement("macro/properties/identification");
             if (idElm is null) continue;
 
             yield return new Equipment(
                 equipmentID,
                 macroName,
                 equipmentTypeID,
-                macroXml.Root.XPathSelectElement("macro/properties/hull")?.Attribute("max")?.GetInt() ?? 0,
-                (macroXml.Root.XPathSelectElement("macro/properties/hull")?.Attribute("integrated")?.GetInt() ?? 0) == 1,
+                macroXml.Root?.XPathSelectElement("macro/properties/hull")?.Attribute("max")?.GetInt() ?? 0,
+                (macroXml.Root?.XPathSelectElement("macro/properties/hull")?.Attribute("integrated")?.GetInt() ?? 0) == 1,
                 idElm.Attribute("mk")?.GetInt() ?? 0,
                 idElm.Attribute("makerrace")?.Value,
                 await _ThumbnailManager.GetThumbnailAsync(macroName, cancellationToken)

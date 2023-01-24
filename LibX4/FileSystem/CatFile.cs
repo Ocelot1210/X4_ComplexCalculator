@@ -110,7 +110,7 @@ public class CatFile : ICatFile
     /// </summary>
     /// <param name="gameRoot">X4 インストール先ディレクトリパス</param>
     /// <returns>Mod の情報を表す <see cref="IReadOnlyList{ModInfo}"/></returns>
-    private IReadOnlyList<ModInfo> GetModInfo(string gameRoot)
+    private static IReadOnlyList<ModInfo> GetModInfo(string gameRoot)
     {
         var entensionsPath = Path.Combine(gameRoot, "extensions");
 

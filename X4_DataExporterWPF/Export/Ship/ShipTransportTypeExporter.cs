@@ -38,6 +38,8 @@ public class ShipTransportTypeExporter : IExporter
     /// <param name="resolver">言語解決用オブジェクト</param>
     public ShipTransportTypeExporter(IIndexResolver catFile, XDocument waresXml)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
+
         _CatFile = catFile;
         _WaresXml = waresXml;
     }
@@ -77,10 +79,10 @@ CREATE TABLE IF NOT EXISTS ShipTransportType
     /// </summary>
     private async IAsyncEnumerable<ShipTransportType> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
         var currentStep = 0;
 
-        foreach (var ship in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'ship')]"))
+        foreach (var ship in _WaresXml.Root!.XPathSelectElements("ware[contains(@tags, 'ship')]"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress.Report((currentStep++, maxSteps));
@@ -110,16 +112,16 @@ CREATE TABLE IF NOT EXISTS ShipTransportType
     /// <returns>該当艦船のカーゴ種別</returns>
     private async Task<IReadOnlyList<string>> GetCargoTypesAsync(XDocument macroXml, CancellationToken cancellationToken)
     {
-        var componentName = macroXml.Root.XPathSelectElement("macro/component")?.Attribute("ref")?.Value ?? "";
+        var componentName = macroXml.Root?.XPathSelectElement("macro/component")?.Attribute("ref")?.Value ?? "";
         if (string.IsNullOrEmpty(componentName)) return Array.Empty<string>();
 
         var componentXml = await _CatFile.OpenIndexXmlAsync("index/components.xml", componentName, cancellationToken);
-        if (componentXml is null) return Array.Empty<string>();
+        if (componentXml?.Root is null) return Array.Empty<string>();
 
         var connName = componentXml.Root.XPathSelectElement("component/connections/connection[contains(@tags, 'storage')]")?.Attribute("name")?.Value ?? "";
         if (string.IsNullOrEmpty(connName)) return Array.Empty<string>();
 
-        var storage = macroXml.Root.XPathSelectElement($"macro/connections/connection[@ref='{connName}']/macro")?.Attribute("ref")?.Value ?? "";
+        var storage = macroXml.Root?.XPathSelectElement($"macro/connections/connection[@ref='{connName}']/macro")?.Attribute("ref")?.Value ?? "";
         if (string.IsNullOrEmpty(storage))
         {
             // カーゴが無い船(ゼノンの艦船等)を考慮
@@ -127,7 +129,7 @@ CREATE TABLE IF NOT EXISTS ShipTransportType
         }
 
         var storageXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", storage, cancellationToken);
-        if (storageXml is null) return Array.Empty<string>();
+        if (storageXml?.Root is null) return Array.Empty<string>();
 
         var tags = storageXml.Root.XPathSelectElement("macro/properties/cargo")?.Attribute("tags")?.Value ?? "";
 

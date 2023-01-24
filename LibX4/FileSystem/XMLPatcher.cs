@@ -24,6 +24,9 @@ static class XMLPatcher
     /// <param name="patchXml">マージする XML</param>
     public static void MergeXML(this XDocument baseXml, XDocument patchXml)
     {
+        ArgumentNullException.ThrowIfNull(baseXml.Root);
+        ArgumentNullException.ThrowIfNull(patchXml.Root);
+
         if (patchXml.Root.Name.LocalName == "diff") ApplyDiffXml(baseXml, patchXml);
         else baseXml.Root.Add(patchXml.Root.Elements());
     }
@@ -36,6 +39,8 @@ static class XMLPatcher
     /// <param name="diffXml">RFC5261 に準拠した diff XML</param>
     private static void ApplyDiffXml(XDocument baseXml, XDocument diffXml)
     {
+        ArgumentNullException.ThrowIfNull(diffXml.Root);
+
         var nsMng = new XmlNamespaceManager(new NameTable());
 
         foreach (var attr in diffXml.Root.Attributes())
@@ -56,7 +61,10 @@ static class XMLPatcher
 
         foreach (var elm in diffXml.Root.Elements())
         {
-            var sel = baseXml.XPathEvaluate(elm.Attribute("sel").Value, nsMng);
+            var selectorText = elm.Attribute("sel")?.Value;
+            if (selectorText is null) continue;
+
+            var sel = baseXml.XPathEvaluate(selectorText, nsMng);
 
             if (sel is not IEnumerable enumerable)
             {
@@ -64,7 +72,7 @@ static class XMLPatcher
             }
 
             var targetNode = enumerable.OfType<XObject>().FirstOrDefault();
-            if (targetNode == null)
+            if (targetNode is null)
             {
                 continue;
             }

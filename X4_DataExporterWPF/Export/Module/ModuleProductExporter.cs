@@ -41,6 +41,9 @@ public class ModuleProductExporter : IExporter
     /// <param name="waresXml">ウェア情報xml</param>
     public ModuleProductExporter(IIndexResolver catFile, XDocument waresXml, XDocument defaultsXml)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
+        ArgumentNullException.ThrowIfNull(defaultsXml.Root);
+
         _CatFile = catFile;
         _WaresXml = waresXml;
         _DefaultsXml = defaultsXml;
@@ -85,10 +88,10 @@ CREATE TABLE IF NOT EXISTS ModuleProduct
     /// <returns>読み出した ModuleProduct データ</returns>
     private async IAsyncEnumerable<ModuleProduct> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware[contains(@tags, 'module')])");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'module')])");
         var currentStep = 0;
 
-        foreach (var module in _WaresXml.Root.XPathSelectElements("ware[contains(@tags, 'module')]"))
+        foreach (var module in _WaresXml.Root!.XPathSelectElements("ware[contains(@tags, 'module')]"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress.Report((currentStep++, maxSteps));
@@ -96,9 +99,11 @@ CREATE TABLE IF NOT EXISTS ModuleProduct
             var moduleID = module.Attribute("id")?.Value;
             if (string.IsNullOrEmpty(moduleID)) continue;
 
-            var macroName = module.XPathSelectElement("component").Attribute("ref").Value;
-            var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
+            var macroName = module.XPathSelectElement("component")?.Attribute("ref")?.Value;
+            if (string.IsNullOrEmpty(macroName)) continue;
 
+            var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
+            if (macroXml?.Root is null) continue;
 
             //////////////////////////////////////////////////
             // *_macro.xml からモジュールの生産品情報を抽出 //
@@ -133,8 +138,8 @@ CREATE TABLE IF NOT EXISTS ModuleProduct
                 var className = macroXml.Root.XPathSelectElement("macro")?.Attribute("class")?.Value;
                 if (!string.IsNullOrEmpty(className))
                 {
-                    var dataSet = _DefaultsXml.Root.XPathSelectElement($"dataset[@class='{className}']");
-                    if (dataSet != null)
+                    var dataSet = _DefaultsXml.Root!.XPathSelectElement($"dataset[@class='{className}']");
+                    if (dataSet is not null)
                     {
                         var product = dataSet.XPathSelectElement("properties/product");
                         var wareID = product?.Attribute("ware")?.Value;

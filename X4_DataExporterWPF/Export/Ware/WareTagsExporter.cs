@@ -29,6 +29,7 @@ class WareTagsExporter : IExporter
     /// <param name="waresXml">ウェア情報xml</param>
     public WareTagsExporter(XDocument waresXml)
     {
+        ArgumentNullException.ThrowIfNull(waresXml.Root);
         _WaresXml = waresXml;
     }
 
@@ -65,11 +66,11 @@ CREATE TABLE IF NOT EXISTS WareTags
 
     private IEnumerable<WareTag> GetRecords(IProgress<(int currentStep, int maxSteps)> progress)
     {
-        var maxSteps = (int)(double)_WaresXml.Root.XPathEvaluate("count(ware)");
+        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware)");
         var currentStep = 0;
 
 
-        foreach (var ware in _WaresXml.Root.XPathSelectElements("ware"))
+        foreach (var ware in _WaresXml.Root!.XPathSelectElements("ware"))
         {
             progress.Report((currentStep++, maxSteps));
 
