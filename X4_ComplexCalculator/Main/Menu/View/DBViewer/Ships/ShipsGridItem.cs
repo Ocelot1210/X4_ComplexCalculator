@@ -16,7 +16,7 @@ class ShipsGridItem : BindableBase
     /// <summary>
     /// 装備したシールド一覧
     /// </summary>
-    private readonly IReadOnlyList<(IShield, int)> _EquippedShields;
+    private readonly IReadOnlyList<(IShield, int)> _equippedShields;
     #endregion
 
 
@@ -278,7 +278,7 @@ class ShipsGridItem : BindableBase
 
         // シールドを設定
         {
-            _EquippedShields = ship.Equipments
+            _equippedShields = ship.Equipments
                 .Where(x => x.Value.EquipmentType.EquipmentTypeID == "shields")
                 .Select(x => ship.GetEquippableEquipment<IShield>(x.Key)
                     .OrderByDescending(y => y.Capacity)
@@ -291,8 +291,8 @@ class ShipsGridItem : BindableBase
                 .OrderBy(x => x.Key.Name)
                 .ToArray();
 
-            MaxShieldCapacity = _EquippedShields.Sum(x => x.Item1.Capacity * x.Item2);
-            ShieldsCount = _EquippedShields.Sum(x => x.Item2);
+            MaxShieldCapacity = _equippedShields.Sum(x => x.Item1.Capacity * x.Item2);
+            ShieldsCount = _equippedShields.Sum(x => x.Item2);
         }
 
 
@@ -358,7 +358,7 @@ class ShipsGridItem : BindableBase
 
         // 保管庫種別
         {
-            const string sql = @"
+            const string SQL = @"
 SELECT
     TransportType.Name
 FROM
@@ -367,7 +367,7 @@ WHERE
     ShipTransportType.TransportTypeID = TransportType.TransportTypeID AND
     ShipID = :ShipID";
 
-            CargoTypes = X4Database.Instance.Query<string>(sql, new { ShipID = ship.ID }).ToArray();
+            CargoTypes = X4Database.Instance.Query<string>(SQL, new { ShipID = ship.ID }).ToArray();
         }
 
 

@@ -13,31 +13,31 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
 /// <summary>
 /// 製品一覧用DataGridViewのViewModel
 /// </summary>
-public class ProductsGridViewModel : BindableBase, IDisposable
+public sealed class ProductsGridViewModel : BindableBase, IDisposable
 {
     #region メンバ
     /// <summary>
     /// 製品一覧用DataGridViewのModel
     /// </summary>
-    readonly ProductsGridModel _Model;
+    readonly ProductsGridModel _model;
 
 
     /// <summary>
     /// 製品価格割合
     /// </summary>
-    private long _UnitPricePercent = 50;
+    private long _unitPricePercent = 50;
 
 
     /// <summary>
     /// 不足ウェアを購入しない
     /// </summary>
-    private bool _NoBuy;
+    private bool _noBuy;
 
 
     /// <summary>
     /// 余剰ウェアを売却しない
     /// </summary>
-    private bool _NoSell;
+    private bool _noSell;
     #endregion
 
 
@@ -59,14 +59,14 @@ public class ProductsGridViewModel : BindableBase, IDisposable
     /// </summary>
     public double UnitPricePercent
     {
-        get => _UnitPricePercent;
+        get => _unitPricePercent;
         set
         {
-            _UnitPricePercent = (long)value;
+            _unitPricePercent = (long)value;
 
-            foreach (var product in _Model.Products)
+            foreach (var product in _model.Products)
             {
-                product.SetUnitPricePercent(_UnitPricePercent);
+                product.SetUnitPricePercent(_unitPricePercent);
             }
 
             RaisePropertyChanged();
@@ -103,15 +103,15 @@ public class ProductsGridViewModel : BindableBase, IDisposable
     /// </summary>
     public bool NoBuy
     {
-        get => _NoBuy;
+        get => _noBuy;
         set
         {
-            foreach (var prod in _Model.Products)
+            foreach (var prod in _model.Products)
             {
                 prod.NoBuy = value;
             }
 
-            SetProperty(ref _NoBuy, value);
+            SetProperty(ref _noBuy, value);
         }
     }
 
@@ -121,15 +121,15 @@ public class ProductsGridViewModel : BindableBase, IDisposable
     /// </summary>
     public bool NoSell
     {
-        get => _NoSell;
+        get => _noSell;
         set
         {
-            foreach (var prod in _Model.Products)
+            foreach (var prod in _model.Products)
             {
                 prod.NoSell = value;
             }
 
-            SetProperty(ref _NoSell, value);
+            SetProperty(ref _noSell, value);
         }
     }
     #endregion
@@ -141,10 +141,10 @@ public class ProductsGridViewModel : BindableBase, IDisposable
     /// <param name="stationData">計算機で使用するステーション情報</param>
     public ProductsGridViewModel(IStationData stationData)
     {
-        _Model = new ProductsGridModel(stationData.ModulesInfo, stationData.ProductsInfo, stationData.Settings);
+        _model = new ProductsGridModel(stationData.ModulesInfo, stationData.ProductsInfo, stationData.Settings);
         ProductsInfo = stationData.ProductsInfo;
 
-        ProductsView = new CollectionViewSource { Source = _Model.Products }.View;
+        ProductsView = new CollectionViewSource { Source = _model.Products }.View;
 
         // ソート方向設定
         ProductsView.SortDescriptions.Clear();
@@ -152,7 +152,7 @@ public class ProductsGridViewModel : BindableBase, IDisposable
         ProductsView.SortDescriptions.Add(new SortDescription("Ware.Name", ListSortDirection.Ascending));
 
         SetSelectedExpandedCommand = new DelegateCommand<bool?>(SetSelectedExpanded);
-        AutoAddModuleCommand = new DelegateCommand(_Model.AutoAddModule);
+        AutoAddModuleCommand = new DelegateCommand(_model.AutoAddModule);
         SetNoBuyToSelectedItemCommand = new DelegateCommand<bool?>(SetNoBuyToSelectedItem);
         SetNoSellToSelectedItemCommand = new DelegateCommand<bool?>(SetNoSellToSelectedItem);
     }
@@ -161,7 +161,7 @@ public class ProductsGridViewModel : BindableBase, IDisposable
     /// <summary>
     /// リソースを開放
     /// </summary>
-    public void Dispose() => _Model.Dispose();
+    public void Dispose() => _model.Dispose();
 
 
     /// <summary>
@@ -170,7 +170,7 @@ public class ProductsGridViewModel : BindableBase, IDisposable
     /// <param name="param">展開するか</param>
     private void SetSelectedExpanded(bool? param)
     {
-        foreach (var item in _Model.Products.Where(x => x.IsSelected))
+        foreach (var item in _model.Products.Where(x => x.IsSelected))
         {
             item.IsExpanded = param == true;
         }
@@ -183,7 +183,7 @@ public class ProductsGridViewModel : BindableBase, IDisposable
     /// <param name="param">購入しないか</param>
     private void SetNoBuyToSelectedItem(bool? param)
     {
-        foreach (var item in _Model.Products.Where(x => x.IsSelected))
+        foreach (var item in _model.Products.Where(x => x.IsSelected))
         {
             item.NoBuy = param == true;
         }
@@ -196,7 +196,7 @@ public class ProductsGridViewModel : BindableBase, IDisposable
     /// <param name="param">販売しないか</param>
     private void SetNoSellToSelectedItem(bool? param)
     {
-        foreach (var item in _Model.Products.Where(x => x.IsSelected))
+        foreach (var item in _model.Products.Where(x => x.IsSelected))
         {
             item.NoSell = param == true;
         }

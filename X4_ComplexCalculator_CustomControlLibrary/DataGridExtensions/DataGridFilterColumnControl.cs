@@ -22,8 +22,8 @@ using X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions.Framework;
 /// <seealso cref="INotifyPropertyChanged" />
 public class DataGridFilterColumnControl : Control, INotifyPropertyChanged
 {
-    private static readonly BooleanToVisibilityConverter _booleanToVisibilityConverter = new();
-    private static readonly ControlTemplate _emptyControlTemplate = new();
+    private static readonly BooleanToVisibilityConverter _BooleanToVisibilityConverter = new();
+    private static readonly ControlTemplate _EmptyControlTemplate = new();
 
     static DataGridFilterColumnControl()
     {
@@ -65,12 +65,12 @@ public class DataGridFilterColumnControl : Control, INotifyPropertyChanged
         ((INotifyCollectionChanged)DataGrid.Items).CollectionChanged += DataGrid_CollectionChanged;
 
         // Must set a non-null empty template here, else we won't get the coerce value callback when the columns attached property is null!
-        Template = _emptyControlTemplate;
+        Template = _EmptyControlTemplate;
 
         // Bind our IsFilterVisible and Template properties to the corresponding properties attached to the
         // DataGridColumnHeader.Column property. Use binding instead of simple assignment since columnHeader.Column is still null at this point.
         var isFilterVisiblePropertyPath = new PropertyPath("(0)", DataGridFilterColumn.IsFilterVisibleProperty);
-        BindingOperations.SetBinding(this, VisibilityProperty, new Binding() { Path = isFilterVisiblePropertyPath, Source = column, Mode = BindingMode.OneWay, Converter = _booleanToVisibilityConverter });
+        BindingOperations.SetBinding(this, VisibilityProperty, new Binding() { Path = isFilterVisiblePropertyPath, Source = column, Mode = BindingMode.OneWay, Converter = _BooleanToVisibilityConverter });
 
         var templatePropertyPath = new PropertyPath("(0)", DataGridFilterColumn.TemplateProperty);
         BindingOperations.SetBinding(this, TemplateProperty, new Binding() { Path = templatePropertyPath, Source = column, Mode = BindingMode.OneWay });

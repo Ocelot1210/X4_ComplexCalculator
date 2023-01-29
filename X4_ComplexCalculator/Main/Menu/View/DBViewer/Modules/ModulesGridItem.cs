@@ -14,12 +14,12 @@ class ModulesGridItem : BindableBase
     /// <summary>
     /// 表示対象モジュール
     /// </summary>
-    private readonly IX4Module _Module;
+    private readonly IX4Module _module;
 
     /// <summary>
     /// 製品
     /// </summary>
-    private readonly IWare? _Product;
+    private readonly IWare? _product;
     #endregion
 
 
@@ -27,13 +27,13 @@ class ModulesGridItem : BindableBase
     /// <summary>
     /// モジュール名
     /// </summary>
-    public string ModuleName => _Module.Name;
+    public string ModuleName => _module.Name;
 
 
     /// <summary>
     /// モジュール種別
     /// </summary>
-    public string ModuleType => _Module.ModuleType.Name;
+    public string ModuleType => _module.ModuleType.Name;
 
 
     /// <summary>
@@ -45,19 +45,19 @@ class ModulesGridItem : BindableBase
     /// <summary>
     /// 従業員数
     /// </summary>
-    public long MaxWorkers => _Module.MaxWorkers;
+    public long MaxWorkers => _module.MaxWorkers;
 
 
     /// <summary>
     /// 収容人数
     /// </summary>
-    public long WorkersCapacity => _Module.WorkersCapacity;
+    public long WorkersCapacity => _module.WorkersCapacity;
 
 
     /// <summary>
     /// 製品
     /// </summary>
-    public string Product => _Product?.Name ?? "";
+    public string Product => _product?.Name ?? "";
 
 
     /// <summary>
@@ -74,19 +74,19 @@ class ModulesGridItem : BindableBase
     /// <param name="module">表示対象モジュール</param>
     public ModulesGridItem(IX4Module module)
     {
-        _Module = module;
+        _module = module;
         
         // 所有派閥を設定(ある種族固有の場合のみ表示)
-        var ownerRaces = _Module.Owners.Select(x => x.Race.Name).OrderBy(x => x).Distinct().ToArray();
+        var ownerRaces = _module.Owners.Select(x => x.Race.Name).OrderBy(x => x).Distinct().ToArray();
         Race = (ownerRaces.Length == 1) ? ownerRaces[0] : "";
 
 
         // 製品がある場合、製品の情報を設定
-        if (_Module.Products.Any())
+        if (_module.Products.Any())
         {
-            var firstWare = _Module.Products.First();
-            _Product = X4Database.Instance.Ware.Get(firstWare.WareID);
-            MaxEfficiency = (long)((_Product.WareEffects.TryGet(firstWare.Method, "work")?.Product ?? 0.0 + 1) * 100);
+            var firstWare = _module.Products[0];
+            _product = X4Database.Instance.Ware.Get(firstWare.WareID);
+            MaxEfficiency = (long)((_product.WareEffects.TryGet(firstWare.Method, "work")?.Product ?? 0.0 + 1) * 100);
         }
     }
 }

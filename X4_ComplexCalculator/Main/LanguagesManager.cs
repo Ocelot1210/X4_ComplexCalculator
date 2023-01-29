@@ -19,7 +19,7 @@ internal class LanguagesManager : IDisposable
     /// <summary>
     /// 購読解除用
     /// </summary>
-    private readonly IDisposable _Disposables;
+    private readonly IDisposable _disposables;
     #endregion
 
 
@@ -49,7 +49,7 @@ internal class LanguagesManager : IDisposable
             .ToArray();
 
         // 他の言語が選択された時、設定言語の変更を実行
-        _Disposables = Languages
+        _disposables = Languages
             .Select(x => x.IsChecked.Where(v => v).Select(_ => x.CultureInfo))
             .Merge()
             .Subscribe(ApplyLanguageChange);
@@ -73,5 +73,5 @@ internal class LanguagesManager : IDisposable
 
 
     /// <inheritdoc />
-    public void Dispose() => _Disposables.Dispose();
+    public void Dispose() => _disposables.Dispose();
 }

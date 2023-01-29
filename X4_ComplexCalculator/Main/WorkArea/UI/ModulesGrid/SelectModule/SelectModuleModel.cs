@@ -15,7 +15,7 @@ class SelectModuleModel : IDisposable
     /// <summary>
     /// モジュール追加先
     /// </summary>
-    private readonly ObservableRangeCollection<ModulesGridItem> ItemCollection;
+    private readonly ObservableRangeCollection<ModulesGridItem> _itemCollection;
     #endregion
 
 
@@ -45,7 +45,7 @@ class SelectModuleModel : IDisposable
     /// <param name="itemCollection">選択結果格納先</param>
     public SelectModuleModel(ObservableRangeCollection<ModulesGridItem> itemCollection)
     {
-        ItemCollection = itemCollection;
+        _itemCollection = itemCollection;
 
         ModuleOwners.CollectionPropertyChanged += UpdateModules;
         ModuleTypes.CollectionPropertyChanged += UpdateModules;
@@ -71,13 +71,13 @@ class SelectModuleModel : IDisposable
     /// </summary>
     private void InitModuleTypes()
     {
-        const string sql1 = @"SELECT ModuleTypeID, Name FROM ModuleType WHERE ModuleTypeID IN (SELECT ModuleTypeID FROM Module) ORDER BY Name";
+        const string SQL_1 = @"SELECT ModuleTypeID, Name FROM ModuleType WHERE ModuleTypeID IN (SELECT ModuleTypeID FROM Module) ORDER BY Name";
 
         var items = new List<ModulesListItem>();
-        foreach (var (moduleTypeID, name) in X4Database.Instance.Query<(string, string)>(sql1))
+        foreach (var (moduleTypeID, name) in X4Database.Instance.Query<(string, string)>(SQL_1))
         {
-            const string sql2 = @"SELECT count(*) AS Count FROM SelectModuleCheckStateModuleTypes WHERE ID = :ID";
-            var @checked = 0 < SettingDatabase.Instance.QuerySingle<long>(sql2, new { ID = moduleTypeID });
+            const string SQL_2 = @"SELECT count(*) AS Count FROM SelectModuleCheckStateModuleTypes WHERE ID = :ID";
+            var @checked = 0 < SettingDatabase.Instance.QuerySingle<long>(SQL_2, new { ID = moduleTypeID });
             items.Add(new ModulesListItem(moduleTypeID, name, @checked));
         }
 
@@ -91,19 +91,19 @@ class SelectModuleModel : IDisposable
     /// </summary>
     private void InitModuleOwners()
     {
-        const string sql1 = @"SELECT FactionID, Name FROM Faction WHERE FactionID IN (SELECT FactionID FROM WareOwner) ORDER BY Name";
+        const string SQL_1 = @"SELECT FactionID, Name FROM Faction WHERE FactionID IN (SELECT FactionID FROM WareOwner) ORDER BY Name";
 
         var items = new List<FactionsListItem>();
 
-        var factions = X4Database.Instance.Query<string>(sql1)
+        var factions = X4Database.Instance.Query<string>(SQL_1)
             .Select(x => X4Database.Instance.Faction.TryGet(x))
             .Where(x => x is not null)
             .Select(x => x!);
 
         foreach (var faction in factions)
         {
-            const string sql2 = @"SELECT count(*) AS Count FROM SelectModuleCheckStateModuleOwners WHERE ID = :ID";
-            var @checked = 0 < SettingDatabase.Instance.QuerySingle<long>(sql2, new { ID = faction.FactionID });
+            const string SQL_2 = @"SELECT count(*) AS Count FROM SelectModuleCheckStateModuleOwners WHERE ID = :ID";
+            var @checked = 0 < SettingDatabase.Instance.QuerySingle<long>(SQL_2, new { ID = faction.FactionID });
             items.Add(new FactionsListItem(faction, @checked));
         }
 
@@ -154,7 +154,7 @@ class SelectModuleModel : IDisposable
             .Where(x => x is not null)
             .Select(x => new ModulesGridItem(x!) { EditStatus = EditStatus.Edited });
 
-        ItemCollection.AddRange(items);
+        _itemCollection.AddRange(items);
     }
 
     /// <summary>

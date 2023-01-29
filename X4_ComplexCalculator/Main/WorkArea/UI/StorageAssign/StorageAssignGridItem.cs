@@ -9,30 +9,30 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign;
 /// <summary>
 /// 保管庫割当用Gridの1レコード分
 /// </summary>
-public class StorageAssignGridItem : BindableBase, IDisposable, IEditable
+public sealed class StorageAssignGridItem : BindableBase, IDisposable, IEditable
 {
     #region メンバ
     /// <summary>
     /// 指定時間
     /// </summary>
-    private long _Hour;
+    private long _hour;
 
     /// <summary>
     /// 割当容量
     /// </summary>
-    private long _AllocCount;
+    private long _allocCount;
 
 
     /// <summary>
     /// 1時間あたりの生産量
     /// </summary>
-    private long _ProductPerHour;
+    private long _productPerHour;
 
 
     /// <summary>
     /// 編集状態
     /// </summary>
-    private EditStatus _EditStatus = EditStatus.Unedited;
+    private EditStatus _editStatus = EditStatus.Unedited;
     #endregion
 
 
@@ -84,12 +84,12 @@ public class StorageAssignGridItem : BindableBase, IDisposable, IEditable
     /// </summary>
     public long AllocCount
     {
-        get => _AllocCount;
+        get => _allocCount;
         set
         {
-            var prevCount = _AllocCount;
+            var prevCount = _allocCount;
 
-            if (SetProperty(ref _AllocCount, value))
+            if (SetProperty(ref _allocCount, value))
             {
                 RaisePropertyChanged(nameof(AllocCapacity));
                 RaisePropertyChanged(nameof(StorageStatus));
@@ -130,10 +130,10 @@ public class StorageAssignGridItem : BindableBase, IDisposable, IEditable
     /// </summary>
     public long ProductPerHour
     {
-        get => _ProductPerHour;
+        get => _productPerHour;
         set
         {
-            if (SetProperty(ref _ProductPerHour, value))
+            if (SetProperty(ref _productPerHour, value))
             {
                 RaisePropertyChanged(nameof(AfterCount));
                 RaisePropertyChanged(nameof(StorageStatus));
@@ -147,10 +147,10 @@ public class StorageAssignGridItem : BindableBase, IDisposable, IEditable
     /// </summary>
     public long Hour
     {
-        get => _Hour;
+        get => _hour;
         set
         {
-            if (SetProperty(ref _Hour, value))
+            if (SetProperty(ref _hour, value))
             {
                 RaisePropertyChanged(nameof(AfterCount));
                 RaisePropertyChanged(nameof(StorageStatus));
@@ -170,8 +170,8 @@ public class StorageAssignGridItem : BindableBase, IDisposable, IEditable
     /// </summary>
     public EditStatus EditStatus
     {
-        get => _EditStatus;
-        set => SetProperty(ref _EditStatus, value);
+        get => _editStatus;
+        set => SetProperty(ref _editStatus, value);
     }
     #endregion
 

@@ -24,13 +24,13 @@ class ProductCalculator
     /// <summary>
     /// ウェアとウェアを生産するモジュールを対応付けたディクショナリ
     /// </summary>
-    private readonly IReadOnlyDictionary<IWare, IX4Module> _Ware2ModuleDict;
+    private readonly IReadOnlyDictionary<IWare, IX4Module> _ware2ModuleDict;
 
 
     /// <summary>
     /// モジュールをキーにした総生産時間のディクショナリ
     /// </summary>
-    private readonly IReadOnlyDictionary<IX4Module, double> _Module2TotalProductionTimeDict;
+    private readonly IReadOnlyDictionary<IX4Module, double> _module2TotalProductionTimeDict;
     #endregion
 
 
@@ -40,12 +40,12 @@ class ProductCalculator
     private ProductCalculator()
     {
         // ウェアとウェアを生産するモジュールを対応付けたディクショナリを初期化
-        _Ware2ModuleDict = X4Database.Instance.Ware.GetAll<IX4Module>()
+        _ware2ModuleDict = X4Database.Instance.Ware.GetAll<IX4Module>()
             .Where(x => x.Products.Any())
-            .GroupBy(x => X4Database.Instance.Ware.Get((x.Products.FirstOrDefault(y => y.Method == "default") ?? x.Products.First()).WareID))
+            .GroupBy(x => X4Database.Instance.Ware.Get((x.Products.FirstOrDefault(y => y.Method == "default") ?? x.Products[0]).WareID))
             .ToDictionary(x => x.Key, x => x.First());
 
-        _Module2TotalProductionTimeDict = X4Database.Instance.Ware.GetAll<IX4Module>()
+        _module2TotalProductionTimeDict = X4Database.Instance.Ware.GetAll<IX4Module>()
             .Where(x => x.Products.Any())
             .ToDictionary(x => x, x => GetTotalWareProductionTime(x));
     }
@@ -70,9 +70,9 @@ class ProductCalculator
             var method = prodWare.Resources.ContainsKey(product.Method) ? product.Method : "default";
 
             // ウェア生産情報を取得
-            var wareProduction = prodWare.TryGetProduction(product.Method) ?? throw new ArgumentException();
+            var wareProduction = prodWare.TryGetProduction(product.Method);
 
-            ret += wareProduction.Time;
+            ret += wareProduction?.Time ?? 0;
         }
 
         return ret;
@@ -126,7 +126,7 @@ class ProductCalculator
         }
 
         // モジュールの総生産時間を取得
-        var totalProductionTime = _Module2TotalProductionTimeDict[module];
+        var totalProductionTime = _module2TotalProductionTimeDict[module];
 
         // モジュールの生産品を取得
         foreach (var product in module.Products)
@@ -138,7 +138,11 @@ class ProductCalculator
             var method = prodWare.Resources.ContainsKey(product.Method) ? product.Method : "default";
 
             // ウェア生産情報を取得
-            var wareProduction = prodWare.TryGetProduction(product.Method) ?? throw new ArgumentException();
+            var wareProduction = prodWare.TryGetProduction(method);
+            if (wareProduction is null)
+            {
+                continue;
+            }
 
             // スクラップ再利用機などはウェアを交互に生産する(複数のウェアを同時に生産はしない)
             // → すべてのウェアの生産時間から対象のウェアの生産時間の割合を算出する必要がある
@@ -175,29 +179,27 @@ class ProductCalculator
     /// <param name="module">計算対象モジュール</param>
     /// <param name="moduleCount">モジュール数</param>
     /// <returns>必要ウェアの列挙</returns>
-    private IEnumerable<CalcResult> CalcHabitationModuleResources(IX4Module module, long moduleCount)
+    private static IEnumerable<CalcResult> CalcHabitationModuleResources(IX4Module module, long moduleCount)
     {
         // 居住モジュールか？
-        if (0 < module.WorkersCapacity)
+        if (0 < module.WorkersCapacity && 0 < module.Owners.Count)
         {
             // 居住モジュールの種族を取得
-            var ownerRace = module.Owners.FirstOrDefault()?.Race;
-            if (ownerRace is not null)
+            var ownerRace = module.Owners[0].Race;
+
+            var workUnit = X4Database.Instance.Ware.Get("workunit_busy");
+
+            var method = workUnit.Resources.ContainsKey(ownerRace.RaceID) ? ownerRace.RaceID : "default";
+
+            var prod = workUnit.TryGetProduction(method) ?? throw new InvalidOperationException();
+
+            if (workUnit.Resources.TryGetValue(method, out var resources))
             {
-                var workUnit = X4Database.Instance.Ware.Get("workunit_busy");
-
-                var method = workUnit.Resources.ContainsKey(ownerRace.RaceID) ? ownerRace.RaceID : "default";
-
-                var prod = workUnit.TryGetProduction(method) ?? throw new InvalidOperationException();
-
-                if (workUnit.Resources.TryGetValue(method, out var resources))
+                foreach (var resource in resources)
                 {
-                    foreach (var resource in resources)
-                    {
-                        // ウェア消費量
-                        var amount = (long)Math.Floor((-3600.0 / prod.Time) * ((double)resource.Amount / prod.Amount) * module.WorkersCapacity);
-                        yield return new CalcResult(resource.NeedWareID, amount, method, module, moduleCount);
-                    }
+                    // ウェア消費量
+                    var amount = (long)Math.Floor((-3600.0 / prod.Time) * ((double)resource.Amount / prod.Amount) * module.WorkersCapacity);
+                    yield return new CalcResult(resource.NeedWareID, amount, method, module, moduleCount);
                 }
             }
         }
@@ -232,7 +234,7 @@ class ProductCalculator
 
 
             // 不足しているウェアを製造するモジュールを取得
-            if (_Ware2ModuleDict.TryGetValue(prod.Ware, out var module))
+            if (_ware2ModuleDict.TryGetValue(prod.Ware, out var module))
             {
                 var modCount = 0L;
 

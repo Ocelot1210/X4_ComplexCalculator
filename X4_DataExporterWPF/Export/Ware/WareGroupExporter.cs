@@ -22,13 +22,13 @@ public class WareGroupExporter : IExporter
     /// <summary>
     /// catファイルオブジェクト
     /// </summary>
-    private readonly ICatFile _CatFile;
+    private readonly ICatFile _catFile;
 
 
     /// <summary>
     /// 言語解決用オブジェクト
     /// </summary>
-    private readonly ILanguageResolver _Resolver;
+    private readonly ILanguageResolver _resolver;
 
 
     /// <summary>
@@ -38,8 +38,8 @@ public class WareGroupExporter : IExporter
     /// <param name="resolver">言語解決用オブジェクト</param>
     public WareGroupExporter(ICatFile catFile, ILanguageResolver resolver)
     {
-        _CatFile = catFile;
-        _Resolver = resolver;
+        _catFile = catFile;
+        _resolver = resolver;
     }
 
 
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS WareGroup
     /// <returns>読み出した WareGroup データ</returns>
     internal async IAsyncEnumerable<WareGroup> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)>? progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var wareGroupXml = await _CatFile.OpenXmlAsync("libraries/waregroups.xml", cancellationToken);
+        var wareGroupXml = await _catFile.OpenXmlAsync("libraries/waregroups.xml", cancellationToken);
         if (wareGroupXml?.Root is null) yield break;
 
         var maxSteps = (int)(double)wareGroupXml.Root.XPathEvaluate("count(group)");
@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS WareGroup
             var wareGroupID = wareGroup.Attribute("id")?.Value;
             if (string.IsNullOrEmpty(wareGroupID)) continue;
 
-            var name = _Resolver.Resolve(wareGroup.Attribute("name")?.Value ?? "");
+            var name = _resolver.Resolve(wareGroup.Attribute("name")?.Value ?? "");
 
             var tier = wareGroup.Attribute("tier")?.GetInt() ?? 0;
 

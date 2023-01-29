@@ -22,32 +22,27 @@ class DataExportViewModel : BindableBase
 {
     #region メンバ
     /// <summary>
-    /// モデル
-    /// </summary>
-    private readonly DataExportModel _Model = new();
-
-    /// <summary>
     /// 出力先ファイルパス
     /// </summary>
-    private readonly string _OutFilePath;
+    private readonly string _outFilePath;
 
 
     /// <summary>
     /// 現在の入力元フォルダパスから言語一覧を取得できなかった場合 true
     /// </summary>
-    private readonly ReactivePropertySlim<bool> _UnableToGetLanguages;
+    private readonly ReactivePropertySlim<bool> _unableToGetLanguages;
 
 
     /// <summary>
     /// 処理状態管理
     /// </summary>
-    private readonly BusyNotifier _BusyNotifier = new();
+    private readonly BusyNotifier _busyNotifier = new();
 
 
     /// <summary>
     /// 親ウィンドウ(メッセージボックス表示用)
     /// </summary>
-    private readonly Window _OwnerWindow;
+    private readonly Window _ownerWindow;
     #endregion
 
 
@@ -130,21 +125,21 @@ class DataExportViewModel : BindableBase
     /// </summary>
     public DataExportViewModel(string inDirPath, string outFilePath, Window window)
     {
-        _OwnerWindow = window;
+        _ownerWindow = window;
 
         CatLoadOption = new ReactivePropertySlim<CatLoadOption>(LibX4.FileSystem.CatLoadOption.All);
 
         InDirPath = new ReactiveProperty<string>(inDirPath,
             mode: ReactivePropertyMode.RaiseLatestValueOnSubscribe);
-        _UnableToGetLanguages = new ReactivePropertySlim<bool>(false);
+        _unableToGetLanguages = new ReactivePropertySlim<bool>(false);
         InDirPath.SetValidateNotifyError(
-            _ => _UnableToGetLanguages.Select(isError => isError ? "Error" : null));
-        _OutFilePath = outFilePath;
+            _ => _unableToGetLanguages.Select(isError => isError ? "Error" : null));
+        _outFilePath = outFilePath;
 
         Languages = new ReactiveCollection<LangComboboxItem>();
         SelectedLanguage = new ReactivePropertySlim<LangComboboxItem?>();
 
-        CanOperation = _BusyNotifier.Inverse().ToReadOnlyReactiveProperty();
+        CanOperation = _busyNotifier.Inverse().ToReadOnlyReactiveProperty();
 
         // 操作可能かつ入力項目に不備がない場合に true にする
         var canExport = new[]{
@@ -179,16 +174,16 @@ class DataExportViewModel : BindableBase
     /// <returns>言語一覧が更新された場合、<c>true;</c>。それ以外の場合 <c>false;</c></returns>
     private async Task UpdateLangList(string x4InstallDirectory)
     {
-        if (_BusyNotifier.IsBusy) return;
-        using var _ = _BusyNotifier.ProcessStart();
+        if (_busyNotifier.IsBusy) return;
+        using var _ = _busyNotifier.ProcessStart();
 
         var prevLangID = SelectedLanguage.Value?.ID ?? -1;
 
-        _UnableToGetLanguages.Value = false;
+        _unableToGetLanguages.Value = false;
         Languages.ClearOnScheduler();
 
-        var (success, languages) = await Task.Run(async () => await _Model.GetLanguages(x4InstallDirectory, _OwnerWindow));
-        _UnableToGetLanguages.Value = !success;
+        var (success, languages) = await Task.Run(async () => await DataExportModel.GetLanguages(x4InstallDirectory, _ownerWindow));
+        _unableToGetLanguages.Value = !success;
         Languages.AddRangeOnScheduler(languages);
 
         ReactivePropertyScheduler.Default.Schedule(() =>
@@ -205,9 +200,11 @@ class DataExportViewModel : BindableBase
     /// </summary>
     private void SelectInDir()
     {
-        var dlg = new CommonOpenFileDialog();
-        dlg.IsFolderPicker = true;
-        dlg.AllowNonFileSystemItems = false;
+        var dlg = new CommonOpenFileDialog
+        {
+            IsFolderPicker = true,
+            AllowNonFileSystemItems = false
+        };
 
         if (Directory.Exists(InDirPath.Value))
         {
@@ -230,7 +227,7 @@ class DataExportViewModel : BindableBase
     /// </summary>
     private async Task Export()
     {
-        using var _ = _BusyNotifier.ProcessStart();
+        using var _ = _busyNotifier.ProcessStart();
 
         // 言語が未選択なら何もしない
         if (SelectedLanguage.Value == null)
@@ -250,13 +247,13 @@ class DataExportViewModel : BindableBase
             MaxStepsSub.Value = s.maxSteps;
         });
 
-        await Task.Run(() => _Model.Export(
+        await Task.Run(() => DataExportModel.Export(
             progress,
             progressSub,
             InDirPath.Value,
-            _OutFilePath,
+            _outFilePath,
             SelectedLanguage.Value,
-            _OwnerWindow
+            _ownerWindow
         ));
         CurrentStep.Value = 0;
     }
@@ -266,5 +263,5 @@ class DataExportViewModel : BindableBase
     /// ウィンドウを閉じる
     /// </summary>
     /// <param name="e"></param>
-    private void Closing(CancelEventArgs e) => e.Cancel = _BusyNotifier.IsBusy;
+    private void Closing(CancelEventArgs e) => e.Cancel = _busyNotifier.IsBusy;
 }

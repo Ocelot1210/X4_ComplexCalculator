@@ -19,25 +19,25 @@ class SelectModuleViewModel : BindableBase
     /// <summary>
     /// モデル
     /// </summary>
-    readonly SelectModuleModel _Model;
+    readonly SelectModuleModel _model;
 
 
     /// <summary>
     /// 検索モジュール名
     /// </summary>
-    private string _SearchModuleName = "";
+    private string _searchModuleName = "";
 
 
     /// <summary>
     /// 置換モードか
     /// </summary>
-    private readonly bool _IsReplaceMode;
+    private readonly bool _isReplaceMode;
 
 
     /// <summary>
     /// ウィンドウの表示状態
     /// </summary>
-    private bool _CloseWindow = false;
+    private bool _closeWindow = false;
     #endregion
 
 
@@ -47,10 +47,10 @@ class SelectModuleViewModel : BindableBase
     /// </summary>
     public bool CloseWindowProperty
     {
-        get => _CloseWindow;
+        get => _closeWindow;
         set
         {
-            _CloseWindow = value;
+            _closeWindow = value;
             RaisePropertyChanged();
         }
     }
@@ -77,13 +77,13 @@ class SelectModuleViewModel : BindableBase
     /// <summary>
     /// 変更前モジュールを表示するか
     /// </summary>
-    public Visibility PrevModuleVisiblity => _IsReplaceMode ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility PrevModuleVisiblity => _isReplaceMode ? Visibility.Visible : Visibility.Collapsed;
 
 
     /// <summary>
     /// モジュール種別
     /// </summary>
-    public ObservableCollection<ModulesListItem> ModuleTypes => _Model.ModuleTypes;
+    public ObservableCollection<ModulesListItem> ModuleTypes => _model.ModuleTypes;
 
 
     /// <summary>
@@ -95,7 +95,7 @@ class SelectModuleViewModel : BindableBase
     /// <summary>
     /// モジュール一覧
     /// </summary>
-    public ObservableCollection<ModulesListItem> Modules => _Model.Modules;
+    public ObservableCollection<ModulesListItem> Modules => _model.Modules;
 
 
     /// <summary>
@@ -103,12 +103,12 @@ class SelectModuleViewModel : BindableBase
     /// </summary>
     public string SearchModuleName
     {
-        private get => _SearchModuleName;
+        private get => _searchModuleName;
         set
         {
-            if (_SearchModuleName != value)
+            if (_searchModuleName != value)
             {
-                _SearchModuleName = value;
+                _searchModuleName = value;
                 RaisePropertyChanged();
                 ModulesView.Refresh();
             }
@@ -131,7 +131,7 @@ class SelectModuleViewModel : BindableBase
     /// <summary>
     /// モジュール一覧ListBoxの選択モード
     /// </summary>
-    public SelectionMode ModuleListSelectionMode => _IsReplaceMode ? SelectionMode.Single : SelectionMode.Extended;
+    public SelectionMode ModuleListSelectionMode => _isReplaceMode ? SelectionMode.Single : SelectionMode.Extended;
     #endregion
 
 
@@ -142,17 +142,17 @@ class SelectModuleViewModel : BindableBase
     /// <param name="prevModuleName"></param>
     public SelectModuleViewModel(ObservableRangeCollection<ModulesGridItem> modules, string prevModuleName = "")
     {
-        _Model = new SelectModuleModel(modules);
+        _model = new SelectModuleModel(modules);
 
         PrevModuleName = prevModuleName;
-        _IsReplaceMode = prevModuleName != "";
+        _isReplaceMode = prevModuleName != "";
 
         ModulesView = (ListCollectionView)CollectionViewSource.GetDefaultView(Modules);
         ModulesView.Filter = Filter;
         ModulesView.SortDescriptions.Clear();
         ModulesView.SortDescriptions.Add(new SortDescription(nameof(ModulesListItem.Name), ListSortDirection.Ascending));
 
-        ModuleOwnersView = CollectionViewSource.GetDefaultView(_Model.ModuleOwners);
+        ModuleOwnersView = CollectionViewSource.GetDefaultView(_model.ModuleOwners);
         ModuleOwnersView.SortDescriptions.Clear();
         ModuleOwnersView.SortDescriptions.Add(new SortDescription(nameof(FactionsListItem.RaceName), ListSortDirection.Ascending));
         ModuleOwnersView.SortDescriptions.Add(new SortDescription(nameof(FactionsListItem.FactionName), ListSortDirection.Ascending));
@@ -183,8 +183,8 @@ class SelectModuleViewModel : BindableBase
     /// </summary>
     public void WindowClosing(CancelEventArgs _)
     {
-        Task.Run(_Model.SaveCheckState);
-        _Model.Dispose();
+        Task.Run(_model.SaveCheckState);
+        _model.Dispose();
 
         if (Application.Current.MainWindow is not null)
         {
@@ -198,10 +198,10 @@ class SelectModuleViewModel : BindableBase
     /// </summary>
     private void OKButtonClicked()
     {
-        _Model.AddSelectedModuleToItemCollection();
+        _model.AddSelectedModuleToItemCollection();
 
         // 置換モードならウィンドウを閉じる
-        if (_IsReplaceMode)
+        if (_isReplaceMode)
         {
             CloseWindowProperty = true;
         }

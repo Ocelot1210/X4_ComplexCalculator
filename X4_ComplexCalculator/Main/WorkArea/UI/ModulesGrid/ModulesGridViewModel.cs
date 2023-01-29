@@ -7,19 +7,19 @@ using X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
-public class ModulesGridViewModel : BindableBase, IDisposable
+public sealed class ModulesGridViewModel : BindableBase, IDisposable
 {
     #region メンバ
     /// <summary>
     /// Model
     /// </summary>
-    private readonly ModulesGridModel _Model;
+    private readonly ModulesGridModel _model;
 
 
     /// <summary>
     /// 検索モジュール名
     /// </summary>
-    private string _SearchModuleName = "";
+    private string _searchModuleName = "";
     #endregion
 
 
@@ -35,10 +35,10 @@ public class ModulesGridViewModel : BindableBase, IDisposable
     /// </summary>
     public string SearchModuleName
     {
-        get => _SearchModuleName;
+        get => _searchModuleName;
         set
         {
-            if (SetProperty(ref _SearchModuleName, value))
+            if (SetProperty(ref _searchModuleName, value))
             {
                 ModulesView.Refresh();
             }
@@ -88,13 +88,13 @@ public class ModulesGridViewModel : BindableBase, IDisposable
     /// <param name="stationData">計算機で使用するステーション情報</param>
     public ModulesGridViewModel(IStationData stationData)
     {
-        _Model = new ModulesGridModel(stationData.ModulesInfo);
-        ModulesView = (ListCollectionView)CollectionViewSource.GetDefaultView(_Model.Modules);
+        _model = new ModulesGridModel(stationData.ModulesInfo);
+        ModulesView = (ListCollectionView)CollectionViewSource.GetDefaultView(_model.Modules);
         ModulesView.Filter   = Filter;
         ContextMenu = new ContextMenuOperation(stationData.ModulesInfo, ModulesView);
 
-        AddModuleCommand     = new DelegateCommand(_Model.ShowAddModuleWindow);
-        MergeModuleCommand   = new DelegateCommand(_Model.MergeModule);
+        AddModuleCommand     = new DelegateCommand(_model.ShowAddModuleWindow);
+        MergeModuleCommand   = new DelegateCommand(_model.MergeModule);
         ReplaceModuleCommand = new DelegateCommand<ModulesGridItem>(ReplaceModule);
     }
 
@@ -103,7 +103,7 @@ public class ModulesGridViewModel : BindableBase, IDisposable
     public void Dispose()
     {
         ContextMenu.Dispose();
-        _Model.Dispose();
+        _model.Dispose();
     }
 
 
@@ -112,7 +112,7 @@ public class ModulesGridViewModel : BindableBase, IDisposable
     /// </summary>
     private void ReplaceModule(ModulesGridItem oldItem)
     {
-        if (_Model.ReplaceModule(oldItem))
+        if (_model.ReplaceModule(oldItem))
         {
             ModulesView.Refresh();
         }

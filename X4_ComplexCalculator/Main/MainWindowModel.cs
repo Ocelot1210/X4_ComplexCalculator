@@ -17,13 +17,13 @@ class MainWindowModel
     /// <summary>
     /// 作業エリア管理用
     /// </summary>
-    private readonly WorkAreaManager _WorkAreaManager;
+    private readonly WorkAreaManager _workAreaManager;
 
 
     /// <summary>
     /// 作業エリアファイル入出力用
     /// </summary>
-    private readonly WorkAreaFileIO _WorkAreFileIO;
+    private readonly WorkAreaFileIO _workAreFileIO;
     #endregion
 
 
@@ -32,8 +32,8 @@ class MainWindowModel
     /// </summary>
     public MainWindowModel(WorkAreaManager workAreaManager, WorkAreaFileIO workAreaFileIO)
     {
-        _WorkAreaManager = workAreaManager;
-        _WorkAreFileIO = workAreaFileIO;
+        _workAreaManager = workAreaManager;
+        _workAreFileIO = workAreaFileIO;
     }
 
 
@@ -48,8 +48,8 @@ class MainWindowModel
 
         var vmList = new List<WorkAreaViewModel>();
 
-        const string sql = "SELECT Path FROM OpenedFiles";
-        var pathes = SettingDatabase.Instance.Query<string>(sql)
+        const string SQL = "SELECT Path FROM OpenedFiles";
+        var pathes = SettingDatabase.Instance.Query<string>(SQL)
             .Where(x => File.Exists(x))
             .ToArray();
 
@@ -57,12 +57,12 @@ class MainWindowModel
         // 開いているファイルテーブルを初期化
         SettingDatabase.Instance.Execute("DELETE FROM OpenedFiles");
 
-        _WorkAreFileIO.OpenFiles(pathes);
+        _workAreFileIO.OpenFiles(pathes);
 
         // 何も開かなければ空の計画を追加する
         if (!pathes.Any())
         {
-            _WorkAreFileIO.CreateNew();
+            _workAreFileIO.CreateNew();
         }
     }
 
@@ -70,7 +70,7 @@ class MainWindowModel
     /// <summary>
     /// DB更新
     /// </summary>
-    public void UpdateDB()
+    public static void UpdateDB()
     {
         var result = LocalizedMessageBox.Show("Lang:MainWindow_Menu_File_UpdateDB_DBUpdate_ConfirmationMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
@@ -105,7 +105,7 @@ class MainWindowModel
         var canceled = false;
 
         // 未保存の内容が存在するか？
-        if (_WorkAreaManager.Documents.Any(x => x.HasChanged))
+        if (_workAreaManager.Documents.Any(x => x.HasChanged))
         {
             var result = LocalizedMessageBox.Show("Lang:MainWindow_ClosingConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 
@@ -113,7 +113,7 @@ class MainWindowModel
             {
                 // 保存する場合
                 case MessageBoxResult.Yes:
-                    foreach (var doc in _WorkAreaManager.Documents)
+                    foreach (var doc in _workAreaManager.Documents)
                     {
                         doc.Save();
                     }
@@ -133,7 +133,7 @@ class MainWindowModel
         // 閉じる場合、開いていたファイル一覧を保存する
         if (!canceled)
         {
-            var pathes = _WorkAreaManager.Documents
+            var pathes = _workAreaManager.Documents
                 .Where(x => File.Exists(x.SaveFilePath))
                 .Select(x => new { Path = x.SaveFilePath });
 

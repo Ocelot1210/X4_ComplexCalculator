@@ -14,31 +14,31 @@ public class EquipmentsInfo : BindableBase
     /// <summary>
     /// 装備管理オブジェクト
     /// </summary>
-    private readonly EquippableWareEquipmentManager _Manager;
+    private readonly EquippableWareEquipmentManager _manager;
 
 
     /// <summary>
     /// 表示対象の装備ID
     /// </summary>
-    private readonly string _EquipmentTypeID;
+    private readonly string _equipmentTypeID;
 
 
     /// <summary>
     /// 更新が必要か
     /// </summary>
-    private bool _UpdateNeeded;
+    private bool _updateNeeded;
 
 
     /// <summary>
     /// 詳細表示文字列
     /// </summary>
-    private string _DetailsText = "";
+    private string _detailsText = "";
 
 
     /// <summary>
     /// 表示対象の装備の個数
     /// </summary>
-    private int _Count;
+    private int _count;
     #endregion
 
 
@@ -50,15 +50,15 @@ public class EquipmentsInfo : BindableBase
     {
         get
         {
-            if (_UpdateNeeded)
+            if (_updateNeeded)
             {
                 Update();
             }
-            return _DetailsText;
+            return _detailsText;
         }
         set
         {
-            SetProperty(ref _DetailsText, value);
+            SetProperty(ref _detailsText, value);
         }
     }
 
@@ -70,15 +70,15 @@ public class EquipmentsInfo : BindableBase
     {
         get
         {
-            if (_UpdateNeeded)
+            if (_updateNeeded)
             {
                 Update();
             }
-            return _Count;
+            return _count;
         }
         set
         {
-            SetProperty(ref _Count, value);
+            SetProperty(ref _count, value);
         }
     }
     #endregion
@@ -92,9 +92,9 @@ public class EquipmentsInfo : BindableBase
     /// <param name="equipmentTypeID">表示対象の装備ID</param>
     public EquipmentsInfo(EquippableWareEquipmentManager manager, string equipmentTypeID)
     {
-        _Manager = manager;
-        _EquipmentTypeID = equipmentTypeID;
-        _UpdateNeeded = true;
+        _manager = manager;
+        _equipmentTypeID = equipmentTypeID;
+        _updateNeeded = true;
     }
 
 
@@ -102,7 +102,7 @@ public class EquipmentsInfo : BindableBase
     /// <summary>
     /// ツールチップ文字列の更新を要求する
     /// </summary>
-    public void RequireUpdate() => _UpdateNeeded = true;
+    public void RequireUpdate() => _updateNeeded = true;
 
 
 
@@ -112,14 +112,14 @@ public class EquipmentsInfo : BindableBase
     /// <returns></returns>
     public void Update()
     {
-        var equipments = _Manager.AllEquipments
-            .Where(x => x.EquipmentType.EquipmentTypeID == _EquipmentTypeID);
+        var equipments = _manager.AllEquipments
+            .Where(x => x.EquipmentType.EquipmentTypeID == _equipmentTypeID);
 
         if (!equipments.Any())
         {
-            _Count = 0;
+            _count = 0;
             DetailsText = (string)WPFLocalizeExtension.Engine.LocalizeDictionary.Instance.GetLocalizedObject("Lang:Common_NotEquippedToolTipText", null, null);
-            _UpdateNeeded = false;
+            _updateNeeded = false;
             return;
         }
 
@@ -154,6 +154,6 @@ public class EquipmentsInfo : BindableBase
 
         DetailsText = sb.ToString();
         Count = total;
-        _UpdateNeeded = false;
+        _updateNeeded = false;
     }
 }

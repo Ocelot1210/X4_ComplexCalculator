@@ -17,7 +17,7 @@ class ShipsViewModel : BindableBase
     /// <summary>
     /// ウェア一覧
     /// </summary>
-    private readonly ObservableRangeCollection<ShipsGridItem> _Ships = new();
+    private readonly ObservableRangeCollection<ShipsGridItem> _ships = new();
     #endregion
 
 
@@ -39,9 +39,9 @@ class ShipsViewModel : BindableBase
             .Where(x => x is not null)
             .Select(x => x!);
 
-        _Ships = new(items);
+        _ships = new(items);
 
-        ShipsView = (ListCollectionView)CollectionViewSource.GetDefaultView(_Ships);
+        ShipsView = (ListCollectionView)CollectionViewSource.GetDefaultView(_ships);
         ShipsView.SortDescriptions.Clear();
         ShipsView.SortDescriptions.Add(new SortDescription(nameof(ShipsGridItem.ShipName), ListSortDirection.Ascending));
     }

@@ -16,7 +16,7 @@ public class StoragesGridItem : BindableBase, ISelectable
     /// <summary>
     /// Expanderが展開されているか
     /// </summary>
-    private bool _IsExpanded;
+    private bool _isExpanded;
     #endregion
 
 
@@ -50,8 +50,8 @@ public class StoragesGridItem : BindableBase, ISelectable
     /// </summary>
     public bool IsExpanded
     {
-        get => _IsExpanded;
-        set => SetProperty(ref _IsExpanded, value);
+        get => _isExpanded;
+        set => SetProperty(ref _isExpanded, value);
     }
     #endregion
 

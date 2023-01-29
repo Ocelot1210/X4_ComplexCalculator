@@ -22,17 +22,17 @@ public class ModuleProductExporter : IExporter
     /// <summary>
     /// catファイルオブジェクト
     /// </summary>
-    private readonly IIndexResolver _CatFile;
+    private readonly IIndexResolver _catFile;
 
     /// <summary>
     /// ウェア情報xml
     /// </summary>
-    private readonly XDocument _WaresXml;
+    private readonly XDocument _waresXml;
 
     /// <summary>
     /// デフォルト値が格納されているxml
     /// </summary>
-    private readonly XDocument _DefaultsXml;
+    private readonly XDocument _defaultsXml;
 
     /// <summary>
     /// コンストラクタ
@@ -44,9 +44,9 @@ public class ModuleProductExporter : IExporter
         ArgumentNullException.ThrowIfNull(waresXml.Root);
         ArgumentNullException.ThrowIfNull(defaultsXml.Root);
 
-        _CatFile = catFile;
-        _WaresXml = waresXml;
-        _DefaultsXml = defaultsXml;
+        _catFile = catFile;
+        _waresXml = waresXml;
+        _defaultsXml = defaultsXml;
     }
 
 
@@ -88,10 +88,10 @@ CREATE TABLE IF NOT EXISTS ModuleProduct
     /// <returns>読み出した ModuleProduct データ</returns>
     private async IAsyncEnumerable<ModuleProduct> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'module')])");
+        var maxSteps = (int)(double)_waresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'module')])");
         var currentStep = 0;
 
-        foreach (var module in _WaresXml.Root!.XPathSelectElements("ware[contains(@tags, 'module')]"))
+        foreach (var module in _waresXml.Root!.XPathSelectElements("ware[contains(@tags, 'module')]"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress.Report((currentStep++, maxSteps));
@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS ModuleProduct
             var macroName = module.XPathSelectElement("component")?.Attribute("ref")?.Value;
             if (string.IsNullOrEmpty(macroName)) continue;
 
-            var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
+            var macroXml = await _catFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
             if (macroXml?.Root is null) continue;
 
             //////////////////////////////////////////////////
@@ -138,7 +138,7 @@ CREATE TABLE IF NOT EXISTS ModuleProduct
                 var className = macroXml.Root.XPathSelectElement("macro")?.Attribute("class")?.Value;
                 if (!string.IsNullOrEmpty(className))
                 {
-                    var dataSet = _DefaultsXml.Root!.XPathSelectElement($"dataset[@class='{className}']");
+                    var dataSet = _defaultsXml.Root!.XPathSelectElement($"dataset[@class='{className}']");
                     if (dataSet is not null)
                     {
                         var product = dataSet.XPathSelectElement("properties/product");

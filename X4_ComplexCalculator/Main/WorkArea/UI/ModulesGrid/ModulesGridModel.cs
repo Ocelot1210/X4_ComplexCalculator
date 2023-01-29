@@ -16,19 +16,19 @@ class ModulesGridModel : IDisposable
     /// <summary>
     /// モジュール選択ウィンドウ
     /// </summary>
-    private SelectModuleWindow? _SelectModuleWindow;
+    private SelectModuleWindow? _selectModuleWindow;
 
 
     /// <summary>
     /// モジュール選択ウィンドウがクローズ済みか
     /// </summary>
-    private bool _SelectModuleWindowClosed = true;
+    private bool _selectModuleWindowClosed = true;
 
 
     /// <summary>
     /// モジュール一覧情報
     /// </summary>
-    private readonly IModulesInfo _ModulesInfo;
+    private readonly IModulesInfo _modulesInfo;
     #endregion
 
 
@@ -36,7 +36,7 @@ class ModulesGridModel : IDisposable
     /// <summary>
     /// モジュール一覧
     /// </summary>
-    public ObservableRangeCollection<ModulesGridItem> Modules => _ModulesInfo.Modules;
+    public ObservableRangeCollection<ModulesGridItem> Modules => _modulesInfo.Modules;
     #endregion
 
 
@@ -45,7 +45,7 @@ class ModulesGridModel : IDisposable
     /// </summary>
     public ModulesGridModel(IModulesInfo modulesInfo)
     {
-        _ModulesInfo = modulesInfo;
+        _modulesInfo = modulesInfo;
         WPFLocalizeExtension.Engine.LocalizeDictionary.Instance.PropertyChanged += LocalizeInstance_PropertyChanged;
     }
 
@@ -62,7 +62,7 @@ class ModulesGridModel : IDisposable
             // 言語変更時、ツールチップ文字列更新
             Application.Current.Dispatcher.Invoke(() =>
             {
-                foreach (var module in _ModulesInfo.Modules)
+                foreach (var module in _modulesInfo.Modules)
                 {
                     module.UpdateEquipmentInfo();
                 }
@@ -76,12 +76,12 @@ class ModulesGridModel : IDisposable
     /// </summary>
     public void Dispose()
     {
-        _ModulesInfo.Modules.Clear();
+        _modulesInfo.Modules.Clear();
 
         // モジュール選択ウィンドウが開いていたら閉じる
-        if (!_SelectModuleWindowClosed)
+        if (!_selectModuleWindowClosed)
         {
-            _SelectModuleWindow?.Close();
+            _selectModuleWindow?.Close();
         }
 
         WPFLocalizeExtension.Engine.LocalizeDictionary.Instance.PropertyChanged -= LocalizeInstance_PropertyChanged;
@@ -93,30 +93,30 @@ class ModulesGridModel : IDisposable
     /// </summary>
     public void ShowAddModuleWindow()
     {
-        if (_SelectModuleWindowClosed)
+        if (_selectModuleWindowClosed)
         {
             void OnWindowClosed(object? s, EventArgs ev)
             {
-                _SelectModuleWindowClosed = true;
+                _selectModuleWindowClosed = true;
             }
 
-            _SelectModuleWindow = new SelectModuleWindow(_ModulesInfo.Modules);
-            _SelectModuleWindow.Closed += OnWindowClosed;
-            _SelectModuleWindow.Show();
+            _selectModuleWindow = new SelectModuleWindow(_modulesInfo.Modules);
+            _selectModuleWindow.Closed += OnWindowClosed;
+            _selectModuleWindow.Show();
         }
-        _SelectModuleWindowClosed = false;
+        _selectModuleWindowClosed = false;
 
 
-        if (_SelectModuleWindow is null)
+        if (_selectModuleWindow is null)
         {
             throw new InvalidOperationException();
         }
 
 
-        _SelectModuleWindow.Activate();
+        _selectModuleWindow.Activate();
 
         // 最小化されていたら通常状態にする
-        _SelectModuleWindow.WindowState = (_SelectModuleWindow.WindowState == WindowState.Minimized) ? WindowState.Normal : _SelectModuleWindow.WindowState;
+        _selectModuleWindow.WindowState = (_selectModuleWindow.WindowState == WindowState.Minimized) ? WindowState.Normal : _selectModuleWindow.WindowState;
     }
 
 
@@ -143,7 +143,7 @@ class ModulesGridModel : IDisposable
             newItem.ModuleCount = oldItem.ModuleCount;
 
             // 要素を入れ替える
-            _ModulesInfo.Modules.Replace(oldItem, newItem);
+            _modulesInfo.Modules.Replace(oldItem, newItem);
 
             ret = true;
         }
@@ -158,7 +158,7 @@ class ModulesGridModel : IDisposable
     public void MergeModule()
     {
         // モジュール数が1以下なら何もしない
-        if (_ModulesInfo.Modules.Count <= 1)
+        if (_modulesInfo.Modules.Count <= 1)
         {
             return;
         }
@@ -194,7 +194,7 @@ class ModulesGridModel : IDisposable
         // モジュール数に変更があった場合のみ処理
         if (prevCnt != dict.Count)
         {
-            _ModulesInfo.Modules.Reset(dict.OrderBy(x => x.Value.idx).Select(x => x.Value.Module));
+            _modulesInfo.Modules.Reset(dict.OrderBy(x => x.Value.idx).Select(x => x.Value.Module));
             LocalizedMessageBox.Show("Lang:Modules_Button_Merge_MergeModulesMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, mergedModules, prevCnt - dict.Count);
         }
         else

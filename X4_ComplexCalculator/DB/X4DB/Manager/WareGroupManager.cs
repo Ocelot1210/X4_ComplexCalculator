@@ -16,13 +16,13 @@ class WareGroupManager
     /// <summary>
     /// ウェア種別IDをキーにした <see cref="IWareGroup"/> の一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IWareGroup> _WareGroups;
+    private readonly IReadOnlyDictionary<string, IWareGroup> _wareGroups;
 
 
     /// <summary>
     /// ダミー用ウェア種別
     /// </summary>
-    private readonly IWareGroup _DummyWareGroup = new WareGroup("", "", -1);
+    private readonly IWareGroup _dummyWareGroup = new WareGroup("", "", -1);
     #endregion
 
 
@@ -32,8 +32,8 @@ class WareGroupManager
     /// <param name="conn">DB接続情報</param>
     public WareGroupManager(IDbConnection conn)
     {
-        const string sql = "SELECT WareGroupID, Name, Tier FROM WareGroup";
-        _WareGroups = conn.Query<WareGroup>(sql)
+        const string SQL = "SELECT WareGroupID, Name, Tier FROM WareGroup";
+        _wareGroups = conn.Query<WareGroup>(SQL)
             .ToDictionary(x => x.WareGroupID, x => x as IWareGroup);
     }
 
@@ -47,5 +47,5 @@ class WareGroupManager
     /// <para>無ければ空の <see cref="IWareGroup"/></para>
     /// </returns>
     public IWareGroup TryGet(string wareGroupID) =>
-        _WareGroups.TryGetValue(wareGroupID, out var ret) ? ret : _DummyWareGroup;
+        _wareGroups.TryGetValue(wareGroupID, out var ret) ? ret : _dummyWareGroup;
 }

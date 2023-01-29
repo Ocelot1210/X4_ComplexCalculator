@@ -18,7 +18,7 @@ class SizeExporter : IExporter
     /// <summary>
     /// 言語解決用オブジェクト
     /// </summary>
-    private readonly ILanguageResolver _Resolver;
+    private readonly ILanguageResolver _resolver;
 
 
     /// <summary>
@@ -27,7 +27,7 @@ class SizeExporter : IExporter
     /// <param name="resolver">言語解決用オブジェクト</param>
     public SizeExporter(ILanguageResolver resolver)
     {
-        _Resolver = resolver;
+        _resolver = resolver;
     }
 
 
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS Size
         foreach (var (id, name) in data)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            yield return new Size(id, _Resolver.Resolve(name));
+            yield return new Size(id, _resolver.Resolve(name));
             progress.Report((currentStep++, data.Length));
         }
     }

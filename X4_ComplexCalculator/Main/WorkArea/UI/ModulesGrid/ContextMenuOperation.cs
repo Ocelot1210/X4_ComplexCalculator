@@ -16,25 +16,25 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 /// <summary>
 /// モジュール一覧タブのコンテキストメニューの処理用クラス
 /// </summary>
-public class ContextMenuOperation : BindableBase, IDisposable
+public sealed class ContextMenuOperation : BindableBase, IDisposable
 {
     #region メンバ
     /// <summary>
     /// モジュール一覧
     /// </summary>
-    private readonly IModulesInfo _ModulesInfo;
+    private readonly IModulesInfo _modulesInfo;
 
 
     /// <summary>
     /// モジュール一覧(表示用)
     /// </summary>
-    private readonly ListCollectionView _CollectionView;
+    private readonly ListCollectionView _collectionView;
 
 
     /// <summary>
     /// モジュール並び替え用
     /// </summary>
-    private readonly ModulesReorder _ModuleReorder;
+    private readonly ModulesReorder _moduleReorder;
     #endregion
 
 
@@ -61,25 +61,25 @@ public class ContextMenuOperation : BindableBase, IDisposable
     /// <summary>
     /// モジュール選択
     /// </summary>
-    public ICommand SelectModulesCommand => _ModuleReorder.SelectModulesCommand;
+    public ICommand SelectModulesCommand => _moduleReorder.SelectModulesCommand;
 
 
     /// <summary>
     /// モジュール選択解除
     /// </summary>
-    public ICommand ClearSelectionCommand => _ModuleReorder.ClearSelectionCommand;
+    public ICommand ClearSelectionCommand => _moduleReorder.ClearSelectionCommand;
 
 
     /// <summary>
     /// 選択項目を上に移動する
     /// </summary>
-    public ICommand MoveUpTheSelectionCommand => _ModuleReorder.MoveUpTheSelectionCommand;
+    public ICommand MoveUpTheSelectionCommand => _moduleReorder.MoveUpTheSelectionCommand;
 
 
     /// <summary>
     /// 選択項目を下に移動する
     /// </summary>
-    public ICommand MoveDownTheSelectionCommand => _ModuleReorder.MoveDownTheSelectionCommand;
+    public ICommand MoveDownTheSelectionCommand => _moduleReorder.MoveDownTheSelectionCommand;
 
 
     // ---------------------------------------------------------------------- //
@@ -105,18 +105,18 @@ public class ContextMenuOperation : BindableBase, IDisposable
     /// <param name="listCollectionView">モジュール一覧のCollectionView</param>
     public ContextMenuOperation(IModulesInfo modulesInfo, ListCollectionView listCollectionView)
     {
-        _ModulesInfo    = modulesInfo;
-        _CollectionView = listCollectionView;
-        _ModuleReorder  = new ModulesReorder(modulesInfo, listCollectionView);
+        _modulesInfo    = modulesInfo;
+        _collectionView = listCollectionView;
+        _moduleReorder  = new ModulesReorder(modulesInfo, listCollectionView);
 
-        ((INotifyCollectionChanged)_CollectionView.SortDescriptions).CollectionChanged += ContextMenuOperation_CollectionChanged;
+        ((INotifyCollectionChanged)_collectionView.SortDescriptions).CollectionChanged += ContextMenuOperation_CollectionChanged;
 
         CopyModulesCommand    = new DelegateCommand(CopyModules);
         PasteModulesCommand   = new DelegateCommand<DataGrid>(PasteModules);
         DeleteModulesCommand  = new DelegateCommand<DataGrid>(DeleteModules);
         ResetSortOrderCommand = new DelegateCommand(
-            () => _CollectionView.SortDescriptions.Clear(),
-            () => 0 < _CollectionView.SortDescriptions.Count
+            () => _collectionView.SortDescriptions.Clear(),
+            () => 0 < _collectionView.SortDescriptions.Count
         );
     }
 
@@ -124,7 +124,7 @@ public class ContextMenuOperation : BindableBase, IDisposable
     /// <inheritdoc/>
     public void Dispose()
     {
-        ((INotifyCollectionChanged)_CollectionView.SortDescriptions).CollectionChanged -= ContextMenuOperation_CollectionChanged;
+        ((INotifyCollectionChanged)_collectionView.SortDescriptions).CollectionChanged -= ContextMenuOperation_CollectionChanged;
     }
 
 
@@ -136,7 +136,7 @@ public class ContextMenuOperation : BindableBase, IDisposable
     private void ContextMenuOperation_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         // 未ソートの場合のみ入れ替え可能にする
-        _ModuleReorder.SortedColumnCount = _CollectionView.SortDescriptions.Count;
+        _moduleReorder.SortedColumnCount = _collectionView.SortDescriptions.Count;
 
         // ソート順初期化可不可更新
         ResetSortOrderCommand.RaiseCanExecuteChanged();
@@ -149,7 +149,7 @@ public class ContextMenuOperation : BindableBase, IDisposable
     private void CopyModules()
     {
         var xml = new XElement("modules");
-        var selectedModules = CollectionViewSource.GetDefaultView(_CollectionView)
+        var selectedModules = CollectionViewSource.GetDefaultView(_collectionView)
                                                   .Cast<ModulesGridItem>()
                                                   .Where(x => x.IsSelected);
 
@@ -176,7 +176,7 @@ public class ContextMenuOperation : BindableBase, IDisposable
             // xmlの内容に問題がないか確認するため、ここでToArray()する
             var modules = clipboardXml.Root.Elements().Select(x => new ModulesGridItem(x) { EditStatus = EditStatus.Edited }).ToArray();
 
-            _ModulesInfo.Modules.AddRange(modules);
+            _modulesInfo.Modules.AddRange(modules);
 
             dataGrid.Focus();
         }
@@ -193,14 +193,14 @@ public class ContextMenuOperation : BindableBase, IDisposable
     /// <param name="dataGrid"></param>
     private void DeleteModules(DataGrid dataGrid)
     {
-        var currPos = _CollectionView.CurrentPosition;
+        var currPos = _collectionView.CurrentPosition;
 
         // モジュール数を編集した後に削除するとcurrPosが-1になる場合があるため、
         // ここで最初に選択されている表示上のモジュールの要素番号を取得する
         if (currPos == -1)
         {
             var cnt = 0;
-            foreach (var module in _CollectionView.OfType<ModulesGridItem>())
+            foreach (var module in _collectionView.OfType<ModulesGridItem>())
             {
                 if (module.IsSelected)
                 {
@@ -211,14 +211,14 @@ public class ContextMenuOperation : BindableBase, IDisposable
             }
         }
 
-        var items = CollectionViewSource.GetDefaultView(_CollectionView)
+        var items = CollectionViewSource.GetDefaultView(_collectionView)
                                         .Cast<ModulesGridItem>()
                                         .Where(x => x.IsSelected);
 
-        _ModulesInfo.Modules.RemoveRange(items);
+        _modulesInfo.Modules.RemoveRange(items);
 
         // 削除後に全部の選択状態を外さないと余計なものまで選択される
-        foreach (var module in _ModulesInfo.Modules)
+        foreach (var module in _modulesInfo.Modules)
         {
             module.IsSelected = false;
         }
@@ -227,21 +227,21 @@ public class ContextMenuOperation : BindableBase, IDisposable
         if (currPos < 0)
         {
             // 先頭行を削除した場合
-            _CollectionView.MoveCurrentToFirst();
+            _collectionView.MoveCurrentToFirst();
         }
-        else if (_CollectionView.Count <= currPos)
+        else if (_collectionView.Count <= currPos)
         {
             // 最後の行を消した場合、選択行を最後にする
-            _CollectionView.MoveCurrentToLast();
+            _collectionView.MoveCurrentToLast();
         }
         else
         {
             // 中間行の場合
-            _CollectionView.MoveCurrentToPosition(currPos);
+            _collectionView.MoveCurrentToPosition(currPos);
         }
 
         // 再度選択
-        if (_CollectionView.CurrentItem is ModulesGridItem item)
+        if (_collectionView.CurrentItem is ModulesGridItem item)
         {
             item.IsSelected = true;
         }
@@ -249,7 +249,7 @@ public class ContextMenuOperation : BindableBase, IDisposable
         // セルフォーカス
         if (dataGrid.CurrentCell.Column is not null)
         {
-            CellFocusCommand?.Execute(new Tuple<DataGrid, int, int>(dataGrid, _CollectionView.CurrentPosition, dataGrid.CurrentCell.Column.DisplayIndex));
+            CellFocusCommand?.Execute(new Tuple<DataGrid, int, int>(dataGrid, _collectionView.CurrentPosition, dataGrid.CurrentCell.Column.DisplayIndex));
         }
     }
 }

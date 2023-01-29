@@ -17,7 +17,7 @@ class ModulesGridViewModel : BindableBase
     /// <summary>
     /// モジュール一覧
     /// </summary>
-    private readonly ObservableRangeCollection<ModulesGridItem> _Modules;
+    private readonly ObservableRangeCollection<ModulesGridItem> _modules;
     #endregion
 
 
@@ -38,9 +38,9 @@ class ModulesGridViewModel : BindableBase
             .Where(x => !x.Tags.Contains("noplayerblueprint"))
             .Select(x => new ModulesGridItem(x));
 
-        _Modules = new(items);
+        _modules = new(items);
 
-        ModulesView = (ListCollectionView)CollectionViewSource.GetDefaultView(_Modules);
+        ModulesView = (ListCollectionView)CollectionViewSource.GetDefaultView(_modules);
         ModulesView.SortDescriptions.Clear();
         ModulesView.SortDescriptions.Add(new SortDescription(nameof(ModulesGridItem.ModuleName), ListSortDirection.Ascending));
     }

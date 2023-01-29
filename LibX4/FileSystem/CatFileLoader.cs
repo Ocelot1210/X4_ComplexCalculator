@@ -193,7 +193,7 @@ sealed class CatFileLoader : IFileLoader
             );
             var buff = new byte[entry.FileSize];
             fs.Seek(entry.Offset, SeekOrigin.Begin);
-            await fs.ReadAsync(buff, 0, buff.Length, cancellationToken);
+            await fs.ReadAsync(buff, cancellationToken);
 
             return new MemoryStream(buff, false);
         }
@@ -208,7 +208,7 @@ sealed class CatFileLoader : IFileLoader
             using var fs = new FileStream(path, FileMode.Open, FileAccess.Read);
 
             var buff = new byte[fs.Length];
-            await fs.ReadAsync(buff, 0, buff.Length, cancellationToken);
+            await fs.ReadAsync(buff, cancellationToken);
 
             return new MemoryStream(buff, false);
         }

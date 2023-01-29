@@ -16,7 +16,7 @@ class ThrusterBuilder
     /// <summary>
     /// スラスター情報一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, X4_DataExporterWPF.Entity.Thruster> _Thrusters;
+    private readonly IReadOnlyDictionary<string, X4_DataExporterWPF.Entity.Thruster> _thrusters;
     #endregion
 
 
@@ -26,7 +26,7 @@ class ThrusterBuilder
     /// <param name="conn">DB接続情報</param>
     public ThrusterBuilder(IDbConnection conn)
     {
-        _Thrusters = conn.Query<X4_DataExporterWPF.Entity.Thruster>("SELECT * FROM Thruster")
+        _thrusters = conn.Query<X4_DataExporterWPF.Entity.Thruster>("SELECT * FROM Thruster")
             .ToDictionary(x => x.EquipmentID);
     }
 
@@ -38,7 +38,7 @@ class ThrusterBuilder
     /// <returns>スラスター情報または装備情報</returns>
     public IEquipment Build(IEquipment equipment)
     {
-        if (_Thrusters.TryGetValue(equipment.ID, out var item))
+        if (_thrusters.TryGetValue(equipment.ID, out var item))
         {
             return new Thruster(
                 equipment,

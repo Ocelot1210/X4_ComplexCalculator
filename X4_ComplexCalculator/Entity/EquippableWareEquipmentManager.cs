@@ -17,7 +17,7 @@ public class EquippableWareEquipmentManager : INotifyCollectionChanged
     /// <summary>
     /// グループ名と接続名をキーにした装備中の項目一覧
     /// </summary>
-    private readonly Dictionary<IWareEquipment, IEquipment> _Equipped;
+    private readonly Dictionary<IWareEquipment, IEquipment> _equipped;
     #endregion
 
 
@@ -31,7 +31,7 @@ public class EquippableWareEquipmentManager : INotifyCollectionChanged
     /// <summary>
     /// 装備中の装備一覧
     /// </summary>
-    public IEnumerable<IEquipment> AllEquipments => _Equipped.Values;
+    public IEnumerable<IEquipment> AllEquipments => _equipped.Values;
 
 
     /// <summary>
@@ -54,7 +54,7 @@ public class EquippableWareEquipmentManager : INotifyCollectionChanged
     public EquippableWareEquipmentManager(IEquippableWare ware)
     {
         Ware = ware;
-        _Equipped = new();
+        _equipped = new();
     }
 
 
@@ -65,7 +65,7 @@ public class EquippableWareEquipmentManager : INotifyCollectionChanged
     public EquippableWareEquipmentManager(EquippableWareEquipmentManager manager)
     {
         Ware = manager.Ware;
-        _Equipped = manager._Equipped.ToDictionary(x => x.Key, x => x.Value);
+        _equipped = manager._equipped.ToDictionary(x => x.Key, x => x.Value);
     }
 
 
@@ -95,7 +95,7 @@ public class EquippableWareEquipmentManager : INotifyCollectionChanged
 
                 if (wareEquipment is not null)
                 {
-                    _Equipped.Add(wareEquipment, X4Database.Instance.Ware.Get<IEquipment>(id));
+                    _equipped.Add(wareEquipment, X4Database.Instance.Ware.Get<IEquipment>(id));
                 }
             }
         }
@@ -112,7 +112,7 @@ public class EquippableWareEquipmentManager : INotifyCollectionChanged
     /// <param name="equipments"></param>
     public void ResetEquipment(IEnumerable<IEquipment> equipments)
     {
-        _Equipped.Clear();
+        _equipped.Clear();
 
         foreach (var equipment in equipments)
         {
@@ -133,10 +133,10 @@ public class EquippableWareEquipmentManager : INotifyCollectionChanged
 
         foreach (var equipment in equipments)
         {
-            var key = _Equipped.Where(x => x.Value == equipment).Select(x => x.Key).FirstOrDefault();
+            var key = _equipped.Where(x => x.Value == equipment).Select(x => x.Key).FirstOrDefault();
             if (key is not null)
             {
-                _Equipped.Remove(key);
+                _equipped.Remove(key);
                 removed?.Add(equipment);
             }
         }
@@ -203,12 +203,12 @@ public class EquippableWareEquipmentManager : INotifyCollectionChanged
     {
         // 装備可能な接続情報を取得する
         var equippableInfo = Ware.Equipments.Values
-            .FirstOrDefault(x => !_Equipped.ContainsKey(x) && x.CanEquipped(equipment));
+            .FirstOrDefault(x => !_equipped.ContainsKey(x) && x.CanEquipped(equipment));
 
         // 装備可能な接続がある場合、装備する
         if (equippableInfo is not null)
         {
-            _Equipped.Add(equippableInfo, equipment);
+            _equipped.Add(equippableInfo, equipment);
             return true;
         }
 
@@ -223,7 +223,7 @@ public class EquippableWareEquipmentManager : INotifyCollectionChanged
     /// <returns>インスタンスの現在の状態を表す XElement</returns>
     public XElement Serialize()
     {
-        var equipments = _Equipped
+        var equipments = _equipped
             .Select(x =>new XElement(
                 "equipment",
                 new XAttribute("group", x.Key.GroupName),
@@ -244,7 +244,7 @@ public class EquippableWareEquipmentManager : INotifyCollectionChanged
     /// <returns>装備IDと装備サイズに対応する装備があと何個装備できるか</returns>
     public int GetEquippableCount(IEquipmentType type, IX4Size size)
         => Ware.Equipments.Values.Count(x =>
-        !_Equipped.ContainsKey(x) &&
+        !_equipped.ContainsKey(x) &&
         x.Tags.Contains(type.EquipmentTypeID[..^1]) &&
         x.Tags.Contains(size.SizeID)
     );
@@ -262,7 +262,7 @@ public class EquippableWareEquipmentManager : INotifyCollectionChanged
 
     /// <inheritdoc />
     public bool Equals(EquippableWareEquipmentManager? other)
-        => other is not null && Ware.Equals(other.Ware) && other._Equipped.SequenceEqual(_Equipped);
+        => other is not null && Ware.Equals(other.Ware) && other._equipped.SequenceEqual(_equipped);
 
 
     /// <inheritdoc />
@@ -275,7 +275,7 @@ public class EquippableWareEquipmentManager : INotifyCollectionChanged
         var hash = new HashCode();
 
         hash.Add(Ware);
-        foreach (var equipment in _Equipped)
+        foreach (var equipment in _equipped)
         {
             hash.Add(equipment);
         }

@@ -14,25 +14,25 @@ public class BuildResourcesGridItem : BindableBaseEx, IEditable, ISelectable
     /// <summary>
     /// 単価
     /// </summary>
-    private long _UnitPrice;
+    private long _unitPrice;
 
 
     /// <summary>
     /// 建造に必要なウェア数量
     /// </summary>
-    private long _Amount;
+    private long _amount;
 
 
     /// <summary>
     /// 建造ウェアを購入しない
     /// </summary>
-    private bool _NoBuy;
+    private bool _noBuy;
 
 
     /// <summary>
     /// 編集状態
     /// </summary>
-    private EditStatus _EditStatus = EditStatus.Unedited;
+    private EditStatus _editStatus = EditStatus.Unedited;
     #endregion
 
 
@@ -48,11 +48,11 @@ public class BuildResourcesGridItem : BindableBaseEx, IEditable, ISelectable
     /// </summary>
     public long Amount
     {
-        get => _Amount;
+        get => _amount;
         set
         {
             var oldPrice = Price;
-            if (SetProperty(ref _Amount, value))
+            if (SetProperty(ref _amount, value))
             {
                 RaisePropertyChangedEx(oldPrice, Price, nameof(Price));
             }
@@ -71,7 +71,7 @@ public class BuildResourcesGridItem : BindableBaseEx, IEditable, ISelectable
     /// </summary>
     public long UnitPrice
     {
-        get => _UnitPrice;
+        get => _unitPrice;
         set
         {
             // 最低価格≦ 入力価格 ≦ 最高価格かつ価格が変更された場合のみ更新
@@ -92,15 +92,15 @@ public class BuildResourcesGridItem : BindableBaseEx, IEditable, ISelectable
 
 
             // 変更無しの場合は何もしない
-            if (setValue == _UnitPrice)
+            if (setValue == _unitPrice)
             {
                 return;
             }
 
 
-            var oldUnitPrice = _UnitPrice;
+            var oldUnitPrice = _unitPrice;
             var oldPrice = Price;
-            _UnitPrice = setValue;
+            _unitPrice = setValue;
 
             RaisePropertyChangedEx(oldUnitPrice, setValue);
 
@@ -125,12 +125,12 @@ public class BuildResourcesGridItem : BindableBaseEx, IEditable, ISelectable
     /// </summary>
     public bool NoBuy
     {
-        get => _NoBuy;
+        get => _noBuy;
         set
         {
             var oldPrice = Price;
 
-            if (SetProperty(ref _NoBuy, value))
+            if (SetProperty(ref _noBuy, value))
             {
                 RaisePropertyChangedEx(oldPrice, Price, nameof(Price));
                 EditStatus = EditStatus.Edited;
@@ -144,8 +144,8 @@ public class BuildResourcesGridItem : BindableBaseEx, IEditable, ISelectable
     /// </summary>
     public EditStatus EditStatus
     {
-        get => _EditStatus;
-        set => SetProperty(ref _EditStatus, value);
+        get => _editStatus;
+        set => SetProperty(ref _editStatus, value);
     }
     #endregion
 

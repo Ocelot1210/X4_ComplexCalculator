@@ -96,8 +96,8 @@ internal class SaveDataReader0 : ISaveDataReader
         var progressCnt = 1;
 
         // モジュールを復元
-        const string sql1 = "SELECT ModuleID, Count FROM Modules ORDER BY Row ASC";
-        foreach (var (moduleID, count) in conn.Query<(string, long)>(sql1))
+        const string SQL_1 = "SELECT ModuleID, Count FROM Modules ORDER BY Row ASC";
+        foreach (var (moduleID, count) in conn.Query<(string, long)>(SQL_1))
         {
             var module = X4Database.Instance.Ware.TryGet<IX4Module>(moduleID);
             if (module is not null)
@@ -109,8 +109,8 @@ internal class SaveDataReader0 : ISaveDataReader
         }
 
         // モジュールの装備を復元
-        const string sql2 = "SELECT Row, EquipmentID FROM Equipments";
-        foreach (var (row, equipmentID) in conn.Query<(int, string)>(sql2))
+        const string SQL_2 = "SELECT Row, EquipmentID FROM Equipments";
+        foreach (var (row, equipmentID) in conn.Query<(int, string)>(SQL_2))
         {
             var eqp = X4Database.Instance.Ware.TryGet<IEquipment>(equipmentID);
             if (eqp is not null)
@@ -130,8 +130,8 @@ internal class SaveDataReader0 : ISaveDataReader
     /// <param name="conn">DB接続情報</param>
     protected virtual void RestoreProducts(DBConnection conn)
     {
-        const string sql = "SELECT WareID, Price FROM Products";
-        foreach (var (wareID, price) in conn.Query<(string, long)>(sql))
+        const string SQL = "SELECT WareID, Price FROM Products";
+        foreach (var (wareID, price) in conn.Query<(string, long)>(SQL))
         {
             var itm = _WorkArea.StationData.ProductsInfo.Products.FirstOrDefault(x => x.Ware.ID == wareID);
             if (itm is not null)
@@ -148,8 +148,8 @@ internal class SaveDataReader0 : ISaveDataReader
     /// <param name="conn">DB接続情報</param>
     protected virtual void RestoreBuildResource(DBConnection conn)
     {
-        const string sql = "SELECT WareID, Price FROM BuildResources";
-        foreach (var (wareID, price) in conn.Query<(string, long)>(sql))
+        const string SQL = "SELECT WareID, Price FROM BuildResources";
+        foreach (var (wareID, price) in conn.Query<(string, long)>(SQL))
         {
             var itm = _WorkArea.StationData.BuildResourcesInfo.BuildResources.FirstOrDefault(x => x.Ware.ID == wareID);
             if (itm is not null)

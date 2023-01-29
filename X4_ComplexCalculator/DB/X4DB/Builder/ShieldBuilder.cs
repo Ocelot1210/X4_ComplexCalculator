@@ -16,7 +16,7 @@ class ShieldBuilder
     /// <summary>
     /// シールド情報一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, X4_DataExporterWPF.Entity.Shield> _Shields;
+    private readonly IReadOnlyDictionary<string, X4_DataExporterWPF.Entity.Shield> _shields;
     #endregion
 
 
@@ -26,7 +26,7 @@ class ShieldBuilder
     /// <param name="conn">DB接続情報</param>
     public ShieldBuilder(IDbConnection conn)
     {
-        _Shields = conn.Query<X4_DataExporterWPF.Entity.Shield>("SELECT * FROM Shield")
+        _shields = conn.Query<X4_DataExporterWPF.Entity.Shield>("SELECT * FROM Shield")
             .ToDictionary(x => x.EquipmentID);
     }
 
@@ -38,7 +38,7 @@ class ShieldBuilder
     /// <returns>シールド情報または装備情報</returns>
     public IEquipment Build(IEquipment equipment)
     {
-        if (_Shields.TryGetValue(equipment.ID, out var item))
+        if (_shields.TryGetValue(equipment.ID, out var item))
         {
             return new Shield(
                 equipment,

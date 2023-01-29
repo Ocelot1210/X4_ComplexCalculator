@@ -13,13 +13,13 @@ public partial class TextFilter
     /// <summary>
     /// 画面前回値
     /// </summary>
-    private (string, TextFilterConditions) _PrevValue;
+    private (string, TextFilterConditions) _prevValue;
 
 
     /// <summary>
     /// DataContext
     /// </summary>
-    private DataGridFilterColumnControl? _FilterColumnControl;
+    private DataGridFilterColumnControl? _filterColumnControl;
     #endregion
 
 
@@ -33,11 +33,11 @@ public partial class TextFilter
     {
         base.OnApplyTemplate();
 
-        _FilterColumnControl = DataContext as DataGridFilterColumnControl;
+        _filterColumnControl = DataContext as DataGridFilterColumnControl;
 
         // DataContext経由で前回のフィルタを取得
-        _FilterColumnControl = DataContext as DataGridFilterColumnControl;
-        var prevFilter = _FilterColumnControl?.LoadFilter();
+        _filterColumnControl = DataContext as DataGridFilterColumnControl;
+        var prevFilter = _filterColumnControl?.LoadFilter();
         if (prevFilter is TextContentFilter filter)
         {
             Filter = filter;
@@ -71,7 +71,7 @@ public partial class TextFilter
             }
 
             // 仮想化対策のためフィルタを保存
-            _FilterColumnControl?.SaveFilter();
+            _filterColumnControl?.SaveFilter();
         }
     }
     #endregion
@@ -82,7 +82,7 @@ public partial class TextFilter
     /// <summary>
     /// フィルタ内容
     /// </summary>
-    private static readonly DependencyProperty IsOpenProperty =
+    private static readonly DependencyProperty _IsOpenProperty =
         DependencyProperty.Register(
             nameof(IsOpen),
             typeof(bool),
@@ -95,8 +95,8 @@ public partial class TextFilter
 
     private bool IsOpen
     {
-        get => (bool)GetValue(IsOpenProperty);
-        set => SetValue(IsOpenProperty, value);
+        get => (bool)GetValue(_IsOpenProperty);
+        set => SetValue(_IsOpenProperty, value);
     }
     #endregion
 
@@ -106,7 +106,7 @@ public partial class TextFilter
     /// <summary>
     /// フィルタ文字列
     /// </summary>
-    private static readonly DependencyProperty FilterTextProperty =
+    private static readonly DependencyProperty _FilterTextProperty =
         DependencyProperty.Register(
             nameof(FilterText),
             typeof(string),
@@ -115,8 +115,8 @@ public partial class TextFilter
         );
     private string FilterText
     {
-        get => (string)GetValue(FilterTextProperty);
-        set => SetValue(FilterTextProperty, value);
+        get => (string)GetValue(_FilterTextProperty);
+        set => SetValue(_FilterTextProperty, value);
     }
     #endregion
 
@@ -126,7 +126,7 @@ public partial class TextFilter
     /// <summary>
     /// 一致条件
     /// </summary>
-    private static readonly DependencyProperty ConditionsProperty =
+    private static readonly DependencyProperty _ConditionsProperty =
         DependencyProperty.Register(
             nameof(Conditions),
             typeof(TextFilterConditions),
@@ -136,8 +136,8 @@ public partial class TextFilter
 
     private TextFilterConditions Conditions
     {
-        get => (TextFilterConditions)GetValue(ConditionsProperty);
-        set => SetValue(ConditionsProperty, value);
+        get => (TextFilterConditions)GetValue(_ConditionsProperty);
+        set => SetValue(_ConditionsProperty, value);
     }
     #endregion
 
@@ -147,7 +147,7 @@ public partial class TextFilter
     /// <summary>
     /// 一致条件
     /// </summary>
-    private static readonly DependencyProperty IsFilterEnabledProperty =
+    private static readonly DependencyProperty _IsFilterEnabledProperty =
         DependencyProperty.Register(
             nameof(IsFilterEnabled),
             typeof(bool),
@@ -157,8 +157,8 @@ public partial class TextFilter
 
     private bool IsFilterEnabled
     {
-        get => (bool)GetValue(IsFilterEnabledProperty);
-        set => SetValue(IsFilterEnabledProperty, value);
+        get => (bool)GetValue(_IsFilterEnabledProperty);
+        set => SetValue(_IsFilterEnabledProperty, value);
     }
     #endregion
 
@@ -172,8 +172,8 @@ public partial class TextFilter
     private void PART_FilterButton_Click(object sender, RoutedEventArgs e)
     {
         IsOpen = true;
-        _PrevValue.Item1 = FilterText;
-        _PrevValue.Item2 = Conditions;
+        _prevValue.Item1 = FilterText;
+        _prevValue.Item2 = Conditions;
     }
 
 
@@ -192,8 +192,8 @@ public partial class TextFilter
     /// </summary>
     private void PART_CancelButton_Click(object sender, RoutedEventArgs e)
     {
-        FilterText = _PrevValue.Item1;
-        Conditions = _PrevValue.Item2;
+        FilterText = _prevValue.Item1;
+        Conditions = _prevValue.Item2;
         IsOpen = false;
     }
 

@@ -10,27 +10,27 @@ public class DoEventsExecuter
     /// <summary>
     /// N回に1回実行するか
     /// </summary>
-    readonly int _ExecuteNum;
+    readonly int _executeNum;
 
     /// <summary>
     /// 最低でも実行する間隔
     /// </summary>
-    readonly long _ExecuteMs;
+    readonly long _executeMs;
 
     /// <summary>
     /// 実行間隔計測用ストップウォッチ
     /// </summary>
-    readonly Stopwatch _Stopwatch = new();
+    readonly Stopwatch _stopwatch = new();
 
     /// <summary>
     /// DoEventsが呼ばれた回数
     /// </summary>
-    int CallCount;
+    int _callCount;
 
     /// <summary>
     /// コールバック処理
     /// </summary>
-    DispatcherOperationCallback _DispatcherOperationCallback
+    readonly DispatcherOperationCallback _dispatcherOperationCallback
         = new(obj => { ((DispatcherFrame)obj).Continue = false; return null; });
 
     /// <summary>
@@ -42,11 +42,11 @@ public class DoEventsExecuter
     {
         if (executeNum == -1 && executeMs == -1)
         {
-            throw new ArgumentException();
+            throw new ArgumentException("Invalid parameter", nameof(executeNum));
         }
-        _ExecuteNum = executeNum;
-        _ExecuteMs = executeMs;
-        _Stopwatch.Start();
+        _executeNum = executeNum;
+        _executeMs = executeMs;
+        _stopwatch.Start();
     }
 
 
@@ -55,11 +55,11 @@ public class DoEventsExecuter
     /// </summary>
     public void DoEvents()
     {
-        if ((_ExecuteNum != -1 && _ExecuteNum < CallCount++) || (_ExecuteMs != -1 && _ExecuteMs < _Stopwatch.ElapsedMilliseconds))
+        if ((_executeNum != -1 && _executeNum < _callCount++) || (_executeMs != -1 && _executeMs < _stopwatch.ElapsedMilliseconds))
         {
             DoEventsMain();
-            CallCount = 0;
-            _Stopwatch.Reset();
+            _callCount = 0;
+            _stopwatch.Reset();
         }
     }
 
@@ -72,8 +72,8 @@ public class DoEventsExecuter
         DoEventsMain();
         if (resetTimer)
         {
-            CallCount = 0;
-            _Stopwatch.Restart();
+            _callCount = 0;
+            _stopwatch.Restart();
         }
     }
 
@@ -84,7 +84,7 @@ public class DoEventsExecuter
     private void DoEventsMain()
     {
         var frame = new DispatcherFrame();
-        Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, _DispatcherOperationCallback, frame);
+        Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, _dispatcherOperationCallback, frame);
         Dispatcher.PushFrame(frame);
     }
 }

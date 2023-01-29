@@ -130,7 +130,7 @@ class ModInfo
     /// <param name="str">変換対象の文字列</param>
     /// <param name="defaultValue">変換後の文字列</param>
     /// <returns><paramref name="str"/> に対応する bool 値</returns>
-    private bool X4StrToBool(string str, bool defaultValue)
+    private static bool X4StrToBool(string str, bool defaultValue)
     {
         if (double.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
         {

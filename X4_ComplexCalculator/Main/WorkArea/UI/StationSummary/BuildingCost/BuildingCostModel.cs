@@ -18,13 +18,13 @@ class BuildingCostModel : BindableBase
     /// <summary>
     /// 建造リソース情報
     /// </summary>
-    private readonly IBuildResourcesInfo _BuildResources;
+    private readonly IBuildResourcesInfo _buildResources;
 
 
     /// <summary>
     /// 建造コスト
     /// </summary>
-    private long _BuildingCost = 0;
+    private long _buildingCost = 0;
     #endregion
 
 
@@ -32,7 +32,7 @@ class BuildingCostModel : BindableBase
     /// <summary>
     /// 建造リソース一覧
     /// </summary>
-    public ObservableCollection<BuildResourcesGridItem> BuildResources => _BuildResources.BuildResources;
+    public ObservableCollection<BuildResourcesGridItem> BuildResources => _buildResources.BuildResources;
 
 
     /// <summary>
@@ -40,12 +40,12 @@ class BuildingCostModel : BindableBase
     /// </summary>
     public long BuildingCost
     {
-        get => _BuildingCost;
+        get => _buildingCost;
         set
         {
-            if (value != _BuildingCost)
+            if (value != _buildingCost)
             {
-                _BuildingCost = value;
+                _buildingCost = value;
                 RaisePropertyChanged();
             }
         }
@@ -59,9 +59,9 @@ class BuildingCostModel : BindableBase
     /// <param name="resources"></param>
     public BuildingCostModel(IBuildResourcesInfo resources)
     {
-        _BuildResources = resources;
-        _BuildResources.BuildResources.CollectionChanged += Resources_OnCollectionChanged;
-        _BuildResources.BuildResources.CollectionPropertyChanged += Resources_OnPropertyChanged;
+        _buildResources = resources;
+        _buildResources.BuildResources.CollectionChanged += Resources_OnCollectionChanged;
+        _buildResources.BuildResources.CollectionPropertyChanged += Resources_OnPropertyChanged;
     }
 
 
@@ -70,8 +70,8 @@ class BuildingCostModel : BindableBase
     /// </summary>
     public void Dispose()
     {
-        _BuildResources.BuildResources.CollectionChanged -= Resources_OnCollectionChanged;
-        _BuildResources.BuildResources.CollectionPropertyChanged -= Resources_OnPropertyChanged;
+        _buildResources.BuildResources.CollectionChanged -= Resources_OnCollectionChanged;
+        _buildResources.BuildResources.CollectionPropertyChanged -= Resources_OnPropertyChanged;
         BuildResources.Clear();
     }
 
@@ -83,7 +83,7 @@ class BuildingCostModel : BindableBase
     /// <param name="e"></param>
     private void Resources_OnPropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        if (!(sender is BuildResourcesGridItem))
+        if (sender is not BuildResourcesGridItem)
         {
             return;
         }

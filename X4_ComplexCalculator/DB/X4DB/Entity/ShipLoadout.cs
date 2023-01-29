@@ -11,7 +11,7 @@ public class ShipLoadout : IShipLoadout
     /// <summary>
     /// 装備品ID
     /// </summary>
-    private readonly string _EquipmentID;
+    private readonly string _equipmentID;
     #endregion
 
 
@@ -25,7 +25,7 @@ public class ShipLoadout : IShipLoadout
 
 
     /// <inheritdoc/>
-    public IEquipment Equipment => X4Database.Instance.Ware.Get<IEquipment>(_EquipmentID);
+    public IEquipment Equipment => X4Database.Instance.Ware.Get<IEquipment>(_equipmentID);
 
 
     /// <inheritdoc/>
@@ -50,7 +50,7 @@ public class ShipLoadout : IShipLoadout
     {
         ID = shipID;
         LoadoutID = loadoutID;
-        _EquipmentID = equipmentID;
+        _equipmentID = equipmentID;
         GroupName = groupName;
         Count = count;
     }

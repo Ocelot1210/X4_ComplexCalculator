@@ -44,9 +44,11 @@ public class XmlFormatException : FormatException
     public static XmlFormatException CreateFrom(XAttribute? attr,
                                                 Exception? innerException = null)
     {
-        var exception = new XmlFormatException("XML format is invalid.", innerException);
-        exception.Input = attr?.Value ?? "<null>";
-        exception.Parent = attr?.Parent?.ToString() ?? "<null>";
+        var exception = new XmlFormatException("XML format is invalid.", innerException)
+        {
+            Input = attr?.Value ?? "<null>",
+            Parent = attr?.Parent?.ToString() ?? "<null>"
+        };
         return exception;
     }
 }

@@ -13,7 +13,7 @@ class Visiblity2NullableBooleanConverter : IValueConverter
 {
     public object Convert(object value, Type _, object parameter, CultureInfo culture)
     {
-        var ret = (value is Visibility) ? ((Visibility)value) == Visibility.Visible : Binding.DoNothing;
+        var ret = (value is Visibility visibility) ? visibility == Visibility.Visible : Binding.DoNothing;
         return ret;
     }
 

@@ -16,13 +16,13 @@ class ShipHangerManager
     /// <summary>
     /// 艦船のハンガー一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, IShipHanger>> _ShipHangers;
+    private readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, IShipHanger>> _shipHangers;
 
 
     /// <summary>
     /// 空のハンガー情報(ダミー用)
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IShipHanger> _EmptyHanger = new Dictionary<string, IShipHanger>();
+    private readonly IReadOnlyDictionary<string, IShipHanger> _emptyHanger = new Dictionary<string, IShipHanger>();
     #endregion
 
 
@@ -32,8 +32,8 @@ class ShipHangerManager
     /// <param name="conn">DB接続情報</param>
     public ShipHangerManager(IDbConnection conn)
     {
-        const string sql = @"SELECT ShipID, SizeID, Count, Capacity FROM ShipHanger";
-        _ShipHangers = conn.Query<ShipHanger>(sql)
+        const string SQL = @"SELECT ShipID, SizeID, Count, Capacity FROM ShipHanger";
+        _shipHangers = conn.Query<ShipHanger>(SQL)
             .GroupBy(x => x.ShipID)
             .ToDictionary(
                 x => x.Key,
@@ -50,5 +50,5 @@ class ShipHangerManager
     /// <para>ハンガー情報が無い場合、空の <see cref="IX4Size.SizeID"/> をキーにしたハンガー情報のディクショナリ</para>
     /// </returns>
     public IReadOnlyDictionary<string, IShipHanger> Get(string id) =>
-        _ShipHangers.TryGetValue(id, out var hanger) ? hanger : _EmptyHanger;
+        _shipHangers.TryGetValue(id, out var hanger) ? hanger : _emptyHanger;
 }

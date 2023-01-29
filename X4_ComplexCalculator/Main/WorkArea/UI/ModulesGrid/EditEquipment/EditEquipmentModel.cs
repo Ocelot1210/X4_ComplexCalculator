@@ -23,12 +23,12 @@ class EditEquipmentModel : BindableBase, IDisposable
     /// <summary>
     /// 編集対象の装備管理
     /// </summary>
-    private readonly EquippableWareEquipmentManager _Manager;
+    private readonly EquippableWareEquipmentManager _manager;
 
     /// <summary>
     /// プリセット削除中か
     /// </summary>
-    private bool _RemovingPreset = false;
+    private bool _removingPreset = false;
     #endregion
 
 
@@ -78,7 +78,7 @@ class EditEquipmentModel : BindableBase, IDisposable
     public EditEquipmentModel(EquippableWareEquipmentManager equipmentManager)
     {
         // 初期化
-        _Manager = equipmentManager;
+        _manager = equipmentManager;
         InitEquipmentSizes();
         UpdateFactions();
         InitPreset();
@@ -94,7 +94,7 @@ class EditEquipmentModel : BindableBase, IDisposable
 
         SelectedPreset.Subscribe(x =>
         {
-            if (_RemovingPreset) return;
+            if (_removingPreset) return;
             foreach (var vm in EquipmentListViewModels)
             {
                 vm.SelectedPreset.Value = x;
@@ -130,7 +130,7 @@ class EditEquipmentModel : BindableBase, IDisposable
     /// </summary>
     private void InitEquipmentSizes()
     {
-        var sizes = _Manager.Ware.Equipments.Values
+        var sizes = _manager.Ware.Equipments.Values
             .SelectMany(x => x.Tags)
             .Distinct()
             .Select(x => X4Database.Instance.X4Size.TryGet(x))
@@ -152,7 +152,7 @@ class EditEquipmentModel : BindableBase, IDisposable
         // 装備可能な装備の製造元派閥一覧を作成
         var factions = X4Database.Instance.Ware.GetAll<IEquipment>()
             .Where(x => !x.Tags.Contains("noplayerblueprint"))
-            .Where(x => _Manager.Ware.Equipments.Values.Any(y => y.CanEquipped(x)))
+            .Where(x => _manager.Ware.Equipments.Values.Any(y => y.CanEquipped(x)))
             .SelectMany(x => x.Owners)
             .Distinct()
             .Select(x => new FactionsListItem(x, checkedFactions.Contains(x.FactionID)));
@@ -166,7 +166,7 @@ class EditEquipmentModel : BindableBase, IDisposable
     /// </summary>
     private void InitPreset()
     {
-        Presets.AddRange(SettingDatabase.Instance.GetModulePreset(_Manager.Ware.ID).Select(x => new PresetComboboxItem(x.ID, x.Name)));
+        Presets.AddRange(SettingDatabase.Instance.GetModulePreset(_manager.Ware.ID).Select(x => new PresetComboboxItem(x.ID, x.Name)));
     }
 
 
@@ -196,7 +196,7 @@ class EditEquipmentModel : BindableBase, IDisposable
         if (onOK)
         {
             // 新プリセット名が設定された場合
-            SettingDatabase.Instance.UpdateModulePresetName(_Manager.Ware.ID, SelectedPreset.Value.ID, newPresetName);
+            SettingDatabase.Instance.UpdateModulePresetName(_manager.Ware.ID, SelectedPreset.Value.ID, newPresetName);
             SelectedPreset.Value.Name = newPresetName;
         }
     }
@@ -210,9 +210,9 @@ class EditEquipmentModel : BindableBase, IDisposable
         var (onOK, presetName) = SelectStringDialog.ShowDialog("Lang:SaveNewPreset_Title", "Lang:SaveNewPreset_Description", "", IsValidPresetName);
         if (onOK)
         {
-            var newID = SettingDatabase.Instance.GetLastModulePresetsID(_Manager.Ware.ID);
+            var newID = SettingDatabase.Instance.GetLastModulePresetsID(_manager.Ware.ID);
             SettingDatabase.Instance.AddModulePreset(
-                _Manager.Ware.ID,
+                _manager.Ware.ID,
                 newID,
                 presetName,
                 EquipmentListViewModels.SelectMany(x => x.Equipped).Select(x => x.Equipment)
@@ -239,12 +239,12 @@ class EditEquipmentModel : BindableBase, IDisposable
         var result = LocalizedMessageBox.Show("Lang:DeletePresetConfirmMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.YesNo, MessageBoxImage.Exclamation, MessageBoxResult.No, SelectedPreset.Value.Name);
         if (result == MessageBoxResult.Yes)
         {
-            SettingDatabase.Instance.DeleteModulePreset(_Manager.Ware.ID, SelectedPreset.Value.ID);
+            SettingDatabase.Instance.DeleteModulePreset(_manager.Ware.ID, SelectedPreset.Value.ID);
 
-            _RemovingPreset = true;
+            _removingPreset = true;
             Presets.Remove(SelectedPreset.Value);
             SelectedPreset.Value = null;
-            _RemovingPreset = false;
+            _removingPreset = false;
         }
     }
 
@@ -257,7 +257,7 @@ class EditEquipmentModel : BindableBase, IDisposable
         if (SelectedPreset.Value is not null)
         {
             SettingDatabase.Instance.OverwritePreset(
-                _Manager.Ware.ID,
+                _manager.Ware.ID,
                 SelectedPreset.Value.ID,
                 EquipmentListViewModels.SelectMany(x => x.Equipped).Select(x => x.Equipment)
             );
@@ -271,7 +271,7 @@ class EditEquipmentModel : BindableBase, IDisposable
     /// </summary>
     public void SaveEquipment()
     {
-        _Manager.ResetEquipment(EquipmentListViewModels.SelectMany(x => x.Equipped.Select(y => y.Equipment)));
+        _manager.ResetEquipment(EquipmentListViewModels.SelectMany(x => x.Equipped.Select(y => y.Equipment)));
         foreach (var vm in EquipmentListViewModels)
         {
             vm.Unsaved.Value = false;

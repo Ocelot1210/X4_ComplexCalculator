@@ -11,13 +11,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid;
 /// <summary>
 /// 保管庫一覧表示用DataGridViewのViewModel
 /// </summary>
-public class StoragesGridViewModel : BindableBase, IDisposable
+public sealed class StoragesGridViewModel : BindableBase, IDisposable
 {
     #region メンバ
     /// <summary>
     /// 保管庫一覧表示用DataGridViewのModel
     /// </summary>
-    private readonly StoragesGridModel _Model;
+    private readonly StoragesGridModel _model;
     #endregion
 
 
@@ -25,7 +25,7 @@ public class StoragesGridViewModel : BindableBase, IDisposable
     /// <summary>
     /// ストレージ一覧
     /// </summary>
-    public ObservableCollection<StoragesGridItem> Storages => _Model.Storages;
+    public ObservableCollection<StoragesGridItem> Storages => _model.Storages;
 
 
     /// <summary>
@@ -41,7 +41,7 @@ public class StoragesGridViewModel : BindableBase, IDisposable
     /// <param name="stationData">計算機で使用するステーション情報</param>
     public StoragesGridViewModel(IStationData stationData)
     {
-        _Model = new StoragesGridModel(stationData.ModulesInfo, stationData.StoragesInfo);
+        _model = new StoragesGridModel(stationData.ModulesInfo, stationData.StoragesInfo);
         SetSelectedExpandedCommand = new DelegateCommand<bool?>(SetSelectedExpanded);
     }
 
@@ -51,7 +51,7 @@ public class StoragesGridViewModel : BindableBase, IDisposable
     /// </summary>
     public void Dispose()
     {
-        _Model.Dispose();
+        _model.Dispose();
     }
 
 

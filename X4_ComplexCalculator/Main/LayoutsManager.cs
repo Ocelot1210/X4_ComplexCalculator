@@ -23,19 +23,19 @@ class LayoutsManager : IDisposable
     /// <summary>
     /// 現在のレイアウト
     /// </summary>
-    private readonly ReactivePropertySlim<LayoutMenuItem?> _ActiveLayout = new();
+    private readonly ReactivePropertySlim<LayoutMenuItem?> _activeLayout = new();
 
 
     /// <summary>
     /// 作業エリア管理用
     /// </summary>
-    private readonly WorkAreaManager _WorkAreaManager;
+    private readonly WorkAreaManager _workAreaManager;
 
 
     /// <summary>
     /// Dispose が必要なオブジェクトのコレクション
     /// </summary>
-    private readonly CompositeDisposable _Disposables = new();
+    private readonly CompositeDisposable _disposables = new();
     #endregion
 
 
@@ -49,7 +49,7 @@ class LayoutsManager : IDisposable
     /// <summary>
     /// 現在のレイアウト
     /// </summary>
-    public IReadOnlyReactiveProperty<LayoutMenuItem?> ActiveLayout => _ActiveLayout;
+    public IReadOnlyReactiveProperty<LayoutMenuItem?> ActiveLayout => _activeLayout;
     #endregion
 
 
@@ -59,25 +59,25 @@ class LayoutsManager : IDisposable
     /// <param name="workAreaManager">作業エリア管理用オブジェクト</param>
     public LayoutsManager(WorkAreaManager workAreaManager)
     {
-        _WorkAreaManager = workAreaManager;
+        _workAreaManager = workAreaManager;
 
         // レイアウト一覧の上書きボタンをトリガーにレイアウト上書き保存を実行
         Layouts.ObserveElementObservableProperty(x => x.SaveButtonClickedCommand)
             .Select(x => x.Instance)
             .Subscribe(OverwritedSaveLayout)
-            .AddTo(_Disposables);
+            .AddTo(_disposables);
 
         // レイアウト一覧の変更ボタンをトリガーにレイアウト名変更を実行
         Layouts.ObserveElementObservableProperty(x => x.EditButtonClickedCommand)
             .Select(x => x.Instance)
             .Subscribe(EditLayoutName)
-            .AddTo(_Disposables);
+            .AddTo(_disposables);
 
         // レイアウト一覧の削除ボタンをトリガーにレイアウト削除を実行
         Layouts.ObserveElementObservableProperty(x => x.DeleteButtonClickedCommand)
             .Select(x => x.Instance)
             .Subscribe(DeleteLayout)
-            .AddTo(_Disposables);
+            .AddTo(_disposables);
 
         // プリセットが選択、または解除された場合、DB に状態を保存する
         var changeChecked = Layouts.ObserveElementObservableProperty(x => x.IsChecked);
@@ -97,8 +97,8 @@ class LayoutsManager : IDisposable
     public void Init()
     {
         // レイアウト一覧読み込み
-        const string sql = "SELECT LayoutID, LayoutName, IsChecked FROM WorkAreaLayouts";
-        var items = SettingDatabase.Instance.Query<(long LayoutID, string LayoutName, bool IsChecked)>(sql);
+        const string SQL = "SELECT LayoutID, LayoutName, IsChecked FROM WorkAreaLayouts";
+        var items = SettingDatabase.Instance.Query<(long LayoutID, string LayoutName, bool IsChecked)>(SQL);
         foreach (var (layoutID, layoutName, isChecked) in items)
         {
             Layouts.Add(new LayoutMenuItem(layoutID, layoutName, isChecked));
@@ -107,7 +107,7 @@ class LayoutsManager : IDisposable
         var checkedLayout = Layouts.FirstOrDefault(x => x.IsChecked.Value);
         if (checkedLayout is not null)
         {
-            _ActiveLayout.Value = checkedLayout;
+            _activeLayout.Value = checkedLayout;
         }
     }
 
@@ -149,13 +149,13 @@ class LayoutsManager : IDisposable
     /// <param name="menuItem">上書きするレイアウト</param>
     private void OverwritedSaveLayout(LayoutMenuItem menuItem)
     {
-        if (_WorkAreaManager.ActiveContent is null) return;
+        if (_workAreaManager.ActiveContent is null) return;
 
         try
         {
-            _WorkAreaManager.ActiveContent.OverwriteSaveLayout(menuItem.LayoutID);
+            _workAreaManager.ActiveContent.OverwriteSaveLayout(menuItem.LayoutID);
 
-            LocalizedMessageBox.Show("Lang:MainWindow_Menu_Layout_MenuItem_LayoutList_Overwrite_SuccessMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, _WorkAreaManager.ActiveContent.Title, menuItem.LayoutName);
+            LocalizedMessageBox.Show("Lang:MainWindow_Menu_Layout_MenuItem_LayoutList_Overwrite_SuccessMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, _workAreaManager.ActiveContent.Title, menuItem.LayoutName);
         }
         catch (Exception ex)
         {
@@ -174,9 +174,9 @@ class LayoutsManager : IDisposable
         {
             menuItem.LayoutName.Value = newLayoutName;
 
-            const string sql = "UPDATE WorkAreaLayouts SET LayoutName = :LayoutName WHERE LayoutID = :LayoutID";
+            const string SQL = "UPDATE WorkAreaLayouts SET LayoutName = :LayoutName WHERE LayoutID = :LayoutID";
 
-            SettingDatabase.Instance.Execute(sql, new { LayoutName = menuItem.LayoutName.Value, LayoutID = menuItem.LayoutID });
+            SettingDatabase.Instance.Execute(SQL, new { LayoutName = menuItem.LayoutName.Value, menuItem.LayoutID });
         }
     }
 
@@ -192,7 +192,7 @@ class LayoutsManager : IDisposable
         {
             SettingDatabase.Instance.Execute("DELETE FROM WorkAreaLayouts WHERE LayoutID = :LayoutID", new { menuItem.LayoutID });
             Layouts.Remove(menuItem);
-            _ActiveLayout.Value = null;
+            _activeLayout.Value = null;
         }
     }
 
@@ -229,11 +229,11 @@ class LayoutsManager : IDisposable
                 layout.IsChecked.Value = false;
             }
 
-            _ActiveLayout.Value = menuItem;
+            _activeLayout.Value = menuItem;
         }
     }
 
 
     /// <inheritdoc />
-    public void Dispose() => _Disposables.Dispose();
+    public void Dispose() => _disposables.Dispose();
 }

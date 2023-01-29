@@ -17,7 +17,7 @@ class RacesViewModel : BindableBase
     /// <summary>
     /// 種族一覧
     /// </summary>
-    private readonly ObservableRangeCollection<RacesGridItem> _Races = new(X4Database.Instance.Race.GetAll().Select(x => new RacesGridItem(x)));
+    private readonly ObservableRangeCollection<RacesGridItem> _races = new(X4Database.Instance.Race.GetAll().Select(x => new RacesGridItem(x)));
     #endregion
 
 
@@ -34,7 +34,7 @@ class RacesViewModel : BindableBase
     /// </summary>
     public RacesViewModel()
     {
-        RacesView = (ListCollectionView)CollectionViewSource.GetDefaultView(_Races);
+        RacesView = (ListCollectionView)CollectionViewSource.GetDefaultView(_races);
         RacesView.SortDescriptions.Clear();
         RacesView.SortDescriptions.Add(new SortDescription(nameof(IRace.Name), ListSortDirection.Ascending));
     }

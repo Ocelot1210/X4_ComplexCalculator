@@ -16,7 +16,7 @@ class EngineBuilder
     /// <summary>
     /// エンジン情報一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, X4_DataExporterWPF.Entity.Engine> _Engines;
+    private readonly IReadOnlyDictionary<string, X4_DataExporterWPF.Entity.Engine> _engines;
     #endregion
 
 
@@ -26,7 +26,7 @@ class EngineBuilder
     /// <param name="conn">DB接続情報</param>
     public EngineBuilder(IDbConnection conn)
     {
-        _Engines = conn.Query<X4_DataExporterWPF.Entity.Engine>("SELECT * FROM Engine")
+        _engines = conn.Query<X4_DataExporterWPF.Entity.Engine>("SELECT * FROM Engine")
             .ToDictionary(x => x.EquipmentID);
     }
 
@@ -38,7 +38,7 @@ class EngineBuilder
     /// <returns>エンジン情報または装備情報</returns>
     public IEquipment Build(IEquipment equipment)
     {
-        if (_Engines.TryGetValue(equipment.ID, out var item))
+        if (_engines.TryGetValue(equipment.ID, out var item))
         {
             return new Engine(
                 equipment,

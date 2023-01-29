@@ -13,7 +13,7 @@ class ImportExporter
     /// <summary>
     /// 作業エリア管理用
     /// </summary>
-    private readonly WorkAreaManager _WorkAreaManager;
+    private readonly WorkAreaManager _workAreaManager;
     #endregion
 
 
@@ -23,7 +23,7 @@ class ImportExporter
     /// <param name="workAreaManager">作業エリア管理用</param>
     public ImportExporter(WorkAreaManager workAreaManager)
     {
-        _WorkAreaManager = workAreaManager;
+        _workAreaManager = workAreaManager;
     }
 
 
@@ -38,11 +38,11 @@ class ImportExporter
 
         for (var cnt = 0; cnt < importCnt; cnt++)
         {
-            var vm = new WorkAreaViewModel(_WorkAreaManager.ActiveLayoutID);
+            var vm = new WorkAreaViewModel(_workAreaManager.ActiveLayoutID);
 
             if (vm.Import(import))
             {
-                _WorkAreaManager.Documents.Add(vm);
+                _workAreaManager.Documents.Add(vm);
             }
             else
             {
@@ -58,6 +58,6 @@ class ImportExporter
     /// <param name="export"></param>
     public void Export(IExport export)
     {
-        _WorkAreaManager.ActiveContent?.Export(export);
+        _workAreaManager.ActiveContent?.Export(export);
     }
 }

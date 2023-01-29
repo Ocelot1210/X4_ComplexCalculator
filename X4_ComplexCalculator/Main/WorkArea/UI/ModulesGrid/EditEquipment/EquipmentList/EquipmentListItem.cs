@@ -12,7 +12,7 @@ class EquipmentListItem : BindableBase
     /// <summary>
     /// 選択されているか
     /// </summary>
-    private bool _IsSelected;
+    private bool _isSelected;
     #endregion
 
 
@@ -28,8 +28,8 @@ class EquipmentListItem : BindableBase
     /// </summary>
     public bool IsSelected
     {
-        get => _IsSelected;
-        set => SetProperty(ref _IsSelected, value);
+        get => _isSelected;
+        set => SetProperty(ref _isSelected, value);
     }
     #endregion
 
@@ -41,6 +41,6 @@ class EquipmentListItem : BindableBase
     public EquipmentListItem(IEquipment equipment)
     {
         Equipment = equipment;
-        _IsSelected = false;
+        _isSelected = false;
     }
 }

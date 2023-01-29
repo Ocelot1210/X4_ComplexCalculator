@@ -15,19 +15,19 @@ class LoadoutImportViewModel : BindableBase
     /// <summary>
     /// Model
     /// </summary>
-    private readonly LoadoutImportModel _Model;
+    private readonly LoadoutImportModel _model;
 
 
     /// <summary>
     /// ダイアログの戻り値
     /// </summary>
-    private bool _DialogResult;
+    private bool _dialogResult;
 
 
     /// <summary>
     /// ダイアログを閉じるか
     /// </summary>
-    private bool _CloseDialogProperty;
+    private bool _closeDialogProperty;
     #endregion
 
 
@@ -37,8 +37,8 @@ class LoadoutImportViewModel : BindableBase
     /// </summary>
     public bool DialogResult
     {
-        get => _DialogResult;
-        set => SetProperty(ref _DialogResult, value);
+        get => _dialogResult;
+        set => SetProperty(ref _dialogResult, value);
     }
 
 
@@ -47,8 +47,8 @@ class LoadoutImportViewModel : BindableBase
     /// </summary>
     public bool CloseDialogProperty
     {
-        get => _CloseDialogProperty;
-        set => SetProperty(ref _CloseDialogProperty, value);
+        get => _closeDialogProperty;
+        set => SetProperty(ref _closeDialogProperty, value);
     }
 
 
@@ -77,13 +77,13 @@ class LoadoutImportViewModel : BindableBase
     /// <summary>
     /// セーブデータファイルパス
     /// </summary>
-    public string LoadoutsFilePath => _Model.LoadoutsFilePath;
+    public string LoadoutsFilePath => _model.LoadoutsFilePath;
 
 
     /// <summary>
     /// 計画一覧
     /// </summary>
-    public ObservableCollection<LoadoutItem> Loadouts => _Model.Loadouts;
+    public ObservableCollection<LoadoutItem> Loadouts => _model.Loadouts;
 
 
     /// <summary>
@@ -110,10 +110,10 @@ class LoadoutImportViewModel : BindableBase
     /// </summary>
     public LoadoutImportViewModel()
     {
-        _Model = new LoadoutImportModel();
-        ImportButtonClickedCommand = new DelegateCommand(_Model.Import);
+        _model = new LoadoutImportModel();
+        ImportButtonClickedCommand = new DelegateCommand(_model.Import);
         CloseButtonClickedCommand  = new DelegateCommand(CloseButtonClicked);
-        SelectSaveDataFileCommand  = new DelegateCommand(_Model.SelectSaveDataFile);
+        SelectSaveDataFileCommand  = new DelegateCommand(_model.SelectSaveDataFile);
     }
 
 

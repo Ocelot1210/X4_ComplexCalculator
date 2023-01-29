@@ -56,11 +56,11 @@ public static class DataGridFilter
     /// <returns>The <see cref="DataGridFilterHost"/></returns>
     public static DataGridFilterHost GetFilter(this DataGrid dataGrid)
     {
-        var value = (DataGridFilterHost)dataGrid.GetValue(FilterProperty);
+        var value = (DataGridFilterHost)dataGrid.GetValue(_FilterProperty);
         if (value is null)
         {
             value = new DataGridFilterHost(dataGrid);
-            dataGrid.SetValue(FilterProperty, value);
+            dataGrid.SetValue(_FilterProperty, value);
         }
         return value;
     }
@@ -68,14 +68,14 @@ public static class DataGridFilter
     /// Identifies the Filters dependency property.
     /// This property definition is private, so it's only accessible by code and can't be messed up by invalid bindings.
     /// </summary>
-    private static readonly DependencyProperty FilterProperty =
+    private static readonly DependencyProperty _FilterProperty =
         DependencyProperty.RegisterAttached("Filter", typeof(DataGridFilterHost), typeof(DataGridFilter));
 
     #endregion
 
     #region ContentFilterFactory attached property
 
-    private static readonly IContentFilterFactory DefaultContentFilterFactory = new SimpleContentFilterFactory(StringComparison.CurrentCultureIgnoreCase);
+    private static readonly IContentFilterFactory _DefaultContentFilterFactory = new SimpleContentFilterFactory(StringComparison.CurrentCultureIgnoreCase);
 
     /// <summary>
     /// Gets the content filter factory for the data grid filter.
@@ -85,7 +85,7 @@ public static class DataGridFilter
     [AttachedPropertyBrowsableForType(typeof(DataGrid))]
     public static IContentFilterFactory GetContentFilterFactory(DependencyObject dataGrid)
     {
-        return (IContentFilterFactory)dataGrid.GetValue(ContentFilterFactoryProperty) ?? DefaultContentFilterFactory;
+        return (IContentFilterFactory)dataGrid.GetValue(ContentFilterFactoryProperty) ?? _DefaultContentFilterFactory;
     }
     /// <summary>
     /// Sets the content filter factory for the data grid filter.
@@ -104,12 +104,12 @@ public static class DataGridFilter
     /// Identifies the ContentFilterFactory dependency property
     /// </summary>
     public static readonly DependencyProperty ContentFilterFactoryProperty =
-        DependencyProperty.RegisterAttached("ContentFilterFactory", typeof(IContentFilterFactory), typeof(DataGridFilter), new FrameworkPropertyMetadata(DefaultContentFilterFactory, null, ContentFilterFactory_CoerceValue));
+        DependencyProperty.RegisterAttached("ContentFilterFactory", typeof(IContentFilterFactory), typeof(DataGridFilter), new FrameworkPropertyMetadata(_DefaultContentFilterFactory, null, ContentFilterFactory_CoerceValue));
 
     private static object ContentFilterFactory_CoerceValue(DependencyObject sender, object? value)
     {
         // Ensure non-null content filter.
-        return value ?? DefaultContentFilterFactory;
+        return value ?? _DefaultContentFilterFactory;
     }
 
     #endregion
@@ -214,16 +214,16 @@ public static class DataGridFilter
     /// <summary>
     /// フィルターを管理するディクショナリ
     /// </summary>
-    private static readonly DependencyProperty FilterManagerProperty =
+    private static readonly DependencyProperty _FilterManagerProperty =
         DependencyProperty.RegisterAttached("FilterManager", typeof(IDictionary<string, IContentFilter>), typeof(DataGridFilter), new FrameworkPropertyMetadata(null));
 
     private static IDictionary<string, IContentFilter> GetFilterManager(DependencyObject dataGrid)
     {
-        var ret = (IDictionary<string, IContentFilter>?)dataGrid.GetValue(FilterManagerProperty);
+        var ret = (IDictionary<string, IContentFilter>?)dataGrid.GetValue(_FilterManagerProperty);
         if (ret is null)
         {
             ret = new Dictionary<string, IContentFilter>();
-            dataGrid.SetValue(FilterManagerProperty, ret);
+            dataGrid.SetValue(_FilterManagerProperty, ret);
         }
         return ret;
     }

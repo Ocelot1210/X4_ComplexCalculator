@@ -16,7 +16,7 @@ class FactionManager
     /// <summary>
     /// 派閥一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IFaction> _Factions;
+    private readonly IReadOnlyDictionary<string, IFaction> _factions;
     #endregion
 
 
@@ -27,7 +27,7 @@ class FactionManager
         /// <param name="raceManager">種族情報</param>
         public FactionManager(IDbConnection conn, RaceManager raceManager)
         {
-            _Factions = conn.Query<X4_DataExporterWPF.Entity.Faction>("SELECT * FROM Faction WHERE RaceID IN (SELECT RaceID FROM Race)")
+            _factions = conn.Query<X4_DataExporterWPF.Entity.Faction>("SELECT * FROM Faction WHERE RaceID IN (SELECT RaceID FROM Race)")
                 .Select(x => new Faction(x.FactionID, x.Name, raceManager.Get(x.RaceID), (int)x.Color) as IFaction)
                 .ToDictionary(x => x.FactionID);
         }
@@ -39,5 +39,5 @@ class FactionManager
     /// <param name="id">種族ID</param>
     /// <returns>派閥IDに対応する派閥 派閥IDに対応する派閥が無ければnull</returns>
     public IFaction? TryGet(string id) =>
-        _Factions.TryGetValue(id, out var race) ? race : null;
+        _factions.TryGetValue(id, out var race) ? race : null;
 }

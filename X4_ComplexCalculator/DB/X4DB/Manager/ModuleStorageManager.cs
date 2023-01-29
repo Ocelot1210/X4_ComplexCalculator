@@ -16,25 +16,25 @@ class ModuleStorageManager
     /// <summary>
     /// モジュールの保管庫情報一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IModuleStorage> _ModuleStorages;
+    private readonly IReadOnlyDictionary<string, IModuleStorage> _moduleStorages;
 
 
     /// <summary>
     /// ダミー用の保管庫情報一覧
     /// </summary>
-    private readonly Dictionary<string, IModuleStorage> _DummyStorages = new();
+    private readonly Dictionary<string, IModuleStorage> _dummyStorages = new();
 
 
     /// <summary>
     /// ダミー用保管庫種別一覧
     /// </summary>
-    private readonly HashSet<ITransportType> _DummyTypes = new();
+    private readonly HashSet<ITransportType> _dummyTypes = new();
 
 
     /// <summary>
     /// 保管庫種別の組み合わせ一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, HashSet<ITransportType>> _TransportTypeDict;
+    private readonly IReadOnlyDictionary<string, HashSet<ITransportType>> _transportTypeDict;
     #endregion
 
 
@@ -47,7 +47,7 @@ class ModuleStorageManager
     {
         // Tagのユニークな組み合わせ一覧を作成する
         {
-            const string sql = @"
+            const string SQL = @"
 SELECT
 	DISTINCT group_concat(Sorted_TransportTypeID.TransportTypeID, '彁') As TransportTypes
 	
@@ -65,13 +65,13 @@ FROM
 GROUP BY
 	Sorted_TransportTypeID.ModuleID";
 
-            _TransportTypeDict = conn.Query<string>(sql)
+            _transportTypeDict = conn.Query<string>(SQL)
                 .ToDictionary(x => x, x => new HashSet<ITransportType>(x.Split('彁').Select(y => transportTypeManager.Get(y))));
         }
 
         // モジュールの保管庫情報一覧を作成
         {
-            const string sql = @"
+            const string SQL = @"
 SELECT
 	ModuleStorage.ModuleID,
 	ModuleStorage.Amount,
@@ -87,8 +87,8 @@ WHERE
 GROUP BY
 	ModuleStorage.ModuleID";
 
-            _ModuleStorages = conn.Query<(string ID, long Amount, string transportTypes)>(sql)
-                .ToDictionary(x => x.ID, x => new ModuleStorage(x.ID, x.Amount, _TransportTypeDict[x.transportTypes]) as IModuleStorage);
+            _moduleStorages = conn.Query<(string ID, long Amount, string transportTypes)>(SQL)
+                .ToDictionary(x => x.ID, x => new ModuleStorage(x.ID, x.Amount, _transportTypeDict[x.transportTypes]) as IModuleStorage);
         }
     }
 
@@ -101,18 +101,18 @@ GROUP BY
     /// <returns>指定したモジュールIDに対応する保管庫情報</returns>
     public IModuleStorage Get(string id)
     {
-        if (_ModuleStorages.TryGetValue(id, out var ret1))
+        if (_moduleStorages.TryGetValue(id, out var ret1))
         {
             return ret1;
         }
 
-        if (_DummyStorages.TryGetValue(id, out var ret2))
+        if (_dummyStorages.TryGetValue(id, out var ret2))
         {
             return ret2;
         }
 
-        var ret3 = new ModuleStorage(id, 0, _DummyTypes);
-        _DummyStorages.Add(id, ret3);
+        var ret3 = new ModuleStorage(id, 0, _dummyTypes);
+        _dummyStorages.Add(id, ret3);
         return ret3;
     }
 }

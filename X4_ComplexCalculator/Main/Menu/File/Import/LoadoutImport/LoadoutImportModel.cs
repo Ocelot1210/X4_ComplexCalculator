@@ -23,7 +23,7 @@ class LoadoutImportModel : BindableBase
     /// <summary>
     /// 装備プリセットファイルパス
     /// </summary>
-    string _LoadoutsFilePath = "";
+    string _loadoutsFilePath = "";
     #endregion
 
 
@@ -39,8 +39,8 @@ class LoadoutImportModel : BindableBase
     /// </summary>
     public string LoadoutsFilePath
     {
-        get => _LoadoutsFilePath;
-        set => SetProperty(ref _LoadoutsFilePath, value);
+        get => _loadoutsFilePath;
+        set => SetProperty(ref _loadoutsFilePath, value);
     }
     #endregion
 
@@ -75,7 +75,7 @@ class LoadoutImportModel : BindableBase
     /// 初期フォルダを取得する
     /// </summary>
     /// <returns></returns>
-    private string GetInitialDirectory()
+    private static string GetInitialDirectory()
     {
         var docDir = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
 
@@ -96,11 +96,12 @@ class LoadoutImportModel : BindableBase
     /// </summary>
     public void SelectSaveDataFile()
     {
-        var dlg = new OpenFileDialog();
-
-        dlg.InitialDirectory = GetInitialDirectory();
-        dlg.RestoreDirectory = true;
-        dlg.Filter = "X4 Loadouts data file (loadouts.xml)|loadouts.xml|All files (*.*)|*.*";
+        var dlg = new OpenFileDialog
+        {
+            InitialDirectory = GetInitialDirectory(),
+            RestoreDirectory = true,
+            Filter = "X4 Loadouts data file (loadouts.xml)|loadouts.xml|All files (*.*)|*.*"
+        };
         if (dlg.ShowDialog() == true)
         {
             Mouse.OverrideCursor = Cursors.Wait;

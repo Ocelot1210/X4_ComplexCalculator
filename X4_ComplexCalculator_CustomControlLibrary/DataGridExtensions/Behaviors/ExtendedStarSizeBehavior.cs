@@ -21,8 +21,8 @@ using X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions.Framework;
 /// </summary>
 public class ExtendedStarSizeBehavior : Behavior<DataGrid>
 {
-    private static readonly DependencyPropertyDescriptor ViewportWidthPropertyDescriptor = DependencyPropertyDescriptor.FromProperty(ScrollViewer.ViewportWidthProperty, typeof(ScrollViewer));
-    private static readonly DependencyPropertyDescriptor NonFrozenColumnsViewportHorizontalOffsetPropertyDescriptor = DependencyPropertyDescriptor.FromProperty(DataGrid.NonFrozenColumnsViewportHorizontalOffsetProperty, typeof(DataGrid));
+    private static readonly DependencyPropertyDescriptor _ViewportWidthPropertyDescriptor = DependencyPropertyDescriptor.FromProperty(ScrollViewer.ViewportWidthProperty, typeof(ScrollViewer));
+    private static readonly DependencyPropertyDescriptor _NonFrozenColumnsViewportHorizontalOffsetPropertyDescriptor = DependencyPropertyDescriptor.FromProperty(DataGrid.NonFrozenColumnsViewportHorizontalOffsetProperty, typeof(DataGrid));
 
     private readonly DispatcherThrottle _updateColumnGripperToolTipVisibilityThrottle;
 
@@ -101,8 +101,8 @@ public class ExtendedStarSizeBehavior : Behavior<DataGrid>
         if (_scrollViewer is null)
             return;
 
-        ViewportWidthPropertyDescriptor.AddValueChanged(_scrollViewer, ScrollViewer_ViewportWidthChanged);
-        NonFrozenColumnsViewportHorizontalOffsetPropertyDescriptor.AddValueChanged(dataGrid, DataGrid_NonFrozenColumnsViewportHorizontalOffsetChanged);
+        _ViewportWidthPropertyDescriptor.AddValueChanged(_scrollViewer, ScrollViewer_ViewportWidthChanged);
+        _NonFrozenColumnsViewportHorizontalOffsetPropertyDescriptor.AddValueChanged(dataGrid, DataGrid_NonFrozenColumnsViewportHorizontalOffsetChanged);
 
         var dataGridEvents = dataGrid.GetAdditionalEvents();
 
@@ -124,8 +124,8 @@ public class ExtendedStarSizeBehavior : Behavior<DataGrid>
         if (scrollViewer is null)
             return;
 
-        ViewportWidthPropertyDescriptor.RemoveValueChanged(scrollViewer, ScrollViewer_ViewportWidthChanged);
-        NonFrozenColumnsViewportHorizontalOffsetPropertyDescriptor.RemoveValueChanged(dataGrid, DataGrid_NonFrozenColumnsViewportHorizontalOffsetChanged);
+        _ViewportWidthPropertyDescriptor.RemoveValueChanged(scrollViewer, ScrollViewer_ViewportWidthChanged);
+        _NonFrozenColumnsViewportHorizontalOffsetPropertyDescriptor.RemoveValueChanged(dataGrid, DataGrid_NonFrozenColumnsViewportHorizontalOffsetChanged);
 
         var dataGridEvents = dataGrid.GetAdditionalEvents();
 
@@ -248,18 +248,18 @@ public class ExtendedStarSizeBehavior : Behavior<DataGrid>
 
         var startColumnIndex = modifiedColumn?.DisplayIndex ?? 0;
 
-        bool IsFixedColumn(DataGridColumn c) => (GetStarSize(c) <= double.Epsilon) || (c.DisplayIndex <= startColumnIndex);
-        bool IsVariableColumn(DataGridColumn c) => !IsFixedColumn(c);
+        bool isFixedColumn(DataGridColumn c) => (GetStarSize(c) <= double.Epsilon) || (c.DisplayIndex <= startColumnIndex);
+        bool isVariableColumn(DataGridColumn c) => !isFixedColumn(c);
 
         var fixedColumnsWidth = dataGridColumns
-            .Where(IsFixedColumn)
+            .Where(isFixedColumn)
             .Select(c => c.ActualWidth)
             .Sum();
 
         var getEffectiveColumnSize = (updateMode == UpdateMode.ResetStarSize) ? (Func<DataGridColumn, double>)GetStarSize : GetActualWidth;
 
         var variableColumnWidths = dataGridColumns
-            .Where(IsVariableColumn)
+            .Where(isVariableColumn)
             .Select(getEffectiveColumnSize)
             .Sum();
 
@@ -275,7 +275,7 @@ public class ExtendedStarSizeBehavior : Behavior<DataGrid>
 
         var factor = spaceAvailable / variableColumnWidths;
 
-        foreach (var column in dataGridColumns.Where(IsVariableColumn))
+        foreach (var column in dataGridColumns.Where(isVariableColumn))
         {
             column.Width = getEffectiveColumnSize(column) * factor;
         }
@@ -291,7 +291,7 @@ public class ExtendedStarSizeBehavior : Behavior<DataGrid>
             if (!width.IsStar)
                 continue;
 
-            column.SetValue(StarSizeProperty, width.Value);
+            column.SetValue(_StarSizeProperty, width.Value);
             column.Width = column.ActualWidth;
         }
     }
@@ -307,8 +307,8 @@ public class ExtendedStarSizeBehavior : Behavior<DataGrid>
 
         foreach (var column in dataGrid.Columns.OrderBy(c => c.DisplayIndex))
         {
-            var leftColumnRightGripperToolTip = (ToolTip?)leftColumn?.GetValue(RightGripperToolTipProperty);
-            var thisColumnLeftGripperToolTip = (ToolTip?)column.GetValue(LeftGripperToolTipProperty);
+            var leftColumnRightGripperToolTip = (ToolTip?)leftColumn?.GetValue(_RightGripperToolTipProperty);
+            var thisColumnLeftGripperToolTip = (ToolTip?)column.GetValue(_LeftGripperToolTipProperty);
 
             var visibility = isLeftColumnStarSized ? Visibility.Visible : Visibility.Collapsed;
 
@@ -322,7 +322,7 @@ public class ExtendedStarSizeBehavior : Behavior<DataGrid>
             isLeftColumnStarSized = GetStarSize(column) > double.Epsilon;
         }
 
-        if (leftColumn?.GetValue(RightGripperToolTipProperty) is ToolTip toolTip)
+        if (leftColumn?.GetValue(_RightGripperToolTipProperty) is ToolTip toolTip)
             toolTip.Visibility = Visibility.Collapsed;
     }
 
@@ -330,11 +330,11 @@ public class ExtendedStarSizeBehavior : Behavior<DataGrid>
     {
         var baseStyle = dataGrid.ColumnHeaderStyle ?? (Style)dataGrid.FindResource(typeof(DataGridColumnHeader));
 
-        if (baseStyle.Setters.OfType<Setter>().Any(setter => setter.Property == ColumnHeaderGripperExtenderProperty))
+        if (baseStyle.Setters.OfType<Setter>().Any(setter => setter.Property == _ColumnHeaderGripperExtenderProperty))
             return;
 
         var newStyle = new Style(typeof(DataGridColumnHeader), baseStyle);
-        newStyle.Setters.Add(new Setter(ColumnHeaderGripperExtenderProperty, this));
+        newStyle.Setters.Add(new Setter(_ColumnHeaderGripperExtenderProperty, this));
         dataGrid.ColumnHeaderStyle = newStyle;
     }
 
@@ -345,19 +345,19 @@ public class ExtendedStarSizeBehavior : Behavior<DataGrid>
 
     private static double GetStarSize(DataGridColumn column)
     {
-        return (double)column.GetValue(StarSizeProperty);
+        return (double)column.GetValue(_StarSizeProperty);
     }
 
-    private static readonly DependencyProperty StarSizeProperty =
+    private static readonly DependencyProperty _StarSizeProperty =
         DependencyProperty.RegisterAttached("StarSize", typeof(double), typeof(ExtendedStarSizeBehavior), new FrameworkPropertyMetadata(0.0));
 
-    private static readonly DependencyProperty LeftGripperToolTipProperty =
+    private static readonly DependencyProperty _LeftGripperToolTipProperty =
         DependencyProperty.RegisterAttached("LeftGripperToolTip", typeof(ToolTip), typeof(ExtendedStarSizeBehavior));
 
-    private static readonly DependencyProperty RightGripperToolTipProperty =
+    private static readonly DependencyProperty _RightGripperToolTipProperty =
         DependencyProperty.RegisterAttached("RightGripperToolTip", typeof(ToolTip), typeof(ExtendedStarSizeBehavior));
 
-    private static readonly DependencyProperty ColumnHeaderGripperExtenderProperty =
+    private static readonly DependencyProperty _ColumnHeaderGripperExtenderProperty =
         DependencyProperty.RegisterAttached("ColumnHeaderGripperExtender", typeof(ExtendedStarSizeBehavior), typeof(ExtendedStarSizeBehavior), new FrameworkPropertyMetadata(null, ColumnHeaderGripperExtender_Changed));
 
     private static void ColumnHeaderGripperExtender_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -372,8 +372,8 @@ public class ExtendedStarSizeBehavior : Behavior<DataGrid>
 
         dataGrid?.BeginInvoke(DispatcherPriority.Background, () =>
         {
-            self.ApplyGripperToolTip(columnHeader, @"PART_LeftHeaderGripper", LeftGripperToolTipProperty);
-            self.ApplyGripperToolTip(columnHeader, @"PART_RightHeaderGripper", RightGripperToolTipProperty);
+            self.ApplyGripperToolTip(columnHeader, @"PART_LeftHeaderGripper", _LeftGripperToolTipProperty);
+            self.ApplyGripperToolTip(columnHeader, @"PART_RightHeaderGripper", _RightGripperToolTipProperty);
         });
     }
 
@@ -392,7 +392,7 @@ public class ExtendedStarSizeBehavior : Behavior<DataGrid>
 
         var toolTip = new ToolTip { Style = style };
 
-        BindingOperations.SetBinding(toolTip, StarSizeProperty, new Binding { Path = new PropertyPath(StarSizeProperty), Source = columnHeader.Column });
+        BindingOperations.SetBinding(toolTip, _StarSizeProperty, new Binding { Path = new PropertyPath(_StarSizeProperty), Source = columnHeader.Column });
 
         gripper.ToolTip = toolTip;
 

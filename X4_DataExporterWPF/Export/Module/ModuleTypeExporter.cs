@@ -22,17 +22,17 @@ public class ModuleTypeExporter : IExporter
     /// <summary>
     /// catファイルオブジェクト
     /// </summary>
-    private readonly ICatFile _CatFile;
+    private readonly ICatFile _catFile;
 
     /// <summary>
     /// ウェア情報xml
     /// </summary>
-    private readonly XDocument _WaresXml;
+    private readonly XDocument _waresXml;
 
     /// <summary>
     /// 言語解決用オブジェクト
     /// </summary>
-    private readonly ILanguageResolver _Resolver;
+    private readonly ILanguageResolver _resolver;
 
 
     /// <summary>
@@ -45,9 +45,9 @@ public class ModuleTypeExporter : IExporter
     {
         ArgumentNullException.ThrowIfNull(waresXml.Root);
 
-        _CatFile = catFile;
-        _WaresXml = waresXml;
-        _Resolver = resolver;
+        _catFile = catFile;
+        _waresXml = waresXml;
+        _resolver = resolver;
     }
 
 
@@ -101,12 +101,12 @@ CREATE TABLE IF NOT EXISTS ModuleType
             {"welfaremodule",       "{1001,    9620}"},
         };
 
-        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'module')])");
+        var maxSteps = (int)(double)_waresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'module')])");
         var currentStep = 0;
 
         var added = new HashSet<string>();
 
-        foreach (var module in _WaresXml.Root!.XPathSelectElements("ware[contains(@tags, 'module')]"))
+        foreach (var module in _waresXml.Root!.XPathSelectElements("ware[contains(@tags, 'module')]"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress?.Report((currentStep++, maxSteps));
@@ -117,7 +117,7 @@ CREATE TABLE IF NOT EXISTS ModuleType
             var macroName = module.XPathSelectElement("component")?.Attribute("ref")?.Value;
             if (string.IsNullOrEmpty(macroName)) continue;
 
-            var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
+            var macroXml = await _catFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
             if (macroXml?.Root is null) continue;
 
             var moduleTypeID = macroXml.Root.XPathSelectElement("macro")?.Attribute("class")?.Value;
@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS ModuleType
             // モジュール種別 ID の名称を表すキーの取得を試みる
             if (names.TryGetValue(moduleTypeID, out var name))
             {
-                name = _Resolver.Resolve(name);
+                name = _resolver.Resolve(name);
             }
             else
             {

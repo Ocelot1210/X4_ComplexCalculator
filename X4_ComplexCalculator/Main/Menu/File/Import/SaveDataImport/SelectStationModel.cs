@@ -21,7 +21,7 @@ class SelectStationModel : BindableBase
     /// <summary>
     /// セーブデータファイルパス
     /// </summary>
-    string _SaveDataFilePath = "";
+    string _saveDataFilePath = "";
     #endregion
 
 
@@ -36,8 +36,8 @@ class SelectStationModel : BindableBase
     /// </summary>
     public string SaveDataFilePath
     {
-        get => _SaveDataFilePath;
-        set => SetProperty(ref _SaveDataFilePath, value);
+        get => _saveDataFilePath;
+        set => SetProperty(ref _saveDataFilePath, value);
     }
     #endregion
 
@@ -55,7 +55,7 @@ class SelectStationModel : BindableBase
     /// 初期フォルダを取得する
     /// </summary>
     /// <returns></returns>
-    private string GetInitialDirectory()
+    private static string GetInitialDirectory()
     {
         var docDir = System.Environment.GetFolderPath(Environment.SpecialFolder.Personal);
 
@@ -76,11 +76,12 @@ class SelectStationModel : BindableBase
     /// </summary>
     public void SelectSaveDataFile()
     {
-        var dlg = new OpenFileDialog();
-
-        dlg.InitialDirectory = GetInitialDirectory();
-        dlg.RestoreDirectory = true;
-        dlg.Filter = "X4 Save data file (*.xml;*.xml.gz)|*.xml;*.xml.gz|All files (*.*)|*.*";
+        var dlg = new OpenFileDialog
+        {
+            InitialDirectory = GetInitialDirectory(),
+            RestoreDirectory = true,
+            Filter = "X4 Save data file (*.xml;*.xml.gz)|*.xml;*.xml.gz|All files (*.*)|*.*"
+        };
         if (dlg.ShowDialog() == true)
         {
             Mouse.OverrideCursor = Cursors.Wait;

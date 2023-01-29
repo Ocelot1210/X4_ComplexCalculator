@@ -14,10 +14,10 @@ public static class X4Path
     public static string GetX4InstallDirectory()
     {
         // アプリケーションのアンインストール情報が保存されている場所
-        const string location = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
+        const string LOCATION = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall";
 
         // レジストリ情報の取得を試みる
-        RegistryKey? parent = Registry.LocalMachine.OpenSubKey(location, false);
+        RegistryKey? parent = Registry.LocalMachine.OpenSubKey(LOCATION, false);
         if (parent is null)
         {
             // だめだった場合諦める
@@ -31,7 +31,7 @@ public static class X4Path
         foreach (var subKeyName in parent.GetSubKeyNames())
         {
             // 子のレジストリの情報を取得する
-            RegistryKey? child = Registry.LocalMachine.OpenSubKey(@$"{location}\{subKeyName}", false);
+            RegistryKey? child = Registry.LocalMachine.OpenSubKey(@$"{LOCATION}\{subKeyName}", false);
             if (child is null)
             {
                 // 取得に失敗したら次のレジストリを見に行く

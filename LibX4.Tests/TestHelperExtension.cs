@@ -21,7 +21,7 @@ internal static class TestHelperExtension
         var indent = lines
             .Where(l => !string.IsNullOrWhiteSpace(l))
             .Min(l => l.TakeWhile(char.IsWhiteSpace).Count());
-        return string.Join("\n", lines.Select(l => l.Substring(indent)));
+        return string.Join("\n", lines.Select(l => l[indent..]));
     }
 
 

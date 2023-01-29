@@ -16,7 +16,7 @@ class WaresViewModel : BindableBase
     /// <summary>
     /// ウェア一覧
     /// </summary>
-    private readonly ObservableRangeCollection<WaresGridItem> _Wares;
+    private readonly ObservableRangeCollection<WaresGridItem> _wares;
     #endregion
 
 
@@ -37,9 +37,9 @@ class WaresViewModel : BindableBase
             .Where(x => x.Tags.Contains("economy"))
             .Select(x => new WaresGridItem(x));
 
-        _Wares = new(items);
+        _wares = new(items);
 
-        WaresView = (ListCollectionView)CollectionViewSource.GetDefaultView(_Wares);
+        WaresView = (ListCollectionView)CollectionViewSource.GetDefaultView(_wares);
         WaresView.SortDescriptions.Clear();
         WaresView.SortDescriptions.Add(new SortDescription(nameof(WaresGridItem.WareName), ListSortDirection.Ascending));
     }

@@ -18,27 +18,21 @@ class WorkAreaManager : IDisposable
 {
     #region メンバ
     /// <summary>
-    /// ガーベジコレクション用ストップウォッチ
+    /// ガベコレ用ストップウォッチ
     /// </summary>
-    private readonly Stopwatch _GCStopWatch = new();
+    private readonly Stopwatch _gCStopWatch = new();
 
 
     /// <summary>
-    /// ガーベジコレクション用タイマー
+    ///ガベコレ用タイマー
     /// </summary>
-    private readonly DispatcherTimer _GCTimer;
+    private readonly DispatcherTimer _gcTimer;
 
 
     /// <summary>
     /// レイアウト管理用クラス
     /// </summary>
-    private readonly LayoutsManager _LayoutsManager;
-
-
-    /// <summary>
-    /// ワークエリア一覧
-    /// </summary>
-    public ObservableRangeCollection<WorkAreaViewModel> Documents = new();
+    private readonly LayoutsManager _layoutsManager;
     #endregion
 
 
@@ -52,13 +46,19 @@ class WorkAreaManager : IDisposable
     /// <summary>
     /// レイアウト一覧
     /// </summary>
-    public ObservableCollection<LayoutMenuItem> Layouts => _LayoutsManager.Layouts;
+    public ObservableCollection<LayoutMenuItem> Layouts => _layoutsManager.Layouts;
 
 
     /// <summary>
     /// 現在のレイアウトID
     /// </summary>
-    public long ActiveLayoutID => _LayoutsManager.ActiveLayout.Value?.LayoutID ?? -1;
+    public long ActiveLayoutID => _layoutsManager.ActiveLayout.Value?.LayoutID ?? -1;
+
+
+    /// <summary>
+    /// ワークエリア一覧
+    /// </summary>
+    public ObservableRangeCollection<WorkAreaViewModel> Documents { get; } = new();
     #endregion
 
 
@@ -67,13 +67,13 @@ class WorkAreaManager : IDisposable
     /// </summary>
     public WorkAreaManager()
     {
-        _LayoutsManager = new LayoutsManager(this);
+        _layoutsManager = new LayoutsManager(this);
 
-        _GCTimer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, new EventHandler(GarvageCollect), Application.Current.Dispatcher);
-        _GCTimer.Stop();
+        _gcTimer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, new EventHandler(GarvageCollect), Application.Current.Dispatcher);
+        _gcTimer.Stop();
 
         // 現在のレイアウトが変更された場合、開いているドキュメントすべてに適用する
-        _LayoutsManager.ActiveLayout
+        _layoutsManager.ActiveLayout
             .Where(layout => layout is not null)
             .Select(layout => layout?.LayoutID ?? throw new InvalidOperationException())
             .Subscribe(layoutID =>
@@ -89,13 +89,13 @@ class WorkAreaManager : IDisposable
     /// <summary>
     /// 初期化
     /// </summary>
-    public void Init() => _LayoutsManager.Init();
+    public void Init() => _layoutsManager.Init();
 
 
     /// <summary>
     /// レイアウト保存
     /// </summary>
-    public void SaveLayout() => _LayoutsManager.SaveLayout(ActiveContent);
+    public void SaveLayout() => _layoutsManager.SaveLayout(ActiveContent);
 
 
     /// <summary>
@@ -148,14 +148,14 @@ class WorkAreaManager : IDisposable
 
             }), DispatcherPriority.Background);
 
-            // ガーベジコレクション用タイマー開始
-            if (!_GCTimer.IsEnabled)
+            // ガベコレ用タイマー開始
+            if (!_gcTimer.IsEnabled)
             {
-                _GCTimer.Start();
+                _gcTimer.Start();
             }
 
             // 時間計測用ストップウォッチを初期化
-            _GCStopWatch.Reset();
+            _gCStopWatch.Reset();
 
         }
 
@@ -164,27 +164,27 @@ class WorkAreaManager : IDisposable
 
 
     /// <summary>
-    /// ガーベジコレクション実行
+    /// ガベコレ実行
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void GarvageCollect(object? sender, EventArgs e)
     {
-        // 最後のタブクローズから1000ミリ秒経過してからガーベジコレクションを発動する
-        _GCStopWatch.Stop();
-        if (1000 < _GCStopWatch.ElapsedMilliseconds)
+        // 最後のタブクローズから1000ミリ秒経過してからガベコレを発動する
+        _gCStopWatch.Stop();
+        if (1000 < _gCStopWatch.ElapsedMilliseconds)
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
             GC.Collect();
 
-            // ガーベジコレクション無効化
-            _GCTimer.Stop();
+            // ガベコレ無効化
+            _gcTimer.Stop();
         }
-        _GCStopWatch.Start();
+        _gCStopWatch.Start();
     }
 
 
     /// <inheritdoc />
-    public void Dispose() => _LayoutsManager.Dispose();
+    public void Dispose() => _layoutsManager.Dispose();
 }

@@ -8,10 +8,10 @@ using System.Windows.Controls;
 
 internal sealed class DataGridEventsProvider : IDataGridEventsProvider
 {
-    private static readonly DependencyPropertyDescriptor VisibilityPropertyDescriptor = DependencyPropertyDescriptor.FromProperty(DataGridColumn.VisibilityProperty, typeof(DataGridColumn));
-    private static readonly DependencyPropertyDescriptor ActualWidthPropertyDescriptor = DependencyPropertyDescriptor.FromProperty(DataGridColumn.ActualWidthProperty, typeof(DataGridColumn));
-    private static readonly DependencyPropertyDescriptor DisplayIndexPropertyDescriptor = DependencyPropertyDescriptor.FromProperty(DataGridColumn.DisplayIndexProperty, typeof(DataGridColumn));
-    private static readonly DependencyPropertyDescriptor SortDirectionPropertyDescriptor = DependencyPropertyDescriptor.FromProperty(DataGridColumn.SortDirectionProperty, typeof(DataGridColumn));
+    private static readonly DependencyPropertyDescriptor _VisibilityPropertyDescriptor = DependencyPropertyDescriptor.FromProperty(DataGridColumn.VisibilityProperty, typeof(DataGridColumn));
+    private static readonly DependencyPropertyDescriptor _ActualWidthPropertyDescriptor = DependencyPropertyDescriptor.FromProperty(DataGridColumn.ActualWidthProperty, typeof(DataGridColumn));
+    private static readonly DependencyPropertyDescriptor _DisplayIndexPropertyDescriptor = DependencyPropertyDescriptor.FromProperty(DataGridColumn.DisplayIndexProperty, typeof(DataGridColumn));
+    private static readonly DependencyPropertyDescriptor _SortDirectionPropertyDescriptor = DependencyPropertyDescriptor.FromProperty(DataGridColumn.SortDirectionProperty, typeof(DataGridColumn));
 
     private readonly DataGrid _dataGrid;
 
@@ -68,18 +68,18 @@ internal sealed class DataGridEventsProvider : IDataGridEventsProvider
 
     private void RemoveEventHandlers(DataGridColumn column)
     {
-        VisibilityPropertyDescriptor.RemoveValueChanged(column, DataGridColumnVisibility_Changed);
-        ActualWidthPropertyDescriptor.RemoveValueChanged(column, DataGridColumnActualWidth_Changed);
-        DisplayIndexPropertyDescriptor.RemoveValueChanged(column, DataGridColumnDisplayIndex_Changed);
-        SortDirectionPropertyDescriptor.RemoveValueChanged(column, DataGridColumnSortDirection_Changed);
+        _VisibilityPropertyDescriptor.RemoveValueChanged(column, DataGridColumnVisibility_Changed);
+        _ActualWidthPropertyDescriptor.RemoveValueChanged(column, DataGridColumnActualWidth_Changed);
+        _DisplayIndexPropertyDescriptor.RemoveValueChanged(column, DataGridColumnDisplayIndex_Changed);
+        _SortDirectionPropertyDescriptor.RemoveValueChanged(column, DataGridColumnSortDirection_Changed);
     }
 
     private void AddEventHandlers(DataGridColumn column)
     {
-        VisibilityPropertyDescriptor.AddValueChanged(column, DataGridColumnVisibility_Changed);
-        ActualWidthPropertyDescriptor.AddValueChanged(column, DataGridColumnActualWidth_Changed);
-        DisplayIndexPropertyDescriptor.AddValueChanged(column, DataGridColumnDisplayIndex_Changed);
-        SortDirectionPropertyDescriptor.AddValueChanged(column, DataGridColumnSortDirection_Changed);
+        _VisibilityPropertyDescriptor.AddValueChanged(column, DataGridColumnVisibility_Changed);
+        _ActualWidthPropertyDescriptor.AddValueChanged(column, DataGridColumnActualWidth_Changed);
+        _DisplayIndexPropertyDescriptor.AddValueChanged(column, DataGridColumnDisplayIndex_Changed);
+        _SortDirectionPropertyDescriptor.AddValueChanged(column, DataGridColumnSortDirection_Changed);
     }
 
     private void OnColumnVisibilityChanged(DataGridColumn column)

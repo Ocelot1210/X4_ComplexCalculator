@@ -13,7 +13,7 @@ public class ClearableWaterMarkTextBox : WatermarkTextBox
     /// <summary>
     /// 内容クリアボタン
     /// </summary>
-    private Button? _ClearButton;
+    private Button? _clearButton;
     #endregion
 
     /// <summary>
@@ -34,18 +34,18 @@ public class ClearableWaterMarkTextBox : WatermarkTextBox
         base.OnApplyTemplate();
 
         // 前のテンプレートのコントロールの後処理
-        if (_ClearButton != null)
+        if (_clearButton != null)
         {
-            _ClearButton.Click -= ClearButton_Click;
+            _clearButton.Click -= ClearButton_Click;
         }
 
         // テンプレートからコントロールの取得
-        _ClearButton = GetTemplateChild("PART_ClearButton") as Button;
+        _clearButton = GetTemplateChild("PART_ClearButton") as Button;
 
         // イベントハンドラの登録
-        if (_ClearButton != null)
+        if (_clearButton != null)
         {
-            _ClearButton.Click += ClearButton_Click;
+            _clearButton.Click += ClearButton_Click;
         }
     }
 

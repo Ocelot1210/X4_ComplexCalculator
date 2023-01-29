@@ -14,7 +14,7 @@ public class XDocumentExTest
     /// <summary>
     /// UTF-8 の BOM
     /// </summary>
-    private static readonly byte[] Bom = Encoding.UTF8.GetPreamble();
+    private static readonly byte[] _Bom = Encoding.UTF8.GetPreamble();
 
 
     /// <summary>
@@ -50,7 +50,7 @@ public class XDocumentExTest
     [MemberData(nameof(TestXmls))]
     public void Utf8WithBom(string source)
     {
-        var stream = new MemoryStream(Bom.Concat(Encoding.UTF8.GetBytes(source)).ToArray());
+        var stream = new MemoryStream(_Bom.Concat(Encoding.UTF8.GetBytes(source)).ToArray());
         XDocumentEx.Load(stream);
     }
 }

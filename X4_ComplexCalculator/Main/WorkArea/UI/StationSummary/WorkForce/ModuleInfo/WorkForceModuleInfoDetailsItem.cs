@@ -13,7 +13,7 @@ public class WorkForceModuleInfoDetailsItem : BindableBase
     /// <summary>
     /// モジュール数
     /// </summary>
-    private long _ModuleCount;
+    private long _moduleCount;
     #endregion
 
 
@@ -35,10 +35,10 @@ public class WorkForceModuleInfoDetailsItem : BindableBase
     /// </summary>
     public long ModuleCount
     {
-        get => _ModuleCount;
+        get => _moduleCount;
         set
         {
-            if (SetProperty(ref _ModuleCount, value))
+            if (SetProperty(ref _moduleCount, value))
             {
                 RaisePropertyChanged(nameof(TotalWorkforce));
             }
@@ -80,7 +80,7 @@ public class WorkForceModuleInfoDetailsItem : BindableBase
     {
         ModuleID = module.ID;
         ModuleName = module.Name;
-        _ModuleCount = moduleCount;
+        _moduleCount = moduleCount;
         MaxWorkers = module.MaxWorkers;
         WorkersCapacity = module.WorkersCapacity;
     }
@@ -97,7 +97,7 @@ public class WorkForceModuleInfoDetailsItem : BindableBase
     {
         ModuleID = moduleID;
         ModuleName = X4Database.Instance.Ware.Get<IX4Module>(moduleID).Name;
-        _ModuleCount = moduleCount;
+        _moduleCount = moduleCount;
         MaxWorkers = maxWorkers;
         WorkersCapacity = workersCapacity;
     }

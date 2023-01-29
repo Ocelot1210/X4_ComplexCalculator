@@ -16,19 +16,19 @@ class WareOwnerManager
     /// <summary>
     /// ユニークなウェア所有派閥一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IReadOnlyList<IFaction>> _Owners;
+    private readonly IReadOnlyDictionary<string, IReadOnlyList<IFaction>> _owners;
 
 
     /// <summary>
     /// ウェアIDとタグ文字列のペア
     /// </summary>
-    private readonly IReadOnlyDictionary<string, string> _WareOwnerPair;
+    private readonly IReadOnlyDictionary<string, string> _wareOwnerPair;
 
 
     /// <summary>
     /// 空の所有派閥一覧(ダミー用)
     /// </summary>
-    private readonly IReadOnlyList<IFaction> _EmptyOwners = Array.Empty<IFaction>();
+    private readonly IReadOnlyList<IFaction> _emptyOwners = Array.Empty<IFaction>();
     #endregion
 
 
@@ -40,12 +40,12 @@ class WareOwnerManager
     {
         // ユニークなウェア所有派閥一覧を作成
         {
-            const string sql = @"
+            const string SQL = @"
 SELECT   DISTINCT group_concat(TmpOwner.FactionID, '彁') As Tags
 FROM     (SELECT WareOwner.WareID, WareOwner.FactionID FROM WareOwner ORDER BY WareOwner.WareID, WareOwner.FactionID) TmpOwner
 GROUP BY TmpOwner.WareID";
 
-            _Owners = conn.Query<string>(sql)
+            _owners = conn.Query<string>(SQL)
                 .ToDictionary(
                     x => x,
                     x => x.Split('彁')
@@ -59,7 +59,7 @@ GROUP BY TmpOwner.WareID";
 
         // ウェアIDとウェア所有派閥一覧文字列のペアを作成する
         {
-            const string sql = @"
+            const string SQL = @"
 SELECT
 	Ware.WareID,
 	group_concat(TmpOwner.FactionID, '彁') As Tags
@@ -74,7 +74,7 @@ WHERE
 GROUP BY
 	Ware.WareID";
 
-            _WareOwnerPair = conn.Query<(string WareID, string Tags)>(sql)
+            _wareOwnerPair = conn.Query<(string WareID, string Tags)>(SQL)
                 .ToDictionary(x => x.WareID, x => x.Tags);
         }
     }
@@ -87,14 +87,14 @@ GROUP BY
     /// <returns><see cref="IWare.ID"/>に対応するウェアの所有派閥一覧</returns>
     public IReadOnlyList<IFaction> Get(string wareID)
     {
-        if (_WareOwnerPair.TryGetValue(wareID, out var owners))
+        if (_wareOwnerPair.TryGetValue(wareID, out var owners))
         {
-            if (_Owners.TryGetValue(owners, out var factions))
+            if (_owners.TryGetValue(owners, out var factions))
             {
                 return factions;
             }
         }
 
-        return _EmptyOwners;
+        return _emptyOwners;
     }
 }

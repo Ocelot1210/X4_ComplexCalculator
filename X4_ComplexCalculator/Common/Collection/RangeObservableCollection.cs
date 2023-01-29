@@ -76,11 +76,11 @@ public class RangeObservableCollection<T> : ObservableCollection<T>
     //------------------------------------------------------
 
     #region Public Properties
-    EqualityComparer<T>? _Comparer;
+    EqualityComparer<T>? _comparer;
     public EqualityComparer<T> Comparer
     {
-        get => _Comparer ??= EqualityComparer<T>.Default;
-        private set => _Comparer = value;
+        get => _comparer ??= EqualityComparer<T>.Default;
+        private set => _comparer = value;
     }
 
     /// <summary>
@@ -707,8 +707,8 @@ public class RangeObservableCollection<T> : ObservableCollection<T>
 /// </remarks>
 internal static class EventArgsCache
 {
-    internal static readonly PropertyChangedEventArgs CountPropertyChanged = new PropertyChangedEventArgs("Count");
-    internal static readonly PropertyChangedEventArgs IndexerPropertyChanged = new PropertyChangedEventArgs("Item[]");
-    internal static readonly NotifyCollectionChangedEventArgs ResetCollectionChanged = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
+    internal static readonly PropertyChangedEventArgs CountPropertyChanged = new("Count");
+    internal static readonly PropertyChangedEventArgs IndexerPropertyChanged = new("Item[]");
+    internal static readonly NotifyCollectionChangedEventArgs ResetCollectionChanged = new(NotifyCollectionChangedAction.Reset);
 }
 #nullable disable

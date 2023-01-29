@@ -24,7 +24,7 @@ class StationCalculatorImport : BindableBase, IImport
     /// <summary>
     /// 入力されたURL
     /// </summary>
-    private string _InputUrl = "";
+    private string _inputUrl = "";
     #endregion
 
 
@@ -64,7 +64,7 @@ class StationCalculatorImport : BindableBase, IImport
         var ret = 0;
         var onOK = false;
 
-        (onOK, _InputUrl) = SelectStringDialog.ShowDialog("Lang:StationCalculatorImport_Title", "Lang:StationCalculatorImport_Description");
+        (onOK, _inputUrl) = SelectStringDialog.ShowDialog("Lang:StationCalculatorImport_Title", "Lang:StationCalculatorImport_Description");
         if (onOK)
         {
             ret = 1;
@@ -85,7 +85,7 @@ class StationCalculatorImport : BindableBase, IImport
 
         try
         {
-            var query = _InputUrl.Split('?').Last();
+            var query = _inputUrl.Split('?').Last();
 
             var paramDict = new Dictionary<string, string>();
 

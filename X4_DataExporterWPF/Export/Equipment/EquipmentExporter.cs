@@ -23,25 +23,25 @@ class EquipmentExporter : IExporter
     /// <summary>
     /// catファイルオブジェクト
     /// </summary>
-    private readonly ICatFile _CatFile;
+    private readonly ICatFile _catFile;
 
 
     /// <summary>
     /// ウェア情報xml
     /// </summary>
-    private readonly XDocument _WaresXml;
+    private readonly XDocument _waresXml;
 
 
     /// <summary>
     /// サムネ画像管理クラス
     /// </summary>
-    private readonly ThumbnailManager _ThumbnailManager;
+    private readonly ThumbnailManager _thumbnailManager;
 
 
     /// <summary>
     /// 装備のタグ一覧
     /// </summary>
-    private readonly LinkedList<IReadOnlyList<EquipmentTag>> _EquipmentTags = new();
+    private readonly LinkedList<IReadOnlyList<EquipmentTag>> _equipmentTags = new();
 
 
     /// <summary>
@@ -53,9 +53,9 @@ class EquipmentExporter : IExporter
     {
         ArgumentNullException.ThrowIfNull(waresXml.Root);
 
-        _CatFile = catFile;
-        _WaresXml = waresXml;
-        _ThumbnailManager = new(catFile, "assets/fx/gui/textures/upgrades", "notfound");
+        _catFile = catFile;
+        _waresXml = waresXml;
+        _thumbnailManager = new(catFile, "assets/fx/gui/textures/upgrades", "notfound");
     }
 
 
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS EquipmentTag
 INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  Hull,  HullIntegrated,  Mk,  MakerRace,  Thumbnail)
             VALUES    (@EquipmentID, @MacroName, @EquipmentTypeID, @Hull, @HullIntegrated, @Mk, @MakerRace, @Thumbnail)", items);
 
-            await connection.ExecuteAsync("INSERT INTO EquipmentTag (EquipmentID, Tag) VALUES (@EquipmentID, @Tag)", _EquipmentTags.SelectMany(x => x));
+            await connection.ExecuteAsync("INSERT INTO EquipmentTag (EquipmentID, Tag) VALUES (@EquipmentID, @Tag)", _equipmentTags.SelectMany(x => x));
         }
     }
 
@@ -114,11 +114,11 @@ INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  Hull,  HullI
     /// <returns>読み出した Equipment データ</returns>
     private async IAsyncEnumerable<Equipment> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[@transport='equipment'])");
+        var maxSteps = (int)(double)_waresXml.Root!.XPathEvaluate("count(ware[@transport='equipment'])");
         var currentStep = 0;
 
 
-        foreach (var equipment in _WaresXml.Root!.XPathSelectElements("ware[@transport='equipment']"))
+        foreach (var equipment in _waresXml.Root!.XPathSelectElements("ware[@transport='equipment']"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress?.Report((currentStep++, maxSteps));
@@ -133,7 +133,7 @@ INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  Hull,  HullI
             if (string.IsNullOrEmpty(equipmentTypeID)) continue;
 
 
-            var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
+            var macroXml = await _catFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
             if (macroXml?.Root is null) continue;
 
             XDocument componentXml;
@@ -142,7 +142,7 @@ INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  Hull,  HullI
                 var componentName = macroXml.Root?.XPathSelectElement("macro/component")?.Attribute("ref")?.Value;
                 if (string.IsNullOrEmpty(componentName)) continue;
 
-                componentXml = await _CatFile.OpenIndexXmlAsync("index/components.xml", componentName, cancellationToken);
+                componentXml = await _catFile.OpenIndexXmlAsync("index/components.xml", componentName, cancellationToken);
             }
             catch
             {
@@ -156,7 +156,7 @@ INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  Hull,  HullI
             var tags = Util.SplitTags(component?.Attribute("tags")?.Value).Distinct();
             if (tags.Any())
             {
-                _EquipmentTags.AddLast(tags.Select(x => new EquipmentTag(equipmentID, x)).ToArray());
+                _equipmentTags.AddLast(tags.Select(x => new EquipmentTag(equipmentID, x)).ToArray());
             }
 
             var idElm = macroXml.Root?.XPathSelectElement("macro/properties/identification");
@@ -170,7 +170,7 @@ INSERT INTO Equipment ( EquipmentID,  MacroName,  EquipmentTypeID,  Hull,  HullI
                 (macroXml.Root?.XPathSelectElement("macro/properties/hull")?.Attribute("integrated")?.GetInt() ?? 0) == 1,
                 idElm.Attribute("mk")?.GetInt() ?? 0,
                 idElm.Attribute("makerrace")?.Value,
-                await _ThumbnailManager.GetThumbnailAsync(macroName, cancellationToken)
+                await _thumbnailManager.GetThumbnailAsync(macroName, cancellationToken)
             );
         }
 

@@ -13,13 +13,13 @@ public class VisiblityMenuItem : BindableBase
     /// <summary>
     /// 表示/非表示設定対象
     /// </summary>
-    private LayoutAnchorable _LayoutAnchorable;
+    private readonly LayoutAnchorable _layoutAnchorable;
 
 
     /// <summary>
     /// 表示状態変更通知をすべきか
     /// </summary>
-    private bool _ShouldNotifyVisibiltyChange;
+    private bool _shouldNotifyVisibiltyChange;
     #endregion
 
 
@@ -27,7 +27,7 @@ public class VisiblityMenuItem : BindableBase
     /// <summary>
     /// タイトル文字列
     /// </summary>
-    public string Title => _LayoutAnchorable.Title;
+    public string Title => _layoutAnchorable.Title;
 
 
     /// <summary>
@@ -35,14 +35,14 @@ public class VisiblityMenuItem : BindableBase
     /// </summary>
     public bool IsChecked
     {
-        get => _LayoutAnchorable.IsVisible;
+        get => _layoutAnchorable.IsVisible;
         set
         {
-            if (_LayoutAnchorable.IsVisible != value)
+            if (_layoutAnchorable.IsVisible != value)
             {
-                _ShouldNotifyVisibiltyChange = false;
-                _LayoutAnchorable.IsVisible  = value;
-                _ShouldNotifyVisibiltyChange = true;
+                _shouldNotifyVisibiltyChange = false;
+                _layoutAnchorable.IsVisible  = value;
+                _shouldNotifyVisibiltyChange = true;
 
                 RaisePropertyChanged();
             }
@@ -57,9 +57,9 @@ public class VisiblityMenuItem : BindableBase
     /// <param name="layoutElement">表示/非表示設定対象</param>
     public VisiblityMenuItem(LayoutAnchorable layoutElement)
     {
-        _LayoutAnchorable = layoutElement;
-        _LayoutAnchorable.IsVisibleChanged += LayoutAnchorable_IsVisibleChanged;
-        _ShouldNotifyVisibiltyChange = true;
+        _layoutAnchorable = layoutElement;
+        _layoutAnchorable.IsVisibleChanged += LayoutAnchorable_IsVisibleChanged;
+        _shouldNotifyVisibiltyChange = true;
     }
 
 
@@ -70,7 +70,7 @@ public class VisiblityMenuItem : BindableBase
     /// <param name="e"></param>
     private void LayoutAnchorable_IsVisibleChanged(object? sender, EventArgs e)
     {
-        if (_ShouldNotifyVisibiltyChange)
+        if (_shouldNotifyVisibiltyChange)
         {
             RaisePropertyChanged(nameof(IsChecked));
         }

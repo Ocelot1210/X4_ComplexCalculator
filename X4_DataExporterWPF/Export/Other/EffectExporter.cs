@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS Effect
     /// Effect データを読み出す
     /// </summary>
     /// <returns>EquipmentType データ</returns>
-    private IEnumerable<Effect> GetRecords(IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
+    private static IEnumerable<Effect> GetRecords(IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
     {
         // TODO: 可能ならファイルから抽出する
         (string id, string name)[] data =

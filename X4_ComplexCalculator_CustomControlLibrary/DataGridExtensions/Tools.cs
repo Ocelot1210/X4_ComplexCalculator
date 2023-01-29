@@ -53,10 +53,10 @@ public static class Tools
     /// <returns>The event provider.</returns>
     public static IDataGridEventsProvider GetAdditionalEvents(this DataGrid dataGrid)
     {
-        if (dataGrid.GetValue(DataGridEventsProviderProperty) is not IDataGridEventsProvider eventsProvider)
+        if (dataGrid.GetValue(_DataGridEventsProviderProperty) is not IDataGridEventsProvider eventsProvider)
         {
             eventsProvider = new DataGridEventsProvider(dataGrid);
-            dataGrid.SetValue(DataGridEventsProviderProperty, eventsProvider);
+            dataGrid.SetValue(_DataGridEventsProviderProperty, eventsProvider);
         }
 
         return eventsProvider;
@@ -64,7 +64,7 @@ public static class Tools
     /// <summary>
     /// Identifies the DataGridEventsProvider dependency property
     /// </summary>
-    private static readonly DependencyProperty DataGridEventsProviderProperty =
+    private static readonly DependencyProperty _DataGridEventsProviderProperty =
         DependencyProperty.RegisterAttached("DataGridEventsProvider", typeof(IDataGridEventsProvider), typeof(Tools));
 
     #endregion

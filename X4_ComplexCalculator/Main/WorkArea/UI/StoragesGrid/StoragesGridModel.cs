@@ -21,13 +21,13 @@ class StoragesGridModel : IDisposable
     /// <summary>
     /// モジュール一覧情報
     /// </summary>
-    private readonly IModulesInfo _Modules;
+    private readonly IModulesInfo _modules;
 
 
     /// <summary>
     /// 保管庫一覧情報
     /// </summary>
-    private readonly IStoragesInfo _Storages;
+    private readonly IStoragesInfo _storages;
     #endregion
 
 
@@ -35,7 +35,7 @@ class StoragesGridModel : IDisposable
     /// <summary>
     /// ストレージ一覧
     /// </summary>
-    public ObservablePropertyChangedCollection<StoragesGridItem> Storages => _Storages.Storages;
+    public ObservablePropertyChangedCollection<StoragesGridItem> Storages => _storages.Storages;
     #endregion
 
 
@@ -46,10 +46,10 @@ class StoragesGridModel : IDisposable
     /// <param name="storages">保管庫一覧</param>
     public StoragesGridModel(IModulesInfo modules, IStoragesInfo storages)
     {
-        _Modules = modules;
-        _Storages = storages;
-        _Modules.Modules.CollectionChangedAsync += OnModulesChanged;
-        _Modules.Modules.CollectionPropertyChangedAsync += OnModulePropertyChanged;
+        _modules = modules;
+        _storages = storages;
+        _modules.Modules.CollectionChangedAsync += OnModulesChanged;
+        _modules.Modules.CollectionPropertyChangedAsync += OnModulePropertyChanged;
     }
 
 
@@ -58,8 +58,8 @@ class StoragesGridModel : IDisposable
     /// </summary>
     public void Dispose()
     {
-        _Modules.Modules.CollectionChangedAsync -= OnModulesChanged;
-        _Modules.Modules.CollectionPropertyChangedAsync -= OnModulePropertyChanged;
+        _modules.Modules.CollectionChangedAsync -= OnModulesChanged;
+        _modules.Modules.CollectionPropertyChangedAsync -= OnModulePropertyChanged;
     }
 
 
@@ -120,7 +120,7 @@ class StoragesGridModel : IDisposable
         if (e.Action == NotifyCollectionChangedAction.Reset)
         {
             Storages.Clear();
-            OnModulesAdded(_Modules.Modules);
+            OnModulesAdded(_modules.Modules);
         }
 
         await Task.CompletedTask;

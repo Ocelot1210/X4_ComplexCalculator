@@ -28,19 +28,19 @@ class EditEquipmentViewModel : BindableBase, IDisposable
     /// <summary>
     /// 装備編集画面のModel
     /// </summary>
-    private readonly EditEquipmentModel _Model;
+    private readonly EditEquipmentModel _model;
 
 
     /// <summary>
     /// ウィンドウの表示状態
     /// </summary>
-    private bool _CloseWindow = false;
+    private bool _closeWindow = false;
 
 
     /// <summary>
     /// ゴミ箱
     /// </summary>
-    private readonly CompositeDisposable _Disposables = new();
+    private readonly CompositeDisposable _disposables = new();
     #endregion
 
 
@@ -58,11 +58,11 @@ class EditEquipmentViewModel : BindableBase, IDisposable
     {
         get
         {
-            return _CloseWindow;
+            return _closeWindow;
         }
         set
         {
-            _CloseWindow = value;
+            _closeWindow = value;
             RaisePropertyChanged();
         }
     }
@@ -77,7 +77,7 @@ class EditEquipmentViewModel : BindableBase, IDisposable
     /// <summary>
     /// 装備サイズ一覧
     /// </summary>
-    public ObservableCollection<IX4Size> EquipmentSizes => _Model.EquipmentSizes;
+    public ObservableCollection<IX4Size> EquipmentSizes => _model.EquipmentSizes;
 
 
     /// <summary>
@@ -95,7 +95,7 @@ class EditEquipmentViewModel : BindableBase, IDisposable
     /// <summary>
     /// プリセット
     /// </summary>
-    public ObservableCollection<PresetComboboxItem> Presets => _Model.Presets;
+    public ObservableCollection<PresetComboboxItem> Presets => _model.Presets;
 
 
     /// <summary>
@@ -143,7 +143,7 @@ class EditEquipmentViewModel : BindableBase, IDisposable
     /// <summary>
     /// タブアイテム一覧
     /// </summary>
-    public ObservableCollection<EquipmentListViewModel> EquipmentListViewModels => _Model.EquipmentListViewModels;
+    public ObservableCollection<EquipmentListViewModel> EquipmentListViewModels => _model.EquipmentListViewModels;
     #endregion
 
 
@@ -156,30 +156,30 @@ class EditEquipmentViewModel : BindableBase, IDisposable
         ModuleName = equipmentManager.Ware.Name;
 
         // Model類
-        _Model = new EditEquipmentModel(equipmentManager);
+        _model = new EditEquipmentModel(equipmentManager);
 
 
         // コマンド類
         SaveButtonClickedCommand = new DelegateCommand(SavebuttonClicked);
         CloseWindowCommand       = new DelegateCommand(CloseWindow);
-        OverwritePresetCommand   = new DelegateCommand(_Model.OverwritePreset);
-        EditPresetNameCommand    = new DelegateCommand(_Model.EditPresetName);
-        AddPresetCommand         = new DelegateCommand(_Model.AddPreset);
-        DeletePresetCommand      = new DelegateCommand(_Model.DeletePreset);
+        OverwritePresetCommand   = new DelegateCommand(_model.OverwritePreset);
+        EditPresetNameCommand    = new DelegateCommand(_model.EditPresetName);
+        AddPresetCommand         = new DelegateCommand(_model.AddPreset);
+        DeletePresetCommand      = new DelegateCommand(_model.DeletePreset);
         WindowClosingCommand     = new DelegateCommand<CancelEventArgs>(WindowClosing);
 
 
         // その他初期化
-        SelectedSize = _Model.SelectedSize
+        SelectedSize = _model.SelectedSize
             .ToReactivePropertyAsSynchronized(x => x.Value)
-            .AddTo(_Disposables);
+            .AddTo(_disposables);
 
-        SelectedPreset = _Model.SelectedPreset
+        SelectedPreset = _model.SelectedPreset
             .ToReactivePropertyAsSynchronized(x => x.Value)
-            .AddTo(_Disposables);
+            .AddTo(_disposables);
 
 
-        FactionsView = CollectionViewSource.GetDefaultView(_Model.Factions);
+        FactionsView = CollectionViewSource.GetDefaultView(_model.Factions);
         FactionsView.SortDescriptions.Clear();
         FactionsView.SortDescriptions.Add(new SortDescription(nameof(FactionsListItem.RaceName), ListSortDirection.Ascending));
         FactionsView.SortDescriptions.Add(new SortDescription(nameof(FactionsListItem.FactionName), ListSortDirection.Ascending));
@@ -193,8 +193,8 @@ class EditEquipmentViewModel : BindableBase, IDisposable
     /// </summary>
     public void Dispose()
     {
-        _Model.Dispose();
-        _Disposables.Dispose();
+        _model.Dispose();
+        _disposables.Dispose();
     }
 
 
@@ -213,7 +213,7 @@ class EditEquipmentViewModel : BindableBase, IDisposable
             {
                 // 保存する場合
                 case MessageBoxResult.Yes:
-                    _Model.SaveEquipment();
+                    _model.SaveEquipment();
                     break;
 
                 // 保存せずに閉じる場合
@@ -231,7 +231,7 @@ class EditEquipmentViewModel : BindableBase, IDisposable
         // ウィンドウを閉じる場合、チェック状態を保存
         if (!e.Cancel)
         {
-            Task.Run(_Model.SaveCheckState);
+            Task.Run(_model.SaveCheckState);
             Dispose();
         }
     }
@@ -242,7 +242,7 @@ class EditEquipmentViewModel : BindableBase, IDisposable
     /// </summary>
     private void SavebuttonClicked()
     {
-        _Model.SaveEquipment();
+        _model.SaveEquipment();
         CloseWindowProperty = true;
     }
 

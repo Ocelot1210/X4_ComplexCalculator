@@ -28,9 +28,10 @@ public partial class DataExportWindow : Window
     /// <param name="outFilePath"></param>
     public static void ShowDialog(string inDirPath, string outFilePath)
     {
-        var wnd = new DataExportWindow(inDirPath, outFilePath);
-
-        wnd.Owner = Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive) ?? Application.Current.MainWindow;
+        var wnd = new DataExportWindow(inDirPath, outFilePath)
+        {
+            Owner = Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive) ?? Application.Current.MainWindow
+        };
 
         wnd.ShowDialog();
     }

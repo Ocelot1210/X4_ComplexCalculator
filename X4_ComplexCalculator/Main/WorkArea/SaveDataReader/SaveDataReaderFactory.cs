@@ -38,11 +38,11 @@ internal static class SaveDataReaderFactory
     {
         using var conn = new DBConnection(path);
 
-        const string sql1 = "SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = 'Common'";
-        var tableExists = conn.QuerySingle<bool>(sql1);
+        const string SQL_1 = "SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = 'Common'";
+        var tableExists = conn.QuerySingle<bool>(SQL_1);
         if (!tableExists) return 0;
 
-        const string sql2 = "SELECT Value FROM Common WHERE Item = 'FormatVersion'";
-        return conn.QuerySingle<int>(sql2);
+        const string SQL_2 = "SELECT Value FROM Common WHERE Item = 'FormatVersion'";
+        return conn.QuerySingle<int>(SQL_2);
     }
 }

@@ -21,19 +21,19 @@ class WorkForceModuleInfoModel : BindableBase
     /// <summary>
     /// モジュール一覧情報
     /// </summary>
-    private readonly IModulesInfo _Modules;
+    private readonly IModulesInfo _modules;
 
 
     /// <summary>
     /// ステーションの設定
     /// </summary>
-    private readonly IStationSettings _Settings;
+    private readonly IStationSettings _settings;
 
 
     /// <summary>
     /// 本部モジュール用データ
     /// </summary>
-    private readonly WorkForceModuleInfoDetailsItem _HQ;
+    private readonly WorkForceModuleInfoDetailsItem _hQ;
     #endregion
 
 
@@ -52,13 +52,13 @@ class WorkForceModuleInfoModel : BindableBase
     /// <param name="settings">ステーションの設定</param>
     public WorkForceModuleInfoModel(IModulesInfo modules, IStationSettings settings)
     {
-        _Modules = modules;
-        _Modules.Modules.CollectionChangedAsync += OnModulesChanged;
-        _Modules.Modules.CollectionPropertyChangedAsync += OnModulesPropertyChanged;
+        _modules = modules;
+        _modules.Modules.CollectionChangedAsync += OnModulesChanged;
+        _modules.Modules.CollectionPropertyChangedAsync += OnModulesPropertyChanged;
 
-        _Settings = settings;
-        _Settings.PropertyChanged += Settings_PropertyChanged;
-        _HQ = new WorkForceModuleInfoDetailsItem("module_player_prod_hq_01_macro", 1, _Settings.HQWorkers, 0);
+        _settings = settings;
+        _settings.PropertyChanged += Settings_PropertyChanged;
+        _hQ = new WorkForceModuleInfoDetailsItem("module_player_prod_hq_01_macro", 1, _settings.HQWorkers, 0);
     }
 
 
@@ -73,15 +73,15 @@ class WorkForceModuleInfoModel : BindableBase
         {
             case nameof(IStationSettings.IsHeadquarters):
                 {
-                    if (_Settings.IsHeadquarters)
+                    if (_settings.IsHeadquarters)
                     {
-                        _Settings.Workforce.Need += _HQ.MaxWorkers;
-                        WorkForceDetails.Add(_HQ);
+                        _settings.Workforce.Need += _hQ.MaxWorkers;
+                        WorkForceDetails.Add(_hQ);
                     }
                     else
                     {
-                        _Settings.Workforce.Need -= _HQ.MaxWorkers;
-                        WorkForceDetails.Remove(_HQ);
+                        _settings.Workforce.Need -= _hQ.MaxWorkers;
+                        WorkForceDetails.Remove(_hQ);
                     }
                 }
                 break;
@@ -97,9 +97,9 @@ class WorkForceModuleInfoModel : BindableBase
     /// </summary>
     public void Dispose()
     {
-        _Modules.Modules.CollectionChangedAsync -= OnModulesChanged;
-        _Modules.Modules.CollectionPropertyChangedAsync -= OnModulesPropertyChanged;
-        _Settings.PropertyChanged -= Settings_PropertyChanged;
+        _modules.Modules.CollectionChangedAsync -= OnModulesChanged;
+        _modules.Modules.CollectionPropertyChangedAsync -= OnModulesPropertyChanged;
+        _settings.PropertyChanged -= Settings_PropertyChanged;
         WorkForceDetails.Clear();
     }
 
@@ -132,7 +132,7 @@ class WorkForceModuleInfoModel : BindableBase
             var itm = WorkForceDetails.First(x => x.ModuleID == module.Module.ID);
 
             // 必要労働力を更新
-            _Settings.Workforce.Need = _Settings.Workforce.Need - Math.Abs(itm.TotalWorkforce) + module.Module.MaxWorkers * module.ModuleCount;
+            _settings.Workforce.Need = _settings.Workforce.Need - Math.Abs(itm.TotalWorkforce) + module.Module.MaxWorkers * module.ModuleCount;
 
             // モジュール数を更新
             itm.ModuleCount = module.ModuleCount;
@@ -146,7 +146,7 @@ class WorkForceModuleInfoModel : BindableBase
             var itm = WorkForceDetails.First(x => x.ModuleID == module.Module.ID);
 
             // 現在の労働者数を更新
-            _Settings.Workforce.Capacity = _Settings.Workforce.Capacity - Math.Abs(itm.TotalWorkforce) + module.Module.WorkersCapacity * module.ModuleCount;
+            _settings.Workforce.Capacity = _settings.Workforce.Capacity - Math.Abs(itm.TotalWorkforce) + module.Module.WorkersCapacity * module.ModuleCount;
 
             // モジュール数を更新
             itm.ModuleCount = module.ModuleCount;
@@ -176,14 +176,14 @@ class WorkForceModuleInfoModel : BindableBase
         if (e.Action == NotifyCollectionChangedAction.Reset)
         {
             WorkForceDetails.Clear();
-            _Settings.Workforce.Clear();
-            OnModuleAdded(_Modules.Modules);
+            _settings.Workforce.Clear();
+            OnModuleAdded(_modules.Modules);
 
             // 本部なら本部モジュールを追加
-            if (_Settings.IsHeadquarters)
+            if (_settings.IsHeadquarters)
             {
-                _Settings.Workforce.Need += _HQ.MaxWorkers;
-                WorkForceDetails.Add(_HQ);
+                _settings.Workforce.Need += _hQ.MaxWorkers;
+                WorkForceDetails.Add(_hQ);
             }
         }
 
@@ -206,40 +206,40 @@ class WorkForceModuleInfoModel : BindableBase
         var capacity = 0L;
 
         var addItems = new List<WorkForceModuleInfoDetailsItem>();
-        foreach (var d in details)
+        foreach (var (module, moduleCount) in details)
         {
-            var itm = WorkForceDetails.FirstOrDefault(x => x.ModuleID == d.Module.ID);
+            var itm = WorkForceDetails.FirstOrDefault(x => x.ModuleID == module.ID);
             if (itm is not null)
             {
                 if (0 < itm.WorkForce)
                 {
-                    capacity += d.ModuleCount * itm.WorkForce;
+                    capacity += moduleCount * itm.WorkForce;
                 }
                 else
                 {
-                    needWorkforce += d.ModuleCount * itm.MaxWorkers;
+                    needWorkforce += moduleCount * itm.MaxWorkers;
                 }
 
-                itm.ModuleCount += d.ModuleCount;
+                itm.ModuleCount += moduleCount;
             }
             else
             {
-                addItems.Add(new WorkForceModuleInfoDetailsItem(d.Module, d.ModuleCount));
+                addItems.Add(new WorkForceModuleInfoDetailsItem(module, moduleCount));
 
-                if (0 < d.Module.WorkersCapacity)
+                if (0 < module.WorkersCapacity)
                 {
-                    capacity += d.Module.WorkersCapacity * d.ModuleCount;
+                    capacity += module.WorkersCapacity * moduleCount;
                 }
                 else
                 {
-                    needWorkforce += d.Module.MaxWorkers * d.ModuleCount;
+                    needWorkforce += module.MaxWorkers * moduleCount;
                 }
             }
         }
 
         WorkForceDetails.AddRange(addItems);
-        _Settings.Workforce.Need += needWorkforce;
-        _Settings.Workforce.Capacity += capacity;
+        _settings.Workforce.Need += needWorkforce;
+        _settings.Workforce.Capacity += capacity;
     }
 
 
@@ -257,26 +257,26 @@ class WorkForceModuleInfoModel : BindableBase
         var needWorkforce = 0L;
         var capacity = 0L;
 
-        foreach (var d in details)
+        foreach (var (module, moduleCount) in details)
         {
-            var itm = WorkForceDetails.FirstOrDefault(x => x.ModuleID == d.Module.ID);
+            var itm = WorkForceDetails.FirstOrDefault(x => x.ModuleID == module.ID);
             if (itm is not null)
             {
                 if (0 < itm.WorkForce)
                 {
-                    capacity += d.ModuleCount * itm.WorkForce;
+                    capacity += moduleCount * itm.WorkForce;
                 }
                 else
                 {
-                    needWorkforce += d.ModuleCount * itm.MaxWorkers;
+                    needWorkforce += moduleCount * itm.MaxWorkers;
                 }
 
-                itm.ModuleCount -= d.ModuleCount;
+                itm.ModuleCount -= moduleCount;
             }
         }
 
-        _Settings.Workforce.Need -= needWorkforce;
-        _Settings.Workforce.Capacity -= capacity;
+        _settings.Workforce.Need -= needWorkforce;
+        _settings.Workforce.Capacity -= capacity;
 
         WorkForceDetails.RemoveAll(x => x.ModuleCount == 0);
     }

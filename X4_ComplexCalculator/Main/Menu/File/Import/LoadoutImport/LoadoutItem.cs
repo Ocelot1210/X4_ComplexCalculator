@@ -20,12 +20,12 @@ public class LoadoutItem : BindableBase
     /// <summary>
     /// チェックされたか
     /// </summary>
-    bool _IsChecked;
+    bool _isChecked;
 
     /// <summary>
     /// インポート済みか
     /// </summary>
-    bool _Imported;
+    bool _imported;
     #endregion
 
 
@@ -53,13 +53,13 @@ public class LoadoutItem : BindableBase
     /// </summary>
     public bool IsChecked
     {
-        get => _IsChecked && !Imported;     // インポート済みの場合、必ずfalseになるようにする
+        get => _isChecked && !Imported;     // インポート済みの場合、必ずfalseになるようにする
         set
         {
             // インポート済でない場合のみ変更許可
             if (!Imported)
             {
-                SetProperty(ref _IsChecked, value);
+                SetProperty(ref _isChecked, value);
             }
         }
     }
@@ -69,11 +69,11 @@ public class LoadoutItem : BindableBase
     /// </summary>
     public bool Imported
     {
-        get => _Imported;
+        get => _imported;
         set
         {
             // インポートされた直後の場合、チェックを外す
-            if (SetProperty(ref _Imported, value) && value)
+            if (SetProperty(ref _imported, value) && value)
             {
                 RaisePropertyChanged(nameof(IsChecked));
             }
@@ -147,9 +147,9 @@ public class LoadoutItem : BindableBase
 
             foreach (var preset in presets)
             {
-                const string sqla = "SELECT EquipmentID FROM ModulePresetsEquipment WHERE ModuleID = :ModuleID AND PresetID = :PresetID";
+                const string SQL_1 = "SELECT EquipmentID FROM ModulePresetsEquipment WHERE ModuleID = :ModuleID AND PresetID = :PresetID";
 
-                var eqp = SettingDatabase.Instance.Query<string>(sqla, preset)
+                var eqp = SettingDatabase.Instance.Query<string>(SQL_1, preset)
                     .Select(x => X4Database.Instance.Ware.TryGet<IEquipment>(x))
                     .Where(x => x is not null)
                     .Select(x => x!);

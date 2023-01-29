@@ -20,7 +20,7 @@ public class DataGridFocusCellBehavior
     /// <summary>
     /// セルフォーカス用コマンドが設定済みか
     /// </summary>
-    private static readonly DependencyProperty HasFocusCommandProperty =
+    public static readonly DependencyProperty HasFocusCommandProperty =
         DependencyProperty.RegisterAttached("HasFocusCommand", typeof(bool), typeof(DataGridFocusCellBehavior), new PropertyMetadata(false));
 
 

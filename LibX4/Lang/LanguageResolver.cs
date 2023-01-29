@@ -17,7 +17,7 @@ public class LanguageResolver : ILanguageResolver
     /// <summary>
     /// 読み込んだ言語 XML
     /// </summary>
-    private readonly IReadOnlyList<XDocument> _LanguagesXml;
+    private readonly IReadOnlyList<XDocument> _languagesXml;
 
 
     /// <summary>
@@ -44,7 +44,7 @@ public class LanguageResolver : ILanguageResolver
     /// 複数の言語 XML が指定された場合、先に指定された物を優先する。
     /// </summary>
     /// <param name="languageXml">参照する言語 XML</param>
-    internal LanguageResolver(params XDocument[] languageXml) => _LanguagesXml = languageXml;
+    internal LanguageResolver(params XDocument[] languageXml) => _languagesXml = languageXml;
 
 
 
@@ -106,7 +106,7 @@ public class LanguageResolver : ILanguageResolver
             pageID = currentPageID ?? "";
         }
 
-        foreach (var languageXml in _LanguagesXml)
+        foreach (var languageXml in _languagesXml)
         {
             var findT = languageXml.Root
                 ?.XPathSelectElement($"page[@id='{pageID}']/t[@id='{tID}']")

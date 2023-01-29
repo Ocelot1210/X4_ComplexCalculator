@@ -29,17 +29,17 @@ public abstract class CSVLocalizationProviderBase : DependencyObject, ILocalizat
     /// Gets the used ResourceManagers with their corresponding <c>namespaces</c>.
     /// </summary>
     protected Dictionary<string, ResourceManager> ResourceManagerList =
-        new Dictionary<string, ResourceManager>();
+        new();
 
     /// <summary>
     /// Lock object for concurrent access to the resource manager list.
     /// </summary>
-    protected object ResourceManagerListLock = new object();
+    protected object ResourceManagerListLock = new();
 
     /// <summary>
     /// Lock object for concurrent access to the available culture list.
     /// </summary>
-    protected object AvailableCultureListLock = new object();
+    protected object AvailableCultureListLock = new();
     #endregion
 
     #region Helper functions
@@ -48,7 +48,7 @@ public abstract class CSVLocalizationProviderBase : DependencyObject, ILocalizat
     /// </summary>
     /// <param name="assembly">The Assembly where to get the name from</param>
     /// <returns>The Assembly name</returns>
-    protected string GetAssemblyName(Assembly assembly)
+    protected static string GetAssemblyName(Assembly assembly)
     {
         if (assembly.FullName is null)
             throw new NullReferenceException("assembly.FullName is null");

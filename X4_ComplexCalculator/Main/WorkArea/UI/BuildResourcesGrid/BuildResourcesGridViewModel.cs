@@ -13,25 +13,25 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
 /// <summary>
 /// 建造に必要なリソースを表示するDataGridView用ViewModel
 /// </summary>
-public class BuildResourcesGridViewModel : BindableBase, IDisposable
+public sealed class BuildResourcesGridViewModel : BindableBase, IDisposable
 {
     #region メンバ
     /// <summary>
     /// 建造に必要なリソースを表示するDataGridView用Model
     /// </summary>
-    private readonly BuildResourcesGridModel _Model;
+    private readonly BuildResourcesGridModel _model;
 
 
     /// <summary>
     /// 価格割合
     /// </summary>
-    private long _UnitPricePercent = 50;
+    private long _unitPricePercent = 50;
 
 
     /// <summary>
     /// 建造に必要なウェアを購入しない
     /// </summary>
-    private bool _NoBuy;
+    private bool _noBuy;
     #endregion
 
 
@@ -39,7 +39,7 @@ public class BuildResourcesGridViewModel : BindableBase, IDisposable
     /// <summary>
     /// 建造に必要なリソース一覧
     /// </summary>
-    public ObservableCollection<BuildResourcesGridItem> BuildResource => _Model.Resources;
+    public ObservableCollection<BuildResourcesGridItem> BuildResource => _model.Resources;
 
 
     /// <summary>
@@ -59,14 +59,14 @@ public class BuildResourcesGridViewModel : BindableBase, IDisposable
     /// </summary>
     public double UnitPricePercent
     {
-        get => _UnitPricePercent;
+        get => _unitPricePercent;
         set
         {
-            _UnitPricePercent = (long)value;
+            _unitPricePercent = (long)value;
 
             foreach (var resource in BuildResource)
             {
-                resource.SetUnitPricePercent(_UnitPricePercent);
+                resource.SetUnitPricePercent(_unitPricePercent);
             }
 
             RaisePropertyChanged();
@@ -79,10 +79,10 @@ public class BuildResourcesGridViewModel : BindableBase, IDisposable
     /// </summary>
     public bool NoBuy
     {
-        get => _NoBuy;
+        get => _noBuy;
         set
         {
-            if (SetProperty(ref _NoBuy, value))
+            if (SetProperty(ref _noBuy, value))
             {
                 foreach (var ware in BuildResource)
                 {
@@ -100,9 +100,9 @@ public class BuildResourcesGridViewModel : BindableBase, IDisposable
     /// <param name="stationData">計算機で使用するステーション情報</param>
     public BuildResourcesGridViewModel(IStationData stationData)
     {
-        _Model = new BuildResourcesGridModel(stationData.ModulesInfo, stationData.BuildResourcesInfo);
+        _model = new BuildResourcesGridModel(stationData.ModulesInfo, stationData.BuildResourcesInfo);
 
-        BuildResourceView = new CollectionViewSource { Source = _Model.Resources }.View;
+        BuildResourceView = new CollectionViewSource { Source = _model.Resources }.View;
         BuildResourceView.SortDescriptions.Add(new SortDescription("Ware.Name", ListSortDirection.Ascending));
         SetNoBuyToSelectedItemCommand = new DelegateCommand<bool?>(SetNoBuyToSelectedItem);
     }
@@ -113,7 +113,7 @@ public class BuildResourcesGridViewModel : BindableBase, IDisposable
     /// </summary>
     public void Dispose()
     {
-        _Model.Dispose();
+        _model.Dispose();
     }
 
 
@@ -123,7 +123,7 @@ public class BuildResourcesGridViewModel : BindableBase, IDisposable
     /// <param name="param"></param>
     private void SetNoBuyToSelectedItem(bool? param)
     {
-        foreach (var item in _Model.Resources.Where(x => x.IsSelected))
+        foreach (var item in _model.Resources.Where(x => x.IsSelected))
         {
             item.NoBuy = param == true;
         }

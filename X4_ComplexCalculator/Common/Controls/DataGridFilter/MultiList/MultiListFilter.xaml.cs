@@ -20,17 +20,17 @@ public partial class MultiListFilter
     /// <summary>
     /// 未チェック項目一覧(前回値復元用)
     /// </summary>
-    private readonly HashSet<string> _UnCheckedSet = new();
+    private readonly HashSet<string> _unCheckedSet = new();
 
     /// <summary>
     /// ListBoxの項目一覧用ビュー
     /// </summary>
-    private ICollectionView? _ListBoxItemsView;
+    private ICollectionView? _listBoxItemsView;
 
     /// <summary>
     /// DataContext
     /// </summary>
-    private DataGridFilterColumnControl? _FilterColumnControl;
+    private DataGridFilterColumnControl? _filterColumnControl;
     #endregion
 
 
@@ -49,8 +49,8 @@ public partial class MultiListFilter
         base.OnApplyTemplate();
 
         // DataContext経由で前回のフィルタを取得
-        _FilterColumnControl = DataContext as DataGridFilterColumnControl;
-        if (_FilterColumnControl?.LoadFilter() is MultiListContentFilter prevFilter)
+        _filterColumnControl = DataContext as DataGridFilterColumnControl;
+        if (_filterColumnControl?.LoadFilter() is MultiListContentFilter prevFilter)
         {
             Filter = prevFilter;
             foreach (var item in ListBoxItems)
@@ -92,7 +92,7 @@ public partial class MultiListFilter
                 IsFilterEnabled = value.IsFilterEnabled;
 
                 // 仮想化対策のためフィルタを保存
-                _FilterColumnControl?.SaveFilter();
+                _filterColumnControl?.SaveFilter();
             }
         }
     }
@@ -173,7 +173,7 @@ public partial class MultiListFilter
     /// <summary>
     /// リストボックス内容
     /// </summary>
-    private static readonly DependencyProperty ListBoxItemsProperty =
+    private static readonly DependencyProperty _ListBoxItemsProperty =
         DependencyProperty.Register(
             nameof(ListBoxItems),
             typeof(ObservableRangeCollection<ListBoxItem>),
@@ -183,8 +183,8 @@ public partial class MultiListFilter
 
     private ObservableRangeCollection<ListBoxItem> ListBoxItems
     {
-        get => (ObservableRangeCollection<ListBoxItem>)GetValue(ListBoxItemsProperty);
-        set => SetValue(ListBoxItemsProperty, value);
+        get => (ObservableRangeCollection<ListBoxItem>)GetValue(_ListBoxItemsProperty);
+        set => SetValue(_ListBoxItemsProperty, value);
     }
     #endregion
 
@@ -196,21 +196,21 @@ public partial class MultiListFilter
     private void PART_FilterButton_Click(object sender, RoutedEventArgs e)
     {
         // Filterを設定する前に未チェックの項目を保存しないとチェック状態が意図しない状態になる
-        _UnCheckedSet.Clear();
+        _unCheckedSet.Clear();
         foreach (var item in ListBoxItems.Where(x => !x.IsChecked))
         {
-            _UnCheckedSet.Add(item.Text);
+            _unCheckedSet.Add(item.Text);
         }
 
 
         // _ListBoxItemsView を設定しないと何故かListBoxItemFilter() で ListBoxSearchText が空文字列になる
         // → コンストラクタや OnApplyTemplate() で設定すると上手く動かない
         //    TODO:原因が分かったら修正する
-        _ListBoxItemsView = CollectionViewSource.GetDefaultView(ListBoxItems);
-        _ListBoxItemsView.Filter = ListBoxItemFilter;
+        _listBoxItemsView = CollectionViewSource.GetDefaultView(ListBoxItems);
+        _listBoxItemsView.Filter = ListBoxItemFilter;
 
         var srcValues = ((DataGridFilterColumnControl)TemplatedParent).GetSourceValuesRaw<IReadOnlyList<string>>().SelectMany(x => x).Concat(new string[] { "" });
-        ListBoxItems.Reset(srcValues.Distinct().OrderBy(x => x).Select(x => new ListBoxItem(x, !_UnCheckedSet.Contains(x))));
+        ListBoxItems.Reset(srcValues.Distinct().OrderBy(x => x).Select(x => new ListBoxItem(x, !_unCheckedSet.Contains(x))));
         IsOpen = true;
     }
 
@@ -232,7 +232,7 @@ public partial class MultiListFilter
     {
         foreach (var item in ListBoxItems)
         {
-            item.IsChecked = !_UnCheckedSet.Contains(item.Text);
+            item.IsChecked = !_unCheckedSet.Contains(item.Text);
         }
         IsOpen = false;
     }
@@ -243,7 +243,7 @@ public partial class MultiListFilter
     /// </summary>
     private void PART_ClearButton_Click(object sender, RoutedEventArgs e)
     {
-        _UnCheckedSet.Clear();
+        _unCheckedSet.Clear();
         foreach (var item in ListBoxItems)
         {
             item.IsChecked = true;
@@ -258,7 +258,7 @@ public partial class MultiListFilter
     /// </summary>
     private void CheckListBoxSearchText_Changed()
     {
-        _ListBoxItemsView?.Refresh();
+        _listBoxItemsView?.Refresh();
     }
 
 
@@ -272,7 +272,7 @@ public partial class MultiListFilter
         if (obj is ListBoxItem item)
         {
             ret = ListBoxSearchText == "" | 0 <= item.Text.IndexOf(ListBoxSearchText, StringComparison.InvariantCultureIgnoreCase);
-            item.IsChecked = ret && !_UnCheckedSet.Contains(item.Text);
+            item.IsChecked = ret && !_unCheckedSet.Contains(item.Text);
         }
 
         return ret;

@@ -11,13 +11,13 @@ public class StorageCapacityInfo : BindableBase
     /// <summary>
     /// 保管庫総容量
     /// </summary>
-    private long _TotalCapacity;
+    private long _totalCapacity;
 
 
     /// <summary>
     /// 保管庫使用容量
     /// </summary>
-    private long _UsedCapacity;
+    private long _usedCapacity;
     #endregion
 
 
@@ -27,10 +27,10 @@ public class StorageCapacityInfo : BindableBase
     /// </summary>
     public long TotalCapacity
     {
-        get => _TotalCapacity;
+        get => _totalCapacity;
         set
         {
-            if (SetProperty(ref _TotalCapacity, value))
+            if (SetProperty(ref _totalCapacity, value))
             {
                 RaisePropertyChanged(nameof(FreeCapacity));
             }
@@ -43,10 +43,10 @@ public class StorageCapacityInfo : BindableBase
     /// </summary>
     public long UsedCapacity
     {
-        get => _UsedCapacity;
+        get => _usedCapacity;
         set
         {
-            if (SetProperty(ref _UsedCapacity, value))
+            if (SetProperty(ref _usedCapacity, value))
             {
                 RaisePropertyChanged(nameof(FreeCapacity));
             }
@@ -57,7 +57,7 @@ public class StorageCapacityInfo : BindableBase
     /// <summary>
     /// 保管庫空き容量
     /// </summary>
-    public long FreeCapacity => TotalCapacity - _UsedCapacity;
+    public long FreeCapacity => TotalCapacity - _usedCapacity;
     #endregion
 
 

@@ -11,25 +11,25 @@ public class WorkforceManager : BindableBaseEx
     /// <summary>
     /// 現在の労働者数
     /// </summary>
-    private long _Actual = 0;
+    private long _actual = 0;
 
 
     /// <summary>
     /// 最大労働者数
     /// </summary>
-    private long _Need = 0;
+    private long _need = 0;
 
 
     /// <summary>
     /// 収容人数
     /// </summary>
-    private long _Capacity = 0;
+    private long _capacity = 0;
 
 
     /// <summary>
     /// 常に最大にするか
     /// </summary>
-    private bool _AlwaysMaximum;
+    private bool _alwaysMaximum;
     #endregion
 
 
@@ -39,11 +39,11 @@ public class WorkforceManager : BindableBaseEx
     /// </summary>
     public long Actual
     {
-        get => _Actual;
+        get => _actual;
         set
         {
             var oldProportion = Proportion;
-            if (SetPropertyEx(ref _Actual, value))
+            if (SetPropertyEx(ref _actual, value))
             {
                 RaisePropertyChangedEx(oldProportion, Proportion, nameof(Proportion));
             }
@@ -56,11 +56,11 @@ public class WorkforceManager : BindableBaseEx
     /// </summary>
     public long Need
     {
-        get => _Need;
+        get => _need;
         set
         {
             var oldProportion = Proportion;
-            if (SetPropertyEx(ref _Need, value))
+            if (SetPropertyEx(ref _need, value))
             {
                 RaisePropertyChangedEx(oldProportion, Proportion, nameof(Proportion));
             }
@@ -73,11 +73,11 @@ public class WorkforceManager : BindableBaseEx
     /// </summary>
     public long Capacity
     {
-        get => _Capacity;
+        get => _capacity;
         set
         {
             var isActualChange = value < Actual || Actual < value && AlwaysMaximum;
-            if (SetPropertyEx(ref _Capacity, value) && isActualChange)
+            if (SetPropertyEx(ref _capacity, value) && isActualChange)
             {
                 Actual = value;
             }
@@ -107,10 +107,10 @@ public class WorkforceManager : BindableBaseEx
     /// </summary>
     public bool AlwaysMaximum
     {
-        get => _AlwaysMaximum;
+        get => _alwaysMaximum;
         set
         {
-            if (SetProperty(ref _AlwaysMaximum, value) && value)
+            if (SetProperty(ref _alwaysMaximum, value) && value)
             {
                 Actual = Capacity;
             }

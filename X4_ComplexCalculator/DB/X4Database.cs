@@ -17,7 +17,7 @@ class X4Database : DBConnection
     /// <summary>
     /// インスタンス
     /// </summary>
-    public static X4Database? _Instance;
+    private static X4Database? _Instance;
     #endregion
 
 
@@ -25,37 +25,37 @@ class X4Database : DBConnection
     /// <summary>
     /// サイズ情報一覧
     /// </summary>
-    private X4SizeManager? _X4Size;
+    private X4SizeManager? _x4Size;
 
 
     /// <summary>
     /// 種族情報一覧
     /// </summary>
-    private RaceManager? _Race;
+    private RaceManager? _race;
 
 
     /// <summary>
     /// 派閥情報一覧
     /// </summary>
-    private FactionManager? _Faction;
+    private FactionManager? _faction;
 
 
     /// <summary>
     /// カーゴ種別一覧
     /// </summary>
-    private TransportTypeManager? _TransportType;
+    private TransportTypeManager? _transportType;
 
 
     /// <summary>
     /// 装備種別一覧
     /// </summary>
-    private EquipmentTypeManager? _EquipmentType;
+    private EquipmentTypeManager? _equipmentType;
 
 
     /// <summary>
     /// ウェア一覧
     /// </summary>
-    private WareManager? _Ware;
+    private WareManager? _ware;
     #endregion
 
 
@@ -73,37 +73,37 @@ class X4Database : DBConnection
     /// <summary>
     /// サイズ情報一覧
     /// </summary>
-    public X4SizeManager X4Size => _X4Size ?? throw new InvalidOperationException();
+    public X4SizeManager X4Size => _x4Size ?? throw new InvalidOperationException();
 
 
     /// <summary>
     /// 種族情報一覧
     /// </summary>
-    public RaceManager Race => _Race ?? throw new InvalidOperationException();
+    public RaceManager Race => _race ?? throw new InvalidOperationException();
 
 
     /// <summary>
     /// 派閥情報一覧
     /// </summary>
-    public FactionManager Faction => _Faction ?? throw new InvalidOperationException();
+    public FactionManager Faction => _faction ?? throw new InvalidOperationException();
 
 
     /// <summary>
     /// カーゴ種別一覧
     /// </summary>
-    public TransportTypeManager TransportType => _TransportType ?? throw new InvalidOperationException();
+    public TransportTypeManager TransportType => _transportType ?? throw new InvalidOperationException();
 
 
     /// <summary>
     /// 装備種別一覧
     /// </summary>
-    public EquipmentTypeManager EquipmentType => _EquipmentType ?? throw new InvalidOperationException();
+    public EquipmentTypeManager EquipmentType => _equipmentType ?? throw new InvalidOperationException();
 
 
     /// <summary>
     /// ウェア一覧
     /// </summary>
-    public WareManager Ware => _Ware ?? throw new InvalidOperationException();
+    public WareManager Ware => _ware ?? throw new InvalidOperationException();
     #endregion
 
 
@@ -197,16 +197,16 @@ class X4Database : DBConnection
     /// </summary>
     private long GetDBVersion()
     {
-        const string sql1 = "SELECT count(*) AS Count FROM sqlite_master WHERE type = 'table' AND name = 'Common'";
-        var tableExists = 0 < QuerySingle<long>(sql1);
+        const string SQL_1 = "SELECT count(*) AS Count FROM sqlite_master WHERE type = 'table' AND name = 'Common'";
+        var tableExists = 0 < QuerySingle<long>(SQL_1);
 
         if (!tableExists)
         {
             return 0;
         }
 
-        const string sql2 = "SELECT Value FROM Common WHERE Item = 'FormatVersion' UNION ALL SELECT 0 LIMIT 1";
-        return QuerySingle<long>(sql2);
+        const string SQL_2 = "SELECT Value FROM Common WHERE Item = 'FormatVersion' UNION ALL SELECT 0 LIMIT 1";
+        return QuerySingle<long>(SQL_2);
     }
 
 
@@ -259,11 +259,11 @@ class X4Database : DBConnection
     /// </summary>
     private void Init()
     {
-        _X4Size = new(_Connection);
-        _Race = new(_Connection);
-        _Faction = new(_Connection, _Race);
-        _TransportType = new(_Connection);
-        _EquipmentType = new(_Connection);
-        _Ware = new(_Connection, _TransportType);
+        _x4Size = new(_connection);
+        _race = new(_connection);
+        _faction = new(_connection, _race);
+        _transportType = new(_connection);
+        _equipmentType = new(_connection);
+        _ware = new(_connection, _transportType);
     }
 }

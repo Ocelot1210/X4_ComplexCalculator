@@ -77,28 +77,28 @@ class SaveDataReader2 : SaveDataReader1
     protected virtual void RestoreSettings(DBConnection conn, IStationSettings settings)
     {
         // 本部か
-        const string sql1 = "SELECT Value FROM StationSettings WHERE Key = 'IsHeadquarters' UNION ALL SELECT 'False' LIMIT 1";
-        settings.IsHeadquarters = conn.QuerySingle<string>(sql1) == bool.TrueString;
+        const string SQL_1 = "SELECT Value FROM StationSettings WHERE Key = 'IsHeadquarters' UNION ALL SELECT 'False' LIMIT 1";
+        settings.IsHeadquarters = conn.QuerySingle<string>(SQL_1) == bool.TrueString;
 
         // 日光
-        const string sql2 = "SELECT Value FROM StationSettings WHERE Key = 'Sunlight' UNION ALL SELECT '100' LIMIT 1";
-        var sunLightString = conn.QuerySingle<string>(sql2);
+        const string SQL_2 = "SELECT Value FROM StationSettings WHERE Key = 'Sunlight' UNION ALL SELECT '100' LIMIT 1";
+        var sunLightString = conn.QuerySingle<string>(SQL_2);
         if (double.TryParse(sunLightString, out var sunLight))
         {
             settings.Sunlight = sunLight;
         }
 
         // 現在の労働者数
-        const string sql3 = "SELECT Value FROM StationSettings WHERE Key = 'ActualWorkforce' UNION ALL SELECT '0' LIMIT 1";
-        var actualWorkforceString = conn.QuerySingle<string>(sql3);
+        const string SQL_3 = "SELECT Value FROM StationSettings WHERE Key = 'ActualWorkforce' UNION ALL SELECT '0' LIMIT 1";
+        var actualWorkforceString = conn.QuerySingle<string>(SQL_3);
         if (long.TryParse(actualWorkforceString, out var actualWorkforce))
         {
             settings.Workforce.Actual = actualWorkforce;
         }
 
         // (労働者数を)常に最大にするか
-        const string sql4 = "SELECT Value FROM StationSettings WHERE key = 'AlwaysMaximumWorkforce' UNION ALL SELECT 'False' LIMIT 1";
-        settings.Workforce.AlwaysMaximum = conn.QuerySingle<string>(sql4) == bool.TrueString;
+        const string SQL_4 = "SELECT Value FROM StationSettings WHERE key = 'AlwaysMaximumWorkforce' UNION ALL SELECT 'False' LIMIT 1";
+        settings.Workforce.AlwaysMaximum = conn.QuerySingle<string>(SQL_4) == bool.TrueString;
     }
 
 
@@ -108,8 +108,8 @@ class SaveDataReader2 : SaveDataReader1
     /// <param name="conn">DB接続情報</param>
     protected override void RestoreProducts(DBConnection conn)
     {
-        const string sql = "SELECT WareID, Price, NoBuy, NoSell FROM Products";
-        foreach (var (wareID, price, noBuy, noSell) in conn.Query<(string, long, long, long)>(sql))
+        const string SQL = "SELECT WareID, Price, NoBuy, NoSell FROM Products";
+        foreach (var (wareID, price, noBuy, noSell) in conn.Query<(string, long, long, long)>(SQL))
         {
             var itm = _WorkArea.StationData.ProductsInfo.Products.FirstOrDefault(x => x.Ware.ID == wareID);
             if (itm is not null)
@@ -128,8 +128,8 @@ class SaveDataReader2 : SaveDataReader1
     /// <param name="conn">DB接続情報</param>
     protected override void RestoreBuildResource(DBConnection conn)
     {
-        const string sql = "SELECT WareID, Price, NoBuy FROM BuildResources";
-        foreach (var (wareID, price, noBuy) in conn.Query<(string, long, long)>(sql))
+        const string SQL = "SELECT WareID, Price, NoBuy FROM BuildResources";
+        foreach (var (wareID, price, noBuy) in conn.Query<(string, long, long)>(SQL))
         {
             var itm = _WorkArea.StationData.BuildResourcesInfo.BuildResources.FirstOrDefault(x => x.Ware.ID == wareID);
             if (itm is not null)

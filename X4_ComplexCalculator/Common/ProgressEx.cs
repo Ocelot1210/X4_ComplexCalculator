@@ -8,7 +8,7 @@ class ProgressEx<T> : IProgress<T>
     /// <summary>
     /// 現在値
     /// </summary>
-    private T _Current;
+    private T _current;
 
 
     /// <summary>
@@ -24,7 +24,7 @@ class ProgressEx<T> : IProgress<T>
     /// <param name="firstValue">初期値</param>
     public ProgressEx(T firstValue)
     {
-        _Current = firstValue;
+        _current = firstValue;
     }
 
 
@@ -35,12 +35,12 @@ class ProgressEx<T> : IProgress<T>
     public void Report(T value)
     {
         // 同じ値なら何もしない
-        if (EqualityComparer<T>.Default.Equals(_Current, value))
+        if (EqualityComparer<T>.Default.Equals(_current, value))
         {
             return;
         }
 
-        _Current = value;
-        ProgressChanged?.Invoke(this, _Current);
+        _current = value;
+        ProgressChanged?.Invoke(this, _current);
     }
 }

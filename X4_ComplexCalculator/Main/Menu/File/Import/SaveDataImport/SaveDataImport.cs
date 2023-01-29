@@ -19,13 +19,13 @@ class SaveDataImport : IImport
     /// <summary>
     /// インポート対象ステーション一覧
     /// </summary>
-    private readonly List<SaveDataStationItem> Stations = new();
+    private readonly List<SaveDataStationItem> _stations = new();
 
 
     /// <summary>
     /// インポート対象ステーション要素番号
     /// </summary>
-    private int _StationIdx = 0;
+    private int _stationIdx = 0;
     #endregion
 
 
@@ -57,14 +57,14 @@ class SaveDataImport : IImport
     /// <returns>インポート対象数</returns>
     public int Select()
     {
-        var onOK = SelectStationDialog.ShowDialog(Stations);
+        var onOK = SelectStationDialog.ShowDialog(_stations);
         if (!onOK)
         {
-            Stations.Clear();
+            _stations.Clear();
         }
 
-        _StationIdx = 0;
-        return Stations.Count;
+        _stationIdx = 0;
+        return _stations.Count;
     }
 
 
@@ -78,8 +78,8 @@ class SaveDataImport : IImport
         bool ret;
         try
         {
-            ret = ImportMain(WorkArea, Stations[_StationIdx]);
-            _StationIdx++;
+            ret = ImportMain(WorkArea, _stations[_stationIdx]);
+            _stationIdx++;
         }
         catch
         {
@@ -96,7 +96,7 @@ class SaveDataImport : IImport
     /// <param name="WorkArea"></param>
     /// <param name="saveData"></param>
     /// <returns></returns>
-    private bool ImportMain(IWorkArea WorkArea, SaveDataStationItem saveData)
+    private static bool ImportMain(IWorkArea WorkArea, SaveDataStationItem saveData)
     {
         // モジュール一覧を設定
         SetModules(WorkArea, saveData);
@@ -118,7 +118,7 @@ class SaveDataImport : IImport
     /// </summary>
     /// <param name="WorkArea"></param>
     /// <param name="saveData"></param>
-    private void SetModules(IWorkArea WorkArea, SaveDataStationItem saveData)
+    private static void SetModules(IWorkArea WorkArea, SaveDataStationItem saveData)
     {
         var modules = new List<ModulesGridItem>((int)(double)saveData.XElement.XPathEvaluate("count(construction/sequence/entry)"));
 
@@ -147,9 +147,9 @@ class SaveDataImport : IImport
                 .Select(x => (Equipment: x.Equipment!, x.Count));
 
             var modulesGridItem = new ModulesGridItem(module);
-            foreach (var equipment in equipments)
+            foreach (var (equipment, count) in equipments)
             {
-                modulesGridItem.Equipments.Add(equipment.Equipment, equipment.Count);
+                modulesGridItem.Equipments.Add(equipment, count);
             }
 
             modules.Add(modulesGridItem);
@@ -188,7 +188,7 @@ class SaveDataImport : IImport
     /// </summary>
     /// <param name="WorkArea"></param>
     /// <param name="saveData"></param>
-    private void SetWarePrice(IWorkArea WorkArea, SaveDataStationItem saveData)
+    private static void SetWarePrice(IWorkArea WorkArea, SaveDataStationItem saveData)
     {
         foreach (var ware in saveData.XElement.XPathSelectElements("/economylog/*[not(self::cargo)]"))
         {
@@ -213,7 +213,7 @@ class SaveDataImport : IImport
     /// </summary>
     /// <param name="WorkArea"></param>
     /// <param name="saveData"></param>
-    private void SetStorageAssign(IWorkArea WorkArea, SaveDataStationItem saveData)
+    private static void SetStorageAssign(IWorkArea WorkArea, SaveDataStationItem saveData)
     {
         foreach (var ware in saveData.XElement.XPathSelectElements("overrides/max/ware"))
         {

@@ -22,19 +22,19 @@ class WorkAreaModel : BindableBase, IDisposable, IWorkArea
     /// <summary>
     /// タイトル文字列
     /// </summary>
-    private string _Title = "";
+    private string _title = "";
 
 
     /// <summary>
     /// 変更されたか
     /// </summary>
-    private bool _HasChanged;
+    private bool _hasChanged;
 
 
     /// <summary>
     /// 保存ファイル書き込み用
     /// </summary>
-    private readonly ISaveDataWriter _SaveDataWriter = new SQLiteSaveDataWriter();
+    private readonly ISaveDataWriter _saveDataWriter = new SQLiteSaveDataWriter();
     #endregion
 
 
@@ -44,8 +44,8 @@ class WorkAreaModel : BindableBase, IDisposable, IWorkArea
     /// </summary>
     public string Title
     {
-        get => _Title;
-        set => SetProperty(ref _Title, value);
+        get => _title;
+        set => SetProperty(ref _title, value);
     }
 
 
@@ -60,10 +60,10 @@ class WorkAreaModel : BindableBase, IDisposable, IWorkArea
     /// </summary>
     public bool HasChanged
     {
-        get => _HasChanged;
+        get => _hasChanged;
         set
         {
-            if (SetProperty(ref _HasChanged, value))
+            if (SetProperty(ref _hasChanged, value))
             {
                 if (value)
                 {
@@ -95,7 +95,7 @@ class WorkAreaModel : BindableBase, IDisposable, IWorkArea
     /// <summary>
     /// 保存先ファイルパス
     /// </summary>
-    public string SaveFilePath => _SaveDataWriter.SaveFilePath;
+    public string SaveFilePath => _saveDataWriter.SaveFilePath;
     #endregion
 
 
@@ -166,7 +166,7 @@ class WorkAreaModel : BindableBase, IDisposable, IWorkArea
     /// </summary>
     public void Save()
     {
-        if (_SaveDataWriter.Save(this))
+        if (_saveDataWriter.Save(this))
         {
             HasChanged = false;
         }
@@ -178,7 +178,7 @@ class WorkAreaModel : BindableBase, IDisposable, IWorkArea
     /// </summary>
     public void SaveAs()
     {
-        if (_SaveDataWriter.SaveAs(this))
+        if (_saveDataWriter.SaveAs(this))
         {
             HasChanged = false;
         }
@@ -198,7 +198,7 @@ class WorkAreaModel : BindableBase, IDisposable, IWorkArea
         // 読み込み成功？
         if (reader.Load(progress))
         {
-            _SaveDataWriter.SaveFilePath = path;
+            _saveDataWriter.SaveFilePath = path;
             HasChanged = false;
             ret = true;
         }

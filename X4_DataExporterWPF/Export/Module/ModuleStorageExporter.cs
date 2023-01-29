@@ -22,17 +22,17 @@ class ModuleStorageExporter : IExporter
     /// <summary>
     /// catファイルオブジェクト
     /// </summary>
-    private readonly IIndexResolver _CatFile;
+    private readonly IIndexResolver _catFile;
 
     /// <summary>
     /// ウェア情報xml
     /// </summary>
-    private readonly XDocument _WaresXml;
+    private readonly XDocument _waresXml;
 
     /// <summary>
     /// 保管庫種別一覧
     /// </summary>
-    private readonly LinkedList<ModuleStorageType> _StorageTypes = new();
+    private readonly LinkedList<ModuleStorageType> _storageTypes = new();
 
 
     /// <summary>
@@ -44,8 +44,8 @@ class ModuleStorageExporter : IExporter
     {
         ArgumentNullException.ThrowIfNull(waresXml.Root);
 
-        _CatFile = catFile;
-        _WaresXml = waresXml;
+        _catFile = catFile;
+        _waresXml = waresXml;
     }
 
 
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS ModuleStorageType
 
             await connection.ExecuteAsync("INSERT INTO ModuleStorage (ModuleID, Amount) VALUES (@ModuleID, @Amount)", items);
 
-            await connection.ExecuteAsync("INSERT INTO ModuleStorageType (ModuleID, TransportTypeID) VALUES (@ModuleID, @TransportTypeID)", _StorageTypes);
+            await connection.ExecuteAsync("INSERT INTO ModuleStorageType (ModuleID, TransportTypeID) VALUES (@ModuleID, @TransportTypeID)", _storageTypes);
         }
     }
 
@@ -96,11 +96,11 @@ CREATE TABLE IF NOT EXISTS ModuleStorageType
     /// <returns>読み出した ModuleStorage データ</returns>
     private async IAsyncEnumerable<ModuleStorage> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'module')])");
+        var maxSteps = (int)(double)_waresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'module')])");
         var currentStep = 0;
 
 
-        foreach (var module in _WaresXml.Root!.XPathSelectElements("ware[contains(@tags, 'module')]"))
+        foreach (var module in _waresXml.Root!.XPathSelectElements("ware[contains(@tags, 'module')]"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress.Report((currentStep++, maxSteps));
@@ -112,7 +112,7 @@ CREATE TABLE IF NOT EXISTS ModuleStorageType
             var macroName = module.XPathSelectElement("component")?.Attribute("ref")?.Value;
             if (string.IsNullOrEmpty(macroName)) continue;
 
-            var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
+            var macroXml = await _catFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
             if (macroXml?.Root is null) continue;
 
             // 容量が記載されている箇所を抽出
@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS ModuleStorageType
             foreach (var transportTypeID in Util.SplitTags(cargo.Attribute("tags")?.Value))
             {
                 transportTypeExists = true;
-                _StorageTypes.AddLast(new ModuleStorageType(moduleID, transportTypeID));
+                _storageTypes.AddLast(new ModuleStorageType(moduleID, transportTypeID));
             }
 
             // 保管庫種別が存在しなければ無効なデータと見なして登録しない

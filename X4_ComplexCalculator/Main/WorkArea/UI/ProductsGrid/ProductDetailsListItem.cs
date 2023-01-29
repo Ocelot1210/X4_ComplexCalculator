@@ -15,25 +15,25 @@ public class ProductDetailsListItem : BindableBase, IProductDetailsListItem
     /// <summary>
     /// 製品数(モジュール追加用)
     /// </summary>
-    private readonly long _Amount;
+    private readonly long _amount;
 
 
     /// <summary>
     /// モジュール数
     /// </summary>
-    private long _ModuleCount;
+    private long _moduleCount;
 
 
     /// <summary>
     /// 生産性
     /// </summary>
-    private readonly Dictionary<string, double> _Efficiencies;
+    private readonly Dictionary<string, double> _efficiencies;
 
 
     /// <summary>
     /// 最大生産性
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IWareEffect> _MaxEfficiencies;
+    private readonly IReadOnlyDictionary<string, IWareEffect> _maxEfficiencies;
     #endregion
 
 
@@ -53,10 +53,10 @@ public class ProductDetailsListItem : BindableBase, IProductDetailsListItem
     /// <inheritdoc/>
     public long ModuleCount
     {
-        get => _ModuleCount;
+        get => _moduleCount;
         set
         {
-            if (SetProperty(ref _ModuleCount, value))
+            if (SetProperty(ref _moduleCount, value))
             {
                 RaisePropertyChanged(nameof(Amount));
             }
@@ -65,7 +65,7 @@ public class ProductDetailsListItem : BindableBase, IProductDetailsListItem
 
 
     /// <inheritdoc/>
-    public long Amount => (long)(Efficiency * _Amount * ModuleCount);
+    public long Amount => (long)(Efficiency * _amount * ModuleCount);
 
 
     /// <inheritdoc/>
@@ -75,14 +75,14 @@ public class ProductDetailsListItem : BindableBase, IProductDetailsListItem
         {
             var ret = 1.0;
 
-            if (_Efficiencies.ContainsKey("work"))
+            if (_efficiencies.ContainsKey("work"))
             {
-                ret *= _MaxEfficiencies["work"].Product * _Efficiencies["work"] + 1.0;
+                ret *= _maxEfficiencies["work"].Product * _efficiencies["work"] + 1.0;
             }
 
-            if (_Efficiencies.ContainsKey("sunlight"))
+            if (_efficiencies.ContainsKey("sunlight"))
             {
-                ret *= _Efficiencies["sunlight"] / 100;
+                ret *= _efficiencies["sunlight"] / 100;
             }
 
             return ret;
@@ -106,19 +106,19 @@ public class ProductDetailsListItem : BindableBase, IProductDetailsListItem
         ModuleID = module.ID;
         ModuleName = module.Name;
         ModuleCount = moduleCount;
-        _Amount = amount;
-        _MaxEfficiencies = efficiency;
+        _amount = amount;
+        _maxEfficiencies = efficiency;
 
-        _Efficiencies = _MaxEfficiencies.ToDictionary(x => x.Key, _ => 1.0);
+        _efficiencies = _maxEfficiencies.ToDictionary(x => x.Key, _ => 1.0);
 
-        if (_Efficiencies.ContainsKey("work"))
+        if (_efficiencies.ContainsKey("work"))
         {
-            _Efficiencies["work"] = settings.Workforce.Proportion;
+            _efficiencies["work"] = settings.Workforce.Proportion;
         }
 
-        if (_Efficiencies.ContainsKey("sunlight"))
+        if (_efficiencies.ContainsKey("sunlight"))
         {
-            _Efficiencies["sunlight"] = settings.Sunlight;
+            _efficiencies["sunlight"] = settings.Sunlight;
         }
     }
 
@@ -132,9 +132,9 @@ public class ProductDetailsListItem : BindableBase, IProductDetailsListItem
     /// <param name="value">設定値</param>
     public void SetEfficiency(string effectID, double value)
     {
-        if (_Efficiencies.ContainsKey(effectID))
+        if (_efficiencies.ContainsKey(effectID))
         {
-            _Efficiencies[effectID] = value;
+            _efficiencies[effectID] = value;
             RaisePropertyChanged(nameof(Amount));
             RaisePropertyChanged(nameof(Efficiency));
         }

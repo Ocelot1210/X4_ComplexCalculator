@@ -18,31 +18,31 @@ class ModuleBuilder
     /// <summary>
     /// モジュール種別一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IModuleType> _ModuleTypes;
+    private readonly IReadOnlyDictionary<string, IModuleType> _moduleTypes;
 
 
     /// <summary>
     /// モジュール情報一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, X4_DataExporterWPF.Entity.Module> _Modules;
+    private readonly IReadOnlyDictionary<string, X4_DataExporterWPF.Entity.Module> _modules;
 
 
     /// <summary>
     /// モジュールの製品情報一覧
     /// </summary>
-    private readonly ModuleProductManager _ModuleProductManager;
+    private readonly ModuleProductManager _moduleProductManager;
 
 
     /// <summary>
     /// モジュールの保管庫情報管理
     /// </summary>
-    private readonly ModuleStorageManager _StorageManager;
+    private readonly ModuleStorageManager _storageManager;
 
 
     /// <summary>
     /// ウェアの装備情報一覧
     /// </summary>
-    private WareEquipmentManager _WareEquipmentManager;
+    private readonly WareEquipmentManager _wareEquipmentManager;
     #endregion
 
 
@@ -62,22 +62,22 @@ class ModuleBuilder
     {
         // モジュール種別一覧を作成
         {
-            const string sql = "SELECT ModuleTypeID, Name FROM ModuleType";
-            _ModuleTypes = conn.Query<ModuleType>(sql)
+            const string SQL = "SELECT ModuleTypeID, Name FROM ModuleType";
+            _moduleTypes = conn.Query<ModuleType>(SQL)
                 .ToDictionary(x => x.ModuleTypeID, x => x as IModuleType);
         }
 
 
         // モジュール情報一覧を作成
-        _Modules = conn.Query<X4_DataExporterWPF.Entity.Module>("SELECT * FROM Module")
+        _modules = conn.Query<X4_DataExporterWPF.Entity.Module>("SELECT * FROM Module")
             .ToDictionary(x => x.ModuleID);
 
 
-        _ModuleProductManager = new(conn, wareProductionManager);
+        _moduleProductManager = new(conn, wareProductionManager);
 
-        _StorageManager = new(conn, transportTypeManager);
+        _storageManager = new(conn, transportTypeManager);
 
-        _WareEquipmentManager = wareEquipmentManager;
+        _wareEquipmentManager = wareEquipmentManager;
     }
 
 
@@ -90,10 +90,10 @@ class ModuleBuilder
     {
         if (!ware.Tags.Contains("module"))
         {
-            throw new ArgumentException();
+            throw new ArgumentException("Ware is not Module", nameof(ware));
         }
 
-        if (!_Modules.TryGetValue(ware.ID, out var item))
+        if (!_modules.TryGetValue(ware.ID, out var item))
         {
             return ware;
         }
@@ -101,13 +101,13 @@ class ModuleBuilder
         return new Module(
             ware,
             item.Macro,
-            _ModuleTypes[item.ModuleTypeID],
+            _moduleTypes[item.ModuleTypeID],
             item.MaxWorkers,
             item.WorkersCapacity,
             item.NoBlueprint,
-            _ModuleProductManager.Get(ware.ID),
-            _StorageManager.Get(ware.ID),
-            _WareEquipmentManager.Get(ware.ID).ToDictionary(x => x.ConnectionName)
+            _moduleProductManager.Get(ware.ID),
+            _storageManager.Get(ware.ID),
+            _wareEquipmentManager.Get(ware.ID).ToDictionary(x => x.ConnectionName)
         );
     }
 }

@@ -22,19 +22,19 @@ public class ShipTypeExporter : IExporter
     /// <summary>
     /// catファイルオブジェクト
     /// </summary>
-    private readonly CatFile _CatFile;
+    private readonly CatFile _catFile;
 
 
     /// <summary>
     /// ウェア情報xml
     /// </summary>
-    private readonly XDocument _WaresXml;
+    private readonly XDocument _waresXml;
 
 
     /// <summary>
     /// 言語解決用オブジェクト
     /// </summary>
-    private readonly ILanguageResolver _Resolver;
+    private readonly ILanguageResolver _resolver;
 
 
     /// <summary>
@@ -45,9 +45,9 @@ public class ShipTypeExporter : IExporter
     {
         ArgumentNullException.ThrowIfNull(waresXml.Root);
 
-        _CatFile = catFile;
-        _WaresXml = waresXml;
-        _Resolver = resolver;
+        _catFile = catFile;
+        _waresXml = waresXml;
+        _resolver = resolver;
     }
 
 
@@ -124,11 +124,11 @@ CREATE TABLE IF NOT EXISTS ShipType
             {"battleship",       (5031, 5032)},         // 戦艦
         };
 
-        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
+        var maxSteps = (int)(double)_waresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
         var currentStep = 0;
         var added = new HashSet<string>();
 
-        foreach (var ship in _WaresXml.Root!.XPathSelectElements("ware[contains(@tags, 'ship')]"))
+        foreach (var ship in _waresXml.Root!.XPathSelectElements("ware[contains(@tags, 'ship')]"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress?.Report((currentStep++, maxSteps));
@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS ShipType
             var macroName = ship.XPathSelectElement("component")?.Attribute("ref")?.Value;
             if (string.IsNullOrEmpty(macroName)) continue;
 
-            var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
+            var macroXml = await _catFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
 
             var properties = macroXml.Root?.XPathSelectElement("macro/properties");
             if (properties is null) continue;
@@ -151,8 +151,8 @@ CREATE TABLE IF NOT EXISTS ShipType
             var descr = "";
             if (names.TryGetValue(shipTypeID, out var item))
             {
-                name = _Resolver.Resolve($"{{20221, {item.name}}}");
-                descr = _Resolver.Resolve($"{{20221, {item.descr}}}");
+                name = _resolver.Resolve($"{{20221, {item.name}}}");
+                descr = _resolver.Resolve($"{{20221, {item.descr}}}");
             }
 
             yield return new ShipType(shipTypeID, name, descr);

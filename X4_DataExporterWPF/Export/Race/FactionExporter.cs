@@ -23,13 +23,13 @@ public class FactionExporter : IExporter
     /// <summary>
     /// catファイルオブジェクト
     /// </summary>
-    private readonly CatFile _CatFile;
+    private readonly CatFile _catFile;
 
 
     /// <summary>
     /// 言語解決用オブジェクト
     /// </summary>
-    private readonly ILanguageResolver _Resolver;
+    private readonly ILanguageResolver _resolver;
 
 
     /// <summary>
@@ -39,8 +39,8 @@ public class FactionExporter : IExporter
     /// <param name="resolver">言語解決用オブジェクト</param>
     public FactionExporter(CatFile catFile, ILanguageResolver resolver)
     {
-        _CatFile = catFile;
-        _Resolver = resolver;
+        _catFile = catFile;
+        _resolver = resolver;
     }
 
 
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS Faction
     /// <returns>読み出した Faction データ</returns>
     private async IAsyncEnumerable<Faction> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var factionsXml = await _CatFile.OpenXmlAsync("libraries/factions.xml", cancellationToken);
+        var factionsXml = await _catFile.OpenXmlAsync("libraries/factions.xml", cancellationToken);
         if (factionsXml?.Root is null) yield break;
 
         var maxSteps = (int)(double)factionsXml.Root.XPathEvaluate("count(faction[@name])");
@@ -97,20 +97,20 @@ CREATE TABLE IF NOT EXISTS Faction
             var factionID = faction.Attribute("id")?.Value;
             if (string.IsNullOrEmpty(factionID)) continue;
 
-            var name = _Resolver.Resolve(faction.Attribute("name")?.Value ?? "");
+            var name = _resolver.Resolve(faction.Attribute("name")?.Value ?? "");
             if (string.IsNullOrEmpty(name)) continue;
 
             var raceID = faction.Attribute("primaryrace")?.Value ?? "";
-            var shortName = _Resolver.Resolve(faction.Attribute("shortname")?.Value ?? "");
+            var shortName = _resolver.Resolve(faction.Attribute("shortname")?.Value ?? "");
 
             yield return new Faction(
                 factionID,
                 name,
                 raceID,
                 shortName,
-                _Resolver.Resolve(faction.Attribute("description")?.Value ?? ""),
+                _resolver.Resolve(faction.Attribute("description")?.Value ?? ""),
                 GetFactionColor(faction),
-                await Util.DDS2PngAsync(_CatFile, "assets/fx/gui/textures/factions", faction.Element("icon")?.Attribute("active")?.Value)
+                await Util.DDS2PngAsync(_catFile, "assets/fx/gui/textures/factions", faction.Element("icon")?.Attribute("active")?.Value, cancellationToken)
             );
         }
 
@@ -123,7 +123,7 @@ CREATE TABLE IF NOT EXISTS Faction
     /// </summary>
     /// <param name="element"></param>
     /// <returns></returns>
-    private int GetFactionColor(XElement element)
+    private static int GetFactionColor(XElement element)
     {
         var colorElm = element.Element("color");
         if (colorElm is null) return 0;

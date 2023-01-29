@@ -13,19 +13,19 @@ class NeedWareInfoDetailsItem : BindableBase
     /// <summary>
     /// 必要数量
     /// </summary>
-    private long _NeedAmount;
+    private long _needAmount;
 
 
     /// <summary>
     /// 合計必要数量
     /// </summary>
-    private long _TotalNeedAmount;
+    private long _totalNeedAmount;
 
 
     /// <summary>
     /// 生産数量
     /// </summary>
-    private long _ProductionAmount;
+    private long _productionAmount;
     #endregion
 
 
@@ -59,10 +59,10 @@ class NeedWareInfoDetailsItem : BindableBase
     /// </summary>
     public long NeedAmount
     {
-        get => _NeedAmount;
+        get => _needAmount;
         set
         {
-            if (SetProperty(ref _NeedAmount, value))
+            if (SetProperty(ref _needAmount, value))
             {
                 RaisePropertyChanged(nameof(Diff));
             }
@@ -75,8 +75,8 @@ class NeedWareInfoDetailsItem : BindableBase
     /// </summary>
     public long TotalNeedAmount
     {
-        get => _TotalNeedAmount;
-        set => SetProperty(ref _TotalNeedAmount, value);
+        get => _totalNeedAmount;
+        set => SetProperty(ref _totalNeedAmount, value);
     }
 
 
@@ -85,10 +85,10 @@ class NeedWareInfoDetailsItem : BindableBase
     /// </summary>
     public long ProductionAmount
     {
-        get => _ProductionAmount;
+        get => _productionAmount;
         set
         {
-            if (SetProperty(ref _ProductionAmount, value))
+            if (SetProperty(ref _productionAmount, value))
             {
                 RaisePropertyChanged(nameof(Diff));
             }
