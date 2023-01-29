@@ -24,11 +24,14 @@ class DataExportModel
     /// <summary>
     /// 言語一覧を更新
     /// </summary>
-    public static async Task<(bool success, IReadOnlyList<LangComboboxItem> languages)> GetLanguages(string inDirPath, Window owner)
+    /// <param name="x4Dir">X4のインストール先フォルダ</param>
+    /// <param name="catLoadOption">cat ファイルの読み込みオプション</param>
+    /// <param name="owner">親ウィンドウハンドル(メッセージボックス表示用)</param>
+    public static async Task<(bool success, IReadOnlyList<LangComboboxItem> languages)> GetLanguages(string x4Dir, CatLoadOption catLoadOption, Window owner)
     {
         try
         {
-            var catFiles = new CatFile(inDirPath);
+            var catFiles = new CatFile(x4Dir, catLoadOption);
             var xml = await catFiles.OpenXmlAsync("libraries/languages.xml", CancellationToken.None);
             var languages = xml.XPathSelectElements("/languages/language")
                 .Select(x => (ID: x.Attribute("id")?.Value, Name: x.Attribute("name")?.Value))
@@ -60,6 +63,7 @@ class DataExportModel
     /// 抽出実行
     /// </summary>
     /// <param name="inDirPath">入力元フォルダパス</param>
+    /// <param name="catLoadOption">cat ファイルの読み込みオプション</param>
     /// <param name="outFilePath">出力先ファイルパス</param>
     /// <param name="language">選択された言語</param>
     /// <param name="owner">親ウィンドウハンドル(メッセージボックス表示用)</param>
@@ -68,12 +72,13 @@ class DataExportModel
         IProgress<(int currentStep, int maxSteps)> progress,
         IProgress<(int currentStep, int maxSteps)> progressSub,
         string inDirPath,
+        CatLoadOption catLoadOption,
         string outFilePath,
         LangComboboxItem language,
         Window owner
     )
     {
-        var catFile = new CatFile(inDirPath);
+        var catFile = new CatFile(inDirPath, catLoadOption);
 
         // 抽出に失敗した場合、例外設定で「Common Languate Runtime Exceptions」にチェックを入れるとどこで例外が発生したか分かる
         try

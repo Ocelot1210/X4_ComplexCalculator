@@ -76,6 +76,7 @@ public class CatFile : ICatFile
     /// コンストラクタ
     /// </summary>
     /// <param name="gameRoot">X4インストール先ディレクトリパス</param>
+    /// <param name="option">cat ファイルの読み込みオプション</param>
     /// <exception cref="DependencyResolutionException">Mod の依存関係の解決に失敗した場合</exception>
     public CatFile(string gameRoot, CatLoadOption option = CatLoadOption.All)
     {
@@ -92,7 +93,7 @@ public class CatFile : ICatFile
             }
         }
 
-        var modInfo = GetModInfo(gameRoot);
+        var modInfo = GetModInfo(gameRoot, option);
 
         _loadedMods = new HashSet<string>(modInfo.Select(x => $"extensions/{Path.GetFileName(x.Directory)}".Replace('\\', '/')));
 
@@ -111,8 +112,9 @@ public class CatFile : ICatFile
     /// Mod の情報を <see cref="IReadOnlyList{ModInfo}"/> で返す
     /// </summary>
     /// <param name="gameRoot">X4 インストール先ディレクトリパス</param>
+    /// <param name="option">cat ファイルの読み込みオプション</param>
     /// <returns>Mod の情報を表す <see cref="IReadOnlyList{ModInfo}"/></returns>
-    private static IReadOnlyList<ModInfo> GetModInfo(string gameRoot)
+    private static IReadOnlyList<ModInfo> GetModInfo(string gameRoot, CatLoadOption option)
     {
         var entensionsPath = Path.Combine(gameRoot, "extensions");
 
@@ -127,7 +129,7 @@ public class CatFile : ICatFile
 
         var unloadedMods = Directory.GetDirectories(entensionsPath)
             .Select(x => new ModInfo(userContentXml, x))
-            .Where(x => x.Enabled)
+            .Where(x => x.CanLoad(option))
             .OrderBy(x => x.Name)
             .ToList();
 

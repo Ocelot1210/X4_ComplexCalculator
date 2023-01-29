@@ -182,7 +182,7 @@ class DataExportViewModel : BindableBase
         _unableToGetLanguages.Value = false;
         Languages.ClearOnScheduler();
 
-        var (success, languages) = await Task.Run(async () => await DataExportModel.GetLanguages(x4InstallDirectory, _ownerWindow));
+        var (success, languages) = await Task.Run(async () => await DataExportModel.GetLanguages(x4InstallDirectory, CatLoadOption.Value, _ownerWindow));
         _unableToGetLanguages.Value = !success;
         Languages.AddRangeOnScheduler(languages);
 
@@ -251,6 +251,7 @@ class DataExportViewModel : BindableBase
             progress,
             progressSub,
             InDirPath.Value,
+            CatLoadOption.Value,
             _outFilePath,
             SelectedLanguage.Value,
             _ownerWindow

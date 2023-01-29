@@ -103,6 +103,24 @@ class ModInfo
 
 
     /// <summary>
+    /// Mod を読み込めるか判定する
+    /// </summary>
+    /// <param name="option">cat ファイルの読み込みオプション</param>
+    /// <returns>Mod を読み込んでも良い場合、<c>true;</c> それ以外の場合 <c>false;</c></returns>
+    /// <exception cref="NotImplementedException"><paramref name="option"/>が無効な場合</exception>
+    public bool CanLoad(CatLoadOption option)
+    {
+        return Enabled && option switch
+        {
+            CatLoadOption.All => true,
+            CatLoadOption.Official => Author == "Egosoft GmbH",
+            CatLoadOption.Vanilla => false,
+            _ => throw new NotImplementedException()
+        };
+    }
+
+
+    /// <summary>
     /// Mod が有効化されているかを取得する
     /// </summary>
     /// <param name="userContentXml">X4 のユーザフォルダ内の content.xml</param>
