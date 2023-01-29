@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using LibX4.Xml;
 using X4_DataExporterWPF.Entity;
 using X4_DataExporterWPF.Internal;
 
@@ -95,7 +96,7 @@ CREATE TABLE IF NOT EXISTS WareEffect
 
                     if (!double.TryParse(effect.Attribute("product")?.Value, out var product))
                     {
-                        continue;
+                        product = 0.0;
                     }
 
                     yield return new WareEffect(wareID, method, effectID, product);
