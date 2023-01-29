@@ -19,7 +19,7 @@ class SelectPlanModel : BindableBase
     /// <summary>
     /// 計画ファイルパス
     /// </summary>
-    string _PlanFilePath = "";
+    string _planFilePath = "";
     #endregion
 
 
@@ -35,8 +35,8 @@ class SelectPlanModel : BindableBase
     /// </summary>
     public string PlanFilePath
     {
-        get => _PlanFilePath;
-        set => SetProperty(ref _PlanFilePath, value);
+        get => _planFilePath;
+        set => SetProperty(ref _planFilePath, value);
     }
     #endregion
 
@@ -80,12 +80,13 @@ class SelectPlanModel : BindableBase
     /// </summary>
     public void SelectPlanFile()
     {
-        var dlg = new OpenFileDialog();
-
-        dlg.InitialDirectory = LibX4.X4Path.GetUserDirectory();
-        dlg.RestoreDirectory = true;
-        dlg.Filter = "X4 Construction planes file (*.xml)|*.xml";
-        dlg.Multiselect = true;
+        var dlg = new OpenFileDialog
+        {
+            InitialDirectory = LibX4.X4Path.GetUserDirectory(),
+            RestoreDirectory = true,
+            Filter = "X4 Construction planes file (*.xml)|*.xml",
+            Multiselect = true
+        };
 
         if (dlg.ShowDialog() == true)
         {

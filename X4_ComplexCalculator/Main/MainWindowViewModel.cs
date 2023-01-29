@@ -38,49 +38,49 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// <summary>
     /// メイン画面のModel
     /// </summary>
-    private readonly MainWindowModel _MainWindowModel;
+    private readonly MainWindowModel _mainWindowModel;
 
 
     /// <summary>
     /// 言語一覧管理用
     /// </summary>
-    private readonly LanguagesManager _LangMgr = new();
+    private readonly LanguagesManager _langMgr = new();
 
 
     /// <summary>
     /// 作業エリア管理用
     /// </summary>
-    private readonly WorkAreaManager _WorkAreaManager = new();
+    private readonly WorkAreaManager _workAreaManager = new();
 
 
     /// <summary>
     /// 作業エリアファイル読み書き用
     /// </summary>
-    private readonly WorkAreaFileIO _WorkAreaFileIO;
+    private readonly WorkAreaFileIO _workAreaFileIO;
 
 
     /// <summary>
     /// インポート/エクスポート処理用
     /// </summary>
-    private readonly ImportExporter _ImportExporter;
+    private readonly ImportExporter _importExporter;
 
 
     /// <summary>
     /// 帝国の概要ウィンドウ
     /// </summary>
-    private Window? _EmpireOverviewWindow;
+    private Window? _empireOverviewWindow;
 
 
     /// <summary>
     /// DBビュワーウィンドウ
     /// </summary>
-    private Window? _DBViewerWindow;
+    private Window? _dBViewerWindow;
 
 
     /// <summary>
     /// アップデート機能
     /// </summary>
-    private readonly ApplicationUpdater _ApplicationUpdater = new();
+    private readonly ApplicationUpdater _applicationUpdater = new();
     #endregion
 
 
@@ -183,7 +183,7 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// <summary>
     /// ワークエリア一覧
     /// </summary>
-    public ObservableCollection<WorkAreaViewModel> Documents => _WorkAreaManager.Documents;
+    public ObservableCollection<WorkAreaViewModel> Documents => _workAreaManager.Documents;
 
 
     /// <summary>
@@ -191,15 +191,15 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// </summary>
     public WorkAreaViewModel? ActiveContent
     {
-        set => _WorkAreaManager.ActiveContent = value;
-        get => _WorkAreaManager.ActiveContent;
+        set => _workAreaManager.ActiveContent = value;
+        get => _workAreaManager.ActiveContent;
     }
 
 
     /// <summary>
     /// レイアウト一覧
     /// </summary>
-    public ObservableCollection<LayoutMenuItem> Layouts => _WorkAreaManager.Layouts;
+    public ObservableCollection<LayoutMenuItem> Layouts => _workAreaManager.Layouts;
 
 
     /// <summary>
@@ -217,25 +217,25 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// <summary>
     /// 言語一覧
     /// </summary>
-    public IReadOnlyList<LangMenuItem> Languages => _LangMgr.Languages;
+    public IReadOnlyList<LangMenuItem> Languages => _langMgr.Languages;
 
 
     /// <summary>
     /// ファイル読み込みがビジー状態か
     /// </summary>
-    public bool FileLoadingIsBusy => _WorkAreaFileIO.IsBusy;
+    public bool FileLoadingIsBusy => _workAreaFileIO.IsBusy;
 
 
     /// <summary>
     /// ファイル読み込み進捗
     /// </summary>
-    public int FileLoadingProgress => _WorkAreaFileIO.Progress;
+    public int FileLoadingProgress => _workAreaFileIO.Progress;
 
 
     /// <summary>
     /// 読込中のファイル名
     /// </summary>
-    public string LoadingFileName => _WorkAreaFileIO.LoadingFileName;
+    public string LoadingFileName => _workAreaFileIO.LoadingFileName;
     #endregion
 
 
@@ -244,16 +244,16 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// </summary>
     public MainWindowViewModel()
     {
-        _WorkAreaFileIO                  = new WorkAreaFileIO(_WorkAreaManager);
-        _MainWindowModel                 = new MainWindowModel(_WorkAreaManager, _WorkAreaFileIO);
+        _workAreaFileIO                  = new WorkAreaFileIO(_workAreaManager);
+        _mainWindowModel                 = new MainWindowModel(_workAreaManager, _workAreaFileIO);
         WindowLoadedCommand              = new DelegateCommand(WindowLoaded);
         WindowClosingCommand             = new DelegateCommand<CancelEventArgs>(WindowClosing);
         CreateNewCommand                 = new DelegateCommand(CreateNew);
-        SaveLayout                       = new DelegateCommand(_WorkAreaManager.SaveLayout);
-        SaveCommand                      = new DelegateCommand(_WorkAreaFileIO.Save);
-        SaveAsCommand                    = new DelegateCommand(_WorkAreaFileIO.SaveAs);
+        SaveLayout                       = new DelegateCommand(_workAreaManager.SaveLayout);
+        SaveCommand                      = new DelegateCommand(_workAreaFileIO.Save);
+        SaveAsCommand                    = new DelegateCommand(_workAreaFileIO.SaveAs);
         OpenCommand                      = new DelegateCommand(Open);
-        UpdateDBCommand                  = new DelegateCommand(_MainWindowModel.UpdateDB);
+        UpdateDBCommand                  = new DelegateCommand(MainWindowModel.UpdateDB);
         ReportIssueCommand               = new DelegateCommand(ReportIssue);
         CheckUpdateAtLaunch              = new ReactiveProperty<bool>(Configuration.Instance.CheckUpdateAtLaunch);
         SetCheckUpdateAtLaunchCommand    = new DelegateCommand(SetCheckUpdateAtLaunch);
@@ -262,20 +262,20 @@ class MainWindowViewModel : BindableBase, IDropTarget
         DocumentClosingCommand           = new DelegateCommand<DocumentClosingEventArgs>(DocumentClosing);
         OpenEmpireOverviewWindowCommand  = new DelegateCommand(OpenEmpireOverviewWindow);
         OpenDBViewerWindowCommand        = new DelegateCommand(OpenDBViewerWindow);
-        _WorkAreaFileIO.PropertyChanged += Member_PropertyChanged;
+        _workAreaFileIO.PropertyChanged += Member_PropertyChanged;
 
-        _ImportExporter = new ImportExporter(_WorkAreaManager);
+        _importExporter = new ImportExporter(_workAreaManager);
         Imports = new List<IImport>()
         {
-            new StationCalculatorImport(new DelegateCommand<IImport>(_ImportExporter.Import)),
-            new StationPlanImport(new DelegateCommand<IImport>(_ImportExporter.Import)),
-            new LoadoutImport(new DelegateCommand<IImport>(_ImportExporter.Import)),
+            new StationCalculatorImport(new DelegateCommand<IImport>(_importExporter.Import)),
+            new StationPlanImport(new DelegateCommand<IImport>(_importExporter.Import)),
+            new LoadoutImport(new DelegateCommand<IImport>(_importExporter.Import)),
             //new SaveDataImport(new DelegateCommand<IImport>(_Model.Import))   // 作成中のため未リリース
         };
 
         Exports = new List<IExport>()
         {
-            new StationCalculatorExport(new DelegateCommand<IExport>(_ImportExporter.Export))
+            new StationCalculatorExport(new DelegateCommand<IExport>(_importExporter.Export))
         };
     }
 
@@ -340,7 +340,7 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// <param name="dropInfo"></param>
     public void Drop(IDropInfo dropInfo)
     {
-        _WorkAreaFileIO.OpenFiles(GetX4Files(((DataObject)dropInfo.Data).GetFileDropList().OfType<string>(), 1));
+        _workAreaFileIO.OpenFiles(GetX4Files(((DataObject)dropInfo.Data).GetFileDropList().OfType<string>(), 1));
     }
 
 
@@ -353,15 +353,15 @@ class MainWindowViewModel : BindableBase, IDropTarget
     {
         switch (e.PropertyName)
         {
-            case nameof(_WorkAreaFileIO.IsBusy):
+            case nameof(_workAreaFileIO.IsBusy):
                 RaisePropertyChanged(nameof(FileLoadingIsBusy));
                 break;
 
-            case nameof(_WorkAreaFileIO.Progress):
+            case nameof(_workAreaFileIO.Progress):
                 RaisePropertyChanged(nameof(FileLoadingProgress));
                 break;
 
-            case nameof(_WorkAreaFileIO.LoadingFileName):
+            case nameof(_workAreaFileIO.LoadingFileName):
                 RaisePropertyChanged(nameof(LoadingFileName));
                 break;
 
@@ -376,7 +376,7 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// </summary>
     private void CreateNew()
     {
-        _WorkAreaFileIO.CreateNew();
+        _workAreaFileIO.CreateNew();
         RaisePropertyChanged(nameof(ActiveContent));
     }
 
@@ -386,7 +386,7 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// </summary>
     private void Open()
     {
-        _WorkAreaFileIO.Open();
+        _workAreaFileIO.Open();
         RaisePropertyChanged(nameof(ActiveContent));
     }
 
@@ -396,8 +396,8 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// </summary>
     private void ReportIssue()
     {
-        const string url = ThisAssembly.Git.RepositoryUrl + "/issues";
-        Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+        const string URL = ThisAssembly.Git.RepositoryUrl + "/issues";
+        Process.Start(new ProcessStartInfo(URL) { UseShellExecute = true });
     }
 
 
@@ -416,13 +416,13 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// </summary>
     private async Task CheckUpdate(bool isUserOperation = false)
     {
-        if (_ApplicationUpdater.FinishedDownload && isUserOperation)
+        if (_applicationUpdater.FinishedDownload && isUserOperation)
         {
             LocalizedMessageBox.Show("Lang:CheckUpdate_FinishedDownloadDescription",
                                      "Lang:CheckUpdate_Title", icon: MessageBoxImage.Information);
             return;
         }
-        else if (_ApplicationUpdater.NowDownloading && isUserOperation)
+        else if (_applicationUpdater.NowDownloading && isUserOperation)
         {
             LocalizedMessageBox.Show("Lang:CheckUpdate_StartDownloadDescription",
                                      "Lang:CheckUpdate_Title", icon: MessageBoxImage.Information);
@@ -432,7 +432,7 @@ class MainWindowViewModel : BindableBase, IDropTarget
         string? latestVersion;
         try
         {
-            latestVersion = await _ApplicationUpdater.CheckUpdate();
+            latestVersion = await _applicationUpdater.CheckUpdate();
         }
         catch (HttpRequestException)
         {
@@ -449,7 +449,7 @@ class MainWindowViewModel : BindableBase, IDropTarget
             {
                 LocalizedMessageBox.Show("Lang:CheckUpdate_NoUpdateDescription",
                                          "Lang:CheckUpdate_Title", icon: MessageBoxImage.Information,
-                                         param: new[] { VersionInfo.BaseVersion });
+                                         param: new[] { VersionInfo.BASE_VERSION });
             }
             return;
         }
@@ -459,12 +459,12 @@ class MainWindowViewModel : BindableBase, IDropTarget
                                               button: MessageBoxButton.YesNo,
                                               icon: MessageBoxImage.Question,
                                               param: new[] {
-                                                  VersionInfo.BaseVersion,
+                                                  VersionInfo.BASE_VERSION,
                                                   latestVersion,
                                               });
         if (result != MessageBoxResult.Yes) return;
 
-        _ApplicationUpdater.StartDownloadByBackground();
+        _applicationUpdater.StartDownloadByBackground();
         LocalizedMessageBox.Show("Lang:CheckUpdate_StartDownloadDescription",
                                  "Lang:CheckUpdate_Title", icon: MessageBoxImage.Information);
     }
@@ -475,14 +475,14 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// </summary>
     private void ShowVersionInfo()
     {
-        const string version = VersionInfo.DetailVersion;
-        const string commit = ThisAssembly.Git.Sha;
-        const string date = ThisAssembly.Git.CommitDate;
+        const string VERSION = VersionInfo.DETAIL_VERSION;
+        const string COMMIT = ThisAssembly.Git.Sha;
+        const string DATE = ThisAssembly.Git.CommitDate;
         var dotnetVersion = Environment.Version.ToString();
 
         LocalizedMessageBox.Show("Lang:MainWindow_Menu_Help_VersionInfo_MessageDescription", "Lang:MainWindow_Menu_Help_VersionInfo_MessageTitle",
                                  icon: MessageBoxImage.Information,
-                                 param: new[] { version, commit, date, dotnetVersion });
+                                 param: new[] { VERSION, COMMIT, DATE, dotnetVersion });
     }
 
 
@@ -494,8 +494,8 @@ class MainWindowViewModel : BindableBase, IDropTarget
         try
         {
             // DB接続開始
-            _MainWindowModel.Init();
-            _WorkAreaManager.Init();
+            _mainWindowModel.Init();
+            _workAreaManager.Init();
 
             // 更新チェックが有効な場合のみ更新を確認する
             if (Configuration.Instance.CheckUpdateAtLaunch)
@@ -516,19 +516,21 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// </summary>
     private void WindowClosing(CancelEventArgs e)
     {
-        e.Cancel = _MainWindowModel.WindowClosing();
+        e.Cancel = _mainWindowModel.WindowClosing();
         if (!e.Cancel)
         {
-            _EmpireOverviewWindow?.Close();
+            _empireOverviewWindow?.Close();
 
-            if (_ApplicationUpdater.FinishedDownload) _ApplicationUpdater.Update();
-            else if (_ApplicationUpdater.NowDownloading)
+            if (_applicationUpdater.FinishedDownload) _applicationUpdater.Update();
+            else if (_applicationUpdater.NowDownloading)
             {
-                var dialog = new UpdateDownloadProglessDialog();
-                dialog.DataContext = new UpdateDownloadProgressViewModel(_ApplicationUpdater);
+                var dialog = new UpdateDownloadProglessDialog
+                {
+                    DataContext = new UpdateDownloadProgressViewModel(_applicationUpdater)
+                };
                 dialog.Show();
             }
-            _WorkAreaManager.Dispose();
+            _workAreaManager.Dispose();
         }
     }
 
@@ -538,9 +540,9 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// <param name="e"></param>
     private void DocumentClosing(DocumentClosingEventArgs e)
     {
-        if (e.Document.Content is WorkAreaViewModel WorkArea)
+        if (e.Document.Content is WorkAreaViewModel workArea)
         {
-            e.Cancel = _WorkAreaManager.DocumentClosing(WorkArea);
+            e.Cancel = _workAreaManager.DocumentClosing(workArea);
         }
     }
 
@@ -550,14 +552,14 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// </summary>
     private void OpenEmpireOverviewWindow()
     {
-        if (_EmpireOverviewWindow is null)
+        if (_empireOverviewWindow is null)
         {
-            _EmpireOverviewWindow = new EmpireOverviewWindow(Documents);
-            _EmpireOverviewWindow.Closed += (obj, e) => { _EmpireOverviewWindow = null; };
-            _EmpireOverviewWindow.Show();
+            _empireOverviewWindow = new EmpireOverviewWindow(Documents);
+            _empireOverviewWindow.Closed += (obj, e) => { _empireOverviewWindow = null; };
+            _empireOverviewWindow.Show();
         }
 
-        _EmpireOverviewWindow.Activate();
+        _empireOverviewWindow.Activate();
     }
 
 
@@ -566,13 +568,13 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// </summary>
     private void OpenDBViewerWindow()
     {
-        if (_DBViewerWindow is null)
+        if (_dBViewerWindow is null)
         {
-            _DBViewerWindow = new DBViewerWindow();
-            _DBViewerWindow.Closed += (_, _) => { _DBViewerWindow = null; };
-            _DBViewerWindow.Show();
+            _dBViewerWindow = new DBViewerWindow();
+            _dBViewerWindow.Closed += (_, _) => { _dBViewerWindow = null; };
+            _dBViewerWindow.Show();
         }
 
-        _DBViewerWindow.Activate();
+        _dBViewerWindow.Activate();
     }
 }

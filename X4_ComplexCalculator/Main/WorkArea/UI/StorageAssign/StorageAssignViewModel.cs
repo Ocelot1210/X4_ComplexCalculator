@@ -9,13 +9,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign;
 /// <summary>
 /// 保管庫割当用ViewModel
 /// </summary>
-public class StorageAssignViewModel : BindableBase, IDisposable
+public sealed class StorageAssignViewModel : BindableBase, IDisposable
 {
     #region メンバ
     /// <summary>
     /// 保管庫割当用Model
     /// </summary>
-    private readonly StorageAssignModel _Model;
+    private readonly StorageAssignModel _model;
     #endregion
 
 
@@ -31,8 +31,8 @@ public class StorageAssignViewModel : BindableBase, IDisposable
     /// </summary>
     public long Hour
     {
-        get => _Model.Hour;
-        set => _Model.Hour = value;
+        get => _model.Hour;
+        set => _model.Hour = value;
     }
     #endregion
 
@@ -43,9 +43,9 @@ public class StorageAssignViewModel : BindableBase, IDisposable
     /// <param name="stationData">計算機で使用するステーション情報</param>
     public StorageAssignViewModel(IStationData stationData)
     {
-        _Model = new StorageAssignModel(stationData.ProductsInfo, stationData.StoragesInfo, stationData.StorageAssignInfo);
+        _model = new StorageAssignModel(stationData.ProductsInfo, stationData.StoragesInfo, stationData.StorageAssignInfo);
 
-        StorageAssignInfo = (ListCollectionView)CollectionViewSource.GetDefaultView(_Model.StorageAssignGridItems);
+        StorageAssignInfo = (ListCollectionView)CollectionViewSource.GetDefaultView(_model.StorageAssignGridItems);
         StorageAssignInfo.SortDescriptions.Clear();
         StorageAssignInfo.SortDescriptions.Add(new SortDescription(nameof(StorageAssignGridItem.Tier), ListSortDirection.Ascending));
         StorageAssignInfo.SortDescriptions.Add(new SortDescription(nameof(StorageAssignGridItem.WareName), ListSortDirection.Ascending));
@@ -58,5 +58,5 @@ public class StorageAssignViewModel : BindableBase, IDisposable
     /// <summary>
     /// リソースを開放
     /// </summary>
-    public void Dispose() => _Model.Dispose();
+    public void Dispose() => _model.Dispose();
 }

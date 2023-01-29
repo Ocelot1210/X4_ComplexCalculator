@@ -22,18 +22,18 @@ public class ModuleExporter : IExporter
     /// <summary>
     /// catファイルオブジェクト
     /// </summary>
-    private readonly ICatFile _CatFile;
+    private readonly ICatFile _catFile;
 
     /// <summary>
     /// ウェア情報xml
     /// </summary>
-    private readonly XDocument _WaresXml;
+    private readonly XDocument _waresXml;
 
 
     /// <summary>
     /// サムネ画像管理クラス
     /// </summary>
-    private readonly ThumbnailManager _ThumbnailManager;
+    private readonly ThumbnailManager _thumbnailManager;
 
 
     /// <summary>
@@ -45,9 +45,9 @@ public class ModuleExporter : IExporter
     {
         ArgumentNullException.ThrowIfNull(waresXml.Root);
 
-        _CatFile = catFile;
-        _WaresXml = waresXml;
-        _ThumbnailManager = new(catFile, "assets/fx/gui/textures/stationmodules", "notfound");
+        _catFile = catFile;
+        _waresXml = waresXml;
+        _thumbnailManager = new(catFile, "assets/fx/gui/textures/stationmodules", "notfound");
     }
 
 
@@ -90,10 +90,10 @@ CREATE TABLE IF NOT EXISTS Module
     /// <returns>読み出した Module データ</returns>
     internal async IAsyncEnumerable<Module> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)>? progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'module')])");
+        var maxSteps = (int)(double)_waresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'module')])");
         var currentStep = 0;
 
-        foreach (var module in _WaresXml.Root!.XPathSelectElements("ware[contains(@tags, 'module')]"))
+        foreach (var module in _waresXml.Root!.XPathSelectElements("ware[contains(@tags, 'module')]"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress?.Report((currentStep++, maxSteps));
@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS Module
             var macroName = module.XPathSelectElement("component")?.Attribute("ref")?.Value;
             if (string.IsNullOrEmpty(macroName)) continue;
 
-            var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName);
+            var macroXml = await _catFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
             if (macroXml?.Root is null) continue;
 
             var moduleTypeID = macroXml.Root.XPathSelectElement("macro")?.Attribute("class")?.Value;
@@ -118,7 +118,7 @@ CREATE TABLE IF NOT EXISTS Module
 
             var noBluePrint = module.Attribute("tags")?.Value.Contains("noblueprint") ?? false;
 
-            yield return new Module(moduleID, moduleTypeID, macroName, maxWorkers, capacity, noBluePrint, await _ThumbnailManager.GetThumbnailAsync(macroName, cancellationToken));
+            yield return new Module(moduleID, moduleTypeID, macroName, maxWorkers, capacity, noBluePrint, await _thumbnailManager.GetThumbnailAsync(macroName, cancellationToken));
         }
 
         progress?.Report((currentStep++, maxSteps));

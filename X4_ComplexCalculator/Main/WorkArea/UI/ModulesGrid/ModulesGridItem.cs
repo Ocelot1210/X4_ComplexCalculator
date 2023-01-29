@@ -32,31 +32,31 @@ public class ModulesGridItem : BindableBaseEx, IEditable, ISelectable, IReorderb
     /// <summary>
     /// モジュール数
     /// </summary>
-    private long _ModuleCount = 1;
+    private long _moduleCount = 1;
 
 
     /// <summary>
     /// 選択された建造方式
     /// </summary>
-    private IWareProduction _SelectedMethod;
+    private IWareProduction _selectedMethod;
 
 
     /// <summary>
     /// 選択されているか
     /// </summary>
-    private bool _IsSelected;
+    private bool _isSelected;
 
 
     /// <summary>
     /// 編集状態
     /// </summary>
-    private EditStatus _EditStatus = EditStatus.Unedited;
+    private EditStatus _editStatus = EditStatus.Unedited;
 
 
     /// <summary>
     /// 順番入れ替え対象か
     /// </summary>
-    private bool _IsReorderTarget;
+    private bool _isReorderTarget;
     #endregion
 
 
@@ -90,8 +90,8 @@ public class ModulesGridItem : BindableBaseEx, IEditable, ISelectable, IReorderb
     /// </summary>
     public bool IsSelected
     {
-        get => _IsSelected;
-        set => SetProperty(ref _IsSelected, value);
+        get => _isSelected;
+        set => SetProperty(ref _isSelected, value);
     }
 
 
@@ -100,13 +100,13 @@ public class ModulesGridItem : BindableBaseEx, IEditable, ISelectable, IReorderb
     /// </summary>
     public long ModuleCount
     {
-        get => _ModuleCount;
+        get => _moduleCount;
         set
         {
             var setValue = (value < 0) ? 0L :
                            (MAX_MODULE_COUNT < value) ? MAX_MODULE_COUNT : value;
 
-            if (SetPropertyEx(ref _ModuleCount, setValue))
+            if (SetPropertyEx(ref _moduleCount, setValue))
             {
                 EditStatus = EditStatus.Edited;
             }
@@ -143,10 +143,10 @@ public class ModulesGridItem : BindableBaseEx, IEditable, ISelectable, IReorderb
     /// </summary>
     public IWareProduction SelectedMethod
     {
-        get => _SelectedMethod;
+        get => _selectedMethod;
         set
         {
-            if (SetPropertyEx(ref _SelectedMethod, value))
+            if (SetPropertyEx(ref _selectedMethod, value))
             {
                 RaisePropertyChanged(nameof(SelectedMethodName));
                 EditStatus = EditStatus.Edited;
@@ -173,8 +173,8 @@ public class ModulesGridItem : BindableBaseEx, IEditable, ISelectable, IReorderb
     /// </summary>
     public EditStatus EditStatus
     {
-        get => _EditStatus;
-        set => SetProperty(ref _EditStatus, value);
+        get => _editStatus;
+        set => SetProperty(ref _editStatus, value);
     }
 
 
@@ -183,8 +183,8 @@ public class ModulesGridItem : BindableBaseEx, IEditable, ISelectable, IReorderb
     /// </summary>
     public bool IsReorderTarget
     {
-        get => _IsReorderTarget;
-        set => SetProperty(ref _IsReorderTarget, value);
+        get => _isReorderTarget;
+        set => SetProperty(ref _isReorderTarget, value);
     }
     #endregion
 
@@ -208,7 +208,7 @@ public class ModulesGridItem : BindableBaseEx, IEditable, ISelectable, IReorderb
         Turrets = new EquipmentsInfo(Equipments, "turrets");
         Shields = new EquipmentsInfo(Equipments, "shields");
 
-        _SelectedMethod = selectedMethod ?? Module.Productions.First().Value;
+        _selectedMethod = selectedMethod ?? Module.Productions.First().Value;
     }
 
 
@@ -226,7 +226,7 @@ public class ModulesGridItem : BindableBaseEx, IEditable, ISelectable, IReorderb
         SelectedMethod = 
             Module.Productions.TryGetValue(element.Attribute("method")?.Value ?? "default", out var method) ? method : Module.Productions.Values.First();
 
-        _SelectedMethod = SelectedMethod;
+        _selectedMethod = SelectedMethod;
 
         Turrets = new EquipmentsInfo(Equipments, "turrets");
         Shields = new EquipmentsInfo(Equipments, "shields");
@@ -292,8 +292,10 @@ public class ModulesGridItem : BindableBaseEx, IEditable, ISelectable, IReorderb
             .OrderBy(x => x).ToArray();
 
 
-        var window = new EditEquipmentWindow(Equipments);
-        window.Owner = Application.Current.MainWindow;
+        var window = new EditEquipmentWindow(Equipments)
+        {
+            Owner = Application.Current.MainWindow
+        };
         window.ShowDialog();
 
         bool equipmentChanged = false;

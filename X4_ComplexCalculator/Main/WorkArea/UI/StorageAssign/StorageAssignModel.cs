@@ -23,37 +23,37 @@ class StorageAssignModel : IDisposable
     /// <summary>
     /// 保管庫状態計算用の指定時間
     /// </summary>
-    private long _Hour = 1;
+    private long _hour = 1;
 
 
     /// <summary>
     /// 製品一覧情報
     /// </summary>
-    private readonly IProductsInfo _Products;
+    private readonly IProductsInfo _products;
 
 
     /// <summary>
     /// 保管庫一覧情報
     /// </summary>
-    private readonly IStoragesInfo _Storages;
+    private readonly IStoragesInfo _storages;
 
 
     /// <summary>
     /// 保管庫割当情報
     /// </summary>
-    private readonly IStorageAssignInfo _StorageAssignInfo;
+    private readonly IStorageAssignInfo _storageAssignInfo;
 
 
     /// <summary>
     /// 保管庫容量情報
     /// </summary>
-    private readonly Dictionary<string, StorageCapacityInfo> _CapacityDict;
+    private readonly Dictionary<string, StorageCapacityInfo> _capacityDict;
 
 
     /// <summary>
     /// 前回値保存用
     /// </summary>
-    private readonly Dictionary<string, StorageAssignGridItem> _OptionsBakDict = new();
+    private readonly Dictionary<string, StorageAssignGridItem> _optionsBakDict = new();
     #endregion
 
 
@@ -61,7 +61,7 @@ class StorageAssignModel : IDisposable
     /// <summary>
     /// 保管庫状態計算用の指定時間
     /// </summary>
-    public ObservableCollection<StorageAssignGridItem> StorageAssignGridItems => _StorageAssignInfo.StorageAssign;
+    public ObservableCollection<StorageAssignGridItem> StorageAssignGridItems => _storageAssignInfo.StorageAssign;
 
 
     /// <summary>
@@ -69,13 +69,13 @@ class StorageAssignModel : IDisposable
     /// </summary>
     public long Hour
     {
-        get => _Hour;
+        get => _hour;
         set
         {
-            if (_Hour != value)
+            if (_hour != value)
             {
-                _Hour = value;
-                foreach (var item in _StorageAssignInfo.StorageAssign)
+                _hour = value;
+                foreach (var item in _storageAssignInfo.StorageAssign)
                 {
                     item.Hour = Hour;
                 }
@@ -93,22 +93,22 @@ class StorageAssignModel : IDisposable
     /// <param name="storageAssignInfo">保管庫割当情報</param>
     public StorageAssignModel(IProductsInfo products, IStoragesInfo storages, IStorageAssignInfo storageAssignInfo)
     {
-        _Products = products;
-        _Products.Products.CollectionChanged += Products_CollectionChanged;
-        _Products.Products.CollectionPropertyChanged += Products_CollectionPropertyChanged;
+        _products = products;
+        _products.Products.CollectionChanged += Products_CollectionChanged;
+        _products.Products.CollectionPropertyChanged += Products_CollectionPropertyChanged;
 
-        _Storages = storages;
-        _Storages.Storages.CollectionChanged += Storages_CollectionChanged;
-        _Storages.Storages.CollectionPropertyChanged += Storages_CollectionPropertyChanged;
+        _storages = storages;
+        _storages.Storages.CollectionChanged += Storages_CollectionChanged;
+        _storages.Storages.CollectionPropertyChanged += Storages_CollectionPropertyChanged;
 
-        _StorageAssignInfo = storageAssignInfo;
+        _storageAssignInfo = storageAssignInfo;
 
-        _CapacityDict = X4Database.Instance.TransportType.GetAll()
+        _capacityDict = X4Database.Instance.TransportType.GetAll()
             .ToDictionary(x => x.TransportTypeID, x => new StorageCapacityInfo());
 
-        foreach (var storage in _Storages.Storages)
+        foreach (var storage in _storages.Storages)
         {
-            _CapacityDict[storage.TransportType.TransportTypeID].TotalCapacity = storage.Capacity;
+            _capacityDict[storage.TransportType.TransportTypeID].TotalCapacity = storage.Capacity;
         }
     }
 
@@ -129,7 +129,7 @@ class StorageAssignModel : IDisposable
         {
             case nameof(StoragesGridItem.Capacity):
                 // 同一カーゴ種別の総容量設定
-                _CapacityDict[storage.TransportType.TransportTypeID].TotalCapacity = storage.Capacity;
+                _capacityDict[storage.TransportType.TransportTypeID].TotalCapacity = storage.Capacity;
                 break;
 
             default:
@@ -149,7 +149,7 @@ class StorageAssignModel : IDisposable
         {
             foreach (var storage in e.NewItems.Cast<StoragesGridItem>())
             {
-                _CapacityDict[storage.TransportType.TransportTypeID].TotalCapacity = storage.Capacity;
+                _capacityDict[storage.TransportType.TransportTypeID].TotalCapacity = storage.Capacity;
             }
         }
 
@@ -157,13 +157,13 @@ class StorageAssignModel : IDisposable
         {
             foreach (var storage in e.OldItems.Cast<StoragesGridItem>())
             {
-                _CapacityDict[storage.TransportType.TransportTypeID].TotalCapacity = 0;
+                _capacityDict[storage.TransportType.TransportTypeID].TotalCapacity = 0;
             }
         }
 
         if (e.Action == NotifyCollectionChangedAction.Reset)
         {
-            foreach (var capacityInfo in _CapacityDict.Values)
+            foreach (var capacityInfo in _capacityDict.Values)
             {
                 capacityInfo.TotalCapacity = 0;
             }
@@ -188,7 +188,7 @@ class StorageAssignModel : IDisposable
             return;
         }
 
-        var assign = _StorageAssignInfo.StorageAssign.FirstOrDefault(x => x.WareID == product.Ware.ID);
+        var assign = _storageAssignInfo.StorageAssign.FirstOrDefault(x => x.WareID == product.Ware.ID);
         if (assign is not null)
         {
             assign.ProductPerHour = product.Count;
@@ -216,12 +216,12 @@ class StorageAssignModel : IDisposable
         if (e.Action == NotifyCollectionChangedAction.Reset)
         {
             // 前回値保存
-            foreach (var itm in _StorageAssignInfo.StorageAssign)
+            foreach (var itm in _storageAssignInfo.StorageAssign)
             {
-                _OptionsBakDict.Add(itm.WareID, itm);
+                _optionsBakDict.Add(itm.WareID, itm);
             }
 
-            _StorageAssignInfo.StorageAssign.Clear();
+            _storageAssignInfo.StorageAssign.Clear();
         }
     }
 
@@ -233,12 +233,12 @@ class StorageAssignModel : IDisposable
     private void OnProductsAdded(IEnumerable<ProductsGridItem> products)
     {
         // 前回値がある場合
-        if (_StorageAssignInfo.StorageAssign.Count == 0 && 0 < _OptionsBakDict.Count)
+        if (_storageAssignInfo.StorageAssign.Count == 0 && 0 < _optionsBakDict.Count)
         {
-            _StorageAssignInfo.StorageAssign.AddRange(products.Select(prod =>
+            _storageAssignInfo.StorageAssign.AddRange(products.Select(prod =>
             {
-                var ret = new StorageAssignGridItem(prod.Ware, _CapacityDict[prod.Ware.TransportType.TransportTypeID], prod.Count, Hour) { EditStatus = EditStatus.Edited };
-                if (_OptionsBakDict.TryGetValue(ret.WareID, out var oldAssign))
+                var ret = new StorageAssignGridItem(prod.Ware, _capacityDict[prod.Ware.TransportType.TransportTypeID], prod.Count, Hour) { EditStatus = EditStatus.Edited };
+                if (_optionsBakDict.TryGetValue(ret.WareID, out var oldAssign))
                 {
                     ret.AllocCount = oldAssign.AllocCount;
                     ret.EditStatus = oldAssign.EditStatus;
@@ -247,13 +247,13 @@ class StorageAssignModel : IDisposable
                 return ret;
             }));
 
-            _OptionsBakDict.Clear();
+            _optionsBakDict.Clear();
         }
         else
         {
-            _StorageAssignInfo.StorageAssign.AddRange(products.Select(prod =>
+            _storageAssignInfo.StorageAssign.AddRange(products.Select(prod =>
             {
-                return new StorageAssignGridItem(prod.Ware, _CapacityDict[prod.Ware.TransportType.TransportTypeID], prod.Count, Hour) { EditStatus = EditStatus.Edited };
+                return new StorageAssignGridItem(prod.Ware, _capacityDict[prod.Ware.TransportType.TransportTypeID], prod.Count, Hour) { EditStatus = EditStatus.Edited };
             }));
         }
     }
@@ -280,7 +280,7 @@ class StorageAssignModel : IDisposable
                 releasedCapacity.Add(prod.Ware.TransportType.TransportTypeID, 0);
             }
 
-            var assign = _StorageAssignInfo.StorageAssign.First(x => x.WareID == prod.Ware.ID);
+            var assign = _storageAssignInfo.StorageAssign.First(x => x.WareID == prod.Ware.ID);
 
             releasedCapacity[assign.TransportTypeID] += assign.AllocCapacity;
             removeWares.Add(assign.WareID);
@@ -288,12 +288,12 @@ class StorageAssignModel : IDisposable
         }
 
         // 削除対象を削除する
-        _StorageAssignInfo.StorageAssign.RemoveAll(x => removeWares.Contains(x.WareID));
+        _storageAssignInfo.StorageAssign.RemoveAll(x => removeWares.Contains(x.WareID));
 
         // 容量開放
         foreach (var kvp in releasedCapacity)
         {
-            _CapacityDict[kvp.Key].UsedCapacity -= kvp.Value;
+            _capacityDict[kvp.Key].UsedCapacity -= kvp.Value;
         }
     }
 
@@ -303,10 +303,10 @@ class StorageAssignModel : IDisposable
     /// </summary>
     public void Dispose()
     {
-        _Products.Products.CollectionChanged -= Products_CollectionChanged;
-        _Products.Products.CollectionPropertyChanged -= Products_CollectionPropertyChanged;
+        _products.Products.CollectionChanged -= Products_CollectionChanged;
+        _products.Products.CollectionPropertyChanged -= Products_CollectionPropertyChanged;
 
-        _Storages.Storages.CollectionChanged -= Storages_CollectionChanged;
-        _Storages.Storages.CollectionPropertyChanged -= Storages_CollectionPropertyChanged;
+        _storages.Storages.CollectionChanged -= Storages_CollectionChanged;
+        _storages.Storages.CollectionPropertyChanged -= Storages_CollectionPropertyChanged;
     }
 }

@@ -22,19 +22,19 @@ public class ShipExporter : IExporter
     /// <summary>
     /// catファイルオブジェクト
     /// </summary>
-    private readonly ICatFile _CatFile;
+    private readonly ICatFile _catFile;
 
 
     /// <summary>
     /// ウェア情報xml
     /// </summary>
-    private readonly XDocument _WaresXml;
+    private readonly XDocument _waresXml;
 
 
     /// <summary>
     /// サムネ画像管理クラス
     /// </summary>
-    private readonly ThumbnailManager _ThumbnailManager;
+    private readonly ThumbnailManager _thumbnailManager;
 
 
     /// <summary>
@@ -46,9 +46,9 @@ public class ShipExporter : IExporter
     {
         ArgumentNullException.ThrowIfNull(waresXml.Root);
 
-        _CatFile = catFile;
-        _WaresXml = waresXml;
-        _ThumbnailManager = new(catFile, "assets/fx/gui/textures/ships", "notfound");
+        _catFile = catFile;
+        _waresXml = waresXml;
+        _thumbnailManager = new(catFile, "assets/fx/gui/textures/ships", "notfound");
     }
 
 
@@ -110,11 +110,11 @@ items);
     /// </summary>
     private async IAsyncEnumerable<Ship> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
+        var maxSteps = (int)(double)_waresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
         var currentStep = 0;
 
 
-        foreach (var ship in _WaresXml.Root!.XPathSelectElements("ware[contains(@tags, 'ship')]"))
+        foreach (var ship in _waresXml.Root!.XPathSelectElements("ware[contains(@tags, 'ship')]"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress.Report((currentStep++, maxSteps));
@@ -126,7 +126,7 @@ items);
             var macroName = ship.XPathSelectElement("component")?.Attribute("ref")?.Value;
             if (string.IsNullOrEmpty(macroName)) continue;
 
-            var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
+            var macroXml = await _catFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
 
             var shipSizeID = GetShipSizeID(macroXml);
             if (string.IsNullOrEmpty(shipSizeID)) continue;
@@ -158,7 +158,7 @@ items);
                 property.MissileStorage,
                 property.DroneStorage,
                 cargoSize,
-                await _ThumbnailManager.GetThumbnailAsync(macroName, cancellationToken)
+                await _thumbnailManager.GetThumbnailAsync(macroName, cancellationToken)
             );
         }
 
@@ -197,7 +197,7 @@ items);
         var componentName = macroXml.Root?.XPathSelectElement("macro/component")?.Attribute("ref")?.Value ?? "";
         if (string.IsNullOrEmpty(componentName)) return -1;
 
-        var componentXml = await _CatFile.OpenIndexXmlAsync("index/components.xml", componentName, cancellationToken);
+        var componentXml = await _catFile.OpenIndexXmlAsync("index/components.xml", componentName, cancellationToken);
         if (componentXml is null) return -1;
 
         var connName = componentXml.Root?.XPathSelectElement("component/connections/connection[contains(@tags, 'storage')]")?.Attribute("name")?.Value ?? "";
@@ -211,7 +211,7 @@ items);
         }
 
 
-        var storageXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", storage, cancellationToken);
+        var storageXml = await _catFile.OpenIndexXmlAsync("index/macros.xml", storage, cancellationToken);
         if (storageXml is null) return -1;
 
         return storageXml.Root?.XPathSelectElement("macro/properties/cargo")?.Attribute("max").GetInt() ?? 0;
@@ -223,49 +223,44 @@ items);
     /// </summary>
     /// <param name="macroXml"></param>
     /// <returns></returns>
-    private ShipProperty? GetProperty(XDocument macroXml)
+    private static ShipProperty? GetProperty(XDocument macroXml)
     {
         var properties = macroXml.Root?.XPathSelectElement("macro/properties");
         if (properties is null) return null;
 
-
-        var ret = new ShipProperty();
-        // 説明文を取得
-
         // 艦船種別IDを取得
-        ret.ShipTypeID = properties.Element("ship")?.Attribute("type")?.Value ?? "";
-        if (string.IsNullOrEmpty(ret.ShipTypeID)) return null;
-
+        var shipTypeId = properties.Element("ship")?.Attribute("type")?.Value;
+        if (string.IsNullOrEmpty(shipTypeId)) return null;
 
         // 抗力を取得
-        {
-            var drag = properties.XPathSelectElement("physics/drag");
-            if (drag is null) return null;
-
-            ret.DragForward = drag.Attribute("forward")?.GetDouble() ?? 0.0;
-            ret.DragReverse = drag.Attribute("reverse")?.GetDouble() ?? 0.0;
-            ret.DragHorizontal = drag.Attribute("horizontal")?.GetDouble() ?? 0.0;
-            ret.DragVertical = drag.Attribute("vertical")?.GetDouble() ?? 0.0;
-            ret.DragPitch = drag.Attribute("pitch")?.GetDouble() ?? 0.0;
-            ret.DragYaw = drag.Attribute("yaw")?.GetDouble() ?? 0.0;
-            ret.DragRoll = drag.Attribute("roll")?.GetDouble() ?? 0.0;
-        }
+        var drag = properties.XPathSelectElement("physics/drag");
+        if (drag is null) return null;
 
         // 慣性を取得
+        var inertia = properties.XPathSelectElement("physics/inertia");
+        if (inertia is null) return null;
+
+        var ret = new ShipProperty
         {
-            var inertia = properties.XPathSelectElement("physics/inertia");
-            if (inertia is null) return null;
+            ShipTypeID      = shipTypeId,
+            DragForward     = drag.Attribute("forward")?.GetDouble()    ?? 0.0,
+            DragReverse     = drag.Attribute("reverse")?.GetDouble()    ?? 0.0,
+            DragHorizontal  = drag.Attribute("horizontal")?.GetDouble() ?? 0.0,
+            DragVertical    = drag.Attribute("vertical")?.GetDouble()   ?? 0.0,
+            DragPitch       = drag.Attribute("pitch")?.GetDouble()      ?? 0.0,
+            DragYaw         = drag.Attribute("yaw")?.GetDouble()        ?? 0.0,
+            DragRoll        = drag.Attribute("roll")?.GetDouble()       ?? 0.0,
 
-            ret.InertiaPitch = inertia.Attribute("pitch")?.GetDouble() ?? 0.0;
-            ret.InertiaYaw = inertia.Attribute("yaw")?.GetDouble() ?? 0.0;
-            ret.InertiaRoll = inertia.Attribute("roll")?.GetDouble() ?? 0.0;
-        }
+            InertiaPitch    = inertia.Attribute("pitch")?.GetDouble()   ?? 0.0,
+            InertiaYaw      = inertia.Attribute("yaw")?.GetDouble()     ?? 0.0,
+            InertiaRoll     = inertia.Attribute("roll")?.GetDouble()    ?? 0.0,
 
-        ret.Hull = properties.Element("hull")?.Attribute("max").GetInt() ?? 0;
-        ret.Mass = properties.Element("physics")?.Attribute("mass").GetDouble() ?? 0;
-        ret.People = properties.Element("people")?.Attribute("capacity").GetInt() ?? 0;
-        ret.MissileStorage = properties.Element("storage")?.Attribute("missile")?.GetInt() ?? 0;    // ミサイル搭載不能なら搭載量は0
-        ret.DroneStorage = properties.Element("storage")?.Attribute("unit")?.GetInt() ?? 0;         // ドローン搭載不能なら搭載量は0
+            Hull            = properties.Element("hull")?.Attribute("max").GetInt()         ?? 0,
+            Mass            = properties.Element("physics")?.Attribute("mass").GetDouble()  ?? 0,
+            People          = properties.Element("people")?.Attribute("capacity").GetInt()  ?? 0,
+            MissileStorage  = properties.Element("storage")?.Attribute("missile")?.GetInt() ?? 0,       // ミサイル搭載不能なら搭載量は0
+            DroneStorage    = properties.Element("storage")?.Attribute("unit")?.GetInt()    ?? 0        // ドローン搭載不能なら搭載量は0
+        };
 
         return ret;
     }

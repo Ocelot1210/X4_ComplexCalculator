@@ -18,31 +18,31 @@ public class ModulesReorder : BindableBase
     /// <summary>
     /// モジュール一覧情報
     /// </summary>
-    private readonly IModulesInfo _ModulesInfo;
+    private readonly IModulesInfo _modulesInfo;
 
 
     /// <summary>
     /// モジュール一覧(表示用)
     /// </summary>
-    private readonly ListCollectionView _CollectionView;
+    private readonly ListCollectionView _collectionView;
 
 
     /// <summary>
     /// 選択数
     /// </summary>
-    private int _Selection;
+    private int _selection;
 
 
     /// <summary>
     /// 選択されたか
     /// </summary>
-    private bool _HasSelected;
+    private bool _hasSelected;
 
 
     /// <summary>
     /// ソート済み列数
     /// </summary>
-    private int _SortedColumnCount;
+    private int _sortedColumnCount;
     #endregion
 
 
@@ -76,10 +76,10 @@ public class ModulesReorder : BindableBase
     /// </summary>
     private bool HasSelected
     {
-        get => _HasSelected;
+        get => _hasSelected;
         set
         {
-            if (SetProperty(ref _HasSelected, value))
+            if (SetProperty(ref _hasSelected, value))
             {
                 MoveUpTheSelectionCommand.RaiseCanExecuteChanged();
                 MoveDownTheSelectionCommand.RaiseCanExecuteChanged();
@@ -93,10 +93,10 @@ public class ModulesReorder : BindableBase
     /// </summary>
     public int SortedColumnCount
     {
-        get => _SortedColumnCount;
+        get => _sortedColumnCount;
         set
         {
-            if (SetProperty(ref _SortedColumnCount, value))
+            if (SetProperty(ref _sortedColumnCount, value))
             {
                 MoveUpTheSelectionCommand.RaiseCanExecuteChanged();
                 MoveDownTheSelectionCommand.RaiseCanExecuteChanged();
@@ -118,8 +118,8 @@ public class ModulesReorder : BindableBase
     /// <param name="modulesInfo">モジュール一覧情報</param>
     public ModulesReorder(IModulesInfo modulesInfo, ListCollectionView listCollectionView)
     {
-        _ModulesInfo = modulesInfo;
-        _CollectionView = listCollectionView;
+        _modulesInfo = modulesInfo;
+        _collectionView = listCollectionView;
         SelectModulesCommand        = new DelegateCommand(SelectModules);
         ClearSelectionCommand       = new DelegateCommand(ClearSelection);
         MoveUpTheSelectionCommand   = new DelegateCommand(MoveUpTheSelection, () => CanMode);
@@ -144,12 +144,12 @@ public class ModulesReorder : BindableBase
         if (isAddMode)
         {
             // 選択追加モードの場合、ソート対象の項目に加え、現在選択している項目を追加する
-            modules = _CollectionView.OfType<ModulesGridItem>().Where(x => !x.IsReorderTarget);
+            modules = _collectionView.OfType<ModulesGridItem>().Where(x => !x.IsReorderTarget);
         }
         else
         {
             // 選択追加モードでない場合、現在選択されているもののみソート対象にする
-            modules = _CollectionView.OfType<ModulesGridItem>();
+            modules = _collectionView.OfType<ModulesGridItem>();
         }
 
         foreach (var item in modules)
@@ -161,8 +161,8 @@ public class ModulesReorder : BindableBase
             }
         }
 
-        _Selection = isAddMode ? (_Selection + added) : added;
-        HasSelected = 0 < _Selection;
+        _selection = isAddMode ? (_selection + added) : added;
+        HasSelected = 0 < _selection;
     }
 
 
@@ -171,12 +171,12 @@ public class ModulesReorder : BindableBase
     /// </summary>
     private void ClearSelection()
     {
-        foreach (var item in _ModulesInfo.Modules.Where(x => x.IsReorderTarget))
+        foreach (var item in _modulesInfo.Modules.Where(x => x.IsReorderTarget))
         {
             item.IsReorderTarget = false;
         }
 
-        _Selection = 0;
+        _selection = 0;
         HasSelected = false;
     }
 
@@ -228,7 +228,7 @@ public class ModulesReorder : BindableBase
         int prev = 0;       // 挿入位置より前にある移動対象の要素数
         int ret = 0;
 
-        var collection = _ModulesInfo.Modules.Select((x, idx) => (Module: x, Index: idx))
+        var collection = _modulesInfo.Modules.Select((x, idx) => (Module: x, Index: idx))
                                              .Where(x => x.Module.IsSelected || x.Module.IsReorderTarget);
 
         foreach (var (module, idx) in collection)
@@ -257,20 +257,20 @@ public class ModulesReorder : BindableBase
     /// <param name="insertIdx">移動先要素番号</param>
     private void Move(int insertIdx)
     {
-        if (_ModulesInfo.Modules.Count - _Selection < insertIdx)
+        if (_modulesInfo.Modules.Count - _selection < insertIdx)
         {
-            insertIdx = _ModulesInfo.Modules.Count - _Selection;
+            insertIdx = _modulesInfo.Modules.Count - _selection;
         }
 
         // 移動対象を退避
-        var list = new List<ModulesGridItem>(_Selection);
-        list.AddRange(_ModulesInfo.Modules.Where(x => x.IsReorderTarget));
+        var list = new List<ModulesGridItem>(_selection);
+        list.AddRange(_modulesInfo.Modules.Where(x => x.IsReorderTarget));
 
         // 移動対象を削除
-        _ModulesInfo.Modules.RemoveAll(x => x.IsReorderTarget);
+        _modulesInfo.Modules.RemoveAll(x => x.IsReorderTarget);
 
         // 挿入位置に挿入
-        _ModulesInfo.Modules.InsertRange(insertIdx, list);
+        _modulesInfo.Modules.InsertRange(insertIdx, list);
 
         // 移動対象から除外＆編集した事にする
         foreach (var item in list)
@@ -279,7 +279,7 @@ public class ModulesReorder : BindableBase
             item.IsReorderTarget = false;
         }
 
-        _Selection = 0;
+        _selection = 0;
         HasSelected = false;
     }
 }

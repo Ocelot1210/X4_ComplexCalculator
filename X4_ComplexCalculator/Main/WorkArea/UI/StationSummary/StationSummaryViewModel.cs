@@ -17,31 +17,31 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary;
 /// <summary>
 /// ステーション概要用ViewModel
 /// </summary>
-public class StationSummaryViewModel : BindableBase, IDisposable
+public sealed class StationSummaryViewModel : BindableBase, IDisposable
 {
     #region メンバ
     /// <summary>
     /// 労働力用Model
     /// </summary>
-    private readonly WorkForceModuleInfoModel _WorkForceModuleInfoModel;
+    private readonly WorkForceModuleInfoModel _workForceModuleInfoModel;
 
 
     /// <summary>
     /// 必要ウェア用Model
     /// </summary>
-    private readonly NeedWareInfoModel _NeedWareInfoModel;
+    private readonly NeedWareInfoModel _needWareInfoModel;
 
 
     /// <summary>
     /// 利益用Model
     /// </summary>
-    private readonly ProfitModel _ProfitModel;
+    private readonly ProfitModel _profitModel;
 
 
     /// <summary>
     /// 建造コスト用Model
     /// </summary>
-    private readonly BuildingCostModel _BuildingCostModel;
+    private readonly BuildingCostModel _buildingCostModel;
     #endregion
 
 
@@ -55,7 +55,7 @@ public class StationSummaryViewModel : BindableBase, IDisposable
     /// <summary>
     /// 労働力関連モジュール情報
     /// </summary>
-    public ObservableCollection<WorkForceModuleInfoDetailsItem> WorkforceModuleDetails => _WorkForceModuleInfoModel.WorkForceDetails;
+    public ObservableCollection<WorkForceModuleInfoDetailsItem> WorkforceModuleDetails => _workForceModuleInfoModel.WorkForceDetails;
 
 
     /// <summary>
@@ -69,13 +69,13 @@ public class StationSummaryViewModel : BindableBase, IDisposable
     /// <summary>
     /// 1時間あたりの損益
     /// </summary>
-    public long Profit => _ProfitModel.Profit;
+    public long Profit => _profitModel.Profit;
 
 
     /// <summary>
     /// 損益詳細
     /// </summary>
-    public ObservableCollection<ProductsGridItem> ProfitDetails => _ProfitModel.ProfitDetails;
+    public ObservableCollection<ProductsGridItem> ProfitDetails => _profitModel.ProfitDetails;
     #endregion
 
 
@@ -83,13 +83,13 @@ public class StationSummaryViewModel : BindableBase, IDisposable
     /// <summary>
     /// 建造費用
     /// </summary>
-    public long BuildingCost => _BuildingCostModel.BuildingCost;
+    public long BuildingCost => _buildingCostModel.BuildingCost;
 
 
     /// <summary>
     /// 建造コスト詳細
     /// </summary>
-    public ObservableCollection<BuildResourcesGridItem> BuildingCostDetails => _BuildingCostModel.BuildResources;
+    public ObservableCollection<BuildResourcesGridItem> BuildingCostDetails => _buildingCostModel.BuildResources;
     #endregion
 
 
@@ -103,13 +103,13 @@ public class StationSummaryViewModel : BindableBase, IDisposable
 
         // 労働力関係初期化
         {
-            _WorkForceModuleInfoModel = new WorkForceModuleInfoModel(stationData.ModulesInfo, stationData.Settings);
+            _workForceModuleInfoModel = new WorkForceModuleInfoModel(stationData.ModulesInfo, stationData.Settings);
         }
 
         {
-            _NeedWareInfoModel = new NeedWareInfoModel(stationData.ModulesInfo, stationData.ProductsInfo);
+            _needWareInfoModel = new NeedWareInfoModel(stationData.ModulesInfo, stationData.ProductsInfo);
 
-            WorkforceNeedWareCollectionView = (ListCollectionView)CollectionViewSource.GetDefaultView(_NeedWareInfoModel.NeedWareInfoDetails);
+            WorkforceNeedWareCollectionView = (ListCollectionView)CollectionViewSource.GetDefaultView(_needWareInfoModel.NeedWareInfoDetails);
             WorkforceNeedWareCollectionView.SortDescriptions.Clear();
             WorkforceNeedWareCollectionView.SortDescriptions.Add(new SortDescription(nameof(NeedWareInfoDetailsItem.Method), ListSortDirection.Ascending));
             WorkforceNeedWareCollectionView.SortDescriptions.Add(new SortDescription(nameof(NeedWareInfoDetailsItem.WareName), ListSortDirection.Ascending));
@@ -121,15 +121,15 @@ public class StationSummaryViewModel : BindableBase, IDisposable
 
         // 損益関係初期化
         {
-            _ProfitModel = new ProfitModel(stationData.ProductsInfo);
-            _ProfitModel.PropertyChanged += ProfitModel_PropertyChanged;
+            _profitModel = new ProfitModel(stationData.ProductsInfo);
+            _profitModel.PropertyChanged += ProfitModel_PropertyChanged;
         }
 
 
         // 建造コスト関係初期化
         {
-            _BuildingCostModel = new BuildingCostModel(stationData.BuildResourcesInfo);
-            _BuildingCostModel.PropertyChanged += BuildingCostModel_PropertyChanged;
+            _buildingCostModel = new BuildingCostModel(stationData.BuildResourcesInfo);
+            _buildingCostModel.PropertyChanged += BuildingCostModel_PropertyChanged;
         }
     }
 
@@ -177,12 +177,12 @@ public class StationSummaryViewModel : BindableBase, IDisposable
     /// </summary>
     public void Dispose()
     {
-        _ProfitModel.PropertyChanged       -= ProfitModel_PropertyChanged;
-        _BuildingCostModel.PropertyChanged -= BuildingCostModel_PropertyChanged;
+        _profitModel.PropertyChanged       -= ProfitModel_PropertyChanged;
+        _buildingCostModel.PropertyChanged -= BuildingCostModel_PropertyChanged;
 
-        _WorkForceModuleInfoModel.Dispose();
-        _NeedWareInfoModel.Dispose();
-        _ProfitModel.Dispose();
-        _BuildingCostModel.Dispose();
+        _workForceModuleInfoModel.Dispose();
+        _needWareInfoModel.Dispose();
+        _profitModel.Dispose();
+        _buildingCostModel.Dispose();
     }
 }

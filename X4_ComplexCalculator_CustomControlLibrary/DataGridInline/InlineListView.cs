@@ -17,7 +17,7 @@ public class InlineListView : ListView
     /// <summary>
     /// スクロールイベントバブリング用
     /// </summary>
-    ScrollViewer? _ScrollViewer;
+    ScrollViewer? _scrollViewer;
     #endregion
 
 
@@ -111,15 +111,15 @@ public class InlineListView : ListView
     private void PreviewMouseWheelEventHandler(object sender, MouseWheelEventArgs e)
     {
         // ListViewn内のScrollViewerを取得する(初回のみ)
-        if (_ScrollViewer == null)
+        if (_scrollViewer == null)
         {
-            _ScrollViewer = FindVisualChild<System.Windows.Controls.ScrollViewer>(this) ?? throw new InvalidOperationException();
+            _scrollViewer = FindVisualChild<System.Windows.Controls.ScrollViewer>(this) ?? throw new InvalidOperationException();
         }
 
-        var scrollPos = _ScrollViewer.ContentVerticalOffset;
+        var scrollPos = _scrollViewer.ContentVerticalOffset;
 
         // スクロールすべきか？
-        if ((scrollPos == _ScrollViewer.ScrollableHeight && e.Delta < 0) || (scrollPos == 0 && e.Delta > 0))
+        if ((scrollPos == _scrollViewer.ScrollableHeight && e.Delta < 0) || (scrollPos == 0 && e.Delta > 0))
         {
             e.Handled = true;
 

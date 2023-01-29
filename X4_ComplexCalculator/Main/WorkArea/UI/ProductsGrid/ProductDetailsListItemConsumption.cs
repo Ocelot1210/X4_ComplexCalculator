@@ -12,13 +12,13 @@ class ProductDetailsListItemConsumption : BindableBase, IProductDetailsListItem
     /// <summary>
     /// 製品数(モジュール追加用)
     /// </summary>
-    private readonly long _Amount;
+    private readonly long _amount;
 
 
     /// <summary>
     /// モジュール数
     /// </summary>
-    private long _ModuleCount;
+    private long _moduleCount;
     #endregion
 
 
@@ -38,10 +38,10 @@ class ProductDetailsListItemConsumption : BindableBase, IProductDetailsListItem
     /// <inheritdoc/>
     public long ModuleCount
     {
-        get => _ModuleCount;
+        get => _moduleCount;
         set
         {
-            if (SetProperty(ref _ModuleCount, value))
+            if (SetProperty(ref _moduleCount, value))
             {
                 RaisePropertyChanged(nameof(Amount));
             }
@@ -50,7 +50,7 @@ class ProductDetailsListItemConsumption : BindableBase, IProductDetailsListItem
 
 
     /// <inheritdoc/>
-    public long Amount => _Amount * ModuleCount;
+    public long Amount => _amount * ModuleCount;
 
 
     /// <inheritdoc/>
@@ -71,7 +71,7 @@ class ProductDetailsListItemConsumption : BindableBase, IProductDetailsListItem
         ModuleID = module.ID;
         ModuleName = module.Name;
         ModuleCount = moduleCount;
-        _Amount = amount;
+        _amount = amount;
     }
 
 

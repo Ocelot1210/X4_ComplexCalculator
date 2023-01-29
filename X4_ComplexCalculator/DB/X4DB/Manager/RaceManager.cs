@@ -16,7 +16,7 @@ public class RaceManager
     /// <summary>
     /// 種族IDをキーにした <see cref="IRace"/> の一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IRace> _Races;
+    private readonly IReadOnlyDictionary<string, IRace> _races;
     #endregion
 
 
@@ -26,8 +26,8 @@ public class RaceManager
     /// <param name="conn">DB接続情報</param>
     public RaceManager(IDbConnection conn)
     {
-        const string sql = "SELECT RaceID, Name, ShortName, Description FROM Race";
-        _Races = conn.Query<Race>(sql).ToDictionary(x => x.RaceID, x => x as IRace);
+        const string SQL = "SELECT RaceID, Name, ShortName, Description FROM Race";
+        _races = conn.Query<Race>(SQL).ToDictionary(x => x.RaceID, x => x as IRace);
     }
 
 
@@ -39,7 +39,7 @@ public class RaceManager
     /// <para><paramref name="id"/> に対応する <see cref="IRace"/></para>
     /// <para><paramref name="id"/> に対応する <see cref="IRace"/> が無ければ null</para></returns>
     public IRace? TryGet(string id) =>
-        _Races.TryGetValue(id, out var race) ? race : null;
+        _races.TryGetValue(id, out var race) ? race : null;
 
 
     /// <summary>
@@ -48,12 +48,12 @@ public class RaceManager
     /// <param name="id">種族ID</param>
     /// <returns><paramref name="id"/> に対応する <see cref="IRace"/></returns>
     /// <exception cref="KeyNotFoundException"><paramref name="id"/> に対応する <see cref="IRace"/> が無い場合</exception>
-    public IRace Get(string id) => _Races[id];
+    public IRace Get(string id) => _races[id];
 
 
     /// <summary>
     /// 全ての <see cref="IRace"/> を取得する
     /// </summary>
     /// <returns>全ての <see cref="IRace"/> の列挙</returns>
-    public IEnumerable<IRace> GetAll() => _Races.Values;
+    public IEnumerable<IRace> GetAll() => _races.Values;
 }

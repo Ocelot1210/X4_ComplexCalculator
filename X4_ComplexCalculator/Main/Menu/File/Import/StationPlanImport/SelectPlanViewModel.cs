@@ -13,25 +13,25 @@ class SelectPlanViewModel : BindableBase
     /// <summary>
     /// Model
     /// </summary>
-    private readonly SelectPlanModel _Model;
+    private readonly SelectPlanModel _model;
 
 
     /// <summary>
     /// ダイアログの戻り値
     /// </summary>
-    private bool _DialogResult;
+    private bool _dialogResult;
 
 
     /// <summary>
     /// ダイアログを閉じるか
     /// </summary>
-    private bool _CloseDialogProperty;
+    private bool _closeDialogProperty;
 
 
     /// <summary>
     /// 選択された計画一覧
     /// </summary>
-    private List<StationPlanItem> _SelectedPlanItems;
+    private readonly List<StationPlanItem> _selectedPlanItems;
     #endregion
 
 
@@ -39,7 +39,7 @@ class SelectPlanViewModel : BindableBase
     /// <summary>
     /// 計画一覧
     /// </summary>
-    public ObservableCollection<StationPlanItem> Planes => _Model.Planes;
+    public ObservableCollection<StationPlanItem> Planes => _model.Planes;
 
 
     /// <summary>
@@ -47,8 +47,8 @@ class SelectPlanViewModel : BindableBase
     /// </summary>
     public bool DialogResult
     {
-        get => _DialogResult;
-        set => SetProperty(ref _DialogResult, value);
+        get => _dialogResult;
+        set => SetProperty(ref _dialogResult, value);
     }
 
     /// <summary>
@@ -56,14 +56,14 @@ class SelectPlanViewModel : BindableBase
     /// </summary>
     public bool CloseDialogProperty
     {
-        get => _CloseDialogProperty;
-        set => SetProperty(ref _CloseDialogProperty, value);
+        get => _closeDialogProperty;
+        set => SetProperty(ref _closeDialogProperty, value);
     }
 
     /// <summary>
     /// 計画ファイルパス
     /// </summary>
-    public string PlanFilePath => _Model.PlanFilePath;
+    public string PlanFilePath => _model.PlanFilePath;
 
 
     /// <summary>
@@ -91,13 +91,13 @@ class SelectPlanViewModel : BindableBase
     /// <param name="planItems">選択計画一覧</param>
     public SelectPlanViewModel(List<StationPlanItem> planItems)
     {
-        _Model = new SelectPlanModel();
-        _Model.PropertyChanged += Model_PropertyChanged;
-        _SelectedPlanItems = planItems;
+        _model = new SelectPlanModel();
+        _model.PropertyChanged += Model_PropertyChanged;
+        _selectedPlanItems = planItems;
 
         OkButtonClickedCommand     = new DelegateCommand(OkButtonClicked);
         CancelButtonClickedCommand = new DelegateCommand(CancelButtonClicked);
-        SelectPlanFileCommand      = new DelegateCommand(_Model.SelectPlanFile);
+        SelectPlanFileCommand      = new DelegateCommand(_model.SelectPlanFile);
     }
 
 
@@ -125,7 +125,7 @@ class SelectPlanViewModel : BindableBase
     /// </summary>
     private void OkButtonClicked()
     {
-        _SelectedPlanItems.AddRange(Planes.Where(x => x.IsChecked));
+        _selectedPlanItems.AddRange(Planes.Where(x => x.IsChecked));
         DialogResult = true;
         CloseDialogProperty = true;
     }

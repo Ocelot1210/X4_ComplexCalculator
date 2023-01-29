@@ -24,7 +24,7 @@ class DataExportModel
     /// <summary>
     /// 言語一覧を更新
     /// </summary>
-    public async Task<(bool success, IReadOnlyList<LangComboboxItem> languages)> GetLanguages(string inDirPath, Window owner)
+    public static async Task<(bool success, IReadOnlyList<LangComboboxItem> languages)> GetLanguages(string inDirPath, Window owner)
     {
         try
         {
@@ -64,7 +64,7 @@ class DataExportModel
     /// <param name="language">選択された言語</param>
     /// <param name="owner">親ウィンドウハンドル(メッセージボックス表示用)</param>
     /// <returns>現在数と合計数のタプルのイテレータ</returns>
-    public async Task Export(
+    public static async Task Export(
         IProgress<(int currentStep, int maxSteps)> progress,
         IProgress<(int currentStep, int maxSteps)> progressSub,
         string inDirPath,
@@ -224,7 +224,7 @@ class DataExportModel
     /// <param name="path"></param>
     /// <param name="catFile"></param>
     /// <param name="e"></param>
-    private void DumpCrashReport(string path, CatFile catFile, Exception e)
+    private static void DumpCrashReport(string path, CatFile catFile, Exception e)
     {
         using var sw = new StreamWriter(path);
 

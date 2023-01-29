@@ -26,9 +26,10 @@ public partial class SelectPlanDialog : Window
     /// <param name="planItems">選択計画一覧</param>
     public static bool ShowDialog(List<StationPlanItem> planItems)
     {
-        var wnd = new SelectPlanDialog(planItems);
-
-        wnd.Owner = Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive) ?? Application.Current.MainWindow;
+        var wnd = new SelectPlanDialog(planItems)
+        {
+            Owner = Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive) ?? Application.Current.MainWindow
+        };
 
         return wnd.ShowDialog() == true;
     }

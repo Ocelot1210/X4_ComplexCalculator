@@ -13,25 +13,25 @@ class SelectStationViewModel : BindableBase
     /// <summary>
     /// Model
     /// </summary>
-    private readonly SelectStationModel _Model;
+    private readonly SelectStationModel _model;
 
 
     /// <summary>
     /// ダイアログの戻り値
     /// </summary>
-    private bool _DialogResult;
+    private bool _dialogResult;
 
 
     /// <summary>
     /// ダイアログを閉じるか
     /// </summary>
-    private bool _CloseDialogProperty;
+    private bool _closeDialogProperty;
 
 
     /// <summary>
     /// 選択された計画一覧
     /// </summary>
-    private readonly List<SaveDataStationItem> _SelectedStationItems;
+    private readonly List<SaveDataStationItem> _selectedStationItems;
     #endregion
 
 
@@ -42,8 +42,8 @@ class SelectStationViewModel : BindableBase
     /// </summary>
     public bool DialogResult
     {
-        get => _DialogResult;
-        set => SetProperty(ref _DialogResult, value);
+        get => _dialogResult;
+        set => SetProperty(ref _dialogResult, value);
     }
 
     /// <summary>
@@ -51,8 +51,8 @@ class SelectStationViewModel : BindableBase
     /// </summary>
     public bool CloseDialogProperty
     {
-        get => _CloseDialogProperty;
-        set => SetProperty(ref _CloseDialogProperty, value);
+        get => _closeDialogProperty;
+        set => SetProperty(ref _closeDialogProperty, value);
     }
 
     public bool? IsCheckedAll
@@ -77,13 +77,13 @@ class SelectStationViewModel : BindableBase
     /// <summary>
     /// セーブデータファイルパス
     /// </summary>
-    public string SaveDataFilePath => _Model.SaveDataFilePath;
+    public string SaveDataFilePath => _model.SaveDataFilePath;
 
 
     /// <summary>
     /// 計画一覧
     /// </summary>
-    public ObservableCollection<SaveDataStationItem> Stations => _Model.Stations;
+    public ObservableCollection<SaveDataStationItem> Stations => _model.Stations;
 
 
     /// <summary>
@@ -111,11 +111,11 @@ class SelectStationViewModel : BindableBase
     /// <param name="stationItems"></param>
     public SelectStationViewModel(List<SaveDataStationItem> stationItems)
     {
-        _Model = new SelectStationModel();
-        _SelectedStationItems = stationItems;
+        _model = new SelectStationModel();
+        _selectedStationItems = stationItems;
         OkButtonClickedCommand      = new DelegateCommand(OkButtonClicked);
         CancelButtonClickedCommand  = new DelegateCommand(CancelButtonClicked);
-        SelectSaveDataFileCommand   = new DelegateCommand(_Model.SelectSaveDataFile);
+        SelectSaveDataFileCommand   = new DelegateCommand(_model.SelectSaveDataFile);
     }
 
 
@@ -124,7 +124,7 @@ class SelectStationViewModel : BindableBase
     /// </summary>
     private void OkButtonClicked()
     {
-        _SelectedStationItems.AddRange(Stations.Where(x => x.IsChecked));
+        _selectedStationItems.AddRange(Stations.Where(x => x.IsChecked));
         DialogResult = true;
         CloseDialogProperty = true;
     }
@@ -135,7 +135,7 @@ class SelectStationViewModel : BindableBase
     /// </summary>
     private void CancelButtonClicked()
     {
-        _SelectedStationItems.Clear();
+        _selectedStationItems.Clear();
         DialogResult = false;
         CloseDialogProperty = true;
     }

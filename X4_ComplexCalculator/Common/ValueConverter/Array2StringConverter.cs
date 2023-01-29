@@ -21,7 +21,7 @@ public class Array2StringConverter : IValueConverter
         return value?.ToString() ?? "";
     }
 
-    private IEnumerable<string> ConvertSub(IEnumerable enumerable)
+    private static IEnumerable<string> ConvertSub(IEnumerable enumerable)
     {
         foreach (var item in enumerable)
         {

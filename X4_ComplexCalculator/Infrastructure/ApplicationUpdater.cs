@@ -17,25 +17,25 @@ public class ApplicationUpdater
     /// <summary>
     /// 参照する GitHub のリポジトリのオーナー名
     /// </summary>
-    private const string _RepoOwner = "Ocelot1210";
+    private const string REPO_OWNER = "Ocelot1210";
 
 
     /// <summary>
     /// 参照する GitHub のリポジトリ名
     /// </summary>
-    private const string _RepoName = "X4_ComplexCalculator";
+    private const string REPO_NAME = "X4_ComplexCalculator";
 
 
     /// <summary>
     /// ダウンロードするアセットファイル名を表す簡易 glob パターン
     /// </summary>
-    private const string _AssetName = "X4_ComplexCalculator.zip";
+    private const string ASSET_NAME = "X4_ComplexCalculator.zip";
 
 
     /// <summary>
     /// Onova で更新情報を GitHub リリースから取得するリゾルバ
     /// </summary>
-    private static readonly GithubPackageResolver _Resolver = new(_RepoOwner, _RepoName, _AssetName);
+    private static readonly GithubPackageResolver _Resolver = new(REPO_OWNER, REPO_NAME, ASSET_NAME);
     #endregion
 
 
@@ -43,31 +43,31 @@ public class ApplicationUpdater
     /// <summary>
     /// Onova のアップデーター
     /// </summary>
-    private readonly UpdateManager _Manager;
+    private readonly UpdateManager _manager;
 
 
     /// <summary>
     /// 最後に確認した時点での最新バージョン。既に最新の場合は null
     /// </summary>
-    private Version? _LastVersion;
+    private Version? _lastVersion;
 
 
     /// <summary>
     /// ダウンロードが完了している場合
     /// </summary>
-    private Task? _DownloadTask;
+    private Task? _downloadTask;
 
 
     /// <summary>
     /// ダウンロードの進捗
     /// </summary>
-    private readonly ReactivePropertySlim<double> _DownloadProgress = new();
+    private readonly ReactivePropertySlim<double> _downloadProgress = new();
 
 
     /// <summary>
     /// キャンセルトークン
     /// </summary>
-    private readonly CancellationTokenSource _Cancellation = new();
+    private readonly CancellationTokenSource _cancellation = new();
     #endregion
 
 
@@ -75,19 +75,19 @@ public class ApplicationUpdater
     /// <summary>
     /// 更新をダウンロード中の場合は true
     /// </summary>
-    public bool NowDownloading => _DownloadTask is not null;
+    public bool NowDownloading => _downloadTask is not null;
 
 
     /// <summary>
     /// 更新のダウンロードが正常終了した場合 true
     /// </summary>
-    public bool FinishedDownload => _DownloadTask?.IsCompletedSuccessfully ?? false;
+    public bool FinishedDownload => _downloadTask?.IsCompletedSuccessfully ?? false;
 
 
     /// <summary>
     /// ダウンロードの進捗
     /// </summary>
-    public IReadOnlyReactiveProperty<double> DownloadProgress => _DownloadProgress;
+    public IReadOnlyReactiveProperty<double> DownloadProgress => _downloadProgress;
     #endregion
 
 
@@ -95,7 +95,7 @@ public class ApplicationUpdater
     /// アップデーターを初期化する
     /// </summary>
     public ApplicationUpdater()
-        => _Manager = new UpdateManager(_Resolver, new ZipExcerptPackageExtractor());
+        => _manager = new UpdateManager(_Resolver, new ZipExcerptPackageExtractor());
 
 
     /// <summary>
@@ -104,9 +104,9 @@ public class ApplicationUpdater
     /// <returns>更新がある場合はバージョン名、ない場合は null</returns>
     public async ValueTask<string?> CheckUpdate()
     {
-        var result = await _Manager.CheckForUpdatesAsync();
+        var result = await _manager.CheckForUpdatesAsync();
         return result.CanUpdate && result.LastVersion is not null
-            ? (_LastVersion = result.LastVersion).ToString()
+            ? (_lastVersion = result.LastVersion).ToString()
             : null;
     }
 
@@ -116,16 +116,16 @@ public class ApplicationUpdater
     /// </summary>
     public void StartDownloadByBackground()
     {
-        var version = _LastVersion ?? throw new InvalidOperationException();
-        var progless = new Progress<double>(progress => _DownloadProgress.Value = progress);
-        _DownloadTask = _Manager.PrepareUpdateAsync(version, progless, _Cancellation.Token);
+        var version = _lastVersion ?? throw new InvalidOperationException();
+        var progless = new Progress<double>(progress => _downloadProgress.Value = progress);
+        _downloadTask = _manager.PrepareUpdateAsync(version, progless, _cancellation.Token);
     }
 
 
     /// <summary>
     /// ダウンロードをキャンセルする
     /// </summary>
-    public void CancelDownload() => _Cancellation.Cancel();
+    public void CancelDownload() => _cancellation.Cancel();
 
 
     /// <summary>
@@ -134,8 +134,8 @@ public class ApplicationUpdater
     /// </summary>
     public async ValueTask UpdateAfterDownloading()
     {
-        if (_DownloadTask is null) return;
-        await _DownloadTask.ConfigureAwait(false);
+        if (_downloadTask is null) return;
+        await _downloadTask.ConfigureAwait(false);
         Update();
     }
 
@@ -146,8 +146,8 @@ public class ApplicationUpdater
     [DoesNotReturn]
     public void Update()
     {
-        var version = _LastVersion ?? throw new InvalidOperationException();
-        _Manager.LaunchUpdater(version, restart: false);
+        var version = _lastVersion ?? throw new InvalidOperationException();
+        _manager.LaunchUpdater(version, restart: false);
         Environment.Exit(0);
     }
 }

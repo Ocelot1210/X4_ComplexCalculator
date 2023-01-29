@@ -128,7 +128,7 @@ public sealed class DataGridFilterHost
         if (_deferFilterEvaluationTimer is null)
         {
             var throttleDelay = DataGridFilter.GetFilterEvaluationDelay(DataGrid);
-            _deferFilterEvaluationTimer = new DispatcherTimer(throttleDelay, DispatcherPriority.Input, (_, __) => EvaluateFilter(), Dispatcher.CurrentDispatcher);
+            _deferFilterEvaluationTimer = new DispatcherTimer(throttleDelay, DispatcherPriority.Input, (_, _) => EvaluateFilter(), Dispatcher.CurrentDispatcher);
         }
 
         _deferFilterEvaluationTimer.Restart();

@@ -72,8 +72,8 @@ internal class SaveDataReader1 : SaveDataReader0
     /// <param name="conn"></param>
     protected virtual void RestoreStorageAssignInfo(DBConnection conn)
     {
-        const string sql = "SELECT WareID, AllocCount FROM StorageAssign";
-        foreach (var (wareID, allocCount) in conn.Query<(string, long)>(sql))
+        const string SQL = "SELECT WareID, AllocCount FROM StorageAssign";
+        foreach (var (wareID, allocCount) in conn.Query<(string, long)>(SQL))
         {
             var itm = _WorkArea.StationData.StorageAssignInfo.StorageAssign.FirstOrDefault(x => x.WareID == wareID);
             if (itm is not null)

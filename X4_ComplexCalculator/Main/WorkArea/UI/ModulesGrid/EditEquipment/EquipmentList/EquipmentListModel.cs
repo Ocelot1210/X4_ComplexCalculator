@@ -20,13 +20,13 @@ class EquipmentListModel : BindableBase
     /// <summary>
     /// 装備管理用(作業用)
     /// </summary>
-    private readonly EquippableWareEquipmentManager _TempManager;
+    private readonly EquippableWareEquipmentManager _tempManager;
 
 
     /// <summary>
     /// 装備種別
     /// </summary>
-    private readonly IEquipmentType _EquipmentType;
+    private readonly IEquipmentType _equipmentType;
     #endregion
 
 
@@ -34,7 +34,7 @@ class EquipmentListModel : BindableBase
     /// <summary>
     /// タイトル文字列
     /// </summary>
-    public string Title => _EquipmentType.Name;
+    public string Title => _equipmentType.Name;
 
 
     /// <summary>
@@ -58,13 +58,13 @@ class EquipmentListModel : BindableBase
     /// <summary>
     /// 装備可能な個数
     /// </summary>
-    public int MaxAmount => _TempManager.GetMaxEquippableCount(_EquipmentType, SelectedSize.Value);
+    public int MaxAmount => _tempManager.GetMaxEquippableCount(_equipmentType, SelectedSize.Value);
 
 
     /// <summary>
     /// 装備済みの個数
     /// </summary>
-    public int EquippedCount => _TempManager.AllEquipments.Count(x => x.EquipmentType.Equals(_EquipmentType) && x.EquipmentTags.Contains(SelectedSize.Value.SizeID));
+    public int EquippedCount => _tempManager.AllEquipments.Count(x => x.EquipmentType.Equals(_equipmentType) && x.EquipmentTags.Contains(SelectedSize.Value.SizeID));
 
 
     /// <summary>
@@ -93,8 +93,8 @@ class EquipmentListModel : BindableBase
         IX4Size size
     )
     {
-        _EquipmentType = equipmentType;
-        _TempManager = new EquippableWareEquipmentManager(manager);
+        _equipmentType = equipmentType;
+        _tempManager = new EquippableWareEquipmentManager(manager);
 
         SelectedPreset = new ();
         SelectedPreset.Subscribe(x => PresetChanged());
@@ -117,7 +117,7 @@ class EquipmentListModel : BindableBase
 
         // 装備済みの装備一覧を作成
         {
-            var equipments = _TempManager.AllEquipments
+            var equipments = _tempManager.AllEquipments
                 .Where(x => x.EquipmentType.Equals(equipmentType))
                 .Select(x => new EquipmentListItem(x));
             Equipped.AddRange(equipments);
@@ -137,7 +137,7 @@ class EquipmentListModel : BindableBase
         }
 
         var addItems = Equippable.Where(x => x.IsSelected);
-        var addRange = _TempManager.GetEquippableCount(_EquipmentType, SelectedSize.Value);
+        var addRange = _tempManager.GetEquippableCount(_equipmentType, SelectedSize.Value);
 
         var added = false;
 
@@ -149,10 +149,10 @@ class EquipmentListModel : BindableBase
                 // 追加可能な分だけ追加する
                 var addTarget = addItems.Take(addRange).Select(x => x.Equipment).ToArray();
                 Equipped.AddRange(addTarget.Select(x => new EquipmentListItem(x)));
-                _TempManager.AddRange(addTarget.Select(x => x));
+                _tempManager.AddRange(addTarget.Select(x => x));
 
                 // 再計算
-                addRange = _TempManager.GetEquippableCount(_EquipmentType, SelectedSize.Value);
+                addRange = _tempManager.GetEquippableCount(_equipmentType, SelectedSize.Value);
 
                 added = true;
             }
@@ -164,7 +164,7 @@ class EquipmentListModel : BindableBase
                 // 追加可能な分だけ追加する
                 var addTarget = addItems.Take(addRange).Select(x => x.Equipment).ToArray();
                 Equipped.AddRange(addTarget.Select(x => new EquipmentListItem(x)));
-                _TempManager.AddRange(addTarget.Select(x => x));
+                _tempManager.AddRange(addTarget.Select(x => x));
 
                 added = true;
             }
@@ -194,7 +194,7 @@ class EquipmentListModel : BindableBase
 
         if (Equipped.Any(x => x.IsSelected))
         {
-            _TempManager.RemoveRange(Equipped.Where(x => x.IsSelected).Select(x => x.Equipment));
+            _tempManager.RemoveRange(Equipped.Where(x => x.IsSelected).Select(x => x.Equipment));
             Equipped.RemoveAll(x => x.IsSelected);
             RaisePropertyChanged(nameof(EquippedCount));
             Unsaved.Value = true;
@@ -214,7 +214,7 @@ class EquipmentListModel : BindableBase
             return;
         }
 
-        const string query = @"
+        const string QUERY = @"
 SELECT
     EquipmentID
 FROM
@@ -226,17 +226,17 @@ WHERE
 
         var param = new 
         {
-            ModuleID = _TempManager.Ware.ID,
+            ModuleID = _tempManager.Ware.ID,
             PresetID = SelectedPreset.Value.ID,
-            EquipmentType = _EquipmentType.EquipmentTypeID
+            EquipmentType = _equipmentType.EquipmentTypeID
         };
 
-        var equipments = SettingDatabase.Instance.Query<string>(query, param)
+        var equipments = SettingDatabase.Instance.Query<string>(QUERY, param)
             .Select(x => X4Database.Instance.Ware.Get<IEquipment>(x))
             .Select(x => new EquipmentListItem(x));
 
         Equipped.Reset(equipments);
-        _TempManager.ResetEquipment(equipments.Select(x => x.Equipment));
+        _tempManager.ResetEquipment(equipments.Select(x => x.Equipment));
 
 
         RaisePropertyChanged(nameof(EquippedCount));

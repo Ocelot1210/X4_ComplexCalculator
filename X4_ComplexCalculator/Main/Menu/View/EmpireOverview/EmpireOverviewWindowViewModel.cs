@@ -17,7 +17,7 @@ class EmpireOverviewWindowViewModel : BindableBase
     /// <summary>
     /// 帝国の概要用Model
     /// </summary>
-    private readonly EmpireOverviewWindowModel _Model;
+    private readonly EmpireOverviewWindowModel _model;
     #endregion
 
 
@@ -41,8 +41,8 @@ class EmpireOverviewWindowViewModel : BindableBase
     /// <param name="workAreas">帝国の概要用Model</param>
     public EmpireOverviewWindowViewModel(ObservableCollection<WorkAreaViewModel> workAreas)
     {
-        _Model = new EmpireOverviewWindowModel(workAreas);
-        ProductsView = CollectionViewSource.GetDefaultView(_Model.Products);
+        _model = new EmpireOverviewWindowModel(workAreas);
+        ProductsView = CollectionViewSource.GetDefaultView(_model.Products);
         ProductsView.SortDescriptions.Add(new SortDescription("Ware.WareGroup.Tier", ListSortDirection.Ascending));
         ProductsView.SortDescriptions.Add(new SortDescription("Ware.Name", ListSortDirection.Ascending));
 
@@ -55,6 +55,6 @@ class EmpireOverviewWindowViewModel : BindableBase
     /// </summary>
     private void WindowClosed()
     {
-        _Model.Dispose();
+        _model.Dispose();
     }
 }

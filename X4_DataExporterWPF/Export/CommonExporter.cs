@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS Common
     /// Common データを返す
     /// </summary>
     /// <returns>Common データ</returns>
-    private IEnumerable<Common> GetRecords(IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
+    private static IEnumerable<Common> GetRecords(IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
     {
         (string item, int value)[] data =
         {

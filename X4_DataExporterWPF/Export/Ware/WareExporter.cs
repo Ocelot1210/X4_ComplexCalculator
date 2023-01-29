@@ -18,13 +18,13 @@ public class WareExporter : IExporter
     /// <summary>
     /// ウェア情報xml
     /// </summary>
-    private readonly XDocument _WaresXml;
+    private readonly XDocument _waresXml;
 
 
     /// <summary>
     /// 言語解決用オブジェクト
     /// </summary>
-    private readonly ILanguageResolver _Resolver;
+    private readonly ILanguageResolver _resolver;
 
 
     /// <summary>
@@ -35,8 +35,8 @@ public class WareExporter : IExporter
     public WareExporter(XDocument waresXml, ILanguageResolver resolver)
     {
         ArgumentNullException.ThrowIfNull(waresXml.Root);
-        _WaresXml = waresXml;
-        _Resolver = resolver;
+        _waresXml = waresXml;
+        _resolver = resolver;
     }
 
 
@@ -81,11 +81,11 @@ CREATE TABLE IF NOT EXISTS Ware
     /// <returns>読み出した Ware データ</returns>
     private IEnumerable<Ware> GetRecords(IProgress<(int currentStep, int maxSteps)> progress, CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware)");
+        var maxSteps = (int)(double)_waresXml.Root!.XPathEvaluate("count(ware)");
         var currentStep = 0;
 
 
-        foreach (var ware in _WaresXml.Root!.XPathSelectElements("ware"))
+        foreach (var ware in _waresXml.Root!.XPathSelectElements("ware"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress.Report((currentStep++, maxSteps));
@@ -97,9 +97,9 @@ CREATE TABLE IF NOT EXISTS Ware
 
             var transportTypeID = ware.Attribute("transport")?.Value;
 
-            var name = _Resolver.Resolve(ware.Attribute("name")?.Value ?? "");
+            var name = _resolver.Resolve(ware.Attribute("name")?.Value ?? "");
 
-            var description = _Resolver.Resolve(ware.Attribute("description")?.Value ?? "");
+            var description = _resolver.Resolve(ware.Attribute("description")?.Value ?? "");
             var volume = ware.Attribute("volume")?.GetInt() ?? 1;
 
             var price = ware.Element("price");

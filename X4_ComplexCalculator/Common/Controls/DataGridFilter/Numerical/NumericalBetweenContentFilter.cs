@@ -13,12 +13,12 @@ class NumericalBetweenContentFilter : IDataGridFilter
     /// <summary>
     /// 最小値
     /// </summary>
-    private readonly decimal? _MinValue;
+    private readonly decimal? _minValue;
 
     /// <summary>
     /// 最大値
     /// </summary>
-    private readonly decimal? _MaxValue;
+    private readonly decimal? _maxValue;
     #endregion
 
 
@@ -36,7 +36,7 @@ class NumericalBetweenContentFilter : IDataGridFilter
 
 
     /// <inheritdoc/>
-    public bool IsFilterEnabled => _MinValue is not null || _MaxValue is not null;
+    public bool IsFilterEnabled => _minValue is not null || _maxValue is not null;
     #endregion
 
 
@@ -49,13 +49,13 @@ class NumericalBetweenContentFilter : IDataGridFilter
     {
         if (decimal.TryParse(minValueText, out var minResult))
         {
-            _MinValue = minResult;
+            _minValue = minResult;
         }
         MinValueText = minValueText;
 
         if (decimal.TryParse(maxValueText, out var maxResult))
         {
-            _MaxValue = maxResult;
+            _maxValue = maxResult;
         }
         MaxValueText = maxValueText;
     }
@@ -65,7 +65,7 @@ class NumericalBetweenContentFilter : IDataGridFilter
     public bool IsMatch(object? value)
     {
         // 最小値も最大値も未指定ならフィルタ無しと見なす
-        if (_MinValue is null && _MaxValue is null)
+        if (_minValue is null && _maxValue is null)
         {
             return true;
         }
@@ -80,15 +80,15 @@ class NumericalBetweenContentFilter : IDataGridFilter
         var ret = true;
 
         // 最小値以上か？
-        if (_MinValue is not null)
+        if (_minValue is not null)
         {
-            ret = _MinValue <= val;
+            ret = _minValue <= val;
         }
 
         // 最大値以下か？
-        if (ret && _MaxValue is not null)
+        if (ret && _maxValue is not null)
         {
-            ret = val <= _MaxValue;
+            ret = val <= _maxValue;
         }
 
         return ret;
@@ -100,7 +100,7 @@ class NumericalBetweenContentFilter : IDataGridFilter
     {
         if (other is NumericalBetweenContentFilter filter)
         {
-            return _MinValue == filter._MinValue && _MaxValue == filter._MaxValue;
+            return _minValue == filter._minValue && _maxValue == filter._maxValue;
         }
 
         return false;

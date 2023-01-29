@@ -12,7 +12,7 @@ class FactionsListItem : BindableBase
     /// <summary>
     /// チェックされたか
     /// </summary>
-    private bool _IsChecked = true;
+    private bool _isChecked = true;
     #endregion
 
     #region プロパティ
@@ -45,8 +45,8 @@ class FactionsListItem : BindableBase
     /// </summary>
     public bool IsChecked
     {
-        get => _IsChecked;
-        set => SetProperty(ref _IsChecked, value);
+        get => _isChecked;
+        set => SetProperty(ref _isChecked, value);
     }
     #endregion
 

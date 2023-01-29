@@ -24,13 +24,13 @@ class NeedWareInfoModel : BindableBase, IDisposable
     /// <summary>
     /// モジュール情報一覧
     /// </summary>
-    private readonly IModulesInfo _Modules;
+    private readonly IModulesInfo _modules;
 
 
     /// <summary>
     /// 製品情報一覧
     /// </summary>
-    private readonly IProductsInfo _Products;
+    private readonly IProductsInfo _products;
 
 
     /// <summary>
@@ -42,7 +42,7 @@ class NeedWareInfoModel : BindableBase, IDisposable
     /// 
     /// イベントの発火順番が前後する事を考慮したいため、集計対象のウェアの情報をここに格納しておく
     /// </remarks>
-    private readonly Dictionary<string, long> AggregateTargetProducts;
+    private readonly Dictionary<string, long> _aggregateTargetProducts;
     #endregion
 
 
@@ -61,17 +61,17 @@ class NeedWareInfoModel : BindableBase, IDisposable
     /// <param name="products">製品一覧情報</param>
     public NeedWareInfoModel(IModulesInfo modules, IProductsInfo products)
     {
-        _Modules = modules;
-        _Modules.Modules.CollectionChanged += Modules_CollectionChanged;
-        _Modules.Modules.CollectionPropertyChanged += Modules_CollectionPropertyChanged;
+        _modules = modules;
+        _modules.Modules.CollectionChanged += Modules_CollectionChanged;
+        _modules.Modules.CollectionPropertyChanged += Modules_CollectionPropertyChanged;
 
-        _Products = products;
-        _Products.Products.CollectionChanged += Products_CollectionChanged;
-        _Products.Products.CollectionPropertyChanged += Products_CollectionPropertyChanged;
+        _products = products;
+        _products.Products.CollectionChanged += Products_CollectionChanged;
+        _products.Products.CollectionPropertyChanged += Products_CollectionPropertyChanged;
 
 
         // 集計対象ウェアを取得
-        AggregateTargetProducts = X4Database.Instance.Ware.Get("workunit_busy")
+        _aggregateTargetProducts = X4Database.Instance.Ware.Get("workunit_busy")
             .Resources
             .SelectMany(x => x.Value.Select(y => y.NeedWareID))
             .Distinct()
@@ -84,10 +84,10 @@ class NeedWareInfoModel : BindableBase, IDisposable
     /// </summary>
     public void Dispose()
     {
-        _Modules.Modules.CollectionChanged -= Modules_CollectionChanged;
-        _Modules.Modules.CollectionPropertyChanged -= Modules_CollectionPropertyChanged;
-        _Products.Products.CollectionChanged -= Products_CollectionChanged;
-        _Products.Products.CollectionPropertyChanged -= Products_CollectionPropertyChanged;
+        _modules.Modules.CollectionChanged -= Modules_CollectionChanged;
+        _modules.Modules.CollectionPropertyChanged -= Modules_CollectionPropertyChanged;
+        _products.Products.CollectionChanged -= Products_CollectionChanged;
+        _products.Products.CollectionPropertyChanged -= Products_CollectionPropertyChanged;
     }
 
 
@@ -207,7 +207,7 @@ class NeedWareInfoModel : BindableBase, IDisposable
             addWares.Clear();
             NeedWareInfoDetails.Clear();
 
-            var calcResults = ((sender as IEnumerable<ModulesGridItem>) ?? throw new ArgumentException())
+            var calcResults = ((sender as IEnumerable<ModulesGridItem>) ?? throw new ArgumentException("sender is not IEnumerable<ModulesGridItem>", nameof(sender)))
                 .Where(x => 0 < x.Module.WorkersCapacity)
                 .SelectMany(x => ProductCalculator.Instance.Calc(x.Module, 1))
                 .GroupBy(x => x.Method);
@@ -257,7 +257,7 @@ class NeedWareInfoModel : BindableBase, IDisposable
                     var race = X4Database.Instance.Race.TryGet((method == "default") ? "argon" : method);
                     if (race is not null)
                     {
-                        NeedWareInfoDetails.Add(new NeedWareInfoDetailsItem(race, method, wareID, amount, AggregateTargetProducts[wareID]));
+                        NeedWareInfoDetails.Add(new NeedWareInfoDetailsItem(race, method, wareID, amount, _aggregateTargetProducts[wareID]));
                     }
                 }
             }
@@ -267,11 +267,11 @@ class NeedWareInfoModel : BindableBase, IDisposable
         if (removeItems.Any())
         {
             // 居住モジュールの種族(メソッド)一覧
-            var habModuleMethods = _Modules.Modules
+            var habModuleMethods = _modules.Modules
                 .Where(x => 0 < x.Module.WorkersCapacity)
                 .Select(x =>
                 {
-                    var ret = x.Module.Owners.First().Race.RaceID;
+                    var ret = x.Module.Owners[0].Race.RaceID;
                     return (ret == "argon") ? "default" : ret;
                 })
                 .Distinct()
@@ -295,12 +295,12 @@ class NeedWareInfoModel : BindableBase, IDisposable
         var totalWares = NeedWareInfoDetails
             .GroupBy(x => x.WareID)
             .Select(x => (WareID: x.Key, Amount: x.Sum(y => y.NeedAmount)));
-        foreach (var (WareID, Amount) in totalWares)
+        foreach (var (wareID, amount) in totalWares)
         {
-            var items = NeedWareInfoDetails.Where(x => x.WareID == WareID);
+            var items = NeedWareInfoDetails.Where(x => x.WareID == wareID);
             foreach (var item in items)
             {
-                item.TotalNeedAmount = Amount;
+                item.TotalNeedAmount = amount;
             }
         }
     }
@@ -327,11 +327,11 @@ class NeedWareInfoModel : BindableBase, IDisposable
 
 
         // 同じウェアの数量更新
-        var keys = AggregateTargetProducts.Keys.ToArray();
+        var keys = _aggregateTargetProducts.Keys.ToArray();
         foreach (var wareID in keys.Where(x => x == product.Ware.ID))
         {
             var amount = product.Details.Where(x => 0 < x.Amount).Sum(x => x.Amount);
-            AggregateTargetProducts[wareID] = amount;
+            _aggregateTargetProducts[wareID] = amount;
 
             // 現在の列にあればそちらを使用
             foreach (var itm in NeedWareInfoDetails.Where(x => x.WareID == wareID))
@@ -359,10 +359,10 @@ class NeedWareInfoModel : BindableBase, IDisposable
             }
 
 
-            foreach (var prod in item.Cast<ProductsGridItem>().Where(x => AggregateTargetProducts.ContainsKey(x.Ware.ID)))
+            foreach (var prod in item.Cast<ProductsGridItem>().Where(x => _aggregateTargetProducts.ContainsKey(x.Ware.ID)))
             {
                 var amount = prod.Details.Where(x => 0 < x.Amount).Sum(x => x.Amount);
-                AggregateTargetProducts[prod.Ware.ID] = amount;
+                _aggregateTargetProducts[prod.Ware.ID] = amount;
 
                 var ware = NeedWareInfoDetails.FirstOrDefault(x => x.WareID == prod.Ware.ID);
                 if (ware is not null)
@@ -376,9 +376,9 @@ class NeedWareInfoModel : BindableBase, IDisposable
         {
             NeedWareInfoDetails.Clear();
 
-            foreach (var key in AggregateTargetProducts.Keys.ToArray())
+            foreach (var key in _aggregateTargetProducts.Keys.ToArray())
             {
-                AggregateTargetProducts[key] = 0;
+                _aggregateTargetProducts[key] = 0;
             }
         }
     }

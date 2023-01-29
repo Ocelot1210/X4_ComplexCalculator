@@ -12,13 +12,13 @@ public class StationSettings : BindableBase, IStationSettings
     /// <summary>
     /// 本部か
     /// </summary>
-    private bool _IsHeadquarters;
+    private bool _isHeadquarters;
 
 
     /// <summary>
     /// 日光[%]
     /// </summary>
-    private double _Sunlight = 100;
+    private double _sunlight = 100;
     #endregion
 
 
@@ -28,8 +28,8 @@ public class StationSettings : BindableBase, IStationSettings
     /// </summary>
     public bool IsHeadquarters
     {
-        get => _IsHeadquarters;
-        set => SetProperty(ref _IsHeadquarters, value);
+        get => _isHeadquarters;
+        set => SetProperty(ref _isHeadquarters, value);
     }
 
 
@@ -50,8 +50,8 @@ public class StationSettings : BindableBase, IStationSettings
     /// </summary>
     public double Sunlight
     {
-        get => _Sunlight;
-        set => SetProperty(ref _Sunlight, value);
+        get => _sunlight;
+        set => SetProperty(ref _sunlight, value);
     }
     #endregion
 }

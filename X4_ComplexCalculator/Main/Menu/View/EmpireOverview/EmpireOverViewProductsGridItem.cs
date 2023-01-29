@@ -12,7 +12,7 @@ public class EmpireOverViewProductsGridItem : BindableBase
     /// <summary>
     /// 生産量
     /// </summary>
-    private long _Count;
+    private long _count;
     #endregion
 
 
@@ -28,8 +28,8 @@ public class EmpireOverViewProductsGridItem : BindableBase
     /// </summary>
     public long Count
     {
-        get => _Count;
-        set => SetProperty(ref _Count, value);
+        get => _count;
+        set => SetProperty(ref _count, value);
     }
     #endregion
 

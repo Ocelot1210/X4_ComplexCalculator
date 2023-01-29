@@ -19,25 +19,25 @@ class WorkAreaFileIO : BindableBase
     /// <summary>
     /// ビジー状態か
     /// </summary>
-    private bool _IsBusy;
+    private bool _isBusy;
 
 
     /// <summary>
     /// 作業エリア管理用
     /// </summary>
-    private readonly WorkAreaManager _WorkAreaManager;
+    private readonly WorkAreaManager _workAreaManager;
 
 
     /// <summary>
     /// ファイル読み込み進捗
     /// </summary>
-    private int _Progress;
+    private int _progress;
 
 
     /// <summary>
     /// 読込中のファイル名
     /// </summary>
-    private string _LoadingFileName = "";
+    private string _loadingFileName = "";
     #endregion
 
 
@@ -47,8 +47,8 @@ class WorkAreaFileIO : BindableBase
     /// </summary>
     public bool IsBusy
     {
-        get => _IsBusy;
-        private set => SetProperty(ref _IsBusy, value);
+        get => _isBusy;
+        private set => SetProperty(ref _isBusy, value);
     }
 
 
@@ -57,8 +57,8 @@ class WorkAreaFileIO : BindableBase
     /// </summary>
     public int Progress
     {
-        get => _Progress;
-        set => SetProperty(ref _Progress, value);
+        get => _progress;
+        set => SetProperty(ref _progress, value);
     }
 
 
@@ -67,8 +67,8 @@ class WorkAreaFileIO : BindableBase
     /// </summary>
     public string LoadingFileName
     {
-        get => _LoadingFileName;
-        set => SetProperty(ref _LoadingFileName, value);
+        get => _loadingFileName;
+        set => SetProperty(ref _loadingFileName, value);
     }
     #endregion
 
@@ -79,20 +79,20 @@ class WorkAreaFileIO : BindableBase
     /// <param name="workAreaManager">作業エリア管理用</param>
     public WorkAreaFileIO(WorkAreaManager workAreaManager)
     {
-        _WorkAreaManager = workAreaManager;
+        _workAreaManager = workAreaManager;
     }
 
 
     /// <summary>
     /// 上書き保存
     /// </summary>
-    public void Save() => _WorkAreaManager.ActiveContent?.Save();
+    public void Save() => _workAreaManager.ActiveContent?.Save();
 
 
     /// <summary>
     /// 名前を付けて保存
     /// </summary>
-    public void SaveAs() => _WorkAreaManager.ActiveContent?.SaveAs();
+    public void SaveAs() => _workAreaManager.ActiveContent?.SaveAs();
 
 
     /// <summary>
@@ -100,9 +100,9 @@ class WorkAreaFileIO : BindableBase
     /// </summary>
     public void CreateNew()
     {
-        var vm = new WorkAreaViewModel(_WorkAreaManager.ActiveLayoutID);
-        _WorkAreaManager.Documents.Add(vm);
-        _WorkAreaManager.ActiveContent = vm;
+        var vm = new WorkAreaViewModel(_workAreaManager.ActiveLayoutID);
+        _workAreaManager.Documents.Add(vm);
+        _workAreaManager.ActiveContent = vm;
     }
 
 
@@ -111,10 +111,11 @@ class WorkAreaFileIO : BindableBase
     /// </summary>
     public void Open()
     {
-        var dlg = new OpenFileDialog();
-
-        dlg.Filter = "X4: Complex calculator data file(*.x4)|*.x4|All Files|*.*";
-        dlg.Multiselect = true;
+        var dlg = new OpenFileDialog
+        {
+            Filter = "X4: Complex calculator data file(*.x4)|*.x4|All Files|*.*",
+            Multiselect = true
+        };
         if (dlg.ShowDialog() == true)
         {
             OpenFiles(dlg.FileNames);
@@ -154,7 +155,7 @@ class WorkAreaFileIO : BindableBase
 
             foreach (var path in pathes)
             {
-                var vm = new WorkAreaViewModel(_WorkAreaManager.ActiveLayoutID);
+                var vm = new WorkAreaViewModel(_workAreaManager.ActiveLayoutID);
 
                 LoadingFileName = System.IO.Path.GetFileName(path);
                 doevents.ForceDoEvents();
@@ -164,7 +165,7 @@ class WorkAreaFileIO : BindableBase
                 loaded++;
             }
 
-            _WorkAreaManager.Documents.AddRange(viewModels);
+            _workAreaManager.Documents.AddRange(viewModels);
         }
         catch (Exception e)
         {

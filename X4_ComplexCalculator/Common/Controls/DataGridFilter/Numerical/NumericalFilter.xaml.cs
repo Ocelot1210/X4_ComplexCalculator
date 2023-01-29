@@ -14,13 +14,13 @@ public partial class NumericalFilter
     /// <summary>
     /// 画面前回値
     /// </summary>
-    private (string, string, NumericalFilterConditinos) _PrevValue;
+    private (string, string, NumericalFilterConditinos) _prevValue;
 
 
     /// <summary>
     /// DataContext
     /// </summary>
-    private DataGridFilterColumnControl? _FilterColumnControl;
+    private DataGridFilterColumnControl? _filterColumnControl;
     #endregion
 
 
@@ -35,11 +35,11 @@ public partial class NumericalFilter
     {
         base.OnApplyTemplate();
 
-        _FilterColumnControl = DataContext as DataGridFilterColumnControl;
+        _filterColumnControl = DataContext as DataGridFilterColumnControl;
 
         // DataContext経由で前回のフィルタを取得
-        _FilterColumnControl = DataContext as DataGridFilterColumnControl;
-        if (_FilterColumnControl?.LoadFilter() is IDataGridFilter prevFilter)
+        _filterColumnControl = DataContext as DataGridFilterColumnControl;
+        if (_filterColumnControl?.LoadFilter() is IDataGridFilter prevFilter)
         {
             Filter = prevFilter;
 
@@ -83,7 +83,7 @@ public partial class NumericalFilter
             }
 
             // 仮想化対策のためフィルタを保存
-            _FilterColumnControl?.SaveFilter();
+            _filterColumnControl?.SaveFilter();
         }
     }
     #endregion
@@ -94,7 +94,7 @@ public partial class NumericalFilter
     /// <summary>
     /// フィルタ内容
     /// </summary>
-    private static readonly DependencyProperty IsOpenProperty =
+    private static readonly DependencyProperty _IsOpenProperty =
         DependencyProperty.Register(
             nameof(IsOpen),
             typeof(bool),
@@ -107,8 +107,8 @@ public partial class NumericalFilter
 
     private bool IsOpen
     {
-        get => (bool)GetValue(IsOpenProperty);
-        set => SetValue(IsOpenProperty, value);
+        get => (bool)GetValue(_IsOpenProperty);
+        set => SetValue(_IsOpenProperty, value);
     }
     #endregion
 
@@ -118,7 +118,7 @@ public partial class NumericalFilter
     /// <summary>
     /// フィルタ文字列1 (指定値と最小値を兼用)
     /// </summary>
-    private static readonly DependencyProperty FilterText1Property =
+    private static readonly DependencyProperty _FilterText1Property =
         DependencyProperty.Register(
             nameof(FilterText1),
             typeof(string),
@@ -127,14 +127,14 @@ public partial class NumericalFilter
         );
     private string FilterText1
     {
-        get => (string)GetValue(FilterText1Property);
-        set => SetValue(FilterText1Property, value);
+        get => (string)GetValue(_FilterText1Property);
+        set => SetValue(_FilterText1Property, value);
     }
 
     /// <summary>
     /// フィルタ文字列2(最大値用)
     /// </summary>
-    private static readonly DependencyProperty FilterText2Property =
+    private static readonly DependencyProperty _FilterText2Property =
         DependencyProperty.Register(
             nameof(FilterText2),
             typeof(string),
@@ -143,8 +143,8 @@ public partial class NumericalFilter
         );
     private string FilterText2
     {
-        get => (string)GetValue(FilterText2Property);
-        set => SetValue(FilterText2Property, value);
+        get => (string)GetValue(_FilterText2Property);
+        set => SetValue(_FilterText2Property, value);
     }
     #endregion
 
@@ -154,7 +154,7 @@ public partial class NumericalFilter
     /// <summary>
     /// 一致条件
     /// </summary>
-    private static readonly DependencyProperty ConditionsProperty =
+    private static readonly DependencyProperty _ConditionsProperty =
         DependencyProperty.Register(
             nameof(Conditions),
             typeof(NumericalFilterConditinos),
@@ -164,8 +164,8 @@ public partial class NumericalFilter
 
     private NumericalFilterConditinos Conditions
     {
-        get => (NumericalFilterConditinos)GetValue(ConditionsProperty);
-        set => SetValue(ConditionsProperty, value);
+        get => (NumericalFilterConditinos)GetValue(_ConditionsProperty);
+        set => SetValue(_ConditionsProperty, value);
     }
     #endregion
 
@@ -175,7 +175,7 @@ public partial class NumericalFilter
     /// <summary>
     /// 一致条件
     /// </summary>
-    private static readonly DependencyProperty IsFilterEnabledProperty =
+    private static readonly DependencyProperty _IsFilterEnabledProperty =
         DependencyProperty.Register(
             nameof(IsFilterEnabled),
             typeof(bool),
@@ -185,8 +185,8 @@ public partial class NumericalFilter
 
     private bool IsFilterEnabled
     {
-        get => (bool)GetValue(IsFilterEnabledProperty);
-        set => SetValue(IsFilterEnabledProperty, value);
+        get => (bool)GetValue(_IsFilterEnabledProperty);
+        set => SetValue(_IsFilterEnabledProperty, value);
     }
     #endregion
 
@@ -196,7 +196,7 @@ public partial class NumericalFilter
     /// <summary>
     /// フィルタ文字列1のウォーターマーク
     /// </summary>
-    private static readonly DependencyProperty FilterText1_WaterMarkProperty =
+    private static readonly DependencyProperty _FilterText1_WaterMarkProperty =
         DependencyProperty.Register(
             nameof(FilterText1_WaterMark),
             typeof(string),
@@ -205,8 +205,8 @@ public partial class NumericalFilter
         );
     private string FilterText1_WaterMark
     {
-        get => (string)GetValue(FilterText1_WaterMarkProperty);
-        set => SetValue(FilterText1_WaterMarkProperty, value);
+        get => (string)GetValue(_FilterText1_WaterMarkProperty);
+        set => SetValue(_FilterText1_WaterMarkProperty, value);
     }
     #endregion
 
@@ -247,9 +247,9 @@ public partial class NumericalFilter
     /// </summary>
     private void CancelButton_Click(object sender, RoutedEventArgs e)
     {
-        FilterText1 = _PrevValue.Item1;
-        FilterText2 = _PrevValue.Item2;
-        Conditions  = _PrevValue.Item3;
+        FilterText1 = _prevValue.Item1;
+        FilterText2 = _prevValue.Item2;
+        Conditions  = _prevValue.Item3;
 
         IsOpen = false;
     }
@@ -260,9 +260,9 @@ public partial class NumericalFilter
     /// </summary>
     private void PART_FilterButton_Click(object sender, RoutedEventArgs e)
     {
-        _PrevValue.Item1 = FilterText1;
-        _PrevValue.Item2 = FilterText2;
-        _PrevValue.Item3 = Conditions;
+        _prevValue.Item1 = FilterText1;
+        _prevValue.Item2 = FilterText2;
+        _prevValue.Item3 = Conditions;
         IsOpen = true;
     }
 

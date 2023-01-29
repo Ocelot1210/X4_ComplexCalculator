@@ -54,9 +54,10 @@ class SQLiteSaveDataWriter : ISaveDataWriter
     /// <param name="WorkArea">作業エリア</param>
     public bool SaveAs(IWorkArea WorkArea)
     {
-        var dlg = new SaveFileDialog();
-
-        dlg.Filter = "X4 Station calculator data (*.x4)|*.x4|All Files|*.*";
+        var dlg = new SaveFileDialog
+        {
+            Filter = "X4 Station calculator data (*.x4)|*.x4|All Files|*.*"
+        };
         if (dlg.ShowDialog() == true)
         {
             SaveFilePath = dlg.FileName;
@@ -120,17 +121,17 @@ class SQLiteSaveDataWriter : ISaveDataWriter
             // モジュール保存
             foreach (var (module, i) in WorkArea.StationData.ModulesInfo.Modules.Select((module, i) => (module, i)))
             {
-                const string sql1 = "INSERT INTO Modules(Row, ModuleID, Count) Values(:Row, :ModuleID, :ModuleCount)";
-                db.Execute(sql1, new { Row = i, ModuleID = module.Module.ID, ModuleCount = module.ModuleCount });
+                const string SQL_1 = "INSERT INTO Modules(Row, ModuleID, Count) Values(:Row, :ModuleID, :ModuleCount)";
+                db.Execute(SQL_1, new { Row = i, ModuleID = module.Module.ID, module.ModuleCount });
 
                 if (module.EditStatus == EditStatus.Edited)
                 {
                     module.EditStatus |= EditStatus.Saved;
                 }
 
-                const string sql2 = "INSERT INTO Equipments(Row, EquipmentID) Values(:Row, :EquipmentID)";
+                const string SQL_2 = "INSERT INTO Equipments(Row, EquipmentID) Values(:Row, :EquipmentID)";
                 var param2 = module.Equipments.AllEquipments.Select(e => new { Row = i, EquipmentID = e.ID });
-                db.Execute(sql2, param2);
+                db.Execute(SQL_2, param2);
             }
 
             // 価格保存
@@ -142,15 +143,15 @@ class SQLiteSaveDataWriter : ISaveDataWriter
                     product.EditStatus |= EditStatus.Saved;
                 }
 
-                const string sql = "INSERT INTO Products(WareID, Price, NoBuy, NoSell) Values(:Ware, :UnitPrice, :NoBuy, :NoSell)";
-                db.Execute(sql, product);
+                const string SQL = "INSERT INTO Products(WareID, Price, NoBuy, NoSell) Values(:Ware, :UnitPrice, :NoBuy, :NoSell)";
+                db.Execute(SQL, product);
             }
 
             // 建造リソース保存
             foreach (var resource in WorkArea.StationData.BuildResourcesInfo.BuildResources)
             {
-                const string sql = "INSERT INTO BuildResources(WareID, Price, NoBuy) Values(:Ware, :UnitPrice, :NoBuy)";
-                db.Execute(sql, resource);
+                const string SQL = "INSERT INTO BuildResources(WareID, Price, NoBuy) Values(:Ware, :UnitPrice, :NoBuy)";
+                db.Execute(SQL, resource);
 
                 if (resource.EditStatus == EditStatus.Edited)
                 {
@@ -161,8 +162,8 @@ class SQLiteSaveDataWriter : ISaveDataWriter
             // 保管庫割当情報保存
             foreach (var assign in WorkArea.StationData.StorageAssignInfo.StorageAssign)
             {
-                const string sql = "INSERT INTO StorageAssign(WareID, AllocCount) Values(:WareID, :AllocCount)";
-                db.Execute(sql, assign);
+                const string SQL = "INSERT INTO StorageAssign(WareID, AllocCount) Values(:WareID, :AllocCount)";
+                db.Execute(SQL, assign);
 
                 if (assign.EditStatus == EditStatus.Edited)
                 {

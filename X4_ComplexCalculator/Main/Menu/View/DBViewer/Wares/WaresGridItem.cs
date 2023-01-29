@@ -13,7 +13,7 @@ class WaresGridItem : BindableBase
     /// <summary>
     /// 表示対象ウェア
     /// </summary>
-    private readonly IWare _Ware;
+    private readonly IWare _ware;
     #endregion
 
 
@@ -21,31 +21,31 @@ class WaresGridItem : BindableBase
     /// <summary>
     /// ウェア名
     /// </summary>
-    public string WareName => _Ware.Name;
+    public string WareName => _ware.Name;
 
 
     /// <summary>
     /// ウェア種別名
     /// </summary>
-    public string WareGroupName => _Ware.WareGroup.Name;
+    public string WareGroupName => _ware.WareGroup.Name;
 
 
     /// <summary>
     /// カーゴ種別名
     /// </summary>
-    public string Transport => _Ware.TransportType.Name;
+    public string Transport => _ware.TransportType.Name;
 
 
     /// <summary>
     /// 最安値
     /// </summary>
-    public long MinPrice => _Ware.MinPrice;
+    public long MinPrice => _ware.MinPrice;
 
 
     /// <summary>
     /// 最高値
     /// </summary>
-    public long MaxPrice => _Ware.MaxPrice;
+    public long MaxPrice => _ware.MaxPrice;
 
 
     /// <summary>
@@ -57,7 +57,7 @@ class WaresGridItem : BindableBase
     /// <summary>
     /// 容量
     /// </summary>
-    public long Volume => _Ware.Volume;
+    public long Volume => _ware.Volume;
 
 
     /// <summary>
@@ -74,6 +74,6 @@ class WaresGridItem : BindableBase
     /// <param name="ware">表示対象ウェア</param>
     public WaresGridItem(IWare ware)
     {
-        _Ware = ware;
+        _ware = ware;
     }
 }

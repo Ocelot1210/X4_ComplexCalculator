@@ -16,13 +16,13 @@ class WareEffectManager
     /// <summary>
     /// <see cref="IWare.ID"/> をキーにしたウェア生産時の追加効果情報一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, WareEffects> _WareEffects;
+    private readonly IReadOnlyDictionary<string, WareEffects> _wareEffects;
 
 
     /// <summary>
     /// 空のウェア生産時の追加効果情報
     /// </summary>
-    private readonly IWareEffects _EmptyEffect = new WareEffects(Enumerable.Empty<IWareEffect>());
+    private readonly IWareEffects _emptyEffect = new WareEffects(Enumerable.Empty<IWareEffect>());
     #endregion
 
 
@@ -32,9 +32,9 @@ class WareEffectManager
     /// <param name="conn">DB接続情報</param>
     public WareEffectManager(IDbConnection conn)
     {
-        const string sql = "SELECT WareID, Method, EffectID, Product FROM WareEffect";
+        const string SQL = "SELECT WareID, Method, EffectID, Product FROM WareEffect";
 
-        _WareEffects = conn.Query<WareEffect>(sql)
+        _wareEffects = conn.Query<WareEffect>(SQL)
             .GroupBy(x => x.WareID)
             .ToDictionary(x => x.Key, x => new WareEffects(x));
     }
@@ -46,5 +46,5 @@ class WareEffectManager
     /// <param name="id"><see cref="IWare.ID"/></param>
     /// <returns><paramref name="id"/> に対応するウェア生産時の追加効果情報一覧</returns>
     public IWareEffects Get(string id)
-        => _WareEffects.TryGetValue(id, out var effects) ? effects : _EmptyEffect;
+        => _wareEffects.TryGetValue(id, out var effects) ? effects : _emptyEffect;
 }

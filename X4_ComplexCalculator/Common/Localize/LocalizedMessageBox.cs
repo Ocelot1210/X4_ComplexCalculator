@@ -16,7 +16,7 @@ public class LocalizedMessageBox
     /// <summary>
     /// フックプロシージャのハンドル
     /// </summary>
-    private static int _hHook = 0;
+    private static int _HHook = 0;
 
     /// <summary>
     /// メッセージボックスのタイトル文字列
@@ -55,7 +55,7 @@ public class LocalizedMessageBox
 
         _HookProcDelegate = new Win32.WindowsHookProc(HookCallback);
 
-        _hHook = Win32.SetWindowsHookEx(Win32.WH_CBT, _HookProcDelegate, IntPtr.Zero, Win32.GetCurrentThreadId());
+        _HHook = Win32.SetWindowsHookEx(Win32.WH_CBT, _HookProcDelegate, IntPtr.Zero, Win32.GetCurrentThreadId());
 
         var result = MessageBox.Show(_Msg, _Title, button, icon, defaultResult);
 
@@ -74,7 +74,7 @@ public class LocalizedMessageBox
     /// <returns></returns>
     private static int HookCallback(int code, IntPtr wParam, IntPtr lParam)
     {
-        int hHook = _hHook;
+        int hHook = _HHook;
 
         if (code == Win32.HCBT_ACTIVATE)
         {
@@ -103,8 +103,8 @@ public class LocalizedMessageBox
     /// </summary>
     private static void UnHook()
     {
-        Win32.UnhookWindowsHookEx(_hHook);
-        _hHook = 0;
+        Win32.UnhookWindowsHookEx(_HHook);
+        _HHook = 0;
         _Msg   = null;
         _Title = null;
         _HookProcDelegate = null;

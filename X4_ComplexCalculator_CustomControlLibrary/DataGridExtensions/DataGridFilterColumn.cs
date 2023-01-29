@@ -198,7 +198,7 @@ public static class DataGridFilterColumn
     /// <summary>
     /// Identifies the CellValue dependency property, a private helper property used to evaluate the property path for the list items.
     /// </summary>
-    private static readonly DependencyProperty _cellValueProperty =
+    private static readonly DependencyProperty _CellValueProperty =
         DependencyProperty.Register("_cellValue", typeof(object), typeof(DataGridFilterColumn));
 
     /// <summary>
@@ -214,9 +214,9 @@ public static class DataGridFilterColumn
 
         // Since already the name "SortMemberPath" implies that this might be not only a simple property name but a full property path
         // we use binding for evaluation; this will properly handle even complex property paths like e.g. "SubItems[0].Name"
-        BindingOperations.SetBinding(column, _cellValueProperty, new Binding(propertyPath) { Source = item });
-        var propertyValue = column.GetValue(_cellValueProperty);
-        BindingOperations.ClearBinding(column, _cellValueProperty);
+        BindingOperations.SetBinding(column, _CellValueProperty, new Binding(propertyPath) { Source = item });
+        var propertyValue = column.GetValue(_CellValueProperty);
+        BindingOperations.ClearBinding(column, _CellValueProperty);
 
         return propertyValue;
     }

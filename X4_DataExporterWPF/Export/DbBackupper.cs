@@ -1,122 +1,122 @@
 ﻿using System;
 using System.IO;
 
-namespace X4_DataExporterWPF.Export
+namespace X4_DataExporterWPF.Export;
+
+
+/// <summary>
+/// DB をバックアップするクラス
+/// </summary>
+internal sealed class DbBackupper : IDisposable
 {
     /// <summary>
-    /// DB をバックアップするクラス
+    /// 破棄されたか
     /// </summary>
-    internal sealed class DbBackupper : IDisposable
+    private bool _disposed;
+
+
+    /// <summary>
+    /// 変更が確定されたか
+    /// </summary>
+    private bool _comitted;
+
+
+    /// <summary>
+    /// ファイルロック用の <see cref="FileStream"/>
+    /// </summary>
+    private readonly FileStream? _file;
+
+
+    /// <summary>
+    /// バックアップされたファイルパス
+    /// </summary>
+    private readonly string _bakFilePath = "";
+
+
+    /// <summary>
+    /// 元のファイルパス
+    /// </summary>
+    private readonly string _orgFilePath;
+
+
+    /// <summary>
+    /// バックアップ対象のファイルパス
+    /// </summary>
+    /// <param name="filePath"></param>
+    internal DbBackupper(string filePath)
     {
-        /// <summary>
-        /// 破棄されたか
-        /// </summary>
-        private bool _Disposed;
+        _orgFilePath = filePath;
 
-
-        /// <summary>
-        /// 変更が確定されたか
-        /// </summary>
-        private bool _Comitted;
-
-
-        /// <summary>
-        /// ファイルロック用の <see cref="FileStream"/>
-        /// </summary>
-        private readonly FileStream? _File;
-
-
-        /// <summary>
-        /// バックアップされたファイルパス
-        /// </summary>
-        private readonly string _BakFilePath = "";
-
-
-        /// <summary>
-        /// 元のファイルパス
-        /// </summary>
-        private readonly string _OrgFilePath;
-
-
-        /// <summary>
-        /// バックアップ対象のファイルパス
-        /// </summary>
-        /// <param name="filePath"></param>
-        internal DbBackupper(string filePath)
+        try
         {
-            _OrgFilePath = filePath;
-
-            try
+            if (File.Exists(_orgFilePath))
             {
-                if (File.Exists(_OrgFilePath))
-                {
-                    _BakFilePath = Path.Combine(Path.GetDirectoryName(filePath) ?? throw new ArgumentException(), Path.GetFileName(filePath) + $"_{DateTime.Now:yyyy_MM_dd-HHmmss-fff}_bak");
-                    File.Move(_OrgFilePath, _BakFilePath);
-                    _File = new FileStream(_BakFilePath, FileMode.Open, FileAccess.Read, FileShare.None);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new DbBackupException(ex);
+                _bakFilePath = Path.Combine(Path.GetDirectoryName(filePath) ?? throw new ArgumentException($"Invalid path : {filePath}", nameof(filePath)), Path.GetFileName(filePath) + $"_{DateTime.Now:yyyy_MM_dd-HHmmss-fff}_bak");
+                File.Move(_orgFilePath, _bakFilePath);
+                _file = new FileStream(_bakFilePath, FileMode.Open, FileAccess.Read, FileShare.None);
             }
         }
-
-
-        /// <summary>
-        /// 変更を確定する
-        /// </summary>
-        public void Commit()
+        catch (Exception ex)
         {
-            try
-            {
-                _File?.Dispose();
-
-                // 不要になったバックアップファイルを削除する
-                if (!string.IsNullOrEmpty(_BakFilePath) && File.Exists(_BakFilePath))
-                {
-                    File.Delete(_BakFilePath);
-                }
-
-                _Comitted = true;
-            }
-            catch (Exception)
-            {
-            }
-        }
-
-
-        /// <inheritdoc/>
-        public void Dispose()
-        {
-            if (!_Disposed)
-            {
-                _Disposed = true;
-                _File?.Dispose();
-
-                // 未コミット == ロールバックする必要があるか？
-                if (!_Comitted && !string.IsNullOrEmpty(_BakFilePath))
-                {
-                    if (File.Exists(_OrgFilePath))
-                    {
-                        File.Delete(_OrgFilePath);
-                    }
-
-                    File.Move(_BakFilePath, _OrgFilePath);
-                }
-            }
+            throw new DbBackupException(ex);
         }
     }
 
 
     /// <summary>
-    /// DB のバックアップに失敗した場合にスローされる例外
+    /// 変更を確定する
     /// </summary>
-    internal class DbBackupException : IOException
+    public void Commit()
     {
-        internal DbBackupException(Exception innerException)
-            : base(innerException.Message, innerException)
+        try
         {
+            _file?.Dispose();
 
+            // 不要になったバックアップファイルを削除する
+            if (!string.IsNullOrEmpty(_bakFilePath) && File.Exists(_bakFilePath))
+            {
+                File.Delete(_bakFilePath);
+            }
+
+            _comitted = true;
         }
+        catch (Exception)
+        {
+        }
+    }
+
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        if (!_disposed)
+        {
+            _disposed = true;
+            _file?.Dispose();
+
+            // 未コミット == ロールバックする必要があるか？
+            if (!_comitted && !string.IsNullOrEmpty(_bakFilePath))
+            {
+                if (File.Exists(_orgFilePath))
+                {
+                    File.Delete(_orgFilePath);
+                }
+
+                File.Move(_bakFilePath, _orgFilePath);
+            }
+        }
+    }
+}
+
+
+/// <summary>
+/// DB のバックアップに失敗した場合にスローされる例外
+/// </summary>
+internal class DbBackupException : IOException
+{
+    internal DbBackupException(Exception innerException)
+        : base(innerException.Message, innerException)
+    {
+
     }
 }

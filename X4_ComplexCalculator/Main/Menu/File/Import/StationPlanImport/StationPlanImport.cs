@@ -20,12 +20,12 @@ class StationPlanImport : BindableBase, IImport
     /// <summary>
     /// インポート対象計画一覧
     /// </summary>
-    private List<StationPlanItem> _PlanItems = new();
+    private readonly List<StationPlanItem> _planItems = new();
 
     /// <summary>
     /// インポート対象計画要素番号
     /// </summary>
-    private int _PlanIdx = 0;
+    private int _planIdx = 0;
     #endregion
 
 
@@ -56,16 +56,16 @@ class StationPlanImport : BindableBase, IImport
     /// <returns>インポート対象数</returns>
     public int Select()
     {
-        _PlanItems.Clear();
+        _planItems.Clear();
 
-        bool onOK = SelectPlanDialog.ShowDialog(_PlanItems);
+        bool onOK = SelectPlanDialog.ShowDialog(_planItems);
         if (!onOK)
         {
-            _PlanItems.Clear();
+            _planItems.Clear();
         }
 
-        _PlanIdx = 0;
-        return _PlanItems.Count;
+        _planIdx = 0;
+        return _planItems.Count;
     }
 
 
@@ -79,8 +79,8 @@ class StationPlanImport : BindableBase, IImport
         bool ret;
         try
         {
-            ret = ImportMain(WorkArea, _PlanItems[_PlanIdx]);
-            _PlanIdx++;
+            ret = ImportMain(WorkArea, _planItems[_planIdx]);
+            _planIdx++;
         }
         catch
         {
@@ -97,7 +97,7 @@ class StationPlanImport : BindableBase, IImport
     /// <param name="WorkArea"></param>
     /// <param name="planItem"></param>
     /// <returns></returns>
-    private bool ImportMain(IWorkArea WorkArea, StationPlanItem planItem)
+    private static bool ImportMain(IWorkArea WorkArea, StationPlanItem planItem)
     {
         var modules = new List<ModulesGridItem>((int)(double)planItem.Plan.XPathEvaluate("count(entry)"));
 
@@ -138,9 +138,9 @@ class StationPlanImport : BindableBase, IImport
                 .Select(x => (Equipment: x.Equipment!, x.Count));
 
             var modulesGridItem = new ModulesGridItem(module);
-            foreach (var equipment in equipments)
+            foreach (var (equipment, count) in equipments)
             {
-                modulesGridItem.Equipments.Add(equipment.Equipment, equipment.Count);
+                modulesGridItem.Equipments.Add(equipment, count);
             }
 
             modules.Add(modulesGridItem);

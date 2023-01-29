@@ -21,13 +21,13 @@ class TransportTypeExporter : IExporter
     /// <summary>
     /// ウェア情報xml
     /// </summary>
-    private readonly XDocument _WaresXml;
+    private readonly XDocument _waresXml;
 
 
     /// <summary>
     /// 言語解決用オブジェクト
     /// </summary>
-    private readonly ILanguageResolver _Resolver;
+    private readonly ILanguageResolver _resolver;
 
 
     /// <summary>
@@ -38,8 +38,8 @@ class TransportTypeExporter : IExporter
     {
         ArgumentNullException.ThrowIfNull(waresXml.Root);
 
-        _WaresXml = waresXml;
-        _Resolver = resolver;
+        _waresXml = waresXml;
+        _resolver = resolver;
     }
 
 
@@ -96,11 +96,11 @@ CREATE TABLE IF NOT EXISTS TransportType
             {"condensate", "{20205, 1100}"},
         };
 
-        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware)");
+        var maxSteps = (int)(double)_waresXml.Root!.XPathEvaluate("count(ware)");
         var currentStep = 0;
 
         var added = new HashSet<string>();
-        foreach (var ware in _WaresXml.Root!.Elements("ware"))
+        foreach (var ware in _waresXml.Root!.Elements("ware"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress.Report((currentStep++, maxSteps));
@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS TransportType
             var name = transportTypeID;
             if (names.TryGetValue(transportTypeID, out var nameID))
             {
-                name = _Resolver.Resolve(nameID);
+                name = _resolver.Resolve(nameID);
             }
 
             yield return new TransportType(transportTypeID, name);
@@ -123,7 +123,7 @@ CREATE TABLE IF NOT EXISTS TransportType
         foreach (var key in names.Keys.Except(added))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            yield return new TransportType(key, _Resolver.Resolve(names[key]));
+            yield return new TransportType(key, _resolver.Resolve(names[key]));
         }
     }
 }

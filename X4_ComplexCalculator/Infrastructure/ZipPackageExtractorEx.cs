@@ -18,7 +18,7 @@ internal class ZipExcerptPackageExtractor : IPackageExtractor
     /// <summary>
     /// 解凍するフォルダのパス
     /// </summary>
-    private const string _RequiredDirPath = "X4_ComplexCalculator/bin/";
+    private const string REQUIRED_DIR_PATH = "X4_ComplexCalculator/bin/";
     #endregion
 
 
@@ -29,7 +29,7 @@ internal class ZipExcerptPackageExtractor : IPackageExtractor
     {
         using var archive = ZipFile.OpenRead(sourceFilePath);
         var entries = archive.Entries
-                .Where(entry => entry.FullName.StartsWith(_RequiredDirPath))
+                .Where(entry => entry.FullName.StartsWith(REQUIRED_DIR_PATH))
                 .ToArray();
 
         var totalBytes = entries.Sum(e => e.Length);
@@ -37,7 +37,7 @@ internal class ZipExcerptPackageExtractor : IPackageExtractor
 
         foreach (var entry in entries)
         {
-            var fullName = entry.FullName.Replace(_RequiredDirPath, "");
+            var fullName = entry.FullName.Replace(REQUIRED_DIR_PATH, "");
             var entryDestFilePath = Path.Combine(destDirPath, fullName);
             var entryDestDirPath = Path.GetDirectoryName(entryDestFilePath);
 
@@ -60,7 +60,7 @@ internal class ZipExcerptPackageExtractor : IPackageExtractor
             do
             {
                 bytesCopied = await input.ReadAsync(buffer, cancellationToken);
-                await output.WriteAsync(buffer, 0, bytesCopied, cancellationToken);
+                await output.WriteAsync(buffer.AsMemory(0, bytesCopied), cancellationToken);
 
                 totalBytesCopied += bytesCopied;
                 progress?.Report(1.0 * totalBytesCopied / totalBytes);

@@ -13,7 +13,7 @@ public class WareEffects : IWareEffects
     /// <summary>
     /// ウェア生産時の追加効果情報一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, IWareEffect>> _Effects;
+    private readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, IWareEffect>> _effects;
     #endregion
 
 
@@ -23,7 +23,7 @@ public class WareEffects : IWareEffects
     /// <param name="effects">ウェア単位の追加効果情報一覧</param>
     public WareEffects(IEnumerable<IWareEffect> effects)
     {
-        _Effects = effects
+        _effects = effects
             .GroupBy(x => x.Method)
             .ToDictionary(
                 x => x.Key,
@@ -36,10 +36,10 @@ public class WareEffects : IWareEffects
     public IReadOnlyDictionary<string, IWareEffect>? TryGet(string method)
     {
         // 生産方式で絞り込み
-        if (!_Effects.TryGetValue(method, out var effects))
+        if (!_effects.TryGetValue(method, out var effects))
         {
             // デフォルトの生産方式で取得
-            if (!_Effects.TryGetValue("default", out effects))
+            if (!_effects.TryGetValue("default", out effects))
             {
                 // 生産方式取得失敗
                 return null;

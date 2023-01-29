@@ -26,7 +26,7 @@ public class Configuration
     /// <summary>
     /// 設定ファイルオブジェクト
     /// </summary>
-    private readonly IConfigurationRoot _Config;
+    private readonly IConfigurationRoot _config;
     #endregion
 
 
@@ -34,14 +34,14 @@ public class Configuration
     /// <summary>
     /// X4DBのファイルパス
     /// </summary>
-    public string X4DBPath => _Config["AppSettings:X4DBPath"] ?? 
+    public string X4DBPath => _config["AppSettings:X4DBPath"] ?? 
         throw new InvalidDataException((string)WPFLocalizeExtension.Engine.LocalizeDictionary.Instance.GetLocalizedObject("Lang:System_InvalidConfigFile", null, null));
 
 
     /// <summary>
     /// CommonDBのファイルパス
     /// </summary>
-    public string CommonDBPath => _Config["AppSettings:CommonDBPath"] ?? 
+    public string CommonDBPath => _config["AppSettings:CommonDBPath"] ?? 
         throw new InvalidDataException((string)WPFLocalizeExtension.Engine.LocalizeDictionary.Instance.GetLocalizedObject("Lang:System_InvalidConfigFile", null, null));
 
 
@@ -53,7 +53,7 @@ public class Configuration
     {
         get
         {
-            var lang = _Config["AppSettings:Language"];
+            var lang = _config["AppSettings:Language"];
 
             try
             {
@@ -87,7 +87,7 @@ public class Configuration
     /// </summary>
     public bool CheckUpdateAtLaunch
     {
-        get => _Config["AppSettings:CheckUpdateAtLaunch"] != bool.FalseString;
+        get => _config["AppSettings:CheckUpdateAtLaunch"] != bool.FalseString;
         set => SetValue("AppSettings.CheckUpdateAtLaunch", value.ToString());
     }
     #endregion
@@ -106,7 +106,7 @@ public class Configuration
             FixSettingFile(path);
         }
 
-        _Config = new ConfigurationBuilder()
+        _config = new ConfigurationBuilder()
             .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
             .AddJsonFile(path)
             .Build();
@@ -193,7 +193,7 @@ public class Configuration
     /// <param name="value">設定値</param>
     private void SetValue(string key, string value)
     {
-        var provider = _Config.Providers.OfType<JsonConfigurationProvider>().First();
+        var provider = _config.Providers.OfType<JsonConfigurationProvider>().First();
         if (provider.Source.FileProvider is null) return;
         if (provider.Source.Path is null) return;
 
@@ -212,7 +212,7 @@ public class Configuration
             string output = JsonConvert.SerializeObject(jsonObj, Formatting.Indented);
             File.WriteAllText(path, output);
 
-            _Config.Reload();
+            _config.Reload();
         }
         else
         {

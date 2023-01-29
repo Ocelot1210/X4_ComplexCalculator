@@ -20,7 +20,7 @@ public class WareOwnerExporter : IExporter
     /// <summary>
     /// ウェア情報xml
     /// </summary>
-    private readonly XDocument _WaresXml;
+    private readonly XDocument _waresXml;
 
 
     /// <summary>
@@ -30,7 +30,7 @@ public class WareOwnerExporter : IExporter
     public WareOwnerExporter(XDocument waresXml)
     {
         ArgumentNullException.ThrowIfNull(waresXml.Root);
-        _WaresXml = waresXml;
+        _waresXml = waresXml;
     }
 
 
@@ -71,11 +71,11 @@ CREATE TABLE IF NOT EXISTS WareOwner
     /// <returns>読み出した WareOwner データ</returns>
     internal IEnumerable<WareOwner> GetRecords(IProgress<(int currentStep, int maxSteps)>? progress = null)
     {
-        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware)");
+        var maxSteps = (int)(double)_waresXml.Root!.XPathEvaluate("count(ware)");
         var currentStep = 0;
 
 
-        foreach (var ware in _WaresXml.Root!.XPathSelectElements("ware"))
+        foreach (var ware in _waresXml.Root!.XPathSelectElements("ware"))
         {
             progress?.Report((currentStep++, maxSteps));
 

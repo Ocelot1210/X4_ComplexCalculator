@@ -14,25 +14,25 @@ class SelectStringDialogModel : BindableBase
     /// <summary>
     /// ダイアログの戻り値
     /// </summary>
-    private bool _DialogResult;
+    private bool _dialogResult;
 
 
     /// <summary>
     /// ダイアログを閉じるか
     /// </summary>
-    private bool _CloseDialogProperty;
+    private bool _closeDialogProperty;
 
 
     /// <summary>
     /// 入力文字列
     /// </summary>
-    private string _InputString = "";
+    private string _inputString = "";
 
 
     /// <summary>
     /// 入力が有効か判定する関数
     /// </summary>
-    private readonly Predicate<string>? IsValidInput;
+    private readonly Predicate<string>? _isValidInput;
     #endregion
 
 
@@ -42,8 +42,8 @@ class SelectStringDialogModel : BindableBase
     /// </summary>
     public bool DialogResult
     {
-        get => _DialogResult;
-        set => SetProperty(ref _DialogResult, value);
+        get => _dialogResult;
+        set => SetProperty(ref _dialogResult, value);
     }
 
 
@@ -52,8 +52,8 @@ class SelectStringDialogModel : BindableBase
     /// </summary>
     public bool CloseDialogProperty
     {
-        get => _CloseDialogProperty;
-        set => SetProperty(ref _CloseDialogProperty, value);
+        get => _closeDialogProperty;
+        set => SetProperty(ref _closeDialogProperty, value);
     }
 
 
@@ -62,8 +62,8 @@ class SelectStringDialogModel : BindableBase
     /// </summary>
     public string InputString
     {
-        get => _InputString;
-        set => SetProperty(ref _InputString, value);
+        get => _inputString;
+        set => SetProperty(ref _inputString, value);
     }
 
 
@@ -88,7 +88,7 @@ class SelectStringDialogModel : BindableBase
     public SelectStringDialogModel(string initialString, Predicate<string>? isValidInput)
     {
         InputString = initialString;
-        IsValidInput = isValidInput;
+        _isValidInput = isValidInput;
         OkButtonClickedCommand = new DelegateCommand(OnOkButtonClick);
         CancelButtonClickedCommand = new DelegateCommand(OnCancelButtonClicked);
     }
@@ -100,7 +100,7 @@ class SelectStringDialogModel : BindableBase
     private void OnOkButtonClick()
     {
         // 入力が有効ならダイアログを閉じる
-        if (IsValidInput?.Invoke(InputString) ?? true)
+        if (_isValidInput?.Invoke(InputString) ?? true)
         {
             DialogResult = true;
             CloseDialogProperty = true;

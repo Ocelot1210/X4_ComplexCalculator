@@ -14,7 +14,7 @@ internal static class XDocumentEx
     /// <summary>
     /// XML 宣言の文頭を UTF-8 で表した配列
     /// </summary>
-    private static readonly byte[] XmlDeclaration = Encoding.UTF8.GetBytes("<?xml");
+    private static readonly byte[] _XmlDeclaration = Encoding.UTF8.GetBytes("<?xml");
 
 
     /// <summary>
@@ -72,7 +72,7 @@ internal static class XDocumentEx
         int seek = buff.StartsWith(Encoding.UTF8.Preamble) ? Encoding.UTF8.Preamble.Length : 0;
 
         // XML 宣言が省略されている場合はそのまま返す
-        if (!buff.Slice(seek).StartsWith(XmlDeclaration))
+        if (!buff[seek..].StartsWith(_XmlDeclaration))
         {
             stream.Position = seek;
             return stream;

@@ -16,13 +16,13 @@ class WareProductionManager
     /// <summary>
     /// ウェアの生産量と生産時間情報の一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, IWareProduction>> _WareProductions;
+    private readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, IWareProduction>> _wareProductions;
 
 
     /// <summary>
     /// ダミー用ウェア生産情報
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IWareProduction> _DummyWareProduction = new Dictionary<string, IWareProduction>();
+    private readonly IReadOnlyDictionary<string, IWareProduction> _dummyWareProduction = new Dictionary<string, IWareProduction>();
     #endregion
 
 
@@ -33,9 +33,9 @@ class WareProductionManager
     /// <param name="conn">DB接続情報</param>
     public WareProductionManager(IDbConnection conn)
     {
-        const string sql = "SELECT WareID, Method, Name, Amount, Time FROM WareProduction";
+        const string SQL = "SELECT WareID, Method, Name, Amount, Time FROM WareProduction";
 
-        _WareProductions = conn.Query<WareProduction>(sql)
+        _wareProductions = conn.Query<WareProduction>(SQL)
             .GroupBy(x => x.WareID)
             .ToDictionary(
                 x => x.Key,
@@ -51,7 +51,7 @@ class WareProductionManager
     /// <param name="id">ウェアID</param>
     /// <returns>ウェアIDに対応するウェア生産方式一覧</returns>
     public IReadOnlyDictionary<string, IWareProduction> Get(string id)
-        => _WareProductions.TryGetValue(id, out var ret) ? ret : _DummyWareProduction;
+        => _wareProductions.TryGetValue(id, out var ret) ? ret : _dummyWareProduction;
 
 
 

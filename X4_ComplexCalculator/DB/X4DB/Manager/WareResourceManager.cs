@@ -16,13 +16,13 @@ class WareResourceManager
     /// <summary>
     /// 1サイクルのウェア生産に必要なウェア情報一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, IReadOnlyList<IWareResource>>> _WareResources;
+    private readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, IReadOnlyList<IWareResource>>> _wareResources;
 
 
     /// <summary>
     /// ダミー用1サイクルのウェア生産に必要なウェア情報一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IReadOnlyList<IWareResource>> _DummyResources
+    private readonly IReadOnlyDictionary<string, IReadOnlyList<IWareResource>> _dummyResources
         = new Dictionary<string, IReadOnlyList<IWareResource>>();
     #endregion
 
@@ -35,9 +35,9 @@ class WareResourceManager
     {
         // ウェア生産情報を作成する
         {
-            const string sql = "SELECT WareID, Method, NeedWareID, Amount FROM WareResource";
+            const string SQL = "SELECT WareID, Method, NeedWareID, Amount FROM WareResource";
 
-            _WareResources = conn.Query<WareResource>(sql)
+            _wareResources = conn.Query<WareResource>(SQL)
                 .GroupBy(x => x.WareID)
                 .ToDictionary(
                     x => x.Key,
@@ -53,5 +53,5 @@ class WareResourceManager
     /// <param name="wareID">ウェアID</param>
     /// <returns>ウェアIDに対応するウェア生産に必要なウェア情報一覧</returns>
     public IReadOnlyDictionary<string, IReadOnlyList<IWareResource>> Get(string wareID)
-        => _WareResources.TryGetValue(wareID, out var resources) ? resources : _DummyResources;
+        => _wareResources.TryGetValue(wareID, out var resources) ? resources : _dummyResources;
 }

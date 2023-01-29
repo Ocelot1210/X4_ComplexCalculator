@@ -13,7 +13,7 @@ public class UpdateDownloadProgressViewModel : BindableBase
     /// <summary>
     /// アップデート機能
     /// </summary>
-    private readonly ApplicationUpdater _ApplicationUpdater;
+    private readonly ApplicationUpdater _applicationUpdater;
     #endregion
 
 
@@ -22,7 +22,7 @@ public class UpdateDownloadProgressViewModel : BindableBase
     /// ダウンロード状況
     /// </summary>
     public IReadOnlyReactiveProperty<double> DownloadProgress
-        => _ApplicationUpdater.DownloadProgress;
+        => _applicationUpdater.DownloadProgress;
 
 
     /// <summary>
@@ -38,16 +38,18 @@ public class UpdateDownloadProgressViewModel : BindableBase
     /// <param name="applicationUpdater">アップデート機能</param>
     public UpdateDownloadProgressViewModel(ApplicationUpdater applicationUpdater)
     {
-        _ApplicationUpdater = applicationUpdater;
+        _applicationUpdater = applicationUpdater;
         CancelCommand = new ReactiveCommand().WithSubscribe(Cancel);
 
         // ダウンロードが終わり次第アプリケーションを終了し、更新を適用する
+#pragma warning disable CA2012 // ValueTask を正しく使用する必要があります
         _ = applicationUpdater.UpdateAfterDownloading();
+#pragma warning restore CA2012 // ValueTask を正しく使用する必要があります
     }
 
 
     /// <summary>
     /// ダウンロードをキャンセルする
     /// </summary>
-    private void Cancel() => _ApplicationUpdater.CancelDownload();
+    private void Cancel() => _applicationUpdater.CancelDownload();
 }

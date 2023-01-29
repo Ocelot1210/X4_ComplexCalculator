@@ -35,16 +35,16 @@ public class WpfObservableRangeCollection<T> : RangeObservableCollection<T>
     /// </remarks>
     protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
     {
-        var _deferredEvents = (ICollection<NotifyCollectionChangedEventArgs>?)typeof(RangeObservableCollection<T>)?.GetField("_deferredEvents", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(this);
-        if (_deferredEvents is not null)
+        var deferredEvents = (ICollection<NotifyCollectionChangedEventArgs>?)typeof(RangeObservableCollection<T>)?.GetField("_deferredEvents", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(this);
+        if (deferredEvents is not null)
         {
-            _deferredEvents.Add(e);
+            deferredEvents.Add(e);
             return;
         }
 
         foreach (var handler in GetHandlers())
         {
-            if (IsRange(e) && handler.Target is CollectionView cv)
+            if (WpfObservableRangeCollection<T>.IsRange(e) && handler.Target is CollectionView cv)
             {
                 cv.Dispatcher.Invoke(() => cv.Refresh());
             }
@@ -60,7 +60,7 @@ public class WpfObservableRangeCollection<T> : RangeObservableCollection<T>
         return new DeferredEventsCollection(this);
     }
 
-    bool IsRange(NotifyCollectionChangedEventArgs e)
+    static bool IsRange(NotifyCollectionChangedEventArgs e)
     {
         return e.NewItems?.Count > 1 || e.OldItems?.Count > 1;
     }

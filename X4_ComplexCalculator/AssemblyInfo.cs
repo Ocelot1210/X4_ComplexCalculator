@@ -2,9 +2,9 @@
 using System.Windows;
 using X4_ComplexCalculator;
 
-[assembly: AssemblyVersion(VersionInfo.BaseVersion)]
-[assembly: AssemblyFileVersion(VersionInfo.BaseVersion)]
-[assembly: AssemblyInformationalVersion(VersionInfo.DetailVersion)]
+[assembly: AssemblyVersion(VersionInfo.BASE_VERSION)]
+[assembly: AssemblyFileVersion(VersionInfo.BASE_VERSION)]
+[assembly: AssemblyInformationalVersion(VersionInfo.DETAIL_VERSION)]
 
 
 [assembly: ThemeInfo(
@@ -28,7 +28,7 @@ public static class VersionInfo
     /// バージョン名
     /// ex: 1.4.1
     /// </summary>
-    internal const string BaseVersion = ThisAssembly.Git.BaseVersion.Major + "."
+    internal const string BASE_VERSION = ThisAssembly.Git.BaseVersion.Major + "."
         + ThisAssembly.Git.BaseVersion.Minor + "." + ThisAssembly.Git.BaseVersion.Patch;
 
 
@@ -36,23 +36,23 @@ public static class VersionInfo
     /// より詳細なバージョン名
     /// ex: v1.4.1-4-g306b97d+dirty (Debug)
     /// </summary>
-    internal const string DetailVersion = ThisAssembly.Git.Tag == ""
-        ? "Unknown version" + " (" + Config + ")"
-        : ThisAssembly.Git.Tag + Dirty + " (" + Config + ")";
+    internal const string DETAIL_VERSION = ThisAssembly.Git.Tag == ""
+        ? "Unknown version" + " (" + CONFIG + ")"
+        : ThisAssembly.Git.Tag + DIRTY + " (" + CONFIG + ")";
 
 
     /// <summary>
     /// コミットされていない変更がある場合 +dirty になる
     /// </summary>
-    private const string Dirty = ThisAssembly.Git.IsDirty ? "+dirty" : "";
+    private const string DIRTY = ThisAssembly.Git.IsDirty ? "+dirty" : "";
 
 
     /// <summary>
     /// ビルド時の構成名
     /// </summary>
 #if DEBUG
-    private const string Config = "Debug";
+    private const string CONFIG = "Debug";
 #else
-    private const string Config = "Release";
+    private const string CONFIG = "Release";
 #endif
 }

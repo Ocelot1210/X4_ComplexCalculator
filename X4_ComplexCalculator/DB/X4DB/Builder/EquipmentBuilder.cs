@@ -18,31 +18,31 @@ class EquipmentBuilder
     /// <summary>
     /// タグ情報一覧
     /// </summary>
-    private readonly EquipmentTagsManager _EquipmentTagsManager;
+    private readonly EquipmentTagsManager _equipmentTagsManager;
 
 
     /// <summary>
     /// <see cref="IEngine"/> 情報ビルダ
     /// </summary>
-    private readonly EngineBuilder _EngineBuilder;
+    private readonly EngineBuilder _engineBuilder;
 
 
     /// <summary>
     /// <see cref="IShield"/> 情報ビルダ
     /// </summary>
-    private readonly ShieldBuilder _ShieldBuilder;
+    private readonly ShieldBuilder _shieldBuilder;
 
 
     /// <summary>
     /// <see cref="IThruster"/> 情報ビルダ
     /// </summary>
-    private readonly ThrusterBuilder _ThrusterBuilder;
+    private readonly ThrusterBuilder _thrusterBuilder;
 
 
     /// <summary>
     /// 装備一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, X4_DataExporterWPF.Entity.Equipment> _Equipments;
+    private readonly IReadOnlyDictionary<string, X4_DataExporterWPF.Entity.Equipment> _equipments;
     #endregion
 
 
@@ -52,15 +52,15 @@ class EquipmentBuilder
     /// <param name="conn"></param>
     public EquipmentBuilder(IDbConnection conn)
     {
-        _EquipmentTagsManager = new(conn);
+        _equipmentTagsManager = new(conn);
 
-        _EngineBuilder = new(conn);
+        _engineBuilder = new(conn);
 
-        _ShieldBuilder = new(conn);
+        _shieldBuilder = new(conn);
 
-        _ThrusterBuilder = new(conn);
+        _thrusterBuilder = new(conn);
 
-        _Equipments = conn.Query<X4_DataExporterWPF.Entity.Equipment>("SELECT * FROM Equipment")
+        _equipments = conn.Query<X4_DataExporterWPF.Entity.Equipment>("SELECT * FROM Equipment")
             .ToDictionary(x => x.EquipmentID);
     }
 
@@ -74,12 +74,12 @@ class EquipmentBuilder
     {
         if (!ware.Tags.Contains("equipment"))
         {
-            throw new ArgumentException();
+            throw new ArgumentException("Ware is not Equipment", nameof(ware));
         }
 
-        if (_Equipments.TryGetValue(ware.ID, out var item))
+        if (_equipments.TryGetValue(ware.ID, out var item))
         {
-            var tags = _EquipmentTagsManager.Get(ware.ID);
+            var tags = _equipmentTagsManager.Get(ware.ID);
             var ret = new Equipment(
                 ware,
                 item.MacroName,
@@ -95,9 +95,9 @@ class EquipmentBuilder
 
             return ret.EquipmentType.EquipmentTypeID switch
             {
-                "engines" => _EngineBuilder.Build(ret),
-                "shields" => _ShieldBuilder.Build(ret),
-                "thrusters" => _ThrusterBuilder.Build(ret),
+                "engines" => _engineBuilder.Build(ret),
+                "shields" => _shieldBuilder.Build(ret),
+                "thrusters" => _thrusterBuilder.Build(ret),
                 _ => ret,
             };
         }

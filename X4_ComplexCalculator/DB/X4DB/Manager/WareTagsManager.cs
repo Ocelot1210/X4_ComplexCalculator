@@ -11,19 +11,19 @@ class WareTagsManager
     /// <summary>
     /// Tagのユニークな組み合わせ一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, HashSet<string>> _Tags;
+    private readonly IReadOnlyDictionary<string, HashSet<string>> _tags;
 
 
     /// <summary>
     /// ウェアIDとタグ文字列のペア
     /// </summary>
-    private readonly IReadOnlyDictionary<string, string> _WareTagsPair;
+    private readonly IReadOnlyDictionary<string, string> _wareTagsPair;
 
 
     /// <summary>
     /// 空のタグ一覧(ダミー用)
     /// </summary>
-    private readonly HashSet<string> _EmptyTags = new();
+    private readonly HashSet<string> _emptyTags = new();
     #endregion
 
 
@@ -36,7 +36,7 @@ class WareTagsManager
     {
         // Tagのユニークな組み合わせ一覧を作成する
         {
-            const string sql = @"
+            const string SQL = @"
 SELECT
 	DISTINCT group_concat(TmpTagsTable.Tag, '彁') As Tags
 	
@@ -46,13 +46,13 @@ FROM
 GROUP BY
 	TmpTagsTable.WareID";
 
-            _Tags = conn.Query<string>(sql)
+            _tags = conn.Query<string>(SQL)
                 .ToDictionary(x => x, x => new HashSet<string>(x.Split('彁')));
         }
 
         // ウェアIDとタグ文字列のペアを作成する
         {
-            const string sql = @"
+            const string SQL = @"
 SELECT
 	Ware.WareID,
 	group_concat(Sorted_WareTags.Tag, '彁') AS Tags
@@ -67,7 +67,7 @@ WHERE
 GROUP BY
 	Ware.WareID";
 
-            _WareTagsPair = conn.Query<(string WareID, string Tags)>(sql)
+            _wareTagsPair = conn.Query<(string WareID, string Tags)>(SQL)
                 .ToDictionary(x => x.WareID, x => x.Tags);
         }
     }
@@ -81,14 +81,14 @@ GROUP BY
     /// <returns>タグ一覧</returns>
     public HashSet<string> Get(string wareID)
     {
-        if (_WareTagsPair.TryGetValue(wareID, out var tagsText))
+        if (_wareTagsPair.TryGetValue(wareID, out var tagsText))
         {
-            if (_Tags.TryGetValue(tagsText, out var tags))
+            if (_tags.TryGetValue(tagsText, out var tags))
             {
                 return tags;
             }
         }
 
-        return _EmptyTags;
+        return _emptyTags;
     }
 }

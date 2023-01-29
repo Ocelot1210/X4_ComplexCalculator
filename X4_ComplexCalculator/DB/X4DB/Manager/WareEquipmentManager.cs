@@ -17,13 +17,13 @@ class WareEquipmentManager
     /// <summary>
     /// 空のウェアの装備情報一覧(ダミー用)
     /// </summary>
-    private readonly IReadOnlyList<IWareEquipment> _EmptyEquipments = Array.Empty<IWareEquipment>();
+    private readonly IReadOnlyList<IWareEquipment> _emptyEquipments = Array.Empty<IWareEquipment>();
 
 
     /// <summary>
     /// ウェアの装備情報一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IReadOnlyList<IWareEquipment>> _WareEquipments;
+    private readonly IReadOnlyDictionary<string, IReadOnlyList<IWareEquipment>> _wareEquipments;
     #endregion
 
 
@@ -34,7 +34,7 @@ class WareEquipmentManager
     public WareEquipmentManager(IDbConnection conn)
     {
         // Tagのユニークな組み合わせ一覧を作成する
-        const string sql1 = @"
+        const string SQL_1 = @"
 SELECT
 	DISTINCT group_concat(TmpTagsTable.Tag, '彁') As Tags
 	
@@ -56,13 +56,13 @@ GROUP BY
 	TmpTagsTable.WareID,
 	TmpTagsTable.ConnectionName";
 
-        var tagsDict = conn.Query<string>(sql1)
+        var tagsDict = conn.Query<string>(SQL_1)
             .ToDictionary(x => x, x => new HashSet<string>(x.Split('彁')));
         
 
 
         // 装備一覧を作成する
-        const string sql2 = @"
+        const string SQL_2 = @"
 SELECT
 	WareEquipment.WareID,
 	WareEquipment.ConnectionName,
@@ -82,7 +82,7 @@ GROUP BY
 	WareEquipment.WareID,
 	WareEquipment.ConnectionName";
 
-        _WareEquipments = conn.Query<TempWareEquipment>(sql2)
+        _wareEquipments = conn.Query<TempWareEquipment>(SQL_2)
             .Select(x => new WareEquipment(x.WareID, x.ConnectionName, x.EquipmentTypeID, x.GroupName, tagsDict[x.Tags]))
             .GroupBy(x => x.ID)
             .ToDictionary(x => x.Key, x => x.ToArray() as IReadOnlyList<IWareEquipment>);
@@ -95,7 +95,7 @@ GROUP BY
     /// </summary>
     /// <param name="id">ウェアID</param>
     /// <returns>ウェアIDに対応するウェアの装備情報一覧</returns>
-    public IReadOnlyList<IWareEquipment> Get(string id) => _WareEquipments.TryGetValue(id, out var value) ? value : _EmptyEquipments;
+    public IReadOnlyList<IWareEquipment> Get(string id) => _wareEquipments.TryGetValue(id, out var value) ? value : _emptyEquipments;
 
 
     /// <summary>

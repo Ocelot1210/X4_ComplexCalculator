@@ -12,7 +12,7 @@ public class SaveDataStationItem : BindableBase
     /// <summary>
     /// チェックされたか
     /// </summary>
-    private bool _IsChecked;
+    private bool _isChecked;
     #endregion
 
 
@@ -34,8 +34,8 @@ public class SaveDataStationItem : BindableBase
     /// </summary>
     public bool IsChecked
     {
-        get => _IsChecked;
-        set => SetProperty(ref _IsChecked, value);
+        get => _isChecked;
+        set => SetProperty(ref _isChecked, value);
     }
 
 

@@ -115,19 +115,19 @@ public class CSVEmbeddedLocalizationProvider : CSVLocalizationProviderBase
     /// <summary>
     /// A dictionary for notification classes for changes of the individual target Parent changes.
     /// </summary>
-    private readonly ParentNotifiers _parentNotifiers = new ParentNotifiers();
+    private readonly ParentNotifiers _parentNotifiers = new();
     #endregion
 
     #region Singleton Variables, Properties & Constructor
     /// <summary>
     /// The instance of the singleton.
     /// </summary>
-    private static CSVEmbeddedLocalizationProvider? _instance;
+    private static CSVEmbeddedLocalizationProvider? _Instance;
 
     /// <summary>
     /// Lock object for the creation of the singleton instance.
     /// </summary>
-    private static readonly object InstanceLock = new object();
+    private static readonly object _InstanceLock = new();
 
     /// <summary>
     /// Gets the <see cref="CSVEmbeddedLocalizationProvider"/> singleton.
@@ -136,17 +136,17 @@ public class CSVEmbeddedLocalizationProvider : CSVLocalizationProviderBase
     {
         get
         {
-            if (_instance is null)
+            if (_Instance is null)
             {
-                lock (InstanceLock)
+                lock (_InstanceLock)
                 {
-                    if (_instance is null)
-                        _instance = new CSVEmbeddedLocalizationProvider();
+                    if (_Instance is null)
+                        _Instance = new CSVEmbeddedLocalizationProvider();
                 }
             }
 
             // return the existing/new instance
-            return _instance;
+            return _Instance;
         }
     }
 
@@ -241,31 +241,29 @@ public class CSVEmbeddedLocalizationProvider : CSVLocalizationProviderBase
                 filename = assemblyInAppDomain.GetManifestResourceNames().FirstOrDefault(r => r.Contains($"{dictionary}{(string.IsNullOrEmpty(culture.Name) ? "" : "-")}{culture.Name}"));
                 if (filename is not null)
                 {
-                    using (var reader = new StreamReader(assemblyInAppDomain.GetManifestResourceStream(filename) ?? throw new InvalidOperationException(), Encoding.Default))
+                    using var reader = new StreamReader(assemblyInAppDomain.GetManifestResourceStream(filename) ?? throw new InvalidOperationException(), Encoding.Default);
+                    if (HasHeader && !reader.EndOfStream)
+                        reader.ReadLine();
+
+                    // Read each line and split it.
+                    while (!reader.EndOfStream)
                     {
-                        if (HasHeader && !reader.EndOfStream)
-                            reader.ReadLine();
-
-                        // Read each line and split it.
-                        while (!reader.EndOfStream)
+                        var line = reader.ReadLine();
+                        if (line is not null)
                         {
-                            var line = reader.ReadLine();
-                            if (line is not null)
-                            {
-                                var parts = line.Split(";".ToCharArray());
+                            var parts = line.Split(";".ToCharArray());
 
-                                if (parts.Length < 2)
-                                    continue;
+                            if (parts.Length < 2)
+                                continue;
 
-                                // Check the key (1st column).
-                                if (parts[0] != key)
-                                    continue;
+                            // Check the key (1st column).
+                            if (parts[0] != key)
+                                continue;
 
-                                // Get the value (2nd column).
-                                ret = parts[1];
-                            }
-                            break;
+                            // Get the value (2nd column).
+                            ret = parts[1];
                         }
+                        break;
                     }
                 }
             }

@@ -16,25 +16,25 @@ public class ProductsGridItem : BindableBaseEx, IEditable, ISelectable
     /// <summary>
     /// 単価
     /// </summary>
-    private long _UnitPrice;
+    private long _unitPrice;
 
 
     /// <summary>
     /// Expanderが展開されているか
     /// </summary>
-    private bool _IsExpanded;
+    private bool _isExpanded;
 
 
     /// <summary>
     /// 売買オプション
     /// </summary>
-    readonly TradeOption _TradeOption;
+    readonly TradeOption _tradeOption;
 
 
     /// <summary>
     /// 編集状態
     /// </summary>
-    private EditStatus _EditStatus = EditStatus.Unedited;
+    private EditStatus _editStatus = EditStatus.Unedited;
     #endregion
 
 
@@ -66,7 +66,7 @@ public class ProductsGridItem : BindableBaseEx, IEditable, ISelectable
     /// </summary>
     public long UnitPrice
     {
-        get => _UnitPrice;
+        get => _unitPrice;
         set
         {
             // 最低価格≦ 入力価格 ≦ 最高価格かつ価格が変更された場合のみ更新
@@ -86,14 +86,14 @@ public class ProductsGridItem : BindableBaseEx, IEditable, ISelectable
             }
 
             // 変更無しの場合は何もしない
-            if (setValue == _UnitPrice)
+            if (setValue == _unitPrice)
             {
                 return;
             }
 
-            var oldUnitPrice = _UnitPrice;
+            var oldUnitPrice = _unitPrice;
             var oldPrice = Price;
-            _UnitPrice = setValue;
+            _unitPrice = setValue;
 
             RaisePropertyChangedEx(oldUnitPrice, setValue);
             RaisePropertyChangedEx(oldPrice, Price, nameof(Price));
@@ -118,8 +118,8 @@ public class ProductsGridItem : BindableBaseEx, IEditable, ISelectable
     /// </summary>
     public bool IsExpanded
     {
-        get => _IsExpanded;
-        set => SetProperty(ref _IsExpanded, value);
+        get => _isExpanded;
+        set => SetProperty(ref _isExpanded, value);
     }
 
 
@@ -138,12 +138,12 @@ public class ProductsGridItem : BindableBaseEx, IEditable, ISelectable
     /// </summary>
     public bool NoBuy
     {
-        get => _TradeOption.NoBuy;
+        get => _tradeOption.NoBuy;
         set
         {
             var oldPrice = Price;
 
-            if (SetProperty(ref _TradeOption.NoBuy, value))
+            if (SetProperty(ref _tradeOption.NoBuy, value))
             {
                 if (oldPrice != Price)
                 {
@@ -160,12 +160,12 @@ public class ProductsGridItem : BindableBaseEx, IEditable, ISelectable
     /// </summary>
     public bool NoSell
     {
-        get => _TradeOption.NoSell;
+        get => _tradeOption.NoSell;
         set
         {
             var oldPrice = Price;
 
-            if (SetProperty(ref _TradeOption.NoSell, value))
+            if (SetProperty(ref _tradeOption.NoSell, value))
             {
                 if (oldPrice != Price)
                 {
@@ -182,8 +182,8 @@ public class ProductsGridItem : BindableBaseEx, IEditable, ISelectable
     /// </summary>
     public EditStatus EditStatus
     {
-        get => _EditStatus;
-        set => SetProperty(ref _EditStatus, value);
+        get => _editStatus;
+        set => SetProperty(ref _editStatus, value);
     }
     #endregion
 
@@ -199,7 +199,7 @@ public class ProductsGridItem : BindableBaseEx, IEditable, ISelectable
         Ware = ware;
         Details = new ObservableRangeCollection<IProductDetailsListItem>(datails);
 
-        _TradeOption = tradeOption;
+        _tradeOption = tradeOption;
         UnitPrice = (Ware.MinPrice + Ware.MaxPrice) / 2;
     }
 
@@ -216,7 +216,7 @@ public class ProductsGridItem : BindableBaseEx, IEditable, ISelectable
         Ware = ware;
         Details = new ObservableRangeCollection<IProductDetailsListItem>(datails);
 
-        _TradeOption = tradeOption;
+        _tradeOption = tradeOption;
         UnitPrice = unitPrice;
     }
 

@@ -19,7 +19,7 @@ public class WareEffectExporter : IExporter
     /// <summary>
     /// ウェア情報xml
     /// </summary>
-    private readonly XDocument _WaresXml;
+    private readonly XDocument _waresXml;
 
 
     /// <summary>
@@ -29,7 +29,7 @@ public class WareEffectExporter : IExporter
     public WareEffectExporter(XDocument waresXml)
     {
         ArgumentNullException.ThrowIfNull(waresXml.Root);
-        _WaresXml = waresXml;
+        _waresXml = waresXml;
     }
 
 
@@ -71,11 +71,11 @@ CREATE TABLE IF NOT EXISTS WareEffect
     /// <returns>読み出した WareEffect データ</returns>
     internal IEnumerable<WareEffect> GetRecords(IProgress<(int currentStep, int maxSteps)>? progress, CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'economy')])");
+        var maxSteps = (int)(double)_waresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'economy')])");
         var currentStep = 0;
 
 
-        foreach (var ware in _WaresXml.Root!.XPathSelectElements("ware[contains(@tags, 'economy')]"))
+        foreach (var ware in _waresXml.Root!.XPathSelectElements("ware[contains(@tags, 'economy')]"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress?.Report((currentStep++, maxSteps));
@@ -93,7 +93,10 @@ CREATE TABLE IF NOT EXISTS WareEffect
                     var effectID = effect.Attribute("type")?.Value;
                     if (string.IsNullOrEmpty(effectID)) continue;
 
-                    double.TryParse(effect.Attribute("product")?.Value, out var product);
+                    if (!double.TryParse(effect.Attribute("product")?.Value, out var product))
+                    {
+                        continue;
+                    }
 
                     yield return new WareEffect(wareID, method, effectID, product);
                 }

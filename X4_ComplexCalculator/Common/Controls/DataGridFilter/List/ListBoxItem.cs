@@ -11,7 +11,7 @@ class ListBoxItem : BindableBase
     /// <summary>
     /// チェックされたか
     /// </summary>
-    private bool _IsChecked;
+    private bool _isChecked;
     #endregion
 
 
@@ -27,8 +27,8 @@ class ListBoxItem : BindableBase
     /// </summary>
     public bool IsChecked
     {
-        get => _IsChecked;
-        set => SetProperty(ref _IsChecked, value);
+        get => _isChecked;
+        set => SetProperty(ref _isChecked, value);
     }
     #endregion
 

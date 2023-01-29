@@ -88,7 +88,7 @@ static class XMLPatcher
                     break;
 
                 case "remove":
-                    Remove(baseXml, targetNode);
+                    Remove(targetNode);
                     break;
 
                 default:
@@ -136,7 +136,7 @@ static class XMLPatcher
         if (type.StartsWith('@'))
         {
             // 属性追加の場合
-            (target as XElement)?.SetAttributeValue(type.Substring(1), element.Value);
+            (target as XElement)?.SetAttributeValue(type[1..], element.Value);
             return;
         }
 
@@ -146,7 +146,7 @@ static class XMLPatcher
         ////////////////////////
         if (type.StartsWith("namespace::"))
         {
-            var attr = new XAttribute(XNamespace.Xmlns + $"{type.Substring("namespace::".Length)}", element.Value);
+            var attr = new XAttribute(XNamespace.Xmlns + $"{type["namespace::".Length..]}", element.Value);
             (target as XElement)?.Add(attr);
             return;
         }
@@ -187,9 +187,8 @@ static class XMLPatcher
     /// <summary>
     /// 要素を削除
     /// </summary>
-    /// <param name="dst"></param>
     /// <param name="target"></param>
-    private static void Remove(XDocument dst, XObject target)
+    private static void Remove(XObject target)
     {
         switch (target.NodeType)
         {

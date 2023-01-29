@@ -14,7 +14,7 @@ class PresetComboboxItem : BindableBase
     /// <summary>
     /// プリセット名
     /// </summary>
-    private string _Name;
+    private string _name;
     #endregion
 
 
@@ -30,8 +30,8 @@ class PresetComboboxItem : BindableBase
     /// </summary>
     public string Name
     {
-        get => _Name;
-        set => SetProperty(ref _Name, value);
+        get => _name;
+        set => SetProperty(ref _name, value);
     }
     #endregion
 
@@ -44,6 +44,6 @@ class PresetComboboxItem : BindableBase
     public PresetComboboxItem(long id, string name)
     {
         ID = id;
-        _Name = name;
+        _name = name;
     }
 }

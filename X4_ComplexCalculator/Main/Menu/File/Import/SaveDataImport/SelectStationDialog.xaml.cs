@@ -26,9 +26,10 @@ public partial class SelectStationDialog : Window
     /// <param name="stationItems">選択計画一覧</param>
     public static bool ShowDialog(List<SaveDataStationItem> stationItems)
     {
-        var wnd = new SelectStationDialog(stationItems);
-
-        wnd.Owner = Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive) ?? Application.Current.MainWindow;
+        var wnd = new SelectStationDialog(stationItems)
+        {
+            Owner = Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive) ?? Application.Current.MainWindow
+        };
 
         return wnd.ShowDialog() == true;
     }

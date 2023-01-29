@@ -26,18 +26,18 @@ namespace X4_ComplexCalculator.Common.Localize;
 /// </summary>
 public class CSVLocalizationProvider : FrameworkElement, ILocalizationProvider
 {
-    private string fileName = "";
+    private string _fileName = "";
     /// <summary>
     /// The name of the file without an extension.
     /// </summary>
     public string FileName
     {
-        get => fileName;
+        get => _fileName;
         set
         {
-            if (fileName != value)
+            if (_fileName != value)
             {
-                fileName = value;
+                _fileName = value;
 
                 AvailableCultures.Clear();
 
@@ -56,16 +56,16 @@ public class CSVLocalizationProvider : FrameworkElement, ILocalizationProvider
         }
     }
 
-    private bool hasHeader = false;
+    private bool _hasHeader = false;
     /// <summary>
     /// A flag indicating, if it has a header row.
     /// </summary>
     public bool HasHeader
     {
-        get => hasHeader;
+        get => _hasHeader;
         set
         {
-            hasHeader = value;
+            _hasHeader = value;
             OnProviderChanged();
         }
     }
@@ -93,7 +93,7 @@ public class CSVLocalizationProvider : FrameworkElement, ILocalizationProvider
     /// Get the working directory, depending on the design mode or runtime.
     /// </summary>
     /// <returns>The working directory.</returns>
-    private string GetWorkingDirectory()
+    private static string GetWorkingDirectory()
     {
         if (AppDomain.CurrentDomain.FriendlyName.Contains("XDesProc"))
         {
@@ -119,7 +119,7 @@ public class CSVLocalizationProvider : FrameworkElement, ILocalizationProvider
         }
     }
 
-    private static Dictionary<int, string> executablePaths = new Dictionary<int, string>();
+    private static readonly Dictionary<int, string> _ExecutablePaths = new();
 
     /// <summary>
     /// Get the executable path for both x86 and x64 processes.
@@ -128,11 +128,11 @@ public class CSVLocalizationProvider : FrameworkElement, ILocalizationProvider
     /// <returns>The path if found; otherwise, null.</returns>
     private static string GetExecutablePath(int processId)
     {
-        if (executablePaths.ContainsKey(processId))
-            return executablePaths[processId];
+        if (_ExecutablePaths.ContainsKey(processId))
+            return _ExecutablePaths[processId];
 
-        const string wmiQueryString = "SELECT ProcessId, ExecutablePath, CommandLine FROM Win32_Process";
-        using (var searcher = new ManagementObjectSearcher(wmiQueryString))
+        const string WMI_QUERY_STRING = "SELECT ProcessId, ExecutablePath, CommandLine FROM Win32_Process";
+        using (var searcher = new ManagementObjectSearcher(WMI_QUERY_STRING))
         using (var results = searcher.Get())
         {
             var query = from p in Process.GetProcesses()
@@ -147,7 +147,7 @@ public class CSVLocalizationProvider : FrameworkElement, ILocalizationProvider
                         };
             foreach (var item in query)
             {
-                executablePaths.Add(processId, item.Path);
+                _ExecutablePaths.Add(processId, item.Path);
                 return item.Path;
             }
         }
@@ -216,7 +216,7 @@ public class CSVLocalizationProvider : FrameworkElement, ILocalizationProvider
     /// <summary>
     /// A dictionary for notification classes for changes of the individual target Parent changes.
     /// </summary>
-    private readonly ParentNotifiers _parentNotifiers = new ParentNotifiers();
+    private readonly ParentNotifiers _parentNotifiers = new();
     #endregion
 
     /// <summary>
@@ -279,7 +279,7 @@ public class CSVLocalizationProvider : FrameworkElement, ILocalizationProvider
         return target.GetValueOrRegisterParentNotifier<string>(CSVEmbeddedLocalizationProvider.DefaultDictionaryProperty, ParentChangedAction, _parentNotifiers);
     }
 
-    private Dictionary<CultureInfo, Dictionary<string, string>> _LangageDict = new Dictionary<CultureInfo, Dictionary<string, string>>();
+    private readonly Dictionary<CultureInfo, Dictionary<string, string>> _languageDict = new();
 
 
     /// <summary>
@@ -299,7 +299,7 @@ public class CSVLocalizationProvider : FrameworkElement, ILocalizationProvider
             dictionary = GetDictionary(target);
 
         // Try to get the culture specific file.
-        const string csvDirectory = "Localization";
+        const string CSV_DIRECTORY = "Localization";
         var csvPath = "";
 
         if (culture is null)
@@ -309,7 +309,7 @@ public class CSVLocalizationProvider : FrameworkElement, ILocalizationProvider
 
         while (culture != CultureInfo.InvariantCulture)
         {
-            csvPath = Path.Combine(GetWorkingDirectory(), csvDirectory, dictionary + (string.IsNullOrEmpty(culture.Name) ? "" : "." + culture.Name) + ".csv");
+            csvPath = Path.Combine(GetWorkingDirectory(), CSV_DIRECTORY, dictionary + (string.IsNullOrEmpty(culture.Name) ? "" : "." + culture.Name) + ".csv");
 
             if (File.Exists(csvPath))
                 break;
@@ -320,7 +320,7 @@ public class CSVLocalizationProvider : FrameworkElement, ILocalizationProvider
         if (!File.Exists(csvPath))
         {
             // Take the invariant culture.
-            csvPath = Path.Combine(GetWorkingDirectory(), csvDirectory, dictionary + ".csv");
+            csvPath = Path.Combine(GetWorkingDirectory(), CSV_DIRECTORY, dictionary + ".csv");
 
             if (!File.Exists(csvPath))
             {
@@ -330,12 +330,12 @@ public class CSVLocalizationProvider : FrameworkElement, ILocalizationProvider
         }
 
         ReadCsv(culture, csvPath);
-        _LangageDict[culture].TryGetValue(key, out string? ret);
+        _languageDict[culture].TryGetValue(key, out string? ret);
 
         // 見つからなかったらデフォルトの言語ファイルから探す
         if (culture != CultureInfo.InvariantCulture && string.IsNullOrEmpty(ret))
         {
-            _LangageDict[CultureInfo.InvariantCulture].TryGetValue(key, out ret);
+            _languageDict[CultureInfo.InvariantCulture].TryGetValue(key, out ret);
         }
 
         // Nothing found -> Raise the error message.
@@ -352,12 +352,12 @@ public class CSVLocalizationProvider : FrameworkElement, ILocalizationProvider
     /// <param name="csvPath">The csv file path.</param>
     private void ReadCsv(CultureInfo culture, string csvPath)
     {
-        if (_LangageDict.ContainsKey(culture))
+        if (_languageDict.ContainsKey(culture))
         {
             return;
         }
 
-        _LangageDict.Add(culture, new Dictionary<string, string>());
+        _languageDict.Add(culture, new Dictionary<string, string>());
 
         // Open the file.
         using var reader = new StreamReader(csvPath, Encoding.Default);
@@ -377,12 +377,12 @@ public class CSVLocalizationProvider : FrameworkElement, ILocalizationProvider
                 if (parts.Length < 2)
                     continue;
 
-                _LangageDict[culture].Add(parts[0], EscapeString(parts[1]));
+                _languageDict[culture].Add(parts[0], EscapeString(parts[1]));
             }
         }
     }
 
-    private string EscapeString(string str)
+    private static string EscapeString(string str)
     {
         var sb = new StringBuilder(str);
 

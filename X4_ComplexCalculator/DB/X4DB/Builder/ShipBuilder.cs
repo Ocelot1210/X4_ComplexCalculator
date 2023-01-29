@@ -18,31 +18,31 @@ class ShipBuilder
     /// <summary>
     /// 艦船種別一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IShipType> _ShipTypes;
+    private readonly IReadOnlyDictionary<string, IShipType> _shipTypes;
 
 
     /// <summary>
     /// 艦船一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, X4_DataExporterWPF.Entity.Ship> _Ships;
+    private readonly IReadOnlyDictionary<string, X4_DataExporterWPF.Entity.Ship> _ships;
 
 
     /// <summary>
     /// ウェアの装備情報一覧
     /// </summary>
-    private WareEquipmentManager _WareEquipmentManager;
+    private readonly WareEquipmentManager _wareEquipmentManager;
 
 
     /// <summary>
     /// 艦船のハンガー情報一覧
     /// </summary>
-    private readonly ShipHangerManager _ShipHangerManager;
+    private readonly ShipHangerManager _shipHangerManager;
 
 
     /// <summary>
     /// 艦船のロードアウト情報一覧
     /// </summary>
-    private readonly ShipLoadoutManager _ShipLoadoutManager;
+    private readonly ShipLoadoutManager _shipLoadoutManager;
     #endregion
 
 
@@ -53,23 +53,23 @@ class ShipBuilder
     /// <param name="wareEquipmentManager">ウェアの装備情報一覧</param>
     public ShipBuilder(IDbConnection conn, WareEquipmentManager wareEquipmentManager)
     {
-        _ShipHangerManager = new(conn);
+        _shipHangerManager = new(conn);
 
-        _ShipLoadoutManager = new(conn);
+        _shipLoadoutManager = new(conn);
 
-        _WareEquipmentManager = wareEquipmentManager;
+        _wareEquipmentManager = wareEquipmentManager;
 
 
         // 艦船種別を初期化
         {
-            const string sql = @"SELECT ShipTypeID, Name, Description FROM ShipType";
-            _ShipTypes = conn.Query<ShipType>(sql)
+            const string SQL = @"SELECT ShipTypeID, Name, Description FROM ShipType";
+            _shipTypes = conn.Query<ShipType>(SQL)
                 .ToDictionary(x => x.ShipTypeID, x => x as IShipType);
         }
 
         // 艦船情報一覧を作成
         {
-            _Ships = conn.Query<X4_DataExporterWPF.Entity.Ship>("SELECT * FROM Ship")
+            _ships = conn.Query<X4_DataExporterWPF.Entity.Ship>("SELECT * FROM Ship")
                 .ToDictionary(x => x.ShipID);
         }
     }
@@ -84,17 +84,17 @@ class ShipBuilder
     {
         if (!ware.Tags.Contains("ship"))
         {
-            throw new ArgumentException();
+            throw new ArgumentException("Ware is not Ship", nameof(ware));
         }
 
-        if (!_Ships.TryGetValue(ware.ID, out var item))
+        if (!_ships.TryGetValue(ware.ID, out var item))
         {
             return ware;
         }
 
         return new Ship(
             ware,
-            _ShipTypes[item.ShipTypeID],
+            _shipTypes[item.ShipTypeID],
             item.Macro,
             X4Database.Instance.X4Size.Get(item.SizeID),
             item.Mass,
@@ -105,9 +105,9 @@ class ShipBuilder
             item.MissileStorage,
             item.DroneStorage,
             item.CargoSize,
-            _ShipHangerManager.Get(ware.ID),
-            _ShipLoadoutManager.Get(ware.ID),
-            _WareEquipmentManager.Get(ware.ID).ToDictionary(x => x.ConnectionName)
+            _shipHangerManager.Get(ware.ID),
+            _shipLoadoutManager.Get(ware.ID),
+            _wareEquipmentManager.Get(ware.ID).ToDictionary(x => x.ConnectionName)
         );
     }
 }

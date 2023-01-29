@@ -22,9 +22,10 @@ public partial class SelectLoadoutDialog : Window
     /// </summary>
     public static bool ShowImportDialog()
     {
-        var wnd = new SelectLoadoutDialog();
-
-        wnd.Owner = Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive) ?? Application.Current.MainWindow;
+        var wnd = new SelectLoadoutDialog
+        {
+            Owner = Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive) ?? Application.Current.MainWindow
+        };
 
         return wnd.ShowDialog() == true;
     }

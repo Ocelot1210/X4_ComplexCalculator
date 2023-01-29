@@ -16,67 +16,67 @@ class WareBuilder
     /// <summary>
     /// DB接続情報
     /// </summary>
-    private readonly IDbConnection _Conn;
+    private readonly IDbConnection _conn;
 
 
     /// <summary>
     /// カーゴ種別一覧
     /// </summary>
-    private readonly TransportTypeManager _TransportTypeManager;
+    private readonly TransportTypeManager _transportTypeManager;
 
 
     /// <summary>
     /// タグ情報一覧
     /// </summary>
-    private readonly WareTagsManager _WareTagsManager;
+    private readonly WareTagsManager _wareTagsManager;
 
 
     /// <summary>
     /// ウェア所有派閥情報一覧
     /// </summary>
-    private readonly WareOwnerManager _WareOwnerManager;
+    private readonly WareOwnerManager _wareOwnerManager;
 
 
     /// <summary>
     /// ウェア生産に必要なウェア情報一覧
     /// </summary>
-    private readonly WareResourceManager _WareResourceManager;
+    private readonly WareResourceManager _wareResourceManager;
 
 
     /// <summary>
     /// ウェアの生産量と生産時間一覧
     /// </summary>
-    private readonly WareProductionManager _WareProductionManager;
+    private readonly WareProductionManager _wareProductionManager;
 
 
     /// <summary>
     /// ウェア種別一覧
     /// </summary>
-    private readonly WareGroupManager _WareGroupManager;
+    private readonly WareGroupManager _wareGroupManager;
 
 
     /// <summary>
     /// ウェア生産時の追加効果一覧
     /// </summary>
-    private readonly WareEffectManager _WareEffectManager;
+    private readonly WareEffectManager _wareEffectManager;
 
 
     /// <summary>
     /// 艦船情報ビルダ
     /// </summary>
-    private readonly ShipBuilder _ShipBuilder;
+    private readonly ShipBuilder _shipBuilder;
 
 
     /// <summary>
     /// モジュール情報ビルダ
     /// </summary>
-    private readonly ModuleBuilder _ModuleBuilder;
+    private readonly ModuleBuilder _moduleBuilder;
 
 
     /// <summary>
     /// 装備情報ビルダ
     /// </summary>
-    private readonly EquipmentBuilder _EquipmentBuilder;
+    private readonly EquipmentBuilder _equipmentBuilder;
     #endregion
 
 
@@ -87,22 +87,22 @@ class WareBuilder
     /// <param name="conn">DB接続情報</param>
     public WareBuilder(IDbConnection conn, TransportTypeManager transportTypeManager)
     {
-        _Conn = conn;
+        _conn = conn;
 
-        _TransportTypeManager = transportTypeManager;
-        _WareTagsManager = new(conn);
-        _WareOwnerManager = new(conn);
-        _WareResourceManager = new(conn);
-        _WareProductionManager = new(conn);
-        _WareGroupManager = new(conn);
-        _WareEffectManager = new(conn);
+        _transportTypeManager = transportTypeManager;
+        _wareTagsManager = new(conn);
+        _wareOwnerManager = new(conn);
+        _wareResourceManager = new(conn);
+        _wareProductionManager = new(conn);
+        _wareGroupManager = new(conn);
+        _wareEffectManager = new(conn);
 
 
         var wareEquipmentManager = new WareEquipmentManager(conn);
 
-        _ShipBuilder = new(conn, wareEquipmentManager);
-        _ModuleBuilder = new(conn, _WareProductionManager, transportTypeManager, wareEquipmentManager);
-        _EquipmentBuilder = new(conn);
+        _shipBuilder = new(conn, wareEquipmentManager);
+        _moduleBuilder = new(conn, _wareProductionManager, transportTypeManager, wareEquipmentManager);
+        _equipmentBuilder = new(conn);
     }
 
 
@@ -113,49 +113,49 @@ class WareBuilder
     /// <returns>全ウェア情報の列挙</returns>
     public IEnumerable<IWare> BuildAll()
     {
-        const string sql1 = @"
+        const string SQL_1 = @"
 SELECT *
 FROM   Ware
 WHERE  TransportTypeID IS NOT NULL AND TransportTypeID <> 'inventory'";
 
-        foreach (var item in _Conn.Query<X4_DataExporterWPF.Entity.Ware>(sql1))
+        foreach (var item in _conn.Query<X4_DataExporterWPF.Entity.Ware>(SQL_1))
         {
             var ware = new Ware(
                 item.WareID,
                 item.Name,
-                _WareGroupManager.TryGet(item.WareGroupID ?? ""),
-                _TransportTypeManager.Get(item.TransportTypeID!),
+                _wareGroupManager.TryGet(item.WareGroupID ?? ""),
+                _transportTypeManager.Get(item.TransportTypeID!),
                 item.Description,
                 item.Volume,
                 item.MinPrice,
                 item.AvgPrice,
                 item.MaxPrice,
-                _WareOwnerManager.Get(item.WareID),
-                _WareProductionManager.Get(item.WareID),
-                _WareResourceManager.Get(item.WareID),
-                _WareTagsManager.Get(item.WareID),
-                _WareEffectManager.Get(item.WareID)
+                _wareOwnerManager.Get(item.WareID),
+                _wareProductionManager.Get(item.WareID),
+                _wareResourceManager.Get(item.WareID),
+                _wareTagsManager.Get(item.WareID),
+                _wareEffectManager.Get(item.WareID)
             );
 
 
             // ステーションモジュールの場合
             if (ware.Tags.Contains("module"))
             {
-                yield return _ModuleBuilder.Builld(ware);
+                yield return _moduleBuilder.Builld(ware);
                 continue;
             }
 
             // 装備の場合
             if (ware.Tags.Contains("equipment"))
             {
-                yield return _EquipmentBuilder.Build(ware);
+                yield return _equipmentBuilder.Build(ware);
                 continue;
             }
 
             // 艦船の場合
             if (ware.Tags.Contains("ship"))
             {
-                yield return _ShipBuilder.Build(ware);
+                yield return _shipBuilder.Build(ware);
                 continue;
             }
 

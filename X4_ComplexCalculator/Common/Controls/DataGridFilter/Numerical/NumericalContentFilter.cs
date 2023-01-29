@@ -13,7 +13,7 @@ class NumericalContentFilter : IDataGridFilter
     /// <summary>
     /// 選択値
     /// </summary>
-    private readonly decimal? _Value;
+    private readonly decimal? _value;
     #endregion
 
 
@@ -31,7 +31,7 @@ class NumericalContentFilter : IDataGridFilter
 
 
     /// <inheritdoc/>
-    public bool IsFilterEnabled => _Value is not null;
+    public bool IsFilterEnabled => _value is not null;
     #endregion
 
 
@@ -49,7 +49,7 @@ class NumericalContentFilter : IDataGridFilter
 
         if (decimal.TryParse(text, out var result))
         {
-            _Value = result;
+            _value = result;
         }
         InputText = text;
         Conditinos = conditions;
@@ -60,7 +60,7 @@ class NumericalContentFilter : IDataGridFilter
     public bool IsMatch(object? value)
     {
         // 値が無効ならフィルタ無しと見なす
-        if (_Value is null)
+        if (_value is null)
         {
             return true;
         }
@@ -75,12 +75,12 @@ class NumericalContentFilter : IDataGridFilter
 
         var ret = Conditinos switch
         {
-            NumericalFilterConditinos.Equals =>               _Value == val,
-            NumericalFilterConditinos.NotEquals =>            _Value != val,
-            NumericalFilterConditinos.GreaterThan =>          _Value <  val,
-            NumericalFilterConditinos.GreaterThanOrEqualTo => _Value <= val,
-            NumericalFilterConditinos.LessThan =>             _Value >  val,
-            NumericalFilterConditinos.LessThanOrEqualTo =>    _Value >= val,
+            NumericalFilterConditinos.Equals =>               _value == val,
+            NumericalFilterConditinos.NotEquals =>            _value != val,
+            NumericalFilterConditinos.GreaterThan =>          _value <  val,
+            NumericalFilterConditinos.GreaterThanOrEqualTo => _value <= val,
+            NumericalFilterConditinos.LessThan =>             _value >  val,
+            NumericalFilterConditinos.LessThanOrEqualTo =>    _value >= val,
             _ => throw new NotSupportedException(),
         };
 
@@ -93,7 +93,7 @@ class NumericalContentFilter : IDataGridFilter
     {
         if (other is NumericalContentFilter filter)
         {
-            return _Value == filter._Value && Conditinos == filter.Conditinos;
+            return _value == filter._value && Conditinos == filter.Conditinos;
         }
 
         return false;

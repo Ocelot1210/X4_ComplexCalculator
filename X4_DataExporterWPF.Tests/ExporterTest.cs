@@ -13,8 +13,8 @@ namespace X4_DataExporterWPF.Tests;
 
 public class ExporterTest
 {
-private static readonly IProgress<(int, int)>? pg = null;
-    private static readonly CancellationToken ct = default;
+    private static readonly IProgress<(int, int)>? _Pg = null;
+    private static readonly CancellationToken _Ct = default;
 
     /// <summary>
     /// モジュールの最大収容人数が省略されている場合、0 として扱う。
@@ -40,7 +40,7 @@ private static readonly IProgress<(int, int)>? pg = null;
             ".ToXDocument();
         var exporter = new ModuleExporter(new DummyCat(macroXml), wareXml);
 
-        Assert.Equal(exporter.GetRecordsAsync(pg, ct).ToEnumerable(), new[] { new Module(
+        Assert.Equal(exporter.GetRecordsAsync(_Pg, _Ct).ToEnumerable(), new[] { new Module(
             ModuleID: "module_arg_hab_l_01",
             ModuleTypeID: "habitation",
             Macro: "hab_arg_l_01_macro",
@@ -76,7 +76,7 @@ private static readonly IProgress<(int, int)>? pg = null;
             ".ToXDocument();
         var exporter = new ModuleExporter(new DummyCat(macroXml), wareXml);
 
-        Assert.Equal(exporter.GetRecordsAsync(pg, ct).ToEnumerable(), new[] { new Module(
+        Assert.Equal(exporter.GetRecordsAsync(_Pg, _Ct).ToEnumerable(), new[] { new Module(
             ModuleID: "module_arg_prod_foodrations_01",
             ModuleTypeID: "production",
             Macro: "prod_arg_foodrations_macro",
@@ -133,7 +133,7 @@ private static readonly IProgress<(int, int)>? pg = null;
             ".ToXDocument();
         var exporter = new WareEffectExporter(xml);
 
-        Assert.Equal(exporter.GetRecords(pg, ct), new[] { new WareEffect(
+        Assert.Equal(exporter.GetRecords(_Pg, _Ct), new[] { new WareEffect(
             WareID: "advancedcomposites",
             Method: "default",
             EffectID: "work",
@@ -160,7 +160,7 @@ private static readonly IProgress<(int, int)>? pg = null;
             ".ToXDocument();
         var exporter = new WareGroupExporter(new DummyCat(xml), new DummyLanguageResolver());
 
-        Assert.Equal(exporter.GetRecordsAsync(pg, ct).ToEnumerable(), new[] { new WareGroup(
+        Assert.Equal(exporter.GetRecordsAsync(_Pg, _Ct).ToEnumerable(), new[] { new WareGroup(
             WareGroupID: "gases",
             Name: "{20215,401}",
             Tier: 0
@@ -176,14 +176,14 @@ private static readonly IProgress<(int, int)>? pg = null;
         /// <summary>
         /// OpenIndexXml で返す XML
         /// </summary>
-        private readonly XDocument _Xml;
+        private readonly XDocument _xml;
 
 
         /// <summary>
         /// 引数に渡された XML を返すだけのダミー CatFile クラスを初期化する
         /// </summary>
         /// <param name="xml"></param>
-        internal DummyCat(XDocument xml) => _Xml = xml;
+        internal DummyCat(XDocument xml) => _xml = xml;
 
 
         public Task<Stream> OpenFileAsync(string filePath, CancellationToken cancellationToken)
@@ -198,13 +198,13 @@ private static readonly IProgress<(int, int)>? pg = null;
         /// インデックスの解決を行う代わりに、コンストラクタに渡された XML を返す
         /// </summary>
         /// <returns>コンストラクタで与えられた XML</returns>
-        public Task<XDocument> OpenIndexXmlAsync(string indexFilePath, string name, CancellationToken cancellationToken = default) => Task.FromResult(_Xml);
+        public Task<XDocument> OpenIndexXmlAsync(string indexFilePath, string name, CancellationToken cancellationToken = default) => Task.FromResult(_xml);
 
 
-        public Task<XDocument> OpenXmlAsync(string filePath, CancellationToken cancellationToken = default) => Task.FromResult(_Xml);
+        public Task<XDocument> OpenXmlAsync(string filePath, CancellationToken cancellationToken = default) => Task.FromResult(_xml);
 
 
-        public Task<XDocument?> TryOpenXmlAsync(string filePath, CancellationToken cancellationToken = default) => Task.FromResult<XDocument?>(_Xml);
+        public Task<XDocument?> TryOpenXmlAsync(string filePath, CancellationToken cancellationToken = default) => Task.FromResult<XDocument?>(_xml);
     }
 
 

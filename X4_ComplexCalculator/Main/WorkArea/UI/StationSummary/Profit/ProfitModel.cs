@@ -15,12 +15,12 @@ class ProfitModel : BindableBase
     /// <summary>
     /// 製品一覧
     /// </summary>
-    private readonly IProductsInfo _Products;
+    private readonly IProductsInfo _products;
 
     /// <summary>
     /// 利益
     /// </summary>
-    private long _Profit = 0;
+    private long _profit = 0;
     #endregion
 
 
@@ -28,7 +28,7 @@ class ProfitModel : BindableBase
     /// <summary>
     /// 利益詳細
     /// </summary>
-    public ObservableCollection<ProductsGridItem> ProfitDetails => _Products.Products;
+    public ObservableCollection<ProductsGridItem> ProfitDetails => _products.Products;
 
 
     /// <summary>
@@ -36,8 +36,8 @@ class ProfitModel : BindableBase
     /// </summary>
     public long Profit
     {
-        get => _Profit;
-        set => SetProperty(ref _Profit, value);
+        get => _profit;
+        set => SetProperty(ref _profit, value);
     }
     #endregion
 
@@ -48,9 +48,9 @@ class ProfitModel : BindableBase
     /// <param name="products">製品一覧</param>
     public ProfitModel(IProductsInfo products)
     {
-        _Products = products;
-        _Products.Products.CollectionChanged += OnProductsCollectionChanged;
-        _Products.Products.CollectionPropertyChanged += OnProductsPropertyChanged;
+        _products = products;
+        _products.Products.CollectionChanged += OnProductsCollectionChanged;
+        _products.Products.CollectionPropertyChanged += OnProductsPropertyChanged;
     }
 
 
@@ -59,8 +59,8 @@ class ProfitModel : BindableBase
     /// </summary>
     public void Dispose()
     {
-        _Products.Products.CollectionChanged -= OnProductsCollectionChanged;
-        _Products.Products.CollectionPropertyChanged -= OnProductsPropertyChanged;
+        _products.Products.CollectionChanged -= OnProductsCollectionChanged;
+        _products.Products.CollectionPropertyChanged -= OnProductsPropertyChanged;
     }
 
 
@@ -86,7 +86,7 @@ class ProfitModel : BindableBase
         // リセットされた場合
         if (e.Action == NotifyCollectionChangedAction.Reset)
         {
-            Profit = _Products.Products.Sum(x => x.Price);
+            Profit = _products.Products.Sum(x => x.Price);
         }
     }
 

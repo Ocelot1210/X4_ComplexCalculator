@@ -21,13 +21,13 @@ public class RaceExporter : IExporter
     /// <summary>
     /// catファイルオブジェクト
     /// </summary>
-    private readonly CatFile _CatFile;
+    private readonly CatFile _catFile;
 
 
     /// <summary>
     /// 言語解決用オブジェクト
     /// </summary>
-    private readonly ILanguageResolver _Resolver;
+    private readonly ILanguageResolver _resolver;
 
 
     /// <summary>
@@ -37,8 +37,8 @@ public class RaceExporter : IExporter
     /// <param name="resolver">言語解決用オブジェクト</param>
     public RaceExporter(CatFile catFile, ILanguageResolver resolver)
     {
-        _CatFile = catFile;
-        _Resolver = resolver;
+        _catFile = catFile;
+        _resolver = resolver;
     }
 
 
@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS Race
     /// <returns>読み出した Race データ</returns>
     private async IAsyncEnumerable<Race> GetRecords(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var raceXml = await _CatFile.OpenXmlAsync("libraries/races.xml", cancellationToken);
+        var raceXml = await _catFile.OpenXmlAsync("libraries/races.xml", cancellationToken);
         if (raceXml?.Root is null) yield break;
 
         var maxSteps = raceXml.Root.Elements().Count();
@@ -92,19 +92,19 @@ CREATE TABLE IF NOT EXISTS Race
             var raceID = race.Attribute("id")?.Value;
             if (string.IsNullOrEmpty(raceID)) continue;
 
-            var name = _Resolver.Resolve(race.Attribute("name")?.Value ?? "");
+            var name = _resolver.Resolve(race.Attribute("name")?.Value ?? "");
             if (string.IsNullOrEmpty(name)) continue;
 
-            var shortName = _Resolver.Resolve(race.Attribute("shortname")?.Value ?? "");
+            var shortName = _resolver.Resolve(race.Attribute("shortname")?.Value ?? "");
 
-            var description = _Resolver.Resolve(race.Attribute("description")?.Value ?? "");
+            var description = _resolver.Resolve(race.Attribute("description")?.Value ?? "");
 
             yield return new Race(
                 raceID,
                 name,
                 shortName,
                 description,
-                await Util.DDS2PngAsync(_CatFile, "assets/fx/gui/textures/races", race.Element("icon")?.Attribute("active")?.Value, cancellationToken)
+                await Util.DDS2PngAsync(_catFile, "assets/fx/gui/textures/races", race.Element("icon")?.Attribute("active")?.Value, cancellationToken)
             );
         }
 

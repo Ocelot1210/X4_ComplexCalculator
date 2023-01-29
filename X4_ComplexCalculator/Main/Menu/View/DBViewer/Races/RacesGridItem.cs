@@ -12,7 +12,7 @@ class RacesGridItem : BindableBase
     /// <summary>
     /// 種族
     /// </summary>
-    private readonly IRace _Race;
+    private readonly IRace _race;
     #endregion
 
 
@@ -20,19 +20,19 @@ class RacesGridItem : BindableBase
     /// <summary>
     /// 種族ID
     /// </summary>
-    public string ID => _Race.RaceID;
+    public string ID => _race.RaceID;
 
 
     /// <summary>
     /// 名称
     /// </summary>
-    public string Name => _Race.Name;
+    public string Name => _race.Name;
 
 
     /// <summary>
     /// 略称
     /// </summary>
-    public string ShortName => _Race.ShortName;
+    public string ShortName => _race.ShortName;
     #endregion
 
 
@@ -42,6 +42,6 @@ class RacesGridItem : BindableBase
     /// <param name="race">種族</param>
     public RacesGridItem(IRace race)
     {
-        _Race = race;
+        _race = race;
     }
 }

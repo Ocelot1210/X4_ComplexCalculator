@@ -16,7 +16,7 @@ public class ClearSortOrderDataGrid : DataGrid
     /// <summary>
     /// ICollectionView.SortDescriptionsの前回値
     /// </summary>
-    private INotifyCollectionChanged? _SortDescriptions;
+    private INotifyCollectionChanged? _sortDescriptions;
     #endregion
 
 
@@ -45,23 +45,23 @@ public class ClearSortOrderDataGrid : DataGrid
         {
             if (view.SortDescriptions is INotifyCollectionChanged collection)
             {
-                if (_SortDescriptions != null)
+                if (_sortDescriptions != null)
                 {
-                    _SortDescriptions.CollectionChanged -= SortDescription_CollectionChanged;
+                    _sortDescriptions.CollectionChanged -= SortDescription_CollectionChanged;
                 }
 
                 collection.CollectionChanged += SortDescription_CollectionChanged;
 
-                _SortDescriptions = collection;
+                _sortDescriptions = collection;
                 clearPrevValueNeeded = false;
             }
         }
 
         // 前回値クリアが必要ならクリアする
-        if (clearPrevValueNeeded && _SortDescriptions != null)
+        if (clearPrevValueNeeded && _sortDescriptions != null)
         {
-            _SortDescriptions.CollectionChanged -= SortDescription_CollectionChanged;
-            _SortDescriptions = null;
+            _sortDescriptions.CollectionChanged -= SortDescription_CollectionChanged;
+            _sortDescriptions = null;
         }
     }
 

@@ -17,13 +17,13 @@ class ShipLoadoutManager
     /// <summary>
     /// 艦船のロードアウト情報一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IReadOnlyList<IShipLoadout>> _ShipLoadouts;
+    private readonly IReadOnlyDictionary<string, IReadOnlyList<IShipLoadout>> _shipLoadouts;
 
 
     /// <summary>
     /// ダミー用のロードアウト情報
     /// </summary>
-    private readonly IReadOnlyList<IShipLoadout> _EmptyLoadouts = Array.Empty<IShipLoadout>();
+    private readonly IReadOnlyList<IShipLoadout> _emptyLoadouts = Array.Empty<IShipLoadout>();
     #endregion
 
 
@@ -33,7 +33,7 @@ class ShipLoadoutManager
     /// <param name="conn">DB接続情報</param>
     public ShipLoadoutManager(IDbConnection conn)
     {
-        const string sql = @"
+        const string SQL = @"
 SELECT
 	ShipLoadout.ShipID,
 	ShipLoadout.LoadoutID,
@@ -47,7 +47,7 @@ FROM
 
 WHERE
 	ShipLoadout.MacroName = Equipment.MacroName";
-        _ShipLoadouts = conn.Query<ShipLoadout>(sql)
+        _shipLoadouts = conn.Query<ShipLoadout>(SQL)
             .GroupBy(x => x.ID)
             .ToDictionary(x => x.Key, x => x.ToArray() as IReadOnlyList<IShipLoadout>);
     }
@@ -60,7 +60,7 @@ WHERE
     /// <returns>艦船IDに対応するロードアウト情報一覧</returns>
     public IReadOnlyDictionary<string, IReadOnlyList<IShipLoadout>> Get(string id)
     {
-        return (_ShipLoadouts.TryGetValue(id, out var loadouts) ? loadouts : _EmptyLoadouts)
+        return (_shipLoadouts.TryGetValue(id, out var loadouts) ? loadouts : _emptyLoadouts)
                 .GroupBy(x => x.LoadoutID)
                 .ToDictionary(x => x.Key, x => x.ToArray() as IReadOnlyList<IShipLoadout>);
     }

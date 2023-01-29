@@ -12,13 +12,13 @@ public class StorageDetailsListItem : BindableBase
     /// <summary>
     /// モジュール
     /// </summary>
-    private readonly IX4Module _Module;
+    private readonly IX4Module _module;
 
 
     /// <summary>
     /// モジュール数
     /// </summary>
-    private long _ModuleCount;
+    private long _moduleCount;
     #endregion
 
 
@@ -26,13 +26,13 @@ public class StorageDetailsListItem : BindableBase
     /// <summary>
     /// モジュールID
     /// </summary>
-    public string ModuleID => _Module.ID;
+    public string ModuleID => _module.ID;
 
 
     /// <summary>
     /// モジュール名
     /// </summary>
-    public string ModuleName => _Module.Name;
+    public string ModuleName => _module.Name;
 
 
     /// <summary>
@@ -47,10 +47,10 @@ public class StorageDetailsListItem : BindableBase
     /// </summary>
     public long ModuleCount
     {
-        get => _ModuleCount;
+        get => _moduleCount;
         set
         {
-            if (SetProperty(ref _ModuleCount, value))
+            if (SetProperty(ref _moduleCount, value))
             {
                 RaisePropertyChanged(nameof(TotalCapacity));
             }
@@ -79,7 +79,7 @@ public class StorageDetailsListItem : BindableBase
     /// <param name="transportType">保管庫種別</param>
     public StorageDetailsListItem(IX4Module module, long moduleCount, ITransportType transportType)
     {
-        _Module = module;
+        _module = module;
         ModuleCount = moduleCount;
         Capacity = module.Storage.Amount / module.Storage.Types.Count;
         TransportType = transportType;

@@ -80,7 +80,7 @@ class SettingDatabase : DBConnection
     /// <returns>使用可能なプリセットID</returns>
     public long GetLastModulePresetsID(string moduleID)
     {
-        const string sql = @"
+        const string SQL = @"
 SELECT
     ifnull(MIN( PresetID + 1 ), 0) AS PresetID
 FROM
@@ -89,7 +89,7 @@ WHERE
 	ModuleID = :ModuleID AND
     ( PresetID + 1 ) NOT IN ( SELECT PresetID FROM ModulePresets WHERE ModuleID = :ModuleID)";
 
-        return QuerySingle<long>(sql, new { ModuleID = moduleID });
+        return QuerySingle<long>(SQL, new { ModuleID = moduleID });
     }
 
 
@@ -118,9 +118,7 @@ WHERE
     /// <returns>装備編集画面でチェックされた派閥一覧のHashSet</returns>
     public HashSet<string> GetCheckedFactionsAtSelectEquipmentWindow()
     {
-        const string sql = "SELECT ID FROM SelectModuleEquipmentCheckStateFactions";
-
-        return new HashSet<string>(Query<string>(sql));
+        return new HashSet<string>(Query<string>("SELECT ID FROM SelectModuleEquipmentCheckStateFactions"));
     }
 
 
@@ -148,9 +146,7 @@ WHERE
     /// <returns>指定したモジュールに対応するプリセットの列挙</returns>
     public IEnumerable<(long ID, string Name)> GetModulePreset(string moduleID)
     {
-        const string sql = "SELECT DISTINCT PresetID, PresetName FROM ModulePresets WHERE ModuleID = @ModuleID";
-
-        return Query<(long, string)>(sql, new { ModuleID = moduleID });
+        return Query<(long, string)>("SELECT DISTINCT PresetID, PresetName FROM ModulePresets WHERE ModuleID = @ModuleID", new { ModuleID = moduleID });
     }
 
 
@@ -166,15 +162,19 @@ WHERE
     {
         BeginTransaction(db =>
         {
-            const string sql1 = "INSERT INTO ModulePresets(ModuleID, PresetID, PresetName) VALUES(:ModuleID, :PresetID, :PresetName)";
-            db.Execute(sql1, new { ModuleID = moduleID, PresetID = presetID, PresetName = presetName });
+            db.Execute(
+                "INSERT INTO ModulePresets(ModuleID, PresetID, PresetName) VALUES(:ModuleID, :PresetID, :PresetName)",
+                new { ModuleID = moduleID, PresetID = presetID, PresetName = presetName }
+            );
 
 
             var data = equipments
-                .Select(x => new { ModuleID = moduleID, PresetID = presetID, EquipmentID = x.ID, EquipmentTypeID = x.EquipmentType.EquipmentTypeID });
+                .Select(x => new { ModuleID = moduleID, PresetID = presetID, EquipmentID = x.ID, x.EquipmentType.EquipmentTypeID });
 
-            const string sql2 = @"INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES(@ModuleID, @PresetID, @EquipmentID, @EquipmentTypeID)";
-            db.Execute(sql2, data);
+            db.Execute(
+                "INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES(@ModuleID, @PresetID, @EquipmentID, @EquipmentTypeID)",
+                data
+            );
         });
     }
 
@@ -190,11 +190,15 @@ WHERE
         {
             var param = new { ModuleID = moduleID, PresetID = presetID };
 
-            const string sql1 = "DELETE FROM ModulePresets WHERE ModuleID = :ModuleID AND PresetID = :PresetID";
-            db.Execute(sql1, param);
+            db.Execute(
+                "DELETE FROM ModulePresets WHERE ModuleID = :ModuleID AND PresetID = :PresetID",
+                param
+            );
 
-            const string sql2 = "DELETE FROM ModulePresetsEquipment WHERE ModuleID = :ModuleID AND PresetID = :PresetID";
-            db.Execute(sql2, param);
+            db.Execute(
+                "DELETE FROM ModulePresetsEquipment WHERE ModuleID = :ModuleID AND PresetID = :PresetID",
+                param
+            );
         });
     }
 
@@ -210,15 +214,19 @@ WHERE
         BeginTransaction(db =>
         {
             // 前回値削除
-            const string sql1 = "DELETE FROM ModulePresetsEquipment WHERE ModuleID = :ModuleID AND PresetID = :PresetID";
-            db.Execute(sql1, new { ModuleID = moduleID, PresetID = presetID });
+            db.Execute(
+                "DELETE FROM ModulePresetsEquipment WHERE ModuleID = :ModuleID AND PresetID = :PresetID",
+                new { ModuleID = moduleID, PresetID = presetID }
+            );
 
 
             var data = equipments
-                .Select(x => new { ModuleID = moduleID, PresetID = presetID, EquipmentID = x.ID, EquipmentTypeID = x.EquipmentType.EquipmentTypeID });
+                .Select(x => new { ModuleID = moduleID, PresetID = presetID, EquipmentID = x.ID, x.EquipmentType.EquipmentTypeID });
 
-            const string sql2 = @"INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES(@ModuleID, @PresetID, @EquipmentID, @EquipmentTypeID)";
-            db.Execute(sql2, data);
+            db.Execute(
+                "INSERT INTO ModulePresetsEquipment(ModuleID, PresetID, EquipmentID, EquipmentType) VALUES(@ModuleID, @PresetID, @EquipmentID, @EquipmentTypeID)",
+                data
+            );
         });
     }
 

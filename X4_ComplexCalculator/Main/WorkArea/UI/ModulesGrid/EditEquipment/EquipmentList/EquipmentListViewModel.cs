@@ -22,19 +22,19 @@ class EquipmentListViewModel : BindableBase, IDisposable
     /// <summary>
     /// 装備一覧用Model
     /// </summary>
-    private readonly EquipmentListModel _Model;
+    private readonly EquipmentListModel _model;
 
 
     /// <summary>
     /// ゴミ箱
     /// </summary>
-    private readonly CompositeDisposable _Disposables = new();
+    private readonly CompositeDisposable _disposables = new();
 
 
     /// <summary>
     /// 派閥一覧
     /// </summary>
-    private readonly ObservablePropertyChangedCollection<FactionsListItem> _Factions;
+    private readonly ObservablePropertyChangedCollection<FactionsListItem> _factions;
     #endregion
 
 
@@ -42,7 +42,7 @@ class EquipmentListViewModel : BindableBase, IDisposable
     /// <summary>
     /// タイトル文字列
     /// </summary>
-    public string Title => _Model.Title;
+    public string Title => _model.Title;
 
 
     /// <summary>
@@ -54,7 +54,7 @@ class EquipmentListViewModel : BindableBase, IDisposable
     /// <summary>
     /// 装備中の装備
     /// </summary>
-    public ObservableCollection<EquipmentListItem> Equipped => _Model.Equipped;
+    public ObservableCollection<EquipmentListItem> Equipped => _model.Equipped;
 
 
     /// <summary>
@@ -126,55 +126,55 @@ class EquipmentListViewModel : BindableBase, IDisposable
         ObservablePropertyChangedCollection<FactionsListItem> factions
     )
     {
-        _Model = model;
+        _model = model;
 
-        _Factions = factions;
-        _Factions.CollectionPropertyChanged += Factions_CollectionPropertyChanged;
+        _factions = factions;
+        _factions.CollectionPropertyChanged += Factions_CollectionPropertyChanged;
 
         // 選択中の装備サイズ
-        SelectedSize = _Model.SelectedSize
+        SelectedSize = _model.SelectedSize
             .ToReactivePropertyAsSynchronized(x => x.Value)
-            .AddTo(_Disposables);
+            .AddTo(_disposables);
 
         // 装備可能個数
-        MaxAmount = _Model
+        MaxAmount = _model
             .ObserveProperty(x => x.MaxAmount)
             .ToReadOnlyReactiveProperty()
-            .AddTo(_Disposables);
+            .AddTo(_disposables);
 
         // 装備中の個数
-        EquippedCount = _Model
+        EquippedCount = _model
             .ObserveProperty(x => x.EquippedCount)
             .ToReadOnlyReactiveProperty()
-            .AddTo(_Disposables);
+            .AddTo(_disposables);
 
         // 装備追加ボタンクリック
         AddButtonClickedCommand = EquippedCount
             .CombineLatest(MaxAmount, (eqp, max) => eqp < max)
             .ToReactiveCommand()
-            .AddTo(_Disposables);
+            .AddTo(_disposables);
         AddButtonClickedCommand
             .Subscribe(AddButtonClicked)
-            .AddTo(_Disposables);
+            .AddTo(_disposables);
 
         // 装備削除ボタンクリック
         RemoveButtonClickedCommand = EquippedCount
             .Select(x => 0 < x)
             .ToReactiveCommand()
-            .AddTo(_Disposables);
+            .AddTo(_disposables);
         RemoveButtonClickedCommand
             .Subscribe(RemoveButtonClicked)
-            .AddTo(_Disposables);
+            .AddTo(_disposables);
 
         // 未保存か
-        Unsaved = _Model.Unsaved
+        Unsaved = _model.Unsaved
             .ToReactiveProperty()
-            .AddTo(_Disposables);
+            .AddTo(_disposables);
 
         // 選択中のプリセット
-        SelectedPreset = _Model.SelectedPreset
+        SelectedPreset = _model.SelectedPreset
             .ToReactivePropertyAsSynchronized(x => x.Value)
-            .AddTo(_Disposables);
+            .AddTo(_disposables);
 
 
         EquipmentsView = (ListCollectionView)CollectionViewSource.GetDefaultView(model.Equippable);
@@ -186,10 +186,10 @@ class EquipmentListViewModel : BindableBase, IDisposable
         // 装備一覧更新用
         SearchEquipmentName
             .Subscribe(x => EquipmentsView.Refresh())
-            .AddTo(_Disposables);
+            .AddTo(_disposables);
         SelectedSize
             .Subscribe(x => { EquipmentsView.Refresh(); EquippedView.Refresh(); })
-            .AddTo(_Disposables);
+            .AddTo(_disposables);
     }
 
 
@@ -200,8 +200,8 @@ class EquipmentListViewModel : BindableBase, IDisposable
     /// </summary>
     public void Dispose()
     {
-        _Factions.CollectionPropertyChanged -= Factions_CollectionPropertyChanged;
-        _Disposables.Dispose();
+        _factions.CollectionPropertyChanged -= Factions_CollectionPropertyChanged;
+        _disposables.Dispose();
     }
 
 
@@ -221,7 +221,7 @@ class EquipmentListViewModel : BindableBase, IDisposable
     /// </summary>
     void AddButtonClicked()
     {
-        if (_Model.AddSelectedEquipments())
+        if (_model.AddSelectedEquipments())
         {
             // 装備が追加された場合
             Unsaved.Value = true;
@@ -234,7 +234,7 @@ class EquipmentListViewModel : BindableBase, IDisposable
     /// </summary>
     void RemoveButtonClicked()
     {
-        if (_Model.RemoveSelectedEquipments())
+        if (_model.RemoveSelectedEquipments())
         {
             // 装備が削除された場合
             Unsaved.Value = true;
@@ -285,7 +285,7 @@ class EquipmentListViewModel : BindableBase, IDisposable
             }
 
             // 所有派閥でなければ表示しない
-            if (!item.Equipment.Owners.Intersect(_Factions.Where(x => x.IsChecked).Select(x => x.Faction)).Any())
+            if (!item.Equipment.Owners.Intersect(_factions.Where(x => x.IsChecked).Select(x => x.Faction)).Any())
             {
                 return false;
             }

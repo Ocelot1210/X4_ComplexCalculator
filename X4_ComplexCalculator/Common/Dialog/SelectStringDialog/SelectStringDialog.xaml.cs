@@ -43,9 +43,10 @@ public partial class SelectStringDialog : Window
             (string)LocalizeDictionary.Instance.GetLocalizedObject(description, null, null),
             initialString,
             isValidInput
-        );
-
-        wnd.Owner = Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive) ?? Application.Current.MainWindow;
+        )
+        {
+            Owner = Application.Current.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive) ?? Application.Current.MainWindow
+        };
 
         if (hideCancelButton)
         {

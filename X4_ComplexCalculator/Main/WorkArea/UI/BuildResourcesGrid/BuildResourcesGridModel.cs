@@ -25,25 +25,25 @@ class BuildResourcesGridModel : IDisposable
     /// <summary>
     /// モジュール一覧
     /// </summary>
-    private readonly IModulesInfo _Modules;
+    private readonly IModulesInfo _modules;
 
 
     /// <summary>
     /// 建造リソース情報
     /// </summary>
-    private readonly IBuildResourcesInfo _BuildResources;
+    private readonly IBuildResourcesInfo _buildResources;
 
 
     /// <summary>
     /// 前回値オプション保存用
     /// </summary>
-    private readonly Dictionary<string, BuildResourcesGridItem> _OptionsBakDict = new();
+    private readonly Dictionary<string, BuildResourcesGridItem> _optionsBakDict = new();
 
 
     /// <summary>
     /// 建造リソース計算用
     /// </summary>
-    private readonly BuildResourceCalculator _Calculator = BuildResourceCalculator.Instance;
+    private readonly BuildResourceCalculator _calculator = BuildResourceCalculator.Instance;
     #endregion
 
 
@@ -51,7 +51,7 @@ class BuildResourcesGridModel : IDisposable
     /// <summary>
     /// 建造に必要なリソース
     /// </summary>
-    public ObservablePropertyChangedCollection<BuildResourcesGridItem> Resources => _BuildResources.BuildResources;
+    public ObservablePropertyChangedCollection<BuildResourcesGridItem> Resources => _buildResources.BuildResources;
     #endregion
 
 
@@ -62,11 +62,11 @@ class BuildResourcesGridModel : IDisposable
     /// <param name="buildResources">建造リソース情報</param>
     public BuildResourcesGridModel(IModulesInfo modules, IBuildResourcesInfo buildResources)
     {
-        _Modules = modules;
-        _BuildResources = buildResources;
+        _modules = modules;
+        _buildResources = buildResources;
 
-        _Modules.Modules.CollectionChangedAsync += OnModulesCollectionChanged;
-        _Modules.Modules.CollectionPropertyChangedAsync += OnModulesPropertyChanged;
+        _modules.Modules.CollectionChangedAsync += OnModulesCollectionChanged;
+        _modules.Modules.CollectionPropertyChangedAsync += OnModulesPropertyChanged;
     }
 
 
@@ -76,8 +76,8 @@ class BuildResourcesGridModel : IDisposable
     public void Dispose()
     {
         Resources.Clear();
-        _Modules.Modules.CollectionChangedAsync -= OnModulesCollectionChanged;
-        _Modules.Modules.CollectionPropertyChangedAsync -= OnModulesPropertyChanged;
+        _modules.Modules.CollectionChangedAsync -= OnModulesCollectionChanged;
+        _modules.Modules.CollectionPropertyChangedAsync -= OnModulesPropertyChanged;
     }
 
 
@@ -159,23 +159,23 @@ class BuildResourcesGridModel : IDisposable
             // 前回値保存
             foreach (var resource in Resources)
             {
-                if (!_OptionsBakDict.TryAdd(resource.Ware.ID, resource))
+                if (!_optionsBakDict.TryAdd(resource.Ware.ID, resource))
                 {
-                    _OptionsBakDict[resource.Ware.ID] = resource;
+                    _optionsBakDict[resource.Ware.ID] = resource;
                 }
             }
 
             Resources.Clear();
 
-            if (_Modules.Modules.Any())
+            if (_modules.Modules.Any())
             {
-                var resources = AggregateModules(_Modules.Modules);
+                var resources = AggregateModules(_modules.Modules);
 
                 // 可能なら前回値復元して製品一覧に追加
                 var addItems = resources.Select(
                     x =>
                     {
-                        if (_OptionsBakDict.TryGetValue(x.WareID, out var oldRes))
+                        if (_optionsBakDict.TryGetValue(x.WareID, out var oldRes))
                         {
                             return new BuildResourcesGridItem(x.WareID, x.Amount, oldRes.UnitPrice) { EditStatus = oldRes.EditStatus };
                         }
@@ -184,7 +184,7 @@ class BuildResourcesGridModel : IDisposable
                     });
 
                 Resources.AddRange(addItems);
-                _OptionsBakDict.Clear();
+                _optionsBakDict.Clear();
             }
         }
 
@@ -213,7 +213,7 @@ class BuildResourcesGridModel : IDisposable
             .GroupBy(x => x)
             .Select(x => (x.Key.Ware as IWare, Method: "default", Count: x.LongCount()));
 
-        IEnumerable<CalcResult> resources = _Calculator.CalcResource(wares.Concat(equipments));
+        IEnumerable<CalcResult> resources = _calculator.CalcResource(wares.Concat(equipments));
 
         foreach (var resource in resources)
         {
@@ -239,7 +239,7 @@ class BuildResourcesGridModel : IDisposable
             (module.Module, module.SelectedMethod.Method, 1)    // 変更後のため +1
         };
 
-        IEnumerable<CalcResult> resources = _Calculator.CalcResource(modules);
+        IEnumerable<CalcResult> resources = _calculator.CalcResource(modules);
 
         var addTarget = new List<BuildResourcesGridItem>();
         foreach (var kvp in resources)
@@ -280,7 +280,7 @@ class BuildResourcesGridModel : IDisposable
             .Select(x => (X4Database.Instance.Ware.Get(x.Key), "default", -(long)x.Count()));
 
         // リソース集計
-        IEnumerable<CalcResult> resources = _Calculator.CalcResource(newEquipments.Concat(oldEquipments));
+        IEnumerable<CalcResult> resources = _calculator.CalcResource(newEquipments.Concat(oldEquipments));
 
         var addTarget = new List<BuildResourcesGridItem>();
         foreach (var resource in resources)
@@ -368,6 +368,6 @@ class BuildResourcesGridModel : IDisposable
             .Select(x => (Ware: x.Key, Method: "default", Count: x.Sum(y => y.Count)));
 
 
-        return _Calculator.CalcResource(moduleList.Concat(equipments));
+        return _calculator.CalcResource(moduleList.Concat(equipments));
     }
 }

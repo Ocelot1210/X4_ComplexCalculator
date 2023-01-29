@@ -15,19 +15,19 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverview;
 /// <summary>
 /// 帝国の概要用Model
 /// </summary>
-public class EmpireOverviewWindowModel : IDisposable
+public sealed class EmpireOverviewWindowModel : IDisposable
 {
     #region メンバ
     /// <summary>
     /// 開いている計画一覧
     /// </summary>
-    private readonly ObservableCollection<WorkAreaViewModel> _WorkAreas;
+    private readonly ObservableCollection<WorkAreaViewModel> _workAreas;
 
 
     /// <summary>
     /// 製品記憶用ディクショナリ
     /// </summary>
-    private readonly ListDictionary<IList<ProductsGridItem>, ProductsGridItem> _ProductsBak = new();
+    private readonly ListDictionary<IList<ProductsGridItem>, ProductsGridItem> _productsBak = new();
     #endregion
 
 
@@ -46,10 +46,10 @@ public class EmpireOverviewWindowModel : IDisposable
     /// <param name="workAreas">開いている計画一覧</param>
     public EmpireOverviewWindowModel(ObservableCollection<WorkAreaViewModel> workAreas)
     {
-        _WorkAreas = workAreas;
+        _workAreas = workAreas;
 
-        _WorkAreas.CollectionChanged += WorkAreas_CollectionChanged;
-        foreach (var products in _WorkAreas.Select(x => x.Products.ProductsInfo.Products))
+        _workAreas.CollectionChanged += WorkAreas_CollectionChanged;
+        foreach (var products in _workAreas.Select(x => x.Products.ProductsInfo.Products))
         {
             products.CollectionChanged += Products_CollectionChanged;
             products.CollectionPropertyChanged += Products_CollectionPropertyChanged;
@@ -62,9 +62,9 @@ public class EmpireOverviewWindowModel : IDisposable
     /// <inheritdoc/>
     public void Dispose()
     {
-        _WorkAreas.CollectionChanged -= WorkAreas_CollectionChanged;
-        _ProductsBak.Clear();
-        foreach (var products in _WorkAreas.Select(x => x.Products.ProductsInfo.Products))
+        _workAreas.CollectionChanged -= WorkAreas_CollectionChanged;
+        _productsBak.Clear();
+        foreach (var products in _workAreas.Select(x => x.Products.ProductsInfo.Products))
         {
             products.CollectionChanged -= Products_CollectionChanged;
             products.CollectionPropertyChanged -= Products_CollectionPropertyChanged;
@@ -87,12 +87,12 @@ public class EmpireOverviewWindowModel : IDisposable
                 item.CollectionPropertyChanged -= Products_CollectionPropertyChanged;
 
                 // 削除された製品の生産/消費量を減算する
-                foreach (var removedItem in _ProductsBak[item])
+                foreach (var removedItem in _productsBak[item])
                 {
                     Products.First(x => x.Ware.ID == removedItem.Ware.ID).Count -= removedItem.Count;
                 }
 
-                _ProductsBak.Remove(item);
+                _productsBak.Remove(item);
 
                 // どのステーションでも生産/消費されていない要素を削除する
                 Products.RemoveAll(x => x.Count == 0);
@@ -177,7 +177,7 @@ public class EmpireOverviewWindowModel : IDisposable
             var added = new List<ProductsGridItem>();
             var removed = new List<ProductsGridItem>();
 
-            foreach (var prod in _ProductsBak[products])
+            foreach (var prod in _productsBak[products])
             {
                 if (products.Any(x => x.Ware.ID == prod.Ware.ID))
                 {
@@ -201,7 +201,7 @@ public class EmpireOverviewWindowModel : IDisposable
     /// <param name="removedItems"></param>
     private void OnProductsRemoved(IList<ProductsGridItem> parent, IEnumerable<ProductsGridItem> removedItems)
     {
-        var prodBak = _ProductsBak[parent];
+        var prodBak = _productsBak[parent];
 
         // 削除された製品の生産/消費量を減算する
         foreach (var removedItem in removedItems)
@@ -228,7 +228,7 @@ public class EmpireOverviewWindowModel : IDisposable
     private void OnProductsAdded(IList<ProductsGridItem> parent, IEnumerable<ProductsGridItem> addedItems)
     {
         var addTarget = new List<EmpireOverViewProductsGridItem>();     // 追加対象
-        var prodBak = _ProductsBak[parent];
+        var prodBak = _productsBak[parent];
 
         foreach (var addedItem in addedItems)
         {

@@ -23,31 +23,31 @@ class ShipHangerExporter : IExporter
     /// <summary>
     /// catファイルオブジェクト
     /// </summary>
-    private readonly IIndexResolver _CatFile;
+    private readonly IIndexResolver _catFile;
 
 
     /// <summary>
     /// ウェア情報xml
     /// </summary>
-    private readonly XDocument _WaresXml;
+    private readonly XDocument _waresXml;
 
 
     /// <summary>
     /// ドックエリア名をキーにしたサイズIDとドック数のディクショナリ
     /// </summary>
-    private readonly Dictionary<string, IReadOnlyDictionary<string, int>> _DockAreaDict = new();
+    private readonly Dictionary<string, IReadOnlyDictionary<string, int>> _dockAreaDict = new();
 
 
     /// <summary>
     /// ドッキングベイ名をキーにしたサイズIDのディクショナリ
     /// </summary>
-    private readonly Dictionary<string, string?> _DockingBaySizeDict = new();
+    private readonly Dictionary<string, string?> _dockingBaySizeDict = new();
 
 
     /// <summary>
     /// ドッキングベイ名をキーにしたサイズIDと機体格納量のディクショナリ
     /// </summary>
-    private readonly Dictionary<string, (string, int)?> _DockingBayDict = new();
+    private readonly Dictionary<string, (string, int)?> _dockingBayDict = new();
 
 
 
@@ -59,8 +59,8 @@ class ShipHangerExporter : IExporter
     /// <param name="waresXml">ウェア情報xml</param>
     public ShipHangerExporter(IIndexResolver catFile, XDocument waresXml)
     {
-        _CatFile = catFile;
-        _WaresXml = waresXml;
+        _catFile = catFile;
+        _waresXml = waresXml;
     }
 
 
@@ -101,11 +101,11 @@ CREATE TABLE IF NOT EXISTS ShipHanger
     /// </summary>
     private async IAsyncEnumerable<ShipHanger> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
+        var maxSteps = (int)(double)_waresXml.Root!.XPathEvaluate("count(ware[contains(@tags, 'ship')])");
         var currentStep = 0;
 
 
-        foreach (var ship in _WaresXml.Root!.XPathSelectElements("ware[contains(@tags, 'ship')]"))
+        foreach (var ship in _waresXml.Root!.XPathSelectElements("ware[contains(@tags, 'ship')]"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress.Report((currentStep++, maxSteps));
@@ -118,14 +118,14 @@ CREATE TABLE IF NOT EXISTS ShipHanger
                 var macroName = ship.XPathSelectElement("component")?.Attribute("ref")?.Value;
                 if (string.IsNullOrEmpty(macroName)) continue;
 
-                shipMacroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
+                shipMacroXml = await _catFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
                 if (shipMacroXml?.Root is null) continue;
             }
 
             var componentName = shipMacroXml.Root.XPathSelectElement("macro/component")?.Attribute("ref")?.Value;
             if (string.IsNullOrEmpty(componentName)) continue;
 
-            var componentXml = await _CatFile.OpenIndexXmlAsync("index/components.xml", componentName, cancellationToken);
+            var componentXml = await _catFile.OpenIndexXmlAsync("index/components.xml", componentName, cancellationToken);
             if (componentXml?.Root is null) continue;
 
             // 集計用辞書
@@ -186,15 +186,15 @@ CREATE TABLE IF NOT EXISTS ShipHanger
         }
 
         // 登録済みにあればxmlを見ないで機体格納数を返す
-        if (_DockingBayDict.TryGetValue(macroName, out var registerdCapacity))
+        if (_dockingBayDict.TryGetValue(macroName, out var registerdCapacity))
         {
             return registerdCapacity;
         }
 
-        var dockingBayXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
+        var dockingBayXml = await _catFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
         if (dockingBayXml is null)
         {
-            _DockingBayDict.TryAdd(macroName, null);
+            _dockingBayDict.TryAdd(macroName, null);
             return null;
         }
 
@@ -205,11 +205,11 @@ CREATE TABLE IF NOT EXISTS ShipHanger
         // 容量が1未満 又は 無効なドックサイズの場合、空の要素を登録
         if (capacity < 1 || string.IsNullOrEmpty(size))
         {
-            _DockingBayDict.TryAdd(macroName, null);
+            _dockingBayDict.TryAdd(macroName, null);
             return null;
         }
 
-        _DockingBayDict.Add(macroName, (size, capacity));
+        _dockingBayDict.Add(macroName, (size, capacity));
 
         return (size, capacity);
     }
@@ -232,18 +232,18 @@ CREATE TABLE IF NOT EXISTS ShipHanger
         }
 
         // 登録済みにあればxmlを見ないでドック数を返す
-        if (_DockAreaDict.TryGetValue(macroName, out var registeredDict))
+        if (_dockAreaDict.TryGetValue(macroName, out var registeredDict))
         {
             return registeredDict;
         }
 
 
 
-        var dockMacroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
+        var dockMacroXml = await _catFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
         if (dockMacroXml is null)
         {
             var ret = new Dictionary<string, int>();
-            _DockAreaDict.TryAdd(macroName, ret);
+            _dockAreaDict.TryAdd(macroName, ret);
             return ret;
         }
 
@@ -269,7 +269,7 @@ CREATE TABLE IF NOT EXISTS ShipHanger
 
         {
             var ret = sizeDict.Where(x => 0 < x.Value).ToDictionary(x => x.Key, x => x.Value);
-            _DockAreaDict.Add(macroName, ret);
+            _dockAreaDict.Add(macroName, ret);
             return ret;
         }
     }
@@ -283,15 +283,15 @@ CREATE TABLE IF NOT EXISTS ShipHanger
     private async Task<string?> GetDockingBaysSizeAsync(string dockingBayMacroName, CancellationToken cancellationToken)
     {
         // メモに残っていればそれを返す
-        if (_DockingBaySizeDict.TryGetValue(dockingBayMacroName, out var size))
+        if (_dockingBaySizeDict.TryGetValue(dockingBayMacroName, out var size))
         {
             return size;
         }
 
-        var dockingMacroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", dockingBayMacroName, cancellationToken);
+        var dockingMacroXml = await _catFile.OpenIndexXmlAsync("index/macros.xml", dockingBayMacroName, cancellationToken);
         if (dockingMacroXml is null)
         {
-            _DockingBaySizeDict.Add(dockingBayMacroName, null);
+            _dockingBaySizeDict.Add(dockingBayMacroName, null);
             return null;
         }
 
@@ -299,7 +299,7 @@ CREATE TABLE IF NOT EXISTS ShipHanger
 
         size = DockSize2SizeID(tag);
 
-        _DockingBaySizeDict.Add(dockingBayMacroName, size);
+        _dockingBaySizeDict.Add(dockingBayMacroName, size);
         return size;
     }
 
@@ -310,7 +310,7 @@ CREATE TABLE IF NOT EXISTS ShipHanger
     /// </summary>
     /// <param name="dockSize">ドックサイズ</param>
     /// <returns>サイズID</returns>
-    private string? DockSize2SizeID(string dockSize)
+    private static string? DockSize2SizeID(string dockSize)
     {
         return dockSize switch
         {

@@ -17,13 +17,13 @@ class ModuleProductManager
     /// <summary>
     /// モジュールの製品情報一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IReadOnlyList<IModuleProduct>> _ModuleProducts;
+    private readonly IReadOnlyDictionary<string, IReadOnlyList<IModuleProduct>> _moduleProducts;
 
 
     /// <summary>
     /// ダミーの製品情報一覧
     /// </summary>
-    private readonly IReadOnlyList<IModuleProduct> _DummyProduct = Array.Empty<IModuleProduct>();
+    private readonly IReadOnlyList<IModuleProduct> _dummyProduct = Array.Empty<IModuleProduct>();
     #endregion
 
 
@@ -34,9 +34,9 @@ class ModuleProductManager
     /// <param name="wareProductionManager">ウェアの生産量と生産時間一覧</param>
     public ModuleProductManager(IDbConnection conn, WareProductionManager wareProductionManager)
     {
-        const string sql = @"SELECT ModuleID, WareID, Method, Amount FROM ModuleProduct";
+        const string SQL = @"SELECT ModuleID, WareID, Method, Amount FROM ModuleProduct";
 
-        _ModuleProducts = conn.Query<X4_DataExporterWPF.Entity.ModuleProduct>(sql)
+        _moduleProducts = conn.Query<X4_DataExporterWPF.Entity.ModuleProduct>(SQL)
             .Select(x => new ModuleProduct(x.ModuleID, x.WareID, x.Method, x.Amount, wareProductionManager.Get(x.WareID, x.Method)))
             .GroupBy(x => x.ModuleID)
             .ToDictionary(x => x.Key, x => x.ToArray() as IReadOnlyList<IModuleProduct>);
@@ -49,5 +49,5 @@ class ModuleProductManager
     /// <param name="id">モジュールID</param>
     /// <returns>モジュールIDに対応するモジュールの製品情報一覧</returns>
     public IReadOnlyList<IModuleProduct> Get(string id) =>
-        _ModuleProducts.TryGetValue(id, out var product) ? product : _DummyProduct;
+        _moduleProducts.TryGetValue(id, out var product) ? product : _dummyProduct;
 }

@@ -16,7 +16,7 @@ class X4SizeManager
     /// <summary>
     /// サイズIDをキーにした <see cref="IX4Size"/> の一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IX4Size> _Sizes;
+    private readonly IReadOnlyDictionary<string, IX4Size> _sizes;
     #endregion
 
 
@@ -26,8 +26,8 @@ class X4SizeManager
     /// <param name="conn">DB接続情報</param>
     public X4SizeManager(IDbConnection conn)
     {
-        const string sql = "SELECT SizeID, Name FROM Size";
-        _Sizes = conn.Query<X4Size>(sql)
+        const string SQL = "SELECT SizeID, Name FROM Size";
+        _sizes = conn.Query<X4Size>(SQL)
             .ToDictionary(x => x.SizeID, x => x as IX4Size);
     }
 
@@ -38,7 +38,7 @@ class X4SizeManager
     /// <param name="id">サイズID</param>
     /// <returns><paramref name="id"/>に対応する <see cref="IX4Size"/></returns>
     /// <exception cref="KeyNotFoundException"><paramref name="id"/>に対応する <see cref="IX4Size"/> が無い場合</exception>
-    public IX4Size Get(string id) => _Sizes[id];
+    public IX4Size Get(string id) => _sizes[id];
 
 
 
@@ -50,5 +50,5 @@ class X4SizeManager
     /// <para><paramref name="id"/> に対応する <see cref="IX4Size"/></para>
     /// <para><paramref name="id"/> に対応するサイズが無ければnull</para>
     /// </returns>
-    public IX4Size? TryGet(string id) => _Sizes.TryGetValue(id, out var ret) ? ret : null;
+    public IX4Size? TryGet(string id) => _sizes.TryGetValue(id, out var ret) ? ret : null;
 }

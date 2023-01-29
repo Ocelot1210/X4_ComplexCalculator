@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using LibX4.FileSystem;
 using LibX4.Lang;
 using System;
 using System.Collections.Generic;
@@ -21,13 +20,13 @@ public class EquipmentTypeExporter : IExporter
     /// <summary>
     /// ウェア情報xml
     /// </summary>
-    private readonly XDocument _WaresXml;
+    private readonly XDocument _waresXml;
 
 
     /// <summary>
     /// 言語解決用オブジェクト
     /// </summary>
-    private readonly ILanguageResolver _Resolver;
+    private readonly ILanguageResolver _resolver;
 
 
     /// <summary>
@@ -39,8 +38,8 @@ public class EquipmentTypeExporter : IExporter
     {
         ArgumentNullException.ThrowIfNull(waresXml.Root);
 
-        _WaresXml = waresXml;
-        _Resolver = resolver;
+        _waresXml = waresXml;
+        _resolver = resolver;
     }
 
 
@@ -91,11 +90,11 @@ CREATE TABLE IF NOT EXISTS EquipmentType
             {"weapons",             "{20215, 2401}"},
         };
 
-        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[@transport='equipment'])");
+        var maxSteps = (int)(double)_waresXml.Root!.XPathEvaluate("count(ware[@transport='equipment'])");
         var currentStep = 0;
         var added = new HashSet<string>();
 
-        foreach (var equipment in _WaresXml.Root!.XPathSelectElements("ware[@transport='equipment']"))
+        foreach (var equipment in _waresXml.Root!.XPathSelectElements("ware[@transport='equipment']"))
         {
             progress?.Report((currentStep++, maxSteps));
 
@@ -105,7 +104,7 @@ CREATE TABLE IF NOT EXISTS EquipmentType
             var name = equipmentTypeID;
             if (names.TryGetValue(equipmentTypeID, out var nameID))
             {
-                name = _Resolver.Resolve(nameID);
+                name = _resolver.Resolve(nameID);
             }
 
             yield return new EquipmentType(equipmentTypeID, name);

@@ -22,19 +22,19 @@ public class WareEquipmentExporter : IExporter
     /// <summary>
     /// catファイルオブジェクト
     /// </summary>
-    private readonly IIndexResolver _CatFile;
+    private readonly IIndexResolver _catFile;
 
 
     /// <summary>
     /// ウェア情報xml
     /// </summary>
-    private readonly XDocument _WaresXml;
+    private readonly XDocument _waresXml;
 
 
     /// <summary>
     /// 装備のタグ情報
     /// </summary>
-    private readonly LinkedList<IReadOnlyList<WareEquipmentTag>> _EquipmentTags = new();
+    private readonly LinkedList<IReadOnlyList<WareEquipmentTag>> _equipmentTags = new();
 
 
     /// <summary>
@@ -46,8 +46,8 @@ public class WareEquipmentExporter : IExporter
     {
         ArgumentNullException.ThrowIfNull(waresXml.Root);
 
-        _CatFile = catFile;
-        _WaresXml = waresXml;
+        _catFile = catFile;
+        _waresXml = waresXml;
     }
 
 
@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS WareEquipmentTag
 
             await connection.ExecuteAsync(@"INSERT INTO WareEquipment (WareID, GroupName, ConnectionName, EquipmentTypeID) VALUES (@WareID, @GroupName, @ConnectionName, @EquipmentTypeID)", items);
 
-            await connection.ExecuteAsync(@"INSERT INTO WareEquipmentTag (WareID, ConnectionName, Tag) VALUES (@WareID, @ConnectionName, @Tag)", _EquipmentTags.SelectMany(x => x));
+            await connection.ExecuteAsync(@"INSERT INTO WareEquipmentTag (WareID, ConnectionName, Tag) VALUES (@WareID, @ConnectionName, @Tag)", _equipmentTags.SelectMany(x => x));
         }
     }
 
@@ -118,11 +118,11 @@ CREATE TABLE IF NOT EXISTS WareEquipmentTag
     /// </summary>
     private async IAsyncEnumerable<WareEquipment> GetRecordsAsync(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware)");
+        var maxSteps = (int)(double)_waresXml.Root!.XPathEvaluate("count(ware)");
         var currentStep = 0;
 
 
-        foreach (var ware in _WaresXml.Root!.XPathSelectElements("ware"))
+        foreach (var ware in _waresXml.Root!.XPathSelectElements("ware"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress.Report((currentStep++, maxSteps));
@@ -134,13 +134,13 @@ CREATE TABLE IF NOT EXISTS WareEquipmentTag
             var macroName = ware.XPathSelectElement("component")?.Attribute("ref")?.Value;
             if (string.IsNullOrEmpty(macroName)) continue;
 
-            var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
+            var macroXml = await _catFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
             if (macroXml?.Root is null) continue;
 
             var componentName = macroXml.Root.XPathSelectElement("macro/component")?.Attribute("ref")?.Value;
             if (string.IsNullOrEmpty(componentName)) continue;  
 
-            var componentXml = await _CatFile.OpenIndexXmlAsync("index/components.xml", componentName, cancellationToken);
+            var componentXml = await _catFile.OpenIndexXmlAsync("index/components.xml", componentName, cancellationToken);
             if (componentXml?.Root is null) continue;
 
             var equipmentTags = new List<WareEquipmentTag>();
@@ -165,15 +165,15 @@ CREATE TABLE IF NOT EXISTS WareEquipmentTag
             var thruster = macroXml.Root.XPathSelectElement("macro/properties/thruster")?.Attribute("tags")?.Value;
             if (thruster is not null)
             {
-                const string thrusterConnectionName = "thruster";
+                const string THRUSTER_CONNECTION_NAME = "thruster";
 
-                equipmentTags.AddRange(Util.SplitTags(thruster).Select(x => new WareEquipmentTag(wareID, thrusterConnectionName, x)));
-                yield return new WareEquipment(wareID, thrusterConnectionName, "thrusters", "");
+                equipmentTags.AddRange(Util.SplitTags(thruster).Select(x => new WareEquipmentTag(wareID, THRUSTER_CONNECTION_NAME, x)));
+                yield return new WareEquipment(wareID, THRUSTER_CONNECTION_NAME, "thrusters", "");
             }
 
             if (equipmentTags.Any())
             {
-                _EquipmentTags.AddLast(equipmentTags);
+                _equipmentTags.AddLast(equipmentTags);
             }
         }
 

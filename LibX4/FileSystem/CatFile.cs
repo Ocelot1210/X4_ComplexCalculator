@@ -30,31 +30,31 @@ public class CatFile : ICatFile
     /// <summary>
     /// ファイル
     /// </summary>
-    private readonly IReadOnlyList<IFileLoader> _FileLoaders;
+    private readonly IReadOnlyList<IFileLoader> _fileLoaders;
 
 
     /// <summary>
     /// 読み込み済み MOD
     /// </summary>
-    private readonly HashSet<string> _LoadedMods = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> _loadedMods = new(StringComparer.OrdinalIgnoreCase);
 
 
     /// <summary>
     /// 読み込み済み Index ファイル名
     /// </summary>
-    private readonly HashSet<string> _LoadedIndex = new();
+    private readonly HashSet<string> _loadedIndex = new();
 
 
     /// <summary>
     /// 読み込み済み Index の内容
     /// </summary>
-    private readonly Dictionary<string, string> _Index = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, string> _index = new(StringComparer.OrdinalIgnoreCase);
 
 
     /// <summary>
     /// Mod情報配列
     /// </summary>
-    private readonly IReadOnlyList<ModInfo> _ModInfo;
+    private readonly IReadOnlyList<ModInfo> _modInfo;
     #endregion
 
 
@@ -68,7 +68,7 @@ public class CatFile : ICatFile
     /// <summary>
     /// Modが導入されているか
     /// </summary>
-    public bool IsModInstalled => 0 < _LoadedMods.Count;
+    public bool IsModInstalled => 0 < _loadedMods.Count;
     #endregion
 
 
@@ -94,14 +94,16 @@ public class CatFile : ICatFile
 
         var modInfo = GetModInfo(gameRoot);
 
-        _LoadedMods = new HashSet<string>(modInfo.Select(x => $"extensions/{Path.GetFileName(x.Directory)}".Replace('\\', '/')));
+        _loadedMods = new HashSet<string>(modInfo.Select(x => $"extensions/{Path.GetFileName(x.Directory)}".Replace('\\', '/')));
 
-        var fileLoader = new List<CatFileLoader>(modInfo.Count + 1);
-        fileLoader.Add(CatFileLoader.CreateFromDirectory(gameRoot));
+        var fileLoader = new List<CatFileLoader>(modInfo.Count + 1)
+        {
+            CatFileLoader.CreateFromDirectory(gameRoot)
+        };
         fileLoader.AddRange(modInfo.Select(x => CatFileLoader.CreateFromDirectory(x.Directory)));
-        _FileLoaders = fileLoader;
+        _fileLoaders = fileLoader;
 
-        _ModInfo = modInfo;
+        _modInfo = modInfo;
     }
 
 
@@ -170,7 +172,7 @@ public class CatFile : ICatFile
     {
         filePath = PathCanonicalize(filePath);
 
-        foreach (var loader in _FileLoaders)
+        foreach (var loader in _fileLoaders)
         {
             var ms = await loader.OpenFileAsync(filePath, cancellationToken);
             if (ms is not null)
@@ -220,7 +222,7 @@ public class CatFile : ICatFile
     {
         filePath = PathCanonicalize(filePath);
 
-        foreach (var loader in _FileLoaders)
+        foreach (var loader in _fileLoaders)
         {
             var ms = await loader.OpenFileAsync(filePath, cancellationToken);
             if (ms is not null)
@@ -238,7 +240,7 @@ public class CatFile : ICatFile
         filePath = PathCanonicalize(filePath);
 
         XDocument? ret = null;
-        foreach (var fileLoader in _FileLoaders)
+        foreach (var fileLoader in _fileLoaders)
         {
             using var ms = await fileLoader.OpenFileAsync(filePath, cancellationToken);
             if (ms is null)
@@ -275,7 +277,7 @@ public class CatFile : ICatFile
     /// <inheritdoc/>
     public async Task<XDocument> OpenIndexXmlAsync(string indexFilePath, string name, CancellationToken cancellationToken = default)
     {
-        if (!_LoadedIndex.Contains(indexFilePath))
+        if (!_loadedIndex.Contains(indexFilePath))
         {
             foreach (var entry in (await OpenXmlAsync(indexFilePath, cancellationToken)).XPathSelectElements("/index/entry"))
             {
@@ -285,12 +287,12 @@ public class CatFile : ICatFile
                 var entryValue = entry.Attribute("value")?.Value.Replace(@"\\", @"\");
                 if (entryValue is null) continue;
 
-                if (!_Index.TryAdd(entryName, entryValue)) _Index[entryName] = entryValue;
+                if (!_index.TryAdd(entryName, entryValue)) _index[entryName] = entryValue;
             }
-            _LoadedIndex.Add(indexFilePath);
+            _loadedIndex.Add(indexFilePath);
         }
 
-        var path = _Index.GetValueOrDefault(name) ?? throw new FileNotFoundException();
+        var path = _index.GetValueOrDefault(name) ?? throw new FileNotFoundException();
 
         if (path is null) throw new FileNotFoundException();
 
@@ -322,7 +324,7 @@ public class CatFile : ICatFile
 
         sw.WriteLine("ID\tName\tAuthor\tVersion\tDate\tEnabled\tSave");
 
-        foreach (var info in _ModInfo)
+        foreach (var info in _modInfo)
         {
             sw.WriteLine($"{info.ID}\t{info.Name}\t{info.Author}\t{info.Version}\t{info.Date}\t{info.Enabled}\t{info.Save}");
         }
@@ -345,7 +347,7 @@ public class CatFile : ICatFile
 
         var modPath = _ParseModRegex.Match(path).Groups[1].Value;
 
-        return _LoadedMods.Contains(modPath)
+        return _loadedMods.Contains(modPath)
             ? path[(modPath.Length + 1)..]
             : path;
     }

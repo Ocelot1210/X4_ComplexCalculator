@@ -15,13 +15,13 @@ public class ListContentFilter : IDataGridFilter
     /// <summary>
     /// 除外された項目一覧
     /// </summary>
-    private readonly IReadOnlyList<string> _ExcludedItems;
+    private readonly IReadOnlyList<string> _excludedItems;
     #endregion
 
 
     #region プロパティ
     /// <inheritdoc/>
-    public bool IsFilterEnabled => _ExcludedItems.Any();
+    public bool IsFilterEnabled => _excludedItems.Any();
     #endregion
 
 
@@ -31,14 +31,14 @@ public class ListContentFilter : IDataGridFilter
     /// <param name="excludedItems">除外された項目一覧</param>
     public ListContentFilter(IEnumerable<string> excludedItems)
     {
-        _ExcludedItems = excludedItems.ToArray();
+        _excludedItems = excludedItems.ToArray();
     }
 
 
     /// <inheritdoc/>
     public bool IsMatch(object? value)
     {
-        return _ExcludedItems.Contains(value?.ToString() ?? string.Empty) != true;
+        return _excludedItems.Contains(value?.ToString() ?? string.Empty) != true;
     }
 
 
@@ -47,8 +47,8 @@ public class ListContentFilter : IDataGridFilter
     {
         if (other is ListContentFilter filter)
         {
-            return _ExcludedItems.Count == filter._ExcludedItems.Count &&
-                   _ExcludedItems.OrderBy(x => x).SequenceEqual(filter._ExcludedItems.OrderBy(x => x));
+            return _excludedItems.Count == filter._excludedItems.Count &&
+                   _excludedItems.OrderBy(x => x).SequenceEqual(filter._excludedItems.OrderBy(x => x));
         }
 
         return false;

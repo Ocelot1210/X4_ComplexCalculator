@@ -22,13 +22,13 @@ class ThrusterExporter : IExporter
     /// <summary>
     /// catファイルオブジェクト
     /// </summary>
-    private readonly IIndexResolver _CatFile;
+    private readonly IIndexResolver _catFile;
 
 
     /// <summary>
     /// ウェア情報xml
     /// </summary>
-    private readonly XDocument _WaresXml;
+    private readonly XDocument _waresXml;
 
 
     /// <summary>
@@ -40,8 +40,8 @@ class ThrusterExporter : IExporter
     {
         ArgumentNullException.ThrowIfNull(waresXml.Root);
 
-        _CatFile = catFile;
-        _WaresXml = waresXml;
+        _catFile = catFile;
+        _waresXml = waresXml;
     }
 
 
@@ -86,11 +86,11 @@ INSERT INTO Thruster ( EquipmentID,  ThrustStrafe,  ThrustPitch,  ThrustYaw,  Th
     /// <returns>読み出した Thruster データ</returns>
     private async IAsyncEnumerable<Thruster> GetRecords(IProgress<(int currentStep, int maxSteps)> progress, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var maxSteps = (int)(double)_WaresXml.Root!.XPathEvaluate("count(ware[@transport='equipment'][@group='thrusters'])");
+        var maxSteps = (int)(double)_waresXml.Root!.XPathEvaluate("count(ware[@transport='equipment'][@group='thrusters'])");
         var currentStep = 0;
 
 
-        foreach (var equipment in _WaresXml.Root!.XPathSelectElements("ware[@transport='equipment'][@group='thrusters']"))
+        foreach (var equipment in _waresXml.Root!.XPathSelectElements("ware[@transport='equipment'][@group='thrusters']"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             progress.Report((currentStep++, maxSteps));
@@ -102,7 +102,7 @@ INSERT INTO Thruster ( EquipmentID,  ThrustStrafe,  ThrustPitch,  ThrustYaw,  Th
             var macroName = equipment.XPathSelectElement("component")?.Attribute("ref")?.Value;
             if (string.IsNullOrEmpty(macroName)) continue;
 
-            var macroXml = await _CatFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
+            var macroXml = await _catFile.OpenIndexXmlAsync("index/macros.xml", macroName, cancellationToken);
             if (macroXml?.Root is null) continue;
 
 

@@ -29,37 +29,37 @@ class ProductsGridModel : BindableBase, IDisposable
     /// <summary>
     /// モジュール一覧
     /// </summary>
-    private readonly IModulesInfo _Modules;
+    private readonly IModulesInfo _modules;
 
 
     /// <summary>
     /// ステーションの設定
     /// </summary>
-    private readonly IStationSettings _Settings;
+    private readonly IStationSettings _settings;
 
 
     /// <summary>
     /// 製品情報
     /// </summary>
-    private readonly IProductsInfo _Products;
+    private readonly IProductsInfo _products;
 
 
     /// <summary>
     /// 生産性
     /// </summary>
-    private double _Efficiency;
+    private double _efficiency;
 
 
     /// <summary>
     /// 製品計算機
     /// </summary>
-    private readonly ProductCalculator _ProductCalculator = ProductCalculator.Instance;
+    private readonly ProductCalculator _productCalculator = ProductCalculator.Instance;
 
 
     /// <summary>
     /// 前回値オプション保存用
     /// </summary>
-    private readonly Dictionary<string, ProductsGridItem> _OptionsBakDict = new();
+    private readonly Dictionary<string, ProductsGridItem> _optionsBakDict = new();
     #endregion
 
 
@@ -67,7 +67,7 @@ class ProductsGridModel : BindableBase, IDisposable
     /// <summary>
     /// 製品一覧
     /// </summary>
-    public ObservableCollection<ProductsGridItem> Products => _Products.Products;
+    public ObservableCollection<ProductsGridItem> Products => _products.Products;
     #endregion
 
 
@@ -78,16 +78,16 @@ class ProductsGridModel : BindableBase, IDisposable
     /// <param name="settings">ステーションの設定</param>
     public ProductsGridModel(IModulesInfo modules, IProductsInfo products, IStationSettings settings)
     {
-        _Modules = modules;
-        _Products = products;
+        _modules = modules;
+        _products = products;
 
-        _Modules.Modules.CollectionChangedAsync += OnModulesChanged;
-        _Modules.Modules.CollectionPropertyChangedAsync += OnModulePropertyChanged;
+        _modules.Modules.CollectionChangedAsync += OnModulesChanged;
+        _modules.Modules.CollectionPropertyChangedAsync += OnModulePropertyChanged;
 
-        _Modules = modules;
-        _Settings = settings;
-        _Settings.PropertyChanged += Settings_PropertyChanged;
-        _Settings.Workforce.PropertyChanged += Workforce_PropertyChanged;
+        _modules = modules;
+        _settings = settings;
+        _settings.PropertyChanged += Settings_PropertyChanged;
+        _settings.Workforce.PropertyChanged += Workforce_PropertyChanged;
     }
 
 
@@ -125,7 +125,7 @@ class ProductsGridModel : BindableBase, IDisposable
             case nameof(IStationSettings.Sunlight):
                 foreach (var prod in Products)
                 {
-                    prod.SetEfficiency("sunlight", _Settings.Sunlight);
+                    prod.SetEfficiency("sunlight", _settings.Sunlight);
                 }
                 break;
 
@@ -141,10 +141,10 @@ class ProductsGridModel : BindableBase, IDisposable
     public void Dispose()
     {
         Products.Clear();
-        _Modules.Modules.CollectionChangedAsync -= OnModulesChanged;
-        _Modules.Modules.CollectionPropertyChangedAsync -= OnModulePropertyChanged;
-        _Settings.PropertyChanged -= Settings_PropertyChanged;
-        _Settings.Workforce.PropertyChanged -= Workforce_PropertyChanged;
+        _modules.Modules.CollectionChangedAsync -= OnModulesChanged;
+        _modules.Modules.CollectionPropertyChangedAsync -= OnModulePropertyChanged;
+        _settings.PropertyChanged -= Settings_PropertyChanged;
+        _settings.Workforce.PropertyChanged -= Workforce_PropertyChanged;
     }
 
 
@@ -169,7 +169,7 @@ class ProductsGridModel : BindableBase, IDisposable
         while (true)
         {
             // 追加モジュールIDとモジュール数のペア一覧
-            var addModules = _ProductCalculator.CalcNeedModules(Products, _Settings);
+            var addModules = _productCalculator.CalcNeedModules(Products, _settings);
 
             // 追加モジュールが無ければ(不足が無くなれば)終了
             if (!addModules.Any())
@@ -205,7 +205,7 @@ class ProductsGridModel : BindableBase, IDisposable
             }
 
             // モジュール一覧に追加対象モジュールを追加
-            _Modules.Modules.AddRange(addTarget);
+            _modules.Modules.AddRange(addTarget);
         }
 
 
@@ -280,24 +280,24 @@ class ProductsGridModel : BindableBase, IDisposable
             // 前回値保存
             foreach (var prod in Products)
             {
-                if (!_OptionsBakDict.TryAdd(prod.Ware.ID, prod))
+                if (!_optionsBakDict.TryAdd(prod.Ware.ID, prod))
                 {
-                    _OptionsBakDict[prod.Ware.ID] = prod;
+                    _optionsBakDict[prod.Ware.ID] = prod;
                 }
             }
 
             Products.Clear();
 
-            if (_Modules.Modules.Any())
+            if (_modules.Modules.Any())
             {
-                var products = AggregateProduct(_Modules.Modules);
+                var products = AggregateProduct(_modules.Modules);
 
                 // 可能なら前回値復元して製品一覧に追加
                 var addItems = products.Select
                 (
                     x =>
                     {
-                        if (_OptionsBakDict.TryGetValue(x.Key.ID, out var oldProd))
+                        if (_optionsBakDict.TryGetValue(x.Key.ID, out var oldProd))
                         {
                             return new ProductsGridItem(x.Key, x.Value, new TradeOption(oldProd.NoBuy, oldProd.NoSell), oldProd.UnitPrice) { EditStatus = oldProd.EditStatus };
                         }
@@ -306,8 +306,8 @@ class ProductsGridModel : BindableBase, IDisposable
                     }
                 );
 
-                _Products.Products.AddRange(addItems);
-                _OptionsBakDict.Clear();
+                _products.Products.AddRange(addItems);
+                _optionsBakDict.Clear();
             }
         }
 
@@ -321,7 +321,7 @@ class ProductsGridModel : BindableBase, IDisposable
     private void UpdateWorkerEfficiency()
     {
         // 労働者による生産性(倍率)
-        double efficiency = _Settings.Workforce.Proportion;
+        double efficiency = _settings.Workforce.Proportion;
 
         if (1.0 < efficiency)
         {
@@ -329,7 +329,7 @@ class ProductsGridModel : BindableBase, IDisposable
         }
 
         // 労働による生産性が変化しない場合、何もしない
-        if (efficiency == _Efficiency)
+        if (efficiency == _efficiency)
         {
             return;
         }
@@ -339,7 +339,7 @@ class ProductsGridModel : BindableBase, IDisposable
             prod.SetEfficiency("work", efficiency);
         }
 
-        _Efficiency = efficiency;
+        _efficiency = efficiency;
     }
 
 
@@ -388,7 +388,7 @@ class ProductsGridModel : BindableBase, IDisposable
             }
         }
 
-        _Products.Products.AddRange(addItems);
+        _products.Products.AddRange(addItems);
     }
 
 
@@ -407,7 +407,7 @@ class ProductsGridModel : BindableBase, IDisposable
             Products.FirstOrDefault(x => x.Ware.Equals(item.Key))?.RemoveDetails(item.Value);
         }
 
-        _Products.Products.RemoveAll(x => !x.Details.Any());
+        _products.Products.RemoveAll(x => !x.Details.Any());
     }
 
 
@@ -422,7 +422,7 @@ class ProductsGridModel : BindableBase, IDisposable
             .Where(x => x.Module.Resources.Any() || x.Module.Products.Any())
             .GroupBy(x => x.Module)
             .Select(x => (Module: x.Key, Count: x.Sum(y => y.ModuleCount)))
-            .SelectMany(x => _ProductCalculator.Calc(x.Module, x.Count))
+            .SelectMany(x => _productCalculator.Calc(x.Module, x.Count))
             .GroupBy(x => x.WareID)
             .ToDictionary(
                 x => X4Database.Instance.Ware.Get(x.Key),
@@ -430,7 +430,7 @@ class ProductsGridModel : BindableBase, IDisposable
                     .SelectMany(
                         x => x.Select(
                             y => y.Efficiency is not null ?
-                                (IProductDetailsListItem)new ProductDetailsListItem(y.WareID, y.Module, x.Sum(z => z.ModuleCount), y.Efficiency, x.Sum(z => z.WareAmount), _Settings) :
+                                (IProductDetailsListItem)new ProductDetailsListItem(y.WareID, y.Module, x.Sum(z => z.ModuleCount), y.Efficiency, x.Sum(z => z.WareAmount), _settings) :
                                 new ProductDetailsListItemConsumption(y.WareID, y.Module, x.Sum(z => z.ModuleCount), x.Sum(z => z.WareAmount)))
                         ).ToArray() as IReadOnlyList<IProductDetailsListItem>
             );
