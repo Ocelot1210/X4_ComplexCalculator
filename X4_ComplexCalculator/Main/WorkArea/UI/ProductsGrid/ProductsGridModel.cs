@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using X4_ComplexCalculator.Common;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
@@ -45,6 +46,12 @@ class ProductsGridModel : BindableBase, IDisposable
 
 
     /// <summary>
+    /// メッセージボックス表示用
+    /// </summary>
+    private readonly ILocalizedMessageBox _messageBox;
+
+
+    /// <summary>
     /// 生産性
     /// </summary>
     private double _efficiency;
@@ -76,10 +83,12 @@ class ProductsGridModel : BindableBase, IDisposable
     /// </summary>
     /// <param name="modules">モジュール一覧</param>
     /// <param name="settings">ステーションの設定</param>
-    public ProductsGridModel(IModulesInfo modules, IProductsInfo products, IStationSettings settings)
+    /// <param name="messageBox">メッセージボックス表示用</param>
+    public ProductsGridModel(IModulesInfo modules, IProductsInfo products, IStationSettings settings, ILocalizedMessageBox messageBox)
     {
         _modules = modules;
         _products = products;
+        _messageBox = messageBox;
 
         _modules.Modules.CollectionChangedAsync += OnModulesChanged;
         _modules.Modules.CollectionPropertyChangedAsync += OnModulePropertyChanged;
@@ -153,8 +162,8 @@ class ProductsGridModel : BindableBase, IDisposable
     /// </summary>
     public void AutoAddModule()
     {
-        var result = LocalizedMessageBox.Show("Lang:Modules_Button_AutoAdd_ConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
-        if (result != MessageBoxResult.Yes)
+        var result = _messageBox.YesNo("Lang:Modules_Button_AutoAdd_ConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", LocalizedMessageBoxResult.No);
+        if (result != LocalizedMessageBoxResult.Yes)
         {
             return;
         }
@@ -211,11 +220,11 @@ class ProductsGridModel : BindableBase, IDisposable
 
         if (addedRecords == 0)
         {
-            LocalizedMessageBox.Show("Lang:Modules_Button_AutoAdd_NoAddedModulesMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);
+            _messageBox.Ok("Lang:Modules_Button_AutoAdd_NoAddedModulesMessage", "Lang:Common_MessageBoxTitle_Confirmation");
         }
         else
         {
-            LocalizedMessageBox.Show("Lang:Modules_Button_AutoAdd_AddedModulesMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, addedRecords, addedModules);
+            _messageBox.Ok("Lang:Modules_Button_AutoAdd_AddedModulesMessage", "Lang:Common_MessageBoxTitle_Confirmation", addedRecords, addedModules);
         }
 
         autoAddedModules.Clear();

@@ -139,7 +139,7 @@ class SelectModuleViewModel : BindableBase
     /// コンストラクタ
     /// </summary>
     /// <param name="modules">選択結果格納先</param>
-    /// <param name="prevModuleName"></param>
+    /// <param name="prevModuleName">前回選択されたモジュール名</param>
     public SelectModuleViewModel(ObservableRangeCollection<ModulesGridItem> modules, string prevModuleName = "")
     {
         _model = new SelectModuleModel(modules);

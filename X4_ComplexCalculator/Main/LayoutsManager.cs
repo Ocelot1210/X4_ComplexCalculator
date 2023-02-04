@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
@@ -21,15 +22,21 @@ class LayoutsManager : IDisposable
 {
     #region メンバ
     /// <summary>
-    /// 現在のレイアウト
-    /// </summary>
-    private readonly ReactivePropertySlim<LayoutMenuItem?> _activeLayout = new();
-
-
-    /// <summary>
     /// 作業エリア管理用
     /// </summary>
     private readonly WorkAreaManager _workAreaManager;
+
+
+    /// <summary>
+    /// メッセージボックス表示用
+    /// </summary>
+    private readonly ILocalizedMessageBox _localizedMessageBox;
+
+
+    /// <summary>
+    /// 現在のレイアウト
+    /// </summary>
+    private readonly ReactivePropertySlim<LayoutMenuItem?> _activeLayout = new();
 
 
     /// <summary>
@@ -57,9 +64,11 @@ class LayoutsManager : IDisposable
     /// コンストラクタ
     /// </summary>
     /// <param name="workAreaManager">作業エリア管理用オブジェクト</param>
-    public LayoutsManager(WorkAreaManager workAreaManager)
+    /// <param name="localizedMessageBox">メッセージボックス表示用</param>
+    public LayoutsManager(WorkAreaManager workAreaManager, ILocalizedMessageBox localizedMessageBox)
     {
         _workAreaManager = workAreaManager;
+        _localizedMessageBox = localizedMessageBox;
 
         // レイアウト一覧の上書きボタンをトリガーにレイアウト上書き保存を実行
         Layouts.ObserveElementObservableProperty(x => x.SaveButtonClickedCommand)
@@ -130,15 +139,15 @@ class LayoutsManager : IDisposable
                 }
                 catch (Exception ex)
                 {
-                    LocalizedMessageBox.Show("Lang:MainWindow_Menu_Layout_MenuItem_SaveLayout_FailedMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, ex.Message);
+                    _localizedMessageBox.Error("Lang:MainWindow_Menu_Layout_MenuItem_SaveLayout_FailedMessage", "Lang:Common_MessageBoxTitle_Error", ex.Message);
                 }
 
-                LocalizedMessageBox.Show("Lang:MainWindow_Menu_Layout_MenuItem_SaveLayout_SucceededMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, vm.Title, layoutName);
+                _localizedMessageBox.Ok("Lang:MainWindow_Menu_Layout_MenuItem_SaveLayout_SucceededMessage", "Lang:Common_MessageBoxTitle_Confirmation", vm.Title, layoutName);
             }
         }
         else
         {
-            LocalizedMessageBox.Show("Lang:MainWindow_Menu_Layout_MenuItem_SaveLayout_TabDoesNotSelectedMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Warning);
+            _localizedMessageBox.Warn("Lang:MainWindow_Menu_Layout_MenuItem_SaveLayout_TabDoesNotSelectedMessage", "Lang:Common_MessageBoxTitle_Confirmation");
         }
     }
 
@@ -155,11 +164,11 @@ class LayoutsManager : IDisposable
         {
             _workAreaManager.ActiveContent.OverwriteSaveLayout(menuItem.LayoutID);
 
-            LocalizedMessageBox.Show("Lang:MainWindow_Menu_Layout_MenuItem_LayoutList_Overwrite_SuccessMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, _workAreaManager.ActiveContent.Title, menuItem.LayoutName);
+            _localizedMessageBox.Ok("Lang:MainWindow_Menu_Layout_MenuItem_LayoutList_Overwrite_SuccessMessage", "Lang:Common_MessageBoxTitle_Confirmation", _workAreaManager.ActiveContent.Title, menuItem.LayoutName);
         }
         catch (Exception ex)
         {
-            LocalizedMessageBox.Show("Lang:MainWindow_Menu_Layout_MenuItem_LayoutList_Overwrite_FailedMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, ex.Message);
+            _localizedMessageBox.Error("Lang:MainWindow_Menu_Layout_MenuItem_LayoutList_Overwrite_FailedMessage", "Lang:Common_MessageBoxTitle_Error", ex.Message);
         }
     }
 
@@ -186,9 +195,9 @@ class LayoutsManager : IDisposable
     /// </summary>
     private void DeleteLayout(LayoutMenuItem menuItem)
     {
-        var result = LocalizedMessageBox.Show("Lang:MainWindow_Menu_Layout_MenuItem_LayoutList_DeleteLayoutButton_ConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No, menuItem.LayoutName);
+        var result = _localizedMessageBox.YesNo("Lang:MainWindow_Menu_Layout_MenuItem_LayoutList_DeleteLayoutButton_ConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", LocalizedMessageBoxResult.No, menuItem.LayoutName);
 
-        if (result == MessageBoxResult.Yes)
+        if (result == LocalizedMessageBoxResult.Yes)
         {
             SettingDatabase.Instance.Execute("DELETE FROM WorkAreaLayouts WHERE LayoutID = :LayoutID", new { menuItem.LayoutID });
             Layouts.Remove(menuItem);
@@ -202,13 +211,13 @@ class LayoutsManager : IDisposable
     /// </summary>
     /// <param name="layoutName">レイアウト名</param>
     /// <returns>レイアウト名が有効か</returns>
-    private static bool IsValidLayoutName(string layoutName)
+    private bool IsValidLayoutName(string layoutName)
     {
         var ret = true;
 
         if (string.IsNullOrWhiteSpace(layoutName))
         {
-            LocalizedMessageBox.Show("Lang:MainWindow_Menu_Layout_InvalidLayoutNameMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Warning);
+            _localizedMessageBox.Warn("Lang:MainWindow_Menu_Layout_InvalidLayoutNameMessage", "Lang:Common_MessageBoxTitle_Confirmation");
             ret = false;
         }
 

@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Windows;
-using X4_ComplexCalculator.Common.Localize;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.WorkArea;
 
@@ -24,16 +23,26 @@ class MainWindowModel
     /// 作業エリアファイル入出力用
     /// </summary>
     private readonly WorkAreaFileIO _workAreFileIO;
+
+
+    /// <summary>
+    /// メッセージボックス表示用
+    /// </summary>
+    private readonly ILocalizedMessageBox _localizedMessageBox;
     #endregion
 
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public MainWindowModel(WorkAreaManager workAreaManager, WorkAreaFileIO workAreaFileIO)
+    /// <param name="workAreaManager">作業エリア管理用</param>
+    /// <param name="workAreaFileIO">作業エリアファイル入出力用</param>
+    /// <param name="localizedMessageBox">メッセージボックス表示用</param>
+    public MainWindowModel(WorkAreaManager workAreaManager, WorkAreaFileIO workAreaFileIO, ILocalizedMessageBox localizedMessageBox)
     {
         _workAreaManager = workAreaManager;
         _workAreFileIO = workAreaFileIO;
+        _localizedMessageBox = localizedMessageBox;
     }
 
 
@@ -43,7 +52,7 @@ class MainWindowModel
     public void Init()
     {
         // DB接続開始
-        X4Database.Open();
+        X4Database.Open(_localizedMessageBox);
         SettingDatabase.Open();
 
         var vmList = new List<WorkAreaViewModel>();
@@ -70,22 +79,22 @@ class MainWindowModel
     /// <summary>
     /// DB更新
     /// </summary>
-    public static void UpdateDB()
+    public void UpdateDB()
     {
-        var result = LocalizedMessageBox.Show("Lang:MainWindow_Menu_File_UpdateDB_DBUpdate_ConfirmationMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
+        var result = _localizedMessageBox.YesNo("Lang:MainWindow_Menu_File_UpdateDB_DBUpdate_ConfirmationMessage", "Lang:Common_MessageBoxTitle_Confirmation", LocalizedMessageBoxResult.Yes);
 
-        if (result == MessageBoxResult.Yes)
+        if (result == LocalizedMessageBoxResult.Yes)
         {
             switch (X4Database.UpdateDB())
             {
                 // DB更新成功
                 case X4Database.UpdateDbStatus.Succeeded:
-                    LocalizedMessageBox.Show("Lang:MainWindow_Menu_File_UpdateDB_DBUpdate_RestartRequestMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);
+                    _localizedMessageBox.Ok("Lang:MainWindow_Menu_File_UpdateDB_DBUpdate_RestartRequestMessage", "Lang:Common_MessageBoxTitle_Confirmation");
                     break;
 
                 // DB更新失敗
                 case X4Database.UpdateDbStatus.Failed:
-                    LocalizedMessageBox.Show("Lang:MainWindow_Menu_File_UpdateDB_DBUpdate_FailureMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    _localizedMessageBox.Error("Lang:MainWindow_Menu_File_UpdateDB_DBUpdate_FailureMessage", "Lang:Common_MessageBoxTitle_Error");
                     break;
 
                 // 更新なし
@@ -107,12 +116,12 @@ class MainWindowModel
         // 未保存の内容が存在するか？
         if (_workAreaManager.Documents.Any(x => x.HasChanged))
         {
-            var result = LocalizedMessageBox.Show("Lang:MainWindow_ClosingConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+            var result = _localizedMessageBox.YesNoCancel("Lang:MainWindow_ClosingConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", LocalizedMessageBoxResult.Yes);
 
             switch (result)
             {
                 // 保存する場合
-                case MessageBoxResult.Yes:
+                case LocalizedMessageBoxResult.Yes:
                     foreach (var doc in _workAreaManager.Documents)
                     {
                         doc.Save();
@@ -120,11 +129,11 @@ class MainWindowModel
                     break;
 
                 // 保存せずに閉じる場合
-                case MessageBoxResult.No:
+                case LocalizedMessageBoxResult.No:
                     break;
 
                 // キャンセルする場合
-                case MessageBoxResult.Cancel:
+                case LocalizedMessageBoxResult.Cancel:
                     canceled = true;
                     break;
             }

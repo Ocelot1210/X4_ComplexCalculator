@@ -6,12 +6,15 @@ using Prism.Mvvm;
 using System;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 using WPFLocalizeExtension.Engine;
 using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.Menu.File.Export;
 using X4_ComplexCalculator.Main.Menu.File.Import;
+using X4_ComplexCalculator.Main.WorkArea.SaveDataWriter;
 using X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.Menu.Tab;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
@@ -32,7 +35,7 @@ public sealed class WorkAreaViewModel : BindableBase, IDisposable
     /// <summary>
     /// モデル
     /// </summary>
-    private readonly WorkAreaModel _model = new();
+    private readonly WorkAreaModel _model;
 
 
     /// <summary>
@@ -145,19 +148,21 @@ public sealed class WorkAreaViewModel : BindableBase, IDisposable
     /// コンストラクタ
     /// </summary>
     /// <param name="layoutID">レイアウトID</param>
+    /// <param name="messageBox">メッセージボックス表示用</param>
     /// <remarks>
     /// レイアウトIDが負の場合、レイアウトは指定されていない事にする
     /// </remarks>
-    public WorkAreaViewModel(long layoutID)
+    public WorkAreaViewModel(long layoutID, ILocalizedMessageBox messageBox)
     {
-        _layoutID = layoutID;
+        _model                  = new(new SQLiteSaveDataWriter(messageBox));
+        _layoutID               = layoutID;
 
-        Summary       = new StationSummaryViewModel(_model.StationData);
-        Modules       = new ModulesGridViewModel(_model.StationData);
-        Products      = new ProductsGridViewModel(_model.StationData);
-        Resources     = new BuildResourcesGridViewModel(_model.StationData);
-        Storages      = new StoragesGridViewModel(_model.StationData);
-        StorageAssign = new StorageAssignViewModel(_model.StationData);
+        Summary                 = new(_model.StationData);
+        Modules                 = new(_model.StationData, messageBox);
+        Products                = new(_model.StationData, messageBox);
+        Resources               = new(_model.StationData);
+        Storages                = new(_model.StationData);
+        StorageAssign           = new(_model.StationData);
 
         Modules.AutoAddModuleCommand = Products.AutoAddModuleCommand;
         OnLoadedCommand     = new DelegateCommand<DockingManager>(OnLoaded);
@@ -349,6 +354,8 @@ public sealed class WorkAreaViewModel : BindableBase, IDisposable
     private void OnLoaded(DockingManager dockingManager)
     {
         _currentDockingManager = dockingManager;
+        var wnd = Window.GetWindow(dockingManager);
+
         RestoreLayout();
     }
 

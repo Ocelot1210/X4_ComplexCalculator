@@ -3,6 +3,7 @@ using Prism.Mvvm;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport;
 
@@ -108,9 +109,10 @@ class LoadoutImportViewModel : BindableBase
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public LoadoutImportViewModel()
+    /// <param name="localizedMessageBox">メッセージボックス表示用</param>
+    public LoadoutImportViewModel(ILocalizedMessageBox localizedMessageBox)
     {
-        _model = new LoadoutImportModel();
+        _model = new LoadoutImportModel(localizedMessageBox);
         ImportButtonClickedCommand = new DelegateCommand(_model.Import);
         CloseButtonClickedCommand  = new DelegateCommand(CloseButtonClicked);
         SelectSaveDataFileCommand  = new DelegateCommand(_model.SelectSaveDataFile);

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport;
 
@@ -109,9 +110,10 @@ class SelectStationViewModel : BindableBase
     /// コンストラクタ
     /// </summary>
     /// <param name="stationItems"></param>
-    public SelectStationViewModel(List<SaveDataStationItem> stationItems)
+    /// <param name="messageBox"></param>
+    public SelectStationViewModel(List<SaveDataStationItem> stationItems, ILocalizedMessageBox messageBox)
     {
-        _model = new SelectStationModel();
+        _model = new SelectStationModel(messageBox);
         _selectedStationItems = stationItems;
         OkButtonClickedCommand      = new DelegateCommand(OkButtonClicked);
         CancelButtonClickedCommand  = new DelegateCommand(CancelButtonClicked);

@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Threading;
 using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Main.Menu.Layout;
 using X4_ComplexCalculator.Main.WorkArea;
@@ -17,6 +18,12 @@ namespace X4_ComplexCalculator.Main;
 class WorkAreaManager : IDisposable
 {
     #region メンバ
+    /// <summary>
+    /// メッセージボックス表示用
+    /// </summary>
+    private readonly ILocalizedMessageBox _messageBox;
+
+
     /// <summary>
     /// ガベコレ用ストップウォッチ
     /// </summary>
@@ -65,9 +72,11 @@ class WorkAreaManager : IDisposable
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public WorkAreaManager()
+    /// <param name="messageBox">メッセージボックス表示用</param>
+    public WorkAreaManager(ILocalizedMessageBox messageBox)
     {
-        _layoutsManager = new LayoutsManager(this);
+        _messageBox = messageBox;
+        _layoutsManager = new LayoutsManager(this, messageBox);
 
         _gcTimer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, new EventHandler(GarvageCollect), Application.Current.Dispatcher);
         _gcTimer.Stop();
@@ -110,22 +119,22 @@ class WorkAreaManager : IDisposable
         // 変更があったか？
         if (vm.HasChanged)
         {
-            var result = LocalizedMessageBox.Show("Lang:MainWindow_PlanClosingConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Cancel, vm.Title);
+            var result = _messageBox.YesNoCancel("Lang:MainWindow_PlanClosingConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", LocalizedMessageBoxResult.Cancel, vm.Title);
 
             switch (result)
             {
                 // 保存する場合
-                case MessageBoxResult.Yes:
+                case LocalizedMessageBoxResult.Yes:
                     vm.Save();
                     canceled = vm.HasChanged;       // 保存したはずなのに変更点がある(保存キャンセルされた等)場合、閉じないようにする
                     break;
 
                 // 保存せずに閉じる場合
-                case MessageBoxResult.No:
+                case LocalizedMessageBoxResult.No:
                     break;
 
                 // キャンセルする場合
-                case MessageBoxResult.Cancel:
+                case LocalizedMessageBoxResult.Cancel:
                     canceled = true;
                     break;
             }

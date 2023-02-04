@@ -23,14 +23,10 @@
     Style="{StaticResource DefaultWindowBackgroundStyle}"
     mc:Ignorable="d">
 
-    <Window.DataContext>
-        <local:MainWindowViewModel />
-    </Window.DataContext>
-
     <Window.Resources>
         <x4vcvt:ActiveDocumentConverter x:Key="ActiveDocumentConverter" />
     </Window.Resources>
-
+    
     <Window.InputBindings>
         <KeyBinding Command="{Binding CreateNewCommand}" Gesture="Ctrl+N" />
         <KeyBinding Command="{Binding SaveCommand}" Gesture="Ctrl+S" />

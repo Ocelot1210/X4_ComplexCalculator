@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport;
 
@@ -16,7 +17,7 @@ public partial class SelectStationDialog : Window
     private SelectStationDialog(List<SaveDataStationItem> planItems)
     {
         InitializeComponent();
-        DataContext = new SelectStationViewModel(planItems);
+        DataContext = new SelectStationViewModel(planItems, new LocalizedMessageBoxEx(this));
     }
 
 

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using X4_ComplexCalculator.Common;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Main.WorkArea;
 
@@ -17,15 +18,21 @@ class WorkAreaFileIO : BindableBase
 {
     #region メンバ
     /// <summary>
-    /// ビジー状態か
-    /// </summary>
-    private bool _isBusy;
-
-
-    /// <summary>
     /// 作業エリア管理用
     /// </summary>
     private readonly WorkAreaManager _workAreaManager;
+
+
+    /// <summary>
+    /// メッセージボックス表示用
+    /// </summary>
+    private readonly ILocalizedMessageBox _localizedMessageBox;
+
+
+    /// <summary>
+    /// ビジー状態か
+    /// </summary>
+    private bool _isBusy;
 
 
     /// <summary>
@@ -77,9 +84,11 @@ class WorkAreaFileIO : BindableBase
     /// コンストラクタ
     /// </summary>
     /// <param name="workAreaManager">作業エリア管理用</param>
-    public WorkAreaFileIO(WorkAreaManager workAreaManager)
+    /// <param name="localizedMessageBox">メッセージボックス表示用</param>
+    public WorkAreaFileIO(WorkAreaManager workAreaManager, ILocalizedMessageBox localizedMessageBox)
     {
         _workAreaManager = workAreaManager;
+        _localizedMessageBox = localizedMessageBox;
     }
 
 
@@ -100,7 +109,7 @@ class WorkAreaFileIO : BindableBase
     /// </summary>
     public void CreateNew()
     {
-        var vm = new WorkAreaViewModel(_workAreaManager.ActiveLayoutID);
+        var vm = new WorkAreaViewModel(_workAreaManager.ActiveLayoutID, _localizedMessageBox);
         _workAreaManager.Documents.Add(vm);
         _workAreaManager.ActiveContent = vm;
     }
@@ -155,7 +164,7 @@ class WorkAreaFileIO : BindableBase
 
             foreach (var path in pathes)
             {
-                var vm = new WorkAreaViewModel(_workAreaManager.ActiveLayoutID);
+                var vm = new WorkAreaViewModel(_workAreaManager.ActiveLayoutID, _localizedMessageBox);
 
                 LoadingFileName = System.IO.Path.GetFileName(path);
                 doevents.ForceDoEvents();
@@ -169,7 +178,7 @@ class WorkAreaFileIO : BindableBase
         }
         catch (Exception e)
         {
-            LocalizedMessageBox.Show("Lang:MainWindow_FaildToLoadFileMessage", "Lang:MainWindow_FaildToLoadFileMessageTitle", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
+            _localizedMessageBox.Error("Lang:MainWindow_FaildToLoadFileMessage", "Lang:MainWindow_FaildToLoadFileMessageTitle", e.Message);
         }
         finally
         {

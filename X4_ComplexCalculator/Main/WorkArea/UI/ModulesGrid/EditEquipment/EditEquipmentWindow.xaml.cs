@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 using X4_ComplexCalculator.Entity;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
@@ -16,6 +17,6 @@ public partial class EditEquipmentWindow : Window
     {
         InitializeComponent();
 
-        DataContext = new EditEquipmentViewModel(equipmentManager);
+        DataContext = new EditEquipmentViewModel(equipmentManager, new LocalizedMessageBoxEx(this));
     }
 }

@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using X4_ComplexCalculator.Common;
-using X4_ComplexCalculator.Common.Localize;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 using X4_ComplexCalculator.Infrastructure;
 using X4_ComplexCalculator.Main.Menu.File.Export;
 using X4_ComplexCalculator.Main.Menu.File.Import;
@@ -36,6 +36,11 @@ class MainWindowViewModel : BindableBase, IDropTarget
 {
     #region メンバ
     /// <summary>
+    /// メッセージボックス表示用
+    /// </summary>
+    private readonly ILocalizedMessageBox _localizedMessageBox;
+
+    /// <summary>
     /// メイン画面のModel
     /// </summary>
     private readonly MainWindowModel _mainWindowModel;
@@ -50,7 +55,7 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// <summary>
     /// 作業エリア管理用
     /// </summary>
-    private readonly WorkAreaManager _workAreaManager = new();
+    private readonly WorkAreaManager _workAreaManager;
 
 
     /// <summary>
@@ -239,13 +244,17 @@ class MainWindowViewModel : BindableBase, IDropTarget
     #endregion
 
 
+
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public MainWindowViewModel()
+    /// <param name="messageBox">メッセージボックス表示用</param>
+    public MainWindowViewModel(ILocalizedMessageBox messageBox)
     {
-        _workAreaFileIO                  = new WorkAreaFileIO(_workAreaManager);
-        _mainWindowModel                 = new MainWindowModel(_workAreaManager, _workAreaFileIO);
+        _localizedMessageBox             = messageBox;
+        _workAreaManager                 = new(_localizedMessageBox);
+        _workAreaFileIO                  = new(_workAreaManager, messageBox);
+        _mainWindowModel                 = new(_workAreaManager, _workAreaFileIO, _localizedMessageBox);
         WindowLoadedCommand              = new DelegateCommand(WindowLoaded);
         WindowClosingCommand             = new DelegateCommand<CancelEventArgs>(WindowClosing);
         CreateNewCommand                 = new DelegateCommand(CreateNew);
@@ -253,7 +262,7 @@ class MainWindowViewModel : BindableBase, IDropTarget
         SaveCommand                      = new DelegateCommand(_workAreaFileIO.Save);
         SaveAsCommand                    = new DelegateCommand(_workAreaFileIO.SaveAs);
         OpenCommand                      = new DelegateCommand(Open);
-        UpdateDBCommand                  = new DelegateCommand(MainWindowModel.UpdateDB);
+        UpdateDBCommand                  = new DelegateCommand(_mainWindowModel.UpdateDB);
         ReportIssueCommand               = new DelegateCommand(ReportIssue);
         CheckUpdateAtLaunch              = new ReactiveProperty<bool>(Configuration.Instance.CheckUpdateAtLaunch);
         SetCheckUpdateAtLaunchCommand    = new DelegateCommand(SetCheckUpdateAtLaunch);
@@ -264,10 +273,10 @@ class MainWindowViewModel : BindableBase, IDropTarget
         OpenDBViewerWindowCommand        = new DelegateCommand(OpenDBViewerWindow);
         _workAreaFileIO.PropertyChanged += Member_PropertyChanged;
 
-        _importExporter = new ImportExporter(_workAreaManager);
+        _importExporter = new ImportExporter(_workAreaManager, _localizedMessageBox);
         Imports = new List<IImport>()
         {
-            new StationCalculatorImport(new DelegateCommand<IImport>(_importExporter.Import)),
+            new StationCalculatorImport(new DelegateCommand<IImport>(_importExporter.Import), messageBox),
             new StationPlanImport(new DelegateCommand<IImport>(_importExporter.Import)),
             new LoadoutImport(new DelegateCommand<IImport>(_importExporter.Import)),
             //new SaveDataImport(new DelegateCommand<IImport>(_Model.Import))   // 作成中のため未リリース
@@ -396,8 +405,8 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// </summary>
     private void ReportIssue()
     {
-        const string URL = ThisAssembly.Git.RepositoryUrl + "/issues";
-        Process.Start(new ProcessStartInfo(URL) { UseShellExecute = true });
+        string url = ThisAssembly.Git.RepositoryUrl[..^4] + "/issues";
+        Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
     }
 
 
@@ -418,14 +427,12 @@ class MainWindowViewModel : BindableBase, IDropTarget
     {
         if (_applicationUpdater.FinishedDownload && isUserOperation)
         {
-            LocalizedMessageBox.Show("Lang:CheckUpdate_FinishedDownloadDescription",
-                                     "Lang:CheckUpdate_Title", icon: MessageBoxImage.Information);
+            _localizedMessageBox.Ok("Lang:CheckUpdate_FinishedDownloadDescription", "Lang:CheckUpdate_Title");
             return;
         }
         else if (_applicationUpdater.NowDownloading && isUserOperation)
         {
-            LocalizedMessageBox.Show("Lang:CheckUpdate_StartDownloadDescription",
-                                     "Lang:CheckUpdate_Title", icon: MessageBoxImage.Information);
+            _localizedMessageBox.Ok("Lang:CheckUpdate_StartDownloadDescription", "Lang:CheckUpdate_Title");
             return;
         }
 
@@ -438,8 +445,7 @@ class MainWindowViewModel : BindableBase, IDropTarget
         {
             if (isUserOperation)
             {
-                LocalizedMessageBox.Show("Lang:CheckUpdate_FailedDescription",
-                                         "Lang:CheckUpdate_Title", icon: MessageBoxImage.Error);
+                _localizedMessageBox.Error("Lang:CheckUpdate_FailedDescription", "Lang:CheckUpdate_Title");
             }
             return;
         }
@@ -447,26 +453,17 @@ class MainWindowViewModel : BindableBase, IDropTarget
         {
             if (isUserOperation)
             {
-                LocalizedMessageBox.Show("Lang:CheckUpdate_NoUpdateDescription",
-                                         "Lang:CheckUpdate_Title", icon: MessageBoxImage.Information,
-                                         param: new[] { VersionInfo.BASE_VERSION });
+                _localizedMessageBox.Ok("Lang:CheckUpdate_NoUpdateDescription", "Lang:CheckUpdate_Title", VersionInfo.BASE_VERSION);
             }
             return;
         }
 
-        var result = LocalizedMessageBox.Show("Lang:CheckUpdate_HasUpdateDescription",
-                                              "Lang:CheckUpdate_Title",
-                                              button: MessageBoxButton.YesNo,
-                                              icon: MessageBoxImage.Question,
-                                              param: new[] {
-                                                  VersionInfo.BASE_VERSION,
-                                                  latestVersion,
-                                              });
-        if (result != MessageBoxResult.Yes) return;
+        var result = _localizedMessageBox.YesNo("Lang:CheckUpdate_HasUpdateDescription", "Lang:CheckUpdate_Title", LocalizedMessageBoxResult.Yes, VersionInfo.BASE_VERSION, latestVersion);
+
+        if (result != LocalizedMessageBoxResult.Yes) return;
 
         _applicationUpdater.StartDownloadByBackground();
-        LocalizedMessageBox.Show("Lang:CheckUpdate_StartDownloadDescription",
-                                 "Lang:CheckUpdate_Title", icon: MessageBoxImage.Information);
+        _localizedMessageBox.Ok("Lang:CheckUpdate_StartDownloadDescription", "Lang:CheckUpdate_Title");
     }
 
 
@@ -480,9 +477,7 @@ class MainWindowViewModel : BindableBase, IDropTarget
         const string DATE = ThisAssembly.Git.CommitDate;
         var dotnetVersion = Environment.Version.ToString();
 
-        LocalizedMessageBox.Show("Lang:MainWindow_Menu_Help_VersionInfo_MessageDescription", "Lang:MainWindow_Menu_Help_VersionInfo_MessageTitle",
-                                 icon: MessageBoxImage.Information,
-                                 param: new[] { VERSION, COMMIT, DATE, dotnetVersion });
+        _localizedMessageBox.Ok("Lang:MainWindow_Menu_Help_VersionInfo_MessageDescription", "Lang:MainWindow_Menu_Help_VersionInfo_MessageTitle", VERSION, COMMIT, DATE, dotnetVersion);
     }
 
 
@@ -505,7 +500,7 @@ class MainWindowViewModel : BindableBase, IDropTarget
         }
         catch (Exception e)
         {
-            LocalizedMessageBox.Show("Lang:MainWindow_UnexpectedErrorMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message, e.StackTrace ?? "");
+            _localizedMessageBox.Error("Lang:MainWindow_UnexpectedErrorMessage", "Lang:Common_MessageBoxTitle_Error", e.Message, e.StackTrace ?? "");
             Environment.Exit(-1);
         }
     }

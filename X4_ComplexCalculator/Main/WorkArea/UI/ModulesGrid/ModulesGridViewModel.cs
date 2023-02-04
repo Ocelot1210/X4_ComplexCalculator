@@ -3,6 +3,7 @@ using Prism.Mvvm;
 using System;
 using System.Windows.Data;
 using System.Windows.Input;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
@@ -86,9 +87,10 @@ public sealed class ModulesGridViewModel : BindableBase, IDisposable
     /// コンストラクタ
     /// </summary>
     /// <param name="stationData">計算機で使用するステーション情報</param>
-    public ModulesGridViewModel(IStationData stationData)
+    /// <param name="localizedMessageBox">メッセージボックス表示用</param>
+    public ModulesGridViewModel(IStationData stationData, ILocalizedMessageBox localizedMessageBox)
     {
-        _model = new ModulesGridModel(stationData.ModulesInfo);
+        _model = new ModulesGridModel(stationData.ModulesInfo, localizedMessageBox);
         ModulesView = (ListCollectionView)CollectionViewSource.GetDefaultView(_model.Modules);
         ModulesView.Filter   = Filter;
         ContextMenu = new ContextMenuOperation(stationData.ModulesInfo, ModulesView);

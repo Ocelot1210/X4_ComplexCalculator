@@ -34,7 +34,7 @@ class WorkAreaModel : BindableBase, IDisposable, IWorkArea
     /// <summary>
     /// 保存ファイル書き込み用
     /// </summary>
-    private readonly ISaveDataWriter _saveDataWriter = new SQLiteSaveDataWriter();
+    private readonly ISaveDataWriter _saveDataWriter;
     #endregion
 
 
@@ -102,8 +102,9 @@ class WorkAreaModel : BindableBase, IDisposable, IWorkArea
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public WorkAreaModel()
+    public WorkAreaModel(ISaveDataWriter saveDataWriter)
     {
+        _saveDataWriter = saveDataWriter;
         HasChanged = true;
     }
 

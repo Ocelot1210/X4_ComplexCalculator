@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Windows;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport;
 
@@ -14,6 +15,8 @@ public partial class SelectLoadoutDialog : Window
     private SelectLoadoutDialog()
     {
         InitializeComponent();
+
+        DataContext = new LoadoutImportViewModel(new LocalizedMessageBoxEx(this));
     }
 
 
