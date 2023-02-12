@@ -119,22 +119,27 @@ class WorkAreaManager : IDisposable
         // 変更があったか？
         if (vm.HasChanged)
         {
-            var result = vm.MessageBox.YesNoCancel("Lang:MainWindow_PlanClosingConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", LocalizedMessageBoxResult.Cancel, vm.Title);
+            (string, string?)[] buttons = {
+                ("Lang:MainWindow_PlanClosingConfirmMessage_Save", null),
+                ("Lang:MainWindow_PlanClosingConfirmMessage_DontSave", "Lang:MainWindow_PlanClosingConfirmMessage_DontSave_Description"),
+                ("Lang:MainWindow_PlanClosingConfirmMessage_Cancel", "Lang:MainWindow_PlanClosingConfirmMessage_Cancel_Description"),
+            };
+            var result = vm.MessageBox.MultiChoiceInfo("Lang:MainWindow_PlanClosingConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", buttons, 2, vm.Title);
 
             switch (result)
             {
                 // 保存する場合
-                case LocalizedMessageBoxResult.Yes:
+                case 0:
                     vm.Save();
                     canceled = vm.HasChanged;       // 保存したはずなのに変更点がある(保存キャンセルされた等)場合、閉じないようにする
                     break;
 
                 // 保存せずに閉じる場合
-                case LocalizedMessageBoxResult.No:
+                case 1:
                     break;
 
                 // キャンセルする場合
-                case LocalizedMessageBoxResult.Cancel:
+                default:
                     canceled = true;
                     break;
             }

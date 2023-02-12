@@ -116,12 +116,17 @@ class MainWindowModel
         // 未保存の内容が存在するか？
         if (_workAreaManager.Documents.Any(x => x.HasChanged))
         {
-            var result = _localizedMessageBox.YesNoCancel("Lang:MainWindow_ClosingConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", LocalizedMessageBoxResult.Yes);
+            (string, string?)[] buttons = { 
+                ("Lang:MainWindow_ClosingConfirmMessage_Save", null),
+                ("Lang:MainWindow_ClosingConfirmMessage_DontSave", "Lang:MainWindow_ClosingConfirmMessage_DontSave_Description"),
+                ("Lang:MainWindow_ClosingConfirmMessage_Cancel", "Lang:MainWindow_ClosingConfirmMessage_Cancel_Description"),
+            };
+            var result = _localizedMessageBox.MultiChoiceInfo("Lang:MainWindow_ClosingConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", buttons, 2);
 
             switch (result)
             {
                 // 保存する場合
-                case LocalizedMessageBoxResult.Yes:
+                case 0:
                     foreach (var doc in _workAreaManager.Documents)
                     {
                         doc.Save();
@@ -129,11 +134,11 @@ class MainWindowModel
                     break;
 
                 // 保存せずに閉じる場合
-                case LocalizedMessageBoxResult.No:
+                case 1:
                     break;
 
                 // キャンセルする場合
-                case LocalizedMessageBoxResult.Cancel:
+                default:
                     canceled = true;
                     break;
             }

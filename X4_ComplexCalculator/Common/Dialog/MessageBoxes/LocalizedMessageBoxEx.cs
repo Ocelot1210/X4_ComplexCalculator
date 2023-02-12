@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Interop;
@@ -124,7 +125,7 @@ public class LocalizedMessageBoxEx : ILocalizedMessageBox
     {
         if (_owner is null)
         {
-            return ShowDialogMain(IntPtr.Zero, messageKey, titleKey, buttons, icon, defaultButton, param);
+            return ShowDialogMain(IntPtr.Zero, messageKey, titleKey, buttons, icon, defaultButton, param).ToLocalizedMessageBoxResult();
         }
         else
         {
@@ -132,7 +133,7 @@ public class LocalizedMessageBoxEx : ILocalizedMessageBox
             {
                 var hwndOwner = new WindowInteropHelper(_owner).Handle;
 
-                return ShowDialogMain(hwndOwner, messageKey, titleKey, buttons, icon, defaultButton, param);
+                return ShowDialogMain(hwndOwner, messageKey, titleKey, buttons, icon, defaultButton, param).ToLocalizedMessageBoxResult();
             });
         }
     }
@@ -148,13 +149,13 @@ public class LocalizedMessageBoxEx : ILocalizedMessageBox
     /// <param name="defaultButton">初期選択状態のボタン</param>
     /// <param name="param"><paramref name="messageKey"/>用のパラメータ</param>
     /// <returns>選択されたボタンを表す <see cref="TaskDialogResult"/></returns>
-    private static LocalizedMessageBoxResult ShowDialogMain(
+    private static TaskDialogButton ShowDialogMain(
         IntPtr hwndOwner,
         string messageKey,
         string titleKey,
         TaskDialogButtonCollection buttons,
         TaskDialogIcon icon,
-        TaskDialogButton defaultButton,
+        TaskDialogButton? defaultButton,
         object[] param
     )
     {
@@ -167,6 +168,55 @@ public class LocalizedMessageBoxEx : ILocalizedMessageBox
             DefaultButton = defaultButton,
         };
 
-        return TaskDialog.ShowDialog(hwndOwner, page).ToLocalizedMessageBoxResult();
+        return TaskDialog.ShowDialog(hwndOwner, page);
     }
+
+
+    /// <inheritdoc/>
+    public int MultiChoiceInfo(
+        string messageKey,
+        string titleKey,
+        IEnumerable<(string textKey, string? descriptionKey)> buttonsKey,
+        int defaultButtonIndex,
+        params object[] param
+    )
+    {
+        // ボタンの一覧を準備する
+        var buttons = new TaskDialogButtonCollection();
+        var tag = 0;
+        foreach (var (textKey, descriptionKey) in buttonsKey)
+        {
+            var button = new TaskDialogCommandLinkButton()
+            {
+                Text = (string)LocalizeDictionary.Instance.GetLocalizedObject(textKey, null, null),
+                DescriptionText = descriptionKey is null ? null : (string)LocalizeDictionary.Instance.GetLocalizedObject(descriptionKey, null, null),
+                Tag = tag++,
+            };
+            
+            buttons.Add(button);
+        }
+
+        // 初期選択ボタンを設定
+        TaskDialogButton? defaultButton = null;
+        if (0 < defaultButtonIndex && defaultButtonIndex < buttons.Count)
+        {
+            defaultButton = buttons[defaultButtonIndex];
+        }
+
+        // ダイアログ表示
+        if (_owner is null)
+        {
+            return (int)ShowDialogMain(IntPtr.Zero, messageKey, titleKey, buttons, TaskDialogIcon.Information, defaultButton, param).Tag!;
+        }
+        else
+        {
+            return (int)_owner.Dispatcher.Invoke(() =>
+            {
+                var hwndOwner = new WindowInteropHelper(_owner).Handle;
+
+                return ShowDialogMain(hwndOwner, messageKey, titleKey, buttons, TaskDialogIcon.Information, defaultButton, param);
+            }).Tag!;
+        }
+    }
+
 }

@@ -213,21 +213,25 @@ class EditEquipmentViewModel : BindableBase, IDisposable
         // 装備が未保存の場合
         if (EquipmentListViewModels.Any(x => x.Unsaved.Value))
         {
-            var result = _localizedMessageBox.YesNoCancel("Lang:EditEquipmentWindow_CloseConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation",  LocalizedMessageBoxResult.Cancel);
-
+            (string, string?)[] buttons = {
+                ("Lang:EditEquipmentWindow_CloseConfirmMessage_Save", null),
+                ("Lang:EditEquipmentWindow_CloseConfirmMessage_DontSave", "Lang:EditEquipmentWindow_CloseConfirmMessage_DontSave_Description"),
+                ("Lang:EditEquipmentWindow_CloseConfirmMessage_Cancel", "Lang:EditEquipmentWindow_CloseConfirmMessage_Cancel_Description"),
+            };
+            var result = _localizedMessageBox.MultiChoiceInfo("Lang:EditEquipmentWindow_CloseConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", buttons, 2);
             switch (result)
             {
                 // 保存する場合
-                case LocalizedMessageBoxResult.Yes:
+                case 0:
                     _model.SaveEquipment();
                     break;
 
                 // 保存せずに閉じる場合
-                case LocalizedMessageBoxResult.No:
+                case 1:
                     break;
 
                 // キャンセルする場合
-                case LocalizedMessageBoxResult.Cancel:
+                default:
                     CloseWindowProperty = false;
                     e.Cancel = true;
                     break;

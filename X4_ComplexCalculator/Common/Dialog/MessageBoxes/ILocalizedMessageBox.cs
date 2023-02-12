@@ -1,4 +1,5 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
+using System.Collections.Generic;
 using System.Windows;
 
 namespace X4_ComplexCalculator.Common.Dialog.MessageBoxes;
@@ -67,6 +68,18 @@ public interface ILocalizedMessageBox
     /// <param name="vs"><paramref name="messageKey"/>用のパラメータ</param>
     /// <returns>選択されたボタンを表す <see cref="TaskDialogResult"/></returns>
     LocalizedMessageBoxResult YesNoWarn(string messageKey, string titleKey, LocalizedMessageBoxResult defaultButton, params object[] vs);
+
+
+    /// <summary>
+    /// 複数の選択肢があるメッセージボックスを表示する (Information マーク)
+    /// </summary>
+    /// <param name="messageKey">表示文字列用キー</param>
+    /// <param name="titleKey">タイトル部分用キー</param>
+    /// <param name="buttonsKey">ボタンのキーと説明文(任意)のキーのタプルの列挙</param>
+    /// <param name="defaultButtonIndex">ボタンの初期値(<paramref name="buttonsKey"/>の要素番号)</param>
+    /// <param name="vs"><paramref name="messageKey"/>用のパラメータ</param>
+    /// <returns>選択されたボタンの要素番号</returns>
+    public int MultiChoiceInfo(string messageKey, string titleKey, IEnumerable<(string textKey, string? descriptionKey)> buttonsKey, int defaultButtonIndex, params object[] vs);
 
 
     /// <summary>
