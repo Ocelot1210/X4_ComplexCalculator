@@ -97,7 +97,7 @@
                 <Slider
                     x:Name="HourSlider"
                     IsSnapToTickEnabled="True"
-                    Maximum="{Binding Value, ElementName=MaxHourUpDown}"
+                    Maximum="{Binding Value, ElementName=MaxHourUpDown, Converter={StaticResource LongUpDownConverter}, ConverterParameter=2}"
                     Minimum="1"
                     TickFrequency="1"
                     Value="{Binding Hour, Mode=TwoWay}" />
@@ -211,13 +211,13 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <xctk:IntegerUpDown
+                            <xctk:LongUpDown
                                 ClipValueToMinMax="True"
                                 FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
                                 FormatString="{StaticResource DefaultNumericFormat}"
                                 Maximum="{Binding MaxAllocableCount, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                 Minimum="0"
-                                Value="{Binding AllocCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                Value="{Binding AllocCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LongUpDownConverter}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </x4cmn:MouseHoverEditCellColumn>
