@@ -109,7 +109,7 @@ class WorkAreaFileIO : BindableBase
     /// </summary>
     public void CreateNew()
     {
-        var vm = new WorkAreaViewModel(_workAreaManager.ActiveLayoutID, _localizedMessageBox);
+        var vm = new WorkAreaViewModel(_workAreaManager.ActiveLayoutID, _localizedMessageBox.Clone());
         _workAreaManager.Documents.Add(vm);
         _workAreaManager.ActiveContent = vm;
     }
@@ -164,7 +164,7 @@ class WorkAreaFileIO : BindableBase
 
             foreach (var path in pathes)
             {
-                var vm = new WorkAreaViewModel(_workAreaManager.ActiveLayoutID, _localizedMessageBox);
+                var vm = new WorkAreaViewModel(_workAreaManager.ActiveLayoutID, _localizedMessageBox.Clone());
 
                 LoadingFileName = System.IO.Path.GetFileName(path);
                 doevents.ForceDoEvents();

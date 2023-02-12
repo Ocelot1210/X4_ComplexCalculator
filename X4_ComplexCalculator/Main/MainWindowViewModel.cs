@@ -95,6 +95,7 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// </summary>
     public ICommand WindowLoadedCommand { get; }
 
+
     /// <summary>
     /// Windowが閉じられる時
     /// </summary>

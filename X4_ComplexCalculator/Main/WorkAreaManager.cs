@@ -89,7 +89,7 @@ class WorkAreaManager : IDisposable
             {
                 foreach (var document in Documents)
                 {
-                    document.SetLayout(layoutID);
+                    document.LayoutManager.SetLayout(layoutID);
                 }
             });
     }
@@ -119,7 +119,7 @@ class WorkAreaManager : IDisposable
         // 変更があったか？
         if (vm.HasChanged)
         {
-            var result = _messageBox.YesNoCancel("Lang:MainWindow_PlanClosingConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", LocalizedMessageBoxResult.Cancel, vm.Title);
+            var result = vm.MessageBox.YesNoCancel("Lang:MainWindow_PlanClosingConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", LocalizedMessageBoxResult.Cancel, vm.Title);
 
             switch (result)
             {

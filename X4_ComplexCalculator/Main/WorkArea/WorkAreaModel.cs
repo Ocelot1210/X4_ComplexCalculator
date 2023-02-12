@@ -44,7 +44,7 @@ class WorkAreaModel : BindableBase, IDisposable, IWorkArea
     /// </summary>
     public string Title
     {
-        get => _title;
+        get => string.IsNullOrEmpty(_title) ? "no title*" : (HasChanged) ? $"{_title}*" : _title;
         set => SetProperty(ref _title, value);
     }
 

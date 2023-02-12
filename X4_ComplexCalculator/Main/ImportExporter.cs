@@ -47,7 +47,7 @@ class ImportExporter
 
         for (var cnt = 0; cnt < importCnt; cnt++)
         {
-            var vm = new WorkAreaViewModel(_workAreaManager.ActiveLayoutID, _localizedMessageBox);
+            var vm = new WorkAreaViewModel(_workAreaManager.ActiveLayoutID, _localizedMessageBox.Clone());
 
             if (vm.Import(import))
             {

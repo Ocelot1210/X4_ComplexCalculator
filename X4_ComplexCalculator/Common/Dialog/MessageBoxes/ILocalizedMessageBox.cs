@@ -1,4 +1,5 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
+using System.Windows;
 
 namespace X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 
@@ -66,4 +67,18 @@ public interface ILocalizedMessageBox
     /// <param name="vs"><paramref name="messageKey"/>用のパラメータ</param>
     /// <returns>選択されたボタンを表す <see cref="TaskDialogResult"/></returns>
     LocalizedMessageBoxResult YesNoWarn(string messageKey, string titleKey, LocalizedMessageBoxResult defaultButton, params object[] vs);
+
+
+    /// <summary>
+    /// 親ウィンドウを設定する
+    /// </summary>
+    /// <param name="window">新しいウィンドウ</param>
+    void SetOwner(Window? window);
+
+
+    /// <summary>
+    /// 自分自身を複製する
+    /// </summary>
+    /// <returns>複製結果</returns>
+    ILocalizedMessageBox Clone();
 }

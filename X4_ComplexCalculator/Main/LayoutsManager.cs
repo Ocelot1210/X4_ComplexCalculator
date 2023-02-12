@@ -5,10 +5,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Windows;
 using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
-using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.Menu.Layout;
 using X4_ComplexCalculator.Main.WorkArea;
@@ -133,7 +131,7 @@ class LayoutsManager : IDisposable
             {
                 try
                 {
-                    var layoutID = vm.SaveLayout(layoutName);
+                    var layoutID = vm.LayoutManager.SaveLayout(layoutName);
 
                     Layouts.Add(new LayoutMenuItem(layoutID, layoutName, false));
                 }
@@ -162,7 +160,7 @@ class LayoutsManager : IDisposable
 
         try
         {
-            _workAreaManager.ActiveContent.OverwriteSaveLayout(menuItem.LayoutID);
+            _workAreaManager.ActiveContent.LayoutManager.OverwriteSaveLayout(menuItem.LayoutID);
 
             _localizedMessageBox.Ok("Lang:MainWindow_Menu_Layout_MenuItem_LayoutList_Overwrite_SuccessMessage", "Lang:Common_MessageBoxTitle_Confirmation", _workAreaManager.ActiveContent.Title, menuItem.LayoutName);
         }

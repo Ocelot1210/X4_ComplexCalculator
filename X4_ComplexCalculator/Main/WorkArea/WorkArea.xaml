@@ -15,7 +15,6 @@
     xmlns:storGrid="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid"
     xmlns:stsmry="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.StationSummary"
     xmlns:stst="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.StationSettings"
-    xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
     d:DesignHeight="450"
     d:DesignWidth="800"
     lex:LocalizeDictionary.DefaultProvider="{StaticResource CSVLocalizationProvider}"
@@ -29,6 +28,7 @@
             <i:InvokeCommandAction Command="{Binding OnLoadedCommand, Mode=OneTime}" CommandParameter="{Binding ElementName=dockingManager}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
+
 
 
     <Grid>

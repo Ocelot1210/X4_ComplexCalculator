@@ -15,7 +15,7 @@ public class LocalizedMessageBoxEx : ILocalizedMessageBox
     /// <summary>
     /// 親ウィンドウ
     /// </summary>
-    private readonly Window? _owner;
+    private Window? _owner;
 
 
     /// <summary>
@@ -46,6 +46,20 @@ public class LocalizedMessageBoxEx : ILocalizedMessageBox
         _buttonsOkOnly = new() { TaskDialogButton.OK };
         _buttonsYesNo = new() { TaskDialogButton.Yes, TaskDialogButton.No };
         _buttonsYesNoCancel = new() { TaskDialogButton.Yes, TaskDialogButton.No, TaskDialogButton.Cancel };
+    }
+
+
+    /// <inheritdoc/>
+    public void SetOwner(Window? window)
+    {
+        _owner = window;
+    }
+
+
+    /// <inheritdoc/>
+    public ILocalizedMessageBox Clone()
+    {
+        return new LocalizedMessageBoxEx(_owner);
     }
 
 
