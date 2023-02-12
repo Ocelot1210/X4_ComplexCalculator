@@ -62,10 +62,6 @@ class MainWindowModel
             .Where(x => File.Exists(x))
             .ToArray();
 
-
-        // 開いているファイルテーブルを初期化
-        SettingDatabase.Instance.Execute("DELETE FROM OpenedFiles");
-
         _workAreFileIO.OpenFiles(pathes);
 
         // 何も開かなければ空の計画を追加する
@@ -147,11 +143,15 @@ class MainWindowModel
         // 閉じる場合、開いていたファイル一覧を保存する
         if (!canceled)
         {
-            var pathes = _workAreaManager.Documents
+            var paths = _workAreaManager.Documents
                 .Where(x => File.Exists(x.SaveFilePath))
                 .Select(x => new { Path = x.SaveFilePath });
 
-            SettingDatabase.Instance.Execute("INSERT INTO OpenedFiles(Path) VALUES(@Path)", pathes);
+            SettingDatabase.Instance.BeginTransaction((con) =>
+            {
+                con.Execute("DELETE FROM OpenedFiles");
+                con.Execute("INSERT INTO OpenedFiles(Path) VALUES(@Path)", paths);
+            });
         }
 
         return canceled;
