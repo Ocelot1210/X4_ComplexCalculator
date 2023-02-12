@@ -5,13 +5,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Windows;
 using System.Windows.Input;
-using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Linq;
 using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.Common.Localize;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport;
 
@@ -22,6 +20,12 @@ class SelectStationModel : BindableBase
     /// セーブデータファイルパス
     /// </summary>
     string _saveDataFilePath = "";
+
+
+    /// <summary>
+    /// メッセージボックス表示用
+    /// </summary>
+    private readonly ILocalizedMessageBox _messageBox;
     #endregion
 
 
@@ -45,9 +49,10 @@ class SelectStationModel : BindableBase
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public SelectStationModel()
+    /// <param name="messageBox">メッセージボックス表示用</param>
+    public SelectStationModel(ILocalizedMessageBox messageBox)
     {
-
+        _messageBox = messageBox;
     }
 
 
@@ -106,10 +111,7 @@ class SelectStationModel : BindableBase
             }
             catch (Exception e)
             {
-                Dispatcher.CurrentDispatcher.BeginInvoke(() =>
-                {
-                    LocalizedMessageBox.Show("Lang:MainWindow_FaildToLoadFileMessage", "Lang:MainWindow_FaildToLoadFileMessageTitle", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
-                });
+                _messageBox.Error("Lang:MainWindow_FaildToLoadFileMessage", "Lang:MainWindow_FaildToLoadFileMessageTitle", e.Message);
             }
             finally
             {

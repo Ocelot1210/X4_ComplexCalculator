@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport;
 
@@ -89,9 +90,10 @@ class SelectPlanViewModel : BindableBase
     /// コンストラクタ
     /// </summary>
     /// <param name="planItems">選択計画一覧</param>
-    public SelectPlanViewModel(List<StationPlanItem> planItems)
+    /// <param name="messageBox">メッセージボックス表示用</param>
+    public SelectPlanViewModel(List<StationPlanItem> planItems, ILocalizedMessageBox messageBox)
     {
-        _model = new SelectPlanModel();
+        _model = new SelectPlanModel(messageBox);
         _model.PropertyChanged += Model_PropertyChanged;
         _selectedPlanItems = planItems;
 

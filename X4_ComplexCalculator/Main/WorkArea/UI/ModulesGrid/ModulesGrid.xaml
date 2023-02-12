@@ -7,6 +7,7 @@
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:x4cvt="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
     xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
     xmlns:x4ccrtl="clr-namespace:X4_ComplexCalculator_CustomControlLibrary;assembly=X4_ComplexCalculator_CustomControlLibrary"
     xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
@@ -135,7 +136,7 @@
 
             <!--  モジュール一覧DataGridの列定義  -->
             <DataGrid.Columns>
-
+                
                 <!--  モジュール名  -->
                 <DataGridTemplateColumn
                     ClipboardContentBinding="{Binding ModuleName}"
@@ -179,12 +180,12 @@
                     <!--  編集モード  -->
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <xctk:IntegerUpDown
+                            <xctk:LongUpDown
                                 ClipValueToMinMax="True"
                                 FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
                                 Maximum="99999"
                                 Minimum="0"
-                                Value="{Binding ModuleCount, UpdateSourceTrigger=PropertyChanged}" />
+                                Value="{Binding ModuleCount, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LongUpDownConverter}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </x4cmn:MouseHoverEditCellColumn>

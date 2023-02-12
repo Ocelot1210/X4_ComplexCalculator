@@ -5,7 +5,7 @@ using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Threading;
 using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.Common.Localize;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 using X4_ComplexCalculator.Main.Menu.Layout;
 using X4_ComplexCalculator.Main.WorkArea;
 
@@ -65,9 +65,10 @@ class WorkAreaManager : IDisposable
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public WorkAreaManager()
+    /// <param name="messageBox">メッセージボックス表示用</param>
+    public WorkAreaManager(ILocalizedMessageBox messageBox)
     {
-        _layoutsManager = new LayoutsManager(this);
+        _layoutsManager = new LayoutsManager(this, messageBox);
 
         _gcTimer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, new EventHandler(GarvageCollect), Application.Current.Dispatcher);
         _gcTimer.Stop();
@@ -80,7 +81,7 @@ class WorkAreaManager : IDisposable
             {
                 foreach (var document in Documents)
                 {
-                    document.SetLayout(layoutID);
+                    document.LayoutManager.SetLayout(layoutID);
                 }
             });
     }
@@ -110,22 +111,27 @@ class WorkAreaManager : IDisposable
         // 変更があったか？
         if (vm.HasChanged)
         {
-            var result = LocalizedMessageBox.Show("Lang:MainWindow_PlanClosingConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Cancel, vm.Title);
+            (string, string?)[] buttons = {
+                ("Lang:MainWindow_PlanClosingConfirmMessage_Save", null),
+                ("Lang:MainWindow_PlanClosingConfirmMessage_DontSave", "Lang:MainWindow_PlanClosingConfirmMessage_DontSave_Description"),
+                ("Lang:MainWindow_PlanClosingConfirmMessage_Cancel", "Lang:MainWindow_PlanClosingConfirmMessage_Cancel_Description"),
+            };
+            var result = vm.MessageBox.MultiChoiceInfo("Lang:MainWindow_PlanClosingConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", buttons, 2, vm.Title);
 
             switch (result)
             {
                 // 保存する場合
-                case MessageBoxResult.Yes:
+                case 0:
                     vm.Save();
                     canceled = vm.HasChanged;       // 保存したはずなのに変更点がある(保存キャンセルされた等)場合、閉じないようにする
                     break;
 
                 // 保存せずに閉じる場合
-                case MessageBoxResult.No:
+                case 1:
                     break;
 
                 // キャンセルする場合
-                case MessageBoxResult.Cancel:
+                default:
                     canceled = true;
                     break;
             }

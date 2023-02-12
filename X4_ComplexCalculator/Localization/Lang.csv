@@ -54,7 +54,17 @@ MainWindow_Title;X4: Complex Calculator
 MainWindow_FaildToLoadFileMessage;Failed to load the file.\r\n\r\n■Reason：\r\n{0}
 MainWindow_FaildToLoadFileMessageTitle;Read failure
 MainWindow_ClosingConfirmMessage;There are some unsaved items. Do you want to save it?
+MainWindow_ClosingConfirmMessage_Save;Save and exit
+MainWindow_ClosingConfirmMessage_DontSave;Exit without saving
+MainWindow_ClosingConfirmMessage_DontSave_Description;Unsaved items are discarded.
+MainWindow_ClosingConfirmMessage_Cancel;Cancel
+MainWindow_ClosingConfirmMessage_Cancel_Description;Returns to the calculator without exiting.
 MainWindow_PlanClosingConfirmMessage;Do you want to save the changes to your plan "{0}"?
+MainWindow_PlanClosingConfirmMessage_Save;Save and close
+MainWindow_PlanClosingConfirmMessage_DontSave;Close without saving
+MainWindow_PlanClosingConfirmMessage_DontSave_Description;Unsaved changes are discarded.
+MainWindow_PlanClosingConfirmMessage_Cancel;Cancel
+MainWindow_PlanClosingConfirmMessage_Cancel_Description;Returns to the calculator without exiting.
 MainWindow_SaveDataWriteFailureMessage;Failed to save.\r\n\r\n■Reason：\r\n{0}\r\n\r\n■Stack trace：\r\n{1}
 MainWindow_ImportFailureMessage;Failed to import.\r\n■Reason：\r\n{0}
 MainWindow_UnexpectedErrorMessage;Unexpected error occurred.\r\n■Error contents：\r\n{0}\r\n\r\n■Stack trace：\r\n{1}
@@ -278,8 +288,13 @@ EditEquipmentWindow_Button_OverwritePreset_ToolTip;Overwrite Loadout
 EditEquipmentWindow_TextBlock_List_Text;List : 
 EditEquipmentWindow_TextBlock_Equipped_Text;Equipped = [{0}/{1}]
 EditEquipmentWindow_Button_Add_ToolTip;You can add a selection at once by clicking while holding down the left Shift key.
-EditEquipmentWindow_Button_Save_Content;Save
+EditEquipmentWindow_Button_Save_Content;Save and close
 EditEquipmentWindow_CloseConfirmMessage;Do you want to save your changes?
+EditEquipmentWindow_CloseConfirmMessage_Save;Save and close
+EditEquipmentWindow_CloseConfirmMessage_DontSave;Exit without saving
+EditEquipmentWindow_CloseConfirmMessage_DontSave_Description;Unsaved items are discarded.
+EditEquipmentWindow_CloseConfirmMessage_Cancel;Cancel
+EditEquipmentWindow_CloseConfirmMessage_Cancel_Description;Returns to the edit equipment window without exiting.
 SaveNewPreset_Title;Save new preset
 SaveNewPreset_Description;Please enter a preset name
 RenamePreset_Title;Rename preset name

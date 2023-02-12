@@ -9,10 +9,9 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
-using X4_ComplexCalculator.Common.Localize;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Entity;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList;
@@ -29,6 +28,12 @@ class EditEquipmentViewModel : BindableBase, IDisposable
     /// 装備編集画面のModel
     /// </summary>
     private readonly EditEquipmentModel _model;
+
+
+    /// <summary>
+    /// メッセージボックス表示用
+    /// </summary>
+    private readonly ILocalizedMessageBox _localizedMessageBox;
 
 
     /// <summary>
@@ -151,13 +156,14 @@ class EditEquipmentViewModel : BindableBase, IDisposable
     /// コンストラクタ
     /// </summary>
     /// <param name="equipmentManager">編集対象の装備情報</param>
-    public EditEquipmentViewModel(EquippableWareEquipmentManager equipmentManager)
+    /// <param name="messageBox">メッセージボックス表示用</param>
+    public EditEquipmentViewModel(EquippableWareEquipmentManager equipmentManager, ILocalizedMessageBox messageBox)
     {
         ModuleName = equipmentManager.Ware.Name;
 
         // Model類
-        _model = new EditEquipmentModel(equipmentManager);
-
+        _model = new EditEquipmentModel(equipmentManager, messageBox);
+        _localizedMessageBox = messageBox;
 
         // コマンド類
         SaveButtonClickedCommand = new DelegateCommand(SavebuttonClicked);
@@ -207,21 +213,25 @@ class EditEquipmentViewModel : BindableBase, IDisposable
         // 装備が未保存の場合
         if (EquipmentListViewModels.Any(x => x.Unsaved.Value))
         {
-            var result = LocalizedMessageBox.Show("Lang:EditEquipmentWindow_CloseConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
-
+            (string, string?)[] buttons = {
+                ("Lang:EditEquipmentWindow_CloseConfirmMessage_Save", null),
+                ("Lang:EditEquipmentWindow_CloseConfirmMessage_DontSave", "Lang:EditEquipmentWindow_CloseConfirmMessage_DontSave_Description"),
+                ("Lang:EditEquipmentWindow_CloseConfirmMessage_Cancel", "Lang:EditEquipmentWindow_CloseConfirmMessage_Cancel_Description"),
+            };
+            var result = _localizedMessageBox.MultiChoiceInfo("Lang:EditEquipmentWindow_CloseConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", buttons, 2);
             switch (result)
             {
                 // 保存する場合
-                case MessageBoxResult.Yes:
+                case 0:
                     _model.SaveEquipment();
                     break;
 
                 // 保存せずに閉じる場合
-                case MessageBoxResult.No:
+                case 1:
                     break;
 
                 // キャンセルする場合
-                case MessageBoxResult.Cancel:
+                default:
                     CloseWindowProperty = false;
                     e.Cancel = true;
                     break;

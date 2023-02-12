@@ -3,10 +3,9 @@ using Reactive.Bindings;
 using System;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Windows;
 using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
-using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Entity;
@@ -24,6 +23,13 @@ class EditEquipmentModel : BindableBase, IDisposable
     /// 編集対象の装備管理
     /// </summary>
     private readonly EquippableWareEquipmentManager _manager;
+
+
+    /// <summary>
+    /// メッセージボックス表示用
+    /// </summary>
+    private readonly ILocalizedMessageBox _localizedMessageBox;
+
 
     /// <summary>
     /// プリセット削除中か
@@ -75,10 +81,12 @@ class EditEquipmentModel : BindableBase, IDisposable
     /// コンストラクタ
     /// </summary>
     /// <param name="ware">編集対象ウェア</param>
-    public EditEquipmentModel(EquippableWareEquipmentManager equipmentManager)
+    /// <param name="localizedMessageBox">メッセージボックス表示用</param>
+    public EditEquipmentModel(EquippableWareEquipmentManager equipmentManager, ILocalizedMessageBox localizedMessageBox)
     {
         // 初期化
         _manager = equipmentManager;
+        _localizedMessageBox = localizedMessageBox;
         InitEquipmentSizes();
         UpdateFactions();
         InitPreset();
@@ -236,8 +244,8 @@ class EditEquipmentModel : BindableBase, IDisposable
             return;
         }
 
-        var result = LocalizedMessageBox.Show("Lang:DeletePresetConfirmMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.YesNo, MessageBoxImage.Exclamation, MessageBoxResult.No, SelectedPreset.Value.Name);
-        if (result == MessageBoxResult.Yes)
+        var result = _localizedMessageBox.YesNo("Lang:DeletePresetConfirmMessage", "Lang:Common_MessageBoxTitle_Error", LocalizedMessageBoxResult.No, SelectedPreset.Value.Name);
+        if (result == LocalizedMessageBoxResult.Yes)
         {
             SettingDatabase.Instance.DeleteModulePreset(_manager.Ware.ID, SelectedPreset.Value.ID);
 
@@ -285,13 +293,13 @@ class EditEquipmentModel : BindableBase, IDisposable
     /// </summary>
     /// <param name="presetName">判定対象プリセット名</param>
     /// <returns>プリセット名が有効か</returns>
-    static private bool IsValidPresetName(string presetName)
+    private bool IsValidPresetName(string presetName)
     {
         var ret = true;
 
         if (string.IsNullOrWhiteSpace(presetName))
         {
-            LocalizedMessageBox.Show("Lang:InvalidPresetNameMessage", "Lang:Common_MessageBoxTitle_Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+            _localizedMessageBox.Warn("Lang:InvalidPresetNameMessage", "Lang:Common_MessageBoxTitle_Warning");
             ret = false;
         }
 

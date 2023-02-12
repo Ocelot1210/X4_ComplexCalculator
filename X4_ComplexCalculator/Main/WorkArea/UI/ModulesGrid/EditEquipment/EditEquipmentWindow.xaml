@@ -12,7 +12,7 @@
     xmlns:xctk="clr-namespace:Xceed.Wpf.Toolkit;assembly=DotNetProjects.Wpf.Extended.Toolkit"
     x:Name="window"
     Title="{lex:Loc Lang:EditEquipmentWindow_Title}"
-    Width="800"
+    Width="850"
     Height="450"
     lex:LocalizeDictionary.DefaultProvider="{StaticResource CSVLocalizationProvider}"
     lex:LocalizeDictionary.DesignCulture="en-US"
@@ -45,7 +45,7 @@
             <ColumnDefinition Width="1.5*" />
             <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="2*" />
-            <ColumnDefinition Width="1.5*" />
+            <ColumnDefinition Width="1.7*" />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
@@ -145,7 +145,7 @@
             <Button
                 x:Name="SaveButton"
                 Grid.Column="0"
-                Width="75"
+                Width="90"
                 Height="20"
                 Command="{Binding SaveButtonClickedCommand}"
                 CommandParameter="{Binding ElementName=window}"

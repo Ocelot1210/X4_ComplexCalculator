@@ -3,11 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Windows;
 using System.Windows.Input;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
 using X4_ComplexCalculator.Common.EditStatus;
-using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Main.WorkArea;
@@ -21,6 +20,12 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import;
 class StationCalculatorImport : BindableBase, IImport
 {
     #region メンバ
+    /// <summary>
+    /// メッセージボックス表示用
+    /// </summary>
+    private readonly ILocalizedMessageBox _messageBox;
+
+
     /// <summary>
     /// 入力されたURL
     /// </summary>
@@ -51,8 +56,13 @@ class StationCalculatorImport : BindableBase, IImport
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    /// <param name="command">Viewより呼ばれるCommand</param>
-    public StationCalculatorImport(ICommand command) => Command = command;
+    /// <param name="command">Viewより呼ばれる <see cref="ICommand"/></param>
+    /// <param name="messageBox">メッセージボックス表示用</param>
+    public StationCalculatorImport(ICommand command, ILocalizedMessageBox messageBox)
+    {
+        _messageBox = messageBox;
+        Command = command;
+    }
 
 
     /// <summary>
@@ -123,7 +133,7 @@ class StationCalculatorImport : BindableBase, IImport
         }
         catch (Exception e)
         {
-            LocalizedMessageBox.Show("Lang:MainWindow_ImportFailureMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
+            _messageBox.Error("Lang:MainWindow_ImportFailureMessage", "Lang:Common_MessageBoxTitle_Error", e.Message);
         }
 
         return ret;

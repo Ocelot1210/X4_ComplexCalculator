@@ -18,10 +18,6 @@
     WindowStyle="ToolWindow"
     mc:Ignorable="d">
 
-    <Window.DataContext>
-        <local:LoadoutImportViewModel />
-    </Window.DataContext>
-
     <Window.Resources>
         <!--  データ中継用  -->
         <x4cmn:BindingProxy x:Key="ProxyIsCheckedAll" Data="{Binding IsCheckedAll, Mode=TwoWay}" />

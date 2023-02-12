@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 using X4_ComplexCalculator.Common.EditStatus;
-using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
 
@@ -13,6 +13,18 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 class ModulesGridModel : IDisposable
 {
     #region メンバ
+    /// <summary>
+    /// モジュール一覧情報
+    /// </summary>
+    private readonly IModulesInfo _modulesInfo;
+
+
+    /// <summary>
+    /// メッセージボックス表示用
+    /// </summary>
+    private readonly ILocalizedMessageBox _localizedMessageBox;
+
+
     /// <summary>
     /// モジュール選択ウィンドウ
     /// </summary>
@@ -23,12 +35,6 @@ class ModulesGridModel : IDisposable
     /// モジュール選択ウィンドウがクローズ済みか
     /// </summary>
     private bool _selectModuleWindowClosed = true;
-
-
-    /// <summary>
-    /// モジュール一覧情報
-    /// </summary>
-    private readonly IModulesInfo _modulesInfo;
     #endregion
 
 
@@ -43,9 +49,12 @@ class ModulesGridModel : IDisposable
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public ModulesGridModel(IModulesInfo modulesInfo)
+    /// <param name="modulesInfo">モジュール一覧</param>
+    /// <param name="localizedMessageBox">メッセージボックス表示用</param>
+    public ModulesGridModel(IModulesInfo modulesInfo, ILocalizedMessageBox localizedMessageBox)
     {
         _modulesInfo = modulesInfo;
+        _localizedMessageBox = localizedMessageBox;
         WPFLocalizeExtension.Engine.LocalizeDictionary.Instance.PropertyChanged += LocalizeInstance_PropertyChanged;
     }
 
@@ -163,8 +172,8 @@ class ModulesGridModel : IDisposable
             return;
         }
 
-        var result = LocalizedMessageBox.Show("Lang:Modules_Button_Merge_ConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
-        if (result != MessageBoxResult.Yes)
+        var result = _localizedMessageBox.YesNo("Lang:Modules_Button_Merge_ConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", LocalizedMessageBoxResult.No);
+        if (result != LocalizedMessageBoxResult.Yes)
         {
             return;
         }
@@ -195,11 +204,11 @@ class ModulesGridModel : IDisposable
         if (prevCnt != dict.Count)
         {
             _modulesInfo.Modules.Reset(dict.OrderBy(x => x.Value.idx).Select(x => x.Value.Module));
-            LocalizedMessageBox.Show("Lang:Modules_Button_Merge_MergeModulesMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, mergedModules, prevCnt - dict.Count);
+            _localizedMessageBox.Ok("Lang:Modules_Button_Merge_MergeModulesMessage", "Lang:Common_MessageBoxTitle_Confirmation", mergedModules, prevCnt - dict.Count);
         }
         else
         {
-            LocalizedMessageBox.Show("Lang:Modules_Button_Merge_NoMergeModulesMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);
+            _localizedMessageBox.Ok("Lang:Modules_Button_Merge_NoMergeModulesMessage", "Lang:Common_MessageBoxTitle_Confirmation");
         }
     }
 }

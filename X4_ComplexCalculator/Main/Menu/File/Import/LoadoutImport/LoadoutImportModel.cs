@@ -4,13 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Windows;
 using System.Windows.Input;
-using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Linq;
 using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.Common.Localize;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport;
 
@@ -20,6 +18,12 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport;
 class LoadoutImportModel : BindableBase
 {
     #region メンバ
+    /// <summary>
+    /// メッセージボックス表示用
+    /// </summary>
+    private readonly ILocalizedMessageBox _localizedMessageBox;
+
+
     /// <summary>
     /// 装備プリセットファイルパス
     /// </summary>
@@ -48,8 +52,11 @@ class LoadoutImportModel : BindableBase
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public LoadoutImportModel()
+    /// <param name="localizedMessageBox">メッセージボックス表示用</param>
+    public LoadoutImportModel(ILocalizedMessageBox localizedMessageBox)
     {
+        _localizedMessageBox = localizedMessageBox;
+
         var docDir = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
 
         var x4Dir = Path.Combine(docDir, "Egosoft\\X4");
@@ -112,10 +119,7 @@ class LoadoutImportModel : BindableBase
             }
             catch (Exception e)
             {
-                Dispatcher.CurrentDispatcher.BeginInvoke(() =>
-                {
-                    LocalizedMessageBox.Show("Lang:MainWindow_FaildToLoadFileMessage", "Lang:MainWindow_FaildToLoadFileMessageTitle", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
-                });
+                _localizedMessageBox.Error("Lang:MainWindow_FaildToLoadFileMessage", "Lang:MainWindow_FaildToLoadFileMessageTitle", e.Message);
             }
             finally
             {
@@ -144,19 +148,19 @@ class LoadoutImportModel : BindableBase
         // プリセットが何も選択されなかったか？
         if (cnt == 0)
         {
-            LocalizedMessageBox.Show("Lang:ImportLoadout_NoPresetSelectedMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Warning);
+            _localizedMessageBox.Warn("Lang:ImportLoadout_NoPresetSelectedMessage", "Lang:Common_MessageBoxTitle_Confirmation");
             return;
         }
 
         // プリセットの全件インポート成功したか？
         if (cnt == succeeded)
         {
-            LocalizedMessageBox.Show("Lang:ImportLoadout_ImportSucceededMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, succeeded);
+            _localizedMessageBox.Ok("Lang:ImportLoadout_ImportSucceededMessage", "Lang:Common_MessageBoxTitle_Confirmation", succeeded);
             return;
         }
 
         // 1件以上のインポートに失敗
-        LocalizedMessageBox.Show("Lang:ImportLoadout_ImportFailedMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, succeeded, cnt - succeeded);
+        _localizedMessageBox.Error("Lang:ImportLoadout_ImportFailedMessage", "Lang:Common_MessageBoxTitle_Error", succeeded, cnt - succeeded);
     }
 
 

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Windows;
 using X4_ComplexCalculator.Common;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB.X4DB.Manager;
 using X4_DataExporterWPF.DataExportWindow;
@@ -118,8 +119,9 @@ class X4Database : DBConnection
     /// <summary>
     /// X4 データベースを開く
     /// </summary>
+    /// <param name="localizedMessageBox">メッセージボックス表示用</param>
     /// <returns>X4 データベース</returns>
-    public static void Open()
+    public static void Open(ILocalizedMessageBox localizedMessageBox)
     {
         if (_Instance is not null) return;
 
@@ -146,12 +148,12 @@ class X4Database : DBConnection
                     // 想定するDBのフォーマットと実際のフォーマットが異なる場合
                     // DB更新を要求
 
-                    LocalizedMessageBox.Show("Lang:DB_OldFormatMessage", "Lang:Common_MessageBoxTitle_Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    localizedMessageBox.Warn("Lang:DB_OldFormatMessage", "Lang:Common_MessageBoxTitle_Warning");
                     if (UpdateDB() != UpdateDbStatus.Succeeded)
                     {
                         // DB更新を要求してもフォーマットが変わらない場合
 
-                        LocalizedMessageBox.Show("Lang:DB_UpdateRequestMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        localizedMessageBox.Error("Lang:DB_UpdateRequestMessage", "Lang:Common_MessageBoxTitle_Error");
                         Environment.Exit(-1);
                     }
                 }
@@ -161,10 +163,10 @@ class X4Database : DBConnection
                 // X4DBが存在しない場合
 
                 // X4DBの作成を要求する
-                LocalizedMessageBox.Show("Lang:DB_ExtractionRequestMessage", "Lang:Common_MessageBoxTitle_Confirmation", MessageBoxButton.OK, MessageBoxImage.Information);
+                localizedMessageBox.Ok("Lang:DB_ExtractionRequestMessage", "Lang:Common_MessageBoxTitle_Confirmation");
                 if (UpdateDB() != UpdateDbStatus.Succeeded)
                 {
-                    LocalizedMessageBox.Show("Lang:DB_MakeRequestMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    localizedMessageBox.Error("Lang:DB_MakeRequestMessage", "Lang:Common_MessageBoxTitle_Error");
                     Environment.Exit(-1);
                 }
             }
@@ -172,20 +174,20 @@ class X4Database : DBConnection
         catch
         {
             // X4DBを開く際にエラーがあった場合、DB更新を提案する
-            if (LocalizedMessageBox.Show("Lang:DB_OpenFailMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.YesNo, MessageBoxImage.Error) == MessageBoxResult.Yes)
+            if (localizedMessageBox.YesNoWarn("Lang:DB_OpenFailMessage", "Lang:Common_MessageBoxTitle_Error", LocalizedMessageBoxResult.Yes) == LocalizedMessageBoxResult.Yes)
             {
                 // 提案が受け入れられた場合、DB更新
                 if (UpdateDB() != UpdateDbStatus.Succeeded)
                 {
                     // DB更新失敗
-                    LocalizedMessageBox.Show("Lang:DB_UpdateRequestMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    localizedMessageBox.Error("Lang:DB_UpdateRequestMessage", "Lang:Common_MessageBoxTitle_Error");
                     Environment.Exit(-1);
                 }
             }
             else
             {
                 // 提案が受け入れられなかった場合
-                LocalizedMessageBox.Show("Lang:DB_UpdateRequestMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                localizedMessageBox.Error("Lang:DB_UpdateRequestMessage", "Lang:Common_MessageBoxTitle_Error");
                 Environment.Exit(-1);
             }
         }

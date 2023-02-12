@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
 using System.Windows.Input;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Products;
 
@@ -139,9 +140,10 @@ public sealed class ProductsGridViewModel : BindableBase, IDisposable
     /// コンストラクタ
     /// </summary>
     /// <param name="stationData">計算機で使用するステーション情報</param>
-    public ProductsGridViewModel(IStationData stationData)
+    /// <param name="messageBox">メッセージボックス表示用</param>
+    public ProductsGridViewModel(IStationData stationData, ILocalizedMessageBox messageBox)
     {
-        _model = new ProductsGridModel(stationData.ModulesInfo, stationData.ProductsInfo, stationData.Settings);
+        _model = new ProductsGridModel(stationData.ModulesInfo, stationData.ProductsInfo, stationData.Settings, messageBox);
         ProductsInfo = stationData.ProductsInfo;
 
         ProductsView = new CollectionViewSource { Source = _model.Products }.View;

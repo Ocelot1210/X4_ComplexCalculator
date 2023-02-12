@@ -54,7 +54,17 @@ MainWindow_Title;X4: ステーション計算機
 MainWindow_FaildToLoadFileMessage;ファイルの読み込みに失敗しました。\r\n\r\n■理由：\r\n{0}
 MainWindow_FaildToLoadFileMessageTitle;読み込み失敗
 MainWindow_ClosingConfirmMessage;未保存の項目があります。保存しますか？
-MainWindow_PlanClosingConfirmMessage;計画{0}の変更内容を保存しますか？
+MainWindow_ClosingConfirmMessage_Save;保存して終了
+MainWindow_ClosingConfirmMessage_DontSave;保存せずに終了
+MainWindow_ClosingConfirmMessage_DontSave_Description;未保存の項目は破棄されます。
+MainWindow_ClosingConfirmMessage_Cancel;キャンセル
+MainWindow_ClosingConfirmMessage_Cancel_Description;終了せずに計算機に戻ります。
+MainWindow_PlanClosingConfirmMessage;計画「{0}」の変更内容を保存しますか？
+MainWindow_PlanClosingConfirmMessage_Save;保存して閉じる
+MainWindow_PlanClosingConfirmMessage_DontSave;保存せずに閉じる
+MainWindow_PlanClosingConfirmMessage_DontSave_Description;未保存の変更内容は破棄されます。
+MainWindow_PlanClosingConfirmMessage_Cancel;キャンセル
+MainWindow_PlanClosingConfirmMessage_Cancel_Description;閉じずに計算機に戻ります。
 MainWindow_SaveDataWriteFailureMessage;保存に失敗しました。\r\n■理由：\r\n{0}\r\n\r\n■スタックトレース：\r\n{1}
 MainWindow_ImportFailureMessage;インポートに失敗しました。\r\n■理由：\r\n{0}
 MainWindow_UnexpectedErrorMessage;予期しないエラーが発生しました。\r\n■エラー内容：\r\n{0}\r\n\r\n■スタックトレース：\r\n{1}
@@ -278,8 +288,13 @@ EditEquipmentWindow_Button_OverwritePreset_ToolTip;兵装を上書き
 EditEquipmentWindow_TextBlock_List_Text;一覧 : 
 EditEquipmentWindow_TextBlock_Equipped_Text;装備中 = [{0}/{1}]
 EditEquipmentWindow_Button_Add_ToolTip;左Shiftキーを押しながらクリックで選択項目を一気に追加できます
-EditEquipmentWindow_Button_Save_Content;保存
+EditEquipmentWindow_Button_Save_Content;保存して終了
 EditEquipmentWindow_CloseConfirmMessage;変更内容を保存しますか？
+EditEquipmentWindow_CloseConfirmMessage_Save;保存して終了
+EditEquipmentWindow_CloseConfirmMessage_DontSave;保存せずに終了
+EditEquipmentWindow_CloseConfirmMessage_DontSave_Description;未保存の内容は破棄されます。
+EditEquipmentWindow_CloseConfirmMessage_Cancel;キャンセル
+EditEquipmentWindow_CloseConfirmMessage_Cancel_Description;終了せずに兵装編集画面に戻ります。
 SaveNewPreset_Title;新規プリセット保存
 SaveNewPreset_Description;プリセット名を入力して下さい
 RenamePreset_Title;プリセット名編集

@@ -1,17 +1,14 @@
 ﻿using AvalonDock;
-using AvalonDock.Layout;
-using AvalonDock.Layout.Serialization;
 using Prism.Commands;
 using Prism.Mvvm;
 using System;
-using System.IO;
-using System.Linq;
 using System.Windows.Input;
-using WPFLocalizeExtension.Engine;
 using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.DB;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 using X4_ComplexCalculator.Main.Menu.File.Export;
 using X4_ComplexCalculator.Main.Menu.File.Import;
+using X4_ComplexCalculator.Main.WorkArea.SaveDataWriter;
+using X4_ComplexCalculator.Main.WorkArea.UI;
 using X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.Menu.Tab;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
@@ -32,25 +29,7 @@ public sealed class WorkAreaViewModel : BindableBase, IDisposable
     /// <summary>
     /// モデル
     /// </summary>
-    private readonly WorkAreaModel _model = new();
-
-
-    /// <summary>
-    /// レイアウトID
-    /// </summary>
-    private long _layoutID;
-
-
-    /// <summary>
-    /// 現在のドッキングマネージャー
-    /// </summary>
-    private DockingManager? _currentDockingManager;
-
-
-    /// <summary>
-    /// レイアウト保持用
-    /// </summary>
-    private byte[]? _layout;
+    private readonly WorkAreaModel _model;
     #endregion
 
 
@@ -58,7 +37,7 @@ public sealed class WorkAreaViewModel : BindableBase, IDisposable
     /// <summary>
     /// 表示/非表示用メニューアイテム一覧
     /// </summary>
-    public ObservableRangeCollection<VisiblityMenuItem> VisiblityMenuItems { get; } = new();
+    public ObservableRangeCollection<VisiblityMenuItem> VisiblityMenuItems => LayoutManager.VisiblityMenuItems;
 
 
     /// <summary>
@@ -106,20 +85,7 @@ public sealed class WorkAreaViewModel : BindableBase, IDisposable
     /// <summary>
     /// タブのタイトル文字列
     /// </summary>
-    public string Title
-    {
-        get
-        {
-            if (string.IsNullOrEmpty(_model.Title))
-            {
-                return "no title*";
-            }
-
-            var ret = _model.Title;
-
-            return (HasChanged) ? $"{ret}*" : ret;
-        }
-    }
+    public string Title => _model.Title;
 
 
     /// <summary>
@@ -138,6 +104,18 @@ public sealed class WorkAreaViewModel : BindableBase, IDisposable
     /// 保存先ファイルパス
     /// </summary>
     public string SaveFilePath => _model.SaveFilePath;
+
+
+    /// <summary>
+    /// レイアウト管理
+    /// </summary>
+    public LayoutManager LayoutManager { get; }
+
+
+    /// <summary>
+    /// メッセージボックス表示用
+    /// </summary>
+    public ILocalizedMessageBox MessageBox { get; }
     #endregion
 
 
@@ -145,51 +123,29 @@ public sealed class WorkAreaViewModel : BindableBase, IDisposable
     /// コンストラクタ
     /// </summary>
     /// <param name="layoutID">レイアウトID</param>
+    /// <param name="messageBox">メッセージボックス表示用</param>
     /// <remarks>
     /// レイアウトIDが負の場合、レイアウトは指定されていない事にする
     /// </remarks>
-    public WorkAreaViewModel(long layoutID)
+    public WorkAreaViewModel(long layoutID, ILocalizedMessageBox messageBox)
     {
-        _layoutID = layoutID;
+        _model                  = new(new SQLiteSaveDataWriter(messageBox));
+        LayoutManager           = new LayoutManager(layoutID);
+        MessageBox              = messageBox;
 
-        Summary       = new StationSummaryViewModel(_model.StationData);
-        Modules       = new ModulesGridViewModel(_model.StationData);
-        Products      = new ProductsGridViewModel(_model.StationData);
-        Resources     = new BuildResourcesGridViewModel(_model.StationData);
-        Storages      = new StoragesGridViewModel(_model.StationData);
-        StorageAssign = new StorageAssignViewModel(_model.StationData);
+        Summary                 = new(_model.StationData);
+        Modules                 = new(_model.StationData, messageBox);
+        Products                = new(_model.StationData, messageBox);
+        Resources               = new(_model.StationData);
+        Storages                = new(_model.StationData);
+        StorageAssign           = new(_model.StationData);
 
         Modules.AutoAddModuleCommand = Products.AutoAddModuleCommand;
-        OnLoadedCommand     = new DelegateCommand<DockingManager>(OnLoaded);
+        OnLoadedCommand     = new DelegateCommand<DockingManager>(LayoutManager.OnLoaded);
 
         _model.PropertyChanged += Model_PropertyChanged;
-        LocalizeDictionary.Instance.PropertyChanged += Instance_PropertyChanged;
     }
 
-
-    /// <summary>
-    /// 言語変更時
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void Instance_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(LocalizeDictionary.Instance.Culture) && _currentDockingManager is not null)
-        {
-            var layout = GetCurrentLayout();
-            if (layout is not null)
-            {
-                using var ms = new MemoryStream(layout, false);
-
-                var serializer = new XmlLayoutSerializer(_currentDockingManager);
-                serializer.LayoutSerializationCallback += LayoutSerializeCallback;
-                serializer.Deserialize(ms);
-                
-                // 表示メニューを初期化
-                VisiblityMenuItems.Reset(_currentDockingManager.Layout.Descendents().OfType<LayoutAnchorable>().Select(x => new VisiblityMenuItem(x)));
-            }
-        }
-    }
 
     /// <summary>
     /// インポート実行
@@ -225,155 +181,6 @@ public sealed class WorkAreaViewModel : BindableBase, IDisposable
 
 
     /// <summary>
-    /// レイアウト保存
-    /// </summary>
-    /// <param name="layoutName">レイアウト名</param>
-    /// <returns>レイアウトID</returns>
-    public long SaveLayout(string layoutName)
-    {
-        var id = SettingDatabase.Instance.GetLastLayoutID();
-
-        var param = new
-        {
-            LayoutID = id,
-            LayoutName = layoutName,
-            Layout = GetCurrentLayout() ?? throw new InvalidOperationException(),
-        };
-
-        const string SQL = "INSERT INTO WorkAreaLayouts(LayoutID, LayoutName, Layout) VALUES(:LayoutID, :LayoutName, :Layout)";
-        SettingDatabase.Instance.Execute(SQL, param);
-
-        return id;
-    }
-
-    /// <summary>
-    /// レイアウトを上書き保存
-    /// </summary>
-    /// <param name="layoutID">レイアウトID</param>
-    public void OverwriteSaveLayout(long layoutID)
-    {
-        var param = new
-        {
-            LayoutID = layoutID,
-            Layout = GetCurrentLayout() ?? throw new InvalidOperationException(),
-        };
-
-        const string SQL = "UPDATE WorkAreaLayouts SET Layout = :Layout WHERE LayoutID = :LayoutID";
-        SettingDatabase.Instance.Execute(SQL, param);
-    }
-
-
-    /// <summary>
-    /// レイアウトを設定
-    /// </summary>
-    /// <param name="layoutID"></param>
-    public void SetLayout(long layoutID)
-    {
-        _layoutID = layoutID;
-        _layout = SettingDatabase.Instance.QuerySingle<byte[]>("SELECT Layout FROM WorkAreaLayouts WHERE LayoutID = :layoutID", new { layoutID });
-
-        if (_layout is not null && _currentDockingManager is not null)
-        {
-            var serializer = new XmlLayoutSerializer(_currentDockingManager);
-            serializer.LayoutSerializationCallback += LayoutSerializeCallback;
-
-            using var ms = new MemoryStream(_layout, false);
-            serializer.Deserialize(ms);
-        }
-
-        // 表示メニューを初期化
-        if (_currentDockingManager is not null)
-        {
-            VisiblityMenuItems.Reset(_currentDockingManager.Layout.Descendents().OfType<LayoutAnchorable>().Select(x => new VisiblityMenuItem(x)));
-        }
-    }
-
-
-    /// <summary>
-    /// 現在のレイアウトを取得
-    /// </summary>
-    /// <returns>現在のレイアウトを表す UTF-8 XML</returns>
-    private byte[]? GetCurrentLayout()
-    {
-        if (_currentDockingManager is null)
-        {
-            return _layout;
-        }
-
-        // レイアウト保存
-        var serializer = new XmlLayoutSerializer(_currentDockingManager);
-        using var ms = new MemoryStream();
-        serializer.Serialize(ms);
-        ms.Position = 0;
-
-        return ms.ToArray();
-    }
-
-
-    /// <summary>
-    /// レイアウトを復元する
-    /// </summary>
-    private void RestoreLayout()
-    {
-        // レイアウトIDが指定されていればレイアウト設定
-        if (0 <= _layoutID)
-        {
-            SetLayout(_layoutID);
-            // 1回ロードしたので次回以降ロードしないようにする
-            _layoutID = -1;
-            return;
-        }
-
-        if (_currentDockingManager is null)
-        {
-            return;
-        }
-
-        // 前回レイアウトがあれば、レイアウト復元
-        if (_layout is not null)
-        {
-            var serializer = new XmlLayoutSerializer(_currentDockingManager);
-            serializer.LayoutSerializationCallback += LayoutSerializeCallback;
-            using var ms = new MemoryStream(_layout, false);
-            serializer.Deserialize(ms);
-        }
-
-        // 表示メニューを初期化
-        VisiblityMenuItems.Reset(_currentDockingManager.Layout.Descendents().OfType<LayoutAnchorable>().Select(x => new VisiblityMenuItem(x)));
-    }
-
-
-    /// <summary>
-    /// ロード時
-    /// </summary>
-    private void OnLoaded(DockingManager dockingManager)
-    {
-        _currentDockingManager = dockingManager;
-        RestoreLayout();
-    }
-
-
-    /// <summary>
-    /// レイアウトをシリアライズする際のコールバック (多言語化対応用)
-    /// </summary>
-    private static void LayoutSerializeCallback(object? sender, LayoutSerializationCallbackEventArgs e)
-    {
-        var getString = (string id) => (string)LocalizeDictionary.Instance.GetLocalizedObject(id, null, null);
-        e.Model.Title = e.Model.ContentId switch
-        {
-            "Modules"           => getString("Lang:PlanArea_ModuleList"),
-            "Products"          => getString("Lang:PlanArea_Products"),
-            "BuildResources"    => getString("Lang:PlanArea_BuildResources"),
-            "Storages"          => getString("Lang:PlanArea_Storages"),
-            "StorageAssign"     => getString("Lang:PlanArea_StorageAssign"),
-            "Summary"           => getString("Lang:PlanArea_Summary"),
-            "Settings"          => getString("Lang:PlanArea_Settings"),
-            _ => e.Model.Title
-        };
-    }
-
-
-    /// <summary>
     /// Modelのプロパティ変更時
     /// </summary>
     /// <param name="sender"></param>
@@ -403,8 +210,8 @@ public sealed class WorkAreaViewModel : BindableBase, IDisposable
     public void Dispose()
     {
         _model.PropertyChanged -= Model_PropertyChanged;
-        LocalizeDictionary.Instance.PropertyChanged -= Instance_PropertyChanged;
         _model.Dispose();
+        LayoutManager.Dispose();
         Summary.Dispose();
         Modules.Dispose();
         Products.Dispose();

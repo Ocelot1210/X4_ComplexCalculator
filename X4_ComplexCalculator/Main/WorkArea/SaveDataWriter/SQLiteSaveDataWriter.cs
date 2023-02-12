@@ -5,6 +5,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
@@ -18,9 +19,24 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriter;
 class SQLiteSaveDataWriter : ISaveDataWriter
 {
     /// <summary>
+    /// メッセージボックス表示用
+    /// </summary>
+    private readonly ILocalizedMessageBox _messageBox;
+
+    /// <summary>
     /// 保存ファイルパス
     /// </summary>
     public string SaveFilePath { get; set; } = "";
+
+
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    /// <param name="messageBox">メッセージボックス表示用</param>
+    public SQLiteSaveDataWriter(ILocalizedMessageBox messageBox)
+    {
+        _messageBox = messageBox;
+    }
 
 
     /// <summary>
@@ -41,7 +57,7 @@ class SQLiteSaveDataWriter : ISaveDataWriter
         }
         catch (Exception e)
         {
-            LocalizedMessageBox.Show("Lang:MainWindow_SaveDataWriteFailureMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message, e.StackTrace ?? "");
+            _messageBox.Error("Lang:MainWindow_SaveDataWriteFailureMessage", "Lang:Common_MessageBoxTitle_Error", e.Message, e.StackTrace ?? "");
         }
 
         return false;
@@ -70,7 +86,7 @@ class SQLiteSaveDataWriter : ISaveDataWriter
             }
             catch (Exception e)
             {
-                LocalizedMessageBox.Show("Lang:MainWindow_SaveDataWriteFailureMessage", "Lang:Common_MessageBoxTitle_Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message, e.StackTrace ?? "");
+                _messageBox.Error("Lang:MainWindow_SaveDataWriteFailureMessage", "Lang:Common_MessageBoxTitle_Error", e.Message, e.StackTrace ?? "");
             }
         }
 

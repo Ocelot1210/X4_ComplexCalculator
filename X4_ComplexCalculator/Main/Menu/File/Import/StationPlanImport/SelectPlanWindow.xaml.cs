@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport;
 
@@ -16,7 +17,7 @@ public partial class SelectPlanDialog : Window
     private SelectPlanDialog(List<StationPlanItem> planItems)
     {
         InitializeComponent();
-        DataContext = new SelectPlanViewModel(planItems);
+        DataContext = new SelectPlanViewModel(planItems, new LocalizedMessageBoxEx(this));
     }
 
 

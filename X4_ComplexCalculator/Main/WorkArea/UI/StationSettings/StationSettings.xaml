@@ -50,7 +50,7 @@
                                 IsEnabled="{Binding Workforce.AlwaysMaximum, Converter={StaticResource BoolNegativeConverter}}"
                                 Maximum="{Binding Workforce.Capacity, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                 Minimum="0"
-                                Value="{Binding Workforce.Actual, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                Value="{Binding Workforce.Actual, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LongUpDownConverter}}" />
                         </StackPanel>
                         <Slider
                             Grid.Row="1"
@@ -91,7 +91,7 @@
                             Increment="0.001"
                             Maximum="1000"
                             Minimum="0"
-                            Value="{Binding Sunlight, Mode=TwoWay}" />
+                            Value="{Binding Sunlight, Mode=TwoWay, Converter={StaticResource DoubleUpDownConverter}}" />
                     </StackPanel>
                 </StackPanel>
             </GroupBox>

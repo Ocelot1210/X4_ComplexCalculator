@@ -11,6 +11,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:plnArea="clr-namespace:X4_ComplexCalculator.Main.WorkArea"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:bhv="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:x4vcvt="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     Title="{lex:Loc Lang:MainWindow_Title}"
@@ -23,14 +24,10 @@
     Style="{StaticResource DefaultWindowBackgroundStyle}"
     mc:Ignorable="d">
 
-    <Window.DataContext>
-        <local:MainWindowViewModel />
-    </Window.DataContext>
-
     <Window.Resources>
         <x4vcvt:ActiveDocumentConverter x:Key="ActiveDocumentConverter" />
     </Window.Resources>
-
+    
     <Window.InputBindings>
         <KeyBinding Command="{Binding CreateNewCommand}" Gesture="Ctrl+N" />
         <KeyBinding Command="{Binding SaveCommand}" Gesture="Ctrl+S" />
@@ -48,6 +45,10 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
+    <bhv:Interaction.Behaviors>
+        <local:OwnerWindowSetter DockingManager="{x:Reference DockingManager}"/>
+    </bhv:Interaction.Behaviors>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -225,16 +226,19 @@
         <!--  計画エリア  -->
         <avdk:DockingManager
             Grid.Row="1"
+            x:Name="DockingManager"
             dd:DragDrop.DropHandler="{Binding}"
             dd:DragDrop.IsDropTarget="True"
             ActiveContent="{Binding ActiveContent, Mode=TwoWay, Converter={StaticResource ActiveDocumentConverter}, UpdateSourceTrigger=PropertyChanged}"
             DocumentsSource="{Binding Documents}">
-
-
+            
             <!--  計画エリアが閉じられるとき  -->
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="DocumentClosing">
                     <i:InvokeCommandAction Command="{Binding DocumentClosingCommand, Mode=OneTime}" PassEventArgsToCommand="True" />
+                </i:EventTrigger>
+                <i:EventTrigger EventName="StateChanged">
+                    <i:InvokeCommandAction Command="{Binding DockedCommand, Mode=OneTime}" PassEventArgsToCommand="True" />
                 </i:EventTrigger>
             </i:Interaction.Triggers>
 

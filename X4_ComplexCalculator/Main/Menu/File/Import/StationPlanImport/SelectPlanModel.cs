@@ -9,6 +9,7 @@ using System.Windows.Threading;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 using X4_ComplexCalculator.Common.Localize;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport;
@@ -20,6 +21,12 @@ class SelectPlanModel : BindableBase
     /// 計画ファイルパス
     /// </summary>
     string _planFilePath = "";
+
+
+    /// <summary>
+    /// メッセージボックス表示用
+    /// </summary>
+    private readonly ILocalizedMessageBox _messageBox;
     #endregion
 
 
@@ -44,8 +51,11 @@ class SelectPlanModel : BindableBase
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public SelectPlanModel()
+    /// <param name="messageBox">メッセージボックス表示用</param>
+    public SelectPlanModel(ILocalizedMessageBox messageBox)
     {
+        _messageBox = messageBox;
+
         // ファイルが見つかった場合、そのファイルで初期化する
         var path = Path.Combine(LibX4.X4Path.GetUserDirectory(), "constructionplans.xml");
         if (System.IO.File.Exists(path))
@@ -115,10 +125,7 @@ class SelectPlanModel : BindableBase
             }
             catch (Exception e)
             {
-                Dispatcher.CurrentDispatcher.BeginInvoke(() =>
-                {
-                    LocalizedMessageBox.Show("Lang:MainWindow_FaildToLoadFileMessage", "Lang:MainWindow_FaildToLoadFileMessageTitle", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, e.Message);
-                });
+                _messageBox.Error("Lang:MainWindow_FaildToLoadFileMessage", "Lang:MainWindow_FaildToLoadFileMessageTitle", e.Message);
             }
             finally
             {

@@ -114,12 +114,12 @@
                 <!--  編集時のスタイル  -->
                 <DataGridTemplateColumn.CellEditingTemplate>
                     <DataTemplate>
-                        <xctk:IntegerUpDown
+                        <xctk:LongUpDown
                             ClipValueToMinMax="True"
                             FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
                             Maximum="{Binding Ware.MaxPrice}"
                             Minimum="{Binding Ware.MinPrice}"
-                            Value="{Binding UnitPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            Value="{Binding UnitPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LongUpDownConverter}}" />
                     </DataTemplate>
                 </DataGridTemplateColumn.CellEditingTemplate>
             </x4cmn:MouseHoverEditCellColumn>
