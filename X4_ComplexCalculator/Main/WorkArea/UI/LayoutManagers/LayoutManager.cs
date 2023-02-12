@@ -23,7 +23,7 @@ public sealed class LayoutManager : IDisposable
     /// <summary>
     /// レイアウト ID
     /// </summary>
-    private readonly long _initialLayoutID;
+    private long _initialLayoutID;
 
 
     /// <summary>
@@ -117,7 +117,13 @@ public sealed class LayoutManager : IDisposable
     /// <param name="layoutID">レイアウト ID</param>
     public void SetLayout(long layoutID)
     {
-        if (_prevDockingManager is null) return;
+        // 前回のドッキングマネージャーが null の場合、1度もアクティブになっていないため
+        // 初期レイアウト ID を設定して終了
+        if (_prevDockingManager is null)
+        {
+            _initialLayoutID = layoutID;
+            return;
+        }
 
         var layoutExists = SettingDatabase.Instance.QuerySingle<bool>("SELECT count(*) FROM WorkAreaLayouts WHERE LayoutID = :layoutID", new { layoutID });
         if (layoutExists)
