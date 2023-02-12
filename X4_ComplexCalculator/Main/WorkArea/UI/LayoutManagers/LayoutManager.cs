@@ -4,8 +4,6 @@ using AvalonDock.Layout.Serialization;
 using System;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
 using WPFLocalizeExtension.Engine;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.DB;

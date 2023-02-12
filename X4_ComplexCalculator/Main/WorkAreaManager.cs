@@ -6,7 +6,6 @@ using System.Windows;
 using System.Windows.Threading;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
-using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.Main.Menu.Layout;
 using X4_ComplexCalculator.Main.WorkArea;
 
@@ -18,12 +17,6 @@ namespace X4_ComplexCalculator.Main;
 class WorkAreaManager : IDisposable
 {
     #region メンバ
-    /// <summary>
-    /// メッセージボックス表示用
-    /// </summary>
-    private readonly ILocalizedMessageBox _messageBox;
-
-
     /// <summary>
     /// ガベコレ用ストップウォッチ
     /// </summary>
@@ -75,7 +68,6 @@ class WorkAreaManager : IDisposable
     /// <param name="messageBox">メッセージボックス表示用</param>
     public WorkAreaManager(ILocalizedMessageBox messageBox)
     {
-        _messageBox = messageBox;
         _layoutsManager = new LayoutsManager(this, messageBox);
 
         _gcTimer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, new EventHandler(GarvageCollect), Application.Current.Dispatcher);
