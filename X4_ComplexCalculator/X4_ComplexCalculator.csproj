@@ -34,7 +34,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-    <PackageReference Include="Onova" Version="2.6.4" />
+    <PackageReference Include="Onova" Version="2.6.6" />
     <PackageReference Include="Prism.Core" Version="8.1.97" />
     <PackageReference Include="ReactiveProperty" Version="8.2.0" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.117" />
