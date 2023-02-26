@@ -3,9 +3,9 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:X4_ComplexCalculator"
-    xmlns:x4cvt="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
-    xmlns:x4loc="clr-namespace:X4_ComplexCalculator.Common.Localize" 
     xmlns:system="clr-namespace:System;assembly=netstandard"
+    xmlns:x4cvt="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
+    xmlns:x4loc="clr-namespace:X4_ComplexCalculator.Common.Localize"
     StartupUri="Main\MainWindow.xaml">
 
 
@@ -34,9 +34,9 @@
 
             <x4loc:CSVLocalizationProvider x:Key="CSVLocalizationProvider" />
 
-            <x4cvt:LongUpDownValueConverter x:Key="LongUpDownConverter"/>
+            <x4cvt:LongUpDownValueConverter x:Key="LongUpDownConverter" />
 
-            <x4cvt:DoubleUpDownValueConverter x:Key="DoubleUpDownConverter"/>
+            <x4cvt:DoubleUpDownValueConverter x:Key="DoubleUpDownConverter" />
 
         </ResourceDictionary>
     </Application.Resources>

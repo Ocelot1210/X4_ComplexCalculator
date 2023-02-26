@@ -1,5 +1,7 @@
-﻿using Prism.Common;
+﻿using Collections.Pooled;
+using Prism.Common;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -79,29 +81,22 @@ public sealed class EmpireOverviewWindowModel : IDisposable
     /// <param name="e"></param>
     private void WorkAreas_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
+        var getProducts = (IList list) => list.OfType<WorkAreaViewModel>().Select(x => x.Products.ProductsInfo.Products);
+
         if (e.OldItems is not null)
         {
-            foreach (var item in e.OldItems.OfType<WorkAreaViewModel>().Select(x => x.Products.ProductsInfo.Products))
+            foreach (var item in getProducts(e.OldItems))
             {
                 item.CollectionChanged -= Products_CollectionChanged;
                 item.CollectionPropertyChanged -= Products_CollectionPropertyChanged;
 
-                // 削除された製品の生産/消費量を減算する
-                foreach (var removedItem in _productsBak[item])
-                {
-                    Products.First(x => x.Ware.ID == removedItem.Ware.ID).Count -= removedItem.Count;
-                }
-
-                _productsBak.Remove(item);
-
-                // どのステーションでも生産/消費されていない要素を削除する
-                Products.RemoveAll(x => x.Count == 0);
+                OnProductsRemoved(item, item);
             }
         }
 
         if (e.NewItems is not null)
         {
-            foreach (var item in e.NewItems.OfType<WorkAreaViewModel>().Select(x => x.Products.ProductsInfo.Products))
+            foreach (var item in getProducts(e.NewItems))
             {
                 item.CollectionChanged += Products_CollectionChanged;
                 item.CollectionPropertyChanged += Products_CollectionPropertyChanged;
@@ -124,25 +119,14 @@ public sealed class EmpireOverviewWindowModel : IDisposable
             return;
         }
 
-        switch (e.PropertyName)
+        if (e.PropertyName == nameof(ProductsGridItem.Count))
         {
-            case nameof(ProductsGridItem.Count):
-                {
-                    if (e is not PropertyChangedExtendedEventArgs<long> ev)
-                    {
-                        return;
-                    }
+            if (e is not PropertyChangedExtendedEventArgs<long> ev)
+            {
+                return;
+            }
 
-                    var prod = Products.FirstOrDefault(x => x.Ware.ID == product.Ware.ID);
-                    if (prod is not null)
-                    {
-                        prod.Count += ev.NewValue - ev.OldValue;
-                    }
-                }
-                break;
-
-            default:
-                break;
+            Products.FirstOrDefault(x => x.Ware.ID == product.Ware.ID)?.UpdateProduct(ev.OldValue, ev.NewValue);
         }
     }
 
@@ -174,8 +158,8 @@ public sealed class EmpireOverviewWindowModel : IDisposable
         // 生産/消費ウェアがリセットされた場合
         if (e.Action == NotifyCollectionChangedAction.Reset)
         {
-            var added = new List<ProductsGridItem>();
-            var removed = new List<ProductsGridItem>();
+            using var added = new PooledList<ProductsGridItem>();
+            using var removed = new PooledList<ProductsGridItem>();
 
             foreach (var prod in _productsBak[products])
             {
@@ -209,7 +193,7 @@ public sealed class EmpireOverviewWindowModel : IDisposable
             var prod = Products.FirstOrDefault(x => x.Ware.ID == removedItem.Ware.ID);
             if (prod is not null)
             {
-                prod.Count -= removedItem.Count;
+                prod.DeleteProduct(removedItem.Count);
             }
 
             prodBak.Remove(removedItem);
@@ -227,7 +211,7 @@ public sealed class EmpireOverviewWindowModel : IDisposable
     /// <param name="addedItems"></param>
     private void OnProductsAdded(IList<ProductsGridItem> parent, IEnumerable<ProductsGridItem> addedItems)
     {
-        var addTarget = new List<EmpireOverViewProductsGridItem>();     // 追加対象
+        using var addTarget = new PooledList<EmpireOverViewProductsGridItem>();     // 追加対象
         var prodBak = _productsBak[parent];
 
         foreach (var addedItem in addedItems)
@@ -244,7 +228,7 @@ public sealed class EmpireOverviewWindowModel : IDisposable
             {
                 // どこかのステーションで既に生産/消費しているウェアの場合
                 // すでにある要素の生産量に加算する
-                prod.Count += addedItem.Count;
+                prod.AddProduct(addedItem.Count);
             }
 
             prodBak.Add(addedItem);

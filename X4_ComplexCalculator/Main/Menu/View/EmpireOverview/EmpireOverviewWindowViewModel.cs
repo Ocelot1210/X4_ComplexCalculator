@@ -43,10 +43,22 @@ class EmpireOverviewWindowViewModel : BindableBase
     {
         _model = new EmpireOverviewWindowModel(workAreas);
         ProductsView = CollectionViewSource.GetDefaultView(_model.Products);
+        ProductsView.Filter = Filter;
         ProductsView.SortDescriptions.Add(new SortDescription("Ware.WareGroup.Tier", ListSortDirection.Ascending));
         ProductsView.SortDescriptions.Add(new SortDescription("Ware.Name", ListSortDirection.Ascending));
 
         WindowClosedCommand = new DelegateCommand(WindowClosed);
+    }
+
+
+    /// <summary>
+    /// フィルタイベント
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    private bool Filter(object obj)
+    {
+        return obj is EmpireOverViewProductsGridItem item && (item.Surplus != 0 || item.Shortage != 0);
     }
 
 

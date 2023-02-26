@@ -57,12 +57,41 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
+                <!--  余剰  -->
+                <DataGridTemplateColumn
+                    ClipboardContentBinding="{Binding Surplus, Mode=OneTime}"
+                    Header="{lex:Loc Lang:EmpireOverview_Surplus}"
+                    SortMemberPath="Surplus">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Text="{Binding Surplus, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}"
+                                TextAlignment="Right" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
 
-                <!--  1時間あたりの個数  -->
+                <!--  不足  -->
+                <DataGridTemplateColumn
+                    ClipboardContentBinding="{Binding Shortage, Mode=OneTime}"
+                    Header="{lex:Loc Lang:EmpireOverview_Shortage}"
+                    SortMemberPath="Shortage">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Text="{Binding Shortage, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}"
+                                TextAlignment="Right" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!--  合計  -->
                 <DataGridTemplateColumn
                     CellStyle="{StaticResource LossEmphasisStyle}"
-                    ClipboardContentBinding="{Binding Count, Mode=OneTime}"
-                    Header="{lex:Loc Lang:Products_AmountPerHour}"
+                    ClipboardContentBinding="{Binding Total, Mode=OneTime}"
+                    Header="{lex:Loc Lang:EmpireOverview_Total}"
                     SortMemberPath="Count">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
