@@ -23,7 +23,7 @@
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="Dirkster.AvalonDock" Version="4.71.1" />
     <PackageReference Include="DotNetProjects.Extended.Wpf.Toolkit" Version="5.0.103" />
-    <PackageReference Include="GitInfo" Version="2.3.0">
+    <PackageReference Include="GitInfo" Version="3.0.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
