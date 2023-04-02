@@ -23,7 +23,7 @@ public sealed class EmpireOverviewWindowModel : IDisposable
     /// <summary>
     /// 開いている計画一覧
     /// </summary>
-    private readonly ObservableCollection<WorkAreaViewModel> _workAreas;
+    private readonly ObservableCollection<WorkAreaViewModel> _sourceWorkAreas;
 
 
     /// <summary>
@@ -39,6 +39,12 @@ public sealed class EmpireOverviewWindowModel : IDisposable
     /// </summary>
     public ObservableRangeCollection<EmpireOverViewProductsGridItem> Products { get; }
         = new ObservableRangeCollection<EmpireOverViewProductsGridItem>();
+
+
+    /// <summary>
+    /// 計画一覧
+    /// </summary>
+    public ObservablePropertyChangedCollection<WorkAreaItem> WorkAreas { get; }
     #endregion
 
 
@@ -48,10 +54,16 @@ public sealed class EmpireOverviewWindowModel : IDisposable
     /// <param name="workAreas">開いている計画一覧</param>
     public EmpireOverviewWindowModel(ObservableCollection<WorkAreaViewModel> workAreas)
     {
-        _workAreas = workAreas;
+        _sourceWorkAreas = workAreas;
+        _sourceWorkAreas.CollectionChanged += SourceWorkAreas_CollectionChanged;
 
-        _workAreas.CollectionChanged += WorkAreas_CollectionChanged;
-        foreach (var products in _workAreas.Select(x => x.Products.ProductsInfo.Products))
+        WorkAreas = new ObservablePropertyChangedCollection<WorkAreaItem>();
+        WorkAreas.CollectionChanged += WorkAreas_CollectionChanged;
+        WorkAreas.CollectionPropertyChanged += WorkAreas_CollectionPropertyChanged;
+
+        WorkAreas.AddRange(workAreas.Select(x => new WorkAreaItem(x, true)));
+
+        foreach (var products in WorkAreas.Select(x => x.WorkArea.Products.ProductsInfo.Products))
         {
             products.CollectionChanged += Products_CollectionChanged;
             products.CollectionPropertyChanged += Products_CollectionPropertyChanged;
@@ -64,12 +76,61 @@ public sealed class EmpireOverviewWindowModel : IDisposable
     /// <inheritdoc/>
     public void Dispose()
     {
-        _workAreas.CollectionChanged -= WorkAreas_CollectionChanged;
+        _sourceWorkAreas.CollectionChanged -= SourceWorkAreas_CollectionChanged;
+        WorkAreas.CollectionChanged -= WorkAreas_CollectionChanged;
+        WorkAreas.CollectionPropertyChanged -= WorkAreas_CollectionPropertyChanged;
+
         _productsBak.Clear();
-        foreach (var products in _workAreas.Select(x => x.Products.ProductsInfo.Products))
+        foreach (var products in WorkAreas.Select(x => x.WorkArea.Products.ProductsInfo.Products))
         {
             products.CollectionChanged -= Products_CollectionChanged;
             products.CollectionPropertyChanged -= Products_CollectionPropertyChanged;
+        }
+    }
+
+
+    /// <summary>
+    /// 計画一覧の要素数に変更があった場合
+    /// </summary>
+    private void SourceWorkAreas_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        switch (e.Action)
+        {
+            case NotifyCollectionChangedAction.Add:
+                WorkAreas.AddRange(e.NewItems!.Cast<WorkAreaViewModel>().Select(x => new WorkAreaItem(x, true)));
+                break;
+
+            case NotifyCollectionChangedAction.Remove:
+                {
+                    using var oldItems = e.OldItems!.Cast<WorkAreaViewModel>().ToPooledList();
+                    WorkAreas.RemoveAll(x => oldItems!.Contains(x.WorkArea));
+                }
+                break;
+
+            case NotifyCollectionChangedAction.Replace:
+                break;
+
+            case NotifyCollectionChangedAction.Move:
+                break;
+
+            case NotifyCollectionChangedAction.Reset:
+                WorkAreas.Reset(_sourceWorkAreas.Select(x => new WorkAreaItem(x, true)));
+                break;
+        }
+    }
+
+
+    /// <summary>
+    /// コレクション内部のプロパティに変更があった場合
+    /// </summary>
+    private void WorkAreas_CollectionPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        _productsBak.Clear();
+        Products.Clear();
+
+        foreach (var products in WorkAreas.Where(x => x.IsChecked).Select(x => x.WorkArea.Products.ProductsInfo.Products))
+        {
+            OnProductsAdded(products, products);
         }
     }
 
@@ -81,28 +142,24 @@ public sealed class EmpireOverviewWindowModel : IDisposable
     /// <param name="e"></param>
     private void WorkAreas_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        var getProducts = (IList list) => list.OfType<WorkAreaViewModel>().Select(x => x.Products.ProductsInfo.Products);
+        var getProducts = (IList? list) => 
+            list?.OfType<WorkAreaViewModel>().Select(x => x.Products.ProductsInfo.Products) ?? 
+            Enumerable.Empty<ObservablePropertyChangedCollection<ProductsGridItem>>(); ;
 
-        if (e.OldItems is not null)
+        foreach (var items in getProducts(e.OldItems))
         {
-            foreach (var item in getProducts(e.OldItems))
-            {
-                item.CollectionChanged -= Products_CollectionChanged;
-                item.CollectionPropertyChanged -= Products_CollectionPropertyChanged;
+            items.CollectionChanged -= Products_CollectionChanged;
+            items.CollectionPropertyChanged -= Products_CollectionPropertyChanged;
 
-                OnProductsRemoved(item, item);
-            }
+            OnProductsRemoved(items, items);
         }
 
-        if (e.NewItems is not null)
+        foreach (var items in getProducts(e.NewItems))
         {
-            foreach (var item in getProducts(e.NewItems))
-            {
-                item.CollectionChanged += Products_CollectionChanged;
-                item.CollectionPropertyChanged += Products_CollectionPropertyChanged;
+            items.CollectionChanged += Products_CollectionChanged;
+            items.CollectionPropertyChanged += Products_CollectionPropertyChanged;
 
-                OnProductsAdded(item, item);
-            }
+            OnProductsAdded(items, items);
         }
     }
 
@@ -198,9 +255,6 @@ public sealed class EmpireOverviewWindowModel : IDisposable
 
             prodBak.Remove(removedItem);
         }
-
-        // どのステーションでも生産/消費されていない要素を削除する
-        Products.RemoveAll(x => x.Count == 0);
     }
 
 
