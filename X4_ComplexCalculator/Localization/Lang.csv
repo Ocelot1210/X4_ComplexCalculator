@@ -97,6 +97,11 @@ MainWindow_Menu_View_Header;View(_V)
 # Empire overview --------------------------------------
 MainWindow_Menu_EmpireOverview_Header;Empire overview
 EmpireOverview_Title;Empire overview
+EmpireOverview_Surplus;Surplus
+EmpireOverview_Shortage;Shortage
+EmpireOverview_Total;Total
+EmpireOverview_ProductList;Product list
+EmpireOverview_AggregationTarget;Aggregation target
 
 # Layout(L) --------------------------------------------
 MainWindow_Menu_Layout_Header;Layout(_L)

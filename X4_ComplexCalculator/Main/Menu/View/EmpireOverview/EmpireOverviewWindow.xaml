@@ -2,13 +2,15 @@
     x:Class="X4_ComplexCalculator.Main.Menu.View.EmpireOverview.EmpireOverviewWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:avdk="https://github.com/Dirkster99/AvalonDock"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:X4_ComplexCalculator.Main.Menu.View.EmpireOverview"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     Title="{lex:Loc Lang:EmpireOverview_Title}"
-    Width="400"
+    Width="800"
     Height="450"
     Style="{StaticResource DefaultWindowBackgroundStyle}"
     mc:Ignorable="d">
@@ -22,57 +24,120 @@
 
     <Grid Margin="5">
 
-        <!--  全ステーションの製品を集計したDataGrid  -->
-        <DataGrid
-            CellStyle="{StaticResource DataGridCellDefaultStyle}"
-            ItemsSource="{Binding ProductsView, Mode=OneTime}"
-            SelectionUnit="Cell"
-            Style="{StaticResource DefaultDataGridStyle}">
+        <avdk:DockingManager
+            Grid.Row="1"
+            Grid.ColumnSpan="2"
+            Background="White">
+            <avdk:LayoutRoot>
+                <avdk:LayoutPanel Orientation="Horizontal">
+                    <avdk:LayoutPanel Orientation="Horizontal">
+                        <avdk:LayoutAnchorablePane>
+                            <avdk:LayoutAnchorable
+                                Title="{lex:Loc Lang:EmpireOverview_ProductList}"
+                                CanClose="False"
+                                CanHide="False">
+                                <!--  全ステーションの製品を集計したDataGrid  -->
+                                <DataGrid
+                                    CellStyle="{StaticResource DataGridCellDefaultStyle}"
+                                    ItemsSource="{Binding ProductsView, Mode=OneTime}"
+                                    SelectionUnit="Cell"
+                                    Style="{StaticResource DefaultDataGridStyle}">
 
-            <DataGrid.Columns>
+                                    <DataGrid.Columns>
 
-                <!--  階級  -->
-                <DataGridTemplateColumn
-                    CellStyle="{StaticResource RightAlignedDataGridCell}"
-                    ClipboardContentBinding="{Binding Ware.WareGroup.Tier, Mode=OneTime}"
-                    Header="{lex:Loc Lang:Common_Tier}"
-                    SortMemberPath="Ware.WareGroup.Tier">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock VerticalAlignment="Center" Text="{Binding Ware.WareGroup.Tier, Mode=OneTime}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-
-
-                <!--  製品名  -->
-                <DataGridTemplateColumn
-                    ClipboardContentBinding="{Binding Ware.Name, Mode=OneTime}"
-                    Header="{lex:Loc Lang:Common_ProductName}"
-                    SortMemberPath="Ware.Name">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock VerticalAlignment="Center" Text="{Binding Ware.Name, Mode=OneTime}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                                        <!--  階級  -->
+                                        <DataGridTemplateColumn
+                                            CellStyle="{StaticResource RightAlignedDataGridCell}"
+                                            ClipboardContentBinding="{Binding Ware.WareGroup.Tier, Mode=OneTime}"
+                                            Header="{lex:Loc Lang:Common_Tier}"
+                                            SortMemberPath="Ware.WareGroup.Tier">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock VerticalAlignment="Center" Text="{Binding Ware.WareGroup.Tier, Mode=OneTime}" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
 
 
-                <!--  1時間あたりの個数  -->
-                <DataGridTemplateColumn
-                    CellStyle="{StaticResource LossEmphasisStyle}"
-                    ClipboardContentBinding="{Binding Count, Mode=OneTime}"
-                    Header="{lex:Loc Lang:Products_AmountPerHour}"
-                    SortMemberPath="Count">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock VerticalAlignment="Center" Text="{Binding Count, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                                        <!--  製品名  -->
+                                        <DataGridTemplateColumn
+                                            ClipboardContentBinding="{Binding Ware.Name, Mode=OneTime}"
+                                            Header="{lex:Loc Lang:Common_ProductName}"
+                                            SortMemberPath="Ware.Name">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock VerticalAlignment="Center" Text="{Binding Ware.Name, Mode=OneTime}" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
 
-            </DataGrid.Columns>
+                                        <!--  余剰  -->
+                                        <DataGridTemplateColumn
+                                            ClipboardContentBinding="{Binding Surplus, Mode=OneTime}"
+                                            Header="{lex:Loc Lang:EmpireOverview_Surplus}"
+                                            SortMemberPath="Surplus">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock
+                                                        VerticalAlignment="Center"
+                                                        Text="{Binding Surplus, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}"
+                                                        TextAlignment="Right" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
 
-        </DataGrid>
+                                        <!--  不足  -->
+                                        <DataGridTemplateColumn
+                                            ClipboardContentBinding="{Binding Shortage, Mode=OneTime}"
+                                            Header="{lex:Loc Lang:EmpireOverview_Shortage}"
+                                            SortMemberPath="Shortage">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock
+                                                        VerticalAlignment="Center"
+                                                        Text="{Binding Shortage, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}"
+                                                        TextAlignment="Right" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+                                        <!--  合計  -->
+                                        <DataGridTemplateColumn
+                                            CellStyle="{StaticResource LossEmphasisStyle}"
+                                            ClipboardContentBinding="{Binding Count, Mode=OneTime}"
+                                            Header="{lex:Loc Lang:EmpireOverview_Total}"
+                                            SortMemberPath="Count">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock VerticalAlignment="Center" Text="{Binding Count, Mode=OneWay, StringFormat={StaticResource DefaultNumericFormat}}" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+
+                                    </DataGrid.Columns>
+
+                                </DataGrid>
+                            </avdk:LayoutAnchorable>
+                        </avdk:LayoutAnchorablePane>
+
+                        <avdk:LayoutAnchorablePane>
+                            <avdk:LayoutAnchorable
+                                Title="{lex:Loc Lang:EmpireOverview_AggregationTarget}"
+                                CanClose="False"
+                                CanHide="False">
+                                <xctk:CheckListBox
+                                    DisplayMemberPath="Title"
+                                    IsSelectAllActive="True"
+                                    ItemsSource="{Binding WorkAreasView, Mode=OneTime}"
+                                    ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                                    ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                    SelectAllContent="{lex:Loc Lang:Common_SelectAll}"
+                                    SelectedMemberPath="IsChecked" />
+                            </avdk:LayoutAnchorable>
+                        </avdk:LayoutAnchorablePane>
+                    </avdk:LayoutPanel>
+                </avdk:LayoutPanel>
+            </avdk:LayoutRoot>
+        </avdk:DockingManager>
     </Grid>
 </Window>

@@ -29,6 +29,12 @@ class EmpireOverviewWindowViewModel : BindableBase
 
 
     /// <summary>
+    /// 計画一覧
+    /// </summary>
+    public ICollectionView WorkAreasView { get; }
+
+
+    /// <summary>
     /// ウィンドウが閉じられた時のコマンド
     /// </summary>
     public ICommand WindowClosedCommand { get; }
@@ -43,10 +49,25 @@ class EmpireOverviewWindowViewModel : BindableBase
     {
         _model = new EmpireOverviewWindowModel(workAreas);
         ProductsView = CollectionViewSource.GetDefaultView(_model.Products);
+        ProductsView.Filter = Filter;
         ProductsView.SortDescriptions.Add(new SortDescription("Ware.WareGroup.Tier", ListSortDirection.Ascending));
         ProductsView.SortDescriptions.Add(new SortDescription("Ware.Name", ListSortDirection.Ascending));
 
+        WorkAreasView = CollectionViewSource.GetDefaultView(_model.WorkAreas);
+        WorkAreasView.SortDescriptions.Add(new SortDescription(nameof(WorkAreaItem.Title), ListSortDirection.Ascending));
+
         WindowClosedCommand = new DelegateCommand(WindowClosed);
+    }
+
+
+    /// <summary>
+    /// フィルタイベント
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    private bool Filter(object obj)
+    {
+        return obj is EmpireOverViewProductsGridItem item && (item.Surplus != 0 || item.Shortage != 0);
     }
 
 

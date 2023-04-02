@@ -97,6 +97,11 @@ MainWindow_Menu_View_Header;表示(_V)
 # Empire overview --------------------------------------
 MainWindow_Menu_EmpireOverview_Header;帝国の概要
 EmpireOverview_Title;帝国の概要
+EmpireOverview_Surplus;余剰
+EmpireOverview_Shortage;不足
+EmpireOverview_Total;合計
+EmpireOverview_ProductList;製品一覧
+EmpireOverview_AggregationTarget;集計対象
 
 # Layout(L) --------------------------------------------
 MainWindow_Menu_Layout_Header;レイアウト(_L)
