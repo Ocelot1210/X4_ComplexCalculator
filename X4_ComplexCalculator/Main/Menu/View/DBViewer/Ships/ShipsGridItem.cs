@@ -351,8 +351,8 @@ class ShipsGridItem : BindableBase
 
         // 武装
         {
-            Weapons = ship.Equipments.Values.Count(x => x.EquipmentType.EquipmentTypeID == "weapons");
-            Turrets = ship.Equipments.Values.Count(x => x.EquipmentType.EquipmentTypeID == "turrets");
+            Weapons = ship.Equipments.Values.Count(x => x.Tags.Contains("weapon"));
+            Turrets = ship.Equipments.Values.Count(x => x.Tags.Contains("turret"));
         }
 
 
