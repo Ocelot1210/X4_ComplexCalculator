@@ -135,7 +135,7 @@ class ProductCalculator
             var prodWare = X4Database.Instance.Ware.Get(product.WareID);
 
             // ウェア生産方式を取得
-            var method = prodWare.Resources.ContainsKey(product.Method) ? product.Method : "default";
+            var method = prodWare.Productions.ContainsKey(product.Method) ? product.Method : "default";
 
             // ウェア生産情報を取得
             var wareProduction = prodWare.TryGetProduction(method);
