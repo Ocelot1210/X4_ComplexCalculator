@@ -1,4 +1,5 @@
 ﻿using Prism.Mvvm;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Input;
@@ -49,9 +50,19 @@ class StationCalculatorExport : BindableBase, IExport
         // モジュール情報を追加
         sb.Append("l=@");
 
+
+        var ignoreModuleTypeIds = new HashSet<string>() { 
+            "ventureplatform",
+        };
+
+        var ignoreModuleIds = new HashSet<string>() {
+            "module_gen_dock_m_venturer_01",
+            "module_par_def_claim_story_01",
+            "module_pir_stor_condensate_s_01",
+        };
+
         var modules = WorkArea.StationData.ModulesInfo.Modules
-            .Where(x => x.Module.ModuleType.ModuleTypeID != "ventureplatform"
-                     && x.Module.ID != "module_gen_dock_m_venturer_01");
+            .Where(x => !ignoreModuleTypeIds.Contains(x.Module.ModuleType.ModuleTypeID) && !ignoreModuleIds.Contains(x.Module.ID));
 
         foreach (var module in modules)
         {

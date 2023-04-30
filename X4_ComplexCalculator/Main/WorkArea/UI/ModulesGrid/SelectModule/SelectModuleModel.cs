@@ -134,7 +134,7 @@ class SelectModuleModel : IDisposable
 
         var newModules = X4Database.Instance.Ware.GetAll<IX4Module>()
             .Where(x => 
-                !x.Tags.Contains("noplayerblueprint") &&
+                !(x.Tags.Contains("noplayerblueprint") || x.Tags.Contains("noblueprint")) &&
                 checkedModuleTypes.Contains(x.ModuleType.ModuleTypeID) &&
                 checkedOwners.Intersect(x.Owners.Select(y => y.FactionID)).Any())
             .Select(x => new ModulesListItem(x));
