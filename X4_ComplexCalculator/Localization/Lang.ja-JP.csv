@@ -149,7 +149,7 @@ CheckUpdate_NowDownloading;ダウンロード中...
 # Station Calculator import/export dialog
 # ------------------------------------------------------
 StationCalculatorExport_Title;Station Calculatorへエクスポート
-StationCalculatorExport_Description;URLをコピーして下さい\r\n注) 以下のモジュールは除外しています。\r\n・探検モジュール
+StationCalculatorExport_Description;URLをコピーして下さい\r\n注) 以下のモジュールは除外しています。\r\n・探検モジュール\r\n・パラニド 派閥首都\r\n・凝縮物質格納施設
 StationCalculatorImport_Title;Station Calculatorからインポート
 StationCalculatorImport_Description;Station Calculator上部のShareボタンをクリックした時に\r\n表示されるURLを入力してください
 
