@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS WareEffect
                     var effectID = effect.Attribute("type")?.Value;
                     if (string.IsNullOrEmpty(effectID)) continue;
 
-                    var product = effect.Attribute("product")?.GetDouble() ?? 0.0;
+                    var product = effect.Attribute("product")?.GetDoubleOrDefault() ?? 0.0;
 
                     yield return new WareEffect(wareID, method, effectID, product);
                 }

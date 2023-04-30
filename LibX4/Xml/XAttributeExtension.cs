@@ -30,6 +30,25 @@ public static class XAttributeExtension
 
 
     /// <summary>
+    /// XML 属性の値を double として取得する。変換できない場合は default と見なす。
+    /// </summary>
+    /// <param name="attr">値を取得する XML 属性</param>
+    /// <returns>変換済みの属性値又は 0.0</returns>
+    public static double GetDoubleOrDefault(this XAttribute? attr)
+    {
+        try
+        {
+            var value = attr?.Value ?? throw XmlFormatException.CreateFrom(attr);
+            return double.Parse(value, CultureInfo.InvariantCulture);
+        }
+        catch
+        {
+            return default;
+        }
+    }
+
+
+    /// <summary>
     /// XML 属性の値を int として取得する
     /// </summary>
     /// <param name="attr">値を取得する XML 属性</param>
