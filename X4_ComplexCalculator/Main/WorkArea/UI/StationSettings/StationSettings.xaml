@@ -89,7 +89,7 @@
                             DefaultValue="100"
                             FormatString="{}{0:F3} %"
                             Increment="0.001"
-                            Maximum="1000"
+                            Maximum="100000"
                             Minimum="0"
                             Value="{Binding Sunlight, Mode=TwoWay, Converter={StaticResource DoubleUpDownConverter}}" />
                     </StackPanel>
