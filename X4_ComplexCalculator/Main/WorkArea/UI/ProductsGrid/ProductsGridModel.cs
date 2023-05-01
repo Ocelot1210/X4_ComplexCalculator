@@ -90,8 +90,8 @@ class ProductsGridModel : BindableBase, IDisposable
         _products = products;
         _messageBox = messageBox;
 
-        _modules.Modules.CollectionChangedAsync += OnModulesChanged;
-        _modules.Modules.CollectionPropertyChangedAsync += OnModulePropertyChanged;
+        _modules.Modules.CollectionChanged += OnModulesChanged;
+        _modules.Modules.CollectionPropertyChanged += OnModulePropertyChanged;
 
         _modules = modules;
         _settings = settings;
@@ -150,8 +150,8 @@ class ProductsGridModel : BindableBase, IDisposable
     public void Dispose()
     {
         Products.Clear();
-        _modules.Modules.CollectionChangedAsync -= OnModulesChanged;
-        _modules.Modules.CollectionPropertyChangedAsync -= OnModulePropertyChanged;
+        _modules.Modules.CollectionChanged -= OnModulesChanged;
+        _modules.Modules.CollectionPropertyChanged -= OnModulePropertyChanged;
         _settings.PropertyChanged -= Settings_PropertyChanged;
         _settings.Workforce.PropertyChanged -= Workforce_PropertyChanged;
     }
@@ -237,18 +237,16 @@ class ProductsGridModel : BindableBase, IDisposable
     /// <param name="sender"></param>
     /// <param name="e"></param>
     /// <returns></returns>
-    private async Task OnModulePropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void OnModulePropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         // モジュール数変更時以外は処理しない
         if (e.PropertyName != nameof(ModulesGridItem.ModuleCount))
         {
-            await Task.CompletedTask;
             return;
         }
 
         if (sender is not ModulesGridItem module)
         {
-            await Task.CompletedTask;
             return;
         }
 
@@ -262,8 +260,6 @@ class ProductsGridModel : BindableBase, IDisposable
 
             OnModuleCountChanged(module, ev.OldValue);
         }
-
-        await Task.CompletedTask;
     }
 
 
@@ -272,7 +268,7 @@ class ProductsGridModel : BindableBase, IDisposable
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private async Task OnModulesChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void OnModulesChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.NewItems is not null)
         {
@@ -319,8 +315,6 @@ class ProductsGridModel : BindableBase, IDisposable
                 _optionsBakDict.Clear();
             }
         }
-
-        await Task.CompletedTask;
     }
 
 

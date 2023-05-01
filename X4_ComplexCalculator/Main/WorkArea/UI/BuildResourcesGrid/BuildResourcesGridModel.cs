@@ -65,8 +65,8 @@ class BuildResourcesGridModel : IDisposable
         _modules = modules;
         _buildResources = buildResources;
 
-        _modules.Modules.CollectionChangedAsync += OnModulesCollectionChanged;
-        _modules.Modules.CollectionPropertyChangedAsync += OnModulesPropertyChanged;
+        _modules.Modules.CollectionChanged += OnModulesCollectionChanged;
+        _modules.Modules.CollectionPropertyChanged += OnModulesPropertyChanged;
     }
 
 
@@ -76,8 +76,8 @@ class BuildResourcesGridModel : IDisposable
     public void Dispose()
     {
         Resources.Clear();
-        _modules.Modules.CollectionChangedAsync -= OnModulesCollectionChanged;
-        _modules.Modules.CollectionPropertyChangedAsync -= OnModulesPropertyChanged;
+        _modules.Modules.CollectionChanged -= OnModulesCollectionChanged;
+        _modules.Modules.CollectionPropertyChanged -= OnModulesPropertyChanged;
     }
 
 
@@ -87,11 +87,10 @@ class BuildResourcesGridModel : IDisposable
     /// <param name="sender"></param>
     /// <param name="e"></param>
     /// <returns></returns>
-    private async Task OnModulesPropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void OnModulesPropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         if (sender is not ModulesGridItem module)
         {
-            await Task.CompletedTask;
             return;
         }
 
@@ -132,8 +131,6 @@ class BuildResourcesGridModel : IDisposable
             default:
                 break;
         }
-
-        await Task.CompletedTask;
     }
 
 
@@ -142,7 +139,7 @@ class BuildResourcesGridModel : IDisposable
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private async Task OnModulesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void OnModulesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.NewItems is not null)
         {
@@ -187,8 +184,6 @@ class BuildResourcesGridModel : IDisposable
                 _optionsBakDict.Clear();
             }
         }
-
-        await Task.CompletedTask;
     }
 
 

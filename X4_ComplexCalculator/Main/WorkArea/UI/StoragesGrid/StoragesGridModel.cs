@@ -48,8 +48,8 @@ class StoragesGridModel : IDisposable
     {
         _modules = modules;
         _storages = storages;
-        _modules.Modules.CollectionChangedAsync += OnModulesChanged;
-        _modules.Modules.CollectionPropertyChangedAsync += OnModulePropertyChanged;
+        _modules.Modules.CollectionChanged += OnModulesChanged;
+        _modules.Modules.CollectionPropertyChanged += OnModulePropertyChanged;
     }
 
 
@@ -58,8 +58,8 @@ class StoragesGridModel : IDisposable
     /// </summary>
     public void Dispose()
     {
-        _modules.Modules.CollectionChangedAsync -= OnModulesChanged;
-        _modules.Modules.CollectionPropertyChangedAsync -= OnModulePropertyChanged;
+        _modules.Modules.CollectionChanged -= OnModulesChanged;
+        _modules.Modules.CollectionPropertyChanged -= OnModulePropertyChanged;
     }
 
 
@@ -69,19 +69,17 @@ class StoragesGridModel : IDisposable
     /// <param name="sender"></param>
     /// <param name="e"></param>
     /// <returns></returns>
-    private async Task OnModulePropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void OnModulePropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         // モジュール数変更時のみ処理
         if (e.PropertyName != nameof(ModulesGridItem.ModuleCount))
         {
-            await Task.CompletedTask;
             return;
         }
 
 
         if (sender is not ModulesGridItem module)
         {
-            await Task.CompletedTask;
             return;
         }
         
@@ -90,13 +88,10 @@ class StoragesGridModel : IDisposable
         {
             if (e is not PropertyChangedExtendedEventArgs<long> ev)
             {
-                await Task.CompletedTask;
                 return;
             }
             OnModuleCountChanged(module, ev.OldValue);
         }
-
-        await Task.CompletedTask;
     }
 
 
@@ -105,7 +100,7 @@ class StoragesGridModel : IDisposable
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private async Task OnModulesChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void OnModulesChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.NewItems is not null)
         {
@@ -122,8 +117,6 @@ class StoragesGridModel : IDisposable
             Storages.Clear();
             OnModulesAdded(_modules.Modules);
         }
-
-        await Task.CompletedTask;
     }
 
 
@@ -169,10 +162,7 @@ class StoragesGridModel : IDisposable
         {
             // 一致するレコードを探す
             var itm = Storages.FirstOrDefault(x => x.TransportType.Equals(kvp.Key));
-            if (itm is not null)
-            {
-                itm.RemoveDetails(kvp.Value);
-            }
+            itm?.RemoveDetails(kvp.Value);
         }
 
         // 空のレコードを削除
@@ -205,7 +195,7 @@ class StoragesGridModel : IDisposable
     /// </summary>
     /// <param name="modules">集計対象</param>
     /// <returns>集計結果</returns>
-    private IReadOnlyDictionary<ITransportType, IReadOnlyList<StorageDetailsListItem>> AggregateStorage(IEnumerable<ModulesGridItem> modules)
+    private static IReadOnlyDictionary<ITransportType, IReadOnlyList<StorageDetailsListItem>> AggregateStorage(IEnumerable<ModulesGridItem> modules)
     {
         return modules
             .Where(x => 0 < x.Module.Storage.Amount && x.Module.Storage.Types.Any())
