@@ -16,7 +16,7 @@
     Height="450"
     lex:LocalizeDictionary.DefaultProvider="{StaticResource CSVLocalizationProvider}"
     lex:LocalizeDictionary.DesignCulture="en-US"
-    lex:ResxLocalizationProvider.DefaultAssembly="WPFLocalizationExtension"
+    lex:ResxLocalizationProvider.DefaultAssembly="WPFLocalizeExtension"
     lex:ResxLocalizationProvider.DefaultDictionary="StringResources"
     x4bhv:CloseWindowBehavior.Close="{Binding CloseWindowProperty, Mode=OneWay}"
     Style="{StaticResource DefaultWindowBackgroundStyle}"
