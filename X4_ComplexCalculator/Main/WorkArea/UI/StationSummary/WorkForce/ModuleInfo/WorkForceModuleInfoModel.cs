@@ -1,4 +1,5 @@
-﻿using Prism.Mvvm;
+﻿using Collections.Pooled;
+using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -198,7 +199,7 @@ class WorkForceModuleInfoModel : BindableBase
         var needWorkforce = 0L;
         var capacity = 0L;
 
-        var addItems = new List<WorkForceModuleInfoDetailsItem>();
+        using var addItems = new PooledList<WorkForceModuleInfoDetailsItem>();
         foreach (var (module, moduleCount) in details)
         {
             var itm = WorkForceDetails.FirstOrDefault(x => x.ModuleID == module.ID);

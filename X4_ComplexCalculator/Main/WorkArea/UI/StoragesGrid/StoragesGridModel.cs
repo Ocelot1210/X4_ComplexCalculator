@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Collections.Pooled;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -128,7 +129,7 @@ class StoragesGridModel : IDisposable
     {
         var storageModules = AggregateStorage(modules);
 
-        var addTarget = new List<StoragesGridItem>();
+        using var addTarget = new PooledList<StoragesGridItem>();
 
         foreach (var kvp in storageModules)
         {

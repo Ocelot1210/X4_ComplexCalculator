@@ -1,4 +1,5 @@
-﻿using Prism.Mvvm;
+﻿using Collections.Pooled;
+using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -172,7 +173,7 @@ class ProductsGridModel : BindableBase, IDisposable
         var addedModules = 0L;              // 追加モジュール数
 
         // モジュール自動追加で追加されたモジュール一覧
-        var autoAddedModules = new Dictionary<string, ModulesGridItem>();
+        using var autoAddedModules = new PooledDictionary<string, ModulesGridItem>();
 
 
         while (true)
@@ -186,7 +187,7 @@ class ProductsGridModel : BindableBase, IDisposable
                 break;
             }
 
-            var addTarget = new List<ModulesGridItem>();      // 実際に追加するモジュール一覧
+            using var addTarget = new PooledList<ModulesGridItem>();      // 実際に追加するモジュール一覧
 
             foreach (var (module, count) in addModules)
             {
@@ -226,8 +227,6 @@ class ProductsGridModel : BindableBase, IDisposable
         {
             _messageBox.Ok("Lang:Modules_Button_AutoAdd_AddedModulesMessage", "Lang:Common_MessageBoxTitle_Confirmation", addedRecords, addedModules);
         }
-
-        autoAddedModules.Clear();
     }
 
 
@@ -374,7 +373,7 @@ class ProductsGridModel : BindableBase, IDisposable
         // 生産品集計用ディクショナリ
         var prodDict = AggregateProduct(addedModules);
 
-        var addItems = new List<ProductsGridItem>();
+        using var addItems = new PooledList<ProductsGridItem>();
         foreach (var item in prodDict)
         {
             // すでにウェアが存在するか検索

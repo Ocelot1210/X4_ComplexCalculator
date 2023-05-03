@@ -1,4 +1,5 @@
-﻿using Prism.Mvvm;
+﻿using Collections.Pooled;
+using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -235,7 +236,7 @@ class NeedWareInfoModel : BindableBase, IDisposable
 
         // ウェア集計
         // 削除対象レコード
-        var removeItems = new List<(string Method, string WareID)>();
+        using var removeItems = new PooledList<(string Method, string WareID)>();
         foreach (var (method, wareArr) in addWares)
         {
             foreach (var (wareID, amount) in wareArr)

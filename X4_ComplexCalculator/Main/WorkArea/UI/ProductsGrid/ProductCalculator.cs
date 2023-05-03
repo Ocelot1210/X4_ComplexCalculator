@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Collections.Pooled;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using X4_ComplexCalculator.DB;
@@ -214,9 +215,9 @@ class ProductCalculator
     /// <returns>必要モジュールと個数のタプル</returns>
     public IEnumerable<(IX4Module Module, long Count)> CalcNeedModules(IReadOnlyList<ProductsGridItem> products, IStationSettings settings)
     {
-        var addModules = new Dictionary<IX4Module, long>();                         // 追加予定モジュールと個数のディクショナリ
-        var addModuleProducts = new List<(IWare Ware, long Count)>();               // 追加予定モジュールの製品一覧
-        var excludeWares = new HashSet<IWare>();                                    // 計算除外製品一覧
+        using var addModules = new PooledDictionary<IX4Module, long>();                 // 追加予定モジュールと個数のディクショナリ
+        using var addModuleProducts = new PooledList<(IWare Ware, long Count)>();       // 追加予定モジュールの製品一覧
+        using var excludeWares = new PooledSet<IWare>();                                // 計算除外製品一覧
 
 
         foreach (var prod in products.Where(x => 0 < x.Ware.WareGroup.Tier).OrderBy(x => x.Ware.WareGroup.Tier))
@@ -274,6 +275,9 @@ class ProductCalculator
             }
         }
 
-        return addModules.Select(x => (x.Key, x.Value));
+        foreach (var kvp in addModules)
+        {
+            yield return (kvp.Key, kvp.Value);
+        }
     }
 }

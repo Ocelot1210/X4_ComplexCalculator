@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Collections.Pooled;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -234,10 +235,8 @@ class BuildResourcesGridModel : IDisposable
             (module.Module, module.SelectedMethod.Method, 1)    // 変更後のため +1
         };
 
-        IEnumerable<CalcResult> resources = _calculator.CalcResource(modules);
-
-        var addTarget = new List<BuildResourcesGridItem>();
-        foreach (var kvp in resources)
+        using var addTarget = new PooledList<BuildResourcesGridItem>();
+        foreach (var kvp in _calculator.CalcResource(modules))
         {
             var item = Resources.FirstOrDefault(x => x.Ware.ID == kvp.WareID);
             if (item is not null)
@@ -275,10 +274,8 @@ class BuildResourcesGridModel : IDisposable
             .Select(x => (X4Database.Instance.Ware.Get(x.Key), "default", -(long)x.Count()));
 
         // リソース集計
-        IEnumerable<CalcResult> resources = _calculator.CalcResource(newEquipments.Concat(oldEquipments));
-
-        var addTarget = new List<BuildResourcesGridItem>();
-        foreach (var resource in resources)
+        using var addTarget = new PooledList<BuildResourcesGridItem>();
+        foreach (var resource in _calculator.CalcResource(newEquipments.Concat(oldEquipments)))
         {
             var item = Resources.FirstOrDefault(x => x.Ware.ID == resource.WareID);
             if (item is not null)
@@ -304,10 +301,8 @@ class BuildResourcesGridModel : IDisposable
     /// <param name="modules">追加されたモジュール</param>
     private void OnModulesAdded(IEnumerable<ModulesGridItem> modules)
     {
-        IEnumerable<CalcResult> resources = AggregateModules(modules);
-
-        var addTarget = new List<BuildResourcesGridItem>();
-        foreach (var kvp in resources)
+        using var addTarget = new PooledList<BuildResourcesGridItem>();
+        foreach (var kvp in AggregateModules(modules))
         {
             var item = Resources.FirstOrDefault(x => x.Ware.ID == kvp.WareID);
             if (item is not null)

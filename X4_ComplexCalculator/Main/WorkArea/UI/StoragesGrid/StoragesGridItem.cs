@@ -1,4 +1,5 @@
-﻿using Prism.Mvvm;
+﻿using Collections.Pooled;
+using Prism.Mvvm;
 using System.Collections.Generic;
 using System.Linq;
 using X4_ComplexCalculator.Common;
@@ -74,7 +75,7 @@ public class StoragesGridItem : BindableBase, ISelectable
     /// <param name="details"></param>
     public void AddDetails(IEnumerable<StorageDetailsListItem> details)
     {
-        var addItems = new List<StorageDetailsListItem>();
+        using var addItems = new PooledList<StorageDetailsListItem>();
 
         foreach (var item in details)
         {

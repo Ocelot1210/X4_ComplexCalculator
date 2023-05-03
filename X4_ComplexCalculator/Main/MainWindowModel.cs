@@ -55,8 +55,6 @@ class MainWindowModel
         X4Database.Open(_localizedMessageBox);
         SettingDatabase.Open();
 
-        var vmList = new List<WorkAreaViewModel>();
-
         const string SQL = "SELECT Path FROM OpenedFiles";
         var pathes = SettingDatabase.Instance.Query<string>(SQL)
             .Where(x => File.Exists(x))

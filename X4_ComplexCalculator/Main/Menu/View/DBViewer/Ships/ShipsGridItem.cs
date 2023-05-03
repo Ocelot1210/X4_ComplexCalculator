@@ -1,4 +1,5 @@
-﻿using Prism.Mvvm;
+﻿using Collections.Pooled;
+using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -236,10 +237,10 @@ class ShipsGridItem : BindableBase
 
         // エンジンを設定
         {
-            var maxForwardEngines = new List<IEngine>();
-            var maxReverseEngines = new List<IEngine>();
-            var maxBoostEngines   = new List<IEngine>();
-            var maxTravelEngines  = new List<IEngine>();
+            using var maxForwardEngines = new PooledList<IEngine>();
+            using var maxReverseEngines = new PooledList<IEngine>();
+            using var maxBoostEngines   = new PooledList<IEngine>();
+            using var maxTravelEngines  = new PooledList<IEngine>();
 
             var conNames = ship.Equipments
                 .Where(x => x.Value.EquipmentType.EquipmentTypeID == "engines")
@@ -298,10 +299,10 @@ class ShipsGridItem : BindableBase
 
         // スラスターを設定
         {
-            var maxTranslationThrusters = new List<IThruster>();
-            var maxPitchThruster        = new List<IThruster>();
-            var maxYawThruster          = new List<IThruster>();
-            var maxRollThruster         = new List<IThruster>();
+            using var maxTranslationThrusters = new PooledList<IThruster>();
+            using var maxPitchThruster        = new PooledList<IThruster>();
+            using var maxYawThruster          = new PooledList<IThruster>();
+            using var maxRollThruster         = new PooledList<IThruster>();
 
             var conNames = ship.Equipments
                 .Where(x => x.Value.EquipmentType.EquipmentTypeID == "thrusters")
@@ -324,11 +325,11 @@ class ShipsGridItem : BindableBase
 
             // 平行移動が最大のスラスター
             {
-                var tmpThrusters = maxTranslationThrusters
+                using var tmpThrusters = maxTranslationThrusters
                     .GroupBy(x => x)
                     .Select(x => (x.Key, x.Count()))
                     .OrderBy(x => x.Key.Name)
-                    .ToArray();
+                    .ToPooledList();
 
                 VerticalMovementSpeed = new EquipmentInfo<IThruster>(tmpThrusters, ship.Drag.Vertical);
                 HorizontalMovementSpeed = new EquipmentInfo<IThruster>(tmpThrusters, ship.Drag.Horizontal);

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Collections.Pooled;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -129,7 +130,7 @@ public class EquippableWareEquipmentManager : INotifyCollectionChanged
     /// <param name="equipments"></param>
     public void RemoveRange(IEnumerable<IEquipment> equipments)
     {
-        var removed = CollectionChanged is null ? null : new List<IEquipment>();
+        using var removed = CollectionChanged is null ? null : new PooledList<IEquipment>();
 
         foreach (var equipment in equipments)
         {
@@ -155,7 +156,7 @@ public class EquippableWareEquipmentManager : INotifyCollectionChanged
     /// <param name="equipment">追加対象の列挙</param>
     public void AddRange(IEnumerable<IEquipment> equipments)
     {
-        var added = CollectionChanged is null ? null : new List<IEquipment>();
+        using var added = CollectionChanged is null ? null : new PooledList<IEquipment>();
 
         foreach (var equipment in equipments)
         {
@@ -179,7 +180,7 @@ public class EquippableWareEquipmentManager : INotifyCollectionChanged
     /// <param name="count">追加個数</param>
     public void Add(IEquipment equipment, long count = 1)
     {
-        var added = CollectionChanged is null ? null : new List<IEquipment>((int)count);
+        using var added = CollectionChanged is null ? null : new PooledList < IEquipment >((int) count);
         var cnt = 0L;
         while (cnt < count && AddEquipmentInternal(equipment))
         {

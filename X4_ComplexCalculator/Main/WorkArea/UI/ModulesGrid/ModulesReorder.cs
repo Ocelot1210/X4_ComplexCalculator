@@ -1,4 +1,5 @@
-﻿using Prism.Commands;
+﻿using Collections.Pooled;
+using Prism.Commands;
 using Prism.Mvvm;
 using System.Collections.Generic;
 using System.Linq;
@@ -263,7 +264,7 @@ public class ModulesReorder : BindableBase
         }
 
         // 移動対象を退避
-        var list = new List<ModulesGridItem>(_selection);
+        using var list = new PooledList<ModulesGridItem>(_selection);
         list.AddRange(_modulesInfo.Modules.Where(x => x.IsReorderTarget));
 
         // 移動対象を削除
