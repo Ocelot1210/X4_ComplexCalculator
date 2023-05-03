@@ -180,7 +180,7 @@ public class EquippableWareEquipmentManager : INotifyCollectionChanged
     /// <param name="count">追加個数</param>
     public void Add(IEquipment equipment, long count = 1)
     {
-        using var added = CollectionChanged is null ? null : new PooledList < IEquipment >((int) count);
+        using var added = CollectionChanged is null ? null : new PooledList <IEquipment>((int) count);
         var cnt = 0L;
         while (cnt < count && AddEquipmentInternal(equipment))
         {

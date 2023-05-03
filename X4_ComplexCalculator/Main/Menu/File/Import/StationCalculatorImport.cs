@@ -1,4 +1,5 @@
-﻿using Prism.Mvvm;
+﻿using Collections.Pooled;
+using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -97,7 +98,7 @@ class StationCalculatorImport : BindableBase, IImport
         {
             var query = _inputUrl.Split('?').Last();
 
-            var paramDict = new Dictionary<string, string>();
+            using var paramDict = new PooledDictionary<string, string>();
 
 
             var paramParser = new Regex(@"(\w+)=(.*)");
