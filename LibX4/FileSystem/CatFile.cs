@@ -133,6 +133,12 @@ public class CatFile : ICatFile
             .OrderBy(x => x.Name)
             .ToList();
 
+        // Mod の依存関係情報に Mod 情報を設定する
+        foreach (var mod in unloadedMods)
+        {
+            mod.SetModInfoToDependencies(unloadedMods);
+        }
+
         var modInfos = new List<ModInfo>(unloadedMods.Count);
 
         while (unloadedMods.Any())
@@ -156,7 +162,7 @@ public class CatFile : ICatFile
             // 未ロードの Mod 数に変化が無ければ依存関係を満たせていないと見なす
             if (prevUnloadModsCount == unloadedMods.Count)
             {
-                throw new DependencyResolutionException();
+                throw new DependencyResolutionException("Failed to resolve Mod dependencies.", unloadedMods);
             }
         }
 

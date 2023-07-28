@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -25,6 +26,25 @@ public class DependencyInfo
     /// Mod の名前
     /// </summary>
     public string Name { get; }
+
+
+    /// <summary>
+    /// Mod の詳細情報
+    /// </summary>
+    private ModInfo? _modInfo = null;
+
+    /// <summary>
+    /// Mod の詳細情報
+    /// </summary>
+    public ModInfo? ModInfo
+    {
+        get => _modInfo;
+        private set
+        {
+            if (value is not null && ID != value.ID) throw new ArgumentException("value.ID");
+            _modInfo = value;
+        }
+    }
 
 
     /// <summary>
@@ -70,5 +90,20 @@ public class DependencyInfo
         ID = id;
         Optional = optional;
         Name = name;
+    }
+
+
+    /// <summary>
+    /// Mod の詳細情報を設定(初期化)する
+    /// </summary>
+    /// <param name="modInfo">Mod の詳細情報</param>
+    public void InitModInfo(ModInfo modInfo)
+    {
+        if (_modInfo != null)
+        {
+            throw new InvalidOperationException();
+        }
+
+        ModInfo = modInfo;
     }
 }

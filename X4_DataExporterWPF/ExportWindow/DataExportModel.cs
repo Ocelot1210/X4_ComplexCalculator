@@ -6,6 +6,7 @@ using System.Data;
 using System.Data.SQLite;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -42,14 +43,40 @@ class DataExportModel
 
             return (true, languages);
         }
-        catch (DependencyResolutionException)
+        catch (DependencyResolutionException ex)
         {
-            await owner.Dispatcher.BeginInvoke((Action)(() =>
+            await owner.Dispatcher.BeginInvoke(() =>
             {
                 var msg = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_FailedToResolveModDependencyMessage", null, null);
                 var title = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_Title", null, null);
+
+                void AddModInfo(StringBuilder sb, ModInfo modInfo, int level = 0)
+                {
+                    sb.Append("".PadRight(level * 4));
+                    sb.AppendLine(modInfo.Name);
+
+                    string indent = "".PadRight((level + 1) * 4);
+
+                    foreach (var d in modInfo.Dependencies)
+                    {
+                        sb.Append(indent);
+                        sb.AppendLine(d.Name);
+
+                        if (d.ModInfo is not null)
+                        {
+                            AddModInfo(sb, d.ModInfo, level + 1);
+                        }
+                    }
+                }
+
+                var sb = new StringBuilder();
+                foreach (var mod in ex.UnloadedMods)
+                {
+                    AddModInfo(sb, mod);
+                }
+
                 MessageBox.Show(owner, msg, title, MessageBoxButton.OK, MessageBoxImage.Error);
-            }));
+            });
             return (false, Array.Empty<LangComboboxItem>());
         }
         catch (Exception)
