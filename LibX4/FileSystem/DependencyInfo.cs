@@ -90,6 +90,10 @@ public class DependencyInfo
         ID = id;
         Optional = optional;
         Name = name;
+        if (string.IsNullOrEmpty(Name))
+        {
+            Name = ID;
+        }
     }
 
 

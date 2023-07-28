@@ -47,35 +47,42 @@ class DataExportModel
         {
             await owner.Dispatcher.BeginInvoke(() =>
             {
-                var msg = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_FailedToResolveModDependencyMessage", null, null);
-                var title = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_Title", null, null);
-
-                void AddModInfo(StringBuilder sb, ModInfo modInfo, int level = 0)
+                static void AddModInfo(StringBuilder sb, ModInfo modInfo, int level = 0)
                 {
-                    sb.Append("".PadRight(level * 4));
-                    sb.AppendLine(modInfo.Name);
+                    if (level == 0)
+                    {
+                        sb.AppendLine(modInfo.Name);
+                    }
 
                     string indent = "".PadRight((level + 1) * 4);
 
-                    foreach (var d in modInfo.Dependencies)
+                    foreach (var dependency in modInfo.Dependencies)
                     {
-                        sb.Append(indent);
-                        sb.AppendLine(d.Name);
+                        // dependency.ModInfo が null 以外の場合も出力する。
+                        // → 依存関係が循環していると Mod の詳細情報 (dependency.ModInfo) が 非 null になるため。
 
-                        if (d.ModInfo is not null)
+                        sb.Append(indent);
+                        sb.AppendLine(dependency.ModInfo?.Name ?? dependency.Name);
+                        if (dependency.ModInfo is not null)
                         {
-                            AddModInfo(sb, d.ModInfo, level + 1);
+                            AddModInfo(sb, dependency.ModInfo, level + 1);
                         }
                     }
                 }
 
                 var sb = new StringBuilder();
+                sb.AppendLine();
+                sb.AppendLine("---------");
                 foreach (var mod in ex.UnloadedMods)
                 {
                     AddModInfo(sb, mod);
+                    sb.AppendLine();
                 }
 
-                MessageBox.Show(owner, msg, title, MessageBoxButton.OK, MessageBoxImage.Error);
+                var msg = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_FailedToResolveModDependencyMessage", null, null);
+                var title = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_Title", null, null);
+
+                MessageBox.Show(owner, $"{msg}\r\n{sb}", title, MessageBoxButton.OK, MessageBoxImage.Error);
             });
             return (false, Array.Empty<LangComboboxItem>());
         }
