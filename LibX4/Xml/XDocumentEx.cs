@@ -36,6 +36,12 @@ internal static class XDocumentEx
     /// <returns>生成した XDocument</returns>
     public static bool TryLoad(string url, [NotNullWhen(true)]out XDocument? xDocument)
     {
+        if (!File.Exists(url))
+        {
+            xDocument = null;
+            return false;
+        }
+
         try
         {
             using var stream = new FileStream(url, FileMode.Open, FileAccess.Read);
