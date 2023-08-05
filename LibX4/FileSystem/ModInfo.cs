@@ -12,7 +12,7 @@ namespace LibX4.FileSystem;
 /// <summary>
 /// Modの情報
 /// </summary>
-class ModInfo
+public class ModInfo
 {
     /// <summary>
     /// 識別ID
@@ -92,7 +92,7 @@ class ModInfo
             ID = Path.GetFileName(modDirPath);
         }
 
-        Name    = modContentXml.Root?.Attribute("name")?.Value    ?? "";
+        Name    = modContentXml.Root?.Attribute("name")?.Value    ?? ID;
         Author  = modContentXml.Root?.Attribute("author")?.Value  ?? "";
         Version = modContentXml.Root?.Attribute("version")?.Value ?? "";
         Date    = modContentXml.Root?.Attribute("date")?.Value    ?? "";
@@ -166,5 +166,26 @@ class ModInfo
         }
 
         return defaultValue;
+    }
+
+
+    /// <summary>
+    /// 依存関係情報に Mod情報を設定する
+    /// </summary>
+    /// <param name="mods">Mod情報一覧</param>
+    public void SetModInfoToDependencies(IReadOnlyList<ModInfo> mods)
+    {
+        // ID が重複しても X4 が正常に起動するので ID をキーにした ModInfo の Dictionary を使わず、
+        // IReadOnlyList<ModInfo> を線形探索する
+
+        foreach (var dependency in Dependencies)
+        {
+            var modInfo = mods.FirstOrDefault(x => x.ID == dependency.ID);
+
+            if (modInfo is not null)
+            {
+                dependency.InitModInfo(modInfo);
+            }
+        }
     }
 }
