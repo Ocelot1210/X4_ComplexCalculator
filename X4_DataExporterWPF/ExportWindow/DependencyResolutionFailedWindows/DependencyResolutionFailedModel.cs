@@ -48,26 +48,37 @@ namespace X4_DataExporterWPF.ExportWindow.DependencyResolutionFailedWindows
                 // dependency.ModInfo が null 以外の場合も出力する。
                 // → 依存関係が循環していると Mod の詳細情報 (dependency.ModInfo) が 非 null になるため。
                 
-                // 依存する Mod が無いか？
-                if (dependency.ModInfo is null)
+                if (dependency.ModInfo is not null)
                 {
+                    // 依存する Mod が有効化されているか？
+                    if (dependency.ModInfo.Enabled)
+                    {
+                        // 依存する Mod を再帰的に出力
+                        foreach (var info in EnumerateInfo(dependency.ModInfo, level + 1))
+                        {
+                            yield return info;
+                        }
+                    }
+                    else
+                    {
+                        // Mod が無効化されている
+                    }
+                }
+                else
+                {
+                    // 依存 Mod が無い場合
+
                     if (dependency.Optional)
                     {
+                        // 任意 Mod が見つからない
                         var remarks = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DependencyResolutionFailedWindow_OptionalModNotFound", null, null);
                         yield return new DependencyResolutionFailedInfo(dependency.Name, dependency.ID, "", remarks, level + 1);
                     }
                     else
                     {
+                        // 必須 Mod が見つからない
                         var remarks = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DependencyResolutionFailedWindow_RequiredModNotFound", null, null);
                         yield return new DependencyResolutionFailedInfo(dependency.Name, dependency.ID, "", remarks, level + 1);
-                    }                    
-                }
-                else
-                {
-                    // 依存する Mod がある場合、再帰的に出力
-                    foreach (var info in EnumerateInfo(dependency.ModInfo, level + 1))
-                    {
-                        yield return info;
                     }
                 }
             }
