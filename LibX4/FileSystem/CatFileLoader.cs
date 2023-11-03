@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.IO;
+using System;
 using System.Buffers.Text;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -30,6 +31,12 @@ sealed class CatFileLoader : IFileLoader
 
 
     /// <summary>
+    /// dat ファイルから <see cref="RecyclableMemoryStream"/> を作成する際に使用する <see cref="RecyclableMemoryStreamManager"/>
+    /// </summary>
+    private readonly RecyclableMemoryStreamManager _memoryStreamManager;
+
+
+    /// <summary>
     /// catファイルの1レコード分の情報
     /// </summary>
     /// <param name="datFilePath">ファイルの実体があるdatファイルパス</param>
@@ -52,6 +59,7 @@ sealed class CatFileLoader : IFileLoader
 
         RootDir = rootDir;
         _entries = new Dictionary<string, Entry>(capacity, StringComparer.OrdinalIgnoreCase);
+        _memoryStreamManager = new RecyclableMemoryStreamManager();
     }
 
 
@@ -181,7 +189,7 @@ sealed class CatFileLoader : IFileLoader
             // ファイルサイズが空なら空の MemoryStream を返す
             if (entry.FileSize == 0)
             {
-                return new MemoryStream(0);
+                return _memoryStreamManager.GetStream();
             }
 
             using var fs = new FileStream(
@@ -191,11 +199,14 @@ sealed class CatFileLoader : IFileLoader
                 FileShare.Read,
                 entry.FileSize
             );
-            var buff = new byte[entry.FileSize];
             fs.Seek(entry.Offset, SeekOrigin.Begin);
-            await fs.ReadAsync(buff, cancellationToken);
 
-            return new MemoryStream(buff, false);
+            var ret = _memoryStreamManager.GetStream(filePath, entry.FileSize);
+            await fs.CopyToAsync(ret, cancellationToken);
+            ret.Position = 0;
+            ret.SetLength(entry.FileSize);
+
+            return ret;
         }
         else
         {
@@ -205,12 +216,7 @@ sealed class CatFileLoader : IFileLoader
                 return null;
             }
 
-            using var fs = new FileStream(path, FileMode.Open, FileAccess.Read);
-
-            var buff = new byte[fs.Length];
-            await fs.ReadAsync(buff, cancellationToken);
-
-            return new MemoryStream(buff, false);
+            return new FileStream(path, FileMode.Open, FileAccess.Read);
         }
     }
     #endregion
