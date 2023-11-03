@@ -60,6 +60,10 @@ sealed class CatFileLoader : IFileLoader
         RootDir = rootDir;
         _entries = new Dictionary<string, Entry>(capacity, StringComparer.OrdinalIgnoreCase);
         _memoryStreamManager = new RecyclableMemoryStreamManager();
+        _memoryStreamManager.GenerateCallStacks = true;
+        _memoryStreamManager.AggressiveBufferReturn = true;
+        _memoryStreamManager.MaximumFreeLargePoolBytes = 16 * (1024 * 1024);
+        _memoryStreamManager.MaximumFreeSmallPoolBytes = 100 * 1024;
     }
 
 
