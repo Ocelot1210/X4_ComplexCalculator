@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Collections.Pooled;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -178,7 +179,7 @@ class ModulesGridModel : IDisposable
             return;
         }
 
-        var dict = new Dictionary<int, (int idx, ModulesGridItem Module)>();
+        using var dict = new PooledDictionary<int, (int idx, ModulesGridItem Module)>();
 
         var prevCnt = Modules.Count;
         var mergedModules = 0L;

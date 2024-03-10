@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using Collections.Pooled;
+using Microsoft.Win32;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
@@ -158,7 +159,7 @@ class WorkAreaFileIO : BindableBase
 
             IsBusy = true;
             doevents.ForceDoEvents();
-            var viewModels = new List<WorkAreaViewModel>(pathesCount);
+            using var viewModels = new PooledList<WorkAreaViewModel>(pathesCount);
 
             foreach (var path in pathes)
             {

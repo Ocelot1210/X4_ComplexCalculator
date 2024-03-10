@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Collections.Pooled;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using X4_ComplexCalculator.Common.EditStatus;
@@ -92,7 +93,7 @@ internal class SaveDataReader0 : ISaveDataReader
         var records = moduleCnt + equipmentCnt;
 
 
-        var modules = new List<ModulesGridItem>(moduleCnt);
+        using var modules = new PooledList<ModulesGridItem>(moduleCnt);
         var progressCnt = 1;
 
         // モジュールを復元

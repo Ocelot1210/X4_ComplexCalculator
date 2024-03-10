@@ -1,6 +1,8 @@
 ﻿#nullable enable
 namespace System.Collections.ObjectModel;
 
+using global::Collections.Pooled;
+
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
@@ -118,11 +120,15 @@ public class RangeObservableCollection<T> : ObservableCollection<T>
         }
         else
         {
-            if (collection is not List<T> list)
+            if (collection is List<T> list)
             {
-                list = new List<T>(collection);
+                InsertRange(Count, list);
             }
-            InsertRange(Count, list);
+            else
+            {
+                using var lst = new PooledList<T>(collection);
+                InsertRange(Count, lst);
+            }
         }
     }
 
@@ -137,27 +143,25 @@ public class RangeObservableCollection<T> : ObservableCollection<T>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is not in the collection range.</exception>
     public void InsertRange(int index, IEnumerable<T> collection)
     {
-        if (collection is null)
-            throw new ArgumentNullException(nameof(collection));
-        if (index < 0)
-            throw new ArgumentOutOfRangeException(nameof(index));
-        if (index > Count)
-            throw new ArgumentOutOfRangeException(nameof(index));
+        if (collection is null) throw new ArgumentNullException(nameof(collection));
+
+        if (index < 0) throw new ArgumentOutOfRangeException(nameof(index));
+
+        if (index > Count) throw new ArgumentOutOfRangeException(nameof(index));
 
         if (!AllowDuplicates)
-            collection =
-              collection
+        {
+            collection = collection
               .Distinct(Comparer)
               .Where(item => !Items.Contains(item, Comparer))
               .ToList();
+        }
 
         if (collection is ICollection<T> countable)
         {
-            if (countable.Count == 0)
-                return;
+            if (countable.Count == 0) return;
         }
-        else if (!collection.Any())
-            return;
+        else if (!collection.Any()) return;
 
         CheckReentrancy();
 
@@ -167,10 +171,16 @@ public class RangeObservableCollection<T> : ObservableCollection<T>
 
         OnEssentialPropertiesChanged();
 
-        if (collection is not IList list)
+        if (collection is IList list)
+        {
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, index));
             list = new List<T>(collection);
-
-        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, index));
+        }
+        else
+        {
+            using var lst = new PooledList<T>(collection);
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, lst, index));
+        }
     }
 
 
@@ -181,53 +191,66 @@ public class RangeObservableCollection<T> : ObservableCollection<T>
     /// <exception cref="ArgumentNullException"><paramref name="collection"/> is null.</exception>
     public virtual void RemoveRange(IEnumerable<T> collection)
     {
-        if (collection is null)
-            throw new ArgumentNullException(nameof(collection));
+        if (collection is null) throw new ArgumentNullException(nameof(collection));
 
         if (Count == 0)
+        {
             return;
+        }
         else if (collection is ICollection<T> countable)
         {
             if (countable.Count == 0)
+            {
                 return;
+            }
             else if (countable.Count == 1)
-                using (IEnumerator<T> enumerator = countable.GetEnumerator())
-                {
-                    enumerator.MoveNext();
-                    Remove(enumerator.Current);
-                    return;
-                }
+            {
+                using IEnumerator<T> enumerator = countable.GetEnumerator();
+                enumerator.MoveNext();
+                Remove(enumerator.Current);
+                return;
+            }
         }
         else if (!collection.Any())
+        {
             return;
+        }
 
         CheckReentrancy();
 
-        var clusters = new Dictionary<int, List<T>>();
+        using var clusters = new PooledDictionary<int, List<T>>();
         var lastIndex = -1;
         List<T>? lastCluster = null;
-        foreach (T item in collection)
+        foreach (var item in collection)
         {
             var index = IndexOf(item);
-            if (index < 0)
-                continue;
+            if (index < 0) continue;
 
             Items.RemoveAt(index);
 
             if (lastIndex == index && lastCluster is not null)
+            {
                 lastCluster.Add(item);
+            }
             else
+            {
                 clusters[lastIndex = index] = lastCluster = new List<T> { item };
+            }
         }
 
         OnEssentialPropertiesChanged();
 
         if (Count == 0)
+        {
             OnCollectionReset();
+        }
         else
+        {
             foreach (KeyValuePair<int, List<T>> cluster in clusters)
+            {
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, cluster.Value, cluster.Key));
-
+            }
+        }
     }
 
     /// <summary>
@@ -449,42 +472,33 @@ public class RangeObservableCollection<T> : ObservableCollection<T>
             var addedCount = list.Count;
 
             var changesMade = false;
-            List<T>?
-              newCluster = null,
-              oldCluster = null;
-
 
             int i = index;
-            for (; i < rangeCount && i - index < addedCount; i++)
             {
-                //parallel position
-                T old = this[i], @new = list[i - index];
-                if (Comparer.Equals(old, @new))
+                using var newCluster = new PooledList<T>();
+                using var oldCluster = new PooledList<T>();
+                for (; i < rangeCount && i - index < addedCount; i++)
                 {
-                    OnRangeReplaced(i, newCluster!, oldCluster!);
-                    continue;
-                }
-                else
-                {
-                    Items[i] = @new;
-
-                    if (newCluster is null)
+                    //parallel position
+                    T old = this[i], @new = list[i - index];
+                    if (Comparer.Equals(old, @new))
                     {
-                        Debug.Assert(oldCluster is null);
-                        newCluster = new List<T> { @new };
-                        oldCluster = new List<T> { old };
+                        OnRangeReplaced(i, newCluster!, oldCluster!);
+                        continue;
                     }
                     else
                     {
+                        Items[i] = @new;
+
                         newCluster.Add(@new);
                         oldCluster!.Add(old);
+
+                        changesMade = true;
                     }
-
-                    changesMade = true;
                 }
-            }
 
-            OnRangeReplaced(i, newCluster!, oldCluster!);
+                OnRangeReplaced(i, newCluster, oldCluster);
+            }
 
             //exceeding position
             if (count != addedCount)

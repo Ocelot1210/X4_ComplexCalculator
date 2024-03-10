@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Collections.Pooled;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -269,7 +270,7 @@ class StorageAssignModel : IDisposable
         var releasedCapacity = new Dictionary<string, long>();
 
         // 削除対象のウェア
-        var removeWares = new List<string>();
+        using var removeWares = new PooledList<string>();
 
 
         foreach (var prod in products)

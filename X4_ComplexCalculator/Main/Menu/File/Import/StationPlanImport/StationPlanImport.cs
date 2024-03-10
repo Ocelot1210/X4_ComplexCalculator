@@ -1,4 +1,5 @@
-﻿using Prism.Mvvm;
+﻿using Collections.Pooled;
+using Prism.Mvvm;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
@@ -150,7 +151,7 @@ class StationPlanImport : BindableBase, IImport
 
 
         // 同一モジュールをマージ
-        var dict = new Dictionary<int, ModulesGridItem>();
+        using var dict = new PooledDictionary<int, ModulesGridItem>();
 
         foreach (var (module, idx) in modules.Select((x, idx) => (x, idx)))
         {

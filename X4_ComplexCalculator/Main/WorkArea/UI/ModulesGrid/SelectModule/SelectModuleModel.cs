@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Collections.Pooled;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using X4_ComplexCalculator.Common.Collection;
@@ -73,7 +74,7 @@ class SelectModuleModel : IDisposable
     {
         const string SQL_1 = @"SELECT ModuleTypeID, Name FROM ModuleType WHERE ModuleTypeID IN (SELECT ModuleTypeID FROM Module) ORDER BY Name";
 
-        var items = new List<ModulesListItem>();
+        using var items = new PooledList<ModulesListItem>();
         foreach (var (moduleTypeID, name) in X4Database.Instance.Query<(string, string)>(SQL_1))
         {
             const string SQL_2 = @"SELECT count(*) AS Count FROM SelectModuleCheckStateModuleTypes WHERE ID = :ID";
@@ -93,7 +94,7 @@ class SelectModuleModel : IDisposable
     {
         const string SQL_1 = @"SELECT FactionID, Name FROM Faction WHERE FactionID IN (SELECT FactionID FROM WareOwner) ORDER BY Name";
 
-        var items = new List<FactionsListItem>();
+        using var items = new PooledList<FactionsListItem>();
 
         var factions = X4Database.Instance.Query<string>(SQL_1)
             .Select(x => X4Database.Instance.Faction.TryGet(x))

@@ -1,4 +1,5 @@
-﻿using Prism.Mvvm;
+﻿using Collections.Pooled;
+using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -141,7 +142,7 @@ class NeedWareInfoModel : BindableBase, IDisposable
     /// <param name="e"></param>
     private void Modules_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        var addWares = new Dictionary<string, Dictionary<string, long>>();
+        using var addWares = new PooledDisposableDictionary<string, PooledDictionary<string, long>>();
 
         // 削除予定のウェアを集計
         if (e.OldItems is not null)
@@ -155,7 +156,7 @@ class NeedWareInfoModel : BindableBase, IDisposable
             {
                 if (!addWares.ContainsKey(calcResultGrp.Key))
                 {
-                    addWares.Add(calcResultGrp.Key, new Dictionary<string, long>());
+                    addWares.Add(calcResultGrp.Key, new());
                 }
 
                 foreach (var calcResult in calcResultGrp)
@@ -184,7 +185,7 @@ class NeedWareInfoModel : BindableBase, IDisposable
             {
                 if (!addWares.ContainsKey(calcResultGrp.Key))
                 {
-                    addWares.Add(calcResultGrp.Key, new Dictionary<string, long>());
+                    addWares.Add(calcResultGrp.Key, new());
                 }
 
                 foreach (var calcResult in calcResultGrp)
@@ -216,7 +217,7 @@ class NeedWareInfoModel : BindableBase, IDisposable
             {
                 if (!addWares.ContainsKey(calcResultGrp.Key))
                 {
-                    addWares.Add(calcResultGrp.Key, new Dictionary<string, long>());
+                    addWares.Add(calcResultGrp.Key, new());
                 }
 
                 foreach (var calcResult in calcResultGrp)
@@ -235,7 +236,7 @@ class NeedWareInfoModel : BindableBase, IDisposable
 
         // ウェア集計
         // 削除対象レコード
-        var removeItems = new List<(string Method, string WareID)>();
+        using var removeItems = new PooledList<(string Method, string WareID)>();
         foreach (var (method, wareArr) in addWares)
         {
             foreach (var (wareID, amount) in wareArr)

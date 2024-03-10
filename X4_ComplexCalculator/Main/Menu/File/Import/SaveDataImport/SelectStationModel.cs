@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using Collections.Pooled;
+using Microsoft.Win32;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
@@ -156,7 +157,7 @@ class SelectStationModel : BindableBase
     /// <param name="reader"></param>
     private void SaveDataFileReadMain(XmlReader reader)
     {
-        var addItems = new List<SaveDataStationItem>();
+        using var addItems = new PooledList<SaveDataStationItem>();
 
         while (reader.Read())
         {

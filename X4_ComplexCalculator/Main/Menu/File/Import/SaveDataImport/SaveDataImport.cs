@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Collections.Pooled;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
@@ -158,7 +159,7 @@ class SaveDataImport : IImport
 
 
         // 同一モジュールをマージ
-        var dict = new Dictionary<int, (int, IX4Module, IWareProduction, long)>();
+        using var dict = new PooledDictionary<int, (int, IX4Module, IWareProduction, long)>();
 
         foreach (var (module, idx) in modules.Select((x, idx) => (x, idx)))
         {
