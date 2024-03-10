@@ -200,8 +200,10 @@ class SQLiteSaveDataWriter : ISaveDataWriter
 
 
         /// <inheritdoc />
-        public override void SetValue(IDbDataParameter parameter, IWare value)
+        public override void SetValue(IDbDataParameter parameter, IWare? value)
         {
+            ArgumentNullException.ThrowIfNull(value);
+
             parameter.DbType = DbType.String;
             parameter.Value = value.ID;
         }
