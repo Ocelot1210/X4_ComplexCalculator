@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Collections.Pooled;
+using System.Collections.Generic;
 using System.Linq;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
@@ -228,7 +229,7 @@ public class ProductsGridItem : BindableBaseEx, IEditable, ISelectable
     /// <param name="details"></param>
     public void AddDetails(IEnumerable<IProductDetailsListItem> details)
     {
-        var addItems = new List<IProductDetailsListItem>();
+        using var addItems = new PooledList<IProductDetailsListItem>();
 
         var oldCount = Count;
         var oldPrice = Price;

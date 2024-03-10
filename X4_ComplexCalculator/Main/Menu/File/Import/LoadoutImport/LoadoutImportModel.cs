@@ -1,7 +1,7 @@
-﻿using Microsoft.Win32;
+﻿using Collections.Pooled;
+using Microsoft.Win32;
 using Prism.Mvvm;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
@@ -173,7 +173,7 @@ class LoadoutImportModel : BindableBase
         using var sr = new StreamReader(path);
         var reader = XmlReader.Create(sr);
 
-        var addItems = new List<LoadoutItem>();
+        using var addItems = new PooledList<LoadoutItem>();
 
         while (reader.Read())
         {

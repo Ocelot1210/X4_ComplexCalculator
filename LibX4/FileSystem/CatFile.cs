@@ -129,42 +129,45 @@ public class CatFile : ICatFile
         // ユーザフォルダにある content.xml を開く
         _ = XDocumentEx.TryLoad(Path.Combine(configFolderPath, "content.xml"), out var userContentXml);
 
-        var unloadedMods = Directory.GetDirectories(entensionsPath)
+        var allMods = Directory.GetDirectories(entensionsPath)
             .Select(x => new ModInfo(userContentXml, x))
             .Where(x => x.CanLoad(option))
+            .ToArray();
+
+        var notYetLoadedMods = allMods.Where(x => x.Enabled)
             .OrderBy(x => x.Name)
             .ToList();
 
         // Mod の依存関係情報に Mod 情報を設定する
-        foreach (var mod in unloadedMods)
+        foreach (var mod in notYetLoadedMods)
         {
-            mod.SetModInfoToDependencies(unloadedMods);
+            mod.SetModInfoToDependencies(allMods);
         }
 
-        var modInfos = new List<ModInfo>(unloadedMods.Count);
+        var modInfos = new List<ModInfo>(notYetLoadedMods.Count);
 
-        while (unloadedMods.Any())
+        while (notYetLoadedMods.Any())
         {
-            var prevUnloadModsCount = unloadedMods.Count;
-            for (var i = 0; i < unloadedMods.Count; i++)
+            var prevUnloadModsCount = notYetLoadedMods.Count;
+            for (var i = 0; i < notYetLoadedMods.Count; i++)
             {
-                var modInfo = unloadedMods[i];
+                var modInfo = notYetLoadedMods[i];
 
                 // 必須 Mod がロード済みかつ任意 Mod が未ロードでないか？
                 var dependencies = modInfo.Dependencies;
                 if (dependencies.Where(x => !x.Optional).All(x => modInfos.Any(y => x.ID == y.ID)) &&
-                    !dependencies.Where(x => x.Optional).Any(x => unloadedMods.Any(y => x.ID == y.ID)))
+                    !dependencies.Where(x => x.Optional).Any(x => notYetLoadedMods.Any(y => x.ID == y.ID)))
                 {
                     modInfos.Add(modInfo);
-                    unloadedMods.RemoveAt(i);
+                    notYetLoadedMods.RemoveAt(i);
                     i--;
                 }
             }
 
             // 未ロードの Mod 数に変化が無ければ依存関係を満たせていないと見なす
-            if (prevUnloadModsCount == unloadedMods.Count)
+            if (prevUnloadModsCount == notYetLoadedMods.Count)
             {
-                throw new DependencyResolutionException("Failed to resolve Mod dependencies.", unloadedMods);
+                throw new DependencyResolutionException("Failed to resolve Mod dependencies.", notYetLoadedMods);
             }
         }
 

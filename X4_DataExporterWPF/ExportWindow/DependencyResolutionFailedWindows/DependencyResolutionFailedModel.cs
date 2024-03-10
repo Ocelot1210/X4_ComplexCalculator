@@ -60,7 +60,7 @@ namespace X4_DataExporterWPF.ExportWindow.DependencyResolutionFailedWindows
                     {
                         var remarks = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DependencyResolutionFailedWindow_RequiredModNotFound", null, null);
                         yield return new DependencyResolutionFailedInfo(dependency.Name, dependency.ID, "", remarks, level + 1);
-                    }                    
+                    }
                 }
                 else
                 {

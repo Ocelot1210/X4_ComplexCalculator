@@ -217,7 +217,7 @@ public sealed class EmpireOverviewWindowModel : IDisposable
         {
             using var added = new PooledList<ProductsGridItem>();
             using var removed = new PooledList<ProductsGridItem>();
-
+            
             foreach (var prod in _productsBak[products])
             {
                 if (products.Any(x => x.Ware.ID == prod.Ware.ID))

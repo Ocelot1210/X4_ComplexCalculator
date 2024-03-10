@@ -1,10 +1,10 @@
-﻿using Prism.Mvvm;
+﻿using Collections.Pooled;
+using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
-using System.Threading.Tasks;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
@@ -53,8 +53,8 @@ class WorkForceModuleInfoModel : BindableBase
     public WorkForceModuleInfoModel(IModulesInfo modules, IStationSettings settings)
     {
         _modules = modules;
-        _modules.Modules.CollectionChangedAsync += OnModulesChanged;
-        _modules.Modules.CollectionPropertyChangedAsync += OnModulesPropertyChanged;
+        _modules.Modules.CollectionChanged += OnModulesChanged;
+        _modules.Modules.CollectionPropertyChanged += OnModulesPropertyChanged;
 
         _settings = settings;
         _settings.PropertyChanged += Settings_PropertyChanged;
@@ -97,8 +97,8 @@ class WorkForceModuleInfoModel : BindableBase
     /// </summary>
     public void Dispose()
     {
-        _modules.Modules.CollectionChangedAsync -= OnModulesChanged;
-        _modules.Modules.CollectionPropertyChangedAsync -= OnModulesPropertyChanged;
+        _modules.Modules.CollectionChanged -= OnModulesChanged;
+        _modules.Modules.CollectionPropertyChanged -= OnModulesPropertyChanged;
         _settings.PropertyChanged -= Settings_PropertyChanged;
         WorkForceDetails.Clear();
     }
@@ -110,18 +110,16 @@ class WorkForceModuleInfoModel : BindableBase
     /// <param name="sender"></param>
     /// <param name="e"></param>
     /// <returns></returns>
-    private async Task OnModulesPropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void OnModulesPropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         // モジュール数変更時以外は処理しない
         if (e.PropertyName != nameof(ModulesGridItem.ModuleCount))
         {
-            await Task.CompletedTask;
             return;
         }
 
         if (sender is not ModulesGridItem module)
         {
-            await Task.CompletedTask;
             return;
         }
 
@@ -151,8 +149,6 @@ class WorkForceModuleInfoModel : BindableBase
             // モジュール数を更新
             itm.ModuleCount = module.ModuleCount;
         }
-
-        await Task.CompletedTask;
     }
 
 
@@ -161,7 +157,7 @@ class WorkForceModuleInfoModel : BindableBase
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private async Task OnModulesChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void OnModulesChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.NewItems is not null)
         {
@@ -186,8 +182,6 @@ class WorkForceModuleInfoModel : BindableBase
                 WorkForceDetails.Add(_hQ);
             }
         }
-
-        await Task.CompletedTask;
     }
 
 
@@ -205,7 +199,7 @@ class WorkForceModuleInfoModel : BindableBase
         var needWorkforce = 0L;
         var capacity = 0L;
 
-        var addItems = new List<WorkForceModuleInfoDetailsItem>();
+        using var addItems = new PooledList<WorkForceModuleInfoDetailsItem>();
         foreach (var (module, moduleCount) in details)
         {
             var itm = WorkForceDetails.FirstOrDefault(x => x.ModuleID == module.ID);

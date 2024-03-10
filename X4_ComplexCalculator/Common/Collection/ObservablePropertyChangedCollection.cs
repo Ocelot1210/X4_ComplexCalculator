@@ -1,28 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace X4_ComplexCalculator.Common.Collection;
-
-/// <summary>
-/// コレクションの内容変更時のイベント(非同期)
-/// </summary>
-/// <param name="sender"></param>
-/// <param name="e"></param>
-/// <returns></returns>
-public delegate Task NotifyCollectionChangedEventAsync(object? sender, NotifyCollectionChangedEventArgs e);
-
-/// <summary>
-/// プロパティ変更時のイベント(非同期)
-/// </summary>
-/// <param name="sender"></param>
-/// <param name="e"></param>
-/// <returns></returns>
-public delegate Task NotifyPropertyChangedEventAsync(object sender, PropertyChangedEventArgs e);
 
 
 /// <summary>
@@ -41,67 +23,18 @@ public class ObservablePropertyChangedCollection<INotifyPropertyChanged> : Obser
 {
     #region イベント
     /// <summary>
-    /// コレクション変更時のイベント
-    /// </summary>
-    public event NotifyCollectionChangedEventAsync? CollectionChangedAsync;
-
-
-    /// <summary>
-    /// コレクションのプロパティ変更時のイベント(非同期)
-    /// </summary>
-    public event NotifyPropertyChangedEventAsync? CollectionPropertyChangedAsync;
-
-
-    /// <summary>
     /// コレクションのプロパティ変更時のイベント
     /// </summary>
     public event NotifyPropertyChangedEvent? CollectionPropertyChanged;
     #endregion
 
-    #region コンストラクタ
-    public ObservablePropertyChangedCollection() : base()
-    {
-        CollectionChanged += CollectionChangedEvent;
-    }
-
-    public ObservablePropertyChangedCollection(IEnumerable<INotifyPropertyChanged> collection) : base(collection)
-    {
-        CollectionChanged += CollectionChangedEvent;
-    }
-
-    public ObservablePropertyChangedCollection(List<INotifyPropertyChanged> list) : base(list)
-    {
-        CollectionChanged += CollectionChangedEvent;
-    }
-    #endregion
-
-
-    /// <summary>
-    /// コレクション変更時のイベントハンドラー
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void CollectionChangedEvent(object? sender, NotifyCollectionChangedEventArgs e)
-    {
-        // 非同期版イベントが購読されていなければ何もしない
-        if (CollectionChangedAsync is null)
-        {
-            return;
-        }
-
-        Task.WhenAll(
-            CollectionChangedAsync.GetInvocationList()
-                                    .OfType<NotifyCollectionChangedEventAsync>()
-                                    .Select(x => x.Invoke(sender, e))
-        );
-    }
 
     /// <summary>
     /// プロパティ変更時のイベント
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private async void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (sender is null)
         {
@@ -109,18 +42,6 @@ public class ObservablePropertyChangedCollection<INotifyPropertyChanged> : Obser
         }
 
         CollectionPropertyChanged?.Invoke(sender, e);
-
-        // 非同期版イベントが購読されていなければ何もしない
-        var handler = CollectionPropertyChangedAsync;
-        if (handler is null)
-        {
-            return;
-        }
-
-        await Task.WhenAll(
-            handler.GetInvocationList()
-                   .OfType<NotifyPropertyChangedEventAsync>()
-                   .Select(async (x) => await x.Invoke(sender, e)));
     }
 
 

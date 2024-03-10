@@ -30,6 +30,8 @@
 
             </ResourceDictionary.MergedDictionaries>
 
+            <x4cvt:BoolNegativeConverter x:Key="BoolNegativeConverter" />
+
             <x4cvt:FormatStringConverter x:Key="FormatStringConverter" />
 
             <x4loc:CSVLocalizationProvider x:Key="CSVLocalizationProvider" />

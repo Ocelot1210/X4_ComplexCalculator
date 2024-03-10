@@ -1,4 +1,5 @@
-﻿using Prism.Mvvm;
+﻿using Collections.Pooled;
+using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -90,8 +91,8 @@ class ProductsGridModel : BindableBase, IDisposable
         _products = products;
         _messageBox = messageBox;
 
-        _modules.Modules.CollectionChangedAsync += OnModulesChanged;
-        _modules.Modules.CollectionPropertyChangedAsync += OnModulePropertyChanged;
+        _modules.Modules.CollectionChanged += OnModulesChanged;
+        _modules.Modules.CollectionPropertyChanged += OnModulePropertyChanged;
 
         _modules = modules;
         _settings = settings;
@@ -150,8 +151,8 @@ class ProductsGridModel : BindableBase, IDisposable
     public void Dispose()
     {
         Products.Clear();
-        _modules.Modules.CollectionChangedAsync -= OnModulesChanged;
-        _modules.Modules.CollectionPropertyChangedAsync -= OnModulePropertyChanged;
+        _modules.Modules.CollectionChanged -= OnModulesChanged;
+        _modules.Modules.CollectionPropertyChanged -= OnModulePropertyChanged;
         _settings.PropertyChanged -= Settings_PropertyChanged;
         _settings.Workforce.PropertyChanged -= Workforce_PropertyChanged;
     }
@@ -172,7 +173,7 @@ class ProductsGridModel : BindableBase, IDisposable
         var addedModules = 0L;              // 追加モジュール数
 
         // モジュール自動追加で追加されたモジュール一覧
-        var autoAddedModules = new Dictionary<string, ModulesGridItem>();
+        using var autoAddedModules = new PooledDictionary<string, ModulesGridItem>();
 
 
         while (true)
@@ -186,7 +187,7 @@ class ProductsGridModel : BindableBase, IDisposable
                 break;
             }
 
-            var addTarget = new List<ModulesGridItem>();      // 実際に追加するモジュール一覧
+            using var addTarget = new PooledList<ModulesGridItem>();      // 実際に追加するモジュール一覧
 
             foreach (var (module, count) in addModules)
             {
@@ -226,8 +227,6 @@ class ProductsGridModel : BindableBase, IDisposable
         {
             _messageBox.Ok("Lang:Modules_Button_AutoAdd_AddedModulesMessage", "Lang:Common_MessageBoxTitle_Confirmation", addedRecords, addedModules);
         }
-
-        autoAddedModules.Clear();
     }
 
 
@@ -237,18 +236,16 @@ class ProductsGridModel : BindableBase, IDisposable
     /// <param name="sender"></param>
     /// <param name="e"></param>
     /// <returns></returns>
-    private async Task OnModulePropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void OnModulePropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         // モジュール数変更時以外は処理しない
         if (e.PropertyName != nameof(ModulesGridItem.ModuleCount))
         {
-            await Task.CompletedTask;
             return;
         }
 
         if (sender is not ModulesGridItem module)
         {
-            await Task.CompletedTask;
             return;
         }
 
@@ -262,8 +259,6 @@ class ProductsGridModel : BindableBase, IDisposable
 
             OnModuleCountChanged(module, ev.OldValue);
         }
-
-        await Task.CompletedTask;
     }
 
 
@@ -272,7 +267,7 @@ class ProductsGridModel : BindableBase, IDisposable
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private async Task OnModulesChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void OnModulesChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.NewItems is not null)
         {
@@ -319,8 +314,6 @@ class ProductsGridModel : BindableBase, IDisposable
                 _optionsBakDict.Clear();
             }
         }
-
-        await Task.CompletedTask;
     }
 
 
@@ -380,7 +373,7 @@ class ProductsGridModel : BindableBase, IDisposable
         // 生産品集計用ディクショナリ
         var prodDict = AggregateProduct(addedModules);
 
-        var addItems = new List<ProductsGridItem>();
+        using var addItems = new PooledList<ProductsGridItem>();
         foreach (var item in prodDict)
         {
             // すでにウェアが存在するか検索
