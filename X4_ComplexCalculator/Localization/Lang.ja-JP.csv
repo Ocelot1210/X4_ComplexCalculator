@@ -406,6 +406,7 @@ DBViewer_Ships_HangerCapacity_Drone;ドローン
 DataExporter_Title;X4: Foundations データ抽出機
 DataExporter_Input;入力
 DataExporter_Input_RootDirectory;X4: Foundations インストール先フォルダ
+DataExporter_Input_ConfigFolder;設定フォルダパス
 DataExporter_Output;出力
 DataExporter_Output_Language;言語
 DataExporter_Export;抽出

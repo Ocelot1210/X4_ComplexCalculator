@@ -43,6 +43,12 @@ class DataExportViewModel : BindableBase
     /// 親ウィンドウ(メッセージボックス表示用)
     /// </summary>
     private readonly Window _ownerWindow;
+
+
+    /// <summary>
+    /// データ抽出処理用Model
+    /// </summary>
+    private readonly DataExportModel _model;
     #endregion
 
 
@@ -56,19 +62,31 @@ class DataExportViewModel : BindableBase
     /// <summary>
     /// 言語一覧
     /// </summary>
-    public ReactiveCollection<LangComboboxItem> Languages { get; }
+    public ReactiveCollection<LangComboboxItem> Languages { get; } = new();
 
 
     /// <summary>
     /// 選択された言語
     /// </summary>
-    public ReactivePropertySlim<LangComboboxItem?> SelectedLanguage { get; }
+    public ReactivePropertySlim<LangComboboxItem?> SelectedLanguage { get; } = new();
 
 
     /// <summary>
     /// 読み込みオプション
     /// </summary>
-    public ReactivePropertySlim<CatLoadOption> CatLoadOption { get; }
+    public ReactivePropertySlim<CatLoadOption> CatLoadOption { get; } = new(LibX4.FileSystem.CatLoadOption.All);
+
+
+    /// <summary>
+    /// 設定フォルダ一覧
+    /// </summary>
+    public ReactiveCollection<string> ConfigFolderPaths { get; } = new();
+
+
+    /// <summary>
+    /// 選択された設定フォルダ
+    /// </summary>
+    public ReactivePropertySlim<string> SelectedConfigFolderPath { get; } = new();
 
 
     /// <summary>
@@ -125,9 +143,8 @@ class DataExportViewModel : BindableBase
     /// </summary>
     public DataExportViewModel(string inDirPath, string outFilePath, Window window)
     {
+        _model = new();
         _ownerWindow = window;
-
-        CatLoadOption = new ReactivePropertySlim<CatLoadOption>(LibX4.FileSystem.CatLoadOption.All);
 
         InDirPath = new ReactiveProperty<string>(inDirPath,
             mode: ReactivePropertyMode.RaiseLatestValueOnSubscribe);
@@ -136,8 +153,14 @@ class DataExportViewModel : BindableBase
             _ => _unableToGetLanguages.Select(isError => isError ? "Error" : null));
         _outFilePath = outFilePath;
 
-        Languages = new ReactiveCollection<LangComboboxItem>();
-        SelectedLanguage = new ReactivePropertySlim<LangComboboxItem?>();
+        {
+            var confFolders = LibX4.X4Path.EnumerateConfigFolders().ToArray();
+            ConfigFolderPaths.AddRangeOnScheduler(confFolders);
+            if (confFolders.Any())
+            {
+                SelectedConfigFolderPath.Value = confFolders.First();
+            }
+        }
 
         CanOperation = _busyNotifier.Inverse().ToReadOnlyReactiveProperty();
 
@@ -146,6 +169,7 @@ class DataExportViewModel : BindableBase
             CanOperation,
             InDirPath.Select(p => !string.IsNullOrEmpty(p)),
             SelectedLanguage.Select(l => l != null),
+            SelectedConfigFolderPath.Select(c => !string.IsNullOrEmpty(c)),
         }.CombineLatestValuesAreAllTrue();
 
         SelectInDirCommand = new ReactiveCommand(CanOperation).WithSubscribe(SelectInDir);
@@ -182,7 +206,7 @@ class DataExportViewModel : BindableBase
         _unableToGetLanguages.Value = false;
         Languages.ClearOnScheduler();
 
-        var (success, languages) = await Task.Run(async () => await DataExportModel.GetLanguages(x4InstallDirectory, CatLoadOption.Value, _ownerWindow));
+        var (success, languages) = await Task.Run(async () => await DataExportModel.GetLanguages(x4InstallDirectory, SelectedConfigFolderPath.Value, CatLoadOption.Value, _ownerWindow));
         _unableToGetLanguages.Value = !success;
         Languages.AddRangeOnScheduler(languages);
 
@@ -251,6 +275,7 @@ class DataExportViewModel : BindableBase
             progress,
             progressSub,
             InDirPath.Value,
+            SelectedConfigFolderPath.Value,
             CatLoadOption.Value,
             _outFilePath,
             SelectedLanguage.Value,

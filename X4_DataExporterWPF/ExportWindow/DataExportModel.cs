@@ -1,7 +1,9 @@
-﻿using LibX4.FileSystem;
+﻿using LibX4;
+using LibX4.FileSystem;
 using LibX4.Lang;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
@@ -27,13 +29,14 @@ class DataExportModel
     /// 言語一覧を更新
     /// </summary>
     /// <param name="x4Dir">X4のインストール先フォルダ</param>
+    /// <param name="configFolderPath">設定フォルダパス</param>
     /// <param name="catLoadOption">cat ファイルの読み込みオプション</param>
     /// <param name="owner">親ウィンドウハンドル(メッセージボックス表示用)</param>
-    public static async Task<(bool success, IReadOnlyList<LangComboboxItem> languages)> GetLanguages(string x4Dir, CatLoadOption catLoadOption, Window owner)
+    public static async Task<(bool success, IReadOnlyList<LangComboboxItem> languages)> GetLanguages(string x4Dir, string configFolderPath, CatLoadOption catLoadOption, Window owner)
     {
         try
         {
-            var catFiles = new CatFile(x4Dir, catLoadOption);
+            var catFiles = new CatFile(x4Dir, configFolderPath, catLoadOption);
             var xml = await catFiles.OpenXmlAsync("libraries/languages.xml", CancellationToken.None);
             var languages = xml.XPathSelectElements("/languages/language")
                 .Select(x => (ID: x.Attribute("id")?.Value, Name: x.Attribute("name")?.Value))
@@ -65,6 +68,7 @@ class DataExportModel
     /// 抽出実行
     /// </summary>
     /// <param name="inDirPath">入力元フォルダパス</param>
+    /// <param name="configFolderPath">設定フォルダパス</param>
     /// <param name="catLoadOption">cat ファイルの読み込みオプション</param>
     /// <param name="outFilePath">出力先ファイルパス</param>
     /// <param name="language">選択された言語</param>
@@ -74,13 +78,14 @@ class DataExportModel
         IProgress<(int currentStep, int maxSteps)> progress,
         IProgress<(int currentStep, int maxSteps)> progressSub,
         string inDirPath,
+        string configFolderPath,
         CatLoadOption catLoadOption,
         string outFilePath,
         LangComboboxItem language,
         Window owner
     )
     {
-        var catFile = new CatFile(inDirPath, catLoadOption);
+        var catFile = new CatFile(inDirPath, configFolderPath, catLoadOption);
 
         // 抽出に失敗した場合、例外設定で「Common Languate Runtime Exceptions」にチェックを入れるとどこで例外が発生したか分かる
         try

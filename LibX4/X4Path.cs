@@ -1,5 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -58,37 +60,32 @@ public static class X4Path
 
 
     /// <summary>
-    /// X4 のユーザフォルダパスを取得する
+    /// X4 の設定フォルダパスを列挙する
     /// </summary>
-    /// <returns>成功した場合 X4 のユーザフォルダパス文字列。失敗した場合空文字列</returns>
-    public static string GetUserDirectory()
+    /// <returns>X4 の設定フォルダパスの列挙</returns>
+    public static IEnumerable<string> EnumerateConfigFolders()
     {
-        // C:\Users\(UserName)\Documents\Egosoft\X4
         var x4Dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Egosoft", "X4");
-
         if (!Directory.Exists(x4Dir))
         {
-            return "";
+            yield break;
         }
 
-        // Steam 版のユーザフォルダを検索
+        // Steam 版の設定フォルダを検索
         foreach (var dir in Directory.GetDirectories(x4Dir))
         {
-            // 名前が全て数字で構成されているフォルダの中に config.xml があればそのフォルダをユーザフォルダと見なす
+            // 名前が全て数字で構成されているフォルダの中に config.xml があればそのフォルダを設定フォルダと見なす
             var folderName = Path.GetFileName(dir);
             if (folderName.All(char.IsDigit) && File.Exists(Path.Combine(dir, "config.xml")))
             {
-                return dir;
+                yield return dir;
             }
         }
 
-        // 非 Steam 版のユーザフォルダか判定
+        // 非 Steam 版の設定フォルダか判定
         if (File.Exists(Path.Combine(x4Dir, "config.xml")))
         {
-            return x4Dir;
+            yield return x4Dir;
         }
-
-        // 見つからなかった
-        return "";
     }
 }

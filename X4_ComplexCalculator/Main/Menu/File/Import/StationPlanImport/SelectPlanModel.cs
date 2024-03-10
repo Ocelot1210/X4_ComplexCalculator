@@ -56,8 +56,11 @@ class SelectPlanModel : BindableBase
     {
         _messageBox = messageBox;
 
+        var configFolderPath = LibX4.X4Path.EnumerateConfigFolders().FirstOrDefault();
+        if (string.IsNullOrEmpty(configFolderPath)) return;
+
         // ファイルが見つかった場合、そのファイルで初期化する
-        var path = Path.Combine(LibX4.X4Path.GetUserDirectory(), "constructionplans.xml");
+        var path = Path.Combine(configFolderPath, "constructionplans.xml");
         if (System.IO.File.Exists(path))
         {
             try
@@ -92,7 +95,7 @@ class SelectPlanModel : BindableBase
     {
         var dlg = new OpenFileDialog
         {
-            InitialDirectory = LibX4.X4Path.GetUserDirectory(),
+            InitialDirectory = LibX4.X4Path.EnumerateConfigFolders().FirstOrDefault() ?? "",
             RestoreDirectory = true,
             Filter = "X4 Construction planes file (*.xml)|*.xml",
             Multiselect = true
