@@ -77,26 +77,21 @@ class MainWindowModel
     /// </summary>
     public void UpdateDB()
     {
-        var result = _localizedMessageBox.YesNo("Lang:MainWindow_Menu_File_UpdateDB_DBUpdate_ConfirmationMessage", "Lang:Common_MessageBoxTitle_Confirmation", LocalizedMessageBoxResult.Yes);
-
-        if (result == LocalizedMessageBoxResult.Yes)
+        switch (X4Database.UpdateDB())
         {
-            switch (X4Database.UpdateDB())
-            {
-                // DB更新成功
-                case X4Database.UpdateDbStatus.Succeeded:
-                    _localizedMessageBox.Ok("Lang:MainWindow_Menu_File_UpdateDB_DBUpdate_RestartRequestMessage", "Lang:Common_MessageBoxTitle_Confirmation");
-                    break;
+            // DB更新成功
+            case X4Database.UpdateDbStatus.Succeeded:
+                _localizedMessageBox.Ok("Lang:MainWindow_Menu_File_UpdateDB_DBUpdate_RestartRequestMessage", "Lang:Common_MessageBoxTitle_Confirmation");
+                break;
 
-                // DB更新失敗
-                case X4Database.UpdateDbStatus.Failed:
-                    _localizedMessageBox.Error("Lang:MainWindow_Menu_File_UpdateDB_DBUpdate_FailureMessage", "Lang:Common_MessageBoxTitle_Error");
-                    break;
+            // DB更新失敗
+            case X4Database.UpdateDbStatus.Failed:
+                _localizedMessageBox.Error("Lang:MainWindow_Menu_File_UpdateDB_DBUpdate_FailureMessage", "Lang:Common_MessageBoxTitle_Error");
+                break;
 
-                // 更新なし
-                default:
-                    break;
-            }
+            // 更新なし
+            default:
+                break;
         }
     }
 

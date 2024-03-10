@@ -87,7 +87,6 @@ MainWindow_Menu_File_MenuItem_Import_MenuItem_Loadout_Header;モジュールの�
 MainWindow_Menu_File_MenuItem_Export_Header;エクスポート
 MainWindow_Menu_File_MenuItem_Export_MenuItem_StationCalculator_Header;Station Calculator
 MainWindow_Menu_File_UpdateDB_Header;DB更新
-MainWindow_Menu_File_UpdateDB_DBUpdate_ConfirmationMessage;DB更新画面を表示しますか？
 MainWindow_Menu_File_UpdateDB_DBUpdate_RestartRequestMessage;DBの更新を適用するためには本アプリケーションの再起動を行ってください。
 MainWindow_Menu_File_UpdateDB_DBUpdate_FailureMessage;DBの更新に失敗しました。\r\nDBファイルにアクセス可能か確認後、再度実行してください。
 
