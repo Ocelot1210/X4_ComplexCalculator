@@ -121,7 +121,6 @@
                     BorderBrush="DarkGray"
                     Header="{lex:Loc Lang:DataExporter_ExportOption}"
                     IsEnabled="{Binding CanOperation.Value, Mode=OneWay}">
-                    IsEnabled="{Binding CanOperation.Value, Mode=OneWay}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <vcvt:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
