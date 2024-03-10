@@ -241,28 +241,4 @@ public class XrCatalogParseException : Exception
     {
 
     }
-
-
-    /// <summary>
-    /// <see cref="XrCatalogParseException"/> を生成する
-    /// </summary>
-    /// <param name="message">エラーメッセージ</param>
-    /// <param name="inner">原因となる例外</param>
-    public XrCatalogParseException(string message, Exception inner)
-        : base(message, inner)
-    {
-
-    }
-
-
-    /// <summary>
-    /// <see cref="XrCatalogParseException"/> を生成する
-    /// </summary>
-    /// <param name="info">シリアライズ情報</param>
-    /// <param name="context">ストリーミングコンテキスト</param>
-    protected XrCatalogParseException(SerializationInfo info, StreamingContext context)
-        : base(info, context)
-    {
-
-    }
 }

@@ -87,7 +87,6 @@ MainWindow_Menu_File_MenuItem_Import_MenuItem_Loadout_Header;モジュールの�
 MainWindow_Menu_File_MenuItem_Export_Header;エクスポート
 MainWindow_Menu_File_MenuItem_Export_MenuItem_StationCalculator_Header;Station Calculator
 MainWindow_Menu_File_UpdateDB_Header;DB更新
-MainWindow_Menu_File_UpdateDB_DBUpdate_ConfirmationMessage;DB更新画面を表示しますか？
 MainWindow_Menu_File_UpdateDB_DBUpdate_RestartRequestMessage;DBの更新を適用するためには本アプリケーションの再起動を行ってください。
 MainWindow_Menu_File_UpdateDB_DBUpdate_FailureMessage;DBの更新に失敗しました。\r\nDBファイルにアクセス可能か確認後、再度実行してください。
 
@@ -407,6 +406,7 @@ DBViewer_Ships_HangerCapacity_Drone;ドローン
 DataExporter_Title;X4: Foundations データ抽出機
 DataExporter_Input;入力
 DataExporter_Input_RootDirectory;X4: Foundations インストール先フォルダ
+DataExporter_Input_ConfigFolder;設定フォルダパス
 DataExporter_Output;出力
 DataExporter_Output_Language;言語
 DataExporter_Export;抽出

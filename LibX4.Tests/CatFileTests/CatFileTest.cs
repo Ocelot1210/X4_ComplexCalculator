@@ -14,7 +14,16 @@ namespace LibX4.Tests.CatFileTests;
 /// </summary>
 public class CatFileTest
 {
+    /// <summary>
+    /// テストデータの基準フォルダ
+    /// </summary>
     private readonly string _baseDir;
+
+    /// <summary>
+    /// 設定ファイル格納先フォルダ
+    /// </summary>
+    private readonly string _configFolderPath;
+
 
     public CatFileTest()
     {
@@ -33,6 +42,8 @@ public class CatFileTest
         }
 
         _baseDir = path ?? "";
+
+        _configFolderPath = Path.Combine(_baseDir, "Config");
     }
 
     private string MakePath(string path)
@@ -46,7 +57,7 @@ public class CatFileTest
     [Fact]
     public void X4Version()
     {
-        var cat = new CatFile(Path.Combine(_baseDir, "VanillaEnvironment"));
+        var cat = new CatFile(Path.Combine(_baseDir, "VanillaEnvironment"), _configFolderPath);
 
         Assert.Equal("330", cat.Version);
     }
@@ -60,7 +71,7 @@ public class CatFileTest
     [Fact]
     public async Task OpenVanillaFile1()
     {
-        var cat = new CatFile(Path.Combine(_baseDir, "VanillaEnvironment"));
+        var cat = new CatFile(Path.Combine(_baseDir, "VanillaEnvironment"), _configFolderPath);
 
         using var ms = await cat.OpenFileAsync("libraries/personal_infomation/personal_infomation.xml");
 
@@ -76,7 +87,7 @@ public class CatFileTest
     [Fact]
     public async Task OpenVanillaFile2()
     {
-        var cat = new CatFile(Path.Combine(_baseDir, "VanillaEnvironment"));
+        var cat = new CatFile(Path.Combine(_baseDir, "VanillaEnvironment"), _configFolderPath);
 
         using var ms = await cat.OpenFileAsync("libraries/personal_infomation/personal infomation.xml");
 
@@ -92,7 +103,7 @@ public class CatFileTest
     [Fact]
     public async Task OpenVanillaFile3()
     {
-        var cat = new CatFile(Path.Combine(_baseDir, "VanillaEnvironment"));
+        var cat = new CatFile(Path.Combine(_baseDir, "VanillaEnvironment"), _configFolderPath);
 
         using var ms = await cat.OpenFileAsync("libraries/personal infomation/personal_infomation.xml");
 
@@ -108,7 +119,7 @@ public class CatFileTest
     [Fact]
     public async Task OpenVanillaFile4()
     {
-        var cat = new CatFile(Path.Combine(_baseDir, "VanillaEnvironment"));
+        var cat = new CatFile(Path.Combine(_baseDir, "VanillaEnvironment"), _configFolderPath);
 
         using var ms = await cat.OpenFileAsync("libraries/personal infomation/personal infomation.xml");
 
@@ -126,7 +137,7 @@ public class CatFileTest
     {
         var ex = await Assert.ThrowsAsync<FileNotFoundException>(async () =>
         {
-            var cat = new CatFile(Path.Combine(_baseDir, "VanillaEnvironment"));
+            var cat = new CatFile(Path.Combine(_baseDir, "VanillaEnvironment"), _configFolderPath);
 
             using var ms = await cat.OpenFileAsync("libraries/not_exist.txt");
         });
@@ -141,7 +152,7 @@ public class CatFileTest
     [Fact]
     public async Task OpenVanillaFile6()
     {
-        var cat = new CatFile(Path.Combine(_baseDir, "VanillaEnvironment"));
+        var cat = new CatFile(Path.Combine(_baseDir, "VanillaEnvironment"), _configFolderPath);
 
         using var ms = await cat.TryOpenFileAsync("libraries/not_exist.txt");
 
@@ -155,7 +166,7 @@ public class CatFileTest
     [Fact]
     public async Task OpenVanillaFile7()
     {
-        var cat = new CatFile(Path.Combine(_baseDir, "VanillaEnvironment"));
+        var cat = new CatFile(Path.Combine(_baseDir, "VanillaEnvironment"), _configFolderPath);
 
         using var ms = await cat.OpenFileAsync("libraries/personal_infomation.xml");
 
@@ -167,14 +178,14 @@ public class CatFileTest
 
 
 
-        #region Mod入でバニラ環境のファイルを開く
+    #region Mod入でバニラ環境のファイルを開く
     /// <summary>
     /// Mod入の環境でバニラのファイルを開く
     /// </summary>
     [Fact]
     public async Task OpenVanillaFileWithMods1()
     {
-        var cat = new CatFile(Path.Combine(_baseDir, "ModEnvironment"));
+        var cat = new CatFile(Path.Combine(_baseDir, "ModEnvironment"), _configFolderPath);
 
         using var ms = await cat.OpenFileAsync("libraries/personal_infomation/personal_infomation.xml");
 
@@ -190,7 +201,7 @@ public class CatFileTest
     [Fact]
     public async Task OpenVanillaFileWithMods2()
     {
-        var cat = new CatFile(Path.Combine(_baseDir, "ModEnvironment"));
+        var cat = new CatFile(Path.Combine(_baseDir, "ModEnvironment"), _configFolderPath);
 
         using var ms = await cat.OpenFileAsync("libraries/personal_infomation/personal infomation.xml");
 
@@ -206,7 +217,7 @@ public class CatFileTest
     [Fact]
     public async Task OpenVanillaFileWithMods3()
     {
-        var cat = new CatFile(Path.Combine(_baseDir, "ModEnvironment"));
+        var cat = new CatFile(Path.Combine(_baseDir, "ModEnvironment"), _configFolderPath);
 
         using var ms = await cat.OpenFileAsync("libraries/personal infomation/personal_infomation.xml");
 
@@ -222,7 +233,7 @@ public class CatFileTest
     [Fact]
     public async Task OpenVanillaFileWithMods4()
     {
-        var cat = new CatFile(Path.Combine(_baseDir, "ModEnvironment"));
+        var cat = new CatFile(Path.Combine(_baseDir, "ModEnvironment"), _configFolderPath);
 
         using var ms = await cat.OpenFileAsync("libraries/personal infomation/personal infomation.xml");
 
@@ -241,7 +252,7 @@ public class CatFileTest
     [Fact]
     public async Task OpenModFile1()
     {
-        var cat = new CatFile(Path.Combine(_baseDir, "ModEnvironment"));
+        var cat = new CatFile(Path.Combine(_baseDir, "ModEnvironment"), _configFolderPath);
 
         using var ms = await cat.OpenFileAsync("libraries/foo_mod_personal_infomation/personal_infomation.xml");
 
@@ -257,7 +268,7 @@ public class CatFileTest
     [Fact]
     public async Task OpenModFile2()
     {
-        var cat = new CatFile(Path.Combine(_baseDir, "PlaneFileModEnvironment"));
+        var cat = new CatFile(Path.Combine(_baseDir, "PlaneFileModEnvironment"), _configFolderPath);
 
         using var ms = await cat.OpenFileAsync("libraries/foo_mod_personal_infomation/personal_infomation.xml");
 
@@ -275,7 +286,7 @@ public class CatFileTest
     [Fact]
     public async Task OpenIndexFile1()
     {
-        var cat = new CatFile(Path.Combine(_baseDir, "VanillaIndexXml"));
+        var cat = new CatFile(Path.Combine(_baseDir, "VanillaIndexXml"), _configFolderPath);
 
         var xml1 = await cat.OpenIndexXmlAsync("index/macros.xml", "foo_macro");
 
@@ -293,7 +304,7 @@ public class CatFileTest
     {
         var ex = await Assert.ThrowsAsync<FileNotFoundException>(async () =>
         {
-            var cat = new CatFile(Path.Combine(_baseDir, "VanillaIndexXml"));
+            var cat = new CatFile(Path.Combine(_baseDir, "VanillaIndexXml"), _configFolderPath);
 
             var xml1 = await cat.OpenIndexXmlAsync("index/macros.xml", "not_exists_macro");
         });
@@ -306,7 +317,7 @@ public class CatFileTest
     [Fact]
     public async Task OpenIndexFile3()
     {
-        var cat = new CatFile(Path.Combine(_baseDir, "ModIndexXml"));
+        var cat = new CatFile(Path.Combine(_baseDir, "ModIndexXml"), _configFolderPath);
 
         var xml1 = await cat.OpenIndexXmlAsync("index/macros.xml", "baz_macro");
 

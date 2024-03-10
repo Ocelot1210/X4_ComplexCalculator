@@ -49,32 +49,57 @@
             Margin="10"
             BorderBrush="DarkGray"
             Header="{lex:Loc Lang:DataExporter_Input}">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="1*" />
-                    <RowDefinition Height="1*" />
-                </Grid.RowDefinitions>
+            <StackPanel Orientation="Vertical">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*" />
+                        <RowDefinition Height="1*" />
+                    </Grid.RowDefinitions>
 
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="20" />
-                </Grid.ColumnDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="20" />
+                    </Grid.ColumnDefinitions>
 
-                <Label Grid.Row="0" Content="{lex:Loc Lang:DataExporter_Input_RootDirectory}" />
+                    <Label Grid.Row="0" Content="{lex:Loc Lang:DataExporter_Input_RootDirectory}" />
 
-                <TextBox
-                    Grid.Row="1"
-                    Grid.Column="0"
-                    Background="WhiteSmoke"
-                    IsReadOnly="True"
-                    Text="{Binding InDirPath.Value}" />
+                    <TextBox
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Background="WhiteSmoke"
+                        IsReadOnly="True"
+                        Text="{Binding InDirPath.Value}" />
 
-                <Button
-                    Grid.Row="1"
-                    Grid.Column="1"
-                    Command="{Binding SelectInDirCommand, Mode=OneTime}"
-                    Content="..." />
-            </Grid>
+                    <Button
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Command="{Binding SelectInDirCommand, Mode=OneTime}"
+                        Content="..." />
+                </Grid>
+
+                <Grid Margin="0,10,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*" />
+                        <RowDefinition Height="1*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="20" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label Grid.Row="0" Content="{lex:Loc Lang:DataExporter_Input_ConfigFolder}" />
+
+                    <ComboBox
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        Background="WhiteSmoke"
+                        IsEnabled="{Binding CanOperation.Value, Mode=OneWay}"
+                        ItemsSource="{Binding ConfigFolderPaths, Mode=OneTime}"
+                        SelectedItem="{Binding SelectedConfigFolderPath.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </Grid>
+            </StackPanel>
         </GroupBox>
 
         <GroupBox
@@ -94,7 +119,8 @@
 
                 <GroupBox
                     BorderBrush="DarkGray"
-                    Header="{lex:Loc Lang:DataExporter_ExportOption}">
+                    Header="{lex:Loc Lang:DataExporter_ExportOption}"
+                    IsEnabled="{Binding CanOperation.Value, Mode=OneWay}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <vcvt:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />

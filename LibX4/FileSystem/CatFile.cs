@@ -76,9 +76,10 @@ public class CatFile : ICatFile
     /// コンストラクタ
     /// </summary>
     /// <param name="gameRoot">X4インストール先ディレクトリパス</param>
+    /// <param name="configFolderPath">設定フォルダパス</param>
     /// <param name="option">cat ファイルの読み込みオプション</param>
     /// <exception cref="DependencyResolutionException">Mod の依存関係の解決に失敗した場合</exception>
-    public CatFile(string gameRoot, CatLoadOption option = CatLoadOption.All)
+    public CatFile(string gameRoot, string configFolderPath, CatLoadOption option = CatLoadOption.All)
     {
         // X4のバージョンを取得
         {
@@ -93,7 +94,7 @@ public class CatFile : ICatFile
             }
         }
 
-        var modInfo = GetModInfo(gameRoot, option);
+        var modInfo = GetModInfo(gameRoot, configFolderPath, option);
 
         _loadedMods = new HashSet<string>(modInfo.Select(x => $"extensions/{Path.GetFileName(x.Directory)}".Replace('\\', '/')));
 
@@ -112,9 +113,10 @@ public class CatFile : ICatFile
     /// Mod の情報を <see cref="IReadOnlyList{ModInfo}"/> で返す
     /// </summary>
     /// <param name="gameRoot">X4 インストール先ディレクトリパス</param>
+    /// <param name="configFolderPath">設定フォルダパス</param>
     /// <param name="option">cat ファイルの読み込みオプション</param>
     /// <returns>Mod の情報を表す <see cref="IReadOnlyList{ModInfo}"/></returns>
-    private static IReadOnlyList<ModInfo> GetModInfo(string gameRoot, CatLoadOption option)
+    private static IReadOnlyList<ModInfo> GetModInfo(string gameRoot, string configFolderPath, CatLoadOption option)
     {
         var entensionsPath = Path.Combine(gameRoot, "extensions");
 
@@ -125,7 +127,7 @@ public class CatFile : ICatFile
         }
 
         // ユーザフォルダにある content.xml を開く
-        _ = XDocumentEx.TryLoad(Path.Combine(X4Path.GetUserDirectory(), "content.xml"), out var userContentXml);
+        _ = XDocumentEx.TryLoad(Path.Combine(configFolderPath, "content.xml"), out var userContentXml);
 
         var unloadedMods = Directory.GetDirectories(entensionsPath)
             .Select(x => new ModInfo(userContentXml, x))

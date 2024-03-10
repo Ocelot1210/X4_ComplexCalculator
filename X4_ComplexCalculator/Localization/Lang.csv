@@ -87,7 +87,6 @@ MainWindow_Menu_File_MenuItem_Import_MenuItem_Loadout_Header;Module equipments
 MainWindow_Menu_File_MenuItem_Export_Header;Export
 MainWindow_Menu_File_MenuItem_Export_MenuItem_StationCalculator_Header;Station Calculator
 MainWindow_Menu_File_UpdateDB_Header;Update DB
-MainWindow_Menu_File_UpdateDB_DBUpdate_ConfirmationMessage;Do you want to display the DB update screen?
 MainWindow_Menu_File_UpdateDB_DBUpdate_RestartRequestMessage;Please restart the application to apply the DB update.
 MainWindow_Menu_File_UpdateDB_DBUpdate_FailureMessage;Failed to update the DB, \r\nplease check if the DB file is accessible and try again.
 
@@ -407,6 +406,7 @@ DBViewer_Ships_HangerCapacity_Drone;Drone
 DataExporter_Title;X4: Foundations data exporter
 DataExporter_Input;Input
 DataExporter_Input_RootDirectory;X4: Foundations Install directory
+DataExporter_Input_ConfigFolder;Config folder path
 DataExporter_Output;Output
 DataExporter_Output_Language;Language
 DataExporter_Export;Export
