@@ -131,7 +131,7 @@ MainWindow_Menu_Help_CheckUpdateAtLaunch;Check Update At Launch
 MainWindow_Menu_Help_CheckUpdate_Title;Check Update...
 MainWindow_Menu_Help_VersionInfo_Title;Version Information
 MainWindow_Menu_Help_VersionInfo_MessageTitle;X4_ComplexCalculator
-MainWindow_Menu_Help_VersionInfo_MessageDescription;X4_ComplexCalculator\r\n\r\nVersion: {0}\r\nCommit: {1}\r\nDate: {2}\r\n.NET Core: {3}
+MainWindow_Menu_Help_VersionInfo_MessageDescription;X4_ComplexCalculator\r\n\r\nVersion: {0}\r\nCommit: {1}\r\nDate: {2}\r\n.NET : {3}
 
 
 # Check update -----------------------------------------

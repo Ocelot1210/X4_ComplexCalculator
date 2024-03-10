@@ -131,7 +131,7 @@ MainWindow_Menu_Help_CheckUpdateAtLaunch;起動時に更新を確認する
 MainWindow_Menu_Help_CheckUpdate_Title;更新を確認...
 MainWindow_Menu_Help_VersionInfo_Title;バージョン情報
 MainWindow_Menu_Help_VersionInfo_MessageTitle;X4_ComplexCalculator
-MainWindow_Menu_Help_VersionInfo_MessageDescription;X4_ComplexCalculator\r\n\r\nバージョン: {0}\r\nコミット: {1}\r\n日付: {2}\r\n.NET Core: {3}
+MainWindow_Menu_Help_VersionInfo_MessageDescription;X4_ComplexCalculator\r\n\r\nバージョン: {0}\r\nコミット: {1}\r\n日付: {2}\r\n.NET : {3}
 
 
 # Check update -----------------------------------------
