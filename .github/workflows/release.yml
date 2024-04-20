@@ -26,7 +26,7 @@ jobs:
         run: dotnet restore -r win-x64
 
       - name: Build
-        run: dotnet build -c Release -r win-x64 --no-restore X4_ComplexCalculator\X4_ComplexCalculator.csproj
+        run: dotnet publish -r win-x64 --self-contained X4_ComplexCalculator\X4_ComplexCalculator.csproj
 
       - name: Compress archive
         run: |
