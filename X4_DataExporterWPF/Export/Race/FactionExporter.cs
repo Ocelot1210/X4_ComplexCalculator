@@ -89,6 +89,8 @@ CREATE TABLE IF NOT EXISTS Faction
         var maxSteps = (int)(double)factionsXml.Root.XPathEvaluate("count(faction[@name])");
         var currentStep = 0;
 
+        var factions = new HashSet<string>();
+
         foreach (var faction in factionsXml.Root.XPathSelectElements("faction[@name]"))
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -96,6 +98,8 @@ CREATE TABLE IF NOT EXISTS Faction
 
             var factionID = faction.Attribute("id")?.Value;
             if (string.IsNullOrEmpty(factionID)) continue;
+
+            if (!factions.Add(factionID)) continue;
 
             var name = _resolver.Resolve(faction.Attribute("name")?.Value ?? "");
             if (string.IsNullOrEmpty(name)) continue;
