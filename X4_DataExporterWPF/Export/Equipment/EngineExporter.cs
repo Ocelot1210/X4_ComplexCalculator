@@ -117,7 +117,7 @@ INSERT INTO Engine ( EquipmentID,  ForwardThrust,  ReverseThrust,  BoostThrust, 
             yield return new Engine(
                 equipmentID,
                 forwardThrust,
-                thrust.Attribute("reverse")?.GetInt() ?? 0,
+                thrust.Attribute("reverse")?.GetDouble() ?? 0,
                 (int)(forwardThrust * boost.Attribute("thrust")?.GetDouble() ?? 1.0),
                 boost.Attribute("duration")?.GetDouble() ?? 0.0,
                 boost.Attribute("release")?.GetDouble() ?? 0.0,
