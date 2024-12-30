@@ -23,11 +23,8 @@
     <PackageReference Include="Collections.Pooled" Version="2.0.0-preview.27" />
     <PackageReference Include="Dapper" Version="2.1.35" />
     <PackageReference Include="Dirkster.AvalonDock" Version="4.72.1" />
-    <PackageReference Include="DotNetProjects.Extended.Wpf.Toolkit" Version="5.0.115" />
-    <PackageReference Include="GitInfo" Version="3.3.5">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="DotNetProjects.Extended.Wpf.Toolkit" Version="5.0.124" />
+    <PackageReference Include="GitInfo" Version="3.3.5" />
     <PackageReference Include="gong-wpf-dragdrop" Version="4.0.0" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
