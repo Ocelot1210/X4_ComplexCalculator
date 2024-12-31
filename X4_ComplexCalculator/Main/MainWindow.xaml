@@ -218,7 +218,7 @@
                 <Separator />
 
                 <!--  X4_ComplexCalculator について  -->
-                <MenuItem Command="{Binding VersionInfoCommand, Mode=OneTime}" Header="{lex:Loc Lang:MainWindow_Menu_Help_VersionInfo_Title}" />
+                <MenuItem Command="{Binding ShowVersionInfoCommand, Mode=OneTime}" Header="{lex:Loc Lang:MainWindow_Menu_Help_VersionInfo_Title}" />
 
             </MenuItem>
         </Menu>

@@ -1,7 +1,8 @@
 ﻿using AvalonDock;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using GongSolutions.Wpf.DragDrop;
 using Prism.Commands;
-using Prism.Mvvm;
 using Reactive.Bindings;
 using System;
 using System.Collections.Generic;
@@ -32,13 +33,14 @@ namespace X4_ComplexCalculator.Main;
 /// <summary>
 /// メイン画面のViewModel
 /// </summary>
-class MainWindowViewModel : BindableBase, IDropTarget
+partial class MainWindowViewModel : ObservableObject, IDropTarget
 {
     #region メンバ
     /// <summary>
     /// メッセージボックス表示用
     /// </summary>
     private readonly ILocalizedMessageBox _localizedMessageBox;
+
 
     /// <summary>
     /// メイン画面のModel
@@ -85,27 +87,9 @@ class MainWindowViewModel : BindableBase, IDropTarget
 
     #region プロパティ
     /// <summary>
-    /// Windowがロードされた時
-    /// </summary>
-    public ICommand WindowLoadedCommand { get; }
-
-
-    /// <summary>
-    /// Windowが閉じられる時
-    /// </summary>
-    public ICommand WindowClosingCommand { get; }
-
-
-    /// <summary>
     /// レイアウト保存
     /// </summary>
     public ICommand SaveLayout { get; }
-
-
-    /// <summary>
-    /// 新規作成
-    /// </summary>
-    public ICommand CreateNewCommand { get; }
 
 
     /// <summary>
@@ -121,63 +105,15 @@ class MainWindowViewModel : BindableBase, IDropTarget
 
 
     /// <summary>
-    /// 開く
-    /// </summary>
-    public ICommand OpenCommand { get; }
-
-
-    /// <summary>
-    /// 帝国の概要ウィンドウを開く
-    /// </summary>
-    public ICommand OpenEmpireOverviewWindowCommand { get; }
-
-
-    /// <summary>
-    /// DBビュワーウィンドウを開く
-    /// </summary>
-    public ICommand OpenDBViewerWindowCommand { get; }
-
-
-    /// <summary>
     /// DB更新
     /// </summary>
     public ICommand UpdateDBCommand { get; }
 
 
     /// <summary>
-    /// 問題を報告
-    /// </summary>
-    public ICommand ReportIssueCommand { get; }
-
-
-    /// <summary>
     /// 起動時に更新を確認するかのチェック状態
     /// </summary>
-    public ReactiveProperty<bool> CheckUpdateAtLaunch { get; }
-
-
-    /// <summary>
-    /// 起動時に更新を確認するか
-    /// </summary>
-    public ICommand SetCheckUpdateAtLaunchCommand { get; }
-
-
-    /// <summary>
-    /// 更新を確認...
-    /// </summary>
-    public AsyncReactiveCommand<bool> CheckUpdateCommand { get; }
-
-
-    /// <summary>
-    /// バージョン情報
-    /// </summary>
-    public ICommand VersionInfoCommand { get; }
-
-
-    /// <summary>
-    /// タブが閉じられる時
-    /// </summary>
-    public ICommand DocumentClosingCommand { get; }
+    public bool CheckUpdateAtLaunch { get; set; }
 
 
     /// <summary>
@@ -248,30 +184,19 @@ class MainWindowViewModel : BindableBase, IDropTarget
     {
         _localizedMessageBox             = messageBox;
         _workAreaManager                 = new(_localizedMessageBox);
-        _workAreaFileIO                  = new(_workAreaManager, messageBox);
+        _workAreaFileIO                  = new(_workAreaManager, _localizedMessageBox);
         _mainWindowModel                 = new(_workAreaManager, _workAreaFileIO, _localizedMessageBox);
-        WindowLoadedCommand              = new DelegateCommand(WindowLoaded);
-        WindowClosingCommand             = new DelegateCommand<CancelEventArgs>(WindowClosing);
-        CreateNewCommand                 = new DelegateCommand(CreateNew);
         SaveLayout                       = new DelegateCommand(_workAreaManager.SaveLayout);
         SaveCommand                      = new DelegateCommand(_workAreaFileIO.Save);
         SaveAsCommand                    = new DelegateCommand(_workAreaFileIO.SaveAs);
-        OpenCommand                      = new DelegateCommand(Open);
         UpdateDBCommand                  = new DelegateCommand(_mainWindowModel.UpdateDB);
-        ReportIssueCommand               = new DelegateCommand(ReportIssue);
         CheckUpdateAtLaunch              = new ReactiveProperty<bool>(Configuration.Instance.CheckUpdateAtLaunch);
-        SetCheckUpdateAtLaunchCommand    = new DelegateCommand(SetCheckUpdateAtLaunch);
-        CheckUpdateCommand               = new AsyncReactiveCommand<bool>().WithSubscribe(CheckUpdate);
-        VersionInfoCommand               = new DelegateCommand(ShowVersionInfo);
-        DocumentClosingCommand           = new DelegateCommand<DocumentClosingEventArgs>(DocumentClosing);
-        OpenEmpireOverviewWindowCommand  = new DelegateCommand(OpenEmpireOverviewWindow);
-        OpenDBViewerWindowCommand        = new DelegateCommand(OpenDBViewerWindow);
         _workAreaFileIO.PropertyChanged += Member_PropertyChanged;
 
         Imports = new List<IImport>()
         {
-            new StationCalculatorImport(_workAreaManager, messageBox),
-            new StationPlanImport(_workAreaManager, messageBox),
+            new StationCalculatorImport(_workAreaManager, _localizedMessageBox),
+            new StationPlanImport(_workAreaManager, _localizedMessageBox),
             new LoadoutImport(),
             //new SaveDataImport(new DelegateCommand<IImport>(_Model.Import))   // 作成中のため未リリース
         };
@@ -290,7 +215,7 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// <param name="maxRecursion">最大再帰回数</param>
     /// <param name="currRecursion">現在の再帰回数</param>
     /// <returns></returns>
-    private IEnumerable<string> GetX4Files(IEnumerable<string> pathes, int maxRecursion, int currRecursion = 0)
+    private static IEnumerable<string> GetX4Files(IEnumerable<string> pathes, int maxRecursion, int currRecursion = 0)
     {
         // 再帰最大の場合、何もしない
         if (maxRecursion < currRecursion)
@@ -357,15 +282,15 @@ class MainWindowViewModel : BindableBase, IDropTarget
         switch (e.PropertyName)
         {
             case nameof(_workAreaFileIO.IsBusy):
-                RaisePropertyChanged(nameof(FileLoadingIsBusy));
+                OnPropertyChanged(nameof(FileLoadingIsBusy));
                 break;
 
             case nameof(_workAreaFileIO.Progress):
-                RaisePropertyChanged(nameof(FileLoadingProgress));
+                OnPropertyChanged(nameof(FileLoadingProgress));
                 break;
 
             case nameof(_workAreaFileIO.LoadingFileName):
-                RaisePropertyChanged(nameof(LoadingFileName));
+                OnPropertyChanged(nameof(LoadingFileName));
                 break;
 
             default:
@@ -377,29 +302,32 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// <summary>
     /// 新規作成
     /// </summary>
+    [RelayCommand]
     private void CreateNew()
     {
         _workAreaFileIO.CreateNew();
-        RaisePropertyChanged(nameof(ActiveContent));
+        OnPropertyChanged(nameof(ActiveContent));
     }
 
 
     /// <summary>
     /// 開く
     /// </summary>
+    [RelayCommand]
     private void Open()
     {
         _workAreaFileIO.Open();
-        RaisePropertyChanged(nameof(ActiveContent));
+        OnPropertyChanged(nameof(ActiveContent));
     }
 
 
     /// <summary>
     /// 問題を報告
     /// </summary>
+    [RelayCommand]
     private void ReportIssue()
     {
-        string url = ThisAssembly.Git.RepositoryUrl[..^4] + "/issues";
+        string url = ThisAssembly.Git.RepositoryUrl + "/issues";
         Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
     }
 
@@ -407,6 +335,7 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// <summary>
     /// 更新確認ON/OFF
     /// </summary>
+    [RelayCommand]
     private void SetCheckUpdateAtLaunch()
     {
         Configuration.Instance.CheckUpdateAtLaunch = !Configuration.Instance.CheckUpdateAtLaunch;
@@ -417,7 +346,8 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// <summary>
     /// 更新を確認...
     /// </summary>
-    private async Task CheckUpdate(bool isUserOperation = false)
+    [RelayCommand]
+    private async Task CheckUpdateAsync(bool isUserOperation = false)
     {
         if (_applicationUpdater.FinishedDownload && isUserOperation)
         {
@@ -464,6 +394,7 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// <summary>
     /// バージョン情報
     /// </summary>
+    [RelayCommand]
     private void ShowVersionInfo()
     {
         const string VERSION = VersionInfo.DETAIL_VERSION;
@@ -478,6 +409,7 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// <summary>
     /// ウィンドウがロードされた時
     /// </summary>
+    [RelayCommand]
     private void WindowLoaded()
     {
         try
@@ -503,6 +435,7 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// <summary>
     /// ウィンドウが閉じられる時
     /// </summary>
+    [RelayCommand]
     private void WindowClosing(CancelEventArgs e)
     {
         e.Cancel = _mainWindowModel.WindowClosing();
@@ -527,6 +460,7 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// タブが閉じられる時
     /// </summary>
     /// <param name="e"></param>
+    [RelayCommand]
     private void DocumentClosing(DocumentClosingEventArgs e)
     {
         if (e.Document.Content is WorkAreaViewModel workArea)
@@ -539,6 +473,7 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// <summary>
     /// 帝国の概要ウィンドウを開く
     /// </summary>
+    [RelayCommand]
     private void OpenEmpireOverviewWindow()
     {
         if (_empireOverviewWindow is null)
@@ -555,6 +490,7 @@ class MainWindowViewModel : BindableBase, IDropTarget
     /// <summary>
     /// DBビュワーウィンドウを開く
     /// </summary>
+    [RelayCommand]
     private void OpenDBViewerWindow()
     {
         if (_dBViewerWindow is null)
