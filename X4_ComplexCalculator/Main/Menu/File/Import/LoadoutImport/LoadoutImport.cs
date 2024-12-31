@@ -1,13 +1,12 @@
-﻿using Prism.Mvvm;
-using System.Windows.Input;
-using X4_ComplexCalculator.Main.WorkArea;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport;
 
 /// <summary>
 /// 装備をインポート
 /// </summary>
-class LoadoutImport : BindableBase, IImport
+partial class LoadoutImport : ObservableObject, IImport
 {
     /// <summary>
     /// メニュー表示用タイトル
@@ -16,33 +15,11 @@ class LoadoutImport : BindableBase, IImport
 
 
     /// <summary>
-    /// Viewより呼ばれるCommand
-    /// </summary>
-    public ICommand Command { get; }
-
-
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    /// <param name="command">Viewより呼ばれるCommand</param>
-    public LoadoutImport(ICommand command) => Command = command;
-
-
-    /// <summary>
     /// インポート処理
     /// </summary>
-    /// <param name="_"></param>
-    /// <returns></returns>
-    public bool Import(IWorkArea _) => true;    // 何もしない
-
-
-    /// <summary>
-    /// インポート対象を選択
-    /// </summary>
-    /// <returns>インポート対象数</returns>
-    public int Select()
+    [RelayCommand]
+    private void Import()
     {
         SelectLoadoutDialog.ShowImportDialog();
-        return 0;
     }
 }

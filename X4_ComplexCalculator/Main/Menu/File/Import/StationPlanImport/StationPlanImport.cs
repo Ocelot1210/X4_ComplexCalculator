@@ -1,12 +1,16 @@
 ﻿using Collections.Pooled;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Prism.Mvvm;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 using System.Xml.XPath;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
+using X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport;
 using X4_ComplexCalculator.Main.WorkArea;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
@@ -15,18 +19,18 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport;
 /// <summary>
 /// 既存の計画ファイルからインポートする
 /// </summary>
-class StationPlanImport : BindableBase, IImport
+partial class StationPlanImport : ObservableObject, IImport
 {
     #region メンバ
     /// <summary>
-    /// インポート対象計画一覧
+    /// 作業エリア管理
     /// </summary>
-    private readonly List<StationPlanItem> _planItems = new();
+    private readonly WorkAreaManager _workAreaManager;
 
     /// <summary>
-    /// インポート対象計画要素番号
+    /// メッセージボックス表示用
     /// </summary>
-    private int _planIdx = 0;
+    private readonly ILocalizedMessageBox _localizedMessageBox;
     #endregion
 
 
@@ -35,38 +39,19 @@ class StationPlanImport : BindableBase, IImport
     /// メニュー表示用タイトル
     /// </summary>
     public string Title => "Lang:MainWindow_Menu_File_MenuItem_Import_MenuItem_ExistingPlan_Header";
-
-
-    /// <summary>
-    /// Viewより呼ばれるCommand
-    /// </summary>
-    public ICommand Command { get; }
     #endregion
+
 
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    /// <param name="command">Viewより呼ばれるCommand</param>
-    public StationPlanImport(ICommand command) => Command = command;
-
-
-    /// <summary>
-    /// インポート対象を選択
-    /// </summary>
-    /// <returns>インポート対象数</returns>
-    public int Select()
+    /// <param name="workAreaManager">作業エリア管理用</param>
+    /// <param name="localizedMessageBox">メッセージボックス表示用</param>
+    public StationPlanImport(WorkAreaManager workAreaManager, ILocalizedMessageBox localizedMessageBox)
     {
-        _planItems.Clear();
-
-        bool onOK = SelectPlanDialog.ShowDialog(_planItems);
-        if (!onOK)
-        {
-            _planItems.Clear();
-        }
-
-        _planIdx = 0;
-        return _planItems.Count;
+        _workAreaManager = workAreaManager;
+        _localizedMessageBox = localizedMessageBox;
     }
 
 
@@ -74,21 +59,28 @@ class StationPlanImport : BindableBase, IImport
     /// インポート処理
     /// </summary>
     /// <param name="WorkArea"></param>
-    /// <returns></returns>
-    public bool Import(IWorkArea WorkArea)
+    [RelayCommand]
+    private void Import()
     {
-        bool ret;
-        try
+        var stations = new List<StationPlanItem>();
+        if (!SelectPlanDialog.ShowDialog(stations))
         {
-            ret = ImportMain(WorkArea, _planItems[_planIdx]);
-            _planIdx++;
-        }
-        catch
-        {
-            ret = false;
+            return;
         }
 
-        return ret;
+        foreach (var station in stations)
+        {
+            var vm = new WorkAreaViewModel(_workAreaManager.ActiveLayoutID, _localizedMessageBox.Clone());
+
+            if (ImportMain(vm.WorkArea, station))
+            {
+                _workAreaManager.Documents.Add(vm);
+            }
+            else
+            {
+                vm.Dispose();
+            }
+        }
     }
 
 

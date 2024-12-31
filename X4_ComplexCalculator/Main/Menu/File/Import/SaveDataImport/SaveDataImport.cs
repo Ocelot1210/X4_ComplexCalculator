@@ -1,9 +1,11 @@
 ﻿using Collections.Pooled;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Input;
 using System.Xml.XPath;
+using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Main.WorkArea;
@@ -14,19 +16,18 @@ namespace X4_ComplexCalculator.Main.Menu.File.Import.SaveDataImport;
 /// <summary>
 /// X4のセーブデータからインポートする機能用クラス
 /// </summary>
-class SaveDataImport : IImport
+partial class SaveDataImport : ObservableObject, IImport
 {
     #region メンバ
     /// <summary>
-    /// インポート対象ステーション一覧
+    /// 作業エリア管理
     /// </summary>
-    private readonly List<SaveDataStationItem> _stations = new();
-
+    private readonly WorkAreaManager _workAreaManager;
 
     /// <summary>
-    /// インポート対象ステーション要素番号
+    /// メッセージボックス表示用
     /// </summary>
-    private int _stationIdx = 0;
+    private readonly ILocalizedMessageBox _localizedMessageBox;
     #endregion
 
 
@@ -37,57 +38,43 @@ class SaveDataImport : IImport
 
 
     /// <summary>
-    /// Viewより呼ばれるCommand
-    /// </summary>
-    public ICommand Command { get; }
-
-
-    /// <summary>
     /// コンストラクタ
     /// </summary>
-    /// <param name="command">Viewより呼ばれるCommand</param>
-    public SaveDataImport(ICommand command)
+    /// <param name="workAreaManager">作業エリア管理用</param>
+    /// <param name="localizedMessageBox">メッセージボックス表示用</param>
+    public SaveDataImport(WorkAreaManager workAreaManager, ILocalizedMessageBox localizedMessageBox)
     {
-        Command = command;
-    }
-
-
-    /// <summary>
-    /// インポート対象を選択
-    /// </summary>
-    /// <returns>インポート対象数</returns>
-    public int Select()
-    {
-        var onOK = SelectStationDialog.ShowDialog(_stations);
-        if (!onOK)
-        {
-            _stations.Clear();
-        }
-
-        _stationIdx = 0;
-        return _stations.Count;
+        _workAreaManager = workAreaManager;
+        _localizedMessageBox = localizedMessageBox;
     }
 
 
     /// <summary>
     /// インポート実行
     /// </summary>
-    /// <param name="WorkArea">作業エリア</param>
-    /// <returns>インポートに成功したか</returns>
-    public bool Import(IWorkArea WorkArea)
+    [RelayCommand]
+    private void Import()
     {
-        bool ret;
-        try
+        var stations = new List<SaveDataStationItem>();
+        if (!SelectStationDialog.ShowDialog(stations))
         {
-            ret = ImportMain(WorkArea, _stations[_stationIdx]);
-            _stationIdx++;
-        }
-        catch
-        {
-            ret = false;
+            return;
         }
 
-        return ret;
+
+        foreach (var station in stations)
+        {
+            var vm = new WorkAreaViewModel(_workAreaManager.ActiveLayoutID, _localizedMessageBox.Clone());
+
+            if (ImportMain(vm.WorkArea, station))
+            {
+                _workAreaManager.Documents.Add(vm);
+            }
+            else
+            {
+                vm.Dispose();
+            }
+        }
     }
 
 
@@ -99,18 +86,25 @@ class SaveDataImport : IImport
     /// <returns></returns>
     private static bool ImportMain(IWorkArea WorkArea, SaveDataStationItem saveData)
     {
-        // モジュール一覧を設定
-        SetModules(WorkArea, saveData);
+        try
+        {
+            // モジュール一覧を設定
+            SetModules(WorkArea, saveData);
 
-        // 製品価格を設定
-        SetWarePrice(WorkArea, saveData);
+            // 製品価格を設定
+            SetWarePrice(WorkArea, saveData);
 
-        // 保管庫割当状態を設定
-        SetStorageAssign(WorkArea, saveData);
+            // 保管庫割当状態を設定
+            SetStorageAssign(WorkArea, saveData);
 
-        WorkArea.Title = saveData.StationName;
+            WorkArea.Title = saveData.StationName;
 
-        return true;
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
 

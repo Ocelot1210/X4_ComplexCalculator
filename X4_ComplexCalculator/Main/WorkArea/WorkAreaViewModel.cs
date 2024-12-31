@@ -116,6 +116,10 @@ public sealed class WorkAreaViewModel : BindableBase, IDisposable
     /// メッセージボックス表示用
     /// </summary>
     public ILocalizedMessageBox MessageBox { get; }
+
+    
+
+    public IWorkArea WorkArea => _model;
     #endregion
 
 
@@ -145,20 +149,6 @@ public sealed class WorkAreaViewModel : BindableBase, IDisposable
 
         _model.PropertyChanged += Model_PropertyChanged;
     }
-
-
-    /// <summary>
-    /// インポート実行
-    /// </summary>
-    /// <param name="import"></param>
-    public bool Import(IImport import) => import.Import(_model);
-
-
-    /// <summary>
-    /// エクスポート実行
-    /// </summary>
-    /// <param name="export"></param>
-    public bool Export(IExport export) => export.Export(_model);
 
 
     /// <summary>

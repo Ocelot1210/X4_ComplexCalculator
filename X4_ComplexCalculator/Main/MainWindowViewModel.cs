@@ -65,12 +65,6 @@ class MainWindowViewModel : BindableBase, IDropTarget
 
 
     /// <summary>
-    /// インポート/エクスポート処理用
-    /// </summary>
-    private readonly ImportExporter _importExporter;
-
-
-    /// <summary>
     /// 帝国の概要ウィンドウ
     /// </summary>
     private Window? _empireOverviewWindow;
@@ -274,18 +268,17 @@ class MainWindowViewModel : BindableBase, IDropTarget
         OpenDBViewerWindowCommand        = new DelegateCommand(OpenDBViewerWindow);
         _workAreaFileIO.PropertyChanged += Member_PropertyChanged;
 
-        _importExporter = new ImportExporter(_workAreaManager, _localizedMessageBox);
         Imports = new List<IImport>()
         {
-            new StationCalculatorImport(new DelegateCommand<IImport>(_importExporter.Import), messageBox),
-            new StationPlanImport(new DelegateCommand<IImport>(_importExporter.Import)),
-            new LoadoutImport(new DelegateCommand<IImport>(_importExporter.Import)),
+            new StationCalculatorImport(_workAreaManager, messageBox),
+            new StationPlanImport(_workAreaManager, messageBox),
+            new LoadoutImport(),
             //new SaveDataImport(new DelegateCommand<IImport>(_Model.Import))   // 作成中のため未リリース
         };
 
         Exports = new List<IExport>()
         {
-            new StationCalculatorExport(new DelegateCommand<IExport>(_importExporter.Export))
+            new StationCalculatorExport(_workAreaManager)
         };
     }
 
