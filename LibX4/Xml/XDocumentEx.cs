@@ -72,7 +72,7 @@ internal static class XDocumentEx
     private static Stream SkipXmlDeclaration(Stream stream)
     {
         Span<byte> buff = stackalloc byte[58]; // XML 宣言の全属性を指定した場合の文字数
-        stream.Read(buff);
+        _ = stream.Read(buff);
 
         // UTF-8 の BOM を読み飛ばす
         int seek = buff.StartsWith(Encoding.UTF8.Preamble) ? Encoding.UTF8.Preamble.Length : 0;

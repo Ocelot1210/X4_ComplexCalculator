@@ -144,7 +144,7 @@ public static class Util
     private static PictureFormat JudgeFormat(Stream stream)
     {
         Span<byte> buff = stackalloc byte[4];
-        stream.Read(buff);
+        stream.ReadExactly(buff);
         stream.Position = 0;
 
         if (buff[0] == 0x1F && buff[1] == 0x8B)
