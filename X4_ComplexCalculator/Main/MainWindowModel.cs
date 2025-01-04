@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using GongSolutions.Wpf.DragDrop;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
@@ -148,5 +150,57 @@ class MainWindowModel
         }
 
         return canceled;
+    }
+
+
+    /// <summary>
+    /// ファイル又はフォルダの一覧から保存したファイルを開く
+    /// </summary>
+    /// <param name="paths">ファイル又はフォルダパスの列挙</param>
+    public void OpenFiles(IEnumerable<string> paths)
+    {
+        _workAreFileIO.OpenFiles(GetX4Files(paths, 1));
+    }
+
+
+    /// <summary>
+    /// ファイル/フォルダ内の.x4ファイルを列挙する
+    /// </summary>
+    /// <param name="paths">ファイル/フォルダパス</param>
+    /// <param name="maxRecursion">最大再帰回数</param>
+    /// <param name="currRecursion">現在の再帰回数</param>
+    /// <returns></returns>
+    private static IEnumerable<string> GetX4Files(IEnumerable<string> paths, int maxRecursion, int currRecursion = 0)
+    {
+        // 再帰最大の場合、何もしない
+        if (maxRecursion < currRecursion)
+        {
+            yield break;
+        }
+
+        foreach (var path in paths)
+        {
+            // パスはフォルダか？
+            if (Directory.Exists(path))
+            {
+                // フォルダの場合
+                var files = GetX4Files(Directory.EnumerateFileSystemEntries(path), maxRecursion, currRecursion++);
+
+                foreach (var file in files)
+                {
+                    yield return file;
+                }
+            }
+            else
+            {
+                // ファイルの場合
+                if (Path.GetExtension(path).Equals(".x4", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    yield return path;
+                }
+            }
+        }
+
+        yield break;
     }
 }

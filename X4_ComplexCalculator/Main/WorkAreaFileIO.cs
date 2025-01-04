@@ -92,18 +92,6 @@ class WorkAreaFileIO : BindableBase
 
 
     /// <summary>
-    /// 上書き保存
-    /// </summary>
-    public void Save() => _workAreaManager.ActiveContent?.Save();
-
-
-    /// <summary>
-    /// 名前を付けて保存
-    /// </summary>
-    public void SaveAs() => _workAreaManager.ActiveContent?.SaveAs();
-
-
-    /// <summary>
     /// 新規作成
     /// </summary>
     public void CreateNew()

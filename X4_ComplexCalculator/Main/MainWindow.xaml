@@ -160,7 +160,7 @@
             <!--  レイアウト(L)  -->
             <MenuItem Header="{lex:Loc Lang:MainWindow_Menu_Layout_Header}">
                 <!--  レイアウト保存  -->
-                <MenuItem Command="{Binding SaveLayout, Mode=OneTime}" Header="{lex:Loc Lang:MainWindow_Menu_Layout_MenuItem_SaveLayout_Header}" />
+                <MenuItem Command="{Binding SaveLayoutCommand, Mode=OneTime}" Header="{lex:Loc Lang:MainWindow_Menu_Layout_MenuItem_SaveLayout_Header}" />
 
                 <!--  レイアウト一覧  -->
                 <MenuItem

@@ -2,19 +2,15 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GongSolutions.Wpf.DragDrop;
-using Prism.Commands;
-using Reactive.Bindings;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 using X4_ComplexCalculator.Infrastructure;
@@ -45,7 +41,7 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
     /// <summary>
     /// メイン画面のModel
     /// </summary>
-    private readonly MainWindowModel _mainWindowModel;
+    private readonly MainWindowModel _model;
 
 
     /// <summary>
@@ -75,7 +71,7 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
     /// <summary>
     /// DBビュワーウィンドウ
     /// </summary>
-    private Window? _dBViewerWindow;
+    private Window? _dbViewerWindow;
 
 
     /// <summary>
@@ -87,33 +83,10 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
 
     #region プロパティ
     /// <summary>
-    /// レイアウト保存
-    /// </summary>
-    public ICommand SaveLayout { get; }
-
-
-    /// <summary>
-    /// 上書き保存
-    /// </summary>
-    public ICommand SaveCommand { get; }
-
-
-    /// <summary>
-    /// 名前を指定して保存
-    /// </summary>
-    public ICommand SaveAsCommand { get; }
-
-
-    /// <summary>
-    /// DB更新
-    /// </summary>
-    public ICommand UpdateDBCommand { get; }
-
-
-    /// <summary>
     /// 起動時に更新を確認するかのチェック状態
     /// </summary>
-    public bool CheckUpdateAtLaunch { get; set; }
+    [ObservableProperty]
+    public partial bool CheckUpdateAtLaunch { get; private set; }
 
 
     /// <summary>
@@ -185,12 +158,8 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
         _localizedMessageBox             = messageBox;
         _workAreaManager                 = new(_localizedMessageBox);
         _workAreaFileIO                  = new(_workAreaManager, _localizedMessageBox);
-        _mainWindowModel                 = new(_workAreaManager, _workAreaFileIO, _localizedMessageBox);
-        SaveLayout                       = new DelegateCommand(_workAreaManager.SaveLayout);
-        SaveCommand                      = new DelegateCommand(_workAreaFileIO.Save);
-        SaveAsCommand                    = new DelegateCommand(_workAreaFileIO.SaveAs);
-        UpdateDBCommand                  = new DelegateCommand(_mainWindowModel.UpdateDB);
-        CheckUpdateAtLaunch              = new ReactiveProperty<bool>(Configuration.Instance.CheckUpdateAtLaunch);
+        _model                           = new(_workAreaManager, _workAreaFileIO, _localizedMessageBox);
+        CheckUpdateAtLaunch              = Configuration.Instance.CheckUpdateAtLaunch;
         _workAreaFileIO.PropertyChanged += Member_PropertyChanged;
 
         Imports = new List<IImport>()
@@ -209,56 +178,12 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
 
 
     /// <summary>
-    /// ファイル/フォルダ内の.x4ファイルを列挙する
-    /// </summary>
-    /// <param name="pathes">ファイル/フォルダパス</param>
-    /// <param name="maxRecursion">最大再帰回数</param>
-    /// <param name="currRecursion">現在の再帰回数</param>
-    /// <returns></returns>
-    private static IEnumerable<string> GetX4Files(IEnumerable<string> pathes, int maxRecursion, int currRecursion = 0)
-    {
-        // 再帰最大の場合、何もしない
-        if (maxRecursion < currRecursion)
-        {
-            yield break;
-        }
-
-        foreach (var path in pathes)
-        {
-            // パスはフォルダか？
-            if (Directory.Exists(path))
-            {
-                // フォルダの場合
-                var files = GetX4Files(Directory.EnumerateFileSystemEntries(path), maxRecursion, currRecursion++);
-
-                foreach (var file in files)
-                {
-                    yield return file;
-                }
-            }
-            else
-            {
-                // ファイルの場合
-                if (Path.GetExtension(path) == ".x4")
-                {
-                    yield return path;
-                }
-            }
-        }
-
-        yield break;
-    }
-
-
-    /// <summary>
     /// ドラッグ中
     /// </summary>
     /// <param name="dropInfo"></param>
     public void DragOver(IDropInfo dropInfo)
     {
-        bool x4FileExists = GetX4Files(((DataObject)dropInfo.Data).GetFileDropList().OfType<string>(), 1).Any();
-
-        dropInfo.Effects = x4FileExists ? DragDropEffects.Copy : DragDropEffects.None;
+        dropInfo.Effects = DragDropEffects.Copy;
     }
 
 
@@ -268,7 +193,8 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
     /// <param name="dropInfo"></param>
     public void Drop(IDropInfo dropInfo)
     {
-        _workAreaFileIO.OpenFiles(GetX4Files(((DataObject)dropInfo.Data).GetFileDropList().OfType<string>(), 1));
+        var paths = ((DataObject)dropInfo.Data).GetFileDropList().OfType<string>();
+        _model.OpenFiles(paths);
     }
 
 
@@ -322,6 +248,26 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
 
 
     /// <summary>
+    /// 保存
+    /// </summary>
+    [RelayCommand]
+    private void Save()
+    {
+        _workAreaManager.ActiveContent?.Save();
+    }
+
+
+    /// <summary>
+    /// 名前を付けて保存
+    /// </summary>
+    [RelayCommand]
+    private void SaveAs()
+    {
+        _workAreaManager.ActiveContent?.SaveAs();
+    }
+
+
+    /// <summary>
     /// 問題を報告
     /// </summary>
     [RelayCommand]
@@ -339,7 +285,7 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
     private void SetCheckUpdateAtLaunch()
     {
         Configuration.Instance.CheckUpdateAtLaunch = !Configuration.Instance.CheckUpdateAtLaunch;
-        CheckUpdateAtLaunch.Value = Configuration.Instance.CheckUpdateAtLaunch;
+        CheckUpdateAtLaunch = Configuration.Instance.CheckUpdateAtLaunch;
     }
 
 
@@ -415,7 +361,7 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
         try
         {
             // DB接続開始
-            _mainWindowModel.Init();
+            _model.Init();
             _workAreaManager.Init();
 
             // 更新チェックが有効な場合のみ更新を確認する
@@ -438,10 +384,11 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
     [RelayCommand]
     private void WindowClosing(CancelEventArgs e)
     {
-        e.Cancel = _mainWindowModel.WindowClosing();
+        e.Cancel = _model.WindowClosing();
         if (!e.Cancel)
         {
             _empireOverviewWindow?.Close();
+            _dbViewerWindow?.Close();
 
             if (_applicationUpdater.FinishedDownload) _applicationUpdater.Update();
             else if (_applicationUpdater.NowDownloading)
@@ -455,6 +402,7 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
             _workAreaManager.Dispose();
         }
     }
+
 
     /// <summary>
     /// タブが閉じられる時
@@ -493,13 +441,33 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
     [RelayCommand]
     private void OpenDBViewerWindow()
     {
-        if (_dBViewerWindow is null)
+        if (_dbViewerWindow is null)
         {
-            _dBViewerWindow = new DBViewerWindow();
-            _dBViewerWindow.Closed += (_, _) => { _dBViewerWindow = null; };
-            _dBViewerWindow.Show();
+            _dbViewerWindow = new DBViewerWindow();
+            _dbViewerWindow.Closed += (_, _) => { _dbViewerWindow = null; };
+            _dbViewerWindow.Show();
         }
 
-        _dBViewerWindow.Activate();
+        _dbViewerWindow.Activate();
+    }
+
+
+    /// <summary>
+    /// レイアウト保存
+    /// </summary>
+    [RelayCommand]
+    private void SaveLayout()
+    {
+        _workAreaManager.SaveLayout();
+    }
+
+
+    /// <summary>
+    /// DB 更新
+    /// </summary>
+    [RelayCommand]
+    private void UpdateDB()
+    {
+        _model.UpdateDB();
     }
 }
