@@ -205,7 +205,7 @@
                     Command="{Binding SetCheckUpdateAtLaunchCommand, Mode=OneTime}"
                     Header="{lex:Loc Lang:MainWindow_Menu_Help_CheckUpdateAtLaunch}"
                     IsCheckable="True"
-                    IsChecked="{Binding CheckUpdateAtLaunch.Value, Mode=TwoWay}" />
+                    IsChecked="{Binding CheckUpdateAtLaunch, Mode=TwoWay}" />
 
 
                 <!--  更新を確認...  -->
@@ -264,11 +264,10 @@
 
         </avdk:DockingManager>
 
-        <!--  IsBusy="{Binding FileLoadingIsBusy, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">  -->
         <xctk:BusyIndicator
             Grid.Row="0"
             Grid.RowSpan="2"
-            IsBusy="{Binding FileLoadingIsBusy, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+            IsBusy="{Binding SaveDataReaderProgress.IsBusy, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
             <xctk:BusyIndicator.BusyContentTemplate>
                 <DataTemplate>
                     <StackPanel Margin="4">
@@ -277,11 +276,11 @@
                             FontWeight="Bold"
                             Text="{lex:Loc Lang:MainWindow_LoadingFile}" />
                         <StackPanel Margin="0,4,4,4">
-                            <TextBlock HorizontalAlignment="Center" Text="{Binding DataContext.LoadingFileName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" />
+                            <TextBlock HorizontalAlignment="Center" Text="{Binding DataContext.SaveDataReaderProgress.LoadingFileName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" />
                             <ProgressBar
                                 Width="200"
                                 Height="15"
-                                Value="{Binding DataContext.FileLoadingProgress, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" />
+                                Value="{Binding DataContext.SaveDataReaderProgress.Progress, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" />
                         </StackPanel>
                     </StackPanel>
                 </DataTemplate>

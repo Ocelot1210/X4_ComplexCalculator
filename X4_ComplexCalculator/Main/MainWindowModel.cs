@@ -22,12 +22,6 @@ class MainWindowModel
 
 
     /// <summary>
-    /// 作業エリアファイル入出力用
-    /// </summary>
-    private readonly WorkAreaFileIO _workAreFileIO;
-
-
-    /// <summary>
     /// メッセージボックス表示用
     /// </summary>
     private readonly ILocalizedMessageBox _localizedMessageBox;
@@ -38,12 +32,10 @@ class MainWindowModel
     /// コンストラクタ
     /// </summary>
     /// <param name="workAreaManager">作業エリア管理用</param>
-    /// <param name="workAreaFileIO">作業エリアファイル入出力用</param>
     /// <param name="localizedMessageBox">メッセージボックス表示用</param>
-    public MainWindowModel(WorkAreaManager workAreaManager, WorkAreaFileIO workAreaFileIO, ILocalizedMessageBox localizedMessageBox)
+    public MainWindowModel(WorkAreaManager workAreaManager, ILocalizedMessageBox localizedMessageBox)
     {
         _workAreaManager = workAreaManager;
-        _workAreFileIO = workAreaFileIO;
         _localizedMessageBox = localizedMessageBox;
     }
 
@@ -58,16 +50,16 @@ class MainWindowModel
         SettingDatabase.Open();
 
         const string SQL = "SELECT Path FROM OpenedFiles";
-        var pathes = SettingDatabase.Instance.Query<string>(SQL)
+        var paths = SettingDatabase.Instance.Query<string>(SQL)
             .Where(x => File.Exists(x))
             .ToArray();
 
-        _workAreFileIO.OpenFiles(pathes);
+        _workAreaManager.OpenFiles(paths);
 
         // 何も開かなければ空の計画を追加する
-        if (!pathes.Any())
+        if (!paths.Any())
         {
-            _workAreFileIO.CreateNew();
+            _workAreaManager.CreateNewDocument();
         }
     }
 
@@ -159,7 +151,7 @@ class MainWindowModel
     /// <param name="paths">ファイル又はフォルダパスの列挙</param>
     public void OpenFiles(IEnumerable<string> paths)
     {
-        _workAreFileIO.OpenFiles(GetX4Files(paths, 1));
+        _workAreaManager.OpenFiles(GetX4Files(paths, 1));
     }
 
 

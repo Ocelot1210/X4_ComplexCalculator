@@ -1,20 +1,27 @@
-﻿using System;
+﻿using Collections.Pooled;
+using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Win32;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Threading;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collection;
 using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 using X4_ComplexCalculator.Main.Menu.Layout;
 using X4_ComplexCalculator.Main.WorkArea;
+using X4_ComplexCalculator.Main.WorkArea.SaveDataReader;
 
 namespace X4_ComplexCalculator.Main;
 
 /// <summary>
 /// 作業エリア管理用
 /// </summary>
-class WorkAreaManager : IDisposable
+partial class WorkAreaManager : ObservableObject, IDisposable
 {
     #region メンバ
     /// <summary>
@@ -24,7 +31,7 @@ class WorkAreaManager : IDisposable
 
 
     /// <summary>
-    ///ガベコレ用タイマー
+    /// ガベコレ用タイマー
     /// </summary>
     private readonly DispatcherTimer _gcTimer;
 
@@ -33,6 +40,18 @@ class WorkAreaManager : IDisposable
     /// レイアウト管理用クラス
     /// </summary>
     private readonly LayoutsManager _layoutsManager;
+
+
+    /// <summary>
+    /// メッセージボックス表示用
+    /// </summary>
+    private readonly ILocalizedMessageBox _localizedMessageBox;
+
+
+    /// <summary>
+    /// 保存ファイル読み込み時の進捗表示用
+    /// </summary>
+    private readonly SaveDataReaderProgress _saveDataReaderProgress;
     #endregion
 
 
@@ -40,7 +59,8 @@ class WorkAreaManager : IDisposable
     /// <summary>
     /// アクティブなワークスペース
     /// </summary>
-    public WorkAreaViewModel? ActiveContent { set; get; }
+    [ObservableProperty]
+    public partial WorkAreaViewModel? ActiveContent { set; get; }
 
 
     /// <summary>
@@ -66,9 +86,12 @@ class WorkAreaManager : IDisposable
     /// コンストラクタ
     /// </summary>
     /// <param name="messageBox">メッセージボックス表示用</param>
-    public WorkAreaManager(ILocalizedMessageBox messageBox)
+    public WorkAreaManager(ILocalizedMessageBox messageBox, SaveDataReaderProgress saveDataReaderProgress)
     {
-        _layoutsManager = new LayoutsManager(this, messageBox);
+        _localizedMessageBox = messageBox;
+        _saveDataReaderProgress = saveDataReaderProgress;
+
+        _layoutsManager = new LayoutsManager(this, _localizedMessageBox);
 
         _gcTimer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, new EventHandler(GarvageCollect), Application.Current.Dispatcher);
         _gcTimer.Stop();
@@ -90,13 +113,121 @@ class WorkAreaManager : IDisposable
     /// <summary>
     /// 初期化
     /// </summary>
-    public void Init() => _layoutsManager.Init();
+    public void Init()
+    {
+        _layoutsManager.Init();
+    }
 
 
     /// <summary>
     /// レイアウト保存
     /// </summary>
-    public void SaveLayout() => _layoutsManager.SaveLayout(ActiveContent);
+    public void SaveLayout()
+    {
+        _layoutsManager.SaveLayout(ActiveContent);
+    }
+
+
+    /// <summary>
+    /// 新規作成
+    /// </summary>
+    public void CreateNewDocument()
+    {
+        var vm = new WorkAreaViewModel(ActiveLayoutID, _localizedMessageBox.Clone());
+        Documents.Add(vm);
+        ActiveContent = vm;
+    }
+
+
+    /// <summary>
+    /// 保存
+    /// </summary>
+    public void SaveDocument()
+    {
+        ActiveContent?.Save();
+    }
+
+
+    /// <summary>
+    /// 名前を付けて保存
+    /// </summary>
+    public void SaveAsDocument()
+    {
+        ActiveContent?.SaveAs();
+    }
+
+
+    /// <summary>
+    /// 開く
+    /// </summary>
+    public void Open()
+    {
+        var dlg = new OpenFileDialog
+        {
+            Filter = "X4: Complex calculator data file(*.x4)|*.x4|All Files|*.*",
+            Multiselect = true
+        };
+        if (dlg.ShowDialog() == true)
+        {
+            OpenFiles(dlg.FileNames);
+        }
+    }
+
+
+    /// <summary>
+    /// ファイルを開く
+    /// </summary>
+    /// <param name="paths">開く対象のファイルパス一覧</param>
+    public void OpenFiles(IEnumerable<string> paths)
+    {
+        if (!paths.Any())
+        {
+            return;
+        }
+
+        try
+        {
+            var doevents = new DoEventsExecuter(0, 10);
+
+            var prg = new ProgressEx<int>(0);
+            var loaded = 0;
+            var pathsCount = paths.Count();
+            var rate = 1.0 / pathsCount;
+
+            prg.ProgressChanged += (sender, e) =>
+            {
+                _saveDataReaderProgress.Progress = (int)(e * rate + (loaded * rate * 100));
+                doevents.DoEvents();
+            };
+
+            _saveDataReaderProgress.IsBusy = true;
+            doevents.ForceDoEvents();
+            using var viewModels = new PooledList<WorkAreaViewModel>(pathsCount);
+
+            foreach (var path in paths)
+            {
+                var vm = new WorkAreaViewModel(ActiveLayoutID, _localizedMessageBox.Clone());
+
+                _saveDataReaderProgress.LoadingFileName = System.IO.Path.GetFileName(path);
+                doevents.ForceDoEvents();
+
+                vm.LoadFile(path, prg);
+                viewModels.Add(vm);
+                loaded++;
+            }
+
+            Documents.AddRange(viewModels);
+        }
+        catch (Exception e)
+        {
+            _localizedMessageBox.Error("Lang:MainWindow_FaildToLoadFileMessage", "Lang:MainWindow_FaildToLoadFileMessageTitle", e.Message);
+        }
+        finally
+        {
+            _saveDataReaderProgress.IsBusy = false;
+            _saveDataReaderProgress.Progress = 0;
+        }
+    }
 
 
     /// <summary>

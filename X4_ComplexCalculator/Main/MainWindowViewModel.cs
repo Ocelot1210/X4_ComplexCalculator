@@ -23,6 +23,7 @@ using X4_ComplexCalculator.Main.Menu.Layout;
 using X4_ComplexCalculator.Main.Menu.View.DBViewer;
 using X4_ComplexCalculator.Main.Menu.View.EmpireOverview;
 using X4_ComplexCalculator.Main.WorkArea;
+using X4_ComplexCalculator.Main.WorkArea.SaveDataReader;
 
 namespace X4_ComplexCalculator.Main;
 
@@ -57,12 +58,6 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
 
 
     /// <summary>
-    /// 作業エリアファイル読み書き用
-    /// </summary>
-    private readonly WorkAreaFileIO _workAreaFileIO;
-
-
-    /// <summary>
     /// 帝国の概要ウィンドウ
     /// </summary>
     private Window? _empireOverviewWindow;
@@ -86,7 +81,7 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
     /// 起動時に更新を確認するかのチェック状態
     /// </summary>
     [ObservableProperty]
-    public partial bool CheckUpdateAtLaunch { get; private set; }
+    public partial bool CheckUpdateAtLaunch { get; set; }
 
 
     /// <summary>
@@ -130,21 +125,9 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
 
 
     /// <summary>
-    /// ファイル読み込みがビジー状態か
+    /// 保存ファイル読み込み時の進捗表示用
     /// </summary>
-    public bool FileLoadingIsBusy => _workAreaFileIO.IsBusy;
-
-
-    /// <summary>
-    /// ファイル読み込み進捗
-    /// </summary>
-    public int FileLoadingProgress => _workAreaFileIO.Progress;
-
-
-    /// <summary>
-    /// 読込中のファイル名
-    /// </summary>
-    public string LoadingFileName => _workAreaFileIO.LoadingFileName;
+    public SaveDataReaderProgress SaveDataReaderProgress { get; } = new();
     #endregion
 
 
@@ -156,11 +139,10 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
     public MainWindowViewModel(ILocalizedMessageBox messageBox)
     {
         _localizedMessageBox             = messageBox;
-        _workAreaManager                 = new(_localizedMessageBox);
-        _workAreaFileIO                  = new(_workAreaManager, _localizedMessageBox);
-        _model                           = new(_workAreaManager, _workAreaFileIO, _localizedMessageBox);
+        _workAreaManager                 = new(_localizedMessageBox, SaveDataReaderProgress);
+        _model                           = new(_workAreaManager, _localizedMessageBox);
         CheckUpdateAtLaunch              = Configuration.Instance.CheckUpdateAtLaunch;
-        _workAreaFileIO.PropertyChanged += Member_PropertyChanged;
+        _workAreaManager.PropertyChanged += Member_PropertyChanged;
 
         Imports = new List<IImport>()
         {
@@ -207,16 +189,8 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
     {
         switch (e.PropertyName)
         {
-            case nameof(_workAreaFileIO.IsBusy):
-                OnPropertyChanged(nameof(FileLoadingIsBusy));
-                break;
-
-            case nameof(_workAreaFileIO.Progress):
-                OnPropertyChanged(nameof(FileLoadingProgress));
-                break;
-
-            case nameof(_workAreaFileIO.LoadingFileName):
-                OnPropertyChanged(nameof(LoadingFileName));
+            case nameof(_workAreaManager.ActiveContent):
+                OnPropertyChanged(nameof(ActiveContent));
                 break;
 
             default:
@@ -229,32 +203,21 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
     /// 新規作成
     /// </summary>
     [RelayCommand]
-    private void CreateNew()
-    {
-        _workAreaFileIO.CreateNew();
-        OnPropertyChanged(nameof(ActiveContent));
-    }
+    private void CreateNew() => _workAreaManager.CreateNewDocument();
 
 
     /// <summary>
     /// 開く
     /// </summary>
     [RelayCommand]
-    private void Open()
-    {
-        _workAreaFileIO.Open();
-        OnPropertyChanged(nameof(ActiveContent));
-    }
+    private void Open() => _workAreaManager.Open();
 
 
     /// <summary>
     /// 保存
     /// </summary>
     [RelayCommand]
-    private void Save()
-    {
-        _workAreaManager.ActiveContent?.Save();
-    }
+    private void Save() => _workAreaManager.SaveDocument();
 
 
     /// <summary>
@@ -263,7 +226,7 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
     [RelayCommand]
     private void SaveAs()
     {
-        _workAreaManager.ActiveContent?.SaveAs();
+        _workAreaManager.SaveAsDocument();
     }
 
 
