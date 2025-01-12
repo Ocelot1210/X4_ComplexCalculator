@@ -207,17 +207,12 @@
                     IsCheckable="True"
                     IsChecked="{Binding CheckUpdateAtLaunch, Mode=TwoWay}" />
 
-
                 <!--  更新を確認...  -->
-                <MenuItem Command="{Binding CheckUpdateCommand, Mode=OneTime}" Header="{lex:Loc Lang:CheckUpdate_Title}">
-                    <MenuItem.CommandParameter>
-                        <sys:Boolean>true</sys:Boolean>
-                    </MenuItem.CommandParameter>
-                </MenuItem>
+                <MenuItem Command="{Binding CheckUpdateCommand, Mode=OneTime}" Header="{lex:Loc Lang:CheckUpdate_Title}"/>
 
                 <Separator />
 
-                <!--  X4_ComplexCalculator について  -->
+                <!--  バージョン情報  -->
                 <MenuItem Command="{Binding ShowVersionInfoCommand, Mode=OneTime}" Header="{lex:Loc Lang:MainWindow_Menu_Help_VersionInfo_Title}" />
 
             </MenuItem>

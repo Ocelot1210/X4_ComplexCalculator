@@ -26,7 +26,5 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReader
         /// </summary>
         [ObservableProperty]
         public partial string LoadingFileName { get; set; } = "";
-
-
     }
 }

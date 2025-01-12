@@ -27,7 +27,7 @@ partial class WorkAreaManager : ObservableObject, IDisposable
     /// <summary>
     /// ガベコレ用ストップウォッチ
     /// </summary>
-    private readonly Stopwatch _gCStopWatch = new();
+    private readonly Stopwatch _gcStopWatch = new();
 
 
     /// <summary>
@@ -292,7 +292,7 @@ partial class WorkAreaManager : ObservableObject, IDisposable
             }
 
             // 時間計測用ストップウォッチを初期化
-            _gCStopWatch.Reset();
+            _gcStopWatch.Reset();
 
         }
 
@@ -308,8 +308,8 @@ partial class WorkAreaManager : ObservableObject, IDisposable
     private void GarvageCollect(object? sender, EventArgs e)
     {
         // 最後のタブクローズから1000ミリ秒経過してからガベコレを発動する
-        _gCStopWatch.Stop();
-        if (1000 < _gCStopWatch.ElapsedMilliseconds)
+        _gcStopWatch.Stop();
+        if (1000 < _gcStopWatch.ElapsedMilliseconds)
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
@@ -318,7 +318,7 @@ partial class WorkAreaManager : ObservableObject, IDisposable
             // ガベコレ無効化
             _gcTimer.Stop();
         }
-        _gCStopWatch.Start();
+        _gcStopWatch.Start();
     }
 
 

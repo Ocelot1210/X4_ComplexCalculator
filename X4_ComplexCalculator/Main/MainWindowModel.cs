@@ -1,43 +1,31 @@
-﻿using GongSolutions.Wpf.DragDrop;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 using X4_ComplexCalculator.DB;
-using X4_ComplexCalculator.Main.WorkArea;
 
 namespace X4_ComplexCalculator.Main;
 
 /// <summary>
 /// メイン画面のModel
 /// </summary>
-class MainWindowModel
+/// <param name="workAreaManager">作業エリア管理用</param>
+/// <param name="localizedMessageBox">メッセージボックス表示用</param>
+class MainWindowModel(WorkAreaManager workAreaManager, ILocalizedMessageBox localizedMessageBox)
 {
     #region メンバ
     /// <summary>
     /// 作業エリア管理用
     /// </summary>
-    private readonly WorkAreaManager _workAreaManager;
+    private readonly WorkAreaManager _workAreaManager = workAreaManager;
 
 
     /// <summary>
     /// メッセージボックス表示用
     /// </summary>
-    private readonly ILocalizedMessageBox _localizedMessageBox;
+    private readonly ILocalizedMessageBox _localizedMessageBox = localizedMessageBox;
     #endregion
-
-
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    /// <param name="workAreaManager">作業エリア管理用</param>
-    /// <param name="localizedMessageBox">メッセージボックス表示用</param>
-    public MainWindowModel(WorkAreaManager workAreaManager, ILocalizedMessageBox localizedMessageBox)
-    {
-        _workAreaManager = workAreaManager;
-        _localizedMessageBox = localizedMessageBox;
-    }
 
 
     /// <summary>

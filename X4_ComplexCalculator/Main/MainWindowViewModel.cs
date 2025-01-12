@@ -6,22 +6,21 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 using System.Windows;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
-using X4_ComplexCalculator.Infrastructure;
-using X4_ComplexCalculator.Main.Menu.File.Export;
-using X4_ComplexCalculator.Main.Menu.File.Import;
-using X4_ComplexCalculator.Main.Menu.File.Import.LoadoutImport;
-using X4_ComplexCalculator.Main.Menu.File.Import.StationPlanImport;
+using X4_ComplexCalculator.Main.Menu.File.Exporters;
+using X4_ComplexCalculator.Main.Menu.File.Exporters.StationCalculatorExporter;
+using X4_ComplexCalculator.Main.Menu.File.Importers;
+using X4_ComplexCalculator.Main.Menu.File.Importers.LoadoutImporters;
+using X4_ComplexCalculator.Main.Menu.File.Importers.StationCalculatorImporters;
+using X4_ComplexCalculator.Main.Menu.File.Importers.StationPlanImporters;
+using X4_ComplexCalculator.Main.Menu.Help;
 using X4_ComplexCalculator.Main.Menu.Lang;
 using X4_ComplexCalculator.Main.Menu.Layout;
-using X4_ComplexCalculator.Main.Menu.View.DBViewer;
-using X4_ComplexCalculator.Main.Menu.View.EmpireOverview;
+using X4_ComplexCalculator.Main.Menu.View.DBViewers;
+using X4_ComplexCalculator.Main.Menu.View.EmpireOverviews;
 using X4_ComplexCalculator.Main.WorkArea;
 using X4_ComplexCalculator.Main.WorkArea.SaveDataReader;
 
@@ -30,7 +29,7 @@ namespace X4_ComplexCalculator.Main;
 /// <summary>
 /// メイン画面のViewModel
 /// </summary>
-partial class MainWindowViewModel : ObservableObject, IDropTarget
+partial class MainWindowViewModel : ObservableRecipient, IDropTarget
 {
     #region メンバ
     /// <summary>
@@ -58,6 +57,12 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
 
 
     /// <summary>
+    /// ヘルプメニューの内容
+    /// </summary>
+    private readonly HelpMenu _helpMenu;
+
+
+    /// <summary>
     /// 帝国の概要ウィンドウ
     /// </summary>
     private Window? _empireOverviewWindow;
@@ -67,12 +72,6 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
     /// DBビュワーウィンドウ
     /// </summary>
     private Window? _dbViewerWindow;
-
-
-    /// <summary>
-    /// アップデート機能
-    /// </summary>
-    private readonly ApplicationUpdater _applicationUpdater = new();
     #endregion
 
 
@@ -109,13 +108,13 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
     /// <summary>
     /// インポート処理一覧
     /// </summary>
-    public List<IImport> Imports { get; }
+    public List<IImporter> Imports { get; }
 
 
     /// <summary>
     /// エクスポート処理一覧
     /// </summary>
-    public List<IExport> Exports { get; }
+    public List<IExporter> Exports { get; }
 
 
     /// <summary>
@@ -141,20 +140,21 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
         _localizedMessageBox             = messageBox;
         _workAreaManager                 = new(_localizedMessageBox, SaveDataReaderProgress);
         _model                           = new(_workAreaManager, _localizedMessageBox);
+        _helpMenu                        = new HelpMenu(_localizedMessageBox);
         CheckUpdateAtLaunch              = Configuration.Instance.CheckUpdateAtLaunch;
         _workAreaManager.PropertyChanged += Member_PropertyChanged;
 
-        Imports = new List<IImport>()
+        Imports = new List<IImporter>()
         {
-            new StationCalculatorImport(_workAreaManager, _localizedMessageBox),
-            new StationPlanImport(_workAreaManager, _localizedMessageBox),
-            new LoadoutImport(),
+            new StationCalculatorImporter(_workAreaManager, _localizedMessageBox),
+            new StationPlanImporter(_workAreaManager, _localizedMessageBox),
+            new LoadoutImporter(),
             //new SaveDataImport(new DelegateCommand<IImport>(_Model.Import))   // 作成中のため未リリース
         };
 
-        Exports = new List<IExport>()
+        Exports = new List<IExporter>()
         {
-            new StationCalculatorExport(_workAreaManager)
+            new StationCalculatorExporter(_workAreaManager)
         };
     }
 
@@ -224,21 +224,14 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
     /// 名前を付けて保存
     /// </summary>
     [RelayCommand]
-    private void SaveAs()
-    {
-        _workAreaManager.SaveAsDocument();
-    }
+    private void SaveAs() => _workAreaManager.SaveAsDocument();
 
 
     /// <summary>
     /// 問題を報告
     /// </summary>
     [RelayCommand]
-    private void ReportIssue()
-    {
-        string url = ThisAssembly.Git.RepositoryUrl + "/issues";
-        Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
-    }
+    private void ReportIssue() => _helpMenu.ReportIssue();
 
 
     /// <summary>
@@ -247,7 +240,7 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
     [RelayCommand]
     private void SetCheckUpdateAtLaunch()
     {
-        Configuration.Instance.CheckUpdateAtLaunch = !Configuration.Instance.CheckUpdateAtLaunch;
+        _helpMenu.SetCheckUpdateAtLaunch();
         CheckUpdateAtLaunch = Configuration.Instance.CheckUpdateAtLaunch;
     }
 
@@ -256,63 +249,14 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
     /// 更新を確認...
     /// </summary>
     [RelayCommand]
-    private async Task CheckUpdateAsync(bool isUserOperation = false)
-    {
-        if (_applicationUpdater.FinishedDownload && isUserOperation)
-        {
-            _localizedMessageBox.Ok("Lang:CheckUpdate_FinishedDownloadDescription", "Lang:CheckUpdate_Title");
-            return;
-        }
-        else if (_applicationUpdater.NowDownloading && isUserOperation)
-        {
-            _localizedMessageBox.Ok("Lang:CheckUpdate_StartDownloadDescription", "Lang:CheckUpdate_Title");
-            return;
-        }
-
-        string? latestVersion;
-        try
-        {
-            latestVersion = await _applicationUpdater.CheckUpdate();
-        }
-        catch (HttpRequestException)
-        {
-            if (isUserOperation)
-            {
-                _localizedMessageBox.Error("Lang:CheckUpdate_FailedDescription", "Lang:CheckUpdate_Title");
-            }
-            return;
-        }
-        if (latestVersion is null)
-        {
-            if (isUserOperation)
-            {
-                _localizedMessageBox.Ok("Lang:CheckUpdate_NoUpdateDescription", "Lang:CheckUpdate_Title", VersionInfo.BASE_VERSION);
-            }
-            return;
-        }
-
-        var result = _localizedMessageBox.YesNo("Lang:CheckUpdate_HasUpdateDescription", "Lang:CheckUpdate_Title", LocalizedMessageBoxResult.Yes, VersionInfo.BASE_VERSION, latestVersion);
-
-        if (result != LocalizedMessageBoxResult.Yes) return;
-
-        _applicationUpdater.StartDownloadByBackground();
-        _localizedMessageBox.Ok("Lang:CheckUpdate_StartDownloadDescription", "Lang:CheckUpdate_Title");
-    }
+    private void CheckUpdate() => _ = _helpMenu.CheckUpdateAsync(true);
 
 
     /// <summary>
     /// バージョン情報
     /// </summary>
     [RelayCommand]
-    private void ShowVersionInfo()
-    {
-        const string VERSION = VersionInfo.DETAIL_VERSION;
-        const string COMMIT = ThisAssembly.Git.Sha;
-        const string DATE = ThisAssembly.Git.CommitDate;
-        var dotnetVersion = Environment.Version.ToString();
-
-        _localizedMessageBox.Ok("Lang:MainWindow_Menu_Help_VersionInfo_MessageDescription", "Lang:MainWindow_Menu_Help_VersionInfo_MessageTitle", VERSION, COMMIT, DATE, dotnetVersion);
-    }
+    private void ShowVersionInfo() => _helpMenu.ShowVersionInfo();
 
 
     /// <summary>
@@ -330,7 +274,7 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
             // 更新チェックが有効な場合のみ更新を確認する
             if (Configuration.Instance.CheckUpdateAtLaunch)
             {
-                CheckUpdateCommand.Execute(false);
+                _ = _helpMenu.CheckUpdateAsync(false);
             }
         }
         catch (Exception e)
@@ -353,15 +297,7 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
             _empireOverviewWindow?.Close();
             _dbViewerWindow?.Close();
 
-            if (_applicationUpdater.FinishedDownload) _applicationUpdater.Update();
-            else if (_applicationUpdater.NowDownloading)
-            {
-                var dialog = new UpdateDownloadProglessDialog
-                {
-                    DataContext = new UpdateDownloadProgressViewModel(_applicationUpdater)
-                };
-                dialog.Show();
-            }
+            _helpMenu.Dispose();
             _workAreaManager.Dispose();
         }
     }
@@ -419,18 +355,12 @@ partial class MainWindowViewModel : ObservableObject, IDropTarget
     /// レイアウト保存
     /// </summary>
     [RelayCommand]
-    private void SaveLayout()
-    {
-        _workAreaManager.SaveLayout();
-    }
+    private void SaveLayout() => _workAreaManager.SaveLayout();
 
 
     /// <summary>
     /// DB 更新
     /// </summary>
     [RelayCommand]
-    private void UpdateDB()
-    {
-        _model.UpdateDB();
-    }
+    private void UpdateDB() => _model.UpdateDB();
 }

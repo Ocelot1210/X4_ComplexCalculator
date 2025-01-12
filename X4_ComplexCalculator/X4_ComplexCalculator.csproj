@@ -57,7 +57,7 @@
     <Compile Update="Common\Dialog\SelectStringDialog\SelectStringDialog.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Main\Menu\File\Import\LoadoutImport\SelectLoadoutDialog.xaml.cs">
+    <Compile Update="Main\Menu\File\Importers\LoadoutImporters\SelectLoadoutDialog.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
@@ -82,7 +82,7 @@
     <Page Update="Common\Dialog\SelectStringDialog\SelectStringDialog.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Main\Menu\File\Import\LoadoutImport\SelectLoadoutDialog.xaml">
+    <Page Update="Main\Menu\File\Importers\LoadoutImporters\SelectLoadoutDialog.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
