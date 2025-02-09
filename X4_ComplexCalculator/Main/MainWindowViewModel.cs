@@ -45,12 +45,6 @@ partial class MainWindowViewModel : ObservableRecipient, IDropTarget
 
 
     /// <summary>
-    /// 言語一覧管理用
-    /// </summary>
-    private readonly LanguagesManager _langMgr = new();
-
-
-    /// <summary>
     /// 作業エリア管理用
     /// </summary>
     private readonly WorkAreaManager _workAreaManager;
@@ -120,7 +114,7 @@ partial class MainWindowViewModel : ObservableRecipient, IDropTarget
     /// <summary>
     /// 言語一覧
     /// </summary>
-    public IReadOnlyList<LangMenuItem> Languages => _langMgr.Languages;
+    public IReadOnlyList<LangMenuItem> Languages { get; } = LangMenuItem.CreateItems();
 
 
     /// <summary>

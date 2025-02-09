@@ -185,9 +185,9 @@
                 ToolBar.OverflowMode="Always">
                 <MenuItem.ItemContainerStyle>
                     <Style TargetType="{x:Type MenuItem}">
-                        <Setter Property="MenuItem.Header" Value="{Binding CultureInfo.NativeName, Mode=OneTime}" />
-                        <Setter Property="MenuItem.IsChecked" Value="{Binding IsChecked.Value, Mode=TwoWay}" />
-                        <Setter Property="MenuItem.IsCheckable" Value="{Binding IsCheckable.Value, Mode=OneWay}" />
+                        <Setter Property="MenuItem.Header" Value="{Binding Name, Mode=OneTime}" />
+                        <Setter Property="MenuItem.IsChecked" Value="{Binding IsChecked, Mode=TwoWay}" />
+                        <Setter Property="MenuItem.IsCheckable" Value="{Binding IsCheckable, Mode=OneWay}" />
                     </Style>
                 </MenuItem.ItemContainerStyle>
             </MenuItem>
