@@ -1,5 +1,6 @@
-﻿using Prism.Commands;
-using Prism.Mvvm;
+﻿using Collections.Pooled;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using System;
 using System.Collections.Specialized;
 using System.Linq;
@@ -8,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Xml.Linq;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
 
@@ -16,7 +18,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 /// <summary>
 /// モジュール一覧タブのコンテキストメニューの処理用クラス
 /// </summary>
-public sealed class ContextMenuOperation : BindableBase, IDisposable
+public sealed partial class ContextMenuOperation : ObservableRecipientEx, IDisposable
 {
     #region メンバ
     /// <summary>
@@ -39,25 +41,6 @@ public sealed class ContextMenuOperation : BindableBase, IDisposable
 
 
     #region プロパティ
-    /// <summary>
-    /// モジュールをコピー
-    /// </summary>
-    public ICommand CopyModulesCommand { get; }
-
-
-    /// <summary>
-    /// モジュールを貼り付け
-    /// </summary>
-    public ICommand PasteModulesCommand { get; }
-
-
-    /// <summary>
-    /// モジュールを削除
-    /// </summary>
-    public ICommand DeleteModulesCommand { get; }
-
-    // ---------------------------------------------------------------------- //
-
     /// <summary>
     /// モジュール選択
     /// </summary>
@@ -82,15 +65,6 @@ public sealed class ContextMenuOperation : BindableBase, IDisposable
     public ICommand MoveDownTheSelectionCommand => _moduleReorder.MoveDownTheSelectionCommand;
 
 
-    // ---------------------------------------------------------------------- //
-
-    /// <summary>
-    /// ソート順を初期化
-    /// </summary>
-    public DelegateCommand ResetSortOrderCommand { get; }
-
-    // ---------------------------------------------------------------------- //
-
     /// <summary>
     /// セルフォーカス用のコマンド
     /// </summary>
@@ -101,23 +75,16 @@ public sealed class ContextMenuOperation : BindableBase, IDisposable
     /// <summary>
     /// コンストラクタ
     /// </summary>
+    /// <param name="messenger">メッセージ通知用</param>
     /// <param name="modulesInfo">モジュール一覧情報</param>
     /// <param name="listCollectionView">モジュール一覧のCollectionView</param>
-    public ContextMenuOperation(IModulesInfo modulesInfo, ListCollectionView listCollectionView)
+    public ContextMenuOperation(IMessenger messenger, IModulesInfo modulesInfo, ListCollectionView listCollectionView) : base(messenger, true)
     {
         _modulesInfo    = modulesInfo;
         _collectionView = listCollectionView;
         _moduleReorder  = new ModulesReorder(modulesInfo, listCollectionView);
 
         ((INotifyCollectionChanged)_collectionView.SortDescriptions).CollectionChanged += ContextMenuOperation_CollectionChanged;
-
-        CopyModulesCommand    = new DelegateCommand(CopyModules);
-        PasteModulesCommand   = new DelegateCommand<DataGrid>(PasteModules);
-        DeleteModulesCommand  = new DelegateCommand<DataGrid>(DeleteModules);
-        ResetSortOrderCommand = new DelegateCommand(
-            () => _collectionView.SortDescriptions.Clear(),
-            () => 0 < _collectionView.SortDescriptions.Count
-        );
     }
 
 
@@ -126,6 +93,22 @@ public sealed class ContextMenuOperation : BindableBase, IDisposable
     {
         ((INotifyCollectionChanged)_collectionView.SortDescriptions).CollectionChanged -= ContextMenuOperation_CollectionChanged;
     }
+
+
+    /// <summary>
+    /// ソート順初期化
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(CanResetOrder))]
+    private void ResetSortOrder()
+    {
+        _collectionView.SortDescriptions.Clear();
+    }
+
+
+    /// <summary>
+    /// ソート順初期化実行可否
+    /// </summary>
+    private bool CanResetOrder() => 0 < _collectionView.SortDescriptions.Count;
 
 
     /// <summary>
@@ -138,20 +121,22 @@ public sealed class ContextMenuOperation : BindableBase, IDisposable
         // 未ソートの場合のみ入れ替え可能にする
         _moduleReorder.SortedColumnCount = _collectionView.SortDescriptions.Count;
 
-        // ソート順初期化可不可更新
-        ResetSortOrderCommand.RaiseCanExecuteChanged();
+        // ソート順初期化の実行可否更新
+        ResetSortOrderCommand.NotifyCanExecuteChanged();
     }
 
 
     /// <summary>
     /// 選択中のモジュールをコピー
     /// </summary>
+    [RelayCommand]
     private void CopyModules()
     {
         var xml = new XElement("modules");
-        var selectedModules = CollectionViewSource.GetDefaultView(_collectionView)
-                                                  .Cast<ModulesGridItem>()
-                                                  .Where(x => x.IsSelected);
+        var selectedModules = CollectionViewSource
+            .GetDefaultView(_collectionView)
+            .Cast<ModulesGridItem>()
+            .Where(x => x.IsSelected);
 
         foreach (var module in selectedModules)
         {
@@ -166,6 +151,7 @@ public sealed class ContextMenuOperation : BindableBase, IDisposable
     /// コピーしたモジュールを貼り付け
     /// </summary>
     /// <param name="dataGrid"></param>
+    [RelayCommand]
     private void PasteModules(DataGrid dataGrid)
     {
         try
@@ -174,7 +160,9 @@ public sealed class ContextMenuOperation : BindableBase, IDisposable
             if (clipboardXml.Root is null) return;
 
             // xmlの内容に問題がないか確認するため、ここでToArray()する
-            var modules = clipboardXml.Root.Elements().Select(x => new ModulesGridItem(x) { EditStatus = EditStatus.Edited }).ToArray();
+            using var modules = clipboardXml.Root.Elements()
+                .Select(x => new ModulesGridItem(Messenger, x) { EditStatus = EditStatus.Edited })
+                .ToPooledList();
 
             _modulesInfo.Modules.AddRange(modules);
 
@@ -191,6 +179,7 @@ public sealed class ContextMenuOperation : BindableBase, IDisposable
     /// 選択中のモジュールを削除
     /// </summary>
     /// <param name="dataGrid"></param>
+    [RelayCommand]
     private void DeleteModules(DataGrid dataGrid)
     {
         var currPos = _collectionView.CurrentPosition;
@@ -211,9 +200,10 @@ public sealed class ContextMenuOperation : BindableBase, IDisposable
             }
         }
 
-        var items = CollectionViewSource.GetDefaultView(_collectionView)
-                                        .Cast<ModulesGridItem>()
-                                        .Where(x => x.IsSelected);
+        var items = CollectionViewSource
+            .GetDefaultView(_collectionView)
+            .Cast<ModulesGridItem>()
+            .Where(x => x.IsSelected);
 
         _modulesInfo.Modules.RemoveRange(items);
 

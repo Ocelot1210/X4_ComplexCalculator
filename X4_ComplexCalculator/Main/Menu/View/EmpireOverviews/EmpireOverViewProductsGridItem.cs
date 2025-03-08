@@ -6,7 +6,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverviews;
 /// <summary>
 /// 帝国の概要の製品一覧DataGridの1レコード分
 /// </summary>
-public partial class EmpireOverViewProductsGridItem : ObservableObject
+public sealed partial class EmpireOverViewProductsGridItem : ObservableObject
 {
     #region プロパティ
     /// <summary>

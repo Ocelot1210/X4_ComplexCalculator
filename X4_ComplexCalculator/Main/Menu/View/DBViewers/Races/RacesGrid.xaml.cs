@@ -5,7 +5,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewers.Races;
 /// <summary>
 /// RacesGrid.xaml の相互作用ロジック
 /// </summary>
-public partial class RacesGrid : UserControl
+public sealed partial class RacesGrid : UserControl
 {
     public RacesGrid()
     {

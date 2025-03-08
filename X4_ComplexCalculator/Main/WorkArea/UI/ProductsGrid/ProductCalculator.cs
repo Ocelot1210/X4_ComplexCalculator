@@ -11,7 +11,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
 /// <summary>
 /// 製品計算用クラス
 /// </summary>
-class ProductCalculator
+sealed class ProductCalculator
 {
     #region スタティックメンバ
     /// <summary>
@@ -88,10 +88,7 @@ class ProductCalculator
         get
         {
             // 未作成なら作成する
-            if (_SingletonInstance is null)
-            {
-                _SingletonInstance = new ProductCalculator();
-            }
+            _SingletonInstance ??= new ProductCalculator();
 
             return _SingletonInstance;
         }

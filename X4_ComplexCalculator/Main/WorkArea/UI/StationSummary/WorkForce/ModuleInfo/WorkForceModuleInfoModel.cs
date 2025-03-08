@@ -1,11 +1,11 @@
 ﻿using Collections.Pooled;
-using Prism.Mvvm;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
-using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Collections;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings;
@@ -15,7 +15,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
 /// <summary>
 /// 労働力用モジュール情報用Model
 /// </summary>
-class WorkForceModuleInfoModel : BindableBase
+sealed partial class WorkForceModuleInfoModel : ObservableObject
 {
     #region メンバ
     /// <summary>
@@ -191,10 +191,11 @@ class WorkForceModuleInfoModel : BindableBase
     /// <param name="modules">追加モジュール一覧</param>
     private void OnModuleAdded(IEnumerable<ModulesGridItem> modules)
     {
-        var details = modules.Where(x => 0 < x.Module.MaxWorkers || 0 < x.Module.WorkersCapacity)
-                             .GroupBy(x => x.Module.ID)
-                             .Select(x => (x.First().Module, ModuleCount: x.Sum(y => y.ModuleCount)))
-                             .OrderBy(x => x.Module.Name);
+        var details = modules
+            .Where(x => 0 < x.Module.MaxWorkers || 0 < x.Module.WorkersCapacity)
+            .GroupBy(x => x.Module.ID)
+            .Select(x => (x.First().Module, ModuleCount: x.Sum(y => y.ModuleCount)))
+            .OrderBy(x => x.Module.Name);
 
         var needWorkforce = 0L;
         var capacity = 0L;
@@ -243,10 +244,11 @@ class WorkForceModuleInfoModel : BindableBase
     /// <param name="modules">削除モジュール一覧</param>
     private void OnModuleRemoved(IEnumerable<ModulesGridItem> modules)
     {
-        var details = modules.Where(x => 0 < x.Module.MaxWorkers || 0 < x.Module.WorkersCapacity)
-                             .GroupBy(x => x.Module.ID)
-                             .Select(x => (x.First().Module, ModuleCount: x.Sum(y => y.ModuleCount)))
-                             .OrderBy(x => x.Module.Name);
+        var details = modules
+            .Where(x => 0 < x.Module.MaxWorkers || 0 < x.Module.WorkersCapacity)
+            .GroupBy(x => x.Module.ID)
+            .Select(x => (x.First().Module, ModuleCount: x.Sum(y => y.ModuleCount)))
+            .OrderBy(x => x.Module.Name);
 
         var needWorkforce = 0L;
         var capacity = 0L;

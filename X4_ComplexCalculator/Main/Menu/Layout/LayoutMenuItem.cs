@@ -1,4 +1,4 @@
-﻿using Prism.Mvvm;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Reactive.Bindings;
 
 namespace X4_ComplexCalculator.Main.Menu.Layout;
@@ -6,13 +6,13 @@ namespace X4_ComplexCalculator.Main.Menu.Layout;
 /// <summary>
 /// レイアウト一覧の1レコード分
 /// </summary>
-public class LayoutMenuItem : BindableBase
+public class LayoutMenuItem : ObservableObject
 {
     #region プロパティ
     /// <summary>
     /// レイアウトID
     /// </summary>
-    public long LayoutID;
+    public long LayoutID { get; }
 
 
     /// <summary>

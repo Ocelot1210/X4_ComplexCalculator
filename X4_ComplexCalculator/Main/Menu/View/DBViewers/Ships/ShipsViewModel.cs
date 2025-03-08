@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
-using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Collections;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
@@ -11,7 +11,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewers.Ships;
 /// <summary>
 /// 艦船情報用ViewModel
 /// </summary>
-partial class ShipsViewModel : ObservableObject
+sealed partial class ShipsViewModel : ObservableObject
 {
     #region メンバ
     /// <summary>

@@ -1,16 +1,16 @@
 ﻿using Collections.Pooled;
-using System;
-using System.Collections.Generic;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 using System.Linq;
-using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Collections;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
-using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
+using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule.Entities;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.SelectModule;
 
-class SelectModuleModel : IDisposable
+sealed class SelectModuleModel : ObservableRecipient
 {
     #region メンバ
     /// <summary>
@@ -24,46 +24,34 @@ class SelectModuleModel : IDisposable
     /// <summary>
     /// モジュール種別
     /// </summary>
-    public ObservablePropertyChangedCollection<ModulesListItem> ModuleTypes { get; } = new();
+    public ObservableRangeCollection<ModuleTypeListItem> ModuleTypes { get; } = [];
 
 
     /// <summary>
     /// モジュール所有派閥
     /// </summary>
-    public ObservablePropertyChangedCollection<FactionsListItem> ModuleOwners { get; } = new();
+    public ObservableRangeCollection<ModuleOwnersListItem> ModuleOwners { get; } = [];
 
 
     /// <summary>
     /// モジュール一覧
     /// </summary>
-    public ObservablePropertyChangedCollection<ModulesListItem> Modules { get; } = new();
+    public ObservableRangeCollection<ModulesListItem> Modules { get; } = [];
     #endregion
 
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
+    /// <param name="messanger">メッセージ交換用</param>
     /// <param name="itemCollection">選択結果格納先</param>
-    public SelectModuleModel(ObservableRangeCollection<ModulesGridItem> itemCollection)
+    public SelectModuleModel(IMessenger messenger, ObservableRangeCollection<ModulesGridItem> itemCollection) : base(messenger)
     {
         _itemCollection = itemCollection;
 
-        ModuleOwners.CollectionPropertyChanged += UpdateModules;
-        ModuleTypes.CollectionPropertyChanged += UpdateModules;
-
         InitModuleTypes();
         InitModuleOwners();
-        UpdateModulesMain();
-    }
-
-
-    /// <summary>
-    /// リソースを開放
-    /// </summary>
-    public void Dispose()
-    {
-        ModuleTypes.CollectionPropertyChanged -= UpdateModules;
-        ModuleOwners.CollectionPropertyChanged -= UpdateModules;
+        InitModules();
     }
 
 
@@ -74,12 +62,12 @@ class SelectModuleModel : IDisposable
     {
         const string SQL_1 = @"SELECT ModuleTypeID, Name FROM ModuleType WHERE ModuleTypeID IN (SELECT ModuleTypeID FROM Module) ORDER BY Name";
 
-        using var items = new PooledList<ModulesListItem>();
+        using var items = new PooledList<ModuleTypeListItem>();
         foreach (var (moduleTypeID, name) in X4Database.Instance.Query<(string, string)>(SQL_1))
         {
             const string SQL_2 = @"SELECT count(*) AS Count FROM SelectModuleCheckStateModuleTypes WHERE ID = :ID";
             var @checked = 0 < SettingDatabase.Instance.QuerySingle<long>(SQL_2, new { ID = moduleTypeID });
-            items.Add(new ModulesListItem(moduleTypeID, name, @checked));
+            items.Add(new ModuleTypeListItem(Messenger, moduleTypeID, name, @checked));
         }
 
 
@@ -94,10 +82,10 @@ class SelectModuleModel : IDisposable
     {
         const string SQL_1 = @"SELECT FactionID, Name FROM Faction WHERE FactionID IN (SELECT FactionID FROM WareOwner) ORDER BY Name";
 
-        using var items = new PooledList<FactionsListItem>();
+        using var items = new PooledList<ModuleOwnersListItem>();
 
         var factions = X4Database.Instance.Query<string>(SQL_1)
-            .Select(x => X4Database.Instance.Faction.TryGet(x))
+            .Select(X4Database.Instance.Faction.TryGet)
             .Where(x => x is not null)
             .Select(x => x!);
 
@@ -105,7 +93,7 @@ class SelectModuleModel : IDisposable
         {
             const string SQL_2 = @"SELECT count(*) AS Count FROM SelectModuleCheckStateModuleOwners WHERE ID = :ID";
             var @checked = 0 < SettingDatabase.Instance.QuerySingle<long>(SQL_2, new { ID = faction.FactionID });
-            items.Add(new FactionsListItem(faction, @checked));
+            items.Add(new ModuleOwnersListItem(Messenger, faction, @checked));
         }
 
         ModuleOwners.AddRange(items);
@@ -113,34 +101,15 @@ class SelectModuleModel : IDisposable
 
 
     /// <summary>
-    /// モジュール一覧を更新する
+    /// モジュール一覧を初期化する
     /// </summary>
-    private void UpdateModules(object sender, EventArgs e)
+    private void InitModules()
     {
-        UpdateModulesMain();
-    }
+        var modules = X4Database.Instance.Ware.GetAll<IX4Module>()
+            .Where(x => !(x.Tags.Contains("noplayerblueprint") || x.Tags.Contains("noblueprint")))
+            .Select(x => new ModulesListItem(x.ID, x.Name, false));
 
-
-    /// <summary>
-    /// モジュール一覧を更新する
-    /// </summary>
-    private void UpdateModulesMain()
-    {
-        var checkedModuleTypes = new HashSet<string>(ModuleTypes.Where(x => x.IsChecked).Select(x => x.ID));
-
-        var checkedOwners = ModuleOwners
-            .Where(x => x.IsChecked)
-            .Select(x => x.Faction.FactionID)
-            .ToArray();
-
-        var newModules = X4Database.Instance.Ware.GetAll<IX4Module>()
-            .Where(x => 
-                !(x.Tags.Contains("noplayerblueprint") || x.Tags.Contains("noblueprint")) &&
-                checkedModuleTypes.Contains(x.ModuleType.ModuleTypeID) &&
-                checkedOwners.Intersect(x.Owners.Select(y => y.FactionID)).Any())
-            .Select(x => new ModulesListItem(x));
-
-        Modules.Reset(newModules);
+        Modules.AddRange(modules);
     }
 
 
@@ -153,10 +122,11 @@ class SelectModuleModel : IDisposable
         var items = Modules.Where(x => x.IsChecked)
             .Select(x => X4Database.Instance.Ware.TryGet<IX4Module>(x.ID))
             .Where(x => x is not null)
-            .Select(x => new ModulesGridItem(x!) { EditStatus = EditStatus.Edited });
+            .Select(x => new ModulesGridItem(Messenger, x!) { EditStatus = EditStatus.Edited });
 
         _itemCollection.AddRange(items);
     }
+
 
     /// <summary>
     /// チェック状態を保存する
@@ -172,7 +142,7 @@ class SelectModuleModel : IDisposable
         db.Execute("INSERT INTO SelectModuleCheckStateModuleTypes(ID) VALUES (:ID)", checkedTypes);
 
         // 派閥一覧のチェック状態保存
-        var checkedFactions = ModuleOwners.Where(x => x.IsChecked).Select(x => x.Faction);
+        var checkedFactions = ModuleOwners.Where(x => x.IsChecked);
         db.Execute("INSERT INTO SelectModuleCheckStateModuleOwners(ID) VALUES (:FactionID)", checkedFactions);
     });
 }

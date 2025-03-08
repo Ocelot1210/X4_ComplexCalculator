@@ -6,47 +6,32 @@ namespace X4_ComplexCalculator.DB.X4DB.Entity;
 /// <summary>
 /// ウェア種別(グループ)情報用クラス
 /// </summary>
-public class WareGroup : IWareGroup
+/// <remarks>
+/// コンストラクタ
+/// </remarks>
+/// <param name="wareGroupID">ウェアグループID</param>
+/// <param name="name">ウェアグループ名</param>
+/// <param name="Tier">階級</param>
+public sealed class WareGroup(string wareGroupID, string name, long tier) : IWareGroup
 {
     #region プロパティ
     /// <inheritdoc/>
-    public string WareGroupID { get; }
+    public string WareGroupID { get; } = wareGroupID;
 
 
     /// <inheritdoc/>
-    public string Name { get; }
+    public string Name { get; } = name;
 
 
     /// <inheritdoc/>
-    public long Tier { get; }
+    public long Tier { get; } = tier;
     #endregion
 
 
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    /// <param name="wareGroupID">ウェアグループID</param>
-    /// <param name="name">ウェアグループ名</param>
-    /// <param name="Tier">階級</param>
-    public WareGroup(string wareGroupID, string name, long tier)
-    {
-        WareGroupID = wareGroupID;
-        Name = name;
-        Tier = tier;
-    }
-
-
-    /// <summary>
-    /// 比較
-    /// </summary>
-    /// <param name="obj">比較対象</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public override bool Equals(object? obj) => obj is IWareGroup other && other.WareGroupID == WareGroupID;
 
 
-    /// <summary>
-    /// ハッシュ値を取得
-    /// </summary>
-    /// <returns>ハッシュ値</returns>
+    /// <inheritdoc/>
     public override int GetHashCode() => HashCode.Combine(WareGroupID);
 }

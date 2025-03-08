@@ -10,7 +10,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager;
 /// <summary>
 /// <see cref="IEquipment"/> に対応する <see cref="IEquipmentType"/> を管理するクラス
 /// </summary>
-class EquipmentTypeManager
+sealed class EquipmentTypeManager
 {
     #region メンバ
     /// <summary>

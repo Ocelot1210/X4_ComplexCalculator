@@ -1,4 +1,4 @@
-﻿using Prism.Mvvm;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
@@ -6,73 +6,41 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
 /// <summary>
 /// 製品一覧DataGridの＋/－で表示するListViewのアイテム(消費品)
 /// </summary>
-class ProductDetailsListItemConsumption : BindableBase, IProductDetailsListItem
+/// <remarks>
+/// コンストラクタ
+/// </remarks>
+/// <param name="wareID">生産/消費ウェアID</param>
+/// <param name="module">モジュール</param>
+/// <param name="moduleCount">モジュール数</param>
+/// <param name="amount">製品数</param>
+sealed partial class ProductDetailsListItemConsumption(string wareID, IX4Module module, long moduleCount, long amount) : ObservableObject, IProductDetailsListItem
 {
-    #region メンバ
-    /// <summary>
-    /// 製品数(モジュール追加用)
-    /// </summary>
-    private readonly long _amount;
-
-
-    /// <summary>
-    /// モジュール数
-    /// </summary>
-    private long _moduleCount;
-    #endregion
-
-
     #region プロパティ
     /// <inheritdoc/>
-    public string WareID { get; }
+    public string WareID { get; } = wareID;
 
 
     /// <inheritdoc/>
-    public string ModuleID { get; }
+    public string ModuleID { get; } = module.ID;
 
 
     /// <inheritdoc/>
-    public string ModuleName { get; }
+    public string ModuleName { get; } = module.Name;
 
 
     /// <inheritdoc/>
-    public long ModuleCount
-    {
-        get => _moduleCount;
-        set
-        {
-            if (SetProperty(ref _moduleCount, value))
-            {
-                RaisePropertyChanged(nameof(Amount));
-            }
-        }
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Amount))]
+    public partial long ModuleCount { get; set; } = moduleCount;
 
 
     /// <inheritdoc/>
-    public long Amount => _amount * ModuleCount;
+    public long Amount => amount * ModuleCount;
 
 
     /// <inheritdoc/>
     public double Efficiency => -1.0;
     #endregion
-
-
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    /// <param name="wareID">生産/消費ウェアID</param>
-    /// <param name="module">モジュール</param>
-    /// <param name="moduleCount">モジュール数</param>
-    /// <param name="amount">製品数</param>
-    public ProductDetailsListItemConsumption(string wareID, IX4Module module, long moduleCount, long amount)
-    {
-        WareID = wareID;
-        ModuleID = module.ID;
-        ModuleName = module.Name;
-        ModuleCount = moduleCount;
-        _amount = amount;
-    }
 
 
     /// <summary>

@@ -1,13 +1,13 @@
-﻿using Prism.Mvvm;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Reactive.Bindings;
-using X4_ComplexCalculator.Infrastructure;
+using X4_ComplexCalculator.Infrastructures;
 
 namespace X4_ComplexCalculator.Main;
 
 /// <summary>
 /// アップデートのダウンロード進捗表示ビューモデル
 /// </summary>
-public class UpdateDownloadProgressViewModel : BindableBase
+public sealed partial class UpdateDownloadProgressViewModel : ObservableObject
 {
     #region メンバ
     /// <summary>

@@ -8,7 +8,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewers.Modules;
 /// <summary>
 /// モジュール一覧表示用DataGridの1レコード分
 /// </summary>
-partial class ModulesGridItem : ObservableObject
+sealed partial class ModulesGridItem : ObservableObject
 {
     #region メンバ
     /// <summary>

@@ -9,7 +9,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using X4_ComplexCalculator.Common;
-using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
+using X4_ComplexCalculator.Common.Dialogs.MessageBoxes;
 using X4_ComplexCalculator.Main.Menu.File.Exporters;
 using X4_ComplexCalculator.Main.Menu.File.Exporters.StationCalculatorExporter;
 using X4_ComplexCalculator.Main.Menu.File.Importers;
@@ -22,7 +22,7 @@ using X4_ComplexCalculator.Main.Menu.Layout;
 using X4_ComplexCalculator.Main.Menu.View.DBViewers;
 using X4_ComplexCalculator.Main.Menu.View.EmpireOverviews;
 using X4_ComplexCalculator.Main.WorkArea;
-using X4_ComplexCalculator.Main.WorkArea.SaveDataReader;
+using X4_ComplexCalculator.Main.WorkArea.SaveDataReaders;
 
 namespace X4_ComplexCalculator.Main;
 
@@ -102,13 +102,13 @@ partial class MainWindowViewModel : ObservableRecipient, IDropTarget
     /// <summary>
     /// インポート処理一覧
     /// </summary>
-    public List<IImporter> Imports { get; }
+    public List<IImporter> Importers { get; }
 
 
     /// <summary>
     /// エクスポート処理一覧
     /// </summary>
-    public List<IExporter> Exports { get; }
+    public List<IExporter> Exporters { get; }
 
 
     /// <summary>
@@ -138,7 +138,7 @@ partial class MainWindowViewModel : ObservableRecipient, IDropTarget
         CheckUpdateAtLaunch              = Configuration.Instance.CheckUpdateAtLaunch;
         _workAreaManager.PropertyChanged += Member_PropertyChanged;
 
-        Imports = new List<IImporter>()
+        Importers = new List<IImporter>()
         {
             new StationCalculatorImporter(_workAreaManager, _localizedMessageBox),
             new StationPlanImporter(_workAreaManager, _localizedMessageBox),
@@ -146,7 +146,7 @@ partial class MainWindowViewModel : ObservableRecipient, IDropTarget
             //new SaveDataImport(new DelegateCommand<IImport>(_Model.Import))   // 作成中のため未リリース
         };
 
-        Exports = new List<IExporter>()
+        Exporters = new List<IExporter>()
         {
             new StationCalculatorExporter(_workAreaManager)
         };

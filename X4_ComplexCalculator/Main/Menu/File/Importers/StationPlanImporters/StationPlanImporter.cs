@@ -1,10 +1,11 @@
 ﻿using Collections.Pooled;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.XPath;
-using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
+using X4_ComplexCalculator.Common.Dialogs.MessageBoxes;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
@@ -67,9 +68,10 @@ partial class StationPlanImporter : ObservableObject, IImporter
 
         foreach (var station in stations)
         {
-            var vm = new WorkAreaViewModel(_workAreaManager.ActiveLayoutID, _localizedMessageBox.Clone());
+            var messenger = new WeakReferenceMessenger();
+            var vm = new WorkAreaViewModel(messenger, _workAreaManager.ActiveLayoutID, _localizedMessageBox.Clone());
 
-            if (ImportMain(vm.WorkArea, station))
+            if (ImportMain(messenger, vm.WorkArea, station))
             {
                 _workAreaManager.Documents.Add(vm);
             }
@@ -84,12 +86,13 @@ partial class StationPlanImporter : ObservableObject, IImporter
     /// <summary>
     /// インポートメイン処理
     /// </summary>
-    /// <param name="WorkArea"></param>
+    /// <param name="messenger"></param>
+    /// <param name="workArea"></param>
     /// <param name="planItem"></param>
     /// <returns></returns>
-    private static bool ImportMain(IWorkArea WorkArea, StationPlanItem planItem)
+    private static bool ImportMain(IMessenger messenger, IWorkArea workArea, StationPlanItem planItem)
     {
-        var modules = new List<ModulesGridItem>((int)(double)planItem.Plan.XPathEvaluate("count(entry)"));
+        using var modules = new PooledList<ModulesGridItem>((int)(double)planItem.Plan.XPathEvaluate("count(entry)"));
 
         foreach (var entry in planItem.Plan.XPathSelectElements("entry"))
         {
@@ -110,7 +113,7 @@ partial class StationPlanImporter : ObservableObject, IImporter
             // 本部モジュールなら本部にチェック入
             if (module.ID == "module_player_prod_hq_01_macro")
             {
-                WorkArea.StationData.Settings.IsHeadquarters = true;
+                workArea.StationData.Settings.IsHeadquarters = true;
             }
 
             // 製造不可なモジュールはインポートしない
@@ -127,7 +130,7 @@ partial class StationPlanImporter : ObservableObject, IImporter
                 .Where(x => x.Equipment is not null)
                 .Select(x => (Equipment: x.Equipment!, x.Count));
 
-            var modulesGridItem = new ModulesGridItem(module);
+            var modulesGridItem = new ModulesGridItem(messenger, module);
             foreach (var (equipment, count) in equipments)
             {
                 modulesGridItem.Equipments.Add(equipment, count);
@@ -156,22 +159,22 @@ partial class StationPlanImporter : ObservableObject, IImporter
         }
 
         // モジュール一覧に追加
-        WorkArea.StationData.ModulesInfo.Modules.AddRange(dict.Select(x => x.Value).OrderBy(x => x.Module.Name));
+        workArea.StationData.ModulesInfo.Modules.AddRange(dict.Select(x => x.Value).OrderBy(x => x.Module.Name));
 
         // 編集状態を全て未編集にする
         IEnumerable<IEditable>[] editables =
         {
-            WorkArea.StationData.ModulesInfo.Modules,
-            WorkArea.StationData.ProductsInfo.Products,
-            WorkArea.StationData.BuildResourcesInfo.BuildResources,
-            WorkArea.StationData.StorageAssignInfo.StorageAssign,
+            workArea.StationData.ModulesInfo.Modules,
+            workArea.StationData.ProductsInfo.Products,
+            workArea.StationData.BuildResourcesInfo.BuildResources,
+            workArea.StationData.StorageAssignInfo.StorageAssign,
         };
         foreach (var editable in editables.SelectMany(x => x))
         {
             editable.EditStatus = EditStatus.Unedited;
         }
 
-        WorkArea.Title = planItem.PlanName;
+        workArea.Title = planItem.PlanName;
         return true;
     }
 }

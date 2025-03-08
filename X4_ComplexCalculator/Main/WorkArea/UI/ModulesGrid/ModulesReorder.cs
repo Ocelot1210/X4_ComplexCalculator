@@ -1,7 +1,6 @@
 ﻿using Collections.Pooled;
-using Prism.Commands;
-using Prism.Mvvm;
-using System.Collections.Generic;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System.Linq;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -13,7 +12,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 /// <summary>
 /// モジュール一覧の入れ替えを行うクラス
 /// </summary>
-public class ModulesReorder : BindableBase
+public partial class ModulesReorder : ObservableObject
 {
     #region メンバ
     /// <summary>
@@ -32,84 +31,34 @@ public class ModulesReorder : BindableBase
     /// 選択数
     /// </summary>
     private int _selection;
-
-
-    /// <summary>
-    /// 選択されたか
-    /// </summary>
-    private bool _hasSelected;
-
-
-    /// <summary>
-    /// ソート済み列数
-    /// </summary>
-    private int _sortedColumnCount;
     #endregion
 
 
     #region プロパティ
     /// <summary>
-    /// モジュール選択
-    /// </summary>
-    public DelegateCommand SelectModulesCommand { get; }
-
-
-    /// <summary>
-    /// モジュール選択解除
-    /// </summary>
-    public DelegateCommand ClearSelectionCommand { get; }
-
-
-    /// <summary>
-    /// 選択項目を上に移動する
-    /// </summary>
-    public DelegateCommand MoveUpTheSelectionCommand { get; }
-
-
-    /// <summary>
-    /// 選択項目を下に移動する
-    /// </summary>
-    public DelegateCommand MoveDownTheSelectionCommand { get; }
-
-
-    /// <summary>
     /// 選択されたか
     /// </summary>
-    private bool HasSelected
-    {
-        get => _hasSelected;
-        set
-        {
-            if (SetProperty(ref _hasSelected, value))
-            {
-                MoveUpTheSelectionCommand.RaiseCanExecuteChanged();
-                MoveDownTheSelectionCommand.RaiseCanExecuteChanged();
-            }
-        }
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanMove))]
+    [NotifyCanExecuteChangedFor(nameof(MoveUpTheSelectionCommand))]
+    [NotifyCanExecuteChangedFor(nameof(MoveDownTheSelectionCommand))]
+    public partial bool HasSelected { get; private set; }
 
 
     /// <summary>
     /// ソート済み列数
     /// </summary>
-    public int SortedColumnCount
-    {
-        get => _sortedColumnCount;
-        set
-        {
-            if (SetProperty(ref _sortedColumnCount, value))
-            {
-                MoveUpTheSelectionCommand.RaiseCanExecuteChanged();
-                MoveDownTheSelectionCommand.RaiseCanExecuteChanged();
-            }
-        }
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanMove))]
+    [NotifyCanExecuteChangedFor(nameof(MoveUpTheSelectionCommand))]
+    [NotifyCanExecuteChangedFor(nameof(MoveDownTheSelectionCommand))]
+    public partial int SortedColumnCount { get; set; }
 
 
     /// <summary>
     /// 移動可能か(選択済みかつ、ソートされていない)
     /// </summary>
-    private bool CanMode => HasSelected && 0 == SortedColumnCount;
+    private bool CanMove => HasSelected && 0 == SortedColumnCount;
     #endregion
 
 
@@ -121,17 +70,13 @@ public class ModulesReorder : BindableBase
     {
         _modulesInfo = modulesInfo;
         _collectionView = listCollectionView;
-        SelectModulesCommand        = new DelegateCommand(SelectModules);
-        ClearSelectionCommand       = new DelegateCommand(ClearSelection);
-        MoveUpTheSelectionCommand   = new DelegateCommand(MoveUpTheSelection, () => CanMode);
-        MoveDownTheSelectionCommand = new DelegateCommand(MoveDownTheSelection, () => CanMode);
     }
-
 
 
     /// <summary>
     /// 選択された項目を選択状態にする
     /// </summary>
+    [RelayCommand]
     private void SelectModules()
     {
         var modules = Enumerable.Empty<ModulesGridItem>();
@@ -170,6 +115,7 @@ public class ModulesReorder : BindableBase
     /// <summary>
     /// 選択解除
     /// </summary>
+    [RelayCommand]
     private void ClearSelection()
     {
         foreach (var item in _modulesInfo.Modules.Where(x => x.IsReorderTarget))
@@ -185,6 +131,7 @@ public class ModulesReorder : BindableBase
     /// <summary>
     /// 選択項目を上に移動
     /// </summary>
+    [RelayCommand(CanExecute = nameof(CanMove))]
     private void MoveUpTheSelection()
     {
         // 挿入位置を取得
@@ -201,6 +148,7 @@ public class ModulesReorder : BindableBase
     /// <summary>
     /// 選択項目を下に移動
     /// </summary>
+    [RelayCommand(CanExecute = nameof(CanMove))]
     private void MoveDownTheSelection()
     {
         // 挿入位置を取得
@@ -229,8 +177,9 @@ public class ModulesReorder : BindableBase
         int prev = 0;       // 挿入位置より前にある移動対象の要素数
         int ret = 0;
 
-        var collection = _modulesInfo.Modules.Select((x, idx) => (Module: x, Index: idx))
-                                             .Where(x => x.Module.IsSelected || x.Module.IsReorderTarget);
+        var collection = _modulesInfo.Modules
+            .Select((x, idx) => (Module: x, Index: idx))
+            .Where(x => x.Module.IsSelected || x.Module.IsReorderTarget);
 
         foreach (var (module, idx) in collection)
         {

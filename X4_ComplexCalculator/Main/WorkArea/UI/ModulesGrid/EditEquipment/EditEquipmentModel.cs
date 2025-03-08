@@ -1,14 +1,14 @@
-using Prism.Mvvm;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Reactive.Bindings;
 using System;
 using System.Linq;
 using System.Reactive.Linq;
-using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
-using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
+using X4_ComplexCalculator.Common.Collections;
+using X4_ComplexCalculator.Common.Dialogs.MessageBoxes;
+using X4_ComplexCalculator.Common.Dialogs.SelectStringDialog;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
-using X4_ComplexCalculator.Entity;
+using X4_ComplexCalculator.Entities;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
@@ -16,7 +16,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
 /// <summary>
 /// 装備編集画面のModel
 /// </summary>
-class EditEquipmentModel : BindableBase, IDisposable
+sealed partial class EditEquipmentModel : ObservableObject, IDisposable
 {
     #region メンバ
     /// <summary>

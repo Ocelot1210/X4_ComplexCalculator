@@ -1,9 +1,9 @@
 ﻿using Collections.Pooled;
-using Prism.Mvvm;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.Generic;
 using System.Linq;
 using X4_ComplexCalculator.Common;
-using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Collections;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid;
@@ -11,16 +11,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid;
 /// <summary>
 /// 保管庫一覧表示用DataGridViewの1レコード分
 /// </summary>
-public class StoragesGridItem : BindableBase, ISelectable
+public sealed partial class StoragesGridItem : ObservableObject, ISelectable
 {
-    #region メンバ
-    /// <summary>
-    /// Expanderが展開されているか
-    /// </summary>
-    private bool _isExpanded;
-    #endregion
-
-
     #region プロパティ
     /// <summary>
     /// ウェア種別
@@ -49,11 +41,8 @@ public class StoragesGridItem : BindableBase, ISelectable
     /// <summary>
     /// Expanderが開いているか
     /// </summary>
-    public bool IsExpanded
-    {
-        get => _isExpanded;
-        set => SetProperty(ref _isExpanded, value);
-    }
+    [ObservableProperty]
+    public partial bool IsExpanded { get; set; }
     #endregion
 
 
@@ -65,7 +54,7 @@ public class StoragesGridItem : BindableBase, ISelectable
     public StoragesGridItem(ITransportType transportType, IEnumerable<StorageDetailsListItem> details)
     {
         TransportType = transportType;
-        Details = new ObservableRangeCollection<StorageDetailsListItem>(details);
+        Details = [.. details];
     }
 
 
@@ -94,7 +83,7 @@ public class StoragesGridItem : BindableBase, ISelectable
 
         Details.AddRange(addItems);
 
-        RaisePropertyChanged(nameof(Capacity));
+        OnPropertyChanged(nameof(Capacity));
     }
 
 
@@ -115,7 +104,7 @@ public class StoragesGridItem : BindableBase, ISelectable
 
         Details.RemoveAll(x => x.ModuleCount == 0);
 
-        RaisePropertyChanged(nameof(Capacity));
+        OnPropertyChanged(nameof(Capacity));
     }
 
 
@@ -135,6 +124,6 @@ public class StoragesGridItem : BindableBase, ISelectable
             }
         }
 
-        RaisePropertyChanged(nameof(Capacity));
+        OnPropertyChanged(nameof(Capacity));
     }
 }

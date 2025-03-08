@@ -1,10 +1,13 @@
 ﻿using Collections.Pooled;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging.Messages;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Linq;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
@@ -18,15 +21,9 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign;
 /// <summary>
 /// 保管庫割当用Model
 /// </summary>
-class StorageAssignModel : IDisposable
+sealed partial class StorageAssignModel : ObservableRecipientEx, IDisposable
 {
     #region メンバ
-    /// <summary>
-    /// 保管庫状態計算用の指定時間
-    /// </summary>
-    private long _hour = 1;
-
-
     /// <summary>
     /// 製品一覧情報
     /// </summary>
@@ -68,74 +65,84 @@ class StorageAssignModel : IDisposable
     /// <summary>
     /// 指定時間
     /// </summary>
-    public long Hour
-    {
-        get => _hour;
-        set
-        {
-            if (_hour != value)
-            {
-                _hour = value;
-                foreach (var item in _storageAssignInfo.StorageAssign)
-                {
-                    item.Hour = Hour;
-                }
-            }
-        }
-    }
+    [ObservableProperty]
+    public partial long Hour { get; set; } = 1;
     #endregion
 
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
+    /// <param name="messenger">メッセージ通知用</param>
     /// <param name="products">製品一覧</param>
     /// <param name="storages">保管庫情報</param>
     /// <param name="storageAssignInfo">保管庫割当情報</param>
-    public StorageAssignModel(IProductsInfo products, IStoragesInfo storages, IStorageAssignInfo storageAssignInfo)
+    public StorageAssignModel(IMessenger messenger, IProductsInfo products, IStoragesInfo storages, IStorageAssignInfo storageAssignInfo) : base(messenger, true)
     {
         _products = products;
         _products.Products.CollectionChanged += Products_CollectionChanged;
-        _products.Products.CollectionPropertyChanged += Products_CollectionPropertyChanged;
 
         _storages = storages;
         _storages.Storages.CollectionChanged += Storages_CollectionChanged;
-        _storages.Storages.CollectionPropertyChanged += Storages_CollectionPropertyChanged;
 
         _storageAssignInfo = storageAssignInfo;
 
         _capacityDict = X4Database.Instance.TransportType.GetAll()
-            .ToDictionary(x => x.TransportTypeID, x => new StorageCapacityInfo());
+            .ToDictionary(x => x.TransportTypeID, x => new StorageCapacityInfo(Messenger));
 
         foreach (var storage in _storages.Storages)
         {
             _capacityDict[storage.TransportType.TransportTypeID].TotalCapacity = storage.Capacity;
         }
+
+        Messenger.RegisterPropertyChangedMessage(this, static (ProductsGridItem x) => x.Count, OnProductsCountChanged);
+        Messenger.RegisterPropertyChangedMessage(this, static (StoragesGridItem x) => x.Capacity, OnStorageCapacityChanged);
     }
 
 
     /// <summary>
-    /// 保管庫のプロパティ変更時
+    /// 時間変更時
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void Storages_CollectionPropertyChanged(object sender, PropertyChangedEventArgs e)
+    /// <param name="value">変更値</param>
+    partial void OnHourChanged(long value)
     {
-        if (sender is not StoragesGridItem storage)
+        foreach (var item in _storageAssignInfo.StorageAssign)
+        {
+            item.Hour = value;
+        }
+    }
+
+
+    /// <summary>
+    /// 製品一覧の生産量変更時
+    /// </summary>
+    private void OnProductsCountChanged(StorageAssignModel recipient, PropertyChangedMessage<long> message)
+    {
+        if (message.Sender is not ProductsGridItem product)
         {
             return;
         }
 
-        switch (e.PropertyName)
+        var assign = _storageAssignInfo.StorageAssign.FirstOrDefault(x => x.WareID == product.Ware.ID);
+        if (assign is not null)
         {
-            case nameof(StoragesGridItem.Capacity):
-                // 同一カーゴ種別の総容量設定
-                _capacityDict[storage.TransportType.TransportTypeID].TotalCapacity = storage.Capacity;
-                break;
-
-            default:
-                break;
+            assign.ProductPerHour = product.Count;
         }
+    }
+
+
+    /// <summary>
+    /// 保管庫の容量変更時
+    /// </summary>
+    private void OnStorageCapacityChanged(StorageAssignModel recipient, PropertyChangedMessage<long> message)
+    {
+        if(message.Sender is not StoragesGridItem storage)
+        {
+            return;
+        }
+
+        // 同一カーゴ種別の総容量設定
+        _capacityDict[storage.TransportType.TransportTypeID].TotalCapacity = storage.Capacity;
     }
 
 
@@ -168,31 +175,6 @@ class StorageAssignModel : IDisposable
             {
                 capacityInfo.TotalCapacity = 0;
             }
-        }
-    }
-
-
-    /// <summary>
-    /// 製品一覧のプロパティ変更時
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void Products_CollectionPropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName != nameof(ProductsGridItem.Count))
-        {
-            return;
-        }
-
-        if (sender is not ProductsGridItem product)
-        {
-            return;
-        }
-
-        var assign = _storageAssignInfo.StorageAssign.FirstOrDefault(x => x.WareID == product.Ware.ID);
-        if (assign is not null)
-        {
-            assign.ProductPerHour = product.Count;
         }
     }
 
@@ -238,7 +220,7 @@ class StorageAssignModel : IDisposable
         {
             _storageAssignInfo.StorageAssign.AddRange(products.Select(prod =>
             {
-                var ret = new StorageAssignGridItem(prod.Ware, _capacityDict[prod.Ware.TransportType.TransportTypeID], prod.Count, Hour) { EditStatus = EditStatus.Edited };
+                var ret = new StorageAssignGridItem(Messenger, prod.Ware, _capacityDict[prod.Ware.TransportType.TransportTypeID], prod.Count, Hour) { EditStatus = EditStatus.Edited };
                 if (_optionsBakDict.TryGetValue(ret.WareID, out var oldAssign))
                 {
                     ret.AllocCount = oldAssign.AllocCount;
@@ -254,7 +236,7 @@ class StorageAssignModel : IDisposable
         {
             _storageAssignInfo.StorageAssign.AddRange(products.Select(prod =>
             {
-                return new StorageAssignGridItem(prod.Ware, _capacityDict[prod.Ware.TransportType.TransportTypeID], prod.Count, Hour) { EditStatus = EditStatus.Edited };
+                return new StorageAssignGridItem(Messenger, prod.Ware, _capacityDict[prod.Ware.TransportType.TransportTypeID], prod.Count, Hour) { EditStatus = EditStatus.Edited };
             }));
         }
     }
@@ -305,9 +287,6 @@ class StorageAssignModel : IDisposable
     public void Dispose()
     {
         _products.Products.CollectionChanged -= Products_CollectionChanged;
-        _products.Products.CollectionPropertyChanged -= Products_CollectionPropertyChanged;
-
         _storages.Storages.CollectionChanged -= Storages_CollectionChanged;
-        _storages.Storages.CollectionPropertyChanged -= Storages_CollectionPropertyChanged;
     }
 }

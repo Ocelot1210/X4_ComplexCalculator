@@ -1,36 +1,21 @@
-﻿using Prism.Mvvm;
-using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
+using X4_ComplexCalculator.Common;
 
 namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings;
 
 /// <summary>
 /// ステーション設定用クラス
 /// </summary>
-public class StationSettings : BindableBase, IStationSettings
+public partial class StationSettings(IMessenger messenger) : ObservableRecipientEx(messenger, true), IStationSettings
 {
-    #region メンバ
-    /// <summary>
-    /// 本部か
-    /// </summary>
-    private bool _isHeadquarters;
-
-
-    /// <summary>
-    /// 日光[%]
-    /// </summary>
-    private double _sunlight = 100;
-    #endregion
-
-
     #region プロパティ
     /// <summary>
     /// 本部か
     /// </summary>
-    public bool IsHeadquarters
-    {
-        get => _isHeadquarters;
-        set => SetProperty(ref _isHeadquarters, value);
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedRecipients]
+    public partial bool IsHeadquarters { get; set; }
 
 
     /// <summary>
@@ -42,16 +27,14 @@ public class StationSettings : BindableBase, IStationSettings
     /// <summary>
     /// 労働者
     /// </summary>
-    public WorkforceManager Workforce { get; } = new();
+    public WorkforceManager Workforce { get; } = new(messenger);
 
 
     /// <summary>
     /// 日光[%]
     /// </summary>
-    public double Sunlight
-    {
-        get => _sunlight;
-        set => SetProperty(ref _sunlight, value);
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedRecipients]
+    public partial double Sunlight { get; set; }
     #endregion
 }

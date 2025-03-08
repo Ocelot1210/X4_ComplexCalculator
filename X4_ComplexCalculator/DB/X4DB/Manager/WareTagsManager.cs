@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace X4_ComplexCalculator.DB.X4DB.Manager;
 
-class WareTagsManager
+sealed class WareTagsManager
 {
     #region メンバ
     /// <summary>

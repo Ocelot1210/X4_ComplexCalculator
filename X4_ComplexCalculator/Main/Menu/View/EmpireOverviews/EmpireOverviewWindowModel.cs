@@ -8,7 +8,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using X4_ComplexCalculator.Common;
-using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Collections;
 using X4_ComplexCalculator.Main.WorkArea;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
 
@@ -37,8 +37,7 @@ public sealed class EmpireOverviewWindowModel : IDisposable
     /// <summary>
     /// 製品一覧
     /// </summary>
-    public ObservableRangeCollection<EmpireOverViewProductsGridItem> Products { get; }
-        = new ObservableRangeCollection<EmpireOverViewProductsGridItem>();
+    public ObservableRangeCollection<EmpireOverViewProductsGridItem> Products { get; } = [];
 
 
     /// <summary>

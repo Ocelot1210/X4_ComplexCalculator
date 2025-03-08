@@ -1,12 +1,13 @@
 ﻿using Collections.Pooled;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
-using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
+using X4_ComplexCalculator.Common.Dialogs.MessageBoxes;
+using X4_ComplexCalculator.Common.Dialogs.SelectStringDialog;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
@@ -67,9 +68,10 @@ partial class StationCalculatorImporter : ObservableObject, IImporter
             return;
         }
 
-        var vm = new WorkAreaViewModel(_workAreaManager.ActiveLayoutID, _localizedMessageBox.Clone());
+        var messenger = new WeakReferenceMessenger();
+        var vm = new WorkAreaViewModel(messenger, _workAreaManager.ActiveLayoutID, _localizedMessageBox.Clone());
 
-        if (ImportMain(vm.WorkArea, url))
+        if (ImportMain(messenger, vm.WorkArea, url))
         {
             _workAreaManager.Documents.Add(vm);
         }
@@ -83,9 +85,10 @@ partial class StationCalculatorImporter : ObservableObject, IImporter
     /// <summary>
     /// インポート実行
     /// </summary>
+    /// <param name="messenger">メッセージ通知用</param>
     /// <param name="WorkArea">作業エリア</param>
     /// <returns>インポートに成功したか</returns>
-    private bool ImportMain(IWorkArea workArea, string url)
+    private bool ImportMain(IMessenger messenger, IWorkArea workArea, string url)
     {
         var ret = false;
 
@@ -109,7 +112,7 @@ partial class StationCalculatorImporter : ObservableObject, IImporter
                 .Select(x => (Module: X4Database.Instance.Ware.TryGet<IX4Module>(x.Groups[1].Value), Count: long.Parse(x.Groups[2].Value)))
                 .Where(x => x.Module is not null)
                 .Select(x => (Module: x.Module!, x.Count))
-                .Select(x => new ModulesGridItem(x.Module, null, x.Count) { EditStatus = EditStatus.Unedited });
+                .Select(x => new ModulesGridItem(messenger, x.Module, null, x.Count) { EditStatus = EditStatus.Unedited });
 
 
             workArea.StationData.ModulesInfo.Modules.AddRange(modules);

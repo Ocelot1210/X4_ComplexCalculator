@@ -5,7 +5,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewers.Modules;
 /// <summary>
 /// ModulesGrid.xaml の相互作用ロジック
 /// </summary>
-public partial class ModulesGrid : UserControl
+public sealed partial class ModulesGrid : UserControl
 {
     public ModulesGrid()
     {

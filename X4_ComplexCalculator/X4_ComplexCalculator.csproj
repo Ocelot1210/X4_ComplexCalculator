@@ -22,15 +22,15 @@
   <ItemGroup>
     <PackageReference Include="Collections.Pooled" Version="2.0.0-preview.27" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageReference Include="Dapper" Version="2.1.35" />
+    <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="Dirkster.AvalonDock" Version="4.72.1" />
     <PackageReference Include="DotNetProjects.Extended.Wpf.Toolkit" Version="5.0.124" />
     <PackageReference Include="GitInfo" Version="3.3.5" />
     <PackageReference Include="gong-wpf-dragdrop" Version="4.0.0" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.2" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Onova" Version="2.6.12" />
@@ -51,10 +51,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Common\Controls\DataGridFilter\MultiList\MultiListFilter.xaml.cs">
+    <Compile Update="Common\Controls\DataGridFilters\MultiList\MultiListFilter.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Common\Dialog\SelectStringDialog\SelectStringDialog.xaml.cs">
+    <Compile Update="Common\Dialogs\SelectStringDialog\SelectStringDialog.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Main\Menu\File\Importers\LoadoutImporters\SelectLoadoutDialog.xaml.cs">
@@ -63,23 +63,23 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Localization\Lang.csv">
+    <None Update="Localizations\Lang.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Localization\Lang.en-US.csv">
+    <None Update="Localizations\Lang.en-US.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Localization\Lang.ja-JP.csv">
+    <None Update="Localizations\Lang.ja-JP.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="Common\Controls\DataGridFilter\MultiList\MultiListFilter.xaml">
+    <Page Update="Common\Controls\DataGridFilters\MultiList\MultiListFilter.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Common\Dialog\SelectStringDialog\SelectStringDialog.xaml">
+    <Page Update="Common\Dialogs\SelectStringDialog\SelectStringDialog.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Main\Menu\File\Importers\LoadoutImporters\SelectLoadoutDialog.xaml">

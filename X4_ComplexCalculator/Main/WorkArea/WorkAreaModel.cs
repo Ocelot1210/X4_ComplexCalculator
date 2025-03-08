@@ -1,9 +1,12 @@
-﻿using Prism.Mvvm;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging.Messages;
 using System;
-using System.Collections.Specialized;
 using System.ComponentModel;
-using X4_ComplexCalculator.Main.WorkArea.SaveDataReader;
-using X4_ComplexCalculator.Main.WorkArea.SaveDataWriter;
+using X4_ComplexCalculator.Common;
+using X4_ComplexCalculator.Common.EditStatus;
+using X4_ComplexCalculator.Main.WorkArea.SaveDataReaders;
+using X4_ComplexCalculator.Main.WorkArea.SaveDataWriters;
 using X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
@@ -16,19 +19,13 @@ namespace X4_ComplexCalculator.Main.WorkArea;
 /// <summary>
 /// 作業エリア用Model
 /// </summary>
-class WorkAreaModel : BindableBase, IDisposable, IWorkArea
+sealed partial class WorkAreaModel : ObservableRecipientEx, IDisposable, IWorkArea
 {
     #region メンバ
     /// <summary>
     /// タイトル文字列
     /// </summary>
     private string _title = "";
-
-
-    /// <summary>
-    /// 変更されたか
-    /// </summary>
-    private bool _hasChanged;
 
 
     /// <summary>
@@ -52,44 +49,14 @@ class WorkAreaModel : BindableBase, IDisposable, IWorkArea
     /// <summary>
     /// 計算機で使用するステーション用データ
     /// </summary>
-    public IStationData StationData { get; } = new StationData();
+    public IStationData StationData { get; }
 
 
     /// <summary>
     /// 変更されたか
     /// </summary>
-    public bool HasChanged
-    {
-        get => _hasChanged;
-        set
-        {
-            if (SetProperty(ref _hasChanged, value))
-            {
-                if (value)
-                {
-                    // 変更検知イベントを購読解除
-                    StationData.ModulesInfo.Modules.CollectionChanged -= OnModulesChanged;
-                    StationData.ModulesInfo.Modules.CollectionPropertyChanged -= OnPropertyChanged;
-                    StationData.ProductsInfo.Products.CollectionPropertyChanged -= OnPropertyChanged;
-                    StationData.BuildResourcesInfo.BuildResources.CollectionPropertyChanged -= OnPropertyChanged;
-                    StationData.StorageAssignInfo.StorageAssign.CollectionPropertyChanged -= OnPropertyChanged;
-                    StationData.Settings.PropertyChanged -= OnPropertyChanged;
-                    StationData.Settings.Workforce.PropertyChanged -= OnPropertyChanged;
-                }
-                else
-                {
-                    // 変更検知イベントを購読
-                    StationData.ModulesInfo.Modules.CollectionChanged += OnModulesChanged;
-                    StationData.ModulesInfo.Modules.CollectionPropertyChanged += OnPropertyChanged;
-                    StationData.ProductsInfo.Products.CollectionPropertyChanged += OnPropertyChanged;
-                    StationData.BuildResourcesInfo.BuildResources.CollectionPropertyChanged += OnPropertyChanged;
-                    StationData.StorageAssignInfo.StorageAssign.CollectionPropertyChanged += OnPropertyChanged;
-                    StationData.Settings.PropertyChanged += OnPropertyChanged;
-                    StationData.Settings.Workforce.PropertyChanged += OnPropertyChanged;
-                }
-            }
-        }
-    }
+    [ObservableProperty]
+    public partial bool HasChanged { get; set; }
 
 
     /// <summary>
@@ -102,10 +69,50 @@ class WorkAreaModel : BindableBase, IDisposable, IWorkArea
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public WorkAreaModel(ISaveDataWriter saveDataWriter)
+    public WorkAreaModel(IMessenger messenger, ISaveDataWriter saveDataWriter) : base(messenger, true)
     {
         _saveDataWriter = saveDataWriter;
+        StationData = new StationData(Messenger);
+
         HasChanged = true;
+
+        Messenger.RegisterPropertyChangedMessage(this, static (ModulesGridItem x)        => x.EditStatus, OnEditStatusChanged);
+        Messenger.RegisterPropertyChangedMessage(this, static (ProductsGridItem x)       => x.EditStatus, OnEditStatusChanged);
+        Messenger.RegisterPropertyChangedMessage(this, static (BuildResourcesGridItem x) => x.EditStatus, OnEditStatusChanged);
+        Messenger.RegisterPropertyChangedMessage(this, static (StorageAssignGridItem x)  => x.EditStatus, OnEditStatusChanged);
+
+        Messenger.RegisterPropertyChangedMessage(this, static (StationSettings x)  => x.IsHeadquarters, (r, m) => HasChanged = true);
+        Messenger.RegisterPropertyChangedMessage(this, static (StationSettings x)  => x.Sunlight,       (r, m) => HasChanged = true);
+        Messenger.RegisterPropertyChangedMessage(this, static (WorkforceManager x) => x.Actual,         (r, m) => HasChanged = true);
+    }
+
+
+    /// <summary>
+    /// 編集状態変更時
+    /// </summary>
+    private void OnEditStatusChanged(WorkAreaModel recipient, PropertyChangedMessage<EditStatus> message)
+    {
+        if (message.NewValue == EditStatus.Edited)
+        {
+            HasChanged = true;
+        }
+    }
+
+
+    partial void OnHasChangedChanged(bool value)
+    {
+        if (value)
+        {
+            // 変更検知イベントを購読解除
+            StationData.Settings.PropertyChanged -= OnPropertyChanged;
+            StationData.Settings.Workforce.PropertyChanged -= OnPropertyChanged;
+        }
+        else
+        {
+            // 変更検知イベントを購読
+            StationData.Settings.PropertyChanged += OnPropertyChanged;
+            StationData.Settings.Workforce.PropertyChanged += OnPropertyChanged;
+        }
     }
 
 
@@ -115,24 +122,17 @@ class WorkAreaModel : BindableBase, IDisposable, IWorkArea
     public void Dispose()
     {
         // 変更検知イベントを購読解除
-        StationData.ModulesInfo.Modules.CollectionChanged -= OnModulesChanged;
-        StationData.ModulesInfo.Modules.CollectionPropertyChanged -= OnPropertyChanged;
-        StationData.ProductsInfo.Products.CollectionPropertyChanged -= OnPropertyChanged;
-        StationData.BuildResourcesInfo.BuildResources.CollectionPropertyChanged -= OnPropertyChanged;
-        StationData.StorageAssignInfo.StorageAssign.CollectionPropertyChanged -= OnPropertyChanged;
         StationData.Settings.PropertyChanged -= OnPropertyChanged;
         StationData.Settings.Workforce.PropertyChanged -= OnPropertyChanged;
-    }
 
+        Messenger.UnregisterPropertyChangedMessage(this, static (ModulesGridItem x)        => x.EditStatus);
+        Messenger.UnregisterPropertyChangedMessage(this, static (ProductsGridItem x)       => x.EditStatus);
+        Messenger.UnregisterPropertyChangedMessage(this, static (BuildResourcesGridItem x) => x.EditStatus);
+        Messenger.UnregisterPropertyChangedMessage(this, static (StorageAssignGridItem x)  => x.EditStatus);
 
-    /// <summary>
-    /// モジュール数に変更があった場合
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void OnModulesChanged(object? sender, NotifyCollectionChangedEventArgs e)
-    {
-        HasChanged = true;
+        Messenger.UnregisterPropertyChangedMessage(this, static (StationSettings x)  => x.IsHeadquarters);
+        Messenger.UnregisterPropertyChangedMessage(this, static (StationSettings x)  => x.Sunlight);
+        Messenger.UnregisterPropertyChangedMessage(this, static (WorkforceManager x) => x.Actual);
     }
 
 
@@ -145,10 +145,6 @@ class WorkAreaModel : BindableBase, IDisposable, IWorkArea
     {
         string[] names =
         {
-            nameof(ModulesGridItem.ModuleCount),
-            nameof(ProductsGridItem.Price),
-            nameof(BuildResourcesGridItem.Price),
-            nameof(StorageAssignGridItem.AllocCount),
             nameof(StationSettings.IsHeadquarters),
             nameof(StationSettings.Sunlight),
             nameof(WorkforceManager.Actual),
@@ -193,7 +189,7 @@ class WorkAreaModel : BindableBase, IDisposable, IWorkArea
     /// <param name="progress">進捗</param>
     public bool Load(string path, IProgress<int> progress)
     {
-        var reader = SaveDataReaderFactory.CreateSaveDataReader(path, this);
+        var reader = SaveDataReaderFactory.CreateSaveDataReader(path, Messenger, this);
         var ret = false;
 
         // 読み込み成功？

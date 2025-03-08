@@ -10,7 +10,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager;
 /// <summary>
 /// <see cref="IShip"/> に対応する <see cref="IShipHanger"/> の一覧を管理するクラス
 /// </summary>
-class ShipHangerManager
+sealed class ShipHangerManager
 {
     #region メンバ
     /// <summary>

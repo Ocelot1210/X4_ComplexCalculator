@@ -1,7 +1,8 @@
-﻿using Prism.Mvvm;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging.Messages;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Linq;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
@@ -12,19 +13,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost;
 /// <summary>
 /// 建造コスト用
 /// </summary>
-class BuildingCostModel : BindableBase
+partial class BuildingCostModel : ObservableRecipient
 {
     #region メンバ
     /// <summary>
     /// 建造リソース情報
     /// </summary>
     private readonly IBuildResourcesInfo _buildResources;
-
-
-    /// <summary>
-    /// 建造コスト
-    /// </summary>
-    private long _buildingCost = 0;
     #endregion
 
 
@@ -38,30 +33,31 @@ class BuildingCostModel : BindableBase
     /// <summary>
     /// 建造コスト
     /// </summary>
-    public long BuildingCost
-    {
-        get => _buildingCost;
-        set
-        {
-            if (value != _buildingCost)
-            {
-                _buildingCost = value;
-                RaisePropertyChanged();
-            }
-        }
-    }
+    [ObservableProperty]
+    public partial long BuildingCost { get; private set; }
     #endregion
 
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    /// <param name="resources"></param>
-    public BuildingCostModel(IBuildResourcesInfo resources)
+    /// <param name="messanger">メッセージ交換用</param>
+    /// <param name="resources">建造リソース一覧</param>
+    public BuildingCostModel(IMessenger messanger, IBuildResourcesInfo resources) : base(messanger)
     {
         _buildResources = resources;
         _buildResources.BuildResources.CollectionChanged += Resources_OnCollectionChanged;
-        _buildResources.BuildResources.CollectionPropertyChanged += Resources_OnPropertyChanged;
+
+        Messenger.RegisterPropertyChangedMessage(this, (BuildResourcesGridItem x) => x.Price, OnBuildResourcePriceChanged);
+    }
+
+
+    /// <summary>
+    /// 建造に必要なウェア一覧のプロパティに変更があった場合
+    /// </summary>
+    private void OnBuildResourcePriceChanged(BuildingCostModel model, PropertyChangedMessage<long> message)
+    {
+        BuildingCost -= (message.OldValue - message.NewValue);
     }
 
 
@@ -71,36 +67,7 @@ class BuildingCostModel : BindableBase
     public void Dispose()
     {
         _buildResources.BuildResources.CollectionChanged -= Resources_OnCollectionChanged;
-        _buildResources.BuildResources.CollectionPropertyChanged -= Resources_OnPropertyChanged;
         BuildResources.Clear();
-    }
-
-
-    /// <summary>
-    /// 建造に必要なウェア一覧のプロパティに変更があった場合
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void Resources_OnPropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        if (sender is not BuildResourcesGridItem)
-        {
-            return;
-        }
-
-        switch (e.PropertyName)
-        {
-            // 価格変更時
-            case nameof(BuildResourcesGridItem.Price):
-                if (e is PropertyChangedExtendedEventArgs<long> ev)
-                {
-                    BuildingCost -= (ev.OldValue - ev.NewValue);
-                }
-                break;
-
-            default:
-                break;
-        }
     }
 
 

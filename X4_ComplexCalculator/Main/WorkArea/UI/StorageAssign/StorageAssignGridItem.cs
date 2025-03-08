@@ -1,6 +1,8 @@
-﻿using Prism.Mvvm;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging.Messages;
 using System;
-using System.ComponentModel;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
@@ -9,31 +11,12 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign;
 /// <summary>
 /// 保管庫割当用Gridの1レコード分
 /// </summary>
-public sealed class StorageAssignGridItem : BindableBase, IDisposable, IEditable
+public sealed partial class StorageAssignGridItem : ObservableRecipientEx, IDisposable, IEditable
 {
-    #region メンバ
     /// <summary>
-    /// 指定時間
+    /// ウェア大きさ
     /// </summary>
-    private long _hour;
-
-    /// <summary>
-    /// 割当容量
-    /// </summary>
-    private long _allocCount;
-
-
-    /// <summary>
-    /// 1時間あたりの生産量
-    /// </summary>
-    private long _productPerHour;
-
-
-    /// <summary>
-    /// 編集状態
-    /// </summary>
-    private EditStatus _editStatus = EditStatus.Unedited;
-    #endregion
+    private readonly long _volume;
 
 
     #region プロパティ
@@ -74,89 +57,54 @@ public sealed class StorageAssignGridItem : BindableBase, IDisposable, IEditable
 
 
     /// <summary>
-    /// ウェア大きさ
-    /// </summary>
-    public long Volume;
-
-
-    /// <summary>
     /// 割当数量
     /// </summary>
-    public long AllocCount
-    {
-        get => _allocCount;
-        set
-        {
-            var prevCount = _allocCount;
-
-            if (SetProperty(ref _allocCount, value))
-            {
-                RaisePropertyChanged(nameof(AllocCapacity));
-                RaisePropertyChanged(nameof(StorageStatus));
-                CapacityInfo.UsedCapacity += (value - prevCount) * Volume;
-                EditStatus = EditStatus.Edited;
-            }
-        }
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(AllocCapacity))]
+    [NotifyPropertyChangedFor(nameof(StorageStatus))]
+    public partial long AllocCount { get; set; }
 
 
     /// <summary>
     /// 保管庫状態
     /// </summary>
-    public int StorageStatus => (AfterCount < 0) ? -1 :
-                                (AfterCount <= AllocCount) ? 0 : 1;
+    public int StorageStatus => (AfterCount < 0) ? -1 : (AfterCount <= AllocCount) ? 0 : 1;
 
 
     /// <summary>
     /// 割当容量
     /// </summary>
-    public long AllocCapacity => AllocCount * Volume;
+    public long AllocCapacity => AllocCount * _volume;
 
 
     /// <summary>
     /// 割当可能容量最大
     /// </summary>
-    public long MaxAllocableCount => (CapacityInfo.FreeCapacity + AllocCapacity) / Volume;
+    public long MaxAllocableCount => (CapacityInfo.FreeCapacity + AllocCapacity) / _volume;
 
 
     /// <summary>
     /// 残り割当可能容量
     /// </summary>
-    public long AllocableCount => CapacityInfo.FreeCapacity / Volume;
+    public long AllocableCount => CapacityInfo.FreeCapacity / _volume;
 
 
     /// <summary>
     /// 1時間あたりの生産量
     /// </summary>
-    public long ProductPerHour
-    {
-        get => _productPerHour;
-        set
-        {
-            if (SetProperty(ref _productPerHour, value))
-            {
-                RaisePropertyChanged(nameof(AfterCount));
-                RaisePropertyChanged(nameof(StorageStatus));
-            }
-        }
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(AfterCount))]
+    [NotifyPropertyChangedFor(nameof(StorageStatus))]
+    public partial long ProductPerHour { get; set; }
 
 
     /// <summary>
     /// 指定時間
     /// </summary>
-    public long Hour
-    {
-        get => _hour;
-        set
-        {
-            if (SetProperty(ref _hour, value))
-            {
-                RaisePropertyChanged(nameof(AfterCount));
-                RaisePropertyChanged(nameof(StorageStatus));
-            }
-        }
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(AfterCount))]
+    [NotifyPropertyChangedFor(nameof(StorageStatus))]
+    public partial long Hour { get; set; }
 
 
     /// <summary>
@@ -168,11 +116,8 @@ public sealed class StorageAssignGridItem : BindableBase, IDisposable, IEditable
     /// <summary>
     /// 編集状態
     /// </summary>
-    public EditStatus EditStatus
-    {
-        get => _editStatus;
-        set => SetProperty(ref _editStatus, value);
-    }
+    [ObservableProperty]
+    public partial EditStatus EditStatus { get; set; }
     #endregion
 
 
@@ -184,7 +129,7 @@ public sealed class StorageAssignGridItem : BindableBase, IDisposable, IEditable
     /// <param name="capacityInfo">保管庫容量情報</param>
     /// <param name="productPerHour">1時間あたりのウェア生産量</param>
     /// <param name="hour">指定時間</param>
-    public StorageAssignGridItem(IWare ware, StorageCapacityInfo capacityInfo, long productPerHour, long hour)
+    public StorageAssignGridItem(IMessenger messenger, IWare ware, StorageCapacityInfo capacityInfo, long productPerHour, long hour) : base(messenger, false)
     {
         WareID = ware.ID;
         WareName = ware.Name;
@@ -193,31 +138,38 @@ public sealed class StorageAssignGridItem : BindableBase, IDisposable, IEditable
         TransportTypeID = ware.TransportType.TransportTypeID;
         TransportTypeName = ware.TransportType.Name;
 
-        Volume = ware.Volume;
+        _volume = ware.Volume;
         CapacityInfo = capacityInfo;
-        CapacityInfo.PropertyChanged += CapacityInfo_PropertyChanged;
-
         ProductPerHour = productPerHour;
         Hour = hour;
+
+        Messenger.RegisterPropertyChangedMessage(this, static (StorageCapacityInfo x) => x.FreeCapacity, OnFreeCapacityChanged);
+
+        IsActive = true;
     }
 
-    /// <summary>
-    /// 保管庫容量プロパティ変更時
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void CapacityInfo_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        switch (e.PropertyName)
-        {
-            case nameof(StorageCapacityInfo.FreeCapacity):
-                RaisePropertyChanged(nameof(AllocableCount));
-                RaisePropertyChanged(nameof(MaxAllocableCount));
-                break;
 
-            default:
-                break;
+    /// <summary>
+    /// 全体の保管庫容量変更時
+    /// </summary>
+    private void OnFreeCapacityChanged(StorageAssignGridItem recipient, PropertyChangedMessage<long> message)
+    {
+        // 容量変更された保管庫種別が自分と同じならプロパティ更新
+        if (message.Sender == CapacityInfo)
+        {
+            OnPropertyChanged(nameof(AllocableCount));
+            OnPropertyChanged(nameof(MaxAllocableCount));
         }
+    }
+
+
+    /// <summary>
+    /// <see cref="AllocCount"/> 変更時
+    /// </summary>
+    partial void OnAllocCountChanged(long oldValue, long newValue)
+    {
+        CapacityInfo.UsedCapacity += (newValue - oldValue) * _volume;
+        EditStatus = EditStatus.Edited;
     }
 
 
@@ -226,6 +178,6 @@ public sealed class StorageAssignGridItem : BindableBase, IDisposable, IEditable
     /// </summary>
     public void Dispose()
     {
-        CapacityInfo.PropertyChanged -= CapacityInfo_PropertyChanged;
+        Messenger.UnregisterPropertyChangedMessage(this, static (StorageCapacityInfo x) => x.FreeCapacity);
     }
 }

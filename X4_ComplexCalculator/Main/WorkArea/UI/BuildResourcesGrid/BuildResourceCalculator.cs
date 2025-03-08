@@ -7,7 +7,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
 /// <summary>
 /// 建造リソース計算用クラス
 /// </summary>
-class BuildResourceCalculator
+sealed class BuildResourceCalculator
 {
     #region スタティックメンバ
     /// <summary>

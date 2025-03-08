@@ -118,7 +118,7 @@ SELECT *
 FROM   Ware
 WHERE  TransportTypeID IS NOT NULL AND TransportTypeID <> 'inventory'";
 
-        foreach (var item in _conn.Query<X4_DataExporterWPF.Entity.Ware>(SQL_1))
+        foreach (var item in _conn.Query<X4_DataExporterWPF.Entities.Ware>(SQL_1))
         {
             var ware = new Ware(
                 item.WareID,

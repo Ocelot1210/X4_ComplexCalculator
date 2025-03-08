@@ -1,4 +1,4 @@
-﻿using Prism.Mvvm;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.Generic;
 using System.Linq;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
@@ -9,19 +9,13 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
 /// <summary>
 /// 製品一覧DataGridの＋/－で表示するListViewのアイテム(生産品)
 /// </summary>
-public class ProductDetailsListItem : BindableBase, IProductDetailsListItem
+sealed partial class ProductDetailsListItem : ObservableObject, IProductDetailsListItem
 {
     #region メンバ
     /// <summary>
     /// 製品数(モジュール追加用)
     /// </summary>
     private readonly long _amount;
-
-
-    /// <summary>
-    /// モジュール数
-    /// </summary>
-    private long _moduleCount;
 
 
     /// <summary>
@@ -51,17 +45,9 @@ public class ProductDetailsListItem : BindableBase, IProductDetailsListItem
 
 
     /// <inheritdoc/>
-    public long ModuleCount
-    {
-        get => _moduleCount;
-        set
-        {
-            if (SetProperty(ref _moduleCount, value))
-            {
-                RaisePropertyChanged(nameof(Amount));
-            }
-        }
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Amount))]
+    public partial long ModuleCount { get; set; }
 
 
     /// <inheritdoc/>
@@ -75,14 +61,14 @@ public class ProductDetailsListItem : BindableBase, IProductDetailsListItem
         {
             var ret = 1.0;
 
-            if (_efficiencies.ContainsKey("work"))
+            if (_efficiencies.TryGetValue("work", out double value))
             {
-                ret *= _maxEfficiencies["work"].Product * _efficiencies["work"] + 1.0;
+                ret *= _maxEfficiencies["work"].Product * value + 1.0;
             }
 
-            if (_efficiencies.ContainsKey("sunlight"))
+            if (_efficiencies.TryGetValue("sunlight", out value))
             {
-                ret *= _efficiencies["sunlight"] / 100;
+                ret *= value / 100;
             }
 
             return ret;
@@ -123,8 +109,6 @@ public class ProductDetailsListItem : BindableBase, IProductDetailsListItem
     }
 
 
-
-
     /// <summary>
     /// 生産性を設定
     /// </summary>
@@ -135,8 +119,8 @@ public class ProductDetailsListItem : BindableBase, IProductDetailsListItem
         if (_efficiencies.ContainsKey(effectID))
         {
             _efficiencies[effectID] = value;
-            RaisePropertyChanged(nameof(Amount));
-            RaisePropertyChanged(nameof(Efficiency));
+            OnPropertyChanged(nameof(Amount));
+            OnPropertyChanged(nameof(Efficiency));
         }
     }
 }

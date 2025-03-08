@@ -1,4 +1,5 @@
-﻿using Prism.Mvvm;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 using System;
 using System.ComponentModel;
 using System.Windows.Data;
@@ -9,7 +10,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StorageAssign;
 /// <summary>
 /// 保管庫割当用ViewModel
 /// </summary>
-public sealed class StorageAssignViewModel : BindableBase, IDisposable
+public sealed partial class StorageAssignViewModel : ObservableObject, IDisposable
 {
     #region メンバ
     /// <summary>
@@ -40,10 +41,11 @@ public sealed class StorageAssignViewModel : BindableBase, IDisposable
     /// <summary>
     /// コンストラクタ
     /// </summary>
+    /// <param name="messenger">メッセージ通知用</param>
     /// <param name="stationData">計算機で使用するステーション情報</param>
-    public StorageAssignViewModel(IStationData stationData)
+    public StorageAssignViewModel(IMessenger messenger, IStationData stationData)
     {
-        _model = new StorageAssignModel(stationData.ProductsInfo, stationData.StoragesInfo, stationData.StorageAssignInfo);
+        _model = new StorageAssignModel(messenger, stationData.ProductsInfo, stationData.StoragesInfo, stationData.StorageAssignInfo);
 
         StorageAssignInfo = (ListCollectionView)CollectionViewSource.GetDefaultView(_model.StorageAssignGridItems);
         StorageAssignInfo.SortDescriptions.Clear();

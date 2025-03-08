@@ -10,25 +10,20 @@ namespace X4_ComplexCalculator.DB.X4DB.Builder;
 /// <summary>
 /// <see cref="Shield"/> クラスのインスタンスを作成するBuilderクラス
 /// </summary>
-class ShieldBuilder
+/// <remarks>
+/// コンストラクタ
+/// </remarks>
+/// <param name="conn">DB接続情報</param>
+class ShieldBuilder(IDbConnection conn)
 {
     #region メンバ
     /// <summary>
     /// シールド情報一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, X4_DataExporterWPF.Entity.Shield> _shields;
-    #endregion
-
-
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    /// <param name="conn">DB接続情報</param>
-    public ShieldBuilder(IDbConnection conn)
-    {
-        _shields = conn.Query<X4_DataExporterWPF.Entity.Shield>("SELECT * FROM Shield")
+    private readonly IReadOnlyDictionary<string, X4_DataExporterWPF.Entities.Shield> _shields = 
+        conn.Query<X4_DataExporterWPF.Entities.Shield>("SELECT * FROM Shield")
             .ToDictionary(x => x.EquipmentID);
-    }
+    #endregion
 
 
     /// <summary>

@@ -1,4 +1,4 @@
-﻿using Prism.Mvvm;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -9,7 +9,7 @@ using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Products;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit;
 
-class ProfitModel : BindableBase
+sealed partial class ProfitModel : ObservableObject
 {
     #region メンバ
     /// <summary>

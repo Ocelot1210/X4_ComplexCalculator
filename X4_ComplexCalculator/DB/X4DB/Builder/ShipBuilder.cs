@@ -12,67 +12,41 @@ namespace X4_ComplexCalculator.DB.X4DB.Builder;
 /// <summary>
 /// <see cref="Ship"/> クラスのインスタンスを作成するBuilderクラス
 /// </summary>
-class ShipBuilder
+/// <remarks>
+/// コンストラクタ
+/// </remarks>
+/// <param name="conn">DB接続情報</param>
+/// <param name="wareEquipmentManager">ウェアの装備情報一覧</param>
+class ShipBuilder(IDbConnection conn, WareEquipmentManager wareEquipmentManager)
 {
     #region メンバ
     /// <summary>
     /// 艦船種別一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IShipType> _shipTypes;
+    private readonly IReadOnlyDictionary<string, IShipType> _shipTypes = 
+        conn.Query<ShipType>("SELECT ShipTypeID, Name, Description FROM ShipType")
+                .ToDictionary(x => x.ShipTypeID, x => x as IShipType);
 
 
     /// <summary>
     /// 艦船一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, X4_DataExporterWPF.Entity.Ship> _ships;
-
-
-    /// <summary>
-    /// ウェアの装備情報一覧
-    /// </summary>
-    private readonly WareEquipmentManager _wareEquipmentManager;
+    private readonly IReadOnlyDictionary<string, X4_DataExporterWPF.Entities.Ship> _ships = 
+        conn.Query<X4_DataExporterWPF.Entities.Ship>("SELECT * FROM Ship")
+                .ToDictionary(x => x.ShipID);
 
 
     /// <summary>
     /// 艦船のハンガー情報一覧
     /// </summary>
-    private readonly ShipHangerManager _shipHangerManager;
+    private readonly ShipHangerManager _shipHangerManager = new(conn);
 
 
     /// <summary>
     /// 艦船のロードアウト情報一覧
     /// </summary>
-    private readonly ShipLoadoutManager _shipLoadoutManager;
+    private readonly ShipLoadoutManager _shipLoadoutManager = new(conn);
     #endregion
-
-
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    /// <param name="conn">DB接続情報</param>
-    /// <param name="wareEquipmentManager">ウェアの装備情報一覧</param>
-    public ShipBuilder(IDbConnection conn, WareEquipmentManager wareEquipmentManager)
-    {
-        _shipHangerManager = new(conn);
-
-        _shipLoadoutManager = new(conn);
-
-        _wareEquipmentManager = wareEquipmentManager;
-
-
-        // 艦船種別を初期化
-        {
-            const string SQL = @"SELECT ShipTypeID, Name, Description FROM ShipType";
-            _shipTypes = conn.Query<ShipType>(SQL)
-                .ToDictionary(x => x.ShipTypeID, x => x as IShipType);
-        }
-
-        // 艦船情報一覧を作成
-        {
-            _ships = conn.Query<X4_DataExporterWPF.Entity.Ship>("SELECT * FROM Ship")
-                .ToDictionary(x => x.ShipID);
-        }
-    }
 
 
     /// <summary>
@@ -107,7 +81,7 @@ class ShipBuilder
             item.CargoSize,
             _shipHangerManager.Get(ware.ID),
             _shipLoadoutManager.Get(ware.ID),
-            _wareEquipmentManager.Get(ware.ID).ToDictionary(x => x.ConnectionName)
+            wareEquipmentManager.Get(ware.ID).ToDictionary(x => x.ConnectionName)
         );
     }
 }

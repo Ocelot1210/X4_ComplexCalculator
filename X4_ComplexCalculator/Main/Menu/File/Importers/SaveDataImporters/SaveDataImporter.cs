@@ -1,11 +1,12 @@
 ﻿using Collections.Pooled;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.XPath;
-using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
+using X4_ComplexCalculator.Common.Dialogs.MessageBoxes;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Main.WorkArea;
@@ -54,9 +55,10 @@ partial class SaveDataImporter(WorkAreaManager workAreaManager, ILocalizedMessag
 
         foreach (var station in stations)
         {
-            var vm = new WorkAreaViewModel(_workAreaManager.ActiveLayoutID, _localizedMessageBox.Clone());
-
-            if (ImportMain(vm.WorkArea, station))
+            var messenger = new WeakReferenceMessenger();
+            var vm = new WorkAreaViewModel(messenger, _workAreaManager.ActiveLayoutID, _localizedMessageBox.Clone());
+            
+            if (ImportMain(messenger, vm.WorkArea, station))
             {
                 _workAreaManager.Documents.Add(vm);
             }
@@ -71,23 +73,24 @@ partial class SaveDataImporter(WorkAreaManager workAreaManager, ILocalizedMessag
     /// <summary>
     /// インポート実行メイン
     /// </summary>
-    /// <param name="WorkArea"></param>
+    /// <param name="messenger"></param>
+    /// <param name="workArea"></param>
     /// <param name="saveData"></param>
     /// <returns></returns>
-    private static bool ImportMain(IWorkArea WorkArea, SaveDataStationItem saveData)
+    private static bool ImportMain(IMessenger messenger, IWorkArea workArea, SaveDataStationItem saveData)
     {
         try
         {
             // モジュール一覧を設定
-            SetModules(WorkArea, saveData);
+            SetModules(messenger, workArea, saveData);
 
             // 製品価格を設定
-            SetWarePrice(WorkArea, saveData);
+            SetWarePrice(workArea, saveData);
 
             // 保管庫割当状態を設定
-            SetStorageAssign(WorkArea, saveData);
+            SetStorageAssign(workArea, saveData);
 
-            WorkArea.Title = saveData.StationName;
+            workArea.Title = saveData.StationName;
 
             return true;
         }
@@ -101,11 +104,12 @@ partial class SaveDataImporter(WorkAreaManager workAreaManager, ILocalizedMessag
     /// <summary>
     /// モジュール一覧を設定
     /// </summary>
+    /// <param name="messenger"></param>
     /// <param name="WorkArea"></param>
     /// <param name="saveData"></param>
-    private static void SetModules(IWorkArea WorkArea, SaveDataStationItem saveData)
+    private static void SetModules(IMessenger messenger, IWorkArea WorkArea, SaveDataStationItem saveData)
     {
-        var modules = new List<ModulesGridItem>((int)(double)saveData.XElement.XPathEvaluate("count(construction/sequence/entry)"));
+        using var modules = new PooledList<ModulesGridItem>((int)(double)saveData.XElement.XPathEvaluate("count(construction/sequence/entry)"));
 
         foreach (var entry in saveData.XElement.XPathSelectElements("construction/sequence/entry"))
         {
@@ -131,7 +135,7 @@ partial class SaveDataImporter(WorkAreaManager workAreaManager, ILocalizedMessag
                 .Where(x => x.Equipment is not null)
                 .Select(x => (Equipment: x.Equipment!, x.Count));
 
-            var modulesGridItem = new ModulesGridItem(module);
+            var modulesGridItem = new ModulesGridItem(messenger, module);
             foreach (var (equipment, count) in equipments)
             {
                 modulesGridItem.Equipments.Add(equipment, count);
@@ -161,7 +165,7 @@ partial class SaveDataImporter(WorkAreaManager workAreaManager, ILocalizedMessag
         }
 
         // モジュール一覧に追加
-        var range = dict.Select(x => (x.Value)).OrderBy(x => x.Item1).Select(x => new ModulesGridItem(x.Item2, x.Item3, x.Item4));
+        var range = dict.Select(x => (x.Value)).OrderBy(x => x.Item1).Select(x => new ModulesGridItem(messenger, x.Item2, x.Item3, x.Item4));
         WorkArea.StationData.ModulesInfo.Modules.AddRange(range);
     }
 

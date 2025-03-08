@@ -12,57 +12,43 @@ namespace X4_ComplexCalculator.DB.X4DB.Builder;
 /// <summary>
 /// <see cref="Equipment"/> クラスのインスタンスを作成するBuilderクラス
 /// </summary>
-class EquipmentBuilder
+/// <remarks>
+/// コンストラクタ
+/// </remarks>
+/// <param name="conn"></param>
+class EquipmentBuilder(IDbConnection conn)
 {
     #region メンバ
     /// <summary>
     /// タグ情報一覧
     /// </summary>
-    private readonly EquipmentTagsManager _equipmentTagsManager;
+    private readonly EquipmentTagsManager _equipmentTagsManager = new(conn);
 
 
     /// <summary>
     /// <see cref="IEngine"/> 情報ビルダ
     /// </summary>
-    private readonly EngineBuilder _engineBuilder;
+    private readonly EngineBuilder _engineBuilder = new(conn);
 
 
     /// <summary>
     /// <see cref="IShield"/> 情報ビルダ
     /// </summary>
-    private readonly ShieldBuilder _shieldBuilder;
+    private readonly ShieldBuilder _shieldBuilder = new(conn);
 
 
     /// <summary>
     /// <see cref="IThruster"/> 情報ビルダ
     /// </summary>
-    private readonly ThrusterBuilder _thrusterBuilder;
+    private readonly ThrusterBuilder _thrusterBuilder = new(conn);
 
 
     /// <summary>
     /// 装備一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, X4_DataExporterWPF.Entity.Equipment> _equipments;
-    #endregion
-
-
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    /// <param name="conn"></param>
-    public EquipmentBuilder(IDbConnection conn)
-    {
-        _equipmentTagsManager = new(conn);
-
-        _engineBuilder = new(conn);
-
-        _shieldBuilder = new(conn);
-
-        _thrusterBuilder = new(conn);
-
-        _equipments = conn.Query<X4_DataExporterWPF.Entity.Equipment>("SELECT * FROM Equipment")
+    private readonly IReadOnlyDictionary<string, X4_DataExporterWPF.Entities.Equipment> _equipments = conn.Query<X4_DataExporterWPF.Entities.Equipment>("SELECT * FROM Equipment")
             .ToDictionary(x => x.EquipmentID);
-    }
+    #endregion
 
 
     /// <summary>

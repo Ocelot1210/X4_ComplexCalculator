@@ -1,5 +1,5 @@
-using Prism.Commands;
-using Prism.Mvvm;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using System;
@@ -10,10 +10,9 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
-using System.Windows.Input;
-using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
+using X4_ComplexCalculator.Common.Dialogs.MessageBoxes;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
-using X4_ComplexCalculator.Entity;
+using X4_ComplexCalculator.Entities;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
@@ -21,7 +20,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
 /// <summary>
 /// 装備編集画面のViewModel
 /// </summary>
-class EditEquipmentViewModel : BindableBase, IDisposable
+sealed partial class EditEquipmentViewModel : ObservableObject, IDisposable
 {
     #region メンバ
     /// <summary>
@@ -34,12 +33,6 @@ class EditEquipmentViewModel : BindableBase, IDisposable
     /// メッセージボックス表示用
     /// </summary>
     private readonly ILocalizedMessageBox _localizedMessageBox;
-
-
-    /// <summary>
-    /// ウィンドウの表示状態
-    /// </summary>
-    private bool _closeWindow = false;
 
 
     /// <summary>
@@ -59,24 +52,8 @@ class EditEquipmentViewModel : BindableBase, IDisposable
     /// <summary>
     /// ウィンドウの表示状態
     /// </summary>
-    public bool CloseWindowProperty
-    {
-        get
-        {
-            return _closeWindow;
-        }
-        set
-        {
-            _closeWindow = value;
-            RaisePropertyChanged();
-        }
-    }
-
-
-    /// <summary>
-    /// ウィンドウが閉じられる時
-    /// </summary>
-    public ICommand WindowClosingCommand { get; }
+    [ObservableProperty]
+    public partial bool CloseWindowProperty { get; set; }
 
 
     /// <summary>
@@ -110,42 +87,6 @@ class EditEquipmentViewModel : BindableBase, IDisposable
 
 
     /// <summary>
-    /// 保存ボタンクリック
-    /// </summary>
-    public ICommand SaveButtonClickedCommand { get; }
-
-
-    /// <summary>
-    /// 閉じるボタンクリック時のコマンド
-    /// </summary>
-    public ICommand CloseWindowCommand { get; }
-
-
-    /// <summary>
-    /// プリセット編集
-    /// </summary>
-    public ICommand EditPresetNameCommand { get; }
-
-
-    /// <summary>
-    /// プリセット追加
-    /// </summary>
-    public ICommand AddPresetCommand { get; }
-
-
-    /// <summary>
-    /// プリセット保存
-    /// </summary>
-    public ICommand OverwritePresetCommand { get; }
-
-
-    /// <summary>
-    /// プリセット削除
-    /// </summary>
-    public ICommand DeletePresetCommand { get; }
-
-
-    /// <summary>
     /// タブアイテム一覧
     /// </summary>
     public ObservableCollection<EquipmentListViewModel> EquipmentListViewModels => _model.EquipmentListViewModels;
@@ -164,15 +105,6 @@ class EditEquipmentViewModel : BindableBase, IDisposable
         // Model類
         _model = new EditEquipmentModel(equipmentManager, messageBox);
         _localizedMessageBox = messageBox;
-
-        // コマンド類
-        SaveButtonClickedCommand = new DelegateCommand(SavebuttonClicked);
-        CloseWindowCommand       = new DelegateCommand(CloseWindow);
-        OverwritePresetCommand   = new DelegateCommand(_model.OverwritePreset);
-        EditPresetNameCommand    = new DelegateCommand(_model.EditPresetName);
-        AddPresetCommand         = new DelegateCommand(_model.AddPreset);
-        DeletePresetCommand      = new DelegateCommand(_model.DeletePreset);
-        WindowClosingCommand     = new DelegateCommand<CancelEventArgs>(WindowClosing);
 
 
         // その他初期化
@@ -207,8 +139,8 @@ class EditEquipmentViewModel : BindableBase, IDisposable
     /// <summary>
     /// ウィンドウが閉じられる時
     /// </summary>
-    /// <param name="e"></param>
-    public void WindowClosing(CancelEventArgs e)
+    [RelayCommand]
+    private void OnWindowClosing(CancelEventArgs e)
     {
         // 装備が未保存の場合
         if (EquipmentListViewModels.Any(x => x.Unsaved.Value))
@@ -250,7 +182,8 @@ class EditEquipmentViewModel : BindableBase, IDisposable
     /// <summary>
     /// 保存ボタンクリック時
     /// </summary>
-    private void SavebuttonClicked()
+    [RelayCommand]
+    private void OnSavebuttonClicked()
     {
         _model.SaveEquipment();
         CloseWindowProperty = true;
@@ -260,5 +193,27 @@ class EditEquipmentViewModel : BindableBase, IDisposable
     /// <summary>
     /// 閉じるボタンクリック時
     /// </summary>
-    private void CloseWindow() => CloseWindowProperty = true;
+    [RelayCommand]
+    private void OnCloseWindow() => CloseWindowProperty = true;
+
+
+    /// <summary>
+    /// プリセット保存ボタンクリック時
+    /// </summary>
+    [RelayCommand]
+    private void OnOverwritePreset() => _model.OverwritePreset();
+
+
+    /// <summary>
+    /// プリセット編集ボタンクリック時
+    /// </summary>
+    [RelayCommand]
+    private void OnEditPresetName() => _model.EditPresetName();
+
+
+    /// <summary>
+    /// プリセット追加ボタンクリック時
+    /// </summary>
+    [RelayCommand]
+    private void OnAddPreset() => _model.AddPreset();
 }

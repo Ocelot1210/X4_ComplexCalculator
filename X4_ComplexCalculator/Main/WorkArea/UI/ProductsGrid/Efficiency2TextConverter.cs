@@ -7,7 +7,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
 /// <summary>
 /// 生産性を表示文字列に変換するValueConverter
 /// </summary>
-class Efficiency2TextConverter : IValueConverter
+sealed class Efficiency2TextConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {

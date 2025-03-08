@@ -10,7 +10,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager;
 /// <summary>
 /// <see cref="IX4Module"/> に対応する <see cref="IModuleStorage"/> の一覧を管理するクラス
 /// </summary>
-class ModuleStorageManager
+sealed class ModuleStorageManager
 {
     #region メンバ
     /// <summary>

@@ -10,7 +10,7 @@ namespace X4_ComplexCalculator.DB;
 /// <summary>
 /// 設定データベースの読み込み・書き込みを行うクラス
 /// </summary>
-class SettingDatabase : DBConnection
+sealed class SettingDatabase : DBConnection
 {
     #region スタティックメンバ
     /// <summary>

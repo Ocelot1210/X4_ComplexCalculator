@@ -1,5 +1,6 @@
 ﻿using Collections.Pooled;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -10,11 +11,11 @@ using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Threading;
 using X4_ComplexCalculator.Common;
-using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
+using X4_ComplexCalculator.Common.Collections;
+using X4_ComplexCalculator.Common.Dialogs.MessageBoxes;
 using X4_ComplexCalculator.Main.Menu.Layout;
 using X4_ComplexCalculator.Main.WorkArea;
-using X4_ComplexCalculator.Main.WorkArea.SaveDataReader;
+using X4_ComplexCalculator.Main.WorkArea.SaveDataReaders;
 
 namespace X4_ComplexCalculator.Main;
 
@@ -133,7 +134,8 @@ partial class WorkAreaManager : ObservableObject, IDisposable
     /// </summary>
     public void CreateNewDocument()
     {
-        var vm = new WorkAreaViewModel(ActiveLayoutID, _localizedMessageBox.Clone());
+        var messenger = new WeakReferenceMessenger();
+        var vm = new WorkAreaViewModel(messenger, ActiveLayoutID, _localizedMessageBox.Clone());
         Documents.Add(vm);
         ActiveContent = vm;
     }
@@ -206,7 +208,8 @@ partial class WorkAreaManager : ObservableObject, IDisposable
 
             foreach (var path in paths)
             {
-                var vm = new WorkAreaViewModel(ActiveLayoutID, _localizedMessageBox.Clone());
+                var messenger = new WeakReferenceMessenger();
+                var vm = new WorkAreaViewModel(messenger, ActiveLayoutID, _localizedMessageBox.Clone());
 
                 _saveDataReaderProgress.LoadingFileName = System.IO.Path.GetFileName(path);
                 doevents.ForceDoEvents();

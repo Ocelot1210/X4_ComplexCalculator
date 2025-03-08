@@ -10,7 +10,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager;
 /// <summary>
 /// <see cref="ITransportType"/> の一覧を管理するクラス
 /// </summary>
-public class TransportTypeManager
+public sealed class TransportTypeManager
 {
     /// <summary>
     /// カーゴタイプ一覧

@@ -1,11 +1,12 @@
 ﻿using Collections.Pooled;
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging.Messages;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Threading.Tasks;
 using X4_ComplexCalculator.Common;
-using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Collections;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
@@ -16,7 +17,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid;
 /// <summary>
 /// 保管庫一覧表示用DataGridViewのModel
 /// </summary>
-class StoragesGridModel : IDisposable
+sealed partial class StoragesGridModel : ObservableRecipientEx, IDisposable
 {
     #region メンバ
     /// <summary>
@@ -45,12 +46,39 @@ class StoragesGridModel : IDisposable
     /// </summary>
     /// <param name="modules">モジュール一覧</param>
     /// <param name="storages">保管庫一覧</param>
-    public StoragesGridModel(IModulesInfo modules, IStoragesInfo storages)
+    public StoragesGridModel(IMessenger messenger, IModulesInfo modules, IStoragesInfo storages) : base(messenger, true)
     {
         _modules = modules;
         _storages = storages;
         _modules.Modules.CollectionChanged += OnModulesChanged;
-        _modules.Modules.CollectionPropertyChanged += OnModulePropertyChanged;
+
+        Messenger.RegisterPropertyChangedMessage(this, static (ModulesGridItem x) => x.ModuleCount, OnModuleCountChanged);
+    }
+
+
+    /// <summary>
+    /// モジュール数変更時
+    /// </summary>
+    private void OnModuleCountChanged(StoragesGridModel recipient, PropertyChangedMessage<long> message)
+    {
+        if (message.Sender is not ModulesGridItem module)
+        {
+            return;
+        }
+
+        // 保管モジュールの場合のみ更新
+        if (0 < module.Module.Storage.Amount && module.Module.Storage.Types.Any())
+        {
+            ModulesGridItem[] modules = [module];
+
+            var storageModules = AggregateStorage(modules);
+
+            foreach (var kvp in storageModules)
+            {
+                // 変更対象のモジュールを検索
+                Storages.FirstOrDefault(x => x.TransportType.Equals(kvp.Key))?.SetDetails(kvp.Value, message.OldValue);
+            }
+        }
     }
 
 
@@ -60,38 +88,19 @@ class StoragesGridModel : IDisposable
     public void Dispose()
     {
         _modules.Modules.CollectionChanged -= OnModulesChanged;
-        _modules.Modules.CollectionPropertyChanged -= OnModulePropertyChanged;
+        Messenger.UnregisterPropertyChangedMessage(this, static (ModulesGridItem x) => x.ModuleCount);
     }
 
 
     /// <summary>
-    /// モジュールのプロパティ変更時
+    /// 選択されたアイテムの展開/折りたたみ状態を設定
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    /// <returns></returns>
-    private void OnModulePropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    /// <param name="value">設定値</param>
+    public void SetExpanded(bool value)
     {
-        // モジュール数変更時のみ処理
-        if (e.PropertyName != nameof(ModulesGridItem.ModuleCount))
+        foreach (var item in Storages.Where(x => x.IsSelected))
         {
-            return;
-        }
-
-
-        if (sender is not ModulesGridItem module)
-        {
-            return;
-        }
-        
-        // 保管モジュールの場合のみ更新
-        if (0 < module.Module.Storage.Amount && module.Module.Storage.Types.Any())
-        {
-            if (e is not PropertyChangedExtendedEventArgs<long> ev)
-            {
-                return;
-            }
-            OnModuleCountChanged(module, ev.OldValue);
+            item.IsExpanded = value;
         }
     }
 
@@ -169,26 +178,6 @@ class StoragesGridModel : IDisposable
         // 空のレコードを削除
         Storages.RemoveAll(x => x.Capacity == 0);
     }
-
-
-    /// <summary>
-    /// モジュール数変更時
-    /// </summary>
-    /// <param name="module">変更があったモジュール</param>
-    /// <param name="prevModuleCount">前回値モジュール数</param>
-    private void OnModuleCountChanged(ModulesGridItem module, long prevModuleCount)
-    {
-        ModulesGridItem[] modules = { module };
-
-        var storageModules = AggregateStorage(modules);
-
-        foreach (var kvp in storageModules)
-        {
-            // 変更対象のモジュールを検索
-            Storages.FirstOrDefault(x => x.TransportType.Equals(kvp.Key))?.SetDetails(kvp.Value, prevModuleCount);
-        }
-    }
-
 
 
     /// <summary>

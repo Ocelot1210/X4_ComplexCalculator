@@ -7,29 +7,24 @@ namespace X4_ComplexCalculator.DB.X4DB.Entity;
 /// <summary>
 /// ウェア単位のウェア生産時の追加効果情報用クラス
 /// </summary>
-public class WareEffects : IWareEffects
+/// <remarks>
+/// コンストラクタ
+/// </remarks>
+/// <param name="effects">ウェア単位の追加効果情報一覧</param>
+public sealed class WareEffects(IEnumerable<IWareEffect> effects) : IWareEffects
 {
     #region メンバ
     /// <summary>
     /// ウェア生産時の追加効果情報一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, IWareEffect>> _effects;
-    #endregion
-
-
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    /// <param name="effects">ウェア単位の追加効果情報一覧</param>
-    public WareEffects(IEnumerable<IWareEffect> effects)
-    {
-        _effects = effects
+    private readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, IWareEffect>> _effects = 
+        effects
             .GroupBy(x => x.Method)
             .ToDictionary(
                 x => x.Key,
                 x => x.ToDictionary(y => y.EffectID) as IReadOnlyDictionary<string, IWareEffect>
             );
-    }
+    #endregion
 
 
     /// <inheritdoc/>

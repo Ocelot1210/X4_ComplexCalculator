@@ -1,4 +1,4 @@
-﻿using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
+﻿using X4_ComplexCalculator.Common.Dialogs.MessageBoxes;
 
 namespace X4_ComplexCalculator.Main;
 

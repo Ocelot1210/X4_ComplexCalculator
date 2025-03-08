@@ -1,9 +1,8 @@
-﻿using Prism.Commands;
-using Prism.Mvvm;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using System;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows.Input;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid;
@@ -11,7 +10,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StoragesGrid;
 /// <summary>
 /// 保管庫一覧表示用DataGridViewのViewModel
 /// </summary>
-public sealed class StoragesGridViewModel : BindableBase, IDisposable
+public sealed partial class StoragesGridViewModel : ObservableObject, IDisposable
 {
     #region メンバ
     /// <summary>
@@ -26,12 +25,6 @@ public sealed class StoragesGridViewModel : BindableBase, IDisposable
     /// ストレージ一覧
     /// </summary>
     public ObservableCollection<StoragesGridItem> Storages => _model.Storages;
-
-
-    /// <summary>
-    /// 選択されたアイテムの展開/折りたたみ状態を設定する
-    /// </summary>
-    public ICommand SetSelectedExpandedCommand { get; }
     #endregion
 
 
@@ -39,10 +32,9 @@ public sealed class StoragesGridViewModel : BindableBase, IDisposable
     /// コンストラクタ
     /// </summary>
     /// <param name="stationData">計算機で使用するステーション情報</param>
-    public StoragesGridViewModel(IStationData stationData)
+    public StoragesGridViewModel(IMessenger messenger, IStationData stationData)
     {
-        _model = new StoragesGridModel(stationData.ModulesInfo, stationData.StoragesInfo);
-        SetSelectedExpandedCommand = new DelegateCommand<bool?>(SetSelectedExpanded);
+        _model = new StoragesGridModel(messenger, stationData.ModulesInfo, stationData.StoragesInfo);
     }
 
 
@@ -58,12 +50,7 @@ public sealed class StoragesGridViewModel : BindableBase, IDisposable
     /// <summary>
     /// 選択されたアイテムの展開/折りたたみ状態を設定する
     /// </summary>
-    /// <param name="param"></param>
-    private void SetSelectedExpanded(bool? param)
-    {
-        foreach (var item in Storages.Where(x => x.IsSelected))
-        {
-            item.IsExpanded = param == true;
-        }
-    }
+    /// <param name="param">設定値</param>
+    [RelayCommand]
+    private void SetSelectedExpanded(bool? param) => _model.SetExpanded(param == true);
 }

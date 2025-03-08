@@ -1,13 +1,15 @@
 ﻿using Collections.Pooled;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging.Messages;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
-using System.Threading.Tasks;
 using X4_ComplexCalculator.Common;
-using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Collections;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
@@ -20,7 +22,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
 /// <summary>
 /// 建造に必要なリソースを表示するDataGridView用Model
 /// </summary>
-class BuildResourcesGridModel : IDisposable
+sealed class BuildResourcesGridModel : ObservableRecipient, IDisposable
 {
     #region メンバ
     /// <summary>
@@ -61,13 +63,15 @@ class BuildResourcesGridModel : IDisposable
     /// </summary>
     /// <param name="modules">モジュール一覧情報</param>
     /// <param name="buildResources">建造リソース情報</param>
-    public BuildResourcesGridModel(IModulesInfo modules, IBuildResourcesInfo buildResources)
+    public BuildResourcesGridModel(IMessenger messenger, IModulesInfo modules, IBuildResourcesInfo buildResources) : base(messenger)
     {
         _modules = modules;
         _buildResources = buildResources;
 
         _modules.Modules.CollectionChanged += OnModulesCollectionChanged;
         _modules.Modules.CollectionPropertyChanged += OnModulesPropertyChanged;
+
+        Messenger.RegisterPropertyChangedMessage(this, static (ModulesGridItem x) => x.ModuleCount, OnModuleCountChanged);
     }
 
 
@@ -79,6 +83,36 @@ class BuildResourcesGridModel : IDisposable
         Resources.Clear();
         _modules.Modules.CollectionChanged -= OnModulesCollectionChanged;
         _modules.Modules.CollectionPropertyChanged -= OnModulesPropertyChanged;
+
+        Messenger.UnregisterPropertyChangedMessage(this, static (ModulesGridItem x) => x.ModuleCount);
+    }
+
+
+    /// <summary>
+    /// 価格割合一括設定
+    /// </summary>
+    /// <param name="value">設定値</param>
+
+    public void SetUnitPricePercent(long value)
+    {
+        foreach (var resource in Resources)
+        {
+            resource.SetUnitPricePercent(value);
+        }
+    }
+
+
+    /// <summary>
+    /// 購入しない一括設定
+    /// </summary>
+    /// <param name="value">設定値</param>
+    /// <param name="onlySelectedItem">選択中の項目のみ設定するか</param>
+    public void SetNoBuy(bool value, bool onlySelectedItem)
+    {
+        foreach (var resource in Resources.Where(x => x.IsSelected || !onlySelectedItem))
+        {
+            resource.NoBuy = value;
+        }
     }
 
 
@@ -97,17 +131,6 @@ class BuildResourcesGridModel : IDisposable
 
         switch (e.PropertyName)
         {
-            // モジュール数変更の場合
-            case nameof(ModulesGridItem.ModuleCount):
-                {
-                    if (e is PropertyChangedExtendedEventArgs<long> ev)
-                    {
-                        OnModuleCountChanged(module, ev.OldValue);
-                    }
-                }
-
-                break;
-
             // 装備変更の場合
             case nameof(ModulesGridItem.Equipments):
                 {
@@ -175,10 +198,10 @@ class BuildResourcesGridModel : IDisposable
                     {
                         if (_optionsBakDict.TryGetValue(x.WareID, out var oldRes))
                         {
-                            return new BuildResourcesGridItem(x.WareID, x.Amount, oldRes.UnitPrice) { EditStatus = oldRes.EditStatus };
+                            return new BuildResourcesGridItem(Messenger, x.WareID, x.Amount, oldRes.UnitPrice) { EditStatus = oldRes.EditStatus };
                         }
 
-                        return new BuildResourcesGridItem(x.WareID, x.Amount) { EditStatus = EditStatus.Edited };
+                        return new BuildResourcesGridItem(Messenger, x.WareID, x.Amount) { EditStatus = EditStatus.Edited };
                     });
 
                 Resources.AddRange(addItems);
@@ -191,19 +214,25 @@ class BuildResourcesGridModel : IDisposable
     /// <summary>
     /// モジュール数変更時に建造に必要なリソースを更新
     /// </summary>
-    /// <param name="module">変更対象モジュール</param>
-    /// <param name="prevModuleCount">モジュール数前回値</param>
-    private void OnModuleCountChanged(ModulesGridItem module, long prevModuleCount)
+    /// <param name="recipient"></param>
+    /// <param name="message"></param>
+    /// <exception cref="InvalidOperationException"></exception>
+    private void OnModuleCountChanged(BuildResourcesGridModel recipient, PropertyChangedMessage<long> message)
     {
-        (IWare Ware, string Method, long Count)[] wares = 
+        if (message.Sender is not ModulesGridItem item)
         {
-            (module.Module, module.SelectedMethod.Method, 1)
-        };
+            throw new InvalidOperationException();
+        }
+
+        (IWare Ware, string Method, long Count)[] wares =
+        [
+            (item.Module, item.SelectedMethod.Method, 1)
+        ];
 
 
         // モジュールの建造に必要なリソースを集計
         // モジュールの装備一覧(装備IDごとに集計)
-        var equipments = module
+        var equipments = item
             .Equipments.AllEquipments
             .Select(x => (Ware: x, Count: 1))
             .GroupBy(x => x)
@@ -216,7 +245,7 @@ class BuildResourcesGridModel : IDisposable
             var itm = Resources.FirstOrDefault(x => x.Ware.ID == resource.WareID);
             if (itm is not null)
             {
-                itm.Amount += resource.Amount * (module.ModuleCount - prevModuleCount);
+                itm.Amount += resource.Amount * (item.ModuleCount - message.OldValue);
             }
         }
     }
@@ -226,13 +255,13 @@ class BuildResourcesGridModel : IDisposable
     /// モジュールの建造方式変更時に必要なリソースを更新
     /// </summary>
     /// <param name="module"></param>
-    /// <param name="buildMethod"></param>
-    private void OnModuleSelectedMethodChanged(ModulesGridItem module, string buildMethod)
+    /// <param name="prevBuildMethod"></param>
+    private void OnModuleSelectedMethodChanged(ModulesGridItem module, string prevBuildMethod)
     {
         (IWare Ware, string Method, long ModuleCount)[] modules =
         {
-            (module.Module, buildMethod, -1),                   // 変更前のため -1
-            (module.Module, module.SelectedMethod.Method, 1)    // 変更後のため +1
+            (module.Module, prevBuildMethod, -1),                   // 変更前のため -1
+            (module.Module, module.SelectedMethod.Method, 1)        // 変更後のため +1
         };
 
         using var addTarget = new PooledList<BuildResourcesGridItem>();
@@ -247,7 +276,7 @@ class BuildResourcesGridModel : IDisposable
             else
             {
                 // ウェアが一覧にない場合
-                addTarget.Add(new BuildResourcesGridItem(kvp.WareID, kvp.Amount * module.ModuleCount) { EditStatus = EditStatus.Edited });
+                addTarget.Add(new BuildResourcesGridItem(Messenger, kvp.WareID, kvp.Amount * module.ModuleCount) { EditStatus = EditStatus.Edited });
             }
         }
 
@@ -286,7 +315,7 @@ class BuildResourcesGridModel : IDisposable
             else
             {
                 // ウェアが一覧にない場合
-                addTarget.Add(new BuildResourcesGridItem(resource.WareID, resource.Amount * module.ModuleCount) { EditStatus = EditStatus.Edited });
+                addTarget.Add(new BuildResourcesGridItem(Messenger, resource.WareID, resource.Amount * module.ModuleCount) { EditStatus = EditStatus.Edited });
             }
         }
 
@@ -313,7 +342,7 @@ class BuildResourcesGridModel : IDisposable
             else
             {
                 // ウェアが一覧にない場合
-                addTarget.Add(new BuildResourcesGridItem(kvp.WareID, kvp.Amount) { EditStatus = EditStatus.Edited });
+                addTarget.Add(new BuildResourcesGridItem(Messenger, kvp.WareID, kvp.Amount) { EditStatus = EditStatus.Edited });
             }
         }
 

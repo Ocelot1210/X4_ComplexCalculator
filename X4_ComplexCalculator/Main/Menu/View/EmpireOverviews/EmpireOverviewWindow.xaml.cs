@@ -7,7 +7,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverviews;
 /// <summary>
 /// EmpireOverviewWindow.xaml の相互作用ロジック
 /// </summary>
-public partial class EmpireOverviewWindow : Window
+public sealed partial class EmpireOverviewWindow : Window
 {
     /// <summary>
     /// コンストラクタ

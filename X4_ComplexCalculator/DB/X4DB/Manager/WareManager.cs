@@ -10,7 +10,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager;
 /// <summary>
 /// <see cref="IWare"/> の一覧を管理するクラス
 /// </summary>
-public class WareManager
+public sealed class WareManager
 {
     #region メンバ
     /// <summary>

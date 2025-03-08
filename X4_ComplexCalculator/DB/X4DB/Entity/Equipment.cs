@@ -4,72 +4,132 @@ using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.DB.X4DB.Entity;
 
+
 /// <summary>
 /// 装備品情報用クラス
 /// </summary>
-public partial class Equipment : IEquipment
+/// <remarks>
+/// コンストラクタ
+/// </remarks>
+/// <param name="ware">ウェア情報</param>
+/// <param name="macro">マクロ名</param>
+/// <param name="equipmentType">装備種別</param>
+/// <param name="hull">船体値</param>
+/// <param name="hullIntegrated">船体値が統合されているか</param>
+/// <param name="mk">Mk</param>
+/// <param name="makerRace">製造種族</param>
+/// <param name="equipmentTags">タグ情報</param>
+/// <param name="size">サイズ</param>
+public sealed class Equipment(
+    IWare ware,
+    string macro,
+    IEquipmentType equipmentType,
+    long hull,
+    bool hullIntegrated,
+    long mk,
+    IRace? makerRace,
+    HashSet<string> equipmentTags,
+    IX4Size? size
+    ) : IEquipment
 {
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    /// <param name="ware">ウェア情報</param>
-    /// <param name="macro">マクロ名</param>
-    /// <param name="equipmentType">装備種別</param>
-    /// <param name="hull">船体値</param>
-    /// <param name="hullIntegrated">船体値が統合されているか</param>
-    /// <param name="mk">Mk</param>
-    /// <param name="makerRace">製造種族</param>
-    /// <param name="equipmentTags">タグ情報</param>
-    /// <param name="size">サイズ</param>
-    public Equipment(
-        IWare ware,
-        string macro,
-        IEquipmentType equipmentType,
-        long hull,
-        bool hullIntegrated,
-        long mk,
-        IRace? makerRace,
-        HashSet<string> equipmentTags,
-        IX4Size? size
-    )
-    {
-        ID = ware.ID;
-        Name = ware.Name;
-        WareGroup = ware.WareGroup;
-        TransportType = ware.TransportType;
-        Description = ware.Description;
-        Volume = ware.Volume;
-        MinPrice = ware.MinPrice;
-        AvgPrice = ware.AvgPrice;
-        MaxPrice = ware.MaxPrice;
-        Owners = ware.Owners;
-        Productions = ware.Productions;
-        Resources = ware.Resources;
-        Tags = ware.Tags;
-        WareEffects = ware.WareEffects;
-
-        MacroName = macro;
-        EquipmentType = equipmentType;
-        Hull = hull;
-        HullIntegrated = hullIntegrated;
-        Mk = mk;
-        MakerRace = makerRace;
-        EquipmentTags = equipmentTags;
-        Size = size;
-    }
+    #region IWare
+    /// <inheritdoc/>
+    public string ID { get; } = ware.ID;
 
 
-    /// <summary>
-    /// 比較
-    /// </summary>
-    /// <param name="obj">比較対象</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
+    public string Name { get; } = ware.Name;
+
+
+    /// <inheritdoc/>
+    public IWareGroup WareGroup { get; } = ware.WareGroup;
+
+
+    /// <inheritdoc/>
+    public ITransportType TransportType { get; } = ware.TransportType;
+
+
+    /// <inheritdoc/>
+    public string Description { get; } = ware.Description;
+
+
+    /// <inheritdoc/>
+    public long Volume { get; } = ware.Volume;
+
+
+    /// <inheritdoc/>
+    public long MinPrice { get; } = ware.MinPrice;
+
+
+    /// <inheritdoc/>
+    public long AvgPrice { get; } = ware.AvgPrice;
+
+
+    /// <inheritdoc/>
+    public long MaxPrice { get; } = ware.MaxPrice;
+
+
+    /// <inheritdoc/>
+    public IReadOnlyList<IFaction> Owners { get; } = ware.Owners;
+
+
+    /// <inheritdoc/>
+    public IReadOnlyDictionary<string, IWareProduction> Productions { get; } = ware.Productions;
+
+
+    /// <inheritdoc/>
+    public IReadOnlyDictionary<string, IReadOnlyList<IWareResource>> Resources { get; } = ware.Resources;
+
+
+    /// <inheritdoc/>
+    public HashSet<string> Tags { get; } = ware.Tags;
+
+
+    /// <inheritdoc/>
+    public IWareEffects WareEffects { get; } = ware.WareEffects;
+    #endregion
+
+
+    #region IEquipment
+    /// <inheritdoc/>
+    public IEquipmentType EquipmentType { get; } = equipmentType;
+
+
+    /// <inheritdoc/>
+    public long Hull { get; } = hull;
+
+
+    /// <inheritdoc/>
+    public bool HullIntegrated { get; } = hullIntegrated;
+
+
+    /// <inheritdoc/>
+    public long Mk { get; } = mk;
+
+
+    /// <inheritdoc/>
+    public IRace? MakerRace { get; } = makerRace;
+
+
+    /// <inheritdoc/>
+    public HashSet<string> EquipmentTags { get; } = equipmentTags;
+
+
+    /// <inheritdoc/>
+    public IX4Size? Size { get; } = size;
+    #endregion
+
+
+    #region IMacro
+    /// <inheritdoc/>
+    public string MacroName { get; } = macro;
+    #endregion
+
+
+    /// <inheritdoc/>
     public override bool Equals(object? obj) => obj is IWare other && ID == other.ID;
 
 
-    /// <summary>
-    /// ハッシュ値を取得
-    /// </summary>
-    /// <returns>ハッシュ値</returns>
+    /// <inheritdoc/>
     public override int GetHashCode() => HashCode.Combine(ID);
 }

@@ -28,11 +28,7 @@ public interface IX4Size : IComparable<IX4Size>
 
 
 
-    /// <summary>
-    /// 比較
-    /// </summary>
-    /// <param name="other">比較対象</param>
-    /// <returns>比較結果</returns>
+    /// <inheritdoc/>
     int IComparable<IX4Size>.CompareTo(IX4Size? other)
     {
         if (other is null)

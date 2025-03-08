@@ -8,7 +8,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewers.Ships;
 /// <summary>
 /// 装備情報表示用
 /// </summary>
-public class EquipmentInfo<T> where T : class, IEquipment
+public sealed class EquipmentInfo<T> where T : class, IEquipment
 {
     /// <summary>
     /// 表示する値

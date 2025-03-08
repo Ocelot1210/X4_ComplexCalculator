@@ -3,7 +3,7 @@
 /// <summary>
 /// 建造リソースの計算結果
 /// </summary>
-public class CalcResult
+public sealed class CalcResult
 {
     #region プロパティ
     /// <summary>

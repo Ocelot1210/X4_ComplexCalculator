@@ -1,14 +1,16 @@
-﻿using System.Linq;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using X4_ComplexCalculator.Entity;
-using Prism.Mvvm;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
+using X4_ComplexCalculator.Entities;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
 /// <summary>
 /// 装備情報
 /// </summary>
-public class EquipmentsInfo : BindableBase
+public sealed partial class EquipmentsInfo : ObservableObject
 {
     #region メンバ 
     /// <summary>
@@ -24,21 +26,9 @@ public class EquipmentsInfo : BindableBase
 
 
     /// <summary>
-    /// 更新が必要か
-    /// </summary>
-    private bool _updateNeeded;
-
-
-    /// <summary>
     /// 詳細表示文字列
     /// </summary>
     private string _detailsText = "";
-
-
-    /// <summary>
-    /// 表示対象の装備の個数
-    /// </summary>
-    private int _count;
     #endregion
 
 
@@ -50,10 +40,7 @@ public class EquipmentsInfo : BindableBase
     {
         get
         {
-            if (_updateNeeded)
-            {
-                Update();
-            }
+            Update();
             return _detailsText;
         }
         set
@@ -63,26 +50,21 @@ public class EquipmentsInfo : BindableBase
     }
 
 
-    /// <summary>
-    /// 表示対象の装備の個数
-    /// </summary>
-    public int Count
+    public IEnumerable<IWareEquipment> Equipments
     {
         get
         {
-            if (_updateNeeded)
-            {
-                Update();
-            }
-            return _count;
-        }
-        set
-        {
-            SetProperty(ref _count, value);
+            yield break; 
         }
     }
-    #endregion
 
+
+    /// <summary>
+    /// 表示対象の装備の個数
+    /// </summary>
+    [ObservableProperty]
+    public partial int Count { get; private set; }
+    #endregion
 
 
     /// <summary>
@@ -94,32 +76,25 @@ public class EquipmentsInfo : BindableBase
     {
         _manager = manager;
         _equipmentTypeID = equipmentTypeID;
-        _updateNeeded = true;
+
+        Count = _manager.AllEquipments.Where(x => x.EquipmentType.EquipmentTypeID == _equipmentTypeID).Count();
     }
-
-
-
-    /// <summary>
-    /// ツールチップ文字列の更新を要求する
-    /// </summary>
-    public void RequireUpdate() => _updateNeeded = true;
-
 
 
     /// <summary>
     /// 表示内容を更新
     /// </summary>
     /// <returns></returns>
-    public void Update()
+    private void Update()
     {
         var equipments = _manager.AllEquipments
             .Where(x => x.EquipmentType.EquipmentTypeID == _equipmentTypeID);
 
+        // 装備が無い場合は
         if (!equipments.Any())
         {
-            _count = 0;
+            Count = 0;
             DetailsText = (string)WPFLocalizeExtension.Engine.LocalizeDictionary.Instance.GetLocalizedObject("Lang:Common_NotEquippedToolTipText", null, null);
-            _updateNeeded = false;
             return;
         }
 
@@ -154,6 +129,11 @@ public class EquipmentsInfo : BindableBase
 
         DetailsText = sb.ToString();
         Count = total;
-        _updateNeeded = false;
     }
+
+
+    //public static EquipmentsInfo Craete(IEquippableWare ware, string equipmentTypeID)
+    //{
+    //    ware.Equipments
+    //}
 }

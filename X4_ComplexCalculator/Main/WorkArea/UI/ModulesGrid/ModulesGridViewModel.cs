@@ -1,26 +1,21 @@
-using Prism.Commands;
-using Prism.Mvvm;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using System;
 using System.Windows.Data;
 using System.Windows.Input;
-using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
+using X4_ComplexCalculator.Common.Dialogs.MessageBoxes;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
-public sealed class ModulesGridViewModel : BindableBase, IDisposable
+public sealed partial class ModulesGridViewModel : ObservableObject, IDisposable
 {
     #region メンバ
     /// <summary>
     /// Model
     /// </summary>
     private readonly ModulesGridModel _model;
-
-
-    /// <summary>
-    /// 検索モジュール名
-    /// </summary>
-    private string _searchModuleName = "";
     #endregion
 
 
@@ -34,17 +29,9 @@ public sealed class ModulesGridViewModel : BindableBase, IDisposable
     /// <summary>
     /// 検索するモジュール名
     /// </summary>
-    public string SearchModuleName
-    {
-        get => _searchModuleName;
-        set
-        {
-            if (SetProperty(ref _searchModuleName, value))
-            {
-                ModulesView.Refresh();
-            }
-        }
-    }
+    [ObservableProperty]
+    public partial string SearchModuleName { get; set; } = "";
+
 
     /// <summary>
     /// コンテキストメニューの処理
@@ -53,51 +40,24 @@ public sealed class ModulesGridViewModel : BindableBase, IDisposable
 
 
     /// <summary>
-    /// モジュール追加ボタンクリック
-    /// </summary>
-    public ICommand AddModuleCommand { get; }
-
-
-    /// <summary>
-    /// モジュール変更
-    /// </summary>
-    public ICommand ReplaceModuleCommand { get; }
-
-
-    /// <summary>
     /// セルフォーカス用のコマンド
     /// </summary>
     public ICommand? CellFocusCommand { private get; set; }
-
-
-    /// <summary>
-    /// モジュールマージコマンド
-    /// </summary>
-    public ICommand MergeModuleCommand { get; }
-
-
-    /// <summary>
-    /// モジュール自動追加コマンド
-    /// </summary>
-    public ICommand? AutoAddModuleCommand { get; set; }
     #endregion
 
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
+    /// <param name="messanger">メッセージ交換用</param>
     /// <param name="stationData">計算機で使用するステーション情報</param>
     /// <param name="localizedMessageBox">メッセージボックス表示用</param>
-    public ModulesGridViewModel(IStationData stationData, ILocalizedMessageBox localizedMessageBox)
+    public ModulesGridViewModel(IMessenger messenger, IStationData stationData, ILocalizedMessageBox localizedMessageBox)
     {
-        _model = new ModulesGridModel(stationData.ModulesInfo, localizedMessageBox);
+        _model = new ModulesGridModel(messenger, stationData.ModulesInfo, localizedMessageBox);
         ModulesView = (ListCollectionView)CollectionViewSource.GetDefaultView(_model.Modules);
-        ModulesView.Filter   = Filter;
-        ContextMenu = new ContextMenuOperation(stationData.ModulesInfo, ModulesView);
-
-        AddModuleCommand     = new DelegateCommand(_model.ShowAddModuleWindow);
-        MergeModuleCommand   = new DelegateCommand(_model.MergeModule);
-        ReplaceModuleCommand = new DelegateCommand<ModulesGridItem>(ReplaceModule);
+        ModulesView.Filter = Filter;
+        ContextMenu = new ContextMenuOperation(messenger, stationData.ModulesInfo, ModulesView);
     }
 
 
@@ -110,8 +70,25 @@ public sealed class ModulesGridViewModel : BindableBase, IDisposable
 
 
     /// <summary>
+    /// 検索モジュール名変更時
+    /// </summary>
+    partial void OnSearchModuleNameChanged(string value)
+    {
+        ModulesView.Refresh();
+    }
+
+
+    /// <summary>
+    /// モジュール追加
+    /// </summary>
+    [RelayCommand]
+    private void AddModule() => _model.ShowAddModuleWindow();
+
+
+    /// <summary>
     /// モジュールを置換する
     /// </summary>
+    [RelayCommand]
     private void ReplaceModule(ModulesGridItem oldItem)
     {
         if (_model.ReplaceModule(oldItem))
@@ -119,6 +96,20 @@ public sealed class ModulesGridViewModel : BindableBase, IDisposable
             ModulesView.Refresh();
         }
     }
+
+
+    /// <summary>
+    /// モジュール追加
+    /// </summary>
+    [RelayCommand]
+    private void MergeModule() => _model.MergeModule();
+
+
+    /// <summary>
+    /// 不足モジュールを自動追加
+    /// </summary>
+    [RelayCommand]
+    private void AutoAddModule() => _model.AutoAddModule();
 
 
     /// <summary>

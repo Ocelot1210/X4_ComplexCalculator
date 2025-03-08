@@ -1,8 +1,8 @@
-﻿using Prism.Mvvm;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
-using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Collections;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
@@ -11,7 +11,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewers.Races;
 /// <summary>
 /// 種族閲覧用ViewModel
 /// </summary>
-class RacesViewModel : BindableBase
+sealed partial class RacesViewModel : ObservableObject
 {
     #region メンバ
     /// <summary>

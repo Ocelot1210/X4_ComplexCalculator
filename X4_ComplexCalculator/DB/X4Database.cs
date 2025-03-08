@@ -2,17 +2,17 @@
 using System.IO;
 using System.Windows;
 using X4_ComplexCalculator.Common;
-using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
-using X4_ComplexCalculator.Common.Localize;
+using X4_ComplexCalculator.Common.Dialogs.MessageBoxes;
+using X4_ComplexCalculator.Common.LocalizationProviders;
 using X4_ComplexCalculator.DB.X4DB.Manager;
-using X4_DataExporterWPF.DataExportWindow;
+using X4_DataExporterWPF.DataExportWindows;
 
 namespace X4_ComplexCalculator.DB;
 
 /// <summary>
 /// X4 データベースの読み込みを行うクラス
 /// </summary>
-class X4Database : DBConnection
+sealed class X4Database : DBConnection
 {
     #region スタティックメンバ
     /// <summary>

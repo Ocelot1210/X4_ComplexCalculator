@@ -1,4 +1,4 @@
-﻿using Prism.Mvvm;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList;
@@ -6,41 +6,23 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
 /// <summary>
 /// 兵装編集画面の装備品一覧1レコード分
 /// </summary>
-class EquipmentListItem : BindableBase
+/// <remarks>
+/// コンストラクタ
+/// </remarks>
+/// <param name="equipment">装備品</param>
+sealed partial class EquipmentListItem(IEquipment equipment) : ObservableObject
 {
-    #region メンバ
-    /// <summary>
-    /// 選択されているか
-    /// </summary>
-    private bool _isSelected;
-    #endregion
-
-
     #region プロパティ
     /// <summary>
     /// 装備品
     /// </summary>
-    public IEquipment Equipment { get; }
+    public IEquipment Equipment { get; } = equipment;
 
 
     /// <summary>
     /// 選択されているか
     /// </summary>
-    public bool IsSelected
-    {
-        get => _isSelected;
-        set => SetProperty(ref _isSelected, value);
-    }
+    [ObservableProperty]
+    public partial bool IsSelected { get; set; }
     #endregion
-
-
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    /// <param name="equipment">装備品</param>
-    public EquipmentListItem(IEquipment equipment)
-    {
-        Equipment = equipment;
-        _isSelected = false;
-    }
 }

@@ -7,7 +7,7 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
+    xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behaviors"
     xmlns:x4ccrtl="clr-namespace:X4_ComplexCalculator_CustomControlLibrary;assembly=X4_ComplexCalculator_CustomControlLibrary"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     Title="{lex:Loc Lang:SelectModuleWindow_Title}"
@@ -70,7 +70,7 @@
             <Button
                 Width="75"
                 Margin="10"
-                Command="{Binding CloseButtonClickedCommand, Mode=OneTime}"
+                Command="{Binding CloseWindowCommand, Mode=OneTime}"
                 Content="{lex:Loc Lang:Common_Close}" />
         </StackPanel>
         <!--#endregion-->
@@ -93,7 +93,7 @@
                                 <xctk:CheckListBox
                                     DisplayMemberPath="Name"
                                     IsSelectAllActive="True"
-                                    ItemsSource="{Binding ModuleTypes}"
+                                    ItemsSource="{Binding ModuleTypesView, Mode=OneTime}"
                                     ScrollViewer.HorizontalScrollBarVisibility="Visible"
                                     ScrollViewer.VerticalScrollBarVisibility="Visible"
                                     SelectAllContent="{lex:Loc Lang:Common_SelectAll}"
@@ -110,7 +110,7 @@
                                 <xctk:CheckListBox
                                     DisplayMemberPath="FactionName"
                                     IsSelectAllActive="True"
-                                    ItemsSource="{Binding ModuleOwnersView}"
+                                    ItemsSource="{Binding ModuleOwnersView, Mode=OneTime}"
                                     ScrollViewer.HorizontalScrollBarVisibility="Visible"
                                     ScrollViewer.VerticalScrollBarVisibility="Visible"
                                     SelectAllContent="{lex:Loc Lang:Common_SelectAll}"
@@ -150,7 +150,7 @@
                                 <ListBox
                                     x4bhv:ControlItemDoubleClick.ItemsDoubleClick="True"
                                     DisplayMemberPath="Name"
-                                    ItemsSource="{Binding ModulesView}"
+                                    ItemsSource="{Binding ModulesView, Mode=OneTime}"
                                     ScrollViewer.HorizontalScrollBarVisibility="Visible"
                                     ScrollViewer.VerticalScrollBarVisibility="Visible"
                                     SelectionMode="{Binding ModuleListSelectionMode}"

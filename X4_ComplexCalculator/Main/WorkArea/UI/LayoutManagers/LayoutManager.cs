@@ -5,7 +5,7 @@ using System;
 using System.IO;
 using System.Linq;
 using WPFLocalizeExtension.Engine;
-using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Collections;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.Menu.Tab;
 

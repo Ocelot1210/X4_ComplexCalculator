@@ -11,7 +11,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager;
 /// <summary>
 /// <see cref="IX4Module"/> に対応する <see cref="IModuleProduct"/> の一覧を管理するクラス
 /// </summary>
-class ModuleProductManager
+sealed class ModuleProductManager
 {
     #region メンバ
     /// <summary>
@@ -36,7 +36,7 @@ class ModuleProductManager
     {
         const string SQL = @"SELECT ModuleID, WareID, Method, Amount FROM ModuleProduct";
 
-        _moduleProducts = conn.Query<X4_DataExporterWPF.Entity.ModuleProduct>(SQL)
+        _moduleProducts = conn.Query<X4_DataExporterWPF.Entities.ModuleProduct>(SQL)
             .Select(x => new ModuleProduct(x.ModuleID, x.WareID, x.Method, x.Amount, wareProductionManager.Get(x.WareID, x.Method)))
             .GroupBy(x => x.ModuleID)
             .ToDictionary(x => x.Key, x => x.ToArray() as IReadOnlyList<IModuleProduct>);

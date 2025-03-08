@@ -1,13 +1,11 @@
 ﻿using AvalonDock;
-using Prism.Commands;
-using Prism.Mvvm;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using System;
-using System.Windows.Input;
-using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
-using X4_ComplexCalculator.Main.Menu.File.Exporters;
-using X4_ComplexCalculator.Main.Menu.File.Importers;
-using X4_ComplexCalculator.Main.WorkArea.SaveDataWriter;
+using X4_ComplexCalculator.Common.Collections;
+using X4_ComplexCalculator.Common.Dialogs.MessageBoxes;
+using X4_ComplexCalculator.Main.WorkArea.SaveDataWriters;
 using X4_ComplexCalculator.Main.WorkArea.UI;
 using X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.Menu.Tab;
@@ -23,7 +21,7 @@ namespace X4_ComplexCalculator.Main.WorkArea;
 /// <summary>
 /// 作業エリア用ViewModel
 /// </summary>
-public sealed class WorkAreaViewModel : BindableBase, IDisposable
+public sealed partial class WorkAreaViewModel : ObservableRecipient, IDisposable
 {
     #region メンバ
     /// <summary>
@@ -89,12 +87,6 @@ public sealed class WorkAreaViewModel : BindableBase, IDisposable
 
 
     /// <summary>
-    /// アンロード時
-    /// </summary>
-    public ICommand OnLoadedCommand { get; }
-
-
-    /// <summary>
     /// モジュールの内容に変更があったか
     /// </summary>
     public bool HasChanged => _model.HasChanged;
@@ -131,21 +123,18 @@ public sealed class WorkAreaViewModel : BindableBase, IDisposable
     /// <remarks>
     /// レイアウトIDが負の場合、レイアウトは指定されていない事にする
     /// </remarks>
-    public WorkAreaViewModel(long layoutID, ILocalizedMessageBox messageBox)
+    public WorkAreaViewModel(IMessenger messenger, long layoutID, ILocalizedMessageBox messageBox) : base(messenger)
     {
-        _model                  = new(new SQLiteSaveDataWriter(messageBox));
+        _model                  = new(Messenger, new SQLiteSaveDataWriter(messageBox));
         LayoutManager           = new LayoutManager(layoutID);
         MessageBox              = messageBox;
 
-        Summary                 = new(_model.StationData);
-        Modules                 = new(_model.StationData, messageBox);
-        Products                = new(_model.StationData, messageBox);
-        Resources               = new(_model.StationData);
-        Storages                = new(_model.StationData);
-        StorageAssign           = new(_model.StationData);
-
-        Modules.AutoAddModuleCommand = Products.AutoAddModuleCommand;
-        OnLoadedCommand     = new DelegateCommand<DockingManager>(LayoutManager.OnLoaded);
+        Summary                 = new(Messenger, _model.StationData);
+        Modules                 = new(Messenger, _model.StationData, messageBox);
+        Products                = new(Messenger, _model.StationData);
+        Resources               = new(Messenger, _model.StationData);
+        Storages                = new(Messenger, _model.StationData);
+        StorageAssign           = new(Messenger, _model.StationData);
 
         _model.PropertyChanged += Model_PropertyChanged;
     }
@@ -171,6 +160,13 @@ public sealed class WorkAreaViewModel : BindableBase, IDisposable
 
 
     /// <summary>
+    /// ロード時
+    /// </summary>
+    [RelayCommand]
+    private void OnLoaded(DockingManager dockingManager) => LayoutManager.OnLoaded(dockingManager);
+
+
+    /// <summary>
     /// Modelのプロパティ変更時
     /// </summary>
     /// <param name="sender"></param>
@@ -180,12 +176,12 @@ public sealed class WorkAreaViewModel : BindableBase, IDisposable
         switch (e.PropertyName)
         {
             case nameof(_model.HasChanged):
-                RaisePropertyChanged(nameof(HasChanged));
-                RaisePropertyChanged(nameof(Title));
+                OnPropertyChanged(nameof(HasChanged));
+                OnPropertyChanged(nameof(Title));
                 break;
 
             case nameof(_model.Title):
-                RaisePropertyChanged(nameof(Title));
+                OnPropertyChanged(nameof(Title));
                 break;
 
             default:

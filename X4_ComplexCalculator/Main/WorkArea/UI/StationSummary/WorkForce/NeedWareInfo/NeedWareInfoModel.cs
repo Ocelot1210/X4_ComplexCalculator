@@ -1,5 +1,5 @@
 ﻿using Collections.Pooled;
-using Prism.Mvvm;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -7,7 +7,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using X4_ComplexCalculator.Common;
-using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Collections;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
@@ -19,7 +19,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
 /// <summary>
 /// 必要ウェア情報
 /// </summary>
-class NeedWareInfoModel : BindableBase, IDisposable
+sealed partial class NeedWareInfoModel : ObservableObject, IDisposable
 {
     #region メンバ
     /// <summary>

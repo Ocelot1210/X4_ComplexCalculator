@@ -5,7 +5,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.Equipm
 /// <summary>
 /// EquipmentList.xaml の相互作用ロジック
 /// </summary>
-public partial class EquipmentList : UserControl
+public sealed partial class EquipmentList : UserControl
 {
     public EquipmentList()
     {

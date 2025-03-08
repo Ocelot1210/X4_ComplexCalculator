@@ -6,7 +6,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Entity;
 /// <summary>
 /// カーゴタイプ(輸送種別)情報用クラス
 /// </summary>
-public class TransportType : ITransportType
+public sealed class TransportType : ITransportType
 {
     #region ITransportType
     /// <inheritdoc/>

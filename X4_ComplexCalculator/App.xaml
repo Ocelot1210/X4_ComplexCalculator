@@ -5,7 +5,7 @@
     xmlns:local="clr-namespace:X4_ComplexCalculator"
     xmlns:system="clr-namespace:System;assembly=netstandard"
     xmlns:x4cvt="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
-    xmlns:x4loc="clr-namespace:X4_ComplexCalculator.Common.Localize"
+    xmlns:x4loc="clr-namespace:X4_ComplexCalculator.Common.LocalizationProviders"
     StartupUri="Main\MainWindow.xaml">
 
 

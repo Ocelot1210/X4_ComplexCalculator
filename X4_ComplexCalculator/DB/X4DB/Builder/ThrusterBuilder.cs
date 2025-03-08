@@ -10,25 +10,20 @@ namespace X4_ComplexCalculator.DB.X4DB.Builder;
 /// <summary>
 /// <see cref="Thruster"/> クラスのインスタンスを作成するBuilderクラス
 /// </summary>
-class ThrusterBuilder
+/// <remarks>
+/// コンストラクタ
+/// </remarks>
+/// <param name="conn">DB接続情報</param>
+class ThrusterBuilder(IDbConnection conn)
 {
     #region メンバ
     /// <summary>
     /// スラスター情報一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, X4_DataExporterWPF.Entity.Thruster> _thrusters;
-    #endregion
-
-
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    /// <param name="conn">DB接続情報</param>
-    public ThrusterBuilder(IDbConnection conn)
-    {
-        _thrusters = conn.Query<X4_DataExporterWPF.Entity.Thruster>("SELECT * FROM Thruster")
+    private readonly IReadOnlyDictionary<string, X4_DataExporterWPF.Entities.Thruster> _thrusters = 
+        conn.Query<X4_DataExporterWPF.Entities.Thruster>("SELECT * FROM Thruster")
             .ToDictionary(x => x.EquipmentID);
-    }
+    #endregion
 
 
     /// <summary>

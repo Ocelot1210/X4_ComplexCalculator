@@ -10,7 +10,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager;
 /// <summary>
 /// <see cref="IX4Size"/> の一覧を管理するクラス
 /// </summary>
-class X4SizeManager
+sealed class X4SizeManager
 {
     #region メンバ
     /// <summary>

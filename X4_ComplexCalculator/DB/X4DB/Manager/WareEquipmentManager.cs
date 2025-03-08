@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using Collections.Pooled;
+using Dapper;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -11,7 +12,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager;
 /// <summary>
 /// <see cref="IWareEquipment"/> の一覧を管理するクラス
 /// </summary>
-class WareEquipmentManager
+sealed class WareEquipmentManager
 {
     #region メンバ
     /// <summary>
@@ -56,8 +57,8 @@ GROUP BY
 	TmpTagsTable.WareID,
 	TmpTagsTable.ConnectionName";
 
-        var tagsDict = conn.Query<string>(SQL_1)
-            .ToDictionary(x => x, x => new HashSet<string>(x.Split('彁')));
+        using var tagsDict = conn.Query<string>(SQL_1)
+            .ToPooledDictionary(x => x, x => new HashSet<string>(x.Split('彁')));
         
 
 
@@ -101,27 +102,18 @@ GROUP BY
     /// <summary>
     /// 装備一覧作成時の一時情報用クラス
     /// </summary>
-    private class TempWareEquipment
-    {
-        public string WareID { get; }
-        public string ConnectionName { get; }
-        public string EquipmentTypeID { get; }
-        public string GroupName { get; }
-        public string Tags { get; }
-
-        public TempWareEquipment(
-            string wareID,
-            string connectionName,
-            string equipmentTypeID,
-            string groupName,
-            string tags
+    private sealed class TempWareEquipment(
+        string wareID,
+        string connectionName,
+        string equipmentTypeID,
+        string groupName,
+        string tags
         )
-        {
-            WareID = wareID;
-            ConnectionName = connectionName;
-            EquipmentTypeID = equipmentTypeID;
-            GroupName = groupName;
-            Tags = tags;
-        }
+    {
+        public string WareID { get; } = wareID;
+        public string ConnectionName { get; } = connectionName;
+        public string EquipmentTypeID { get; } = equipmentTypeID;
+        public string GroupName { get; } = groupName;
+        public string Tags { get; } = tags;
     }
 }

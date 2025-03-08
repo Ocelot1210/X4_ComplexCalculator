@@ -1,32 +1,19 @@
-using Prism.Commands;
-using Prism.Mvvm;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows.Input;
-using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
+using X4_ComplexCalculator.Common.Dialogs.MessageBoxes;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Importers.StationPlanImporters;
 
-class SelectPlanViewModel : BindableBase
+sealed partial class SelectPlanViewModel : ObservableObject
 {
     #region メンバ
     /// <summary>
     /// Model
     /// </summary>
     private readonly SelectPlanModel _model;
-
-
-    /// <summary>
-    /// ダイアログの戻り値
-    /// </summary>
-    private bool _dialogResult;
-
-
-    /// <summary>
-    /// ダイアログを閉じるか
-    /// </summary>
-    private bool _closeDialogProperty;
 
 
     /// <summary>
@@ -46,43 +33,21 @@ class SelectPlanViewModel : BindableBase
     /// <summary>
     /// ダイアログの戻り値
     /// </summary>
-    public bool DialogResult
-    {
-        get => _dialogResult;
-        set => SetProperty(ref _dialogResult, value);
-    }
+    [ObservableProperty]
+    public partial bool DialogResult { get; set; }
+
 
     /// <summary>
     /// ダイアログを閉じるか
     /// </summary>
-    public bool CloseDialogProperty
-    {
-        get => _closeDialogProperty;
-        set => SetProperty(ref _closeDialogProperty, value);
-    }
+    [ObservableProperty]
+    public partial bool CloseDialogProperty { get; set; }
+
 
     /// <summary>
     /// 計画ファイルパス
     /// </summary>
     public string PlanFilePath => _model.PlanFilePath;
-
-
-    /// <summary>
-    /// 建造計画ファイル選択
-    /// </summary>
-    public ICommand SelectPlanFileCommand { get; }
-
-
-    /// <summary>
-    /// OKボタンクリック時の処理
-    /// </summary>
-    public ICommand OkButtonClickedCommand { get; }
-
-
-    /// <summary>
-    /// キャンセルボタンクリック時の処理
-    /// </summary>
-    public ICommand CancelButtonClickedCommand { get; }
     #endregion
 
 
@@ -96,10 +61,6 @@ class SelectPlanViewModel : BindableBase
         _model = new SelectPlanModel(messageBox);
         _model.PropertyChanged += Model_PropertyChanged;
         _selectedPlanItems = planItems;
-
-        OkButtonClickedCommand     = new DelegateCommand(OkButtonClicked);
-        CancelButtonClickedCommand = new DelegateCommand(CancelButtonClicked);
-        SelectPlanFileCommand      = new DelegateCommand(_model.SelectPlanFile);
     }
 
 
@@ -113,7 +74,7 @@ class SelectPlanViewModel : BindableBase
         switch (e.PropertyName)
         {
             case nameof(SelectPlanModel.PlanFilePath):
-                RaisePropertyChanged(nameof(PlanFilePath));
+                OnPropertyChanged(nameof(PlanFilePath));
                 break;
 
             default:
@@ -125,7 +86,8 @@ class SelectPlanViewModel : BindableBase
     /// <summary>
     /// OKボタンクリック時
     /// </summary>
-    private void OkButtonClicked()
+    [RelayCommand]
+    private void OnOkButtonClicked()
     {
         _selectedPlanItems.AddRange(Planes.Where(x => x.IsChecked));
         DialogResult = true;
@@ -136,9 +98,17 @@ class SelectPlanViewModel : BindableBase
     /// <summary>
     /// キャンセルボタンクリック時
     /// </summary>
-    private void CancelButtonClicked()
+    [RelayCommand]
+    private void OnCancelButtonClicked()
     {
         DialogResult = false;
         CloseDialogProperty = true;
     }
+
+
+    /// <summary>
+    /// 建造計画ファイルを選択
+    /// </summary>
+    [RelayCommand]
+    private void OnSelectPlanFile() => _model.SelectPlanFile();
 }

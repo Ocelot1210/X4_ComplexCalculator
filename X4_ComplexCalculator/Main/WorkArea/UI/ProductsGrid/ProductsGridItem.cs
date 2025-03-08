@@ -1,8 +1,12 @@
 ﻿using Collections.Pooled;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using X4_ComplexCalculator.Common;
-using X4_ComplexCalculator.Common.Collection;
+using X4_ComplexCalculator.Common.Collections;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
@@ -11,34 +15,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
 /// <summary>
 /// 製品一覧を表示するDataGridViewの1レコード分用クラス
 /// </summary>
-public class ProductsGridItem : BindableBaseEx, IEditable, ISelectable
+public partial class ProductsGridItem : ObservableRecipientEx, IEditable, ISelectable
 {
-    #region メンバ
-    /// <summary>
-    /// 単価
-    /// </summary>
-    private long _unitPrice;
-
-
-    /// <summary>
-    /// Expanderが展開されているか
-    /// </summary>
-    private bool _isExpanded;
-
-
-    /// <summary>
-    /// 売買オプション
-    /// </summary>
-    readonly TradeOption _tradeOption;
-
-
-    /// <summary>
-    /// 編集状態
-    /// </summary>
-    private EditStatus _editStatus = EditStatus.Unedited;
-    #endregion
-
-
     #region プロパティ
     /// <summary>
     /// 製品
@@ -55,11 +33,8 @@ public class ProductsGridItem : BindableBaseEx, IEditable, ISelectable
     /// <summary>
     /// 価格
     /// </summary>
-    public long Price
-    {
-        // ウェアが不足しているが購入しない or ウェアが余っているが販売しない場合、価格を0にする
-        get => (Count < 0 && NoBuy) || (0 < Count && NoSell) ? 0 : UnitPrice * Count;
-    }
+    /// <remarks>ウェアが不足しているが購入しない or ウェアが余っているが販売しない場合、価格を0にする</remarks>
+    public long Price => CalcPrice(Count, UnitPrice, NoBuy, NoSell);
 
 
     /// <summary>
@@ -67,40 +42,26 @@ public class ProductsGridItem : BindableBaseEx, IEditable, ISelectable
     /// </summary>
     public long UnitPrice
     {
-        get => _unitPrice;
+        get => field;
         set
         {
-            // 最低価格≦ 入力価格 ≦ 最高価格かつ価格が変更された場合のみ更新
-
-
-            var setValue = value;
-
-            if (setValue < Ware.MinPrice)
-            {
-                // 入力された値が最低価格未満の場合、最低価格を設定する
-                setValue = Ware.MinPrice;
-            }
-            else if (Ware.MaxPrice < setValue)
-            {
-                // 入力された値が最高価格を超える場合、最高価格を設定する
-                setValue = Ware.MaxPrice;
-            }
-
-            // 変更無しの場合は何もしない
-            if (setValue == _unitPrice)
-            {
-                return;
-            }
-
-            var oldUnitPrice = _unitPrice;
+            // 最低価格≦ 入力価格 ≦ 最高価格に抑える
+            var oldUnitPrice = field;
             var oldPrice = Price;
-            _unitPrice = setValue;
 
-            RaisePropertyChangedEx(oldUnitPrice, setValue);
-            RaisePropertyChangedEx(oldPrice, Price, nameof(Price));
-            EditStatus = EditStatus.Edited;
+            var setValue = Math.Min(Math.Max(value, Ware.MinPrice), Ware.MaxPrice);
+            if (SetProperty(ref field, setValue))
+            {
+                OnPropertyChanged(nameof(UnitPrice));
+                OnPropertyChanged(nameof(Price));
+
+                Broadcast(oldUnitPrice, UnitPrice, nameof(UnitPrice));
+                Broadcast(oldPrice, Price, nameof(Price));
+                EditStatus = EditStatus.Edited;
+            }
         }
     }
+
 
     /// <summary>
     /// ウェア詳細(関連モジュール等)
@@ -117,10 +78,84 @@ public class ProductsGridItem : BindableBaseEx, IEditable, ISelectable
     /// <summary>
     /// Expanderが展開されているか
     /// </summary>
-    public bool IsExpanded
+    [ObservableProperty]
+    public partial bool IsExpanded { get; set; }
+
+
+    /// <summary>
+    /// 購入しないか
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedRecipients]
+    [NotifyPropertyChangedFor(nameof(Price))]
+    public partial bool NoBuy { get; set; }
+
+
+    /// <summary>
+    /// 販売しないか
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedRecipients]
+    [NotifyPropertyChangedFor(nameof(Price))]
+    public partial bool NoSell { get; set; }
+
+
+    /// <summary>
+    /// 編集状態
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedRecipients]
+    public partial EditStatus EditStatus { get; set; } = EditStatus.Unedited;
+    #endregion
+
+
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    /// <param name="wareID">ウェア</param>
+    /// <param name="datails">ウェア詳細(関連モジュール等)</param>
+    /// <param name="noBuy">購入しないか</param>
+    /// <param name="noSell">販売しないか</param>
+    /// <param name="unitPrice">単価</param>
+    public ProductsGridItem(IMessenger messenger, IWare ware, IEnumerable<IProductDetailsListItem> datails, bool noBuy = false, bool noSell = false, long unitPrice = -1) : base(messenger)
     {
-        get => _isExpanded;
-        set => SetProperty(ref _isExpanded, value);
+        Ware = ware;
+        Details = new ObservableRangeCollection<IProductDetailsListItem>(datails);
+
+        NoBuy = noBuy;
+        NoSell = noSell;
+
+        UnitPrice = unitPrice == -1 ? (Ware.MinPrice + Ware.MaxPrice) / 2 : unitPrice;
+
+        IsActive = true;
+    }
+
+
+    /// <summary>
+    /// <see cref="NoBuy"/> 変更時
+    /// </summary>
+    partial void OnNoBuyChanged(bool oldValue, bool newValue)
+    {
+        var oldPrice = CalcPrice(Count, UnitPrice, oldValue, NoSell);
+        if (Price != oldPrice)
+        {
+            Broadcast(oldPrice, Price, nameof(Price));
+        }
+        EditStatus = EditStatus.Edited;
+    }
+
+
+    /// <summary>
+    /// <see cref="NoSell"/> 変更時
+    /// </summary>
+    partial void OnNoBuyChanging(bool oldValue, bool newValue)
+    {
+        var oldPrice = CalcPrice(Count, UnitPrice, NoBuy, oldValue);
+        if (Price != oldPrice)
+        {
+            Broadcast(oldPrice, Price, nameof(Price));
+        }
+        EditStatus = EditStatus.Edited;
     }
 
 
@@ -132,95 +167,6 @@ public class ProductsGridItem : BindableBaseEx, IEditable, ISelectable
     {
         UnitPrice = (long)(Ware.MinPrice + (Ware.MaxPrice - Ware.MinPrice) * 0.01 * percent);
     }
-
-
-    /// <summary>
-    /// 購入しないか
-    /// </summary>
-    public bool NoBuy
-    {
-        get => _tradeOption.NoBuy;
-        set
-        {
-            var oldPrice = Price;
-
-            if (SetProperty(ref _tradeOption.NoBuy, value))
-            {
-                if (oldPrice != Price)
-                {
-                    RaisePropertyChangedEx(oldPrice, Price, nameof(Price));
-                }
-                EditStatus = EditStatus.Edited;
-            }
-        }
-    }
-
-
-    /// <summary>
-    /// 販売しないか
-    /// </summary>
-    public bool NoSell
-    {
-        get => _tradeOption.NoSell;
-        set
-        {
-            var oldPrice = Price;
-
-            if (SetProperty(ref _tradeOption.NoSell, value))
-            {
-                if (oldPrice != Price)
-                {
-                    RaisePropertyChangedEx(oldPrice, Price, nameof(Price));
-                }
-                EditStatus = EditStatus.Edited;
-            }
-        }
-    }
-
-
-    /// <summary>
-    /// 編集状態
-    /// </summary>
-    public EditStatus EditStatus
-    {
-        get => _editStatus;
-        set => SetProperty(ref _editStatus, value);
-    }
-    #endregion
-
-
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    /// <param name="wareID">ウェア</param>
-    /// <param name="datails">ウェア詳細(関連モジュール等)</param>
-    /// <param name="tradeOption">売買オプション</param>
-    public ProductsGridItem(IWare ware, IEnumerable<IProductDetailsListItem> datails, TradeOption tradeOption)
-    {
-        Ware = ware;
-        Details = new ObservableRangeCollection<IProductDetailsListItem>(datails);
-
-        _tradeOption = tradeOption;
-        UnitPrice = (Ware.MinPrice + Ware.MaxPrice) / 2;
-    }
-
-
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    /// <param name="wareID">ウェア</param>
-    /// <param name="datails">ウェア詳細(関連モジュール等)</param>
-    /// <param name="tradeOption">売買オプション</param>
-    /// <param name="unitPrice">単価</param>
-    public ProductsGridItem(IWare ware, IEnumerable<IProductDetailsListItem> datails, TradeOption tradeOption, long unitPrice)
-    {
-        Ware = ware;
-        Details = new ObservableRangeCollection<IProductDetailsListItem>(datails);
-
-        _tradeOption = tradeOption;
-        UnitPrice = unitPrice;
-    }
-
 
 
     /// <summary>
@@ -255,17 +201,20 @@ public class ProductsGridItem : BindableBaseEx, IEditable, ISelectable
             var newCount = Count;
             if (oldCount != newCount)
             {
-                RaisePropertyChangedEx(oldCount, newCount, nameof(Count));
+                OnPropertyChanged(nameof(Count));
+                Broadcast(oldCount, newCount, nameof(Count));
             }
         }
         {
             var newPrice = Price;
             if (oldPrice != newPrice)
             {
-                RaisePropertyChangedEx(oldPrice, newPrice, nameof(Price));
+                OnPropertyChanged(nameof(Price));
+                Broadcast(oldPrice, newPrice, nameof(Price));
             }
         }
     }
+
 
     /// <summary>
     /// 詳細情報を設定
@@ -291,14 +240,16 @@ public class ProductsGridItem : BindableBaseEx, IEditable, ISelectable
             var newCount = Count;
             if (oldCount != newCount)
             {
-                RaisePropertyChangedEx(oldCount, newCount, nameof(Count));
+                OnPropertyChanged(nameof(Count));
+                Broadcast(oldCount, newCount, nameof(Count));
             }
         }
         {
             var newPrice = Price;
             if (oldPrice != newPrice)
             {
-                RaisePropertyChangedEx(oldPrice, newPrice, nameof(Price));
+                OnPropertyChanged(nameof(Price));
+                Broadcast(oldPrice, newPrice, nameof(Price));
             }
         }
     }
@@ -330,14 +281,16 @@ public class ProductsGridItem : BindableBaseEx, IEditable, ISelectable
             var newCount = Count;
             if (oldCount != newCount)
             {
-                RaisePropertyChangedEx(oldCount, newCount, nameof(Count));
+                OnPropertyChanged(nameof(Count));
+                Broadcast(oldCount, newCount, nameof(Count));
             }
         }
         {
             var newPrice = Price;
             if (oldPrice != newPrice)
             {
-                RaisePropertyChangedEx(oldPrice, newPrice, nameof(Price));
+                OnPropertyChanged(nameof(Price));
+                Broadcast(oldPrice, newPrice, nameof(Price));
             }
         }
     }
@@ -363,15 +316,34 @@ public class ProductsGridItem : BindableBaseEx, IEditable, ISelectable
             var newCount = Count;
             if (oldCount != newCount)
             {
-                RaisePropertyChangedEx(oldCount, newCount, nameof(Count));
+                OnPropertyChanged(nameof(Count));
+                Broadcast(oldCount, newCount, nameof(Count));
             }
         }
         {
             var newPrice = Price;
             if (oldPrice != newPrice)
             {
-                RaisePropertyChangedEx(oldPrice, newPrice, nameof(Price));
+                OnPropertyChanged(nameof(Price));
+                Broadcast(oldPrice, newPrice, nameof(Price));
             }
         }
+    }
+
+
+
+
+    /// <summary>
+    /// 価格を計算
+    /// </summary>
+    /// <param name="count">個数</param>
+    /// <param name="unitPrice">単価</param>
+    /// <param name="noBuy">購入しないフラグ</param>
+    /// <param name="noSell">販売しないフラグ</param>
+    /// <returns>ウェアが不足しているが購入しない or ウェアが余っているが販売しない場合、0。それ以外の場合、個数×単価</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static long CalcPrice(long count, long unitPrice, bool noBuy, bool noSell)
+    {
+        return (count < 0 && noBuy) || (0 < count && noSell) ? 0 : unitPrice * count;
     }
 }

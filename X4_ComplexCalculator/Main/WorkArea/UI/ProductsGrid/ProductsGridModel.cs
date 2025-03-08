@@ -1,18 +1,14 @@
 ﻿using Collections.Pooled;
-using Prism.Mvvm;
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging.Messages;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Data;
 using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
 using X4_ComplexCalculator.Common;
-using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
 using X4_ComplexCalculator.Common.EditStatus;
-using X4_ComplexCalculator.Common.Localize;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
@@ -25,7 +21,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
 /// <summary>
 /// 製品一覧用DataGridViewのModel
 /// </summary>
-class ProductsGridModel : BindableBase, IDisposable
+sealed partial class ProductsGridModel : ObservableRecipientEx, IDisposable
 {
     #region メンバ
     /// <summary>
@@ -44,12 +40,6 @@ class ProductsGridModel : BindableBase, IDisposable
     /// 製品情報
     /// </summary>
     private readonly IProductsInfo _products;
-
-
-    /// <summary>
-    /// メッセージボックス表示用
-    /// </summary>
-    private readonly ILocalizedMessageBox _messageBox;
 
 
     /// <summary>
@@ -85,63 +75,20 @@ class ProductsGridModel : BindableBase, IDisposable
     /// <param name="modules">モジュール一覧</param>
     /// <param name="settings">ステーションの設定</param>
     /// <param name="messageBox">メッセージボックス表示用</param>
-    public ProductsGridModel(IModulesInfo modules, IProductsInfo products, IStationSettings settings, ILocalizedMessageBox messageBox)
+    public ProductsGridModel(IMessenger messenger, IModulesInfo modules, IProductsInfo products, IStationSettings settings) : base(messenger, true)
     {
         _modules = modules;
         _products = products;
-        _messageBox = messageBox;
 
         _modules.Modules.CollectionChanged += OnModulesChanged;
-        _modules.Modules.CollectionPropertyChanged += OnModulePropertyChanged;
 
         _modules = modules;
         _settings = settings;
-        _settings.PropertyChanged += Settings_PropertyChanged;
-        _settings.Workforce.PropertyChanged += Workforce_PropertyChanged;
-    }
 
-
-
-    /// <summary>
-    /// 労働者情報に変更があった場合
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void Workforce_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        switch (e.PropertyName)
-        {
-            // 現在労働者数と必要労働者数の割合
-            case nameof(WorkforceManager.Proportion):
-                UpdateWorkerEfficiency();
-                break;
-
-            default:
-                break;
-        }
-    }
-
-
-    /// <summary>
-    /// 設定に変更があった場合
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        switch (e.PropertyName)
-        {
-            // 日光
-            case nameof(IStationSettings.Sunlight):
-                foreach (var prod in Products)
-                {
-                    prod.SetEfficiency("sunlight", _settings.Sunlight);
-                }
-                break;
-
-            default:
-                break;
-        }
+        Messenger.RegisterPropertyChangedMessage(this, static (ModulesGridItem x) => x.ModuleCount, OnModuleCountChanged);
+        Messenger.RegisterPropertyChangedMessage(this, static (WorkAreaData.StationSettings.StationSettings x) => x.Sunlight, OnSunlightChanged);
+        Messenger.RegisterPropertyChangedMessage(this, static (WorkforceManager x) => x.Proportion, OnWorkerProportionChanged);
+        Messenger.Register<ProductsGridModel, RequestMessage<(IX4Module, long)[]>>(this, OnNeedModulesRequired);
     }
 
 
@@ -152,112 +99,137 @@ class ProductsGridModel : BindableBase, IDisposable
     {
         Products.Clear();
         _modules.Modules.CollectionChanged -= OnModulesChanged;
-        _modules.Modules.CollectionPropertyChanged -= OnModulePropertyChanged;
-        _settings.PropertyChanged -= Settings_PropertyChanged;
-        _settings.Workforce.PropertyChanged -= Workforce_PropertyChanged;
+
+        Messenger.UnregisterPropertyChangedMessage(this, static (WorkAreaData.StationSettings.StationSettings x) => x.Sunlight);
+        Messenger.UnregisterPropertyChangedMessage(this, static (WorkforceManager x) => x.Proportion);
+        Messenger.Unregister<RequestMessage<(IX4Module, long)[]>>(this);
     }
 
 
     /// <summary>
-    /// モジュール自動追加
+    /// 単価を百分率ベースで一括設定する
     /// </summary>
-    public void AutoAddModule()
+    /// <param name="value">設定値</param>
+    public void SetUnitPricePercent(long value)
     {
-        var result = _messageBox.YesNo("Lang:Modules_Button_AutoAdd_ConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", LocalizedMessageBoxResult.No);
-        if (result != LocalizedMessageBoxResult.Yes)
+        foreach (var product in Products)
         {
-            return;
-        }
-
-        var addedRecords = 0L;              // 追加レコード数
-        var addedModules = 0L;              // 追加モジュール数
-
-        // モジュール自動追加で追加されたモジュール一覧
-        using var autoAddedModules = new PooledDictionary<string, ModulesGridItem>();
-
-
-        while (true)
-        {
-            // 追加モジュールIDとモジュール数のペア一覧
-            var addModules = _productCalculator.CalcNeedModules(Products, _settings);
-
-            // 追加モジュールが無ければ(不足が無くなれば)終了
-            if (!addModules.Any())
-            {
-                break;
-            }
-
-            using var addTarget = new PooledList<ModulesGridItem>();      // 実際に追加するモジュール一覧
-
-            foreach (var (module, count) in addModules)
-            {
-                // モジュール自動追加作業用に実際に追加するモジュールが存在するか？
-                if (autoAddedModules.ContainsKey(module.ID))
-                {
-                    // モジュール自動追加作業用に実際に追加するモジュールが存在する場合、
-                    // モジュール数を増やしてレコードがなるべく増えないようにする
-                    autoAddedModules[module.ID].ModuleCount += count;
-                }
-                else
-                {
-                    // モジュール自動追加作業用に実際に追加するモジュールが存在しない場合、
-                    // 実際に追加するモジュールと見なす
-                    var mgi = new ModulesGridItem(module, null, count) { EditStatus = EditStatus.Edited };
-                    addTarget.Add(mgi);
-                    autoAddedModules.Add(module.ID, mgi);
-
-                    // 追加レコード数更新
-                    addedRecords++;
-                }
-
-                // 追加モジュール数更新
-                addedModules += count;
-            }
-
-            // モジュール一覧に追加対象モジュールを追加
-            _modules.Modules.AddRange(addTarget);
-        }
-
-
-        if (addedRecords == 0)
-        {
-            _messageBox.Ok("Lang:Modules_Button_AutoAdd_NoAddedModulesMessage", "Lang:Common_MessageBoxTitle_Confirmation");
-        }
-        else
-        {
-            _messageBox.Ok("Lang:Modules_Button_AutoAdd_AddedModulesMessage", "Lang:Common_MessageBoxTitle_Confirmation", addedRecords, addedModules);
+            product.SetUnitPricePercent(value);
         }
     }
 
 
     /// <summary>
-    /// モジュールのプロパティが変更された場合
+    /// 購入フラグを一括設定する
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    /// <returns></returns>
-    private void OnModulePropertyChanged(object sender, PropertyChangedEventArgs e)
+    /// <param name="value">設定値</param>
+    /// <param name="onlySelectedItem">選択中の項目のみ設定するか</param>
+    public void SetNoBuy(bool value, bool onlySelectedItem)
     {
-        // モジュール数変更時以外は処理しない
-        if (e.PropertyName != nameof(ModulesGridItem.ModuleCount))
+        foreach (var prod in Products.Where(x => x.IsSelected || !onlySelectedItem))
+        {
+            prod.NoBuy = value;
+        }
+    }
+
+
+    /// <summary>
+    /// 販売フラグを一括設定
+    /// </summary>
+    /// <param name="value">設定値</param>
+    /// <param name="onlySelectedItem">選択中の項目のみ設定するか</param>
+    public void SetNoSell(bool value, bool onlySelectedItem)
+    {
+        foreach (var prod in Products.Where(x => x.IsSelected || !onlySelectedItem))
+        {
+            prod.NoSell = value;
+        }
+    }
+
+
+    /// <summary>
+    /// 選択されたアイテムの展開/折りたたみ状態を設定
+    /// </summary>
+    /// <param name="value">設定値</param>
+    public void SetExpanded(bool value)
+    {
+        foreach (var item in Products.Where(x => x.IsSelected))
+        {
+            item.IsExpanded = value;
+        }
+    }
+
+
+    /// <summary>
+    /// 不足している製品に対応するモジュールを返す
+    /// </summary>
+    private static void OnNeedModulesRequired(ProductsGridModel recipient, RequestMessage<(IX4Module, long)[]> message)
+    {
+        message.Reply(recipient._productCalculator.CalcNeedModules(recipient.Products, recipient._settings).ToArray());
+    }
+
+
+    /// <summary>
+    /// 現在労働者数と必要労働者数の割合に変化があった場合
+    /// </summary>
+    private void OnWorkerProportionChanged(ProductsGridModel recipient, PropertyChangedMessage<double> message)
+    {
+        // 労働者による生産性(倍率)
+        double efficiency = _settings.Workforce.Proportion;
+
+        if (1.0 < efficiency)
+        {
+            efficiency = 1.0;
+        }
+
+        // 労働による生産性が変化しない場合、何もしない
+        if (efficiency == _efficiency)
         {
             return;
         }
 
-        if (sender is not ModulesGridItem module)
+        foreach (var prod in Products)
+        {
+            prod.SetEfficiency("work", efficiency);
+        }
+
+        _efficiency = efficiency;
+    }
+
+
+    /// <summary>
+    /// 日光に変化があった場合
+    /// </summary>
+    private void OnSunlightChanged(ProductsGridModel recipient, PropertyChangedMessage<double> message)
+    {
+        foreach (var prod in Products)
+        {
+            prod.SetEfficiency("sunlight", _settings.Sunlight);
+        }
+    }
+
+
+    /// <summary>
+    /// モジュール数に変更があった場合
+    /// </summary>
+    private void OnModuleCountChanged(ProductsGridModel recipient, PropertyChangedMessage<long> message)
+    {
+        if (message.Sender is not ModulesGridItem module)
         {
             return;
         }
 
-        // 製品/消費ウェアがあるモジュールなら再計算する
-        if (module.Module.Resources.Any() || module.Module.Products.Any())
+        // 生産/消費ウェアのどちらも無いモジュール以外は再計算不要のため何もしない
+        if (!(module.Module.Resources.Any() || module.Module.Products.Any()))
         {
-            if (e is not PropertyChangedExtendedEventArgs<long> ev)
-            {
-                return;
-            }
+            return;
+        }
 
-            OnModuleCountChanged(module, ev.OldValue);
+        // 変更があったモジュールに対応する生産/消費ウェアに対して詳細情報を設定
+        var prodDict = AggregateProduct([module]);
+        foreach (var item in prodDict)
+        {
+            Products.FirstOrDefault(x => x.Ware.Equals(item.Key))?.SetDetails(item.Value, message.OldValue);
         }
     }
 
@@ -303,63 +275,16 @@ class ProductsGridModel : BindableBase, IDisposable
                     {
                         if (_optionsBakDict.TryGetValue(x.Key.ID, out var oldProd))
                         {
-                            return new ProductsGridItem(x.Key, x.Value, new TradeOption(oldProd.NoBuy, oldProd.NoSell), oldProd.UnitPrice) { EditStatus = oldProd.EditStatus };
+                            return new ProductsGridItem(Messenger, x.Key, x.Value, oldProd.NoBuy, oldProd.NoSell, oldProd.UnitPrice) { EditStatus = oldProd.EditStatus };
                         }
 
-                        return new ProductsGridItem(x.Key, x.Value, new TradeOption());
+                        return new ProductsGridItem(Messenger, x.Key, x.Value);
                     }
                 );
 
                 _products.Products.AddRange(addItems);
                 _optionsBakDict.Clear();
             }
-        }
-    }
-
-
-    /// <summary>
-    /// 生産性を更新
-    /// </summary>
-    private void UpdateWorkerEfficiency()
-    {
-        // 労働者による生産性(倍率)
-        double efficiency = _settings.Workforce.Proportion;
-
-        if (1.0 < efficiency)
-        {
-            efficiency = 1.0;
-        }
-
-        // 労働による生産性が変化しない場合、何もしない
-        if (efficiency == _efficiency)
-        {
-            return;
-        }
-
-        foreach (var prod in Products)
-        {
-            prod.SetEfficiency("work", efficiency);
-        }
-
-        _efficiency = efficiency;
-    }
-
-
-    /// <summary>
-    /// モジュール数変更時
-    /// </summary>
-    /// <param name="module">変更があったモジュール</param>
-    /// <param name="prevModuleCount">変更前モジュール数</param>
-    private void OnModuleCountChanged(ModulesGridItem module, long prevModuleCount)
-    {
-        ModulesGridItem[] modules = { module };
-
-        var prodDict = AggregateProduct(modules);
-
-        foreach (var item in prodDict)
-        {
-            // 変更対象のウェアを検索
-            Products.FirstOrDefault(x => x.Ware.Equals(item.Key))?.SetDetails(item.Value, prevModuleCount);
         }
     }
 
@@ -386,7 +311,7 @@ class ProductsGridModel : BindableBase, IDisposable
             else
             {
                 // ウェアが一覧に無い場合
-                addItems.Add(new ProductsGridItem(item.Key, item.Value, new TradeOption()) { EditStatus = EditStatus.Edited });
+                addItems.Add(new ProductsGridItem(Messenger, item.Key, item.Value) { EditStatus = EditStatus.Edited });
             }
         }
 
@@ -429,13 +354,29 @@ class ProductsGridModel : BindableBase, IDisposable
             .ToDictionary(
                 x => X4Database.Instance.Ware.Get(x.Key),
                 x => x.GroupBy(x => x.Module)
-                    .SelectMany(
-                        x => x.Select(
-                            y => y.Efficiency is not null ?
-                                (IProductDetailsListItem)new ProductDetailsListItem(y.WareID, y.Module, x.Sum(z => z.ModuleCount), y.Efficiency, x.Sum(z => z.WareAmount), _settings) :
-                                new ProductDetailsListItemConsumption(y.WareID, y.Module, x.Sum(z => z.ModuleCount), x.Sum(z => z.WareAmount)))
-                        ).ToArray() as IReadOnlyList<IProductDetailsListItem>
+                    .SelectMany(x => x.Select(y => CreateProductDetailsItem(y, x.Sum(z => z.ModuleCount), x.Sum(z => z.WareAmount))))
+                    .ToArray() as IReadOnlyList<IProductDetailsListItem>
             );
 
+    }
+
+
+    /// <summary>
+    /// 製品詳細情報を作成する
+    /// </summary>
+    /// <param name="calcResult">計算結果</param>
+    /// <param name="moduleCount">モジュール数</param>
+    /// <param name="wareAmount">生産/消費数</param>
+    /// <returns>製品詳細情報</returns>
+    private IProductDetailsListItem CreateProductDetailsItem(CalcResult calcResult, long moduleCount, long wareAmount)
+    {
+        if (calcResult.Efficiency is not null)
+        {
+            return new ProductDetailsListItem(calcResult.WareID, calcResult.Module, moduleCount, calcResult.Efficiency, wareAmount, _settings);
+        }
+        else
+        {
+            return new ProductDetailsListItemConsumption(calcResult.WareID, calcResult.Module, moduleCount, wareAmount);
+        }
     }
 }

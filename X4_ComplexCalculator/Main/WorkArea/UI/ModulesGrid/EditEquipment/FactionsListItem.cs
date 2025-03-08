@@ -1,4 +1,4 @@
-﻿using Prism.Mvvm;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
@@ -6,20 +6,18 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
 /// <summary>
 /// 派閥リストの1レコード分
 /// </summary>
-class FactionsListItem : BindableBase
+/// <remarks>
+/// コンストラクタ
+/// </remarks>
+/// <param name="faction">派閥</param>
+/// <param name="isChecked">チェック状態</param>
+sealed partial class FactionsListItem(IFaction faction, bool isChecked) : ObservableObject
 {
-    #region メンバ
-    /// <summary>
-    /// チェックされたか
-    /// </summary>
-    private bool _isChecked = true;
-    #endregion
-
     #region プロパティ
     /// <summary>
     /// 派閥
     /// </summary>
-    public IFaction Faction { get; }
+    public IFaction Faction { get; } = faction;
 
 
     /// <summary>
@@ -43,22 +41,7 @@ class FactionsListItem : BindableBase
     /// <summary>
     /// チェック状態
     /// </summary>
-    public bool IsChecked
-    {
-        get => _isChecked;
-        set => SetProperty(ref _isChecked, value);
-    }
+    [ObservableProperty]
+    public partial bool IsChecked { get; set; } = isChecked;
     #endregion
-
-
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    /// <param name="faction">派閥</param>
-    /// <param name="isChecked">チェック状態</param>
-    public FactionsListItem(IFaction faction, bool isChecked)
-    {
-        Faction = faction;
-        IsChecked = isChecked;
-    }
 }

@@ -1,4 +1,4 @@
-﻿using Prism.Mvvm;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
@@ -7,16 +7,8 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleI
 /// <summary>
 /// 労働力用ListVierのアイテム
 /// </summary>
-public class WorkForceModuleInfoDetailsItem : BindableBase
+public sealed partial class WorkForceModuleInfoDetailsItem : ObservableObject
 {
-    #region メンバ
-    /// <summary>
-    /// モジュール数
-    /// </summary>
-    private long _moduleCount;
-    #endregion
-
-
     #region プロパティ
     /// <summary>
     /// モジュールID
@@ -33,17 +25,9 @@ public class WorkForceModuleInfoDetailsItem : BindableBase
     /// <summary>
     /// モジュール数
     /// </summary>
-    public long ModuleCount
-    {
-        get => _moduleCount;
-        set
-        {
-            if (SetProperty(ref _moduleCount, value))
-            {
-                RaisePropertyChanged(nameof(TotalWorkforce));
-            }
-        }
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TotalWorkforce))]
+    public partial long ModuleCount { get; set; }
 
 
     /// <summary>
@@ -80,7 +64,7 @@ public class WorkForceModuleInfoDetailsItem : BindableBase
     {
         ModuleID = module.ID;
         ModuleName = module.Name;
-        _moduleCount = moduleCount;
+        ModuleCount = moduleCount;
         MaxWorkers = module.MaxWorkers;
         WorkersCapacity = module.WorkersCapacity;
     }
@@ -97,7 +81,7 @@ public class WorkForceModuleInfoDetailsItem : BindableBase
     {
         ModuleID = moduleID;
         ModuleName = X4Database.Instance.Ware.Get<IX4Module>(moduleID).Name;
-        _moduleCount = moduleCount;
+        ModuleCount = moduleCount;
         MaxWorkers = maxWorkers;
         WorkersCapacity = workersCapacity;
     }

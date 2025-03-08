@@ -1,4 +1,5 @@
-﻿using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.BuildResources;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.BuildResources;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Products;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings;
@@ -10,7 +11,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
 /// <summary>
 /// 計算機で使用するステーション用データ用クラス
 /// </summary>
-public class StationData : IStationData
+public class StationData(IMessenger messenger) : IStationData
 {
     /// <summary>
     /// モジュール一覧
@@ -45,5 +46,5 @@ public class StationData : IStationData
     /// <summary>
     /// ステーション設定
     /// </summary>
-    public IStationSettings Settings { get; } = new StationSettings.StationSettings();
+    public IStationSettings Settings { get; } = new StationSettings.StationSettings(messenger);
 }

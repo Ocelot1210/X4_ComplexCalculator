@@ -1,9 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Prism.Commands;
+using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Data;
-using System.Windows.Input;
 using X4_ComplexCalculator.Main.WorkArea;
 
 namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverviews;
@@ -11,7 +10,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverviews;
 /// <summary>
 /// 帝国の概要用ViewModel
 /// </summary>
-partial class EmpireOverviewWindowViewModel : ObservableObject
+sealed partial class EmpireOverviewWindowViewModel : ObservableObject
 {
     #region メンバ
     /// <summary>
@@ -32,12 +31,6 @@ partial class EmpireOverviewWindowViewModel : ObservableObject
     /// 計画一覧
     /// </summary>
     public ICollectionView WorkAreasView { get; }
-
-
-    /// <summary>
-    /// ウィンドウが閉じられた時のコマンド
-    /// </summary>
-    public ICommand WindowClosedCommand { get; }
     #endregion
 
 
@@ -55,8 +48,6 @@ partial class EmpireOverviewWindowViewModel : ObservableObject
 
         WorkAreasView = CollectionViewSource.GetDefaultView(_model.WorkAreas);
         WorkAreasView.SortDescriptions.Add(new SortDescription(nameof(WorkAreaItem.Title), ListSortDirection.Ascending));
-
-        WindowClosedCommand = new DelegateCommand(WindowClosed);
     }
 
 
@@ -74,8 +65,6 @@ partial class EmpireOverviewWindowViewModel : ObservableObject
     /// <summary>
     /// ウィンドウが閉じられた時
     /// </summary>
-    private void WindowClosed()
-    {
-        _model.Dispose();
-    }
+    [RelayCommand]
+    private void OnWindowClosed() => _model.Dispose();
 }

@@ -6,8 +6,9 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid"
+    xmlns:localcvt="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.Converters"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
+    xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behaviors"
     xmlns:x4ccrtl="clr-namespace:X4_ComplexCalculator_CustomControlLibrary;assembly=X4_ComplexCalculator_CustomControlLibrary"
     xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
     xmlns:x4cvt="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
@@ -66,7 +67,10 @@
 
         </ContextMenu>
 
+        <localcvt:BuildMethodVisiblityConverter x:Key="BuildMethodVisiblityConverter"/>
 
+        <localcvt:EditEquipmentButtonVisiblityConverter x:Key="EditEquipmentButtonVisiblityConverter"/>
+        
     </UserControl.Resources>
 
     <DockPanel>
@@ -134,6 +138,7 @@
 
             </DataGrid.InputBindings>
 
+            
             <!--  モジュール一覧DataGridの列定義  -->
             <DataGrid.Columns>
 
@@ -196,7 +201,7 @@
                     CanUserResize="False"
                     Header="{lex:Loc Lang:Modules_Column_Equipment_Header}"
                     IsReadOnly="True"
-                    SortMemberPath="EditEquipmentButtonVisiblity">
+                    CanUserSort="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock
@@ -204,7 +209,7 @@
                                 Style="{StaticResource ClickableTextBlockStyle}"
                                 Text="{lex:Loc Lang:Modules_Column_Equipment_Edit_Text}"
                                 TextAlignment="Center"
-                                Visibility="{Binding EditEquipmentButtonVisiblity, Mode=OneTime}">
+                                Visibility="{Binding Equipments, Mode=OneTime, Converter={StaticResource EditEquipmentButtonVisiblityConverter}}">
                                 <TextBlock.InputBindings>
                                     <MouseBinding Command="{Binding EditEquipmentCommand, Mode=OneTime}" MouseAction="LeftClick" />
                                 </TextBlock.InputBindings>
@@ -219,7 +224,7 @@
                     CanUserResize="False"
                     ClipboardContentBinding="{Binding Turrets.Count, Mode=OneTime}"
                     Header="{lex:Loc Lang:Common_Turrets}"
-                    SortMemberPath="TurretsCount">
+                    SortMemberPath="Turrets.Count">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock
@@ -227,7 +232,7 @@
                                 Text="{Binding Turrets.Count, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat='{}{0:N0}'}"
                                 TextAlignment="Right"
                                 ToolTipService.ShowDuration="1000000"
-                                Visibility="{Binding EditEquipmentButtonVisiblity, Mode=OneTime}">
+                                Visibility="{Binding Equipments, Mode=OneTime, Converter={StaticResource EditEquipmentButtonVisiblityConverter}}">
                                 <TextBlock.Style>
                                     <Style TargetType="{x:Type TextBlock}">
                                         <Setter Property="ToolTip">
@@ -253,7 +258,7 @@
                     CanUserResize="False"
                     ClipboardContentBinding="{Binding Shields.Count, Mode=OneTime}"
                     Header="{lex:Loc Lang:Common_Shields}"
-                    SortMemberPath="ShieldsCount">
+                    SortMemberPath="Shields.Count">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock
@@ -261,7 +266,7 @@
                                 Text="{Binding Shields.Count, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat='{}{0:N0}'}"
                                 TextAlignment="Right"
                                 ToolTipService.ShowDuration="1000000"
-                                Visibility="{Binding EditEquipmentButtonVisiblity, Mode=OneTime}">
+                                Visibility="{Binding Equipments, Mode=OneTime, Converter={StaticResource EditEquipmentButtonVisiblityConverter}}">
                                 <TextBlock.Style>
                                     <Style TargetType="{x:Type TextBlock}">
                                         <Setter Property="ToolTip">
@@ -294,7 +299,7 @@
                                 VerticalAlignment="Center"
                                 Style="{StaticResource ClickableTextBlockStyle}"
                                 Text="{Binding SelectedMethodName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                Visibility="{Binding SelectedMethodVisiblity, Mode=OneTime}" />
+                                Visibility="{Binding Module, Mode=OneTime, Converter={StaticResource BuildMethodVisiblityConverter}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
 
@@ -306,7 +311,7 @@
                                 FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
                                 ItemsSource="{Binding Productions, Mode=OneTime}"
                                 SelectedItem="{Binding SelectedMethod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                Visibility="{Binding SelectedMethodVisiblity, Mode=OneTime}" />
+                                Visibility="{Binding Module, Mode=OneTime, Converter={StaticResource BuildMethodVisiblityConverter}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </x4cmn:MouseHoverEditCellColumn>

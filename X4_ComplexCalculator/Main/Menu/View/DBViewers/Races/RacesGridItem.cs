@@ -7,7 +7,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewers.Races;
 /// 種族表示用DataGridの1レコード分
 /// </summary>
 /// <param name="race">種族</param>
-partial class RacesGridItem(IRace race) : ObservableObject
+sealed partial class RacesGridItem(IRace race) : ObservableObject
 {
     #region メンバ
     /// <summary>

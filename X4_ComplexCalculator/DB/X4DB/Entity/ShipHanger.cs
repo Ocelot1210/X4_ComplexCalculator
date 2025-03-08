@@ -5,7 +5,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Entity;
 /// <summary>
 /// 艦船のハンガー情報用クラス
 /// </summary>
-public class ShipHanger : IShipHanger
+public sealed class ShipHanger : IShipHanger
 {
     #region IShipHanger
     /// <inheritdoc/>

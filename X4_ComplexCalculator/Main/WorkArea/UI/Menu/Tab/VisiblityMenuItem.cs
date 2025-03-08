@@ -1,5 +1,5 @@
 ﻿using AvalonDock.Layout;
-using Prism.Mvvm;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.Menu.Tab;
@@ -7,7 +7,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.Menu.Tab;
 /// <summary>
 /// 表示状態メニュー1レコード分のクラス
 /// </summary>
-public class VisiblityMenuItem : BindableBase
+public sealed class VisiblityMenuItem : ObservableObject
 {
     #region メンバ
     /// <summary>
@@ -44,7 +44,7 @@ public class VisiblityMenuItem : BindableBase
                 _layoutAnchorable.IsVisible  = value;
                 _shouldNotifyVisibiltyChange = true;
 
-                RaisePropertyChanged();
+                OnPropertyChanged();
             }
         }
     }
@@ -72,7 +72,7 @@ public class VisiblityMenuItem : BindableBase
     {
         if (_shouldNotifyVisibiltyChange)
         {
-            RaisePropertyChanged(nameof(IsChecked));
+            OnPropertyChanged(nameof(IsChecked));
         }
     }
 }

@@ -8,7 +8,7 @@
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behavior"
+    xmlns:x4bhv="clr-namespace:X4_ComplexCalculator.Common.Behaviors"
     xmlns:x4cmn="clr-namespace:X4_ComplexCalculator.Common"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     x:Name="Control"
@@ -216,8 +216,8 @@
                         <xctk:LongUpDown
                             ClipValueToMinMax="True"
                             FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
-                            Maximum="{Binding Ware.MaxPrice}"
-                            Minimum="{Binding Ware.MinPrice}"
+                            Maximum="{Binding Ware.MaxPrice, Mode=OneTime}"
+                            Minimum="{Binding Ware.MinPrice, Mode=OneTime}"
                             Value="{Binding UnitPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LongUpDownConverter}}" />
                     </DataTemplate>
                 </DataGridTemplateColumn.CellEditingTemplate>

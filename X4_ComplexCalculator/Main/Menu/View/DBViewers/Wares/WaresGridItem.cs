@@ -8,7 +8,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewers.Wares;
 /// ウェア閲覧用DataGridの1レコード分
 /// </summary>
 /// <param name="ware">表示対象ウェア</param>
-class WaresGridItem(IWare ware) : ObservableObject
+sealed class WaresGridItem(IWare ware) : ObservableObject
 {
     #region メンバ
     /// <summary>

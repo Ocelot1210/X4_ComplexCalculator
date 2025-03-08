@@ -1,65 +1,26 @@
-﻿using Prism.Commands;
+﻿using Collections.Pooled;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using System;
-using System.Collections.Specialized;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using System.Windows.Input;
 using System.Xml.Linq;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
-using X4_ComplexCalculator.Entity;
+using X4_ComplexCalculator.Entities;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
-using System.Collections.Generic;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
 /// <summary>
 /// Module一覧DataGridの1レコード分の情報を管理するクラス
 /// </summary>
-public class ModulesGridItem : BindableBaseEx, IEditable, ISelectable, IReorderble
+public sealed partial class ModulesGridItem : ObservableRecipientEx, IEditable, ISelectable, IReorderble
 {
-    #region スタティックメンバ
-    /// <summary>
-    /// モジュール数最大値
-    /// </summary>
-    public const long MAX_MODULE_COUNT = 99999;
-    #endregion
-
-
-    #region メンバ
-    /// <summary>
-    /// モジュール数
-    /// </summary>
-    private long _moduleCount = 1;
-
-
-    /// <summary>
-    /// 選択された建造方式
-    /// </summary>
-    private IWareProduction _selectedMethod;
-
-
-    /// <summary>
-    /// 選択されているか
-    /// </summary>
-    private bool _isSelected;
-
-
-    /// <summary>
-    /// 編集状態
-    /// </summary>
-    private EditStatus _editStatus = EditStatus.Unedited;
-
-
-    /// <summary>
-    /// 順番入れ替え対象か
-    /// </summary>
-    private bool _isReorderTarget;
-    #endregion
-
-
     #region プロパティ
     /// <summary>
     /// モジュール
@@ -80,38 +41,18 @@ public class ModulesGridItem : BindableBaseEx, IEditable, ISelectable, IReorderb
 
 
     /// <summary>
-    /// モジュールの装備編集
-    /// </summary>
-    public ICommand EditEquipmentCommand { get; }
-
-
-    /// <summary>
     /// 選択されているか
     /// </summary>
-    public bool IsSelected
-    {
-        get => _isSelected;
-        set => SetProperty(ref _isSelected, value);
-    }
+    [ObservableProperty]
+    public partial bool IsSelected { get; set; }
 
 
     /// <summary>
     /// モジュール数
     /// </summary>
-    public long ModuleCount
-    {
-        get => _moduleCount;
-        set
-        {
-            var setValue = (value < 0) ? 0L :
-                           (MAX_MODULE_COUNT < value) ? MAX_MODULE_COUNT : value;
-
-            if (SetPropertyEx(ref _moduleCount, setValue))
-            {
-                EditStatus = EditStatus.Edited;
-            }
-        }
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedRecipients]
+    public partial long ModuleCount { get; set; } = 1;
 
 
     /// <summary>
@@ -127,32 +68,10 @@ public class ModulesGridItem : BindableBaseEx, IEditable, ISelectable, IReorderb
 
 
     /// <summary>
-    /// 編集ボタンを表示すべきか
-    /// </summary>
-    public Visibility EditEquipmentButtonVisiblity => (Equipments.CanEquipped) ? Visibility.Visible : Visibility.Hidden;
-
-
-    /// <summary>
-    /// 建造方式を表示すべきか
-    /// </summary>
-    public Visibility SelectedMethodVisiblity => (2 <= Module.Productions.Count) ? Visibility.Visible : Visibility.Hidden;
-
-
-    /// <summary>
     /// 選択中の建造方式
     /// </summary>
-    public IWareProduction SelectedMethod
-    {
-        get => _selectedMethod;
-        set
-        {
-            if (SetPropertyEx(ref _selectedMethod, value))
-            {
-                RaisePropertyChanged(nameof(SelectedMethodName));
-                EditStatus = EditStatus.Edited;
-            }
-        }
-    }
+    [ObservableProperty]
+    public partial IWareProduction SelectedMethod { get; set; }
 
 
     /// <summary>
@@ -165,58 +84,51 @@ public class ModulesGridItem : BindableBaseEx, IEditable, ISelectable, IReorderb
     /// 建造方式一覧
     /// </summary>
     public IEnumerable<IWareProduction> Productions => Module.Productions.Values;
-    
 
 
     /// <summary>
     /// 編集状態
     /// </summary>
-    public EditStatus EditStatus
-    {
-        get => _editStatus;
-        set => SetProperty(ref _editStatus, value);
-    }
+    [ObservableProperty]
+    public partial EditStatus EditStatus { get; set; } = EditStatus.Unedited;
 
 
     /// <summary>
     /// 順番入れ替え対象か
     /// </summary>
-    public bool IsReorderTarget
-    {
-        get => _isReorderTarget;
-        set => SetProperty(ref _isReorderTarget, value);
-    }
+    [ObservableProperty]
+    public partial bool IsReorderTarget { get; set; }
     #endregion
-
-
 
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
+    /// <param name="messenger">メッセージ通知用</param>
     /// <param name="module">モジュール</param>
     /// <param name="selectedMethod">選択中の建造方式</param>
     /// <param name="moduleCount">モジュール数</param>
-    public ModulesGridItem(IX4Module module, IWareProduction? selectedMethod = null, long moduleCount = 1)
+    public ModulesGridItem(IMessenger messenger, IX4Module module, IWareProduction? selectedMethod = null, long moduleCount = 1) : base(messenger, false)
     {
         Module = module;
         ModuleCount = moduleCount;
-        EditEquipmentCommand = new DelegateCommand(EditEquipment);
         Equipments = new EquippableWareEquipmentManager(module);
-        Equipments.CollectionChanged += Equipments_CollectionChanged;
         
         Turrets = new EquipmentsInfo(Equipments, "turrets");
         Shields = new EquipmentsInfo(Equipments, "shields");
 
-        _selectedMethod = selectedMethod ?? Module.Productions.First().Value;
+        SelectedMethod = selectedMethod ?? Module.Productions.First().Value;
+
+        IsActive = true;
     }
 
 
     /// <summary>
     /// コンストラクタ(xmlより作成)
     /// </summary>
+    /// <param name="messenger">メッセージ通知用</param>
     /// <param name="element">モジュール情報が記載されたxml</param>
-    public ModulesGridItem(XElement element)
+    public ModulesGridItem(IMessenger messenger, XElement element) : base(messenger, false)
     {
         Module = X4Database.Instance.Ware.TryGet<IX4Module>(element.Attribute("id")!.Value) ?? throw new ArgumentException("Invalid XElement.", nameof(element));
         Equipments = new EquippableWareEquipmentManager(Module, element.Element("equipments"));
@@ -226,13 +138,10 @@ public class ModulesGridItem : BindableBaseEx, IEditable, ISelectable, IReorderb
         SelectedMethod = 
             Module.Productions.TryGetValue(element.Attribute("method")?.Value ?? "default", out var method) ? method : Module.Productions.Values.First();
 
-        _selectedMethod = SelectedMethod;
-
         Turrets = new EquipmentsInfo(Equipments, "turrets");
         Shields = new EquipmentsInfo(Equipments, "shields");
-        UpdateEquipmentInfo();
 
-        EditEquipmentCommand = new DelegateCommand(EditEquipment);
+        IsActive = true;
     }
 
 
@@ -263,33 +172,39 @@ public class ModulesGridItem : BindableBaseEx, IEditable, ISelectable, IReorderb
 
 
     /// <summary>
-    /// 装備情報を更新する
+    /// モジュール数変更時
     /// </summary>
-    public void UpdateEquipmentInfo()
+    partial void OnModuleCountChanged(long value)
     {
-        if (Equipments.CanEquipped)
-        {
-            Turrets.RequireUpdate();
-            Shields.RequireUpdate();
-        }
+        EditStatus = EditStatus.Edited;
+    }
+
+
+    /// <summary>
+    /// 建造方式変更時
+    /// </summary>
+    partial void OnSelectedMethodChanged(IWareProduction value)
+    {
+        EditStatus = EditStatus.Edited;
     }
 
 
     /// <summary>
     /// 装備を編集
     /// </summary>
+    [RelayCommand]
     private void EditEquipment()
     {
         // 変更前
-        var turretsOld = Equipments.AllEquipments
+        using var turretsOld = Equipments.AllEquipments
             .Where(x => x.EquipmentType.EquipmentTypeID == "turrets")
             .Select(x => x.ID)
-            .OrderBy(x => x).ToArray();
+            .OrderBy(x => x).ToPooledList();
 
-        var shieldsOld = Equipments.AllEquipments
+        using var shieldsOld = Equipments.AllEquipments
             .Where(x => x.EquipmentType.EquipmentTypeID == "shields")
             .Select(x => x.ID)
-            .OrderBy(x => x).ToArray();
+            .OrderBy(x => x).ToPooledList();
 
 
         var window = new EditEquipmentWindow(Equipments)
@@ -303,86 +218,23 @@ public class ModulesGridItem : BindableBaseEx, IEditable, ISelectable, IReorderb
         // 変更があった場合のみ通知
         if (!turretsOld.SequenceEqual(Equipments.AllEquipments.Where(x => x.EquipmentType.EquipmentTypeID == "turrets").Select(x => x.ID).OrderBy(x => x)))
         {
-            Turrets.Update();
             equipmentChanged = true;
         }
 
         if (!shieldsOld.SequenceEqual(Equipments.AllEquipments.Where(x => x.EquipmentType.EquipmentTypeID == "shields").Select(x => x.ID).OrderBy(x => x)))
         {
-            Shields.Update();
             equipmentChanged = true;
         }
 
         if (equipmentChanged)
         {
-            var newItems = Equipments.AllEquipments
-                .Where(x => x.EquipmentType.EquipmentTypeID == "shields")
+            using var newItems = Equipments.AllEquipments
+                .Where(x => x.EquipmentType.EquipmentTypeID == "shields" || x.EquipmentType.EquipmentTypeID == "turrets")
                 .Select(x => x.ID)
-                .ToArray();
-            RaisePropertyChangedEx(turretsOld.Concat(shieldsOld), newItems, nameof(Equipments));
+                .ToPooledList();
+            Broadcast(turretsOld.Concat(shieldsOld), newItems, nameof(Equipments));
             EditStatus = EditStatus.Edited;
         }
-    }
-
-
-
-    /// <summary>
-    /// 装備に変更があった場合
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void Equipments_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-    {
-        var addedTurretCount = 0;
-        var addedShieldCount = 0;
-
-        if (e.NewItems is not null)
-        {
-            var groups = e.NewItems
-                .Cast<IEquipment>()
-                .Where(x => x.EquipmentType.EquipmentTypeID == "shields" || x.EquipmentType.EquipmentTypeID == "turrets")
-                .GroupBy(x => x.EquipmentType);
-            
-            foreach (var grp in groups)
-            {
-                if (grp.Key.EquipmentTypeID == "shields")
-                {
-                    addedTurretCount += grp.Count();
-                    continue;
-                }
-
-                if (grp.Key.EquipmentTypeID == "turrets")
-                {
-                    addedShieldCount += grp.Count();
-                    continue;
-                }
-            }
-        }
-
-        if (e.OldItems is not null)
-        {
-            var groups = e.OldItems
-                .Cast<IEquipment>()
-                .Where(x => x.EquipmentType.EquipmentTypeID == "shields" || x.EquipmentType.EquipmentTypeID == "turrets")
-                .GroupBy(x => x.EquipmentType);
-
-            foreach (var grp in groups)
-            {
-                if (grp.Key.EquipmentTypeID == "shields")
-                {
-                    addedTurretCount -= grp.Count();
-                    continue;
-                }
-
-                if (grp.Key.EquipmentTypeID == "turrets")
-                {
-                    addedShieldCount -= grp.Count();
-                    continue;
-                }
-            }
-        }
-
-        UpdateEquipmentInfo();
     }
 
 

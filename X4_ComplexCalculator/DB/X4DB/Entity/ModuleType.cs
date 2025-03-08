@@ -6,41 +6,26 @@ namespace X4_ComplexCalculator.DB.X4DB.Entity;
 /// <summary>
 /// モジュール種別情報用クラス
 /// </summary>
-public class ModuleType : IModuleType
+/// <remarks>
+/// コンストラクタ
+/// </remarks>
+/// <param name="moduleTypeID">モジュール種別ID</param>
+/// <param name="name">モジュール種別名</param>
+public sealed class ModuleType(string moduleTypeID, string name) : IModuleType
 {
     #region IModuleType
     /// <inheritdoc/>
-    public string ModuleTypeID { get; }
-
+    public string ModuleTypeID { get; } = moduleTypeID;
 
     /// <inheritdoc/>
-    public string Name { get; }
+    public string Name { get; } = name;
     #endregion
 
 
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    /// <param name="moduleTypeID">モジュール種別ID</param>
-    /// <param name="name">モジュール種別名</param>
-    public ModuleType(string moduleTypeID, string name)
-    {
-        ModuleTypeID = moduleTypeID;
-        Name = name;
-    }
-
-
-    /// <summary>
-    /// 比較
-    /// </summary>
-    /// <param name="obj">比較対象</param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public override bool Equals(object? obj) => obj is IModuleType other && ModuleTypeID == other.ModuleTypeID;
 
 
-    /// <summary>
-    /// ハッシュ値を取得
-    /// </summary>
-    /// <returns>ハッシュ値</returns>
+    /// <inheritdoc/>
     public override int GetHashCode() => HashCode.Combine(ModuleTypeID);
 }

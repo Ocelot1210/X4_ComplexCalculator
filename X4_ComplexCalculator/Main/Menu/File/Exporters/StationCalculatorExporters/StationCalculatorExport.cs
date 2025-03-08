@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using X4_ComplexCalculator.Common.Dialog.SelectStringDialog;
+using X4_ComplexCalculator.Common.Dialogs.SelectStringDialog;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Exporters.StationCalculatorExporter;
 

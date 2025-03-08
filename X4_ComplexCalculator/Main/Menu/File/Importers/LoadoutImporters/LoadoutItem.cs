@@ -6,7 +6,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
-using X4_ComplexCalculator.Entity;
+using X4_ComplexCalculator.Entities;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Importers.LoadoutImporters;

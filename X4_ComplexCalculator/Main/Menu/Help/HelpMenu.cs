@@ -3,8 +3,8 @@ using System.Diagnostics;
 using System.Net.Http;
 using System.Threading.Tasks;
 using X4_ComplexCalculator.Common;
-using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
-using X4_ComplexCalculator.Infrastructure;
+using X4_ComplexCalculator.Common.Dialogs.MessageBoxes;
+using X4_ComplexCalculator.Infrastructures;
 
 namespace X4_ComplexCalculator.Main.Menu.Help
 {

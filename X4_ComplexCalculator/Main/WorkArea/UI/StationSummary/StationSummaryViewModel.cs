@@ -1,4 +1,5 @@
-﻿using Prism.Mvvm;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -17,7 +18,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary;
 /// <summary>
 /// ステーション概要用ViewModel
 /// </summary>
-public sealed class StationSummaryViewModel : BindableBase, IDisposable
+public sealed class StationSummaryViewModel : ObservableRecipient, IDisposable
 {
     #region メンバ
     /// <summary>
@@ -96,8 +97,9 @@ public sealed class StationSummaryViewModel : BindableBase, IDisposable
     /// <summary>
     /// コンストラクタ
     /// </summary>
+    /// <param name="messanger">メッセージ交換用</param>
     /// <param name="stationData">計算機で使用するステーション情報</param>
-    public StationSummaryViewModel(IStationData stationData)
+    public StationSummaryViewModel(IMessenger messanger, IStationData stationData) : base(messanger)
     {
         Workforce = stationData.Settings.Workforce;
 
@@ -128,7 +130,7 @@ public sealed class StationSummaryViewModel : BindableBase, IDisposable
 
         // 建造コスト関係初期化
         {
-            _buildingCostModel = new BuildingCostModel(stationData.BuildResourcesInfo);
+            _buildingCostModel = new BuildingCostModel(Messenger, stationData.BuildResourcesInfo);
             _buildingCostModel.PropertyChanged += BuildingCostModel_PropertyChanged;
         }
     }
@@ -144,7 +146,7 @@ public sealed class StationSummaryViewModel : BindableBase, IDisposable
         switch (e.PropertyName)
         {
             case nameof(ProfitModel.Profit):
-                RaisePropertyChanged(nameof(Profit));
+                OnPropertyChanged(nameof(Profit));
                 break;
 
             default:
@@ -163,7 +165,7 @@ public sealed class StationSummaryViewModel : BindableBase, IDisposable
         switch (e.PropertyName)
         {
             case nameof(BuildingCostModel.BuildingCost):
-                RaisePropertyChanged(nameof(BuildingCost));
+                OnPropertyChanged(nameof(BuildingCost));
                 break;
 
             default:

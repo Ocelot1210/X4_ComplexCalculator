@@ -10,7 +10,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager;
 /// <summary>
 /// <see cref="IRace"/> の一覧を管理するクラス
 /// </summary>
-public class RaceManager
+sealed public class RaceManager
 {
     #region メンバ
     /// <summary>

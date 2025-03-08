@@ -12,73 +12,50 @@ namespace X4_ComplexCalculator.DB.X4DB.Builder;
 /// <summary>
 /// <see cref="Module"/> クラスのインスタンスを作成するBuilderクラス
 /// </summary>
-class ModuleBuilder
+/// <remarks>
+/// コンストラクタ
+/// </remarks>
+/// <param name="conn">DB接続情報</param>
+/// <param name="wareProductionManager">ウェア生産情報一覧</param>
+/// <param name="transportTypeManager">カーゴ種別一覧</param>
+/// <param name="wareEquipmentManager">
+/// ウェアの装備情報一覧
+/// </param>
+class ModuleBuilder(
+    IDbConnection conn,
+    WareProductionManager wareProductionManager,
+    TransportTypeManager transportTypeManager,
+    WareEquipmentManager wareEquipmentManager
+    )
 {
     #region メンバ
     /// <summary>
     /// モジュール種別一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IModuleType> _moduleTypes;
+    private readonly IReadOnlyDictionary<string, IModuleType> _moduleTypes = 
+        conn.Query<ModuleType>("SELECT ModuleTypeID, Name FROM ModuleType")
+            .ToDictionary(x => x.ModuleTypeID, x => x as IModuleType);
 
 
     /// <summary>
     /// モジュール情報一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, X4_DataExporterWPF.Entity.Module> _modules;
+    private readonly IReadOnlyDictionary<string, X4_DataExporterWPF.Entities.Module> _modules = 
+        conn.Query<X4_DataExporterWPF.Entities.Module>("SELECT * FROM Module")
+            .ToDictionary(x => x.ModuleID);
 
 
     /// <summary>
     /// モジュールの製品情報一覧
     /// </summary>
-    private readonly ModuleProductManager _moduleProductManager;
+    private readonly ModuleProductManager _moduleProductManager = new(conn, wareProductionManager);
 
 
     /// <summary>
     /// モジュールの保管庫情報管理
     /// </summary>
-    private readonly ModuleStorageManager _storageManager;
-
-
-    /// <summary>
-    /// ウェアの装備情報一覧
-    /// </summary>
-    private readonly WareEquipmentManager _wareEquipmentManager;
+    private readonly ModuleStorageManager _storageManager = new(conn, transportTypeManager);
     #endregion
-
-
-
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    /// <param name="conn">DB接続情報</param>
-    /// <param name="wareProductionManager">ウェア生産情報一覧</param>
-    /// <param name="transportTypeManager">カーゴ種別一覧</param>
-    public ModuleBuilder(
-        IDbConnection conn,
-        WareProductionManager wareProductionManager,
-        TransportTypeManager transportTypeManager,
-        WareEquipmentManager wareEquipmentManager
-    )
-    {
-        // モジュール種別一覧を作成
-        {
-            const string SQL = "SELECT ModuleTypeID, Name FROM ModuleType";
-            _moduleTypes = conn.Query<ModuleType>(SQL)
-                .ToDictionary(x => x.ModuleTypeID, x => x as IModuleType);
-        }
-
-
-        // モジュール情報一覧を作成
-        _modules = conn.Query<X4_DataExporterWPF.Entity.Module>("SELECT * FROM Module")
-            .ToDictionary(x => x.ModuleID);
-
-
-        _moduleProductManager = new(conn, wareProductionManager);
-
-        _storageManager = new(conn, transportTypeManager);
-
-        _wareEquipmentManager = wareEquipmentManager;
-    }
 
 
     /// <summary>
@@ -107,7 +84,7 @@ class ModuleBuilder
             item.NoBlueprint,
             _moduleProductManager.Get(ware.ID),
             _storageManager.Get(ware.ID),
-            _wareEquipmentManager.Get(ware.ID).ToDictionary(x => x.ConnectionName)
+            wareEquipmentManager.Get(ware.ID).ToDictionary(x => x.ConnectionName)
         );
     }
 }

@@ -6,8 +6,8 @@ using System.Linq;
 using System.Windows.Input;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using X4_ComplexCalculator.Common.Collection;
-using X4_ComplexCalculator.Common.Dialog.MessageBoxes;
+using X4_ComplexCalculator.Common.Collections;
+using X4_ComplexCalculator.Common.Dialogs.MessageBoxes;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Importers.StationPlanImporters;
 

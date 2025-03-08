@@ -11,7 +11,7 @@ namespace X4_ComplexCalculator.Main.Menu.View.DBViewers.Ships;
 /// <summary>
 /// 艦船一覧表示用DataGridの1レコード分
 /// </summary>
-partial class ShipsGridItem : ObservableObject
+sealed partial class ShipsGridItem : ObservableObject
 {
     #region メンバ
     /// <summary>
