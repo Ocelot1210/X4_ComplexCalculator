@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 
-namespace X4_DataExporterWPF.DataExportWindows;
+namespace X4_DataExporterWPF.ExportWindows;
 
 /// <summary>
 /// データ抽出進捗

@@ -12,7 +12,7 @@ namespace LibX4.FileSystem;
 /// <summary>
 /// Modの情報
 /// </summary>
-public class ModInfo
+public sealed class ModInfo
 {
     /// <summary>
     /// 識別ID

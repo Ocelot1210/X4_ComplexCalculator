@@ -1,4 +1,4 @@
-﻿namespace X4_DataExporterWPF.DataExportWindows;
+﻿namespace X4_DataExporterWPF.ExportWindows;
 
 /// <summary>
 /// 言語コンボボックス用アイテム

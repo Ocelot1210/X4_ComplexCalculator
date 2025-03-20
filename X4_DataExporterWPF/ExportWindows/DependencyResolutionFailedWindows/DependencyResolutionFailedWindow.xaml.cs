@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Windows;
 
-namespace X4_DataExporterWPF.ExportWindow.DependencyResolutionFailedWindows
+namespace X4_DataExporterWPF.ExportWindows.DependencyResolutionFailedWindows
 {
     /// <summary>
     /// DependencyResolutionFailedWindow.xaml の相互作用ロジック

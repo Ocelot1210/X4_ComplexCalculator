@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace X4_DataExporterWPF.ExportWindow.ValueConverters;
+namespace X4_DataExporterWPF.ExportWindows.ValueConverters;
 
 
 /// <summary>

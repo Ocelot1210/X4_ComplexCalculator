@@ -11,7 +11,7 @@ namespace LibX4.Lang;
 /// <summary>
 /// X4 の言語フィールド文字列 (例: {1001,2490}) を解決するクラス
 /// </summary>
-public class LanguageResolver : ILanguageResolver
+public sealed class LanguageResolver : ILanguageResolver
 {
     #region メンバ
     /// <summary>
@@ -23,19 +23,19 @@ public class LanguageResolver : ILanguageResolver
     /// <summary>
     /// 言語フィールド文字列から pageID, tID を抽出する正規表現
     /// </summary>
-    private static readonly Regex _GetIDRegex = new(@"\{\s*(\d+)?\s*,\s*(\d+)\s*\}");
+    private static readonly Regex _GetIDRegex = new(@"\{\s*(\d+)?\s*,\s*(\d+)\s*\}", RegexOptions.Compiled);
 
 
     /// <summary>
     /// エスケープされていない括弧とその内部を削除する正規表現
     /// </summary>
-    private static readonly Regex _RemoveCommentRegex = new(@"(?<!\\)\((?:|.*[^\\])\)");
+    private static readonly Regex _RemoveCommentRegex = new(@"(?<!\\)\((?:|.*[^\\])\)", RegexOptions.Compiled);
 
 
     /// <summary>
     /// エスケープを解除する正規表現
     /// </summary>
-    private static readonly Regex _UnescapeRegex = new(@"\\(.)");
+    private static readonly Regex _UnescapeRegex = new(@"\\(.)", RegexOptions.Compiled);
     #endregion
 
 

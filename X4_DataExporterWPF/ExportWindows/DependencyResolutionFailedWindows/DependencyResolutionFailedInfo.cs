@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace X4_DataExporterWPF.ExportWindow.DependencyResolutionFailedWindows
+namespace X4_DataExporterWPF.ExportWindows.DependencyResolutionFailedWindows
 {
     /// <summary>
     /// 依存関係の解決に失敗した情報を表すクラス

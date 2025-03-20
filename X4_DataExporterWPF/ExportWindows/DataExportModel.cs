@@ -1,4 +1,5 @@
-﻿using LibX4.FileSystem;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using LibX4.FileSystem;
 using LibX4.Lang;
 using System;
 using System.Collections.Generic;
@@ -9,14 +10,12 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Data;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using WPFLocalizeExtension.Engine;
 using X4_DataExporterWPF.Export;
 
-namespace X4_DataExporterWPF.DataExportWindows;
+namespace X4_DataExporterWPF.ExportWindows;
 
 /// <summary>
 /// データ抽出処理用Model
@@ -24,7 +23,13 @@ namespace X4_DataExporterWPF.DataExportWindows;
 class DataExportModel
 {
     /// <summary>
-    /// 出力先フォルダパス
+    /// メッセージ通知用
+    /// </summary>
+    private readonly IMessenger _messenger;
+
+
+    /// <summary>
+    /// 出力先ファイルパス
     /// </summary>
     private readonly string _outFilePath;
 
@@ -41,9 +46,14 @@ class DataExportModel
     public ObservableCollection<string> ConfigFolderPaths { get; } = new();
 
 
-
-    public DataExportModel(string outFilePath)
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    /// <param name="messenger">メッセージ通知用</param>
+    /// <param name="outFilePath">ファイルパス</param>
+    public DataExportModel(IMessenger messenger, string outFilePath)
     {
+        _messenger = messenger;
         _outFilePath = outFilePath;
 
         BindingOperations.EnableCollectionSynchronization(Languages, new object());
@@ -65,6 +75,8 @@ class DataExportModel
     /// <param name="cancellationToken">キャンセル用トークン</param>
     public async Task UpdateLanguagesAsync(string x4Dir, string configFolderPath, CatLoadOption catLoadOption, CancellationToken cancellationToken = default)
     {
+        Languages.Clear();
+
         var catFiles = new CatFile(x4Dir, configFolderPath, catLoadOption);
         var xml = await catFiles.OpenXmlAsync("libraries/languages.xml", cancellationToken);
 
@@ -74,7 +86,6 @@ class DataExportModel
             .Select(x => new LangComboboxItem(int.Parse(x.ID!), x.Name!))
             .OrderBy(x => x.ID);
 
-        Languages.Clear();
         foreach (var item in languages)
         {
             Languages.Add(item);
@@ -89,7 +100,6 @@ class DataExportModel
     /// <param name="configFolderPath">設定フォルダパス</param>
     /// <param name="catLoadOption">cat ファイルの読み込みオプション</param>
     /// <param name="language">選択された言語</param>
-    /// <param name="owner">親ウィンドウハンドル(メッセージボックス表示用)</param>
     /// <returns>現在数と合計数のタプルのイテレータ</returns>
     public async Task Export(
         IProgress<(int currentStep, int maxSteps)> progress,
@@ -97,8 +107,7 @@ class DataExportModel
         string inDirPath,
         string configFolderPath,
         CatLoadOption catLoadOption,
-        LangComboboxItem language,
-        Window owner
+        LangComboboxItem language
     )
     {
         var catFile = new CatFile(inDirPath, configFolderPath, catLoadOption);
@@ -123,7 +132,7 @@ class DataExportModel
             var defaultXml = await catFile.OpenXmlAsync("libraries/defaults.xml");
 
             IExporter[] exporters =
-            {
+            [
                 // 共通
                 new CommonExporter(),                                       // 共通情報
                 new EffectExporter(),                                       // 追加効果情報
@@ -165,7 +174,7 @@ class DataExportModel
                 new ShipHangerExporter(catFile, waresXml),                  // 艦船ハンガー(機体格納庫)情報
                 new ShipTransportTypeExporter(catFile, waresXml),           // 艦船カーゴ情報
                 new ShipLoadoutExporter(catFile, waresXml),                 // 艦船のロードアウト情報
-            };
+            ];
 
             // 進捗初期化
             var maxSteps = exporters.Length;
@@ -180,39 +189,19 @@ class DataExportModel
             trans.Commit();
             backupper.Commit();
 
-            await owner.Dispatcher.BeginInvoke((Action)(() =>
-            {
-                var msg = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_ExportCompleted", null, null);
-                var title = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_Title", null, null);
-
-                MessageBox.Show(owner, msg, title, MessageBoxButton.OK, MessageBoxImage.Information);
-            }));
+            _messenger.Send(Tuple.Create("Lang:DataExporter_ExportCompleted", "Lang:DataExporter_Title"));
         }
-        catch (DbBackupException)
+        catch (DbBackupException e)
         {
-            await owner.Dispatcher.BeginInvoke((Action)(() =>
-            {
-                var msg = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_FailedToBackupDb", null, null);
-                var title = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_Title", null, null);
-
-                MessageBox.Show(owner, msg, title, MessageBoxButton.OK, MessageBoxImage.Error);
-            }));
+            _messenger.Send(e);
         }
         catch (Exception e)
         {
             // テンポラリフォルダにクラッシュレポートをダンプする
             var dumpPath = Path.Combine(Path.GetTempPath(), "X4_ComplexCalculator_CrashReport.txt");
-
             DumpCrashReport(dumpPath, catFile, e);
 
-            await owner.Dispatcher.BeginInvoke((Action)(() =>
-            {
-                var msg = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_FailedToExportMessage", null, null);
-                var title = (string)LocalizeDictionary.Instance.GetLocalizedObject("Lang:DataExporter_Title", null, null);
-
-                MessageBox.Show(owner, msg, title, MessageBoxButton.OK, MessageBoxImage.Error);
-                System.Diagnostics.Process.Start("explorer.exe", $@"/select,""{dumpPath}""");
-            }));
+            _messenger.Send(Tuple.Create(e, dumpPath));
         }
         finally
         {

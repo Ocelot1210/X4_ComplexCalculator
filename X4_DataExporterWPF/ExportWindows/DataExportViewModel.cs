@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using LibX4.FileSystem;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
@@ -9,9 +10,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
-using X4_DataExporterWPF.ExportWindow.DependencyResolutionFailedWindows;
 
-namespace X4_DataExporterWPF.DataExportWindows;
+namespace X4_DataExporterWPF.ExportWindows;
 
 /// <summary>
 /// データ抽出処理用ViewModel
@@ -20,15 +20,15 @@ sealed partial class DataExportViewModel : ObservableValidator
 {
     #region メンバ
     /// <summary>
-    /// 親ウィンドウ(メッセージボックス表示用)
-    /// </summary>
-    private readonly Window _ownerWindow;
-
-
-    /// <summary>
     /// データ抽出処理用Model
     /// </summary>
     private readonly DataExportModel _model;
+
+
+    /// <summary>
+    /// メッセージ通知用
+    /// </summary>
+    private readonly IMessenger _messenger;
     #endregion
 
 
@@ -37,7 +37,9 @@ sealed partial class DataExportViewModel : ObservableValidator
     /// 入力元フォルダパス
     /// </summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CanExport))]
+    [NotifyDataErrorInfo]
+    [NotifyCanExecuteChangedFor(nameof(ExportCommand))]
+    [InDirPathChecker]
     public partial string InDirPath { get; set; } = "";
 
 
@@ -48,10 +50,17 @@ sealed partial class DataExportViewModel : ObservableValidator
 
 
     /// <summary>
+    /// 言語一覧の取得に失敗したか
+    /// </summary>
+    [ObservableProperty]
+    public partial bool UnableToGetLanguages { get; private set; }
+
+
+    /// <summary>
     /// 選択された言語
     /// </summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CanExport))]
+    [NotifyCanExecuteChangedFor(nameof(ExportCommand))]
     public partial LangComboboxItem? SelectedLanguage { get; set; }
 
 
@@ -72,7 +81,7 @@ sealed partial class DataExportViewModel : ObservableValidator
     /// 選択された設定フォルダ
     /// </summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CanExport))]
+    [NotifyCanExecuteChangedFor(nameof(ExportCommand))]
     public partial string SelectedConfigFolderPath { get; set; } = "";
 
 
@@ -86,24 +95,20 @@ sealed partial class DataExportViewModel : ObservableValidator
     /// ビジー状態か
     /// </summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CanExport))]
+    [NotifyCanExecuteChangedFor(nameof(ExportCommand))]
+    [NotifyCanExecuteChangedFor(nameof(SelectInDirCommand))]
     public partial bool IsBusy { get; private set; }
-
-
-    /// <summary>
-    /// エクスポート可能か
-    /// </summary>
-    public bool CanExport => !IsBusy && !string.IsNullOrEmpty(InDirPath) && SelectedLanguage is not null && !string.IsNullOrEmpty(SelectedConfigFolderPath);
     #endregion
 
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    public DataExportViewModel(string inDirPath, string outFilePath, Window window)
+    public DataExportViewModel(IMessenger messenger, string inDirPath, string outFilePath)
     {
-        _model = new(outFilePath);
-        _ownerWindow = window;
+        _messenger = messenger;
+
+        _model = new(_messenger, outFilePath);
 
         ConfigFolderPaths = CollectionViewSource.GetDefaultView(_model.ConfigFolderPaths);
         Languages = CollectionViewSource.GetDefaultView(_model.Languages);
@@ -136,10 +141,12 @@ sealed partial class DataExportViewModel : ObservableValidator
     {
         if (IsBusy) return;
 
+        UnableToGetLanguages = false;
+        ClearErrors(nameof(InDirPath));
+        
         try
         {
             IsBusy = true;
-            //_unableToGetLanguages.Value = false;
             
             var prevLangID = SelectedLanguage?.ID ?? -1;
 
@@ -151,23 +158,18 @@ sealed partial class DataExportViewModel : ObservableValidator
         }
         catch (DependencyResolutionException ex)
         {
-            //_unableToGetLanguages.Value = true;
+            UnableToGetLanguages = true;
 
-            _ownerWindow.Dispatcher.Invoke(() =>
-            {
-                var wnd = new DependencyResolutionFailedWindow(ex.UnloadedMods);
-                wnd.Owner = _ownerWindow;
-                wnd.ShowDialog();
-            });
+            _messenger.Send(ex);
         }
         catch (Exception)
         {
-            //_unableToGetLanguages.Value = true;
+            UnableToGetLanguages = true;
         }
         finally
         {
             IsBusy = false;
-            ValidateProperty(this, nameof(InDirPath));
+            ValidateAllProperties();
         }
     }
 
@@ -175,7 +177,7 @@ sealed partial class DataExportViewModel : ObservableValidator
     /// <summary>
     /// 入力元フォルダを選択
     /// </summary>
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanSelectInDir))]
     private void SelectInDir()
     {
         var dlg = new CommonOpenFileDialog
@@ -201,9 +203,15 @@ sealed partial class DataExportViewModel : ObservableValidator
 
 
     /// <summary>
+    /// 入力元フォルダを選択可能か
+    /// </summary>
+    private bool CanSelectInDir() => !IsBusy;
+
+
+    /// <summary>
     /// データ抽出実行
     /// </summary>
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanExport))]
     private async Task ExportAsync()
     {
         if (IsBusy) return;
@@ -217,15 +225,13 @@ sealed partial class DataExportViewModel : ObservableValidator
         try
         {
             IsBusy = true;
-
             await Task.Run(() => _model.Export(
                 ExportProgress.MainProgress,
                 ExportProgress.SubProgress,
                 InDirPath,
                 SelectedConfigFolderPath,
                 CatLoadOption,
-                SelectedLanguage,
-                _ownerWindow
+                SelectedLanguage
             ));
         }
         finally
@@ -234,6 +240,12 @@ sealed partial class DataExportViewModel : ObservableValidator
             ExportProgress.Clear();
         }
     }
+
+
+    /// <summary>
+    /// データ抽出実行可能か
+    /// </summary>
+    private bool CanExport() => !IsBusy && !string.IsNullOrEmpty(InDirPath) && SelectedLanguage is not null && !string.IsNullOrEmpty(SelectedConfigFolderPath);
 
 
     /// <summary>

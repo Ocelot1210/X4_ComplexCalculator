@@ -5,7 +5,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using WPFLocalizeExtension.Engine;
 
-namespace X4_DataExporterWPF.ExportWindow.DependencyResolutionFailedWindows
+namespace X4_DataExporterWPF.ExportWindows.DependencyResolutionFailedWindows
 {
     internal sealed partial class DependencyResolutionFailedModel : ObservableObject
     {

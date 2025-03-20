@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace X4_DataExporterWPF.ExportWindow.ValueConverters;
+namespace X4_DataExporterWPF.ExportWindows.ValueConverters;
 
 
 /// <summary>
@@ -13,7 +13,7 @@ internal sealed class InvertedBoolConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (parameter is not bool ret)
+        if (value is not bool ret)
         {
             return DependencyProperty.UnsetValue;
         }
@@ -23,7 +23,7 @@ internal sealed class InvertedBoolConverter : IValueConverter
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (parameter is not bool ret)
+        if (value is not bool ret)
         {
             return DependencyProperty.UnsetValue;
         }

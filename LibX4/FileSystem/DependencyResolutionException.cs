@@ -7,7 +7,7 @@ namespace LibX4.FileSystem;
 /// <summary>
 /// Mod の依存関係の解決に失敗した際にスローされる例外
 /// </summary>
-public class DependencyResolutionException : Exception
+public sealed class DependencyResolutionException : Exception
 {
     public readonly IReadOnlyList<ModInfo> UnloadedMods = Array.Empty<ModInfo>();
 

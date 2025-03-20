@@ -1,10 +1,10 @@
 ﻿<Window
-    x:Class="X4_DataExporterWPF.ExportWindow.DependencyResolutionFailedWindows.DependencyResolutionFailedWindow"
+    x:Class="X4_DataExporterWPF.ExportWindows.DependencyResolutionFailedWindows.DependencyResolutionFailedWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
-    xmlns:local="clr-namespace:X4_DataExporterWPF.ExportWindow.DependencyResolutionFailedWindows"
+    xmlns:local="clr-namespace:X4_DataExporterWPF.ExportWindows.DependencyResolutionFailedWindows"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="{lex:Loc Lang:DependencyResolutionFailedWindow_Title}"
     Width="800"

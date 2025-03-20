@@ -15,7 +15,7 @@ namespace LibX4.FileSystem;
 /// <summary>
 /// catファイル用ユーティリティクラス
 /// </summary>
-public class CatFile : ICatFile
+public sealed class CatFile : ICatFile
 {
     #region スタティックメンバ
     /// <summary>

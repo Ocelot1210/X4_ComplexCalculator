@@ -5,7 +5,7 @@ using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Dialogs.MessageBoxes;
 using X4_ComplexCalculator.Common.LocalizationProviders;
 using X4_ComplexCalculator.DB.X4DB.Manager;
-using X4_DataExporterWPF.DataExportWindows;
+using X4_DataExporterWPF.ExportWindows;
 
 namespace X4_ComplexCalculator.DB;
 

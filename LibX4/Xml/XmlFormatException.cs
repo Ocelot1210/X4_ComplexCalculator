@@ -6,7 +6,7 @@ namespace LibX4.Xml;
 /// <summary>
 /// XML 文書の形式が無効である場合にスローされる例外
 /// </summary>
-public class XmlFormatException : FormatException
+public sealed class XmlFormatException : FormatException
 {
     public XmlFormatException() { }
 

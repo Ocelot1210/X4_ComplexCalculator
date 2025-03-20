@@ -1,12 +1,12 @@
 ﻿<Window
-    x:Class="X4_DataExporterWPF.DataExportWindows.DataExportWindow"
+    x:Class="X4_DataExporterWPF.ExportWindows.DataExportWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vcvt="clr-namespace:X4_DataExporterWPF.ExportWindow.ValueConverters"
+    xmlns:vcvt="clr-namespace:X4_DataExporterWPF.ExportWindows.ValueConverters"
     x:Name="Window"
     Title="{lex:Loc Lang:DataExporter_Title}"
     Width="420"
@@ -76,7 +76,6 @@
                     <Button
                         Grid.Row="1"
                         Grid.Column="1"
-                        IsEnabled="{Binding IsBusy, Mode=OneTime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvertedBoolConverter}}"
                         Command="{Binding SelectInDirCommand, Mode=OneTime}"
                         Content="..." />
                 </Grid>
@@ -99,7 +98,7 @@
                         Grid.Column="0"
                         Grid.ColumnSpan="2"
                         Background="WhiteSmoke"
-                        IsEnabled="{Binding IsBusy, Mode=OneTime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvertedBoolConverter}}"
+                        IsEnabled="{Binding IsBusy, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvertedBoolConverter}}"
                         ItemsSource="{Binding ConfigFolderPaths, Mode=OneTime}"
                         SelectedItem="{Binding SelectedConfigFolderPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </Grid>
@@ -117,14 +116,14 @@
                 <ComboBox
                     Background="WhiteSmoke"
                     DisplayMemberPath="Name"
-                    IsEnabled="{Binding IsBusy, Mode=OneTime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvertedBoolConverter}}"
+                    IsEnabled="{Binding IsBusy, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvertedBoolConverter}}"
                     ItemsSource="{Binding Languages}"
                     SelectedItem="{Binding SelectedLanguage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                 <GroupBox
                     BorderBrush="DarkGray"
                     Header="{lex:Loc Lang:DataExporter_ExportOption}"
-                    IsEnabled="{Binding IsBusy, Mode=OneTime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvertedBoolConverter}}">
+                    IsEnabled="{Binding IsBusy, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvertedBoolConverter}}">
                     <StackPanel>
                         <StackPanel.Resources>
                             <vcvt:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
@@ -172,15 +171,14 @@
             <Button
                 Grid.Column="1"
                 Margin="3"
-                IsEnabled="{Binding CanExport, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                 Command="{Binding ExportCommand, Mode=OneTime}"
                 Content="{lex:Loc Lang:DataExporter_Export}" />
 
             <Button
                 Grid.Column="2"
                 Margin="3"
-                Content="{lex:Loc Lang:DataExporter_Close}"
-                IsEnabled="{Binding IsBusy, Mode=OneTime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvertedBoolConverter}}">
+                IsEnabled="{Binding IsBusy, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvertedBoolConverter}}"
+                Content="{lex:Loc Lang:DataExporter_Close}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="Click">
                         <i:CallMethodAction MethodName="Close" TargetObject="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Mode=OneTime}" />
