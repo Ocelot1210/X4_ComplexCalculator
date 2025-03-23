@@ -1,21 +1,25 @@
 ﻿using Collections.Pooled;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging.Messages;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collections;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings;
+using Xceed.Wpf.Toolkit.Core;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleInfo;
 
 /// <summary>
 /// 労働力用モジュール情報用Model
 /// </summary>
-sealed partial class WorkForceModuleInfoModel : ObservableObject
+sealed partial class WorkForceModuleInfoModel : ObservableRecipient
 {
     #region メンバ
     /// <summary>
@@ -50,45 +54,16 @@ sealed partial class WorkForceModuleInfoModel : ObservableObject
     /// </summary>
     /// <param name="modules">モジュール一覧情報</param>
     /// <param name="settings">ステーションの設定</param>
-    public WorkForceModuleInfoModel(IModulesInfo modules, IStationSettings settings)
+    public WorkForceModuleInfoModel(IMessenger messenger, IModulesInfo modules, IStationSettings settings) : base(messenger)
     {
         _modules = modules;
         _modules.Modules.CollectionChanged += OnModulesChanged;
-        _modules.Modules.CollectionPropertyChanged += OnModulesPropertyChanged;
+        Messenger.RegisterPropertyChangedMessage(this, static (ModulesGridItem x) => x.ModuleCount, static (r, m) => r.OnModuleCountChanged(m));
 
         _settings = settings;
-        _settings.PropertyChanged += Settings_PropertyChanged;
+        Messenger.RegisterPropertyChangedMessage(this, static (IStationSettings x) => x.IsHeadquarters, static (r, m) => r.OnSettingsIsHeadquarterChanged(m));
+
         _hQ = new WorkForceModuleInfoDetailsItem("module_player_prod_hq_01_macro", 1, _settings.HQWorkers, 0);
-    }
-
-
-    /// <summary>
-    /// ステーションの設定変更時
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        switch (e.PropertyName)
-        {
-            case nameof(IStationSettings.IsHeadquarters):
-                {
-                    if (_settings.IsHeadquarters)
-                    {
-                        _settings.Workforce.Need += _hQ.MaxWorkers;
-                        WorkForceDetails.Add(_hQ);
-                    }
-                    else
-                    {
-                        _settings.Workforce.Need -= _hQ.MaxWorkers;
-                        WorkForceDetails.Remove(_hQ);
-                    }
-                }
-                break;
-
-            default:
-                break;
-        }
     }
 
 
@@ -98,27 +73,34 @@ sealed partial class WorkForceModuleInfoModel : ObservableObject
     public void Dispose()
     {
         _modules.Modules.CollectionChanged -= OnModulesChanged;
-        _modules.Modules.CollectionPropertyChanged -= OnModulesPropertyChanged;
-        _settings.PropertyChanged -= Settings_PropertyChanged;
         WorkForceDetails.Clear();
+    }
+
+
+    /// <summary>
+    /// 本部かどうかが変更時
+    /// </summary>
+    private void OnSettingsIsHeadquarterChanged(PropertyChangedMessage<bool> message)
+    {
+        if (message.NewValue)
+        {
+            _settings.Workforce.Need += _hQ.MaxWorkers;
+            WorkForceDetails.Add(_hQ);
+        }
+        else
+        {
+            _settings.Workforce.Need -= _hQ.MaxWorkers;
+            WorkForceDetails.Remove(_hQ);
+        }
     }
 
 
     /// <summary>
     /// モジュールのプロパティ変更時
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    /// <returns></returns>
-    private void OnModulesPropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void OnModuleCountChanged(PropertyChangedMessage<long> message)
     {
-        // モジュール数変更時以外は処理しない
-        if (e.PropertyName != nameof(ModulesGridItem.ModuleCount))
-        {
-            return;
-        }
-
-        if (sender is not ModulesGridItem module)
+        if (message.Sender is not ModulesGridItem module)
         {
             return;
         }

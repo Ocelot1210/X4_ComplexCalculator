@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace X4_ComplexCalculator.Common.ValueConverter;
+namespace X4_ComplexCalculator.Common.ValueConverters;
 
 /// <summary>
 /// bool値を反転するValueConverter

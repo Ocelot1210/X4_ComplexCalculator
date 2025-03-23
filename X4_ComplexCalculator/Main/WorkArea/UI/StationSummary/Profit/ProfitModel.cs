@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -9,18 +10,13 @@ using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Products;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.Profit;
 
-sealed partial class ProfitModel : ObservableObject
+sealed partial class ProfitModel : ObservableRecipientEx
 {
     #region メンバ
     /// <summary>
     /// 製品一覧
     /// </summary>
     private readonly IProductsInfo _products;
-
-    /// <summary>
-    /// 利益
-    /// </summary>
-    private long _profit = 0;
     #endregion
 
 
@@ -34,11 +30,9 @@ sealed partial class ProfitModel : ObservableObject
     /// <summary>
     /// 利益
     /// </summary>
-    public long Profit
-    {
-        get => _profit;
-        set => SetProperty(ref _profit, value);
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedRecipients]
+    public partial long Profit { get; set; }
     #endregion
 
 
@@ -46,11 +40,11 @@ sealed partial class ProfitModel : ObservableObject
     /// コンストラクタ
     /// </summary>
     /// <param name="products">製品一覧</param>
-    public ProfitModel(IProductsInfo products)
+    public ProfitModel(IMessenger messenger, IProductsInfo products) : base(messenger, true)
     {
         _products = products;
         _products.Products.CollectionChanged += OnProductsCollectionChanged;
-        _products.Products.CollectionPropertyChanged += OnProductsPropertyChanged;
+        Messenger.RegisterPropertyChangedMessage(this, static (ProductsGridItem x) => x.Price, static (r, m) => r.Profit -= (m.OldValue - m.NewValue));
     }
 
 
@@ -60,7 +54,7 @@ sealed partial class ProfitModel : ObservableObject
     public void Dispose()
     {
         _products.Products.CollectionChanged -= OnProductsCollectionChanged;
-        _products.Products.CollectionPropertyChanged -= OnProductsPropertyChanged;
+        Messenger.UnregisterAll(this);
     }
 
 
@@ -87,30 +81,6 @@ sealed partial class ProfitModel : ObservableObject
         if (e.Action == NotifyCollectionChangedAction.Reset)
         {
             Profit = _products.Products.Sum(x => x.Price);
-        }
-    }
-
-
-    /// <summary>
-    /// 製品のプロパティが変更された時
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void OnProductsPropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        switch (e.PropertyName)
-        {
-            // 価格変更の場合
-            case nameof(ProductsGridItem.Price):
-                if (e is PropertyChangedExtendedEventArgs<long> ev)
-                {
-                    Profit -= (ev.OldValue - ev.NewValue);
-                }
-                break;
-
-            // それ以外の場合
-            default:
-                break;
         }
     }
 }

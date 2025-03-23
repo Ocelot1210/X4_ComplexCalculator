@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using System;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collections;
 using X4_ComplexCalculator.Common.Dialogs.MessageBoxes;
 using X4_ComplexCalculator.Main.WorkArea.SaveDataWriters;
@@ -136,7 +137,8 @@ public sealed partial class WorkAreaViewModel : ObservableRecipient, IDisposable
         Storages                = new(Messenger, _model.StationData);
         StorageAssign           = new(Messenger, _model.StationData);
 
-        _model.PropertyChanged += Model_PropertyChanged;
+        Messenger.RegisterPropertyChangedMessage(this, static (WorkAreaModel x) => x.HasChanged, static (r, m) => r.OnPropertyChanged(nameof(HasChanged)));
+        Messenger.RegisterPropertyChangedMessage(this, static (WorkAreaModel x) => x.Title,      static (r, m) => r.OnPropertyChanged(nameof(Title)));
     }
 
 
@@ -167,35 +169,10 @@ public sealed partial class WorkAreaViewModel : ObservableRecipient, IDisposable
 
 
     /// <summary>
-    /// Modelのプロパティ変更時
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void Model_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
-        switch (e.PropertyName)
-        {
-            case nameof(_model.HasChanged):
-                OnPropertyChanged(nameof(HasChanged));
-                OnPropertyChanged(nameof(Title));
-                break;
-
-            case nameof(_model.Title):
-                OnPropertyChanged(nameof(Title));
-                break;
-
-            default:
-                break;
-        }
-    }
-
-
-    /// <summary>
     /// リソースを開放
     /// </summary>
     public void Dispose()
     {
-        _model.PropertyChanged -= Model_PropertyChanged;
         _model.Dispose();
         LayoutManager.Dispose();
         Summary.Dispose();
@@ -203,5 +180,7 @@ public sealed partial class WorkAreaViewModel : ObservableRecipient, IDisposable
         Products.Dispose();
         Resources.Dispose();
         Storages.Dispose();
+
+        Messenger.UnregisterAll(this);
     }
 }

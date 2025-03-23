@@ -85,10 +85,10 @@ sealed partial class ProductsGridModel : ObservableRecipientEx, IDisposable
         _modules = modules;
         _settings = settings;
 
-        Messenger.RegisterPropertyChangedMessage(this, static (ModulesGridItem x) => x.ModuleCount, OnModuleCountChanged);
-        Messenger.RegisterPropertyChangedMessage(this, static (WorkAreaData.StationSettings.StationSettings x) => x.Sunlight, OnSunlightChanged);
-        Messenger.RegisterPropertyChangedMessage(this, static (WorkforceManager x) => x.Proportion, OnWorkerProportionChanged);
-        Messenger.Register<ProductsGridModel, RequestMessage<(IX4Module, long)[]>>(this, OnNeedModulesRequired);
+        Messenger.RegisterPropertyChangedMessage(this, static (ModulesGridItem x)  => x.ModuleCount, static (r, m) => r.OnModuleCountChanged(m));
+        Messenger.RegisterPropertyChangedMessage(this, static (IStationSettings x) => x.Sunlight,    static (r, m) => r.OnSunlightChanged());
+        Messenger.RegisterPropertyChangedMessage(this, static (WorkforceManager x) => x.Proportion,  static (r, m) => r.OnWorkerProportionChanged());
+        Messenger.RegisterRequestMessage(this, static (r) => r._productCalculator.CalcNeedModules(r.Products, r._settings).ToArray());
     }
 
 
@@ -100,9 +100,7 @@ sealed partial class ProductsGridModel : ObservableRecipientEx, IDisposable
         Products.Clear();
         _modules.Modules.CollectionChanged -= OnModulesChanged;
 
-        Messenger.UnregisterPropertyChangedMessage(this, static (WorkAreaData.StationSettings.StationSettings x) => x.Sunlight);
-        Messenger.UnregisterPropertyChangedMessage(this, static (WorkforceManager x) => x.Proportion);
-        Messenger.Unregister<RequestMessage<(IX4Module, long)[]>>(this);
+        Messenger.UnregisterAll(this);
     }
 
 
@@ -161,18 +159,9 @@ sealed partial class ProductsGridModel : ObservableRecipientEx, IDisposable
 
 
     /// <summary>
-    /// 不足している製品に対応するモジュールを返す
-    /// </summary>
-    private static void OnNeedModulesRequired(ProductsGridModel recipient, RequestMessage<(IX4Module, long)[]> message)
-    {
-        message.Reply(recipient._productCalculator.CalcNeedModules(recipient.Products, recipient._settings).ToArray());
-    }
-
-
-    /// <summary>
     /// 現在労働者数と必要労働者数の割合に変化があった場合
     /// </summary>
-    private void OnWorkerProportionChanged(ProductsGridModel recipient, PropertyChangedMessage<double> message)
+    private void OnWorkerProportionChanged()
     {
         // 労働者による生産性(倍率)
         double efficiency = _settings.Workforce.Proportion;
@@ -200,7 +189,7 @@ sealed partial class ProductsGridModel : ObservableRecipientEx, IDisposable
     /// <summary>
     /// 日光に変化があった場合
     /// </summary>
-    private void OnSunlightChanged(ProductsGridModel recipient, PropertyChangedMessage<double> message)
+    private void OnSunlightChanged()
     {
         foreach (var prod in Products)
         {
@@ -212,7 +201,7 @@ sealed partial class ProductsGridModel : ObservableRecipientEx, IDisposable
     /// <summary>
     /// モジュール数に変更があった場合
     /// </summary>
-    private void OnModuleCountChanged(ProductsGridModel recipient, PropertyChangedMessage<long> message)
+    private void OnModuleCountChanged(PropertyChangedMessage<long> message)
     {
         if (message.Sender is not ModulesGridItem module)
         {

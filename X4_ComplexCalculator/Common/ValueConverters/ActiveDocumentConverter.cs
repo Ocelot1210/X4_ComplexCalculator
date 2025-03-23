@@ -2,7 +2,7 @@
 using System.Windows.Data;
 using X4_ComplexCalculator.Main.WorkArea;
 
-namespace X4_ComplexCalculator.Common.ValueConverter;
+namespace X4_ComplexCalculator.Common.ValueConverters;
 
 /// <summary>
 /// 

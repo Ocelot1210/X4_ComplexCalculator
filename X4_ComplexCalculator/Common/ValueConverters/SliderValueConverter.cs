@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Data;
 
-namespace X4_ComplexCalculator.Common.ValueConverter;
+namespace X4_ComplexCalculator.Common.ValueConverters;
 
 /// <summary>
 /// DataGridのヘッダ部分のスライダー用ValueConverter

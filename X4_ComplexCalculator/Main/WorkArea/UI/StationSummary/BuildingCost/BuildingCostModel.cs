@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
-using CommunityToolkit.Mvvm.Messaging.Messages;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
@@ -13,7 +12,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost;
 /// <summary>
 /// 建造コスト用
 /// </summary>
-partial class BuildingCostModel : ObservableRecipient
+partial class BuildingCostModel : ObservableRecipientEx
 {
     #region メンバ
     /// <summary>
@@ -43,21 +42,12 @@ partial class BuildingCostModel : ObservableRecipient
     /// </summary>
     /// <param name="messanger">メッセージ交換用</param>
     /// <param name="resources">建造リソース一覧</param>
-    public BuildingCostModel(IMessenger messanger, IBuildResourcesInfo resources) : base(messanger)
+    public BuildingCostModel(IMessenger messanger, IBuildResourcesInfo resources) : base(messanger, true)
     {
         _buildResources = resources;
         _buildResources.BuildResources.CollectionChanged += Resources_OnCollectionChanged;
 
-        Messenger.RegisterPropertyChangedMessage(this, (BuildResourcesGridItem x) => x.Price, OnBuildResourcePriceChanged);
-    }
-
-
-    /// <summary>
-    /// 建造に必要なウェア一覧のプロパティに変更があった場合
-    /// </summary>
-    private void OnBuildResourcePriceChanged(BuildingCostModel model, PropertyChangedMessage<long> message)
-    {
-        BuildingCost -= (message.OldValue - message.NewValue);
+        Messenger.RegisterPropertyChangedMessage(this, static (BuildResourcesGridItem x) => x.Price, static (r, m) => r.BuildingCost -= (m.OldValue - m.NewValue));
     }
 
 
@@ -68,6 +58,7 @@ partial class BuildingCostModel : ObservableRecipient
     {
         _buildResources.BuildResources.CollectionChanged -= Resources_OnCollectionChanged;
         BuildResources.Clear();
+        Messenger.UnregisterAll(this);
     }
 
 

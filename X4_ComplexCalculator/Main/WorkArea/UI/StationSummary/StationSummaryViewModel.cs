@@ -1,9 +1,9 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Messaging;
+﻿using CommunityToolkit.Mvvm.Messaging;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Data;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Main.WorkArea.UI.BuildResourcesGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
 using X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost;
@@ -18,7 +18,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary;
 /// <summary>
 /// ステーション概要用ViewModel
 /// </summary>
-public sealed class StationSummaryViewModel : ObservableRecipient, IDisposable
+public sealed class StationSummaryViewModel : ObservableRecipientEx, IDisposable
 {
     #region メンバ
     /// <summary>
@@ -99,17 +99,17 @@ public sealed class StationSummaryViewModel : ObservableRecipient, IDisposable
     /// </summary>
     /// <param name="messanger">メッセージ交換用</param>
     /// <param name="stationData">計算機で使用するステーション情報</param>
-    public StationSummaryViewModel(IMessenger messanger, IStationData stationData) : base(messanger)
+    public StationSummaryViewModel(IMessenger messanger, IStationData stationData) : base(messanger, true)
     {
         Workforce = stationData.Settings.Workforce;
 
         // 労働力関係初期化
         {
-            _workForceModuleInfoModel = new WorkForceModuleInfoModel(stationData.ModulesInfo, stationData.Settings);
+            _workForceModuleInfoModel = new WorkForceModuleInfoModel(Messenger, stationData.ModulesInfo, stationData.Settings);
         }
 
         {
-            _needWareInfoModel = new NeedWareInfoModel(stationData.ModulesInfo, stationData.ProductsInfo);
+            _needWareInfoModel = new NeedWareInfoModel(Messenger, stationData.ModulesInfo, stationData.ProductsInfo);
 
             WorkforceNeedWareCollectionView = (ListCollectionView)CollectionViewSource.GetDefaultView(_needWareInfoModel.NeedWareInfoDetails);
             WorkforceNeedWareCollectionView.SortDescriptions.Clear();
@@ -123,53 +123,15 @@ public sealed class StationSummaryViewModel : ObservableRecipient, IDisposable
 
         // 損益関係初期化
         {
-            _profitModel = new ProfitModel(stationData.ProductsInfo);
-            _profitModel.PropertyChanged += ProfitModel_PropertyChanged;
+            _profitModel = new ProfitModel(Messenger, stationData.ProductsInfo);
+            Messenger.RegisterPropertyChangedMessage(this, (ProfitModel x) => x.Profit, (r, m) => r.OnPropertyChanged(nameof(Profit)));
         }
 
 
         // 建造コスト関係初期化
         {
             _buildingCostModel = new BuildingCostModel(Messenger, stationData.BuildResourcesInfo);
-            _buildingCostModel.PropertyChanged += BuildingCostModel_PropertyChanged;
-        }
-    }
-
-
-    /// <summary>
-    /// 損益情報用Modelのプロパティ変更時
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void ProfitModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        switch (e.PropertyName)
-        {
-            case nameof(ProfitModel.Profit):
-                OnPropertyChanged(nameof(Profit));
-                break;
-
-            default:
-                break;
-        }
-    }
-
-
-    /// <summary>
-    /// 建造コスト用Modelのプロパティ変更時
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void BuildingCostModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        switch (e.PropertyName)
-        {
-            case nameof(BuildingCostModel.BuildingCost):
-                OnPropertyChanged(nameof(BuildingCost));
-                break;
-
-            default:
-                break;
+            Messenger.RegisterPropertyChangedMessage(this, (BuildingCostModel x) => x.BuildingCost, (r, m) => r.OnPropertyChanged(nameof(BuildingCost)));
         }
     }
 
@@ -179,12 +141,10 @@ public sealed class StationSummaryViewModel : ObservableRecipient, IDisposable
     /// </summary>
     public void Dispose()
     {
-        _profitModel.PropertyChanged       -= ProfitModel_PropertyChanged;
-        _buildingCostModel.PropertyChanged -= BuildingCostModel_PropertyChanged;
-
         _workForceModuleInfoModel.Dispose();
         _needWareInfoModel.Dispose();
         _profitModel.Dispose();
         _buildingCostModel.Dispose();
+        Messenger.UnregisterAll(this);
     }
 }

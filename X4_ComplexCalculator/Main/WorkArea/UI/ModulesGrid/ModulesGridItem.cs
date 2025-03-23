@@ -71,6 +71,7 @@ public sealed partial class ModulesGridItem : ObservableRecipientEx, IEditable, 
     /// 選択中の建造方式
     /// </summary>
     [ObservableProperty]
+    [NotifyPropertyChangedRecipients]
     public partial IWareProduction SelectedMethod { get; set; }
 
 
@@ -90,6 +91,7 @@ public sealed partial class ModulesGridItem : ObservableRecipientEx, IEditable, 
     /// 編集状態
     /// </summary>
     [ObservableProperty]
+    [NotifyPropertyChangedRecipients]
     public partial EditStatus EditStatus { get; set; } = EditStatus.Unedited;
 
 
@@ -108,7 +110,7 @@ public sealed partial class ModulesGridItem : ObservableRecipientEx, IEditable, 
     /// <param name="module">モジュール</param>
     /// <param name="selectedMethod">選択中の建造方式</param>
     /// <param name="moduleCount">モジュール数</param>
-    public ModulesGridItem(IMessenger messenger, IX4Module module, IWareProduction? selectedMethod = null, long moduleCount = 1) : base(messenger, false)
+    public ModulesGridItem(IMessenger messenger, IX4Module module, IWareProduction? selectedMethod = null, long moduleCount = 1) : base(messenger, false, nameof(ModulesGridItem))
     {
         Module = module;
         ModuleCount = moduleCount;
@@ -128,7 +130,7 @@ public sealed partial class ModulesGridItem : ObservableRecipientEx, IEditable, 
     /// </summary>
     /// <param name="messenger">メッセージ通知用</param>
     /// <param name="element">モジュール情報が記載されたxml</param>
-    public ModulesGridItem(IMessenger messenger, XElement element) : base(messenger, false)
+    public ModulesGridItem(IMessenger messenger, XElement element) : base(messenger, false, nameof(ModulesGridItem))
     {
         Module = X4Database.Instance.Ware.TryGet<IX4Module>(element.Attribute("id")!.Value) ?? throw new ArgumentException("Invalid XElement.", nameof(element));
         Equipments = new EquippableWareEquipmentManager(Module, element.Element("equipments"));
@@ -198,13 +200,13 @@ public sealed partial class ModulesGridItem : ObservableRecipientEx, IEditable, 
         // 変更前
         using var turretsOld = Equipments.AllEquipments
             .Where(x => x.EquipmentType.EquipmentTypeID == "turrets")
-            .Select(x => x.ID)
-            .OrderBy(x => x).ToPooledList();
+            .OrderBy(x => x.ID)
+            .ToPooledList();
 
         using var shieldsOld = Equipments.AllEquipments
             .Where(x => x.EquipmentType.EquipmentTypeID == "shields")
-            .Select(x => x.ID)
-            .OrderBy(x => x).ToPooledList();
+            .OrderBy(x => x.ID)
+            .ToPooledList();
 
 
         var window = new EditEquipmentWindow(Equipments)
@@ -216,12 +218,12 @@ public sealed partial class ModulesGridItem : ObservableRecipientEx, IEditable, 
         bool equipmentChanged = false;
 
         // 変更があった場合のみ通知
-        if (!turretsOld.SequenceEqual(Equipments.AllEquipments.Where(x => x.EquipmentType.EquipmentTypeID == "turrets").Select(x => x.ID).OrderBy(x => x)))
+        if (!turretsOld.SequenceEqual(Equipments.AllEquipments.Where(x => x.EquipmentType.EquipmentTypeID == "turrets").OrderBy(x => x.ID)))
         {
             equipmentChanged = true;
         }
 
-        if (!shieldsOld.SequenceEqual(Equipments.AllEquipments.Where(x => x.EquipmentType.EquipmentTypeID == "shields").Select(x => x.ID).OrderBy(x => x)))
+        if (!shieldsOld.SequenceEqual(Equipments.AllEquipments.Where(x => x.EquipmentType.EquipmentTypeID == "shields").OrderBy(x => x.ID)))
         {
             equipmentChanged = true;
         }
@@ -230,7 +232,6 @@ public sealed partial class ModulesGridItem : ObservableRecipientEx, IEditable, 
         {
             using var newItems = Equipments.AllEquipments
                 .Where(x => x.EquipmentType.EquipmentTypeID == "shields" || x.EquipmentType.EquipmentTypeID == "turrets")
-                .Select(x => x.ID)
                 .ToPooledList();
             Broadcast(turretsOld.Concat(shieldsOld), newItems, nameof(Equipments));
             EditStatus = EditStatus.Edited;

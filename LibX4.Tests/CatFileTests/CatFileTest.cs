@@ -24,7 +24,6 @@ public class CatFileTest
     /// </summary>
     private readonly string _configFolderPath;
 
-
     public CatFileTest()
     {
         var path = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) ?? Environment.CurrentDirectory;
@@ -51,6 +50,7 @@ public class CatFileTest
         return Path.Combine(_baseDir, path);
     }
 
+
     /// <summary>
     /// X4のバージョンを確認する
     /// </summary>
@@ -61,7 +61,6 @@ public class CatFileTest
 
         Assert.Equal("330", cat.Version);
     }
-
 
 
     #region バニラ環境のファイルを開く
@@ -177,7 +176,6 @@ public class CatFileTest
     #endregion
 
 
-
     #region Mod入でバニラ環境のファイルを開く
     /// <summary>
     /// Mod入の環境でバニラのファイルを開く
@@ -242,7 +240,6 @@ public class CatFileTest
         Assert.True(IsSameStream(ms, fs));
     }
     #endregion
-
 
 
     #region Modのファイルを開く

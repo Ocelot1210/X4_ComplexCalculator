@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace X4_ComplexCalculator.Common.ValueConverter;
+namespace X4_ComplexCalculator.Common.ValueConverters;
 
 /// <summary>
 /// 特定の値未満なら動作するValueConverter

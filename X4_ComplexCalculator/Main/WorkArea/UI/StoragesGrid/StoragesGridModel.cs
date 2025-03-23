@@ -52,14 +52,14 @@ sealed partial class StoragesGridModel : ObservableRecipientEx, IDisposable
         _storages = storages;
         _modules.Modules.CollectionChanged += OnModulesChanged;
 
-        Messenger.RegisterPropertyChangedMessage(this, static (ModulesGridItem x) => x.ModuleCount, OnModuleCountChanged);
+        Messenger.RegisterPropertyChangedMessage(this, static (ModulesGridItem x) => x.ModuleCount, static (r, m) => r.OnModuleCountChanged(m));
     }
 
 
     /// <summary>
     /// モジュール数変更時
     /// </summary>
-    private void OnModuleCountChanged(StoragesGridModel recipient, PropertyChangedMessage<long> message)
+    private void OnModuleCountChanged(PropertyChangedMessage<long> message)
     {
         if (message.Sender is not ModulesGridItem module)
         {
@@ -88,7 +88,7 @@ sealed partial class StoragesGridModel : ObservableRecipientEx, IDisposable
     public void Dispose()
     {
         _modules.Modules.CollectionChanged -= OnModulesChanged;
-        Messenger.UnregisterPropertyChangedMessage(this, static (ModulesGridItem x) => x.ModuleCount);
+        Messenger.UnregisterAll(this);
     }
 
 

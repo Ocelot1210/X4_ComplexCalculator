@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Data;
 
 
-namespace X4_ComplexCalculator.Common.ValueConverter;
+namespace X4_ComplexCalculator.Common.ValueConverters;
 
 /// <summary>
 /// Visiblityとboolの変換を行う

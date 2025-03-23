@@ -116,8 +116,8 @@ sealed partial class SelectModuleViewModel : ObservableRecipient
         ModuleOwnersView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ModuleOwnersListItem.RaceID)));
 
 
-        Messenger.RegisterPropertyChangedMessage(this, static (ModuleTypeListItem x) => x.IsChecked, (r, m) => ModulesView.Refresh());
-        Messenger.RegisterPropertyChangedMessage(this, static (ModuleOwnersListItem x) => x.IsChecked, (r, m) => ModulesView.Refresh());
+        Messenger.RegisterPropertyChangedMessage(this, static (ModuleTypeListItem x) => x.IsChecked, static (r, m) => r.ModulesView.Refresh());
+        Messenger.RegisterPropertyChangedMessage(this, static (ModuleOwnersListItem x) => x.IsChecked, static (r, m) => r.ModulesView.Refresh());
 
         // 親ウィンドウが閉じられたときに子のウィンドウも閉じるようにする
         Application.Current.MainWindow.Closed += MainWindow_Closed;
@@ -157,8 +157,7 @@ sealed partial class SelectModuleViewModel : ObservableRecipient
             Application.Current.MainWindow.Closed -= MainWindow_Closed;
         }
 
-        Messenger.UnregisterPropertyChangedMessage(this, static (ModuleOwnersListItem x) => x.IsChecked);
-        Messenger.UnregisterPropertyChangedMessage(this, static (ModulesListItem x) => x.IsChecked);
+        Messenger.UnregisterAll(this);
     }
 
 

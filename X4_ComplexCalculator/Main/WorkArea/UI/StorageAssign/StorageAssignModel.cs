@@ -95,8 +95,8 @@ sealed partial class StorageAssignModel : ObservableRecipientEx, IDisposable
             _capacityDict[storage.TransportType.TransportTypeID].TotalCapacity = storage.Capacity;
         }
 
-        Messenger.RegisterPropertyChangedMessage(this, static (ProductsGridItem x) => x.Count, OnProductsCountChanged);
-        Messenger.RegisterPropertyChangedMessage(this, static (StoragesGridItem x) => x.Capacity, OnStorageCapacityChanged);
+        Messenger.RegisterPropertyChangedMessage(this, static (ProductsGridItem x) => x.Count, static (r, m) => r.OnProductsCountChanged(m));
+        Messenger.RegisterPropertyChangedMessage(this, static (StoragesGridItem x) => x.Capacity, static (r, m) => r.OnStorageCapacityChanged(m));
     }
 
 
@@ -116,7 +116,7 @@ sealed partial class StorageAssignModel : ObservableRecipientEx, IDisposable
     /// <summary>
     /// 製品一覧の生産量変更時
     /// </summary>
-    private void OnProductsCountChanged(StorageAssignModel recipient, PropertyChangedMessage<long> message)
+    private void OnProductsCountChanged(PropertyChangedMessage<long> message)
     {
         if (message.Sender is not ProductsGridItem product)
         {
@@ -134,7 +134,7 @@ sealed partial class StorageAssignModel : ObservableRecipientEx, IDisposable
     /// <summary>
     /// 保管庫の容量変更時
     /// </summary>
-    private void OnStorageCapacityChanged(StorageAssignModel recipient, PropertyChangedMessage<long> message)
+    private void OnStorageCapacityChanged(PropertyChangedMessage<long> message)
     {
         if(message.Sender is not StoragesGridItem storage)
         {

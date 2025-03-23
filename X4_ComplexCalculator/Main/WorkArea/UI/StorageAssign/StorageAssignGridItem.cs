@@ -143,7 +143,7 @@ public sealed partial class StorageAssignGridItem : ObservableRecipientEx, IDisp
         ProductPerHour = productPerHour;
         Hour = hour;
 
-        Messenger.RegisterPropertyChangedMessage(this, static (StorageCapacityInfo x) => x.FreeCapacity, OnFreeCapacityChanged);
+        Messenger.RegisterPropertyChangedMessage(this, static (StorageCapacityInfo x) => x.FreeCapacity, static (r, m) => r.OnFreeCapacityChanged(m));
 
         IsActive = true;
     }
@@ -152,7 +152,7 @@ public sealed partial class StorageAssignGridItem : ObservableRecipientEx, IDisp
     /// <summary>
     /// 全体の保管庫容量変更時
     /// </summary>
-    private void OnFreeCapacityChanged(StorageAssignGridItem recipient, PropertyChangedMessage<long> message)
+    private void OnFreeCapacityChanged(PropertyChangedMessage<long> message)
     {
         // 容量変更された保管庫種別が自分と同じならプロパティ更新
         if (message.Sender == CapacityInfo)
@@ -178,6 +178,6 @@ public sealed partial class StorageAssignGridItem : ObservableRecipientEx, IDisp
     /// </summary>
     public void Dispose()
     {
-        Messenger.UnregisterPropertyChangedMessage(this, static (StorageCapacityInfo x) => x.FreeCapacity);
+        Messenger.UnregisterAll(this);
     }
 }

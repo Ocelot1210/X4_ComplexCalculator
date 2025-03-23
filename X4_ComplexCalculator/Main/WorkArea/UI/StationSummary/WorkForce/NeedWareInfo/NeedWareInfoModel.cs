@@ -1,5 +1,7 @@
 ﻿using Collections.Pooled;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging.Messages;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -19,7 +21,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.NeedWar
 /// <summary>
 /// 必要ウェア情報
 /// </summary>
-sealed partial class NeedWareInfoModel : ObservableObject, IDisposable
+sealed partial class NeedWareInfoModel : ObservableRecipient, IDisposable
 {
     #region メンバ
     /// <summary>
@@ -58,17 +60,18 @@ sealed partial class NeedWareInfoModel : ObservableObject, IDisposable
     /// <summary>
     /// コンストラクタ
     /// </summary>
+    /// <param name="messenger">メッセージ通知用</param>
     /// <param name="modules">モジュール一覧情報</param>
     /// <param name="products">製品一覧情報</param>
-    public NeedWareInfoModel(IModulesInfo modules, IProductsInfo products)
+    public NeedWareInfoModel(IMessenger messenger, IModulesInfo modules, IProductsInfo products) : base(messenger)
     {
         _modules = modules;
         _modules.Modules.CollectionChanged += Modules_CollectionChanged;
-        _modules.Modules.CollectionPropertyChanged += Modules_CollectionPropertyChanged;
+        Messenger.RegisterPropertyChangedMessage(this, static (ModulesGridItem x) => x.ModuleCount, static (r, m) => r.OnModuleCountChanged(m));
 
         _products = products;
         _products.Products.CollectionChanged += Products_CollectionChanged;
-        _products.Products.CollectionPropertyChanged += Products_CollectionPropertyChanged;
+        Messenger.RegisterPropertyChangedMessage(this, static (ProductsGridItem x) => x.Count, static (r, m) => r.OnProductCountChanged(m));
 
 
         // 集計対象ウェアを取得
@@ -86,33 +89,18 @@ sealed partial class NeedWareInfoModel : ObservableObject, IDisposable
     public void Dispose()
     {
         _modules.Modules.CollectionChanged -= Modules_CollectionChanged;
-        _modules.Modules.CollectionPropertyChanged -= Modules_CollectionPropertyChanged;
         _products.Products.CollectionChanged -= Products_CollectionChanged;
-        _products.Products.CollectionPropertyChanged -= Products_CollectionPropertyChanged;
+        Messenger.UnregisterAll(this);
     }
 
 
     /// <summary>
-    /// モジュールのプロパティ変更時
+    /// モジュール数変更時
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void Modules_CollectionPropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void OnModuleCountChanged(PropertyChangedMessage<long> message)
     {
-        // ModulesGridItemでなければ何もしない
-        if (sender is not ModulesGridItem module)
-        {
-            return;
-        }
-
-        // 居住モジュールでなければ何もしない
-        if (module.Module.WorkersCapacity <= 0)
-        {
-            return;
-        }
-
-        // PropertyChangedExtendedEventArgsでない or モジュール数変更以外なら何もしない
-        if (e is not PropertyChangedExtendedEventArgs<long> ev || e.PropertyName != nameof(ModulesGridItem.ModuleCount))
+        // ModulesGridItemでなければ何もしない or 居住モジュールでなければ何もしない
+        if (message.Sender is not ModulesGridItem module || module.Module.WorkersCapacity <= 0)
         {
             return;
         }
@@ -125,7 +113,7 @@ sealed partial class NeedWareInfoModel : ObservableObject, IDisposable
             {
                 foreach (var item in NeedWareInfoDetails.Where(x => x.Method == calcResult.Method && x.WareID == calcResult.WareID))
                 {
-                    item.NeedAmount -= (ev.NewValue - ev.OldValue) * calcResult.WareAmount;
+                    item.NeedAmount -= (message.NewValue - message.OldValue) * calcResult.WareAmount;
                 }
             }
         }
@@ -310,18 +298,10 @@ sealed partial class NeedWareInfoModel : ObservableObject, IDisposable
     /// <summary>
     /// 製品のプロパティ変更時
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void Products_CollectionPropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void OnProductCountChanged(PropertyChangedMessage<long> message)
     {
-        // ウェア数量以外の変更なら何もしない
-        if (e.PropertyName != nameof(ProductsGridItem.Count))
-        {
-            return;
-        }
-
         // キャストに失敗したら何もしない
-        if (sender is not ProductsGridItem product)
+        if (message.Sender is not ProductsGridItem product)
         {
             return;
         }

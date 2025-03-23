@@ -7,7 +7,7 @@
     xmlns:multilistfilter="clr-namespace:X4_ComplexCalculator.Common.Controls.DataGridFilters.MultiList"
     xmlns:numericalfilter="clr-namespace:X4_ComplexCalculator.Common.Controls.DataGridFilters.Numerical"
     xmlns:textfilter="clr-namespace:X4_ComplexCalculator.Common.Controls.DataGridFilters.Text"
-    xmlns:x4conv="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
+    xmlns:x4conv="clr-namespace:X4_ComplexCalculator.Common.ValueConverters"
     xmlns:x4enum="clr-namespace:X4_ComplexCalculator.Common.EditStatus">
 
     <!--  文字列用フィルタ  -->

@@ -101,8 +101,8 @@ public sealed class EmpireOverviewWindowModel : IDisposable
 
             case NotifyCollectionChangedAction.Remove:
                 {
-                    using var oldItems = e.OldItems!.Cast<WorkAreaViewModel>().ToPooledList();
-                    WorkAreas.RemoveAll(x => oldItems!.Contains(x.WorkArea));
+                    using var oldItems = e.OldItems!.Cast<WorkAreaViewModel>().ToPooledSet();
+                    WorkAreas.RemoveAll(x => oldItems.Contains(x.WorkArea));
                 }
                 break;
 

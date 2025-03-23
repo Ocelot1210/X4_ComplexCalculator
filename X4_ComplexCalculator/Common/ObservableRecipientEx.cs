@@ -29,10 +29,9 @@ public class ObservableRecipientEx : ObservableRecipient
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    /// <param name="messenger"></param>
-    public ObservableRecipientEx(IMessenger messenger, bool isActive = false) : base(messenger)
+    public ObservableRecipientEx(IMessenger messenger, bool isActive = false, string? className = null) : base(messenger)
     {
-        _className = GetType().Name;
+        _className = className ?? GetType().Name;
         IsActive = isActive;
     }
 

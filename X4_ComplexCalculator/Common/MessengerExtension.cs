@@ -34,25 +34,6 @@ internal static class MessengerExtension
 
 
     /// <summary>
-    /// <see cref="PropertyChangedMessage{T}">の登録解除補助</see
-    /// </summary>
-    /// <typeparam name="TRecipient"></typeparam>
-    /// <typeparam name="TObservable"></typeparam>
-    /// <typeparam name="TProperty"></typeparam>
-    /// <param name="messenger"></param>
-    /// <param name="recipient"></param>
-    /// <param name="expr"></param>
-    public static void UnregisterPropertyChangedMessage<TRecipient, TObservable, TProperty>(
-        this IMessenger messenger,
-             TRecipient recipient,
-             Expression<Func<TObservable, TProperty>> expr
-        ) where TRecipient : ObservableRecipient
-    {
-        messenger.Unregister<TRecipient, string>(recipient, MakeToken(expr));
-    }
-
-
-    /// <summary>
     /// 
     /// </summary>
     /// <typeparam name="TObservable"></typeparam>
@@ -70,5 +51,15 @@ internal static class MessengerExtension
         }
 
         return $"{className}.{memberName}";
+    }
+
+
+    public static void RegisterRequestMessage<TRecipient, TResult>(
+        this IMessenger messenger,
+        TRecipient recipient,
+        Func<TRecipient, TResult> getter
+    ) where TRecipient : ObservableRecipient
+    {
+        messenger.Register<TRecipient, RequestMessage<TResult>>(recipient, (r, m) => m.Reply(getter(recipient)));
     }
 }

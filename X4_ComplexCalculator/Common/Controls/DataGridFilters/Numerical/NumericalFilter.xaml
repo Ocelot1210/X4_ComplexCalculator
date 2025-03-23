@@ -6,7 +6,7 @@
     xmlns:dgx="clr-namespace:X4_ComplexCalculator_CustomControlLibrary.DataGridExtensions;assembly=X4_ComplexCalculator_CustomControlLibrary"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:x4conv="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
+    xmlns:x4conv="clr-namespace:X4_ComplexCalculator.Common.ValueConverters"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     x:Name="Control"
     lex:LocalizeDictionary.DefaultProvider="{StaticResource CSVLocalizationProvider}"

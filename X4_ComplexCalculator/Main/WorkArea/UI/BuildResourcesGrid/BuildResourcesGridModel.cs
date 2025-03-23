@@ -5,13 +5,11 @@ using CommunityToolkit.Mvvm.Messaging.Messages;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collections;
 using X4_ComplexCalculator.Common.EditStatus;
-using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.BuildResources;
@@ -35,12 +33,6 @@ sealed class BuildResourcesGridModel : ObservableRecipient, IDisposable
     /// 建造リソース情報
     /// </summary>
     private readonly IBuildResourcesInfo _buildResources;
-
-
-    /// <summary>
-    /// 前回値オプション保存用
-    /// </summary>
-    private readonly Dictionary<string, BuildResourcesGridItem> _optionsBakDict = new();
 
 
     /// <summary>
@@ -69,9 +61,10 @@ sealed class BuildResourcesGridModel : ObservableRecipient, IDisposable
         _buildResources = buildResources;
 
         _modules.Modules.CollectionChanged += OnModulesCollectionChanged;
-        _modules.Modules.CollectionPropertyChanged += OnModulesPropertyChanged;
 
-        Messenger.RegisterPropertyChangedMessage(this, static (ModulesGridItem x) => x.ModuleCount, OnModuleCountChanged);
+        Messenger.RegisterPropertyChangedMessage(this, static (ModulesGridItem x) => x.Equipments,     static (r, m) => r.OnModuleEquipmentChanged((m.Sender as ModulesGridItem)!, m.OldValue.AllEquipments));
+        Messenger.RegisterPropertyChangedMessage(this, static (ModulesGridItem x) => x.SelectedMethod, static (r, m) => r.OnModuleSelectedMethodChanged((m.Sender as ModulesGridItem)!, m.OldValue.Method));
+        Messenger.RegisterPropertyChangedMessage(this, static (ModulesGridItem x) => x.ModuleCount,    static (r, m) => r.OnModuleCountChanged(m));
     }
 
 
@@ -82,9 +75,8 @@ sealed class BuildResourcesGridModel : ObservableRecipient, IDisposable
     {
         Resources.Clear();
         _modules.Modules.CollectionChanged -= OnModulesCollectionChanged;
-        _modules.Modules.CollectionPropertyChanged -= OnModulesPropertyChanged;
 
-        Messenger.UnregisterPropertyChangedMessage(this, static (ModulesGridItem x) => x.ModuleCount);
+        Messenger.UnregisterAll(this);
     }
 
 
@@ -92,7 +84,6 @@ sealed class BuildResourcesGridModel : ObservableRecipient, IDisposable
     /// 価格割合一括設定
     /// </summary>
     /// <param name="value">設定値</param>
-
     public void SetUnitPricePercent(long value)
     {
         foreach (var resource in Resources)
@@ -117,48 +108,6 @@ sealed class BuildResourcesGridModel : ObservableRecipient, IDisposable
 
 
     /// <summary>
-    /// モジュールのプロパティ変更時
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    /// <returns></returns>
-    private void OnModulesPropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        if (sender is not ModulesGridItem module)
-        {
-            return;
-        }
-
-        switch (e.PropertyName)
-        {
-            // 装備変更の場合
-            case nameof(ModulesGridItem.Equipments):
-                {
-                    if (e is PropertyChangedExtendedEventArgs<IEnumerable<string>> ev)
-                    {
-                        OnModuleEquipmentChanged(module, ev.OldValue);
-                    }
-                }
-
-                break;
-
-            // 建造方式変更の場合
-            case nameof(ModulesGridItem.SelectedMethod):
-                {
-                    if (e is PropertyChangedExtendedEventArgs<IWareProduction> ev)
-                    {
-                        OnModuleSelectedMethodChanged(module, ev.OldValue.Method);
-                    }
-                }
-                break;
-
-            default:
-                break;
-        }
-    }
-
-
-    /// <summary>
     /// モジュール一覧変更時
     /// </summary>
     /// <param name="sender"></param>
@@ -178,13 +127,7 @@ sealed class BuildResourcesGridModel : ObservableRecipient, IDisposable
         if (e.Action == NotifyCollectionChangedAction.Reset)
         {
             // 前回値保存
-            foreach (var resource in Resources)
-            {
-                if (!_optionsBakDict.TryAdd(resource.Ware.ID, resource))
-                {
-                    _optionsBakDict[resource.Ware.ID] = resource;
-                }
-            }
+            using var optBakDict = Resources.ToPooledDictionary(x => x.Ware.ID);
 
             Resources.Clear();
 
@@ -194,18 +137,13 @@ sealed class BuildResourcesGridModel : ObservableRecipient, IDisposable
 
                 // 可能なら前回値復元して製品一覧に追加
                 var addItems = resources.Select(
-                    x =>
-                    {
-                        if (_optionsBakDict.TryGetValue(x.WareID, out var oldRes))
-                        {
-                            return new BuildResourcesGridItem(Messenger, x.WareID, x.Amount, oldRes.UnitPrice) { EditStatus = oldRes.EditStatus };
-                        }
+                    x => optBakDict.TryGetValue(x.WareID, out var oldRes) ? 
+                        new BuildResourcesGridItem(Messenger, x.WareID, x.Amount, oldRes.UnitPrice) { EditStatus = oldRes.EditStatus } :
+                        new BuildResourcesGridItem(Messenger, x.WareID, x.Amount) { EditStatus = EditStatus.Edited }
+                );
 
-                        return new BuildResourcesGridItem(Messenger, x.WareID, x.Amount) { EditStatus = EditStatus.Edited };
-                    });
 
                 Resources.AddRange(addItems);
-                _optionsBakDict.Clear();
             }
         }
     }
@@ -214,10 +152,9 @@ sealed class BuildResourcesGridModel : ObservableRecipient, IDisposable
     /// <summary>
     /// モジュール数変更時に建造に必要なリソースを更新
     /// </summary>
-    /// <param name="recipient"></param>
     /// <param name="message"></param>
     /// <exception cref="InvalidOperationException"></exception>
-    private void OnModuleCountChanged(BuildResourcesGridModel recipient, PropertyChangedMessage<long> message)
+    private void OnModuleCountChanged(PropertyChangedMessage<long> message)
     {
         if (message.Sender is not ModulesGridItem item)
         {
@@ -259,10 +196,10 @@ sealed class BuildResourcesGridModel : ObservableRecipient, IDisposable
     private void OnModuleSelectedMethodChanged(ModulesGridItem module, string prevBuildMethod)
     {
         (IWare Ware, string Method, long ModuleCount)[] modules =
-        {
+        [
             (module.Module, prevBuildMethod, -1),                   // 変更前のため -1
             (module.Module, module.SelectedMethod.Method, 1)        // 変更後のため +1
-        };
+        ];
 
         using var addTarget = new PooledList<BuildResourcesGridItem>();
         foreach (var kvp in _calculator.CalcResource(modules))
@@ -290,7 +227,7 @@ sealed class BuildResourcesGridModel : ObservableRecipient, IDisposable
     /// </summary>
     /// <param name="module">変更対象モジュール</param>
     /// <param name="prevEquipments">前回装備</param>
-    private void OnModuleEquipmentChanged(ModulesGridItem module, IEnumerable<string> prevEquipments)
+    private void OnModuleEquipmentChanged(ModulesGridItem module, IEnumerable<IEquipment> prevEquipments)
     {
         // 新しい装備一覧
         var newEquipments = module.Equipments.AllEquipments
@@ -300,7 +237,7 @@ sealed class BuildResourcesGridModel : ObservableRecipient, IDisposable
         // 古い装備一覧
         var oldEquipments = prevEquipments
             .GroupBy(x => x)
-            .Select(x => (X4Database.Instance.Ware.Get(x.Key), "default", -(long)x.Count()));
+            .Select(x => (x.Key as IWare, "default", -(long)x.Count()));
 
         // リソース集計
         using var addTarget = new PooledList<BuildResourcesGridItem>();
@@ -331,10 +268,11 @@ sealed class BuildResourcesGridModel : ObservableRecipient, IDisposable
     private void OnModulesAdded(IEnumerable<ModulesGridItem> modules)
     {
         using var addTarget = new PooledList<BuildResourcesGridItem>();
+        using var resources = Resources.ToPooledDictionary(x => x.Ware.ID, x => x);
+
         foreach (var kvp in AggregateModules(modules))
         {
-            var item = Resources.FirstOrDefault(x => x.Ware.ID == kvp.WareID);
-            if (item is not null)
+            if (resources.TryGetValue(kvp.WareID, out var item))
             {
                 // 既にウェアが一覧にある場合
                 item.Amount += kvp.Amount;
@@ -342,7 +280,9 @@ sealed class BuildResourcesGridModel : ObservableRecipient, IDisposable
             else
             {
                 // ウェアが一覧にない場合
-                addTarget.Add(new BuildResourcesGridItem(Messenger, kvp.WareID, kvp.Amount) { EditStatus = EditStatus.Edited });
+                item = new BuildResourcesGridItem(Messenger, kvp.WareID, kvp.Amount) { EditStatus = EditStatus.Edited };
+                resources.Add(kvp.WareID, item);
+                addTarget.Add(item);
             }
         }
 
@@ -356,15 +296,11 @@ sealed class BuildResourcesGridModel : ObservableRecipient, IDisposable
     /// <param name="modules">削除されたモジュール</param>
     private void OnModulesRemoved(IEnumerable<ModulesGridItem> modules)
     {
-        IEnumerable<CalcResult> resources = AggregateModules(modules);
+        using var resources = Resources.ToPooledDictionary(x => x.Ware.ID, x => x);
 
-        foreach (var kvp in resources)
+        foreach (var result in AggregateModules(modules))
         {
-            var itm = Resources.FirstOrDefault(x => x.Ware.ID == kvp.WareID);
-            if (itm is not null)
-            {
-                itm.Amount -= kvp.Amount;
-            }
+            resources[result.WareID].Amount -= result.Amount;
         }
 
         Resources.RemoveAll(x => x.Amount == 0);
@@ -378,15 +314,28 @@ sealed class BuildResourcesGridModel : ObservableRecipient, IDisposable
     /// <returns>集計結果</returns>
     private IEnumerable<CalcResult> AggregateModules(IEnumerable<ModulesGridItem> modules)
     {
-        // モジュール一覧
-        var moduleList = modules.Select(x => (x.Module as IWare, x.SelectedMethod.Method, x.ModuleCount));
+        // 同一ウェアを事前に集計するための、ウェアと建造方式をキーにした数量のディクショナリ
+        using var tmp = new PooledDictionary<(IWare Ware, string Method), long>(256);
 
-        var equipments = modules
-            .SelectMany(x => x.Equipments.AllEquipments.Select(y => (Ware: y as IWare, Count: x.ModuleCount)))
-            .GroupBy(x => x.Ware)
-            .Select(x => (Ware: x.Key, Method: "default", Count: x.Sum(y => y.Count)));
+        foreach (var module in modules)
+        {
+            if (!tmp.TryAdd((module.Module, module.SelectedMethod.Method), module.ModuleCount))
+            {
+                tmp[(module.Module, module.SelectedMethod.Method)] += module.ModuleCount;
+            }
 
+            foreach (var equipment in module.Equipments.AllEquipments)
+            {
+                if (!tmp.TryAdd((equipment, "default"), 1))
+                {
+                    tmp[(equipment, "default")] += 1;
+                }
+            }
+        }
 
-        return _calculator.CalcResource(moduleList.Concat(equipments));
+        foreach (var resource in _calculator.CalcResource(tmp.Select(x => (x.Key.Ware, x.Key.Method, x.Value))))
+        {
+            yield return resource;
+        }
     }
 }

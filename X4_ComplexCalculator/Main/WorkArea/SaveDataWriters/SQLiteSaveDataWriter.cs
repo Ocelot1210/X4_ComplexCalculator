@@ -14,27 +14,21 @@ namespace X4_ComplexCalculator.Main.WorkArea.SaveDataWriters;
 /// <summary>
 /// SQLite形式の保存ファイル作成クラス
 /// </summary>
-class SQLiteSaveDataWriter : ISaveDataWriter
+/// <remarks>
+/// コンストラクタ
+/// </remarks>
+/// <param name="messageBox">メッセージボックス表示用</param>
+sealed class SQLiteSaveDataWriter(ILocalizedMessageBox messageBox) : ISaveDataWriter
 {
     /// <summary>
     /// メッセージボックス表示用
     /// </summary>
-    private readonly ILocalizedMessageBox _messageBox;
+    private readonly ILocalizedMessageBox _messageBox = messageBox;
 
     /// <summary>
     /// 保存ファイルパス
     /// </summary>
     public string SaveFilePath { get; set; } = "";
-
-
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    /// <param name="messageBox">メッセージボックス表示用</param>
-    public SQLiteSaveDataWriter(ILocalizedMessageBox messageBox)
-    {
-        _messageBox = messageBox;
-    }
 
 
     /// <summary>

@@ -1,3 +1,4 @@
+using Collections.Pooled;
 using System.Collections.Generic;
 using System.Linq;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
@@ -26,10 +27,7 @@ sealed class BuildResourceCalculator
         get
         {
             // 未作成なら作成する
-            if (_SingletonInstance is null)
-            {
-                _SingletonInstance = new BuildResourceCalculator();
-            }
+            _SingletonInstance ??= new BuildResourceCalculator();
 
             return _SingletonInstance;
         }
@@ -44,10 +42,20 @@ sealed class BuildResourceCalculator
     /// <returns>建造に必要なウェア一覧</returns>
     public IEnumerable<CalcResult> CalcResource(IEnumerable<(IWare Ware, string Method, long Count)> items)
     {
-        return items
-            .SelectMany(x => CalcResourceInternal(x.Ware, x.Method, x.Count))
-            .GroupBy(x => x.WareID)
-            .Select(x => new CalcResult(x.Key, x.Sum(y => y.Amount)));
+        using var tmp = new PooledDictionary<string, long>(128);
+
+        foreach (var (wareID, amount) in items.SelectMany(x => CalcSingleWare(x.Ware, x.Method, x.Count)))
+        {
+            if (!tmp.TryAdd(wareID, amount))
+            {
+                tmp[wareID] += amount;
+            }
+        }
+
+        foreach (var kvp in tmp)
+        {
+            yield return new CalcResult(kvp.Key, kvp.Value);
+        }
     }
 
 
@@ -58,13 +66,13 @@ sealed class BuildResourceCalculator
     /// <param name="method">建造方法</param>
     /// <param name="count">個数</param>
     /// <returns></returns>
-    private IEnumerable<CalcResult> CalcResourceInternal(IWare ware, string method, long count)
+    private IEnumerable<(string WareID, long Amount)> CalcSingleWare(IWare ware, string method, long count)
     {
         var resources = 
-            ware.Resources.TryGetValue(method, out var ret1) ? ret1 :
-            ware.Resources.TryGetValue(method, out var ret2) ? ret2 :
+            ware.Resources.TryGetValue(method,    out var ret1) ? ret1 :
+            ware.Resources.TryGetValue("default", out var ret2) ? ret2 :
             Enumerable.Empty<IWareResource>();
 
-        return resources.Select(x => new CalcResult(x.NeedWareID, x.Amount * count));
+        return resources.Select(x => (x.NeedWareID, x.Amount * count));
     }
 }

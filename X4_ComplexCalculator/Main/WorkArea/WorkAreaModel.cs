@@ -23,12 +23,6 @@ sealed partial class WorkAreaModel : ObservableRecipientEx, IDisposable, IWorkAr
 {
     #region メンバ
     /// <summary>
-    /// タイトル文字列
-    /// </summary>
-    private string _title = "";
-
-
-    /// <summary>
     /// 保存ファイル書き込み用
     /// </summary>
     private readonly ISaveDataWriter _saveDataWriter;
@@ -39,11 +33,9 @@ sealed partial class WorkAreaModel : ObservableRecipientEx, IDisposable, IWorkAr
     /// <summary>
     /// タイトル文字列
     /// </summary>
-    public string Title
-    {
-        get => string.IsNullOrEmpty(_title) ? "no title*" : (HasChanged) ? $"{_title}*" : _title;
-        set => SetProperty(ref _title, value);
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedRecipients]
+    public partial string Title { get; set; } = "no title";
 
 
     /// <summary>
@@ -56,6 +48,7 @@ sealed partial class WorkAreaModel : ObservableRecipientEx, IDisposable, IWorkAr
     /// 変更されたか
     /// </summary>
     [ObservableProperty]
+    [NotifyPropertyChangedRecipients]
     public partial bool HasChanged { get; set; }
 
 
@@ -76,21 +69,21 @@ sealed partial class WorkAreaModel : ObservableRecipientEx, IDisposable, IWorkAr
 
         HasChanged = true;
 
-        Messenger.RegisterPropertyChangedMessage(this, static (ModulesGridItem x)        => x.EditStatus, OnEditStatusChanged);
-        Messenger.RegisterPropertyChangedMessage(this, static (ProductsGridItem x)       => x.EditStatus, OnEditStatusChanged);
-        Messenger.RegisterPropertyChangedMessage(this, static (BuildResourcesGridItem x) => x.EditStatus, OnEditStatusChanged);
-        Messenger.RegisterPropertyChangedMessage(this, static (StorageAssignGridItem x)  => x.EditStatus, OnEditStatusChanged);
+        Messenger.RegisterPropertyChangedMessage(this, static (ModulesGridItem x)        => x.EditStatus, static (r, m) => r.OnEditStatusChanged(m));
+        Messenger.RegisterPropertyChangedMessage(this, static (ProductsGridItem x)       => x.EditStatus, static (r, m) => r.OnEditStatusChanged(m));
+        Messenger.RegisterPropertyChangedMessage(this, static (BuildResourcesGridItem x) => x.EditStatus, static (r, m) => r.OnEditStatusChanged(m));
+        Messenger.RegisterPropertyChangedMessage(this, static (StorageAssignGridItem x)  => x.EditStatus, static (r, m) => r.OnEditStatusChanged(m));
 
-        Messenger.RegisterPropertyChangedMessage(this, static (StationSettings x)  => x.IsHeadquarters, (r, m) => HasChanged = true);
-        Messenger.RegisterPropertyChangedMessage(this, static (StationSettings x)  => x.Sunlight,       (r, m) => HasChanged = true);
-        Messenger.RegisterPropertyChangedMessage(this, static (WorkforceManager x) => x.Actual,         (r, m) => HasChanged = true);
+        Messenger.RegisterPropertyChangedMessage(this, static (IStationSettings x) => x.IsHeadquarters, static (r, m) => r.HasChanged = true);
+        Messenger.RegisterPropertyChangedMessage(this, static (IStationSettings x) => x.Sunlight,       static (r, m) => r.HasChanged = true);
+        Messenger.RegisterPropertyChangedMessage(this, static (WorkforceManager x) => x.Actual,         static (r, m) => r.HasChanged = true);
     }
 
 
     /// <summary>
     /// 編集状態変更時
     /// </summary>
-    private void OnEditStatusChanged(WorkAreaModel recipient, PropertyChangedMessage<EditStatus> message)
+    private void OnEditStatusChanged(PropertyChangedMessage<EditStatus> message)
     {
         if (message.NewValue == EditStatus.Edited)
         {
@@ -125,14 +118,7 @@ sealed partial class WorkAreaModel : ObservableRecipientEx, IDisposable, IWorkAr
         StationData.Settings.PropertyChanged -= OnPropertyChanged;
         StationData.Settings.Workforce.PropertyChanged -= OnPropertyChanged;
 
-        Messenger.UnregisterPropertyChangedMessage(this, static (ModulesGridItem x)        => x.EditStatus);
-        Messenger.UnregisterPropertyChangedMessage(this, static (ProductsGridItem x)       => x.EditStatus);
-        Messenger.UnregisterPropertyChangedMessage(this, static (BuildResourcesGridItem x) => x.EditStatus);
-        Messenger.UnregisterPropertyChangedMessage(this, static (StorageAssignGridItem x)  => x.EditStatus);
-
-        Messenger.UnregisterPropertyChangedMessage(this, static (StationSettings x)  => x.IsHeadquarters);
-        Messenger.UnregisterPropertyChangedMessage(this, static (StationSettings x)  => x.Sunlight);
-        Messenger.UnregisterPropertyChangedMessage(this, static (WorkforceManager x) => x.Actual);
+        Messenger.UnregisterAll(this);
     }
 
 
@@ -143,15 +129,15 @@ sealed partial class WorkAreaModel : ObservableRecipientEx, IDisposable, IWorkAr
     /// <param name="e"></param>
     private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        string[] names =
-        {
+        Span<string> names =
+        [
             nameof(StationSettings.IsHeadquarters),
             nameof(StationSettings.Sunlight),
             nameof(WorkforceManager.Actual),
             nameof(WorkforceManager.AlwaysMaximum)
-        };
-
-        if (0 < Array.IndexOf(names, e.PropertyName))
+        ];
+        
+        if (names.Contains(e.PropertyName ?? ""))
         {
             HasChanged = true;
         }

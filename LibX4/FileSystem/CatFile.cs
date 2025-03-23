@@ -22,7 +22,7 @@ public sealed class CatFile : ICatFile
     /// Modのファイルパスを分割する正規表現
     /// </summary>
     private static readonly Regex _ParseModRegex
-        = new(@"(extensions\/.+?)\/(.+)", RegexOptions.IgnoreCase);
+        = new(@"(extensions\/.+?)\/(.+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
     #endregion
 
 

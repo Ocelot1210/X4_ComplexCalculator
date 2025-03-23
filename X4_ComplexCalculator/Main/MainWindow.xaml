@@ -12,7 +12,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:plnArea="clr-namespace:X4_ComplexCalculator.Main.WorkArea"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
-    xmlns:x4vcvt="clr-namespace:X4_ComplexCalculator.Common.ValueConverter"
+    xmlns:x4vcvt="clr-namespace:X4_ComplexCalculator.Common.ValueConverters"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     Title="{lex:Loc Lang:MainWindow_Title}"
     Width="1000"
@@ -26,6 +26,7 @@
 
     <Window.Resources>
         <x4vcvt:ActiveDocumentConverter x:Key="ActiveDocumentConverter" />
+        <x4vcvt:WorkAreaTitleValueConverter x:Key="WorkAreaTitleValueConverter"/>
     </Window.Resources>
 
     <Window.InputBindings>
@@ -244,14 +245,28 @@
             <!--  計画エリアのタイトル部の設定  -->
             <avdk:DockingManager.DocumentHeaderTemplate>
                 <DataTemplate>
-                    <TextBlock MinWidth="70" Text="{Binding Content.Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock MinWidth="70" Name="WorkAreaTitle">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource WorkAreaTitleValueConverter}">
+                                <Binding Path="Content.Title" Mode="OneWay" UpdateSourceTrigger="PropertyChanged"/>
+                                <Binding Path="Content.HasChanged" Mode="OneWay" UpdateSourceTrigger="PropertyChanged"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
                 </DataTemplate>
             </avdk:DockingManager.DocumentHeaderTemplate>
 
             <!--  計画エリア一覧に表示する内容の設定  -->
             <avdk:DockingManager.DocumentPaneMenuItemHeaderTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Content.Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock>
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource WorkAreaTitleValueConverter}">
+                                <Binding Path="Content.Title" Mode="OneWay" UpdateSourceTrigger="PropertyChanged"/>
+                                <Binding Path="Content.HasChanged" Mode="OneWay" UpdateSourceTrigger="PropertyChanged"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
                 </DataTemplate>
             </avdk:DockingManager.DocumentPaneMenuItemHeaderTemplate>
 
