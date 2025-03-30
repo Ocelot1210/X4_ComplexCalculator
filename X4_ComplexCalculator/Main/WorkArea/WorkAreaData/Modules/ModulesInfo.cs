@@ -6,10 +6,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
 /// <summary>
 /// モジュール一覧情報用クラス
 /// </summary>
-public class ModulesInfo : IModulesInfo
+public class ModulesInfo
 {
     /// <summary>
     /// モジュール一覧
     /// </summary>
-    public ObservablePropertyChangedCollection<ModulesGridItem> Modules { get; } = new();
+    public ObservablePropertyChangedCollection<ModulesGridItem> Modules { get; } = [];
 }

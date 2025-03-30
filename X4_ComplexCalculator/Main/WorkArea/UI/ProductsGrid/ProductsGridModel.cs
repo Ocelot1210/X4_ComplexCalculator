@@ -27,19 +27,19 @@ sealed partial class ProductsGridModel : ObservableRecipientEx, IDisposable
     /// <summary>
     /// モジュール一覧
     /// </summary>
-    private readonly IModulesInfo _modules;
+    private readonly ModulesInfo _modules;
 
 
     /// <summary>
     /// ステーションの設定
     /// </summary>
-    private readonly IStationSettings _settings;
+    private readonly StationSettingInfo _settings;
 
 
     /// <summary>
     /// 製品情報
     /// </summary>
-    private readonly IProductsInfo _products;
+    private readonly ProductsInfo _products;
 
 
     /// <summary>
@@ -75,7 +75,7 @@ sealed partial class ProductsGridModel : ObservableRecipientEx, IDisposable
     /// <param name="modules">モジュール一覧</param>
     /// <param name="settings">ステーションの設定</param>
     /// <param name="messageBox">メッセージボックス表示用</param>
-    public ProductsGridModel(IMessenger messenger, IModulesInfo modules, IProductsInfo products, IStationSettings settings) : base(messenger, true)
+    public ProductsGridModel(IMessenger messenger, ModulesInfo modules, ProductsInfo products, StationSettingInfo settings) : base(messenger, true)
     {
         _modules = modules;
         _products = products;
@@ -85,9 +85,9 @@ sealed partial class ProductsGridModel : ObservableRecipientEx, IDisposable
         _modules = modules;
         _settings = settings;
 
-        Messenger.RegisterPropertyChangedMessage(this, static (ModulesGridItem x)  => x.ModuleCount, static (r, m) => r.OnModuleCountChanged(m));
-        Messenger.RegisterPropertyChangedMessage(this, static (IStationSettings x) => x.Sunlight,    static (r, m) => r.OnSunlightChanged());
-        Messenger.RegisterPropertyChangedMessage(this, static (WorkforceManager x) => x.Proportion,  static (r, m) => r.OnWorkerProportionChanged());
+        Messenger.RegisterPropertyChangedMessage(this, static (ModulesGridItem x)    => x.ModuleCount, static (r, m) => r.OnModuleCountChanged(m));
+        Messenger.RegisterPropertyChangedMessage(this, static (StationSettingInfo x) => x.Sunlight,    static (r, m) => r.OnSunlightChanged());
+        Messenger.RegisterPropertyChangedMessage(this, static (WorkforceManager x)   => x.Proportion,  static (r, m) => r.OnWorkerProportionChanged());
         Messenger.RegisterRequestMessage(this, static (r) => r._productCalculator.CalcNeedModules(r.Products, r._settings).ToArray());
     }
 

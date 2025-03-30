@@ -27,19 +27,19 @@ sealed partial class StorageAssignModel : ObservableRecipientEx, IDisposable
     /// <summary>
     /// 製品一覧情報
     /// </summary>
-    private readonly IProductsInfo _products;
+    private readonly ProductsInfo _products;
 
 
     /// <summary>
     /// 保管庫一覧情報
     /// </summary>
-    private readonly IStoragesInfo _storages;
+    private readonly StoragesInfo _storages;
 
 
     /// <summary>
     /// 保管庫割当情報
     /// </summary>
-    private readonly IStorageAssignInfo _storageAssignInfo;
+    private readonly StorageAssignInfo _storageAssignInfo;
 
 
     /// <summary>
@@ -77,7 +77,7 @@ sealed partial class StorageAssignModel : ObservableRecipientEx, IDisposable
     /// <param name="products">製品一覧</param>
     /// <param name="storages">保管庫情報</param>
     /// <param name="storageAssignInfo">保管庫割当情報</param>
-    public StorageAssignModel(IMessenger messenger, IProductsInfo products, IStoragesInfo storages, IStorageAssignInfo storageAssignInfo) : base(messenger, true)
+    public StorageAssignModel(IMessenger messenger, ProductsInfo products, StoragesInfo storages, StorageAssignInfo storageAssignInfo) : base(messenger, true)
     {
         _products = products;
         _products.Products.CollectionChanged += Products_CollectionChanged;

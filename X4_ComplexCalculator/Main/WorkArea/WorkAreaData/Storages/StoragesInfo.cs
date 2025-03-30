@@ -6,11 +6,10 @@ namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Storages;
 /// <summary>
 /// 保管庫情報用インターフェイス
 /// </summary>
-public class StoragesInfo : IStoragesInfo
+public class StoragesInfo
 {
     /// <summary>
     /// 保管庫情報
     /// </summary>
-    public ObservablePropertyChangedCollection<StoragesGridItem> Storages { get; }
-        = new ObservablePropertyChangedCollection<StoragesGridItem>();
+    public ObservablePropertyChangedCollection<StoragesGridItem> Storages { get; } = [];
 }

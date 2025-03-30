@@ -23,13 +23,13 @@ sealed partial class StoragesGridModel : ObservableRecipientEx, IDisposable
     /// <summary>
     /// モジュール一覧情報
     /// </summary>
-    private readonly IModulesInfo _modules;
+    private readonly ModulesInfo _modules;
 
 
     /// <summary>
     /// 保管庫一覧情報
     /// </summary>
-    private readonly IStoragesInfo _storages;
+    private readonly StoragesInfo _storages;
     #endregion
 
 
@@ -46,7 +46,7 @@ sealed partial class StoragesGridModel : ObservableRecipientEx, IDisposable
     /// </summary>
     /// <param name="modules">モジュール一覧</param>
     /// <param name="storages">保管庫一覧</param>
-    public StoragesGridModel(IMessenger messenger, IModulesInfo modules, IStoragesInfo storages) : base(messenger, true)
+    public StoragesGridModel(IMessenger messenger, ModulesInfo modules, StoragesInfo storages) : base(messenger, true)
     {
         _modules = modules;
         _storages = storages;

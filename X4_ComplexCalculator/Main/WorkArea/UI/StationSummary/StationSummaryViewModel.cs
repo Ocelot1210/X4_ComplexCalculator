@@ -99,7 +99,7 @@ public sealed class StationSummaryViewModel : ObservableRecipientEx, IDisposable
     /// </summary>
     /// <param name="messanger">メッセージ交換用</param>
     /// <param name="stationData">計算機で使用するステーション情報</param>
-    public StationSummaryViewModel(IMessenger messanger, IStationData stationData) : base(messanger, true)
+    public StationSummaryViewModel(IMessenger messanger, StationData stationData) : base(messanger, true)
     {
         Workforce = stationData.Settings.Workforce;
 

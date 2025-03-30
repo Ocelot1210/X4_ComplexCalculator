@@ -41,7 +41,7 @@ sealed partial class WorkAreaModel : ObservableRecipientEx, IDisposable, IWorkAr
     /// <summary>
     /// 計算機で使用するステーション用データ
     /// </summary>
-    public IStationData StationData { get; }
+    public StationData StationData { get; }
 
 
     /// <summary>
@@ -74,9 +74,9 @@ sealed partial class WorkAreaModel : ObservableRecipientEx, IDisposable, IWorkAr
         Messenger.RegisterPropertyChangedMessage(this, static (BuildResourcesGridItem x) => x.EditStatus, static (r, m) => r.OnEditStatusChanged(m));
         Messenger.RegisterPropertyChangedMessage(this, static (StorageAssignGridItem x)  => x.EditStatus, static (r, m) => r.OnEditStatusChanged(m));
 
-        Messenger.RegisterPropertyChangedMessage(this, static (IStationSettings x) => x.IsHeadquarters, static (r, m) => r.HasChanged = true);
-        Messenger.RegisterPropertyChangedMessage(this, static (IStationSettings x) => x.Sunlight,       static (r, m) => r.HasChanged = true);
-        Messenger.RegisterPropertyChangedMessage(this, static (WorkforceManager x) => x.Actual,         static (r, m) => r.HasChanged = true);
+        Messenger.RegisterPropertyChangedMessage(this, static (StationSettingInfo x) => x.IsHeadquarters, static (r, m) => r.HasChanged = true);
+        Messenger.RegisterPropertyChangedMessage(this, static (StationSettingInfo x) => x.Sunlight,       static (r, m) => r.HasChanged = true);
+        Messenger.RegisterPropertyChangedMessage(this, static (WorkforceManager x)   => x.Actual,         static (r, m) => r.HasChanged = true);
     }
 
 
@@ -131,8 +131,8 @@ sealed partial class WorkAreaModel : ObservableRecipientEx, IDisposable, IWorkAr
     {
         Span<string> names =
         [
-            nameof(StationSettings.IsHeadquarters),
-            nameof(StationSettings.Sunlight),
+            nameof(StationSettingInfo.IsHeadquarters),
+            nameof(StationSettingInfo.Sunlight),
             nameof(WorkforceManager.Actual),
             nameof(WorkforceManager.AlwaysMaximum)
         ];

@@ -86,7 +86,7 @@ sealed partial class ProductDetailsListItem : ObservableObject, IProductDetailsL
     /// <param name="efficiency">効率</param>
     /// <param name="amount">製品数</param>
     /// <param name="settings">ステーションの設定</param>
-    public ProductDetailsListItem(string wareID, IX4Module module, long moduleCount, IReadOnlyDictionary<string, IWareEffect> efficiency, long amount, IStationSettings settings)
+    public ProductDetailsListItem(string wareID, IX4Module module, long moduleCount, IReadOnlyDictionary<string, IWareEffect> efficiency, long amount, StationSettingInfo settings)
     {
         WareID = wareID;
         ModuleID = module.ID;

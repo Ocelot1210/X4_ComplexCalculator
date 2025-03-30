@@ -7,7 +7,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings;
 /// <summary>
 /// ステーション設定用クラス
 /// </summary>
-public partial class StationSettings(IMessenger messenger) : ObservableRecipientEx(messenger, true, nameof(IStationSettings)), IStationSettings
+public partial class StationSettingInfo(IMessenger messenger) : ObservableRecipientEx(messenger, true)
 {
     #region プロパティ
     /// <summary>

@@ -25,13 +25,13 @@ sealed partial class WorkForceModuleInfoModel : ObservableRecipient
     /// <summary>
     /// モジュール一覧情報
     /// </summary>
-    private readonly IModulesInfo _modules;
+    private readonly ModulesInfo _modules;
 
 
     /// <summary>
     /// ステーションの設定
     /// </summary>
-    private readonly IStationSettings _settings;
+    private readonly StationSettingInfo _settings;
 
 
     /// <summary>
@@ -54,14 +54,14 @@ sealed partial class WorkForceModuleInfoModel : ObservableRecipient
     /// </summary>
     /// <param name="modules">モジュール一覧情報</param>
     /// <param name="settings">ステーションの設定</param>
-    public WorkForceModuleInfoModel(IMessenger messenger, IModulesInfo modules, IStationSettings settings) : base(messenger)
+    public WorkForceModuleInfoModel(IMessenger messenger, ModulesInfo modules, StationSettingInfo settings) : base(messenger)
     {
         _modules = modules;
         _modules.Modules.CollectionChanged += OnModulesChanged;
         Messenger.RegisterPropertyChangedMessage(this, static (ModulesGridItem x) => x.ModuleCount, static (r, m) => r.OnModuleCountChanged(m));
 
         _settings = settings;
-        Messenger.RegisterPropertyChangedMessage(this, static (IStationSettings x) => x.IsHeadquarters, static (r, m) => r.OnSettingsIsHeadquarterChanged(m));
+        Messenger.RegisterPropertyChangedMessage(this, static (StationSettingInfo x) => x.IsHeadquarters, static (r, m) => r.OnSettingsIsHeadquarterChanged(m));
 
         _hQ = new WorkForceModuleInfoDetailsItem("module_player_prod_hq_01_macro", 1, _settings.HQWorkers, 0);
     }

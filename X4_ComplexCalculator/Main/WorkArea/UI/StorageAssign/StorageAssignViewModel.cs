@@ -43,7 +43,7 @@ public sealed partial class StorageAssignViewModel : ObservableObject, IDisposab
     /// </summary>
     /// <param name="messenger">メッセージ通知用</param>
     /// <param name="stationData">計算機で使用するステーション情報</param>
-    public StorageAssignViewModel(IMessenger messenger, IStationData stationData)
+    public StorageAssignViewModel(IMessenger messenger, StationData stationData)
     {
         _model = new StorageAssignModel(messenger, stationData.ProductsInfo, stationData.StoragesInfo, stationData.StorageAssignInfo);
 

@@ -18,7 +18,7 @@ partial class BuildingCostModel : ObservableRecipientEx
     /// <summary>
     /// 建造リソース情報
     /// </summary>
-    private readonly IBuildResourcesInfo _buildResources;
+    private readonly BuildResourcesInfo _buildResources;
     #endregion
 
 
@@ -42,7 +42,7 @@ partial class BuildingCostModel : ObservableRecipientEx
     /// </summary>
     /// <param name="messanger">メッセージ交換用</param>
     /// <param name="resources">建造リソース一覧</param>
-    public BuildingCostModel(IMessenger messanger, IBuildResourcesInfo resources) : base(messanger, true)
+    public BuildingCostModel(IMessenger messanger, BuildResourcesInfo resources) : base(messanger, true)
     {
         _buildResources = resources;
         _buildResources.BuildResources.CollectionChanged += Resources_OnCollectionChanged;

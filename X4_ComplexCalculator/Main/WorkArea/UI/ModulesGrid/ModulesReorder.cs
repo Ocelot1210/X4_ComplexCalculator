@@ -18,7 +18,7 @@ public partial class ModulesReorder : ObservableObject
     /// <summary>
     /// モジュール一覧情報
     /// </summary>
-    private readonly IModulesInfo _modulesInfo;
+    private readonly ModulesInfo _modulesInfo;
 
 
     /// <summary>
@@ -66,7 +66,7 @@ public partial class ModulesReorder : ObservableObject
     /// コンストラクタ
     /// </summary>
     /// <param name="modulesInfo">モジュール一覧情報</param>
-    public ModulesReorder(IModulesInfo modulesInfo, ListCollectionView listCollectionView)
+    public ModulesReorder(ModulesInfo modulesInfo, ListCollectionView listCollectionView)
     {
         _modulesInfo = modulesInfo;
         _collectionView = listCollectionView;

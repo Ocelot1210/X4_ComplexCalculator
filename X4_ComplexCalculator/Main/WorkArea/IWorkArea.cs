@@ -13,5 +13,5 @@ public interface IWorkArea
     /// <summary>
     /// 計算機で使用するステーション用データ
     /// </summary>
-    public IStationData StationData { get; }
+    public StationData StationData { get; }
 }

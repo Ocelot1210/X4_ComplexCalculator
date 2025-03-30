@@ -2,7 +2,6 @@
 using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Linq;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
@@ -16,7 +15,7 @@ sealed partial class ProfitModel : ObservableRecipientEx
     /// <summary>
     /// 製品一覧
     /// </summary>
-    private readonly IProductsInfo _products;
+    private readonly ProductsInfo _products;
     #endregion
 
 
@@ -40,7 +39,7 @@ sealed partial class ProfitModel : ObservableRecipientEx
     /// コンストラクタ
     /// </summary>
     /// <param name="products">製品一覧</param>
-    public ProfitModel(IMessenger messenger, IProductsInfo products) : base(messenger, true)
+    public ProfitModel(IMessenger messenger, ProductsInfo products) : base(messenger, true)
     {
         _products = products;
         _products.Products.CollectionChanged += OnProductsCollectionChanged;

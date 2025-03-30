@@ -52,7 +52,7 @@ public sealed partial class ModulesGridViewModel : ObservableObject, IDisposable
     /// <param name="messanger">メッセージ交換用</param>
     /// <param name="stationData">計算機で使用するステーション情報</param>
     /// <param name="localizedMessageBox">メッセージボックス表示用</param>
-    public ModulesGridViewModel(IMessenger messenger, IStationData stationData, ILocalizedMessageBox localizedMessageBox)
+    public ModulesGridViewModel(IMessenger messenger, StationData stationData, ILocalizedMessageBox localizedMessageBox)
     {
         _model = new ModulesGridModel(messenger, stationData.ModulesInfo, localizedMessageBox);
         ModulesView = (ListCollectionView)CollectionViewSource.GetDefaultView(_model.Modules);

@@ -6,7 +6,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData.BuildResources;
 /// <summary>
 /// 建造リソース情報用クラス
 /// </summary>
-public class BuildResourcesInfo : IBuildResourcesInfo
+public class BuildResourcesInfo
 {
     /// <summary>
     /// 建造リソース情報

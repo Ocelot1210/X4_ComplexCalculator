@@ -48,7 +48,7 @@ public sealed partial class BuildResourcesGridViewModel : ObservableRecipient, I
     /// </summary>
     /// <param name="messanger">メッセージ交換用</param>
     /// <param name="stationData">計算機で使用するステーション情報</param>
-    public BuildResourcesGridViewModel(IMessenger messenger, IStationData stationData) : base(messenger)
+    public BuildResourcesGridViewModel(IMessenger messenger, StationData stationData) : base(messenger)
     {
         _model = new BuildResourcesGridModel(messenger, stationData.ModulesInfo, stationData.BuildResourcesInfo);
 

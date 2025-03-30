@@ -32,7 +32,7 @@ public sealed partial class ProductsGridViewModel : ObservableObject, IDisposabl
     /// <summary>
     /// 製品情報
     /// </summary>
-    public IProductsInfo ProductsInfo { get; }
+    public ProductsInfo ProductsInfo { get; }
 
 
     /// <summary>
@@ -62,7 +62,7 @@ public sealed partial class ProductsGridViewModel : ObservableObject, IDisposabl
     /// </summary>
     /// <param name="messenger">メッセージ通知用</param>
     /// <param name="stationData">計算機で使用するステーション情報</param>
-    public ProductsGridViewModel(IMessenger messenger, IStationData stationData)
+    public ProductsGridViewModel(IMessenger messenger, StationData stationData)
     {
         _model = new ProductsGridModel(messenger, stationData.ModulesInfo, stationData.ProductsInfo, stationData.Settings);
         ProductsInfo = stationData.ProductsInfo;

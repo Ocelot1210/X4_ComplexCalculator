@@ -71,7 +71,7 @@ class SaveDataReader2(IMessenger messenger, IWorkArea workArea) : SaveDataReader
     /// ステーションの設定を復元
     /// </summary>
     /// <param name="conn">DB接続情報</param>
-    protected virtual void RestoreSettings(DBConnection conn, IStationSettings settings)
+    protected virtual void RestoreSettings(DBConnection conn, StationSettingInfo settings)
     {
         // 本部か
         const string SQL_1 = "SELECT Value FROM StationSettings WHERE Key = 'IsHeadquarters' UNION ALL SELECT 'False' LIMIT 1";

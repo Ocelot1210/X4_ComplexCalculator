@@ -78,7 +78,7 @@ public sealed partial class WorkAreaViewModel : ObservableRecipient, IDisposable
     /// <summary>
     /// 設定
     /// </summary>
-    public IStationSettings Settings => _model.StationData.Settings;
+    public StationSettingInfo Settings => _model.StationData.Settings;
 
 
     /// <summary>

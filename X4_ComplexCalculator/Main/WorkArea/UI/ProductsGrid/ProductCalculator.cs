@@ -210,7 +210,7 @@ sealed class ProductCalculator
     /// <param name="products">製品一覧</param>
     /// <param name="settings">ステーションの設定</param>
     /// <returns>必要モジュールと個数のタプル</returns>
-    public IEnumerable<(IX4Module Module, long Count)> CalcNeedModules(IReadOnlyList<ProductsGridItem> products, IStationSettings settings)
+    public IEnumerable<(IX4Module Module, long Count)> CalcNeedModules(IReadOnlyList<ProductsGridItem> products, StationSettingInfo settings)
     {
         using var addModules = new PooledDictionary<IX4Module, long>();                 // 追加予定モジュールと個数のディクショナリ
         using var addModuleProducts = new PooledList<(IWare Ware, long Count)>();       // 追加予定モジュールの製品一覧

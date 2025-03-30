@@ -32,7 +32,7 @@ public sealed partial class StoragesGridViewModel : ObservableObject, IDisposabl
     /// コンストラクタ
     /// </summary>
     /// <param name="stationData">計算機で使用するステーション情報</param>
-    public StoragesGridViewModel(IMessenger messenger, IStationData stationData)
+    public StoragesGridViewModel(IMessenger messenger, StationData stationData)
     {
         _model = new StoragesGridModel(messenger, stationData.ModulesInfo, stationData.StoragesInfo);
     }

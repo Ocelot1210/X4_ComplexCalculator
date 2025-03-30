@@ -24,7 +24,7 @@ public sealed partial class ContextMenuOperation : ObservableRecipientEx, IDispo
     /// <summary>
     /// モジュール一覧
     /// </summary>
-    private readonly IModulesInfo _modulesInfo;
+    private readonly ModulesInfo _modulesInfo;
 
 
     /// <summary>
@@ -78,7 +78,7 @@ public sealed partial class ContextMenuOperation : ObservableRecipientEx, IDispo
     /// <param name="messenger">メッセージ通知用</param>
     /// <param name="modulesInfo">モジュール一覧情報</param>
     /// <param name="listCollectionView">モジュール一覧のCollectionView</param>
-    public ContextMenuOperation(IMessenger messenger, IModulesInfo modulesInfo, ListCollectionView listCollectionView) : base(messenger, true)
+    public ContextMenuOperation(IMessenger messenger, ModulesInfo modulesInfo, ListCollectionView listCollectionView) : base(messenger, true)
     {
         _modulesInfo    = modulesInfo;
         _collectionView = listCollectionView;

@@ -26,13 +26,13 @@ sealed class BuildResourcesGridModel : ObservableRecipient, IDisposable
     /// <summary>
     /// モジュール一覧
     /// </summary>
-    private readonly IModulesInfo _modules;
+    private readonly ModulesInfo _modules;
 
 
     /// <summary>
     /// 建造リソース情報
     /// </summary>
-    private readonly IBuildResourcesInfo _buildResources;
+    private readonly BuildResourcesInfo _buildResources;
 
 
     /// <summary>
@@ -55,7 +55,7 @@ sealed class BuildResourcesGridModel : ObservableRecipient, IDisposable
     /// </summary>
     /// <param name="modules">モジュール一覧情報</param>
     /// <param name="buildResources">建造リソース情報</param>
-    public BuildResourcesGridModel(IMessenger messenger, IModulesInfo modules, IBuildResourcesInfo buildResources) : base(messenger)
+    public BuildResourcesGridModel(IMessenger messenger, ModulesInfo modules, BuildResourcesInfo buildResources) : base(messenger)
     {
         _modules = modules;
         _buildResources = buildResources;

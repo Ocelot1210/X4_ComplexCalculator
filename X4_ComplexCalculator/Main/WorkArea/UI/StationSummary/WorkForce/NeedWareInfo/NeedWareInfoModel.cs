@@ -5,7 +5,6 @@ using CommunityToolkit.Mvvm.Messaging.Messages;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using X4_ComplexCalculator.Common;
@@ -27,13 +26,13 @@ sealed partial class NeedWareInfoModel : ObservableRecipient, IDisposable
     /// <summary>
     /// モジュール情報一覧
     /// </summary>
-    private readonly IModulesInfo _modules;
+    private readonly ModulesInfo _modules;
 
 
     /// <summary>
     /// 製品情報一覧
     /// </summary>
-    private readonly IProductsInfo _products;
+    private readonly ProductsInfo _products;
 
 
     /// <summary>
@@ -63,7 +62,7 @@ sealed partial class NeedWareInfoModel : ObservableRecipient, IDisposable
     /// <param name="messenger">メッセージ通知用</param>
     /// <param name="modules">モジュール一覧情報</param>
     /// <param name="products">製品一覧情報</param>
-    public NeedWareInfoModel(IMessenger messenger, IModulesInfo modules, IProductsInfo products) : base(messenger)
+    public NeedWareInfoModel(IMessenger messenger, ModulesInfo modules, ProductsInfo products) : base(messenger)
     {
         _modules = modules;
         _modules.Modules.CollectionChanged += Modules_CollectionChanged;
