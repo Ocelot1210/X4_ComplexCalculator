@@ -124,14 +124,14 @@ public sealed class StationSummaryViewModel : ObservableRecipientEx, IDisposable
         // 損益関係初期化
         {
             _profitModel = new ProfitModel(Messenger, stationData.ProductsInfo);
-            Messenger.RegisterPropertyChangedMessage(this, (ProfitModel x) => x.Profit, (r, m) => r.OnPropertyChanged(nameof(Profit)));
+            Messenger.RegisterPropertyChangedMessage(this, static (ProfitModel x) => x.Profit, static (r, m) => r.OnPropertyChanged(nameof(Profit)));
         }
 
 
         // 建造コスト関係初期化
         {
             _buildingCostModel = new BuildingCostModel(Messenger, stationData.BuildResourcesInfo);
-            Messenger.RegisterPropertyChangedMessage(this, (BuildingCostModel x) => x.BuildingCost, (r, m) => r.OnPropertyChanged(nameof(BuildingCost)));
+            Messenger.RegisterPropertyChangedMessage(this, static (BuildingCostModel x) => x.BuildingCost, static(r, m) => r.OnPropertyChanged(nameof(BuildingCost)));
         }
     }
 

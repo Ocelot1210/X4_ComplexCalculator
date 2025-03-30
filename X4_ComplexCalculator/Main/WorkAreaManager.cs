@@ -23,7 +23,7 @@ namespace X4_ComplexCalculator.Main;
 /// <summary>
 /// 作業エリア管理用
 /// </summary>
-partial class WorkAreaManager : ObservableRecipient
+partial class WorkAreaManager : ObservableRecipientEx
 {
     #region メンバ
     /// <summary>
@@ -62,6 +62,7 @@ partial class WorkAreaManager : ObservableRecipient
     /// アクティブなワークスペース
     /// </summary>
     [ObservableProperty]
+    [NotifyPropertyChangedRecipients]
     public partial WorkAreaViewModel? ActiveContent { set; get; }
 
 
@@ -88,7 +89,7 @@ partial class WorkAreaManager : ObservableRecipient
     /// コンストラクタ
     /// </summary>
     /// <param name="messageBox">メッセージボックス表示用</param>
-    public WorkAreaManager(IMessenger messenger, ILocalizedMessageBox messageBox, SaveDataReaderProgress saveDataReaderProgress)
+    public WorkAreaManager(IMessenger messenger, ILocalizedMessageBox messageBox, SaveDataReaderProgress saveDataReaderProgress) : base(messenger)
     {
         _localizedMessageBox = messageBox;
         _saveDataReaderProgress = saveDataReaderProgress;
@@ -99,8 +100,9 @@ partial class WorkAreaManager : ObservableRecipient
         _gcTimer.Stop();
 
         Messenger.RegisterPropertyChangedMessage(this, static (LayoutsManager x) => x.ActiveLayout, static (r, m) => r.OnActiveLayoutChanged(m));
+        Messenger.RegisterRequestMessage(this, static (r) => r.ActiveContent);
 
-        messenger.RegisterRequestMessage(this, static (r) => r.ActiveContent);
+        IsActive = true;
     }
 
 

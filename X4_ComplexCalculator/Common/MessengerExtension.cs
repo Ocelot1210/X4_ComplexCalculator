@@ -34,7 +34,7 @@ internal static class MessengerExtension
 
 
     /// <summary>
-    /// 
+    /// クラス名とメンバ名からトークン文字列を作成
     /// </summary>
     /// <typeparam name="TObservable"></typeparam>
     /// <typeparam name="TProperty"></typeparam>
@@ -54,6 +54,14 @@ internal static class MessengerExtension
     }
 
 
+    /// <summary>
+    /// <see cref="RequestMessage{T}"/> の登録補助
+    /// </summary>
+    /// <typeparam name="TRecipient"></typeparam>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="messenger"></param>
+    /// <param name="recipient"></param>
+    /// <param name="getter"></param>
     public static void RegisterRequestMessage<TRecipient, TResult>(
         this IMessenger messenger,
         TRecipient recipient,

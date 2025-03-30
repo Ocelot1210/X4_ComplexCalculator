@@ -138,20 +138,21 @@ partial class MainWindowViewModel : ObservableRecipient, IDropTarget
         _model                           = new(_workAreaManager, _localizedMessageBox);
         _helpMenu                        = new HelpMenu(_localizedMessageBox);
         CheckUpdateAtLaunch              = Configuration.Instance.CheckUpdateAtLaunch;
-        _workAreaManager.PropertyChanged += Member_PropertyChanged;
 
-        Importers = new List<IImporter>()
-        {
+        Importers =
+        [
             new StationCalculatorImporter(_workAreaManager, _localizedMessageBox),
             new StationPlanImporter(_workAreaManager, _localizedMessageBox),
             new LoadoutImporter(),
             //new SaveDataImport(new DelegateCommand<IImport>(_Model.Import))   // 作成中のため未リリース
-        };
+        ];
 
-        Exporters = new List<IExporter>()
-        {
+        Exporters =
+        [
             new StationCalculatorExporter(_workAreaManager)
-        };
+        ];
+
+        Messenger.RegisterPropertyChangedMessage(this, static (WorkAreaManager x) => x.ActiveContent, static (r, m) => r.OnPropertyChanged(nameof(ActiveContent)));
     }
 
 
@@ -173,25 +174,6 @@ partial class MainWindowViewModel : ObservableRecipient, IDropTarget
     {
         var paths = ((DataObject)dropInfo.Data).GetFileDropList().OfType<string>();
         _model.OpenFiles(paths);
-    }
-
-
-    /// <summary>
-    /// メンバのプロパティ変更時
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void Member_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        switch (e.PropertyName)
-        {
-            case nameof(_workAreaManager.ActiveContent):
-                OnPropertyChanged(nameof(ActiveContent));
-                break;
-
-            default:
-                break;
-        }
     }
 
 
