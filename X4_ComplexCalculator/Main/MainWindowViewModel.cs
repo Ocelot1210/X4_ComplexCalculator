@@ -1,6 +1,7 @@
 ﻿using AvalonDock;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using GongSolutions.Wpf.DragDrop;
 using System;
 using System.Collections.Generic;
@@ -128,11 +129,12 @@ partial class MainWindowViewModel : ObservableRecipient, IDropTarget
     /// <summary>
     /// コンストラクタ
     /// </summary>
+    /// <param name="messenger">メッセージ通知用</param>
     /// <param name="messageBox">メッセージボックス表示用</param>
-    public MainWindowViewModel(ILocalizedMessageBox messageBox)
+    public MainWindowViewModel(IMessenger messenger, ILocalizedMessageBox messageBox) : base(messenger)
     {
         _localizedMessageBox             = messageBox;
-        _workAreaManager                 = new(_localizedMessageBox, SaveDataReaderProgress);
+        _workAreaManager                 = new(Messenger, _localizedMessageBox, SaveDataReaderProgress);
         _model                           = new(_workAreaManager, _localizedMessageBox);
         _helpMenu                        = new HelpMenu(_localizedMessageBox);
         CheckUpdateAtLaunch              = Configuration.Instance.CheckUpdateAtLaunch;
@@ -292,7 +294,6 @@ partial class MainWindowViewModel : ObservableRecipient, IDropTarget
             _dbViewerWindow?.Close();
 
             _helpMenu.Dispose();
-            _workAreaManager.Dispose();
         }
     }
 

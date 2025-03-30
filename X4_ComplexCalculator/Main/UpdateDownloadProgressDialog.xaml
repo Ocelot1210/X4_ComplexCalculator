@@ -27,7 +27,7 @@
             Margin="3"
             Maximum="1"
             Minimum="0"
-            Value="{Binding DownloadProgress.Value, Mode=OneWay}" />
+            Value="{Binding DownloadProgress, Mode=OneWay}" />
         <Button
             MinWidth="80"
             Margin="3"

@@ -1,4 +1,5 @@
-﻿using X4_ComplexCalculator.Common.Dialogs.MessageBoxes;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using X4_ComplexCalculator.Common.Dialogs.MessageBoxes;
 
 namespace X4_ComplexCalculator.Main;
 
@@ -12,6 +13,6 @@ public partial class MainWindow
         System.Windows.Forms.Application.EnableVisualStyles();
 
         InitializeComponent();
-        DataContext = new MainWindowViewModel(new LocalizedMessageBoxEx(this));
+        DataContext = new MainWindowViewModel(WeakReferenceMessenger.Default, new LocalizedMessageBoxEx(this));
     }
 }

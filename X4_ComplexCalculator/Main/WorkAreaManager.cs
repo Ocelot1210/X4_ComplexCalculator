@@ -1,6 +1,7 @@
 ﻿using Collections.Pooled;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging.Messages;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace X4_ComplexCalculator.Main;
 /// <summary>
 /// 作業エリア管理用
 /// </summary>
-partial class WorkAreaManager : ObservableObject, IDisposable
+partial class WorkAreaManager : ObservableRecipient
 {
     #region メンバ
     /// <summary>
@@ -73,7 +74,7 @@ partial class WorkAreaManager : ObservableObject, IDisposable
     /// <summary>
     /// 現在のレイアウトID
     /// </summary>
-    public long ActiveLayoutID => _layoutsManager.ActiveLayout.Value?.LayoutID ?? -1;
+    public long ActiveLayoutID => _layoutsManager.ActiveLayout?.LayoutID ?? -1;
 
 
     /// <summary>
@@ -87,27 +88,19 @@ partial class WorkAreaManager : ObservableObject, IDisposable
     /// コンストラクタ
     /// </summary>
     /// <param name="messageBox">メッセージボックス表示用</param>
-    public WorkAreaManager(ILocalizedMessageBox messageBox, SaveDataReaderProgress saveDataReaderProgress)
+    public WorkAreaManager(IMessenger messenger, ILocalizedMessageBox messageBox, SaveDataReaderProgress saveDataReaderProgress)
     {
         _localizedMessageBox = messageBox;
         _saveDataReaderProgress = saveDataReaderProgress;
 
-        _layoutsManager = new LayoutsManager(this, _localizedMessageBox);
+        _layoutsManager = new LayoutsManager(messenger, _localizedMessageBox);
 
         _gcTimer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, new EventHandler(GarvageCollect), Application.Current.Dispatcher);
         _gcTimer.Stop();
 
-        // 現在のレイアウトが変更された場合、開いているドキュメントすべてに適用する
-        _layoutsManager.ActiveLayout
-            .Where(layout => layout is not null)
-            .Select(layout => layout?.LayoutID ?? throw new InvalidOperationException())
-            .Subscribe(layoutID =>
-            {
-                foreach (var document in Documents)
-                {
-                    document.LayoutManager.SetLayout(layoutID);
-                }
-            });
+        Messenger.RegisterPropertyChangedMessage(this, static (LayoutsManager x) => x.ActiveLayout, static (r, m) => r.OnActiveLayoutChanged(m));
+
+        messenger.RegisterRequestMessage(this, static (r) => r.ActiveContent);
     }
 
 
@@ -304,6 +297,22 @@ partial class WorkAreaManager : ObservableObject, IDisposable
 
 
     /// <summary>
+    /// 現在のレイアウトが変更された時
+    /// </summary>
+    private void OnActiveLayoutChanged(PropertyChangedMessage<LayoutMenuItem?> message)
+    {
+        // 現在のレイアウトを開いているドキュメントすべてに適用する
+        if (message.NewValue is not null)
+        {
+            foreach (var document in Documents)
+            {
+                document.LayoutManager.SetLayout(message.NewValue.LayoutID);
+            }
+        }
+    }
+
+
+    /// <summary>
     /// ガベコレ実行
     /// </summary>
     /// <param name="sender"></param>
@@ -323,8 +332,4 @@ partial class WorkAreaManager : ObservableObject, IDisposable
         }
         _gcStopWatch.Start();
     }
-
-
-    /// <inheritdoc />
-    public void Dispose() => _layoutsManager.Dispose();
 }

@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Reactive.Bindings;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Infrastructures;
 
 namespace X4_ComplexCalculator.Main;
@@ -7,7 +9,7 @@ namespace X4_ComplexCalculator.Main;
 /// <summary>
 /// アップデートのダウンロード進捗表示ビューモデル
 /// </summary>
-public sealed partial class UpdateDownloadProgressViewModel : ObservableObject
+public sealed partial class UpdateDownloadProgressViewModel : ObservableRecipient
 {
     #region メンバ
     /// <summary>
@@ -21,14 +23,8 @@ public sealed partial class UpdateDownloadProgressViewModel : ObservableObject
     /// <summary>
     /// ダウンロード状況
     /// </summary>
-    public IReadOnlyReactiveProperty<double> DownloadProgress
+    public double DownloadProgress
         => _applicationUpdater.DownloadProgress;
-
-
-    /// <summary>
-    /// キャンセルコマンド
-    /// </summary>
-    public ReactiveCommand CancelCommand { get; }
     #endregion
 
 
@@ -39,7 +35,8 @@ public sealed partial class UpdateDownloadProgressViewModel : ObservableObject
     public UpdateDownloadProgressViewModel(ApplicationUpdater applicationUpdater)
     {
         _applicationUpdater = applicationUpdater;
-        CancelCommand = new ReactiveCommand().WithSubscribe(Cancel);
+
+        WeakReferenceMessenger.Default.RegisterPropertyChangedMessage(this, static (ApplicationUpdater x) => x.DownloadProgress, static (r, m) => r.OnPropertyChanged(nameof(DownloadProgress)));
 
         // ダウンロードが終わり次第アプリケーションを終了し、更新を適用する
 #pragma warning disable CA2012 // ValueTask を正しく使用する必要があります
@@ -51,5 +48,6 @@ public sealed partial class UpdateDownloadProgressViewModel : ObservableObject
     /// <summary>
     /// ダウンロードをキャンセルする
     /// </summary>
+    [RelayCommand]
     private void Cancel() => _applicationUpdater.CancelDownload();
 }

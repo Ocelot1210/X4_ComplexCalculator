@@ -1,17 +1,18 @@
-﻿using Onova;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Onova;
 using Onova.Services;
-using Reactive.Bindings;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
+using X4_ComplexCalculator.Common;
 
 namespace X4_ComplexCalculator.Infrastructures;
 
 /// <summary>
 /// アプリケーションの更新を行うクラス
 /// </summary>
-public class ApplicationUpdater
+public sealed partial class ApplicationUpdater : ObservableRecipientEx
 {
     #region スタティックメンバ
     /// <summary>
@@ -59,12 +60,6 @@ public class ApplicationUpdater
 
 
     /// <summary>
-    /// ダウンロードの進捗
-    /// </summary>
-    private readonly ReactivePropertySlim<double> _downloadProgress = new();
-
-
-    /// <summary>
     /// キャンセルトークン
     /// </summary>
     private readonly CancellationTokenSource _cancellation = new();
@@ -87,14 +82,16 @@ public class ApplicationUpdater
     /// <summary>
     /// ダウンロードの進捗
     /// </summary>
-    public IReadOnlyReactiveProperty<double> DownloadProgress => _downloadProgress;
+    [ObservableProperty]
+    [NotifyPropertyChangedRecipients]
+    public partial double DownloadProgress { get; private set; }
     #endregion
 
 
     /// <summary>
     /// アップデーターを初期化する
     /// </summary>
-    public ApplicationUpdater()
+    public ApplicationUpdater() : base(true)
         => _manager = new UpdateManager(_Resolver, new ZipExcerptPackageExtractor());
 
 
@@ -117,7 +114,7 @@ public class ApplicationUpdater
     public void StartDownloadByBackground()
     {
         var version = _lastVersion ?? throw new InvalidOperationException();
-        var progless = new Progress<double>(progress => _downloadProgress.Value = progress);
+        var progless = new Progress<double>(progress => DownloadProgress = progress);
         _downloadTask = _manager.PrepareUpdateAsync(version, progless, _cancellation.Token);
     }
 
