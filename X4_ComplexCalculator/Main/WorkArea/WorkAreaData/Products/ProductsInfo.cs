@@ -6,7 +6,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Products;
 /// <summary>
 /// 製品一覧情報用クラス
 /// </summary>
-public class ProductsInfo
+public sealed class ProductsInfo
 {
     /// <summary>
     /// 製品一覧情報

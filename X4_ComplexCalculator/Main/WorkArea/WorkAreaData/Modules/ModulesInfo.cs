@@ -6,7 +6,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
 /// <summary>
 /// モジュール一覧情報用クラス
 /// </summary>
-public class ModulesInfo
+public sealed class ModulesInfo
 {
     /// <summary>
     /// モジュール一覧

@@ -6,7 +6,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StorageAssign;
 /// <summary>
 /// 保管庫割当情報用クラス
 /// </summary>
-public class StorageAssignInfo
+public sealed class StorageAssignInfo
 {
     /// <summary>
     /// 保管庫割当情報

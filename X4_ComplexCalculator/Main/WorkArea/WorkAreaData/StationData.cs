@@ -11,7 +11,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.WorkAreaData;
 /// <summary>
 /// 計算機で使用するステーション用データ用クラス
 /// </summary>
-public class StationData(IMessenger messenger)
+public sealed class StationData(IMessenger messenger)
 {
     /// <summary>
     /// モジュール一覧
