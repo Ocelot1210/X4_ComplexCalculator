@@ -537,7 +537,7 @@ public class ObservableRangeCollection<T> : ObservableCollection<T>
             return;
         }
 
-        
+
         if (_deferredEvents is not null)
         {
             _deferredEvents.Add(e);

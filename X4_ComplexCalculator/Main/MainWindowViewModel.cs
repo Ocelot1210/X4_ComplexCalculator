@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Dialogs.MessageBoxes;
@@ -173,7 +174,7 @@ partial class MainWindowViewModel : ObservableRecipient, IDropTarget
     public void Drop(IDropInfo dropInfo)
     {
         var paths = ((DataObject)dropInfo.Data).GetFileDropList().OfType<string>();
-        _model.OpenFiles(paths);
+        _ = _model.OpenFilesAsync(paths);
     }
 
 
@@ -188,7 +189,7 @@ partial class MainWindowViewModel : ObservableRecipient, IDropTarget
     /// 開く
     /// </summary>
     [RelayCommand]
-    private void Open() => _workAreaManager.Open();
+    private Task OpenAsync() => _workAreaManager.OpenAsync();
 
 
     /// <summary>
@@ -241,12 +242,12 @@ partial class MainWindowViewModel : ObservableRecipient, IDropTarget
     /// ウィンドウがロードされた時
     /// </summary>
     [RelayCommand]
-    private void WindowLoaded()
+    private async Task WindowLoadedAsync()
     {
         try
         {
             // DB接続開始
-            _model.Init();
+            await _model.InitAsync();
             _workAreaManager.Init();
 
             // 更新チェックが有効な場合のみ更新を確認する

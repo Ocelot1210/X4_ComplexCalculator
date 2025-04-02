@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using X4_ComplexCalculator.Common;
@@ -157,7 +158,7 @@ partial class WorkAreaManager : ObservableRecipientEx
     /// <summary>
     /// 開く
     /// </summary>
-    public void Open()
+    public async Task OpenAsync()
     {
         var dlg = new OpenFileDialog
         {
@@ -166,7 +167,7 @@ partial class WorkAreaManager : ObservableRecipientEx
         };
         if (dlg.ShowDialog() == true)
         {
-            OpenFiles(dlg.FileNames);
+            await OpenFilesAsync(dlg.FileNames);
         }
     }
 
@@ -175,44 +176,40 @@ partial class WorkAreaManager : ObservableRecipientEx
     /// ファイルを開く
     /// </summary>
     /// <param name="paths">開く対象のファイルパス一覧</param>
-    public void OpenFiles(IEnumerable<string> paths)
+    public async Task OpenFilesAsync(IEnumerable<string> paths)
     {
-        if (!paths.Any())
+        using var pathsList = new PooledList<string>(paths);
+
+        if (!pathsList.Any())
         {
             return;
         }
 
         try
         {
-            var doevents = new DoEventsExecuter(0, 10);
-
             var prg = new ProgressEx<int>(0);
             var loaded = 0;
-            var pathsCount = paths.Count();
-            var rate = 1.0 / pathsCount;
+            var rate = 1.0 / pathsList.Count;
 
             prg.ProgressChanged += (sender, e) =>
             {
                 _saveDataReaderProgress.Progress = (int)(e * rate + (loaded * rate * 100));
-                doevents.DoEvents();
             };
 
             _saveDataReaderProgress.IsBusy = true;
-            doevents.ForceDoEvents();
-            using var viewModels = new PooledList<WorkAreaViewModel>(pathsCount);
+            using var viewModels = new PooledList<WorkAreaViewModel>(
+                Enumerable.Range(0, pathsList.Count).Select(x => new WorkAreaViewModel(new WeakReferenceMessenger(), ActiveLayoutID, _localizedMessageBox.Clone()))
+                );
 
-            foreach (var path in paths)
+            await Task.Run(() =>
             {
-                var messenger = new WeakReferenceMessenger();
-                var vm = new WorkAreaViewModel(messenger, ActiveLayoutID, _localizedMessageBox.Clone());
-
-                _saveDataReaderProgress.LoadingFileName = System.IO.Path.GetFileName(path);
-                doevents.ForceDoEvents();
-
-                vm.LoadFile(path, prg);
-                viewModels.Add(vm);
-                loaded++;
-            }
+                foreach (var (vm, path) in viewModels.Zip(paths))
+                {
+                    _saveDataReaderProgress.LoadingFileName = System.IO.Path.GetFileName(path);
+                    vm.LoadFile(path, prg);
+                    loaded++;
+                }
+            });
 
             Documents.AddRange(viewModels);
         }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using X4_ComplexCalculator.Common.Dialogs.MessageBoxes;
 using X4_ComplexCalculator.DB;
 
@@ -31,7 +32,7 @@ class MainWindowModel(WorkAreaManager workAreaManager, ILocalizedMessageBox loca
     /// <summary>
     /// ウィンドウがロードされた時
     /// </summary>
-    public void Init()
+    public async Task InitAsync()
     {
         // DB接続開始
         X4Database.Open(_localizedMessageBox);
@@ -42,7 +43,7 @@ class MainWindowModel(WorkAreaManager workAreaManager, ILocalizedMessageBox loca
             .Where(x => File.Exists(x))
             .ToArray();
 
-        _workAreaManager.OpenFiles(paths);
+        await _workAreaManager.OpenFilesAsync(paths);
 
         // 何も開かなければ空の計画を追加する
         if (!paths.Any())
@@ -137,9 +138,9 @@ class MainWindowModel(WorkAreaManager workAreaManager, ILocalizedMessageBox loca
     /// ファイル又はフォルダの一覧から保存したファイルを開く
     /// </summary>
     /// <param name="paths">ファイル又はフォルダパスの列挙</param>
-    public void OpenFiles(IEnumerable<string> paths)
+    public Task OpenFilesAsync(IEnumerable<string> paths)
     {
-        _workAreaManager.OpenFiles(GetX4Files(paths, 1));
+        return _workAreaManager.OpenFilesAsync(GetX4Files(paths, 1));
     }
 
 
