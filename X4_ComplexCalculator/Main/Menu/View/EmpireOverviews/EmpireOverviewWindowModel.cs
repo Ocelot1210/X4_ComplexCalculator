@@ -1,11 +1,11 @@
 ﻿using Collections.Pooled;
-using Prism.Common;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging.Messages;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Linq;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collections;
@@ -17,19 +17,13 @@ namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverviews;
 /// <summary>
 /// 帝国の概要用Model
 /// </summary>
-public sealed class EmpireOverviewWindowModel : IDisposable
+public sealed class EmpireOverviewWindowModel : ObservableRecipient, IDisposable
 {
     #region メンバ
     /// <summary>
     /// 開いている計画一覧
     /// </summary>
     private readonly ObservableCollection<WorkAreaViewModel> _sourceWorkAreas;
-
-
-    /// <summary>
-    /// 製品記憶用ディクショナリ
-    /// </summary>
-    private readonly ListDictionary<IList<ProductsGridItem>, ProductsGridItem> _productsBak = new();
     #endregion
 
 
@@ -43,7 +37,7 @@ public sealed class EmpireOverviewWindowModel : IDisposable
     /// <summary>
     /// 計画一覧
     /// </summary>
-    public ObservablePropertyChangedCollection<WorkAreaItem> WorkAreas { get; }
+    public ObservableRangeCollection<WorkAreaItem> WorkAreas { get; } = [];
     #endregion
 
 
@@ -51,24 +45,16 @@ public sealed class EmpireOverviewWindowModel : IDisposable
     /// コンストラクタ
     /// </summary>
     /// <param name="workAreas">開いている計画一覧</param>
-    public EmpireOverviewWindowModel(ObservableCollection<WorkAreaViewModel> workAreas)
+    public EmpireOverviewWindowModel(ObservableCollection<WorkAreaViewModel> workAreas) : base(new WeakReferenceMessenger())
     {
         _sourceWorkAreas = workAreas;
         _sourceWorkAreas.CollectionChanged += SourceWorkAreas_CollectionChanged;
 
-        WorkAreas = new ObservablePropertyChangedCollection<WorkAreaItem>();
         WorkAreas.CollectionChanged += WorkAreas_CollectionChanged;
-        WorkAreas.CollectionPropertyChanged += WorkAreas_CollectionPropertyChanged;
+        Messenger.RegisterPropertyChangedMessage(this, static (WorkAreaItem x) => x.IsChecked, static (r, m) => r.RecalculateAll());
 
-        WorkAreas.AddRange(workAreas.Select(x => new WorkAreaItem(x, true)));
-
-        foreach (var products in WorkAreas.Select(x => x.WorkArea.Products.ProductsInfo.Products))
-        {
-            products.CollectionChanged += Products_CollectionChanged;
-            products.CollectionPropertyChanged += Products_CollectionPropertyChanged;
-
-            OnProductsAdded(products, products);
-        }
+        // 初期値として、既に表示中の計画を追加
+        WorkAreas.Reset(_sourceWorkAreas.Select(x => new WorkAreaItem(Messenger, x, true)));
     }
 
 
@@ -77,59 +63,37 @@ public sealed class EmpireOverviewWindowModel : IDisposable
     {
         _sourceWorkAreas.CollectionChanged -= SourceWorkAreas_CollectionChanged;
         WorkAreas.CollectionChanged -= WorkAreas_CollectionChanged;
-        WorkAreas.CollectionPropertyChanged -= WorkAreas_CollectionPropertyChanged;
 
-        _productsBak.Clear();
+        Messenger.UnregisterAll(this);
+
         foreach (var products in WorkAreas.Select(x => x.WorkArea.Products.ProductsInfo.Products))
         {
             products.CollectionChanged -= Products_CollectionChanged;
-            products.CollectionPropertyChanged -= Products_CollectionPropertyChanged;
         }
     }
 
 
     /// <summary>
-    /// 計画一覧の要素数に変更があった場合
+    /// 開いている計画一覧と帝国の概要画面に表示する計画一覧を同期する
     /// </summary>
     private void SourceWorkAreas_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         switch (e.Action)
         {
             case NotifyCollectionChangedAction.Add:
-                WorkAreas.AddRange(e.NewItems!.Cast<WorkAreaViewModel>().Select(x => new WorkAreaItem(x, true)));
+                WorkAreas.AddRange(e.NewItems!.Cast<WorkAreaViewModel>().Select(x => new WorkAreaItem(Messenger, x, true)));
                 break;
 
             case NotifyCollectionChangedAction.Remove:
-                {
-                    using var oldItems = e.OldItems!.Cast<WorkAreaViewModel>().ToPooledSet();
-                    WorkAreas.RemoveAll(x => oldItems.Contains(x.WorkArea));
-                }
-                break;
-
-            case NotifyCollectionChangedAction.Replace:
-                break;
-
-            case NotifyCollectionChangedAction.Move:
+                WorkAreas.RemoveAll(x => e.OldItems!.Contains(x.WorkArea));
                 break;
 
             case NotifyCollectionChangedAction.Reset:
-                WorkAreas.Reset(_sourceWorkAreas.Select(x => new WorkAreaItem(x, true)));
+                WorkAreas.Reset(_sourceWorkAreas.Select(x => new WorkAreaItem(Messenger, x, true)));
                 break;
-        }
-    }
 
-
-    /// <summary>
-    /// コレクション内部のプロパティに変更があった場合
-    /// </summary>
-    private void WorkAreas_CollectionPropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        _productsBak.Clear();
-        Products.Clear();
-
-        foreach (var products in WorkAreas.Where(x => x.IsChecked).Select(x => x.WorkArea.Products.ProductsInfo.Products))
-        {
-            OnProductsAdded(products, products);
+            default:
+                break;
         }
     }
 
@@ -137,28 +101,72 @@ public sealed class EmpireOverviewWindowModel : IDisposable
     /// <summary>
     /// 計画の要素数に変更があった場合
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
     private void WorkAreas_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        var getProducts = (IList? list) => 
-            list?.OfType<WorkAreaViewModel>().Select(x => x.Products.ProductsInfo.Products) ?? 
-            Enumerable.Empty<ObservablePropertyChangedCollection<ProductsGridItem>>(); ;
-
-        foreach (var items in getProducts(e.OldItems))
+        switch (e.Action)
         {
-            items.CollectionChanged -= Products_CollectionChanged;
-            items.CollectionPropertyChanged -= Products_CollectionPropertyChanged;
+            case NotifyCollectionChangedAction.Add:
+                OnWorkAreaAdded(e.NewItems?.Cast<WorkAreaItem>() ?? []);
+                break;
 
-            OnProductsRemoved(items, items);
+            case NotifyCollectionChangedAction.Remove:
+                OnWorkAreaRemoved(e.OldItems?.Cast<WorkAreaItem>() ?? []);
+                break;
+
+            case NotifyCollectionChangedAction.Reset:
+                OnWorkAreaReseted();
+                break;
         }
+    }
 
-        foreach (var items in getProducts(e.NewItems))
+
+    /// <summary>
+    /// 計画が追加された場合
+    /// </summary>
+    private void OnWorkAreaAdded(IEnumerable<WorkAreaItem> addedWorkAreas)
+    {
+        foreach (var item in addedWorkAreas)
         {
-            items.CollectionChanged += Products_CollectionChanged;
-            items.CollectionPropertyChanged += Products_CollectionPropertyChanged;
+            var products = item.WorkArea.Products.ProductsInfo.Products;
 
-            OnProductsAdded(items, items);
+            products.CollectionChanged += Products_CollectionChanged;
+            item.WorkArea.GetMessenger().RegisterPropertyChangedMessage(this, static (ProductsGridItem x) => x.Count, static (r, m) => r.OnProductsCountChanged(m));
+
+            OnProductsAdded(products);
+        }
+    }
+
+
+    /// <summary>
+    /// 計画が削除された場合
+    /// </summary>
+    private void OnWorkAreaRemoved(IEnumerable<WorkAreaItem> removedWorkAreas)
+    {
+        foreach (var item in removedWorkAreas)
+        {
+            var products = item.WorkArea.Products.ProductsInfo.Products;
+
+            products.CollectionChanged -= Products_CollectionChanged;
+            item.WorkArea.GetMessenger().UnregisterAll(this);
+
+            OnProductsRemoved(products);
+        }
+    }
+
+
+    /// <summary>
+    /// 計画がリセットされた場合
+    /// </summary>
+    private void OnWorkAreaReseted()
+    {
+        foreach (var item in WorkAreas)
+        {
+            var products = item.WorkArea.Products.ProductsInfo.Products;
+
+            products.CollectionChanged += Products_CollectionChanged;
+            item.WorkArea.GetMessenger().RegisterPropertyChangedMessage(this, static (ProductsGridItem x) => x.Count, static (r, m) => r.OnProductsCountChanged(m));
+
+            OnProductsAdded(products);
         }
     }
 
@@ -166,24 +174,14 @@ public sealed class EmpireOverviewWindowModel : IDisposable
     /// <summary>
     /// ある計画の製品のプロパティに変更があった場合
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void Products_CollectionPropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void OnProductsCountChanged(PropertyChangedMessage<long> message)
     {
-        if (sender is not ProductsGridItem product)
+        if (message.Sender is not ProductsGridItem product)
         {
             return;
         }
 
-        if (e.PropertyName == nameof(ProductsGridItem.Count))
-        {
-            if (e is not PropertyChangedExtendedEventArgs<long> ev)
-            {
-                return;
-            }
-
-            Products.FirstOrDefault(x => x.Ware.ID == product.Ware.ID)?.UpdateProduct(ev.OldValue, ev.NewValue);
-        }
+        Products.FirstOrDefault(x => x.Ware.ID == product.Ware.ID)?.UpdateProduct(message.OldValue, message.NewValue);
     }
 
 
@@ -194,65 +192,19 @@ public sealed class EmpireOverviewWindowModel : IDisposable
     /// <param name="e"></param>
     private void Products_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        if (sender is not ObservableCollection<ProductsGridItem> products)
+        switch (e.Action)
         {
-            return;
-        }
+            case NotifyCollectionChangedAction.Add:
+                OnProductsAdded(e.NewItems?.OfType<ProductsGridItem>() ?? []);
+                break;
 
-        // 生産/消費ウェアが削除された場合
-        if (e.OldItems is not null)
-        {
-            OnProductsRemoved(products, e.OldItems.OfType<ProductsGridItem>());
-        }
+            case NotifyCollectionChangedAction.Remove:
+                OnProductsRemoved(e.OldItems?.OfType<ProductsGridItem>() ?? []);
+                break;
 
-        // 生産/消費ウェアが追加された場合
-        if (e.NewItems is not null)
-        {
-            OnProductsAdded(products, e.NewItems.OfType<ProductsGridItem>());
-        }
-
-        // 生産/消費ウェアがリセットされた場合
-        if (e.Action == NotifyCollectionChangedAction.Reset)
-        {
-            using var added = new PooledList<ProductsGridItem>();
-            using var removed = new PooledList<ProductsGridItem>();
-            
-            foreach (var prod in _productsBak[products])
-            {
-                if (products.Any(x => x.Ware.ID == prod.Ware.ID))
-                {
-                    added.Add(prod);
-                }
-                else
-                {
-                    removed.Add(prod);
-                }
-            }
-
-            OnProductsRemoved(products, removed);
-            OnProductsAdded(products, added);
-        }
-    }
-
-
-    /// <summary>
-    /// 製品が削除された場合
-    /// </summary>
-    /// <param name="removedItems"></param>
-    private void OnProductsRemoved(IList<ProductsGridItem> parent, IEnumerable<ProductsGridItem> removedItems)
-    {
-        var prodBak = _productsBak[parent];
-
-        // 削除された製品の生産/消費量を減算する
-        foreach (var removedItem in removedItems)
-        {
-            var prod = Products.FirstOrDefault(x => x.Ware.ID == removedItem.Ware.ID);
-            if (prod is not null)
-            {
-                prod.DeleteProduct(removedItem.Count);
-            }
-
-            prodBak.Remove(removedItem);
+            case NotifyCollectionChangedAction.Reset:
+                RecalculateAll();
+                break;
         }
     }
 
@@ -260,34 +212,62 @@ public sealed class EmpireOverviewWindowModel : IDisposable
     /// <summary>
     /// 製品が追加された場合
     /// </summary>
-    /// <param name="parent"></param>
-    /// <param name="addedItems"></param>
-    private void OnProductsAdded(IList<ProductsGridItem> parent, IEnumerable<ProductsGridItem> addedItems)
+    private void OnProductsAdded(IEnumerable<ProductsGridItem> addedItems)
     {
         using var addTarget = new PooledList<EmpireOverViewProductsGridItem>();     // 追加対象
-        var prodBak = _productsBak[parent];
+
+        using var currProduct = Products.ToPooledDictionary(x => x.Ware.ID, x => x);
 
         foreach (var addedItem in addedItems)
         {
-            var prod = Products.FirstOrDefault(x => x.Ware.ID == addedItem.Ware.ID);
-
-            if (prod is null)
+            // 追加された製品は、どこかのステーションで既に生産/消費しているか？
+            if (currProduct.TryGetValue(addedItem.Ware.ID, out var prod))
             {
-                // どのステーションでもまだ生産/消費していないウェアの場合
-                // 追加対象に突っ込む
-                addTarget.Add(new EmpireOverViewProductsGridItem(addedItem.Ware, addedItem.Count));
+                // すでに表示している要素の生産量に加算して重複しないようにする
+                prod.AddProduct(addedItem.Count);
             }
             else
             {
-                // どこかのステーションで既に生産/消費しているウェアの場合
-                // すでにある要素の生産量に加算する
-                prod.AddProduct(addedItem.Count);
+                // どのステーションでもまだ生産/消費していないウェアの場合、追加対象に追加する
+                var item = new EmpireOverViewProductsGridItem(addedItem.Ware, addedItem.Count);
+                addTarget.Add(item);
+                currProduct.Add(item.Ware.ID, item);
             }
-
-            prodBak.Add(addedItem);
         }
 
         // 追加対象の要素を一気に追加する
         Products.AddRange(addTarget);
+    }
+
+
+    /// <summary>
+    /// 製品が削除された場合
+    /// </summary>
+    private void OnProductsRemoved(IEnumerable<ProductsGridItem> removedItems)
+    {
+        using var currProduct = Products.ToPooledDictionary(x => x.Ware.ID, x => x);
+
+        // 削除された製品の生産/消費量を減算する
+        foreach (var removedItem in removedItems)
+        {
+            if (currProduct.TryGetValue(removedItem.Ware.ID, out var prod))
+            {
+                prod.DeleteProduct(removedItem.Count);
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// 全て再計算
+    /// </summary>
+    private void RecalculateAll()
+    {
+        Products.Clear();
+
+        foreach (var products in WorkAreas.Where(x => x.IsChecked).Select(x => x.WorkArea.Products.ProductsInfo.Products))
+        {
+            OnProductsAdded(products);
+        }
     }
 }

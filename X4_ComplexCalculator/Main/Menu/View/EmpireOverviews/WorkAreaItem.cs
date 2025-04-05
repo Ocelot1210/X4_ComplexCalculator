@@ -1,30 +1,46 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Main.WorkArea;
 
 namespace X4_ComplexCalculator.Main.Menu.View.EmpireOverviews;
 
+
 /// <summary>
-/// コンストラクタ
+/// 帝国の概要用の計画一覧
 /// </summary>
-/// <param name="workArea">計画</param>
-/// <param name="isChecked">集計対象か</param>
-public sealed partial class WorkAreaItem(WorkAreaViewModel workArea, bool isChecked) : ObservableObject
+public sealed partial class WorkAreaItem : ObservableRecipientEx
 {
     /// <summary>
-    /// 集計対象か
+    /// 計画名
     /// </summary>
-    [ObservableProperty]
-    public partial bool IsChecked { get; set; } = isChecked;
+    public string Title => WorkArea.Title;
 
 
     /// <summary>
     /// 計画
     /// </summary>
-    public WorkAreaViewModel WorkArea { get; } = workArea;
+    public WorkAreaViewModel WorkArea { get; }
 
 
     /// <summary>
-    /// 計画名
+    /// 集計対象か
     /// </summary>
-    public string Title => WorkArea.Title;
+    [ObservableProperty]
+    [NotifyPropertyChangedRecipients]
+    public partial bool IsChecked { get; set; }
+
+
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    /// <param name="workArea">計画</param>
+    /// <param name="isChecked">集計対象か</param>
+    public WorkAreaItem(IMessenger messenger, WorkAreaViewModel workArea, bool isChecked) : base(messenger)
+    {
+        WorkArea = workArea;
+        IsChecked = isChecked;
+
+        IsActive = true;
+    }
 }

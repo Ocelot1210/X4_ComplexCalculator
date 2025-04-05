@@ -11,5 +11,5 @@ public sealed class StorageAssignInfo
     /// <summary>
     /// 保管庫割当情報
     /// </summary>
-    public ObservablePropertyChangedCollection<StorageAssignGridItem> StorageAssign { get; } = [];
+    public ObservableRangeCollection<StorageAssignGridItem> StorageAssign { get; } = [];
 }

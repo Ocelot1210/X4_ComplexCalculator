@@ -11,5 +11,5 @@ public sealed class BuildResourcesInfo
     /// <summary>
     /// 建造リソース情報
     /// </summary>
-    public ObservablePropertyChangedCollection<BuildResourcesGridItem> BuildResources { get; } = new();
+    public ObservableRangeCollection<BuildResourcesGridItem> BuildResources { get; } = new();
 }

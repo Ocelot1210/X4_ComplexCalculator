@@ -46,7 +46,7 @@ sealed class BuildResourcesGridModel : ObservableRecipient, IDisposable
     /// <summary>
     /// 建造に必要なリソース
     /// </summary>
-    public ObservablePropertyChangedCollection<BuildResourcesGridItem> Resources => _buildResources.BuildResources;
+    public ObservableRangeCollection<BuildResourcesGridItem> Resources => _buildResources.BuildResources;
     #endregion
 
 

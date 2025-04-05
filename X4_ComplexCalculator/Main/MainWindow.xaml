@@ -290,7 +290,8 @@
                             <ProgressBar
                                 Width="200"
                                 Height="15"
-                                Value="{Binding DataContext.SaveDataReaderProgress.Progress, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" />
+                                Maximum="{Binding DataContext.SaveDataReaderProgress.Maximum, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                Value="{Binding DataContext.SaveDataReaderProgress.Value, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" />
                         </StackPanel>
                     </StackPanel>
                 </DataTemplate>

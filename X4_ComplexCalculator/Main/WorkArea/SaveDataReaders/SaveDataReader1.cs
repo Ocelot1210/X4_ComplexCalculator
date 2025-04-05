@@ -19,7 +19,7 @@ class SaveDataReader1(IMessenger messenger, IWorkArea workArea) : SaveDataReader
     /// ファイル読み込み
     /// </summary>
     /// <returns>成功したか</returns>
-    public override bool Load(IProgress<int> progress)
+    public override bool Load(IProgress<double> progress)
     {
         using var conn = new DBConnection(Path);
 

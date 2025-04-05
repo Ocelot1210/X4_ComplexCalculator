@@ -173,7 +173,7 @@ sealed partial class WorkAreaModel : ObservableRecipientEx, IDisposable, IWorkAr
     /// </summary>
     /// <param name="path">読み込み対象ファイルパス</param>
     /// <param name="progress">進捗</param>
-    public bool Load(string path, IProgress<int> progress)
+    public bool Load(string path, IProgress<double> progress)
     {
         var reader = SaveDataReaderFactory.CreateSaveDataReader(path, Messenger, this);
         var ret = false;

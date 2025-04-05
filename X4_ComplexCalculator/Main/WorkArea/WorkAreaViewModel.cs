@@ -158,7 +158,7 @@ public sealed partial class WorkAreaViewModel : ObservableRecipient, IDisposable
     /// ファイル読み込み
     /// </summary>
     /// <param name="path">ファイルパス</param>
-    public bool LoadFile(string path, IProgress<int> progress) => _model.Load(path, progress);
+    public bool LoadFile(string path, IProgress<double> progress) => _model.Load(path, progress);
 
 
     /// <summary>
@@ -183,4 +183,10 @@ public sealed partial class WorkAreaViewModel : ObservableRecipient, IDisposable
 
         Messenger.UnregisterAll(this);
     }
+
+
+    /// <summary>
+    /// このインスタンスの <see cref="IMessenger"/> を取得する
+    /// </summary>
+    public IMessenger GetMessenger() => Messenger;
 }

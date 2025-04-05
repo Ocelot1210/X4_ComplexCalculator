@@ -17,5 +17,5 @@ interface ISaveDataReader
     /// 保存したファイル読み込み
     /// </summary>
     /// <returns>成功したか</returns>
-    bool Load(IProgress<int> progress);
+    bool Load(IProgress<double> progress);
 }

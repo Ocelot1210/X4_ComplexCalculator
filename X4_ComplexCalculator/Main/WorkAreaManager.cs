@@ -178,49 +178,38 @@ partial class WorkAreaManager : ObservableRecipientEx
     /// <param name="paths">開く対象のファイルパス一覧</param>
     public async Task OpenFilesAsync(IEnumerable<string> paths)
     {
-        using var pathsList = new PooledList<string>(paths);
+        using var pathsList = paths.ToPooledList();
 
         if (!pathsList.Any())
         {
             return;
         }
 
+
+        using var _ = _saveDataReaderProgress.Start(pathsList.Count);
+        await Task.Yield();
+
         try
         {
-            var prg = new ProgressEx<int>(0);
-            var loaded = 0;
-            var rate = 1.0 / pathsList.Count;
-
-            prg.ProgressChanged += (sender, e) =>
-            {
-                _saveDataReaderProgress.Progress = (int)(e * rate + (loaded * rate * 100));
-            };
-
-            _saveDataReaderProgress.IsBusy = true;
-            using var viewModels = new PooledList<WorkAreaViewModel>(
-                Enumerable.Range(0, pathsList.Count).Select(x => new WorkAreaViewModel(new WeakReferenceMessenger(), ActiveLayoutID, _localizedMessageBox.Clone()))
-                );
+            using var viewModels = Enumerable.Range(0, pathsList.Count)
+                .Select(x => new WorkAreaViewModel(new WeakReferenceMessenger(), ActiveLayoutID, _localizedMessageBox.Clone()))
+                .ToPooledList();
 
             await Task.Run(() =>
             {
                 foreach (var (vm, path) in viewModels.Zip(paths))
                 {
                     _saveDataReaderProgress.LoadingFileName = System.IO.Path.GetFileName(path);
-                    vm.LoadFile(path, prg);
-                    loaded++;
+                    vm.LoadFile(path, _saveDataReaderProgress.Progress);
+                    _saveDataReaderProgress.OnFileLoaded();
                 }
-            });
+            }).ConfigureAwait(false);
 
             Documents.AddRange(viewModels);
         }
         catch (Exception e)
         {
             _localizedMessageBox.Error("Lang:MainWindow_FaildToLoadFileMessage", "Lang:MainWindow_FaildToLoadFileMessageTitle", e.Message);
-        }
-        finally
-        {
-            _saveDataReaderProgress.IsBusy = false;
-            _saveDataReaderProgress.Progress = 0;
         }
     }
 

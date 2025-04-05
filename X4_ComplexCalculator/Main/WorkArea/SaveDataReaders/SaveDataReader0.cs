@@ -41,7 +41,7 @@ class SaveDataReader0(IMessenger messenger, IWorkArea WorkArea) : ISaveDataReade
     /// ファイル読み込み
     /// </summary>
     /// <returns>成功したか</returns>
-    public virtual bool Load(IProgress<int> progress)
+    public virtual bool Load(IProgress<double> progress)
     {
         using var conn = new DBConnection(Path);
 
@@ -86,7 +86,7 @@ class SaveDataReader0(IMessenger messenger, IWorkArea WorkArea) : ISaveDataReade
     /// <param name="conn">DB接続情報</param>
     /// <param name="progress">進捗</param>
     /// <param name="maxProgress">進捗最大</param>
-    protected virtual void RestoreModules(DBConnection conn, IProgress<int> progress, int maxProgress)
+    protected virtual void RestoreModules(DBConnection conn, IProgress<double> progress, int maxProgress)
     {
         // レコード数取得
         var moduleCnt = conn.QuerySingle<int>("SELECT count(*) AS Count from Modules");
@@ -107,9 +107,9 @@ class SaveDataReader0(IMessenger messenger, IWorkArea WorkArea) : ISaveDataReade
                 var mod = new ModulesGridItem(_messenger, module, null, count) { EditStatus = EditStatus.Unedited };
                 modules.Add(mod);
             }
-            progress.Report((int)((double)progressCnt++ / records * maxProgress));
+            progress.Report((double)progressCnt++ / (records * maxProgress));
         }
-
+        
         // モジュールの装備を復元
         const string SQL_2 = "SELECT Row, EquipmentID FROM Equipments";
         foreach (var (row, equipmentID) in conn.Query<(int, string)>(SQL_2))
@@ -119,7 +119,7 @@ class SaveDataReader0(IMessenger messenger, IWorkArea WorkArea) : ISaveDataReade
             {
                 modules[row].AddEquipment(eqp);
             }
-            progress.Report((int)((double)progressCnt++ / records * maxProgress));
+            progress.Report((double)progressCnt++ / (records * maxProgress));
         }
 
         _workArea.StationData.ModulesInfo.Modules.Reset(modules);

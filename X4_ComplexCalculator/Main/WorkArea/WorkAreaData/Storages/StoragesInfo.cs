@@ -11,5 +11,5 @@ public sealed class StoragesInfo
     /// <summary>
     /// 保管庫情報
     /// </summary>
-    public ObservablePropertyChangedCollection<StoragesGridItem> Storages { get; } = [];
+    public ObservableRangeCollection<StoragesGridItem> Storages { get; } = [];
 }

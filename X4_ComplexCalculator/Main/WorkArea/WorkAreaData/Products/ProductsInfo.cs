@@ -11,5 +11,5 @@ public sealed class ProductsInfo
     /// <summary>
     /// 製品一覧情報
     /// </summary>
-    public ObservablePropertyChangedCollection<ProductsGridItem> Products { get; } = [];
+    public ObservableRangeCollection<ProductsGridItem> Products { get; } = [];
 }

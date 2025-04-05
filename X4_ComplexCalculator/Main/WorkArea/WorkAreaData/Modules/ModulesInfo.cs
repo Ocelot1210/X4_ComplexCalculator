@@ -11,5 +11,5 @@ public sealed class ModulesInfo
     /// <summary>
     /// モジュール一覧
     /// </summary>
-    public ObservablePropertyChangedCollection<ModulesGridItem> Modules { get; } = [];
+    public ObservableRangeCollection<ModulesGridItem> Modules { get; } = [];
 }

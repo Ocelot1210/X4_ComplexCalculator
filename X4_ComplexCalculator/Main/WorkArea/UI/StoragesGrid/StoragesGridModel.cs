@@ -37,7 +37,7 @@ sealed partial class StoragesGridModel : ObservableRecipientEx, IDisposable
     /// <summary>
     /// ストレージ一覧
     /// </summary>
-    public ObservablePropertyChangedCollection<StoragesGridItem> Storages => _storages.Storages;
+    public ObservableRangeCollection<StoragesGridItem> Storages => _storages.Storages;
     #endregion
 
 
