@@ -270,7 +270,6 @@ public class ObservableRangeCollection<T> : ObservableCollection<T>
         var removedCount = 0;
 
         using (BlockReentrancy())
-        using (DeferEvents())
         {
             for (var i = 0; i < count; i++, index++)
             {

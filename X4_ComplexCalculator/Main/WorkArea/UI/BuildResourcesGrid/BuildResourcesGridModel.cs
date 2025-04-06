@@ -62,7 +62,7 @@ sealed class BuildResourcesGridModel : ObservableRecipient, IDisposable
 
         _modules.Modules.CollectionChanged += OnModulesCollectionChanged;
 
-        Messenger.RegisterPropertyChangedMessage(this, static (ModulesGridItem x) => x.Equipments,     static (r, m) => r.OnModuleEquipmentChanged((m.Sender as ModulesGridItem)!, m.OldValue.AllEquipments));
+        Messenger.Register<BuildResourcesGridModel, PropertyChangedMessage<IEnumerable<IEquipment>>, string>(this, $"{nameof(ModulesGridItem)}.{nameof(ModulesGridItem.Equipments)}", static (r, m) => r.OnModuleEquipmentChanged((m.Sender as ModulesGridItem)!, m.OldValue));
         Messenger.RegisterPropertyChangedMessage(this, static (ModulesGridItem x) => x.SelectedMethod, static (r, m) => r.OnModuleSelectedMethodChanged((m.Sender as ModulesGridItem)!, m.OldValue.Method));
         Messenger.RegisterPropertyChangedMessage(this, static (ModulesGridItem x) => x.ModuleCount,    static (r, m) => r.OnModuleCountChanged(m));
     }

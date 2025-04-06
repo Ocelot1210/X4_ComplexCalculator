@@ -1,26 +1,21 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Reactive.Bindings;
-using Reactive.Bindings.Extensions;
+using CommunityToolkit.Mvvm.Messaging;
 using System;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Dialogs.MessageBoxes;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
-using X4_ComplexCalculator.Entities;
-using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
 
 /// <summary>
 /// 装備編集画面のViewModel
 /// </summary>
-sealed partial class EditEquipmentViewModel : ObservableObject, IDisposable
+sealed partial class EditEquipmentViewModel : ObservableRecipient, IDisposable
 {
     #region メンバ
     /// <summary>
@@ -33,12 +28,6 @@ sealed partial class EditEquipmentViewModel : ObservableObject, IDisposable
     /// メッセージボックス表示用
     /// </summary>
     private readonly ILocalizedMessageBox _localizedMessageBox;
-
-
-    /// <summary>
-    /// ゴミ箱
-    /// </summary>
-    private readonly CompositeDisposable _disposables = new();
     #endregion
 
 
@@ -59,13 +48,17 @@ sealed partial class EditEquipmentViewModel : ObservableObject, IDisposable
     /// <summary>
     /// 装備サイズ一覧
     /// </summary>
-    public ObservableCollection<IX4Size> EquipmentSizes => _model.EquipmentSizes;
+    public ICollectionView EquipmentSizesView { get; }
 
 
     /// <summary>
     /// 選択中の装備サイズ
     /// </summary>
-    public ReactiveProperty<IX4Size> SelectedSize { get; }
+    public IX4Size SelectedSize
+    {
+        get => _model.SelectedSize;
+        set => _model.SelectedSize = value;
+    }
 
 
     /// <summary>
@@ -75,54 +68,57 @@ sealed partial class EditEquipmentViewModel : ObservableObject, IDisposable
 
 
     /// <summary>
-    /// プリセット
+    /// プリセット一覧
     /// </summary>
-    public ObservableCollection<PresetComboboxItem> Presets => _model.Presets;
+    public ICollectionView PresetsView { get; }
 
 
     /// <summary>
     /// 選択中のプリセット
     /// </summary>
-    public ReactiveProperty<PresetComboboxItem?> SelectedPreset { get; }
+    public PresetComboboxItem? SelectedPreset
+    {
+        get => _model.SelectedPreset;
+        set => _model.SelectedPreset = value;
+    }
 
 
     /// <summary>
-    /// タブアイテム一覧
+    /// 編集対象の装備種別一覧
     /// </summary>
-    public ObservableCollection<EquipmentListViewModel> EquipmentListViewModels => _model.EquipmentListViewModels;
+    public ICollectionView EquipmentTypesView { get; }
     #endregion
 
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
+    /// <param name="messenger">メッセージ通知用</param>
     /// <param name="equipmentManager">編集対象の装備情報</param>
     /// <param name="messageBox">メッセージボックス表示用</param>
-    public EditEquipmentViewModel(EquippableWareEquipmentManager equipmentManager, ILocalizedMessageBox messageBox)
+    public EditEquipmentViewModel(IMessenger messenger, EquippableWareEquipmentManager equipmentManager, ILocalizedMessageBox messageBox) : base(messenger)
     {
         ModuleName = equipmentManager.Ware.Name;
 
         // Model類
-        _model = new EditEquipmentModel(equipmentManager, messageBox);
+        _model = new EditEquipmentModel(messenger, equipmentManager, messageBox);
         _localizedMessageBox = messageBox;
 
 
         // その他初期化
-        SelectedSize = _model.SelectedSize
-            .ToReactivePropertyAsSynchronized(x => x.Value)
-            .AddTo(_disposables);
-
-        SelectedPreset = _model.SelectedPreset
-            .ToReactivePropertyAsSynchronized(x => x.Value)
-            .AddTo(_disposables);
-
-
         FactionsView = CollectionViewSource.GetDefaultView(_model.Factions);
         FactionsView.SortDescriptions.Clear();
         FactionsView.SortDescriptions.Add(new SortDescription(nameof(FactionsListItem.RaceName), ListSortDirection.Ascending));
         FactionsView.SortDescriptions.Add(new SortDescription(nameof(FactionsListItem.FactionName), ListSortDirection.Ascending));
         FactionsView.GroupDescriptions.Clear();
         FactionsView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(FactionsListItem.RaceID)));
+
+        EquipmentSizesView  = CollectionViewSource.GetDefaultView(_model.EquipmentSizes);
+        PresetsView         = CollectionViewSource.GetDefaultView(_model.Presets);
+        EquipmentTypesView  = CollectionViewSource.GetDefaultView(_model.EquipmentListViewModels);
+
+        Messenger.RegisterPropertyChangedMessage(this, static (EditEquipmentModel x) => x.SelectedSize,   static (r, m) => r.OnPropertyChanged(nameof(SelectedSize)));
+        Messenger.RegisterPropertyChangedMessage(this, static (EditEquipmentModel x) => x.SelectedPreset, static (r, m) => r.OnPropertyChanged(nameof(SelectedPreset)));
     }
 
 
@@ -132,7 +128,7 @@ sealed partial class EditEquipmentViewModel : ObservableObject, IDisposable
     public void Dispose()
     {
         _model.Dispose();
-        _disposables.Dispose();
+        Messenger.UnregisterAll(this);
     }
 
 
@@ -143,13 +139,13 @@ sealed partial class EditEquipmentViewModel : ObservableObject, IDisposable
     private void OnWindowClosing(CancelEventArgs e)
     {
         // 装備が未保存の場合
-        if (EquipmentListViewModels.Any(x => x.Unsaved.Value))
+        if (_model.EquipmentListViewModels.Any(x => x.Unsaved))
         {
-            (string, string?)[] buttons = {
+            (string, string?)[] buttons = [
                 ("Lang:EditEquipmentWindow_CloseConfirmMessage_Save", null),
                 ("Lang:EditEquipmentWindow_CloseConfirmMessage_DontSave", "Lang:EditEquipmentWindow_CloseConfirmMessage_DontSave_Description"),
                 ("Lang:EditEquipmentWindow_CloseConfirmMessage_Cancel", "Lang:EditEquipmentWindow_CloseConfirmMessage_Cancel_Description"),
-            };
+            ];
             var result = _localizedMessageBox.MultiChoiceInfo("Lang:EditEquipmentWindow_CloseConfirmMessage", "Lang:Common_MessageBoxTitle_Confirmation", buttons, 2);
             switch (result)
             {
@@ -183,7 +179,7 @@ sealed partial class EditEquipmentViewModel : ObservableObject, IDisposable
     /// 保存ボタンクリック時
     /// </summary>
     [RelayCommand]
-    private void OnSavebuttonClicked()
+    private void SaveEquipment()
     {
         _model.SaveEquipment();
         CloseWindowProperty = true;
@@ -216,4 +212,11 @@ sealed partial class EditEquipmentViewModel : ObservableObject, IDisposable
     /// </summary>
     [RelayCommand]
     private void OnAddPreset() => _model.AddPreset();
+
+
+    /// <summary>
+    /// プリセット削除ボタンクリック時
+    /// </summary>
+    [RelayCommand]
+    private void OnDeletePreset() => _model.DeletePreset();
 }

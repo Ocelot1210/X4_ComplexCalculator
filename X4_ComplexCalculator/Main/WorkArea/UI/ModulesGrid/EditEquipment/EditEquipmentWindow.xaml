@@ -77,9 +77,9 @@
             <ComboBox
                 Name="SizeComboBox"
                 DisplayMemberPath="Name"
-                ItemsSource="{Binding EquipmentSizes}"
+                ItemsSource="{Binding EquipmentSizesView, Mode=OneTime}"
                 SelectedIndex="0"
-                SelectedItem="{Binding SelectedSize.Value, Mode=TwoWay}" />
+                SelectedItem="{Binding SelectedSize, Mode=TwoWay}" />
         </StackPanel>
 
         <!--  プリセット  -->
@@ -126,8 +126,8 @@
                     DockPanel.Dock="Left"
                     IsSynchronizedWithCurrentItem="True"
                     IsTextSearchEnabled="True"
-                    ItemsSource="{Binding Presets}"
-                    SelectedItem="{Binding SelectedPreset.Value}" />
+                    ItemsSource="{Binding PresetsView, Mode=OneTime}"
+                    SelectedItem="{Binding SelectedPreset}" />
 
             </DockPanel>
         </StackPanel>
@@ -147,7 +147,7 @@
                 Grid.Column="0"
                 Width="90"
                 Height="20"
-                Command="{Binding SaveButtonClickedCommand}"
+                Command="{Binding SaveEquipmentCommand, Mode=OneTime}"
                 CommandParameter="{Binding ElementName=window}"
                 Content="{lex:Loc Lang:EditEquipmentWindow_Button_Save_Content}" />
 
@@ -155,7 +155,7 @@
                 Grid.Column="1"
                 Width="{Binding ElementName=SaveButton, Path=Width}"
                 Height="{Binding ElementName=SaveButton, Path=Height}"
-                Command="{Binding CloseWindowCommand}"
+                Command="{Binding CloseWindowCommand, Mode=OneTime}"
                 CommandParameter="{Binding ElementName=window}"
                 Content="{lex:Loc Lang:Common_Close}" />
         </Grid>
@@ -200,7 +200,7 @@
             Grid.Column="1"
             Grid.ColumnSpan="3"
             Margin="5,5,5,5"
-            ItemsSource="{Binding EquipmentListViewModels, Mode=OneTime}"
+            ItemsSource="{Binding EquipmentTypesView, Mode=OneTime}"
             SelectedIndex="0">
             <TabControl.ItemTemplate>
                 <DataTemplate>

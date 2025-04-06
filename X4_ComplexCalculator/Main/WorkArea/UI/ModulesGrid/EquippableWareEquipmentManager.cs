@@ -1,18 +1,20 @@
 ﻿using Collections.Pooled;
+using CommunityToolkit.Mvvm.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Xml.Linq;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
-namespace X4_ComplexCalculator.Entities;
+namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
 /// <summary>
 /// ウェアの装備品管理クラス
 /// </summary>
-public class EquippableWareEquipmentManager : INotifyCollectionChanged
+public sealed class EquippableWareEquipmentManager : ObservableRecipientEx, INotifyCollectionChanged
 {
     #region メンバ
     /// <summary>
@@ -52,10 +54,10 @@ public class EquippableWareEquipmentManager : INotifyCollectionChanged
     /// コンストラクタ
     /// </summary>
     /// <param name="ware">ウェア</param>
-    public EquippableWareEquipmentManager(IEquippableWare ware)
+    public EquippableWareEquipmentManager(IMessenger messenger, IEquippableWare ware) : base(messenger, true)
     {
         Ware = ware;
-        _equipped = new();
+        _equipped = [];
     }
 
 
@@ -63,7 +65,7 @@ public class EquippableWareEquipmentManager : INotifyCollectionChanged
     /// コピーコンストラクタ
     /// </summary>
     /// <param name="manager">コピー元インスタンス</param>
-    public EquippableWareEquipmentManager(EquippableWareEquipmentManager manager)
+    public EquippableWareEquipmentManager(EquippableWareEquipmentManager manager) : base(manager.Messenger, true)
     {
         Ware = manager.Ware;
         _equipped = manager._equipped.ToDictionary(x => x.Key, x => x.Value);
@@ -75,7 +77,7 @@ public class EquippableWareEquipmentManager : INotifyCollectionChanged
     /// </summary>
     /// <param name="ware">管理対象のウェア</param>
     /// <param name="element">シリアライズされたXElement</param>
-    public EquippableWareEquipmentManager(IEquippableWare ware, XElement? element) : this(ware)
+    public EquippableWareEquipmentManager(IMessenger messenger, IEquippableWare ware, XElement? element) : this(messenger, ware)
     {
         if (element is null) return;
 
@@ -180,7 +182,7 @@ public class EquippableWareEquipmentManager : INotifyCollectionChanged
     /// <param name="count">追加個数</param>
     public void Add(IEquipment equipment, long count = 1)
     {
-        using var added = CollectionChanged is null ? null : new PooledList <IEquipment>((int) count);
+        using var added = CollectionChanged is null ? null : new PooledList<IEquipment>((int) count);
         var cnt = 0L;
         while (cnt < count && AddEquipmentInternal(equipment))
         {

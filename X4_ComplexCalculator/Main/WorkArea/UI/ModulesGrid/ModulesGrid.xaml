@@ -42,7 +42,6 @@
             <!--  削除  -->
             <MenuItem
                 Command="{Binding ContextMenu.DeleteModulesCommand, Mode=OneTime}"
-                CommandParameter="{x:Reference Name=moduleGrid}"
                 Header="{lex:Loc X4_ComplexCalculator:Lang:Modules_ContextMenu_MenuItem_Delete_Header}"
                 InputGestureText="Delete" />
 
@@ -70,7 +69,13 @@
         <localcvt:BuildMethodVisiblityConverter x:Key="BuildMethodVisiblityConverter"/>
 
         <localcvt:EditEquipmentButtonVisiblityConverter x:Key="EditEquipmentButtonVisiblityConverter"/>
-        
+
+        <localcvt:BuildMethodNameConverter x:Key="BuildMethodNameConverter"/>
+
+        <localcvt:BuildMethodItemsConverter x:Key="BuildMethodItemsConverter"/>
+
+        <localcvt:ModuleNameConverter x:Key="ModuleNameConverter"/>
+
     </UserControl.Resources>
 
     <DockPanel>
@@ -133,7 +138,6 @@
                 <!--  削除  -->
                 <KeyBinding
                     Command="{Binding ContextMenu.DeleteModulesCommand, Mode=OneTime}"
-                    CommandParameter="{x:Reference Name=moduleGrid}"
                     Gesture="Delete" />
 
             </DataGrid.InputBindings>
@@ -144,7 +148,7 @@
 
                 <!--  モジュール名  -->
                 <DataGridTemplateColumn
-                    ClipboardContentBinding="{Binding ModuleName}"
+                    ClipboardContentBinding="{Binding Module, Mode=OneTime, Converter={StaticResource ModuleNameConverter}}"
                     Header="{lex:Loc Lang:Common_ModuleName}"
                     IsReadOnly="True"
                     SortMemberPath="Module.Name">
@@ -153,7 +157,7 @@
                             <TextBlock
                                 VerticalAlignment="Center"
                                 Style="{StaticResource ClickableTextBlockStyle}"
-                                Text="{Binding ModuleName, Mode=OneTime}">
+                                Text="{Binding Module, Mode=OneTime, Converter={StaticResource ModuleNameConverter}}">
                                 <TextBlock.InputBindings>
                                     <MouseBinding
                                         Command="{Binding DataContext.ReplaceModuleCommand, Mode=OneTime, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
@@ -168,7 +172,7 @@
 
                 <!--  モジュール数  -->
                 <x4cmn:MouseHoverEditCellColumn
-                    ClipboardContentBinding="{Binding ModuleCount}"
+                    ClipboardContentBinding="{Binding ModuleCount, Mode=OneWay}"
                     Header="{lex:Loc Lang:Common_ModuleCount}"
                     SortMemberPath="ModuleCount">
                     <!--  表示モード  -->
@@ -288,9 +292,9 @@
 
                 <!--  建造方式  -->
                 <x4cmn:MouseHoverEditCellColumn
-                    ClipboardContentBinding="{Binding SelectedMethodName, Mode=OneWay}"
+                    ClipboardContentBinding="{Binding SelectedMethod, Mode=OneWay, Converter={StaticResource BuildMethodNameConverter}}"
                     Header="{lex:Loc Lang:Modules_Column_BuildMethod_Header}"
-                    SortMemberPath="SelectedMethodName">
+                    SortMemberPath="SelectedMethod.Name">
 
                     <!--  表示モード  -->
                     <DataGridTemplateColumn.CellTemplate>
@@ -298,7 +302,7 @@
                             <TextBlock
                                 VerticalAlignment="Center"
                                 Style="{StaticResource ClickableTextBlockStyle}"
-                                Text="{Binding SelectedMethodName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                Text="{Binding SelectedMethod, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BuildMethodNameConverter}}"
                                 Visibility="{Binding Module, Mode=OneTime, Converter={StaticResource BuildMethodVisiblityConverter}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -309,7 +313,7 @@
                             <ComboBox
                                 DisplayMemberPath="Name"
                                 FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
-                                ItemsSource="{Binding Productions, Mode=OneTime}"
+                                ItemsSource="{Binding Module, Mode=OneTime, Converter={StaticResource BuildMethodItemsConverter}}"
                                 SelectedItem="{Binding SelectedMethod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 Visibility="{Binding Module, Mode=OneTime, Converter={StaticResource BuildMethodVisiblityConverter}}" />
                         </DataTemplate>

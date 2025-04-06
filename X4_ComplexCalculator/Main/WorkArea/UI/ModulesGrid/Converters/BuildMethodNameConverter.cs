@@ -2,25 +2,19 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
+using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.Converters;
 
-
 /// <summary>
-/// 装備編集関連コントロールの表示状態用 ValueConverter
+/// 建造方式名を表示するための <see cref="IValueConverter"/>
 /// </summary>
-public sealed class EditEquipmentButtonVisiblityConverter : IValueConverter
+public sealed class BuildMethodNameConverter : IValueConverter
 {
     /// <inheritdoc/>
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (value is EquippableWareEquipmentManager mgr)
-        {
-            // 装備スロットを持つモジュールの場合、装備を編集可能にする
-            return (mgr.CanEquipped) ? Visibility.Visible : Visibility.Hidden;
-        }
-
-        return Binding.DoNothing;
+        return (value as IWareProduction)?.Name ?? Binding.DoNothing;
     }
 
 

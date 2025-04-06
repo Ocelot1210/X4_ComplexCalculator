@@ -11,7 +11,6 @@ using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
-using X4_ComplexCalculator.Entities;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
@@ -26,12 +25,6 @@ public sealed partial class ModulesGridItem : ObservableRecipientEx, IEditable, 
     /// モジュール
     /// </summary>
     public IX4Module Module { get; }
-
-
-    /// <summary>
-    /// モジュール名
-    /// </summary>
-    public string ModuleName => Module.Name;
 
 
     /// <summary>
@@ -76,18 +69,6 @@ public sealed partial class ModulesGridItem : ObservableRecipientEx, IEditable, 
 
 
     /// <summary>
-    /// 選択中の建造方式名称
-    /// </summary>
-    public string SelectedMethodName => SelectedMethod.Name;
-
-
-    /// <summary>
-    /// 建造方式一覧
-    /// </summary>
-    public IEnumerable<IWareProduction> Productions => Module.Productions.Values;
-
-
-    /// <summary>
     /// 編集状態
     /// </summary>
     [ObservableProperty]
@@ -114,7 +95,7 @@ public sealed partial class ModulesGridItem : ObservableRecipientEx, IEditable, 
     {
         Module = module;
         ModuleCount = moduleCount;
-        Equipments = new EquippableWareEquipmentManager(module);
+        Equipments = new EquippableWareEquipmentManager(Messenger, module);
         
         Turrets = new EquipmentsInfo(Equipments, "turrets");
         Shields = new EquipmentsInfo(Equipments, "shields");
@@ -133,7 +114,7 @@ public sealed partial class ModulesGridItem : ObservableRecipientEx, IEditable, 
     public ModulesGridItem(IMessenger messenger, XElement element) : base(messenger, false, nameof(ModulesGridItem))
     {
         Module = X4Database.Instance.Ware.TryGet<IX4Module>(element.Attribute("id")!.Value) ?? throw new ArgumentException("Invalid XElement.", nameof(element));
-        Equipments = new EquippableWareEquipmentManager(Module, element.Element("equipments"));
+        Equipments = new EquippableWareEquipmentManager(Messenger, Module, element.Element("equipments"));
 
         ModuleCount = long.Parse(element.Attribute("count")?.Value ?? "1");
 
@@ -209,32 +190,32 @@ public sealed partial class ModulesGridItem : ObservableRecipientEx, IEditable, 
             .ToPooledList();
 
 
-        var window = new EditEquipmentWindow(Equipments)
+        var window = new EditEquipmentWindow(Messenger, Equipments)
         {
             Owner = Application.Current.MainWindow
         };
         window.ShowDialog();
 
-        bool equipmentChanged = false;
 
-        // 変更があった場合のみ通知
-        if (!turretsOld.SequenceEqual(Equipments.AllEquipments.Where(x => x.EquipmentType.EquipmentTypeID == "turrets").OrderBy(x => x.ID)))
         {
-            equipmentChanged = true;
-        }
+            (IList<IEquipment> OldEquipement, string EquipmentTypeID)[] equipemtns = 
+            [
+                (turretsOld, "turrets"),
+                (shieldsOld, "shields")
+            ];
 
-        if (!shieldsOld.SequenceEqual(Equipments.AllEquipments.Where(x => x.EquipmentType.EquipmentTypeID == "shields").OrderBy(x => x.ID)))
-        {
-            equipmentChanged = true;
-        }
+            // 変更があったか？
+            var equipmentChanged = equipemtns.Any(x => x.OldEquipement.SequenceEqual(Equipments.AllEquipments.Where(y => y.EquipmentType.EquipmentTypeID == x.EquipmentTypeID).OrderBy(x => x.ID)));
 
-        if (equipmentChanged)
-        {
-            using var newItems = Equipments.AllEquipments
-                .Where(x => x.EquipmentType.EquipmentTypeID == "shields" || x.EquipmentType.EquipmentTypeID == "turrets")
-                .ToPooledList();
-            Broadcast(turretsOld.Concat(shieldsOld), newItems, nameof(Equipments));
-            EditStatus = EditStatus.Edited;
+            if (equipmentChanged)
+            {
+                using var newItems = Equipments.AllEquipments
+                    .Where(x => x.EquipmentType.EquipmentTypeID == "shields" || x.EquipmentType.EquipmentTypeID == "turrets")
+                    .ToPooledList();
+
+                Broadcast(turretsOld.Concat(shieldsOld), newItems, nameof(Equipments));
+                EditStatus = EditStatus.Edited;
+            }
         }
     }
 

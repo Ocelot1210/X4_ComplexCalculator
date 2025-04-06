@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -6,7 +7,6 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
-using X4_ComplexCalculator.Entities;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Importers.LoadoutImporters;
@@ -131,7 +131,7 @@ public class LoadoutItem : ObservableObject
         Name = elm.Attribute("name")?.Value ?? "";
 
         Module = module;
-        Equipment = new EquippableWareEquipmentManager(module);
+        Equipment = new EquippableWareEquipmentManager(WeakReferenceMessenger.Default, module);
 
         AddEquipment(elm.XPathSelectElements("groups/shields"));
         AddEquipment(elm.XPathSelectElements("groups/turrets"));

@@ -36,7 +36,7 @@
                 Margin="5,0,0,0"
                 VerticalAlignment="Center"
                 Text="{lex:Loc Lang:EditEquipmentWindow_TextBlock_List_Text}" />
-            <x4ccrtl:ClearableWaterMarkTextBox Text="{Binding SearchEquipmentName.Value, UpdateSourceTrigger=PropertyChanged}" Watermark="{lex:Loc Lang:Common_SearchByEnteringText}" />
+            <x4ccrtl:ClearableWaterMarkTextBox Text="{Binding SearchEquipmentName, UpdateSourceTrigger=PropertyChanged}" Watermark="{lex:Loc Lang:Common_SearchByEnteringText}" />
         </DockPanel>
 
         <TextBlock
@@ -48,12 +48,12 @@
                     <lex:BLoc Key="Lang:EditEquipmentWindow_TextBlock_Equipped_Text" />
                     <Binding
                         Mode="OneWay"
-                        Path="EquippedCount.Value"
+                        Path="EquippedCount"
                         UpdateSourceTrigger="PropertyChanged" />
 
                     <Binding
                         Mode="OneWay"
-                        Path="MaxAmount.Value"
+                        Path="MaxAmount"
                         UpdateSourceTrigger="PropertyChanged" />
                 </MultiBinding>
             </TextBlock.Text>
@@ -71,7 +71,7 @@
                 Grid.Row="0"
                 Height="30"
                 VerticalContentAlignment="Center"
-                Command="{Binding AddButtonClickedCommand}"
+                Command="{Binding AddButtonClickedCommand, Mode=OneTime}"
                 Content="➡"
                 FontSize="18"
                 ToolTip="{lex:Loc Lang:EditEquipmentWindow_Button_Add_ToolTip}" />
@@ -81,7 +81,7 @@
                 Grid.Row="1"
                 Height="30"
                 VerticalContentAlignment="Center"
-                Command="{Binding RemoveButtonClickedCommand}"
+                Command="{Binding RemoveButtonClickedCommand, Mode=OneTime}"
                 Content="⬅"
                 FontSize="18" />
         </Grid>
@@ -102,7 +102,7 @@
                 </Style>
             </ListBox.ItemContainerStyle>
             <ListBox.InputBindings>
-                <MouseBinding Command="{Binding AddButtonClickedCommand}" MouseAction="LeftDoubleClick" />
+                <MouseBinding Command="{Binding AddButtonClickedCommand, Mode=OneTime}" MouseAction="LeftDoubleClick" />
             </ListBox.InputBindings>
         </ListBox>
 
@@ -121,8 +121,8 @@
                 </Style>
             </ListBox.ItemContainerStyle>
             <ListBox.InputBindings>
-                <MouseBinding Command="{Binding RemoveButtonClickedCommand}" MouseAction="LeftDoubleClick" />
-                <KeyBinding Key="Delete" Command="{Binding RemoveButtonClickedCommand}" />
+                <MouseBinding Command="{Binding RemoveButtonClickedCommand, Mode=OneTime}" MouseAction="LeftDoubleClick" />
+                <KeyBinding Key="Delete" Command="{Binding RemoveButtonClickedCommand, Mode=OneTime}" />
             </ListBox.InputBindings>
         </ListBox>
 

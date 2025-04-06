@@ -1,14 +1,13 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Reactive.Bindings;
+using CommunityToolkit.Mvvm.Messaging;
 using System;
 using System.Linq;
-using System.Reactive.Linq;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collections;
 using X4_ComplexCalculator.Common.Dialogs.MessageBoxes;
 using X4_ComplexCalculator.Common.Dialogs.SelectStringDialog;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
-using X4_ComplexCalculator.Entities;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
@@ -16,7 +15,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
 /// <summary>
 /// 装備編集画面のModel
 /// </summary>
-sealed partial class EditEquipmentModel : ObservableObject, IDisposable
+sealed partial class EditEquipmentModel : ObservableRecipientEx, IDisposable
 {
     #region メンバ
     /// <summary>
@@ -42,84 +41,74 @@ sealed partial class EditEquipmentModel : ObservableObject, IDisposable
     /// <summary>
     /// 装備サイズ一覧
     /// </summary>
-    public ObservableRangeCollection<IX4Size> EquipmentSizes { get; } = new();
+    public ObservableRangeCollection<IX4Size> EquipmentSizes { get; } = [];
 
 
     /// <summary>
-    /// 種族一覧
+    /// 派閥一覧
     /// </summary>
-    public ObservablePropertyChangedCollection<FactionsListItem> Factions { get; } = new();
+    public ObservableRangeCollection<FactionsListItem> Factions { get; } = [];
 
 
     /// <summary>
     /// プリセット一覧
     /// </summary>
-    public ObservableRangeCollection<PresetComboboxItem> Presets { get; } = new();
+    public ObservableRangeCollection<PresetComboboxItem> Presets { get; } = [];
 
 
     /// <summary>
     /// 選択中のプリセット
     /// </summary>
-    public ReactiveProperty<PresetComboboxItem?> SelectedPreset { get; } = new();
+    [ObservableProperty]
+    [NotifyPropertyChangedRecipients]
+    public partial PresetComboboxItem? SelectedPreset { get; set; }
 
 
     /// <summary>
     /// 選択中のサイズ
     /// </summary>
-    public ReactiveProperty<IX4Size> SelectedSize { get; }
+    [ObservableProperty]
+    [NotifyPropertyChangedRecipients]
+    public partial IX4Size SelectedSize { get; set; }
 
 
     /// <summary>
     /// タブアイテム一覧
     /// </summary>
-    public ObservableRangeCollection<EquipmentListViewModel> EquipmentListViewModels { get; } = new();
+    public ObservableRangeCollection<EquipmentListViewModel> EquipmentListViewModels { get; } = [];
     #endregion
-
 
 
     /// <summary>
     /// コンストラクタ
     /// </summary>
+    /// <param name="messenger">メッセージ通知用</param>
     /// <param name="ware">編集対象ウェア</param>
     /// <param name="localizedMessageBox">メッセージボックス表示用</param>
-    public EditEquipmentModel(EquippableWareEquipmentManager equipmentManager, ILocalizedMessageBox localizedMessageBox)
+    public EditEquipmentModel(IMessenger messenger, EquippableWareEquipmentManager equipmentManager, ILocalizedMessageBox localizedMessageBox) : base(messenger, false)
     {
         // 初期化
         _manager = equipmentManager;
         _localizedMessageBox = localizedMessageBox;
+
         InitEquipmentSizes();
         UpdateFactions();
         InitPreset();
 
-        SelectedSize = new ReactiveProperty<IX4Size>(EquipmentSizes.First());
-        SelectedSize.Subscribe(x =>
-        {
-            foreach (var vm in EquipmentListViewModels)
-            {
-                vm.SelectedSize.Value = x;
-            }
-        });
-
-        SelectedPreset.Subscribe(x =>
-        {
-            if (_removingPreset) return;
-            foreach (var vm in EquipmentListViewModels)
-            {
-                vm.SelectedPreset.Value = x;
-            }
-        });
-
+        SelectedSize = EquipmentSizes.First();
 
         {
-            string[] types = { "turrets", "shields" };
+            string[] types = ["turrets", "shields"];
 
             var viewModels = types
                 .Select(x => X4Database.Instance.EquipmentType.Get(x))
-                .Select(x => new EquipmentListModel(equipmentManager, x, SelectedSize.Value))
-                .Select(x => new EquipmentListViewModel(x, Factions));
+                .Select(x => new EquipmentListModel(Messenger, equipmentManager, x, SelectedSize, Factions))
+                .Select(x => new EquipmentListViewModel(Messenger, x));
 
             EquipmentListViewModels.AddRange(viewModels);
         }
+
+        IsActive = true;
     }
 
 
@@ -163,7 +152,7 @@ sealed partial class EditEquipmentModel : ObservableObject, IDisposable
             .Where(x => _manager.Ware.Equipments.Values.Any(y => y.CanEquipped(x)))
             .SelectMany(x => x.Owners)
             .Distinct()
-            .Select(x => new FactionsListItem(x, checkedFactions.Contains(x.FactionID)));
+            .Select(x => new FactionsListItem(Messenger, x, checkedFactions.Contains(x.FactionID)));
 
         Factions.AddRange(factions);
     }
@@ -175,6 +164,31 @@ sealed partial class EditEquipmentModel : ObservableObject, IDisposable
     private void InitPreset()
     {
         Presets.AddRange(SettingDatabase.Instance.GetModulePreset(_manager.Ware.ID).Select(x => new PresetComboboxItem(x.ID, x.Name)));
+    }
+
+
+    /// <summary>
+    /// 選択サイズ変更時
+    /// </summary>
+    partial void OnSelectedSizeChanged(IX4Size value)
+    {
+        foreach (var vm in EquipmentListViewModels)
+        {
+            vm.UpdateSelectedSize(value);
+        }
+    }
+
+
+    /// <summary>
+    /// 選択プリセット変更時
+    /// </summary>
+    partial void OnSelectedPresetChanged(PresetComboboxItem? value)
+    {
+        if (_removingPreset) return;
+        foreach (var vm in EquipmentListViewModels)
+        {
+            vm.UpdateSelectedPreset(value);
+        }
     }
 
 
@@ -194,18 +208,18 @@ sealed partial class EditEquipmentModel : ObservableObject, IDisposable
     /// </summary>
     public void EditPresetName()
     {
-        if (SelectedPreset.Value is null)
+        if (SelectedPreset is null)
         {
             return;
         }
 
         // 新プリセット名
-        var (onOK, newPresetName) = SelectStringDialog.ShowDialog("Lang:RenamePreset_Title", "Lang:RenamePreset_Description", SelectedPreset.Value.Name, IsValidPresetName);
+        var (onOK, newPresetName) = SelectStringDialog.ShowDialog("Lang:RenamePreset_Title", "Lang:RenamePreset_Description", SelectedPreset.Name, IsValidPresetName);
         if (onOK)
         {
             // 新プリセット名が設定された場合
-            SettingDatabase.Instance.UpdateModulePresetName(_manager.Ware.ID, SelectedPreset.Value.ID, newPresetName);
-            SelectedPreset.Value.Name = newPresetName;
+            SettingDatabase.Instance.UpdateModulePresetName(_manager.Ware.ID, SelectedPreset.ID, newPresetName);
+            SelectedPreset.Name = newPresetName;
         }
     }
 
@@ -228,7 +242,7 @@ sealed partial class EditEquipmentModel : ObservableObject, IDisposable
 
             var item = new PresetComboboxItem(newID, presetName);
             Presets.Add(item);
-            SelectedPreset.Value = item;
+            SelectedPreset = item;
         }
     }
 
@@ -239,19 +253,19 @@ sealed partial class EditEquipmentModel : ObservableObject, IDisposable
     /// </summary>
     public void DeletePreset()
     {
-        if (SelectedPreset.Value is null)
+        if (SelectedPreset is null)
         {
             return;
         }
 
-        var result = _localizedMessageBox.YesNo("Lang:DeletePresetConfirmMessage", "Lang:Common_MessageBoxTitle_Error", LocalizedMessageBoxResult.No, SelectedPreset.Value.Name);
+        var result = _localizedMessageBox.YesNo("Lang:DeletePresetConfirmMessage", "Lang:Common_MessageBoxTitle_Error", LocalizedMessageBoxResult.No, SelectedPreset.Name);
         if (result == LocalizedMessageBoxResult.Yes)
         {
-            SettingDatabase.Instance.DeleteModulePreset(_manager.Ware.ID, SelectedPreset.Value.ID);
+            SettingDatabase.Instance.DeleteModulePreset(_manager.Ware.ID, SelectedPreset.ID);
 
             _removingPreset = true;
-            Presets.Remove(SelectedPreset.Value);
-            SelectedPreset.Value = null;
+            Presets.Remove(SelectedPreset);
+            SelectedPreset = null;
             _removingPreset = false;
         }
     }
@@ -262,11 +276,11 @@ sealed partial class EditEquipmentModel : ObservableObject, IDisposable
     /// </summary>
     public void OverwritePreset()
     {
-        if (SelectedPreset.Value is not null)
+        if (SelectedPreset is not null)
         {
             SettingDatabase.Instance.OverwritePreset(
                 _manager.Ware.ID,
-                SelectedPreset.Value.ID,
+                SelectedPreset.ID,
                 EquipmentListViewModels.SelectMany(x => x.Equipped).Select(x => x.Equipment)
             );
         }
@@ -282,7 +296,7 @@ sealed partial class EditEquipmentModel : ObservableObject, IDisposable
         _manager.ResetEquipment(EquipmentListViewModels.SelectMany(x => x.Equipped.Select(y => y.Equipment)));
         foreach (var vm in EquipmentListViewModels)
         {
-            vm.Unsaved.Value = false;
+            vm.SetSaved();
         }
     }
 

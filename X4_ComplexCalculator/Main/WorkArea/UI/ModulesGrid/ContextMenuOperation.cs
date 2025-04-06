@@ -178,9 +178,8 @@ public sealed partial class ContextMenuOperation : ObservableRecipientEx, IDispo
     /// <summary>
     /// 選択中のモジュールを削除
     /// </summary>
-    /// <param name="dataGrid"></param>
     [RelayCommand]
-    private void DeleteModules(DataGrid dataGrid)
+    private void DeleteModules()
     {
         var currPos = _collectionView.CurrentPosition;
 
@@ -237,9 +236,6 @@ public sealed partial class ContextMenuOperation : ObservableRecipientEx, IDispo
         }
 
         // セルフォーカス
-        if (dataGrid.CurrentCell.Column is not null)
-        {
-            CellFocusCommand?.Execute(new Tuple<DataGrid, int, int>(dataGrid, _collectionView.CurrentPosition, dataGrid.CurrentCell.Column.DisplayIndex));
-        }
+        CellFocusCommand?.Execute(_collectionView.CurrentPosition);
     }
 }

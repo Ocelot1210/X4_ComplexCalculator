@@ -1,20 +1,21 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Reactive.Bindings;
+using CommunityToolkit.Mvvm.Messaging;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Windows.Input;
+using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collections;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
-using X4_ComplexCalculator.Entities;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment.EquipmentList;
+
 
 /// <summary>
 /// 装備リストのModel
 /// </summary>
-sealed partial class EquipmentListModel : ObservableObject
+sealed partial class EquipmentListModel : ObservableRecipientEx
 {
     #region メンバ
     /// <summary>
@@ -40,43 +41,54 @@ sealed partial class EquipmentListModel : ObservableObject
     /// <summary>
     /// 現在のサイズ
     /// </summary>
-    public ReactiveProperty<IX4Size> SelectedSize { get; }
+    [ObservableProperty]
+    [NotifyPropertyChangedRecipients]
+    public partial IX4Size SelectedSize { get; set; }
 
 
     /// <summary>
     /// 装備可能な装備一覧
     /// </summary>
-    public ObservablePropertyChangedCollection<EquipmentListItem> Equippable { get; } = new();
+    public ObservableRangeCollection<EquipmentListItem> Equippable { get; } = [];
 
 
     /// <summary>
     /// 装備済みの装備一覧
     /// </summary>
-    public ObservablePropertyChangedCollection<EquipmentListItem> Equipped { get; } = new();
+    public ObservableRangeCollection<EquipmentListItem> Equipped { get; } = [];
 
 
     /// <summary>
     /// 装備可能な個数
     /// </summary>
-    public int MaxAmount => _tempManager.GetMaxEquippableCount(_equipmentType, SelectedSize.Value);
+    public int MaxAmount => _tempManager.GetMaxEquippableCount(_equipmentType, SelectedSize);
 
 
     /// <summary>
     /// 装備済みの個数
     /// </summary>
-    public int EquippedCount => _tempManager.AllEquipments.Count(x => x.EquipmentType.Equals(_equipmentType) && x.EquipmentTags.Contains(SelectedSize.Value.SizeID));
+    public int EquippedCount => _tempManager.AllEquipments.Count(x => x.EquipmentType.Equals(_equipmentType) && x.EquipmentTags.Contains(SelectedSize.SizeID));
 
 
     /// <summary>
     /// 選択中のプリセット
     /// </summary>
-    public ReactiveProperty<PresetComboboxItem?> SelectedPreset { get; }
+    [ObservableProperty]
+    public partial PresetComboboxItem? SelectedPreset { get; set; }
 
 
     /// <summary>
     /// 保存済みでないか
     /// </summary>
-    public ReactiveProperty<bool> Unsaved { get; } = new(false);
+    [ObservableProperty]
+    [NotifyPropertyChangedRecipients]
+    public partial bool Unsaved { get; set; }
+
+
+    /// <summary>
+    /// 派閥一覧
+    /// </summary>
+    public IReadOnlyCollection<FactionsListItem> Factions { get; }
     #endregion
 
 
@@ -84,28 +96,22 @@ sealed partial class EquipmentListModel : ObservableObject
     /// <summary>
     /// コンストラクタ
     /// </summary>
+    /// <param name="messenger">メッセージ通知用</param>
     /// <param name="manager"></param>
     /// <param name="equipmentTypeID"></param>
     /// <param name="factions"></param>
     public EquipmentListModel(
+        IMessenger messenger,
         EquippableWareEquipmentManager manager,
         IEquipmentType equipmentType,
-        IX4Size size
-    )
+        IX4Size size,
+        IReadOnlyCollection<FactionsListItem> factions
+    ) : base(messenger, false)
     {
         _equipmentType = equipmentType;
-        _tempManager = new EquippableWareEquipmentManager(manager);
-
-        SelectedPreset = new ();
-        SelectedPreset.Subscribe(x => PresetChanged());
-
-        SelectedSize = new(size);
-        SelectedSize.Subscribe(_ => 
-        {
-            OnPropertyChanged(nameof(MaxAmount));
-            OnPropertyChanged(nameof(EquippedCount));
-        });
-
+        _tempManager   = new EquippableWareEquipmentManager(manager);
+        Factions       = factions;
+        SelectedSize   = size;
 
         // 装備可能な装備一覧を作成
         {
@@ -122,29 +128,29 @@ sealed partial class EquipmentListModel : ObservableObject
                 .Select(x => new EquipmentListItem(x));
             Equipped.AddRange(equipments);
         }
+
+        IsActive = true;
     }
 
 
     /// <summary>
     /// 選択された装備を追加
     /// </summary>
-    /// <returns>装備が追加されたか</returns>
-    public bool AddSelectedEquipments()
+    /// <param name="addMaximum">最大まで追加するか</param>
+    public void AddSelectedEquipments(bool addMaximum)
     {
-        if (SelectedSize is null)
-        {
-            return false;
-        }
+        if (SelectedSize is null) return;
+
+        var oldEquippedCount = EquippedCount;
 
         var addItems = Equippable.Where(x => x.IsSelected);
-        var addRange = _tempManager.GetEquippableCount(_equipmentType, SelectedSize.Value);
+        var addRange = _tempManager.GetEquippableCount(_equipmentType, SelectedSize);
 
         var added = false;
 
-        // 左Shiftキー押下時なら選択アイテムを全追加
-        if (Keyboard.IsKeyDown(Key.LeftShift))
+        if (0 < addRange)
         {
-            while (0 < addRange)
+            do
             {
                 // 追加可能な分だけ追加する
                 var addTarget = addItems.Take(addRange).Select(x => x.Equipment).ToArray();
@@ -152,31 +158,19 @@ sealed partial class EquipmentListModel : ObservableObject
                 _tempManager.AddRange(addTarget.Select(x => x));
 
                 // 再計算
-                addRange = _tempManager.GetEquippableCount(_equipmentType, SelectedSize.Value);
+                addRange = _tempManager.GetEquippableCount(_equipmentType, SelectedSize);
 
                 added = true;
             }
-        }
-        else
-        {
-            if (0 < addRange)
-            {
-                // 追加可能な分だけ追加する
-                var addTarget = addItems.Take(addRange).Select(x => x.Equipment).ToArray();
-                Equipped.AddRange(addTarget.Select(x => new EquipmentListItem(x)));
-                _tempManager.AddRange(addTarget.Select(x => x));
-
-                added = true;
-            }
+            while (0 < addRange && addMaximum);
         }
 
         if (added)
         {
-            Unsaved.Value = true;
+            Unsaved = true;
             OnPropertyChanged(nameof(EquippedCount));
+            Broadcast(oldEquippedCount, EquippedCount, nameof(EquippedCount));
         }
-
-        return added;
     }
 
 
@@ -185,7 +179,7 @@ sealed partial class EquipmentListModel : ObservableObject
     /// 装備を削除
     /// </summary>
     /// <returns>装備が削除されたか</returns>
-    public bool RemoveSelectedEquipments()
+    public void RemoveSelectedEquipments()
     {
         if (SelectedSize is null)
         {
@@ -194,22 +188,44 @@ sealed partial class EquipmentListModel : ObservableObject
 
         if (Equipped.Any(x => x.IsSelected))
         {
+            var oldEquippedCount = EquippedCount;
+
             _tempManager.RemoveRange(Equipped.Where(x => x.IsSelected).Select(x => x.Equipment));
             Equipped.RemoveAll(x => x.IsSelected);
-            OnPropertyChanged(nameof(EquippedCount));
-            Unsaved.Value = true;
-        }
 
-        return false;
+            OnPropertyChanged(nameof(EquippedCount));
+            Broadcast(oldEquippedCount, EquippedCount, nameof(EquippedCount));
+
+            Unsaved = true;
+        }
     }
+
+
+    /// <summary>
+    /// 選択サイズ変更時
+    /// </summary>
+    partial void OnSelectedSizeChanged(IX4Size oldValue, IX4Size newValue)
+    {
+        if (oldValue is null) return;
+
+        var oldMaxAmount = _tempManager.GetMaxEquippableCount(_equipmentType, oldValue);
+        var oldEquippedCount = _tempManager.AllEquipments.Count(x => x.EquipmentType.Equals(_equipmentType) && x.EquipmentTags.Contains(oldValue.SizeID));
+
+        OnPropertyChanged(nameof(MaxAmount));
+        Broadcast(oldMaxAmount, MaxAmount, nameof(MaxAmount));
+
+        OnPropertyChanged(nameof(EquippedCount));
+        Broadcast(oldEquippedCount, EquippedCount, nameof(EquippedCount));
+    }
+
 
 
     /// <summary>
     /// プリセット変更時
     /// </summary>
-    private void PresetChanged()
+    partial void OnSelectedPresetChanged(PresetComboboxItem? value)
     {
-        if (SelectedPreset.Value is null)
+        if (value is null)
         {
             return;
         }
@@ -227,7 +243,7 @@ WHERE
         var param = new 
         {
             ModuleID = _tempManager.Ware.ID,
-            PresetID = SelectedPreset.Value.ID,
+            PresetID = value.ID,
             EquipmentType = _equipmentType.EquipmentTypeID
         };
 
@@ -235,11 +251,14 @@ WHERE
             .Select(x => X4Database.Instance.Ware.Get<IEquipment>(x))
             .Select(x => new EquipmentListItem(x));
 
+        var oldEquippedCount = EquippedCount;
+
         Equipped.Reset(equipments);
         _tempManager.ResetEquipment(equipments.Select(x => x.Equipment));
 
-
         OnPropertyChanged(nameof(EquippedCount));
-        Unsaved.Value = true;
+        Broadcast(oldEquippedCount, EquippedCount, nameof(EquippedCount));
+
+        Unsaved = true;
     }
 }

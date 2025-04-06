@@ -88,7 +88,7 @@ public sealed partial class WorkAreaViewModel : ObservableRecipient, IDisposable
 
 
     /// <summary>
-    /// モジュールの内容に変更があったか
+    /// 変更があったか
     /// </summary>
     public bool HasChanged => _model.HasChanged;
 
