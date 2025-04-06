@@ -1,11 +1,9 @@
 ﻿using Collections.Pooled;
-using CommunityToolkit.Mvvm.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Xml.Linq;
-using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
@@ -14,7 +12,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 /// <summary>
 /// ウェアの装備品管理クラス
 /// </summary>
-public sealed class EquippableWareEquipmentManager : ObservableRecipientEx, INotifyCollectionChanged
+public sealed class EquippableWareEquipmentManager : INotifyCollectionChanged
 {
     #region メンバ
     /// <summary>
@@ -54,7 +52,7 @@ public sealed class EquippableWareEquipmentManager : ObservableRecipientEx, INot
     /// コンストラクタ
     /// </summary>
     /// <param name="ware">ウェア</param>
-    public EquippableWareEquipmentManager(IMessenger messenger, IEquippableWare ware) : base(messenger, true)
+    public EquippableWareEquipmentManager(IEquippableWare ware)
     {
         Ware = ware;
         _equipped = [];
@@ -65,7 +63,7 @@ public sealed class EquippableWareEquipmentManager : ObservableRecipientEx, INot
     /// コピーコンストラクタ
     /// </summary>
     /// <param name="manager">コピー元インスタンス</param>
-    public EquippableWareEquipmentManager(EquippableWareEquipmentManager manager) : base(manager.Messenger, true)
+    public EquippableWareEquipmentManager(EquippableWareEquipmentManager manager)
     {
         Ware = manager.Ware;
         _equipped = manager._equipped.ToDictionary(x => x.Key, x => x.Value);
@@ -77,7 +75,7 @@ public sealed class EquippableWareEquipmentManager : ObservableRecipientEx, INot
     /// </summary>
     /// <param name="ware">管理対象のウェア</param>
     /// <param name="element">シリアライズされたXElement</param>
-    public EquippableWareEquipmentManager(IMessenger messenger, IEquippableWare ware, XElement? element) : this(messenger, ware)
+    public EquippableWareEquipmentManager(IEquippableWare ware, XElement? element) : this(ware)
     {
         if (element is null) return;
 
@@ -115,6 +113,8 @@ public sealed class EquippableWareEquipmentManager : ObservableRecipientEx, INot
     /// <param name="equipments"></param>
     public void ResetEquipment(IEnumerable<IEquipment> equipments)
     {
+        if (!CanEquipped) throw new InvalidOperationException();
+
         _equipped.Clear();
 
         foreach (var equipment in equipments)
@@ -132,6 +132,8 @@ public sealed class EquippableWareEquipmentManager : ObservableRecipientEx, INot
     /// <param name="equipments"></param>
     public void RemoveRange(IEnumerable<IEquipment> equipments)
     {
+        if (!CanEquipped) throw new InvalidOperationException();
+
         using var removed = CollectionChanged is null ? null : new PooledList<IEquipment>();
 
         foreach (var equipment in equipments)
@@ -158,6 +160,8 @@ public sealed class EquippableWareEquipmentManager : ObservableRecipientEx, INot
     /// <param name="equipment">追加対象の列挙</param>
     public void AddRange(IEnumerable<IEquipment> equipments)
     {
+        if (!CanEquipped) throw new InvalidOperationException();
+
         using var added = CollectionChanged is null ? null : new PooledList<IEquipment>();
 
         foreach (var equipment in equipments)
@@ -182,6 +186,8 @@ public sealed class EquippableWareEquipmentManager : ObservableRecipientEx, INot
     /// <param name="count">追加個数</param>
     public void Add(IEquipment equipment, long count = 1)
     {
+        if (!CanEquipped) throw new InvalidOperationException();
+
         using var added = CollectionChanged is null ? null : new PooledList<IEquipment>((int) count);
         var cnt = 0L;
         while (cnt < count && AddEquipmentInternal(equipment))

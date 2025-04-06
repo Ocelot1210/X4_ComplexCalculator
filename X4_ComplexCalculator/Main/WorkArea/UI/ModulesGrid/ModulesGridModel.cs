@@ -225,7 +225,7 @@ class ModulesGridModel(IMessenger messenger, ModulesInfo modulesInfo, ILocalized
             }
             else
             {
-                dict.Add(hash, (idx, new ModulesGridItem(Messenger, module.ToXml()) { EditStatus = module.EditStatus }));
+                dict.Add(hash, (idx, new ModulesGridItem(Messenger, module.ToXml(), module.EditStatus)));
             }
         }
 

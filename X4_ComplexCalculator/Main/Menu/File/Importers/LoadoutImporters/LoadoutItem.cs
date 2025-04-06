@@ -131,7 +131,7 @@ public class LoadoutItem : ObservableObject
         Name = elm.Attribute("name")?.Value ?? "";
 
         Module = module;
-        Equipment = new EquippableWareEquipmentManager(WeakReferenceMessenger.Default, module);
+        Equipment = new EquippableWareEquipmentManager(module);
 
         AddEquipment(elm.XPathSelectElements("groups/shields"));
         AddEquipment(elm.XPathSelectElements("groups/turrets"));

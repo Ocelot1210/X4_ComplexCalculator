@@ -95,7 +95,7 @@ public sealed partial class ModulesGridItem : ObservableRecipientEx, IEditable, 
     {
         Module = module;
         ModuleCount = moduleCount;
-        Equipments = new EquippableWareEquipmentManager(Messenger, module);
+        Equipments = new EquippableWareEquipmentManager(module);
         
         Turrets = new EquipmentsInfo(Equipments, "turrets");
         Shields = new EquipmentsInfo(Equipments, "shields");
@@ -111,10 +111,10 @@ public sealed partial class ModulesGridItem : ObservableRecipientEx, IEditable, 
     /// </summary>
     /// <param name="messenger">メッセージ通知用</param>
     /// <param name="element">モジュール情報が記載されたxml</param>
-    public ModulesGridItem(IMessenger messenger, XElement element) : base(messenger, false, nameof(ModulesGridItem))
+    public ModulesGridItem(IMessenger messenger, XElement element, EditStatus editStatus) : base(messenger, false, nameof(ModulesGridItem))
     {
         Module = X4Database.Instance.Ware.TryGet<IX4Module>(element.Attribute("id")!.Value) ?? throw new ArgumentException("Invalid XElement.", nameof(element));
-        Equipments = new EquippableWareEquipmentManager(Messenger, Module, element.Element("equipments"));
+        Equipments = new EquippableWareEquipmentManager(Module, element.Element("equipments"));
 
         ModuleCount = long.Parse(element.Attribute("count")?.Value ?? "1");
 
@@ -123,6 +123,8 @@ public sealed partial class ModulesGridItem : ObservableRecipientEx, IEditable, 
 
         Turrets = new EquipmentsInfo(Equipments, "turrets");
         Shields = new EquipmentsInfo(Equipments, "shields");
+
+        EditStatus = editStatus;
 
         IsActive = true;
     }

@@ -161,7 +161,7 @@ public sealed partial class ContextMenuOperation : ObservableRecipientEx, IDispo
 
             // xmlの内容に問題がないか確認するため、ここでToArray()する
             using var modules = clipboardXml.Root.Elements()
-                .Select(x => new ModulesGridItem(Messenger, x) { EditStatus = EditStatus.Edited })
+                .Select(x => new ModulesGridItem(Messenger, x, EditStatus.Edited))
                 .ToPooledList();
 
             _modulesInfo.Modules.AddRange(modules);
