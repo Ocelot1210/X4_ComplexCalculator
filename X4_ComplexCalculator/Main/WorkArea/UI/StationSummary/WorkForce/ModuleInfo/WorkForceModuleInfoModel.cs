@@ -5,14 +5,12 @@ using CommunityToolkit.Mvvm.Messaging.Messages;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Linq;
 using X4_ComplexCalculator.Common;
 using X4_ComplexCalculator.Common.Collections;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.Modules;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings;
-using Xceed.Wpf.Toolkit.Core;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.WorkForce.ModuleInfo;
 
@@ -235,6 +233,8 @@ sealed partial class WorkForceModuleInfoModel : ObservableRecipient
         var needWorkforce = 0L;
         var capacity = 0L;
 
+        var removeTargets = new PooledSet<WorkForceModuleInfoDetailsItem>();
+
         foreach (var (module, moduleCount) in details)
         {
             var itm = WorkForceDetails.FirstOrDefault(x => x.ModuleID == module.ID);
@@ -250,12 +250,18 @@ sealed partial class WorkForceModuleInfoModel : ObservableRecipient
                 }
 
                 itm.ModuleCount -= moduleCount;
+                if (itm.ModuleCount == 0)
+                {
+                    removeTargets.Add(itm);
+                }
             }
         }
 
         _settings.Workforce.Need -= needWorkforce;
         _settings.Workforce.Capacity -= capacity;
 
-        WorkForceDetails.RemoveAll(x => x.ModuleCount == 0);
+        // RemoveAll(x => x.ModuleCount == 0); とした場合、
+        // 無関係なモジュール数 0 の項目まで削除されるので HashSet で覚えたやつだけ削除する
+        WorkForceDetails.RemoveAll(x => removeTargets.Contains(x));
     }
 }
