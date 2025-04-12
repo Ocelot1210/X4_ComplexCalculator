@@ -112,12 +112,22 @@ public partial class ProductsGridItem : ObservableRecipientEx, IEditable, ISelec
     /// <summary>
     /// コンストラクタ
     /// </summary>
-    /// <param name="wareID">ウェア</param>
+    /// <param name="messenger">メッセージ通知用</param>
+    /// <param name="ware">ウェア</param>
     /// <param name="datails">ウェア詳細(関連モジュール等)</param>
     /// <param name="noBuy">購入しないか</param>
     /// <param name="noSell">販売しないか</param>
     /// <param name="unitPrice">単価</param>
-    public ProductsGridItem(IMessenger messenger, IWare ware, IEnumerable<IProductDetailsListItem> datails, bool noBuy = false, bool noSell = false, long unitPrice = -1) : base(messenger)
+    /// <param name="editStatus">編集状態</param>
+    public ProductsGridItem(
+        IMessenger messenger, 
+        IWare ware, 
+        IEnumerable<IProductDetailsListItem> datails, 
+        bool noBuy = false, 
+        bool noSell = false, 
+        long unitPrice = -1,
+        EditStatus editStatus = EditStatus.Unedited
+    ) : base(messenger)
     {
         Ware = ware;
         Details = new ObservableRangeCollection<IProductDetailsListItem>(datails);
@@ -126,6 +136,8 @@ public partial class ProductsGridItem : ObservableRecipientEx, IEditable, ISelec
         NoSell = noSell;
 
         UnitPrice = unitPrice == -1 ? (Ware.MinPrice + Ware.MaxPrice) / 2 : unitPrice;
+
+        EditStatus = editStatus;
 
         IsActive = true;
     }

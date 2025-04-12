@@ -52,12 +52,6 @@ sealed partial class ProductsGridModel : ObservableRecipientEx, IDisposable
     /// 製品計算機
     /// </summary>
     private readonly ProductCalculator _productCalculator = ProductCalculator.Instance;
-
-
-    /// <summary>
-    /// 前回値オプション保存用
-    /// </summary>
-    private readonly Dictionary<string, ProductsGridItem> _optionsBakDict = new();
     #endregion
 
 
@@ -243,14 +237,7 @@ sealed partial class ProductsGridModel : ObservableRecipientEx, IDisposable
         if (e.Action == NotifyCollectionChangedAction.Reset)
         {
             // 前回値保存
-            foreach (var prod in Products)
-            {
-                if (!_optionsBakDict.TryAdd(prod.Ware.ID, prod))
-                {
-                    _optionsBakDict[prod.Ware.ID] = prod;
-                }
-            }
-
+            using var prevOptions = Products.ToPooledDictionary(x => x.Ware.ID);
             Products.Clear();
 
             if (_modules.Modules.Any())
@@ -262,9 +249,9 @@ sealed partial class ProductsGridModel : ObservableRecipientEx, IDisposable
                 (
                     x =>
                     {
-                        if (_optionsBakDict.TryGetValue(x.Key.ID, out var oldProd))
+                        if (prevOptions.TryGetValue(x.Key.ID, out var oldProd))
                         {
-                            return new ProductsGridItem(Messenger, x.Key, x.Value, oldProd.NoBuy, oldProd.NoSell, oldProd.UnitPrice) { EditStatus = oldProd.EditStatus };
+                            return new ProductsGridItem(Messenger, x.Key, x.Value, oldProd.NoBuy, oldProd.NoSell, oldProd.UnitPrice, oldProd.EditStatus);
                         }
 
                         return new ProductsGridItem(Messenger, x.Key, x.Value);
@@ -272,7 +259,6 @@ sealed partial class ProductsGridModel : ObservableRecipientEx, IDisposable
                 );
 
                 _products.Products.AddRange(addItems);
-                _optionsBakDict.Clear();
             }
         }
     }
@@ -300,7 +286,7 @@ sealed partial class ProductsGridModel : ObservableRecipientEx, IDisposable
             else
             {
                 // ウェアが一覧に無い場合
-                addItems.Add(new ProductsGridItem(Messenger, item.Key, item.Value) { EditStatus = EditStatus.Edited });
+                addItems.Add(new ProductsGridItem(Messenger, item.Key, item.Value, false, false, -1, EditStatus.Edited));
             }
         }
 
