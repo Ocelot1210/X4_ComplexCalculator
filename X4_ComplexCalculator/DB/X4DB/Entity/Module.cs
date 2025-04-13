@@ -19,7 +19,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Entity;
 /// <param name="products">モジュールの製品</param>
 /// <param name="storage">保管庫情報</param>
 /// <param name="equipments">装備一覧</param>
-public partial class Module(
+public sealed partial class Module(
     IWare ware,
     string macro,
     IModuleType moduleType,
@@ -59,6 +59,6 @@ public partial class Module(
                 .Where(x => !x.EquipmentTags.Except(wareEquipment.Tags).Any());
         }
 
-        return Enumerable.Empty<T>();
+        return [];
     }
 }

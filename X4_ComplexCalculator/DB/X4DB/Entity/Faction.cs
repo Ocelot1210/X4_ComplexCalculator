@@ -7,7 +7,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Entity;
 /// <summary>
 /// 派閥情報用クラス
 /// </summary>
-public class Faction : IFaction
+public sealed class Faction : IFaction
 {
     #region IFaction
     /// <inheritdoc/>

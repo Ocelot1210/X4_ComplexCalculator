@@ -1,7 +1,7 @@
-﻿using Dapper;
-using System.Collections.Generic;
+﻿using Collections.Pooled;
+using Dapper;
+using System;
 using System.Data;
-using System.Linq;
 using X4_ComplexCalculator.DB.X4DB.Entity;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
@@ -14,15 +14,15 @@ namespace X4_ComplexCalculator.DB.X4DB.Builder;
 /// コンストラクタ
 /// </remarks>
 /// <param name="conn">DB接続情報</param>
-class ShieldBuilder(IDbConnection conn)
+sealed class ShieldBuilder(IDbConnection conn) : IDisposable
 {
     #region メンバ
     /// <summary>
     /// シールド情報一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, X4_DataExporterWPF.Entities.Shield> _shields = 
+    private readonly PooledDictionary<string, X4_DataExporterWPF.Entities.Shield> _shields = 
         conn.Query<X4_DataExporterWPF.Entities.Shield>("SELECT * FROM Shield")
-            .ToDictionary(x => x.EquipmentID);
+            .ToPooledDictionary(x => x.EquipmentID);
     #endregion
 
 
@@ -44,5 +44,12 @@ class ShieldBuilder(IDbConnection conn)
         }
 
         return equipment;
+    }
+
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        _shields.Dispose();
     }
 }

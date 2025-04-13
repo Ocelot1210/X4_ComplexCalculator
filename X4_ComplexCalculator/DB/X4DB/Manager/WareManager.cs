@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using X4_ComplexCalculator.DB.X4DB.Builder;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
+using ZLinq;
 
 namespace X4_ComplexCalculator.DB.X4DB.Manager;
 
@@ -33,11 +34,12 @@ public sealed class WareManager
     /// <param name="transportTypeManager">カーゴ種別一覧</param>
     public WareManager(IDbConnection conn, TransportTypeManager transportTypeManager)
     {
-        var builder = new WareBuilder(conn, transportTypeManager);
+        using var builder = new WareBuilder(conn, transportTypeManager);
         _wares = builder.BuildAll()
             .ToDictionary(x => x.ID);
 
         _macroWares = _wares.Values.OfType<IMacro>()
+            .AsValueEnumerable()
             .GroupBy(x => x.MacroName)
             .Select(x => x.First())
             .ToDictionary(x => x.MacroName);

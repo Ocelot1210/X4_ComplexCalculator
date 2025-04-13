@@ -1,33 +1,35 @@
-﻿using Dapper;
+﻿using Collections.Pooled;
+using Dapper;
+using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
+using ZLinq;
 
 namespace X4_ComplexCalculator.DB.X4DB.Manager;
 
 /// <summary>
 /// <see cref="IEquipment.EquipmentTags"/> のユニークな組み合わせを管理するクラス
 /// </summary>
-sealed class EquipmentTagsManager
+sealed class EquipmentTagsManager : IDisposable
 {
     #region メンバ
     /// <summary>
-    /// Tagのユニークな組み合わせ一覧
+    /// 装備IDとタグのペア
     /// </summary>
-    private readonly IReadOnlyDictionary<string, HashSet<string>> _tags;
+    private readonly PooledDictionary<string, HashSet<string>> _equipmentTagsPair;
 
 
     /// <summary>
-    /// ウェアIDとタグ文字列のペア
+    /// 装備IDとサイズのペア
     /// </summary>
-    private readonly IReadOnlyDictionary<string, string> _equipmentTagsPair;
+    private readonly PooledDictionary<string, IX4Size?> _equipmentSizePair;
 
 
     /// <summary>
     /// ダミー用のタグ一覧
     /// </summary>
-    private readonly HashSet<string> _dummyTags = new();
+    private readonly HashSet<string> _dummyTags = [];
     #endregion
 
 
@@ -37,42 +39,48 @@ sealed class EquipmentTagsManager
     /// <param name="conn">DB接続情報</param>
     public EquipmentTagsManager(IDbConnection conn)
     {
-        // Tagのユニークな組み合わせ一覧を作成する
+        // 装備IDとタグ文字列一覧のペアを作成する
         {
-            const string SQL = @"
-SELECT
-	DISTINCT group_concat(TmpTagsTable.Tag, '彁') As Tags
-	
-FROM
-	(SELECT EquipmentTag.EquipmentID, EquipmentTag.Tag FROM EquipmentTag ORDER BY EquipmentTag.EquipmentID, EquipmentTag.Tag) TmpTagsTable
+            const string SQL1 = @"
+WITH
+	TmpTags AS (
+		SELECT	 E.EquipmentID, E.Tag
+		FROM 	 EquipmentTag E
+		ORDER BY E.EquipmentID, E.Tag
+	)
 
-GROUP BY
-	TmpTagsTable.EquipmentID";
+SELECT   E.EquipmentID, group_concat(T.Tag, '彁') AS Tags
+FROM 	 Equipment E, TmpTags T
+WHERE    E.EquipmentID = T.EquipmentID
+GROUP BY E.EquipmentID
+";
+            int capacity = conn.QuerySingle<int>("SELECT count(*) FROM (SELECT DISTINCT EquipmentID FROM EquipmentTag)");
+            using var tagsMgr = new TagsManager<HashSet<string>>(capacity, static x => [.. x.Split('彁')]);
 
-            _tags = conn.Query<string>(SQL)
-                .ToDictionary(x => x, x => new HashSet<string>(x.Split('彁')));
+            _equipmentTagsPair = new(capacity);
+            foreach (var (wareID, tags) in conn.Query<(string, string)>(SQL1))
+            {
+                _equipmentTagsPair.Add(wareID, tagsMgr[tags]);
+            }
         }
-
-
-        // 装備IDとタグ文字列のペアを作成する
+        
+        // 装備IDに対応するサイズIDのペアを作成する
         {
-            const string SQL = @"
-SELECT
-	Equipment.EquipmentID ,
-	group_concat(TmpTagsTable.Tag, '彁') As Tags
-	
-FROM
-	Equipment,
-	(SELECT EquipmentTag.EquipmentID, EquipmentTag.Tag FROM EquipmentTag ORDER BY EquipmentTag.EquipmentID, EquipmentTag.Tag) TmpTagsTable
+            const string SQL2 = @"
+WITH
+	EqpSize AS (
+		SELECT DISTINCT T.EquipmentID, S.SizeID
+		FROM   EquipmentTag T, Size S
+		WHERE  T.Tag = S.SizeID
+	)
 
-WHERE
-	Equipment.EquipmentID = TmpTagsTable.EquipmentID
-	
-GROUP BY
-	Equipment.EquipmentID ";
+SELECT E.EquipmentID, S.SizeID
+FROM   Equipment E, EqpSize S
+WHERE  E.EquipmentID = S.EquipmentID
+";
 
-            _equipmentTagsPair = conn.Query<(string WareID, string Tags)>(SQL)
-                .ToDictionary(x => x.WareID, x => x.Tags);
+            _equipmentSizePair = conn.Query<(string EquipmentID, string SizeID)>(SQL2)
+                .ToPooledDictionary(x => x.EquipmentID, x => X4Database.Instance.X4Size.TryGet(x.SizeID));
         }
     }
 
@@ -82,16 +90,21 @@ GROUP BY
     /// </summary>
     /// <param name="id">装備ID</param>
     /// <returns>装備IDに対応するタグ一覧</returns>
-    public HashSet<string> Get(string id)
-    {
-        if (_equipmentTagsPair.TryGetValue(id, out var tags))
-        {
-            if (_tags.TryGetValue(tags, out var ret))
-            {
-                return ret;
-            }
-        }
+    public HashSet<string> GetTags(string id) => _equipmentTagsPair.TryGetValue(id, out var tags) ? tags : _dummyTags;
 
-        return _dummyTags;
+
+    /// <summary>
+    /// 装備IDに対応するサイズの取得を試みる
+    /// </summary>
+    /// <param name="id">装備ID</param>
+    /// <returns>装備IDに対応するサイズ</returns>
+    public IX4Size? TryGetSize(string id) => _equipmentSizePair.TryGetValue(id, out var size) ? size : null;
+
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        _equipmentTagsPair.Dispose();
+        _equipmentSizePair.Dispose();
     }
 }

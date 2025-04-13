@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using Collections.Pooled;
+using Dapper;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -6,24 +7,25 @@ using System.Linq;
 using X4_ComplexCalculator.DB.X4DB.Entity;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
+
 namespace X4_ComplexCalculator.DB.X4DB.Manager;
 
 /// <summary>
 /// <see cref="IShipLoadout"/> の一覧を管理するクラス
 /// </summary>
-sealed class ShipLoadoutManager
+sealed class ShipLoadoutManager : IDisposable
 {
     #region メンバ
     /// <summary>
     /// 艦船のロードアウト情報一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IReadOnlyList<IShipLoadout>> _shipLoadouts;
+    private readonly PooledDictionary<string, IReadOnlyList<IShipLoadout>> _shipLoadouts;
 
 
     /// <summary>
     /// ダミー用のロードアウト情報
     /// </summary>
-    private readonly IReadOnlyList<IShipLoadout> _emptyLoadouts = Array.Empty<IShipLoadout>();
+    private readonly IReadOnlyList<IShipLoadout> _emptyLoadouts = [];
     #endregion
 
 
@@ -49,7 +51,7 @@ WHERE
 	ShipLoadout.MacroName = Equipment.MacroName";
         _shipLoadouts = conn.Query<ShipLoadout>(SQL)
             .GroupBy(x => x.ID)
-            .ToDictionary(x => x.Key, x => x.ToArray() as IReadOnlyList<IShipLoadout>);
+            .ToPooledDictionary(x => x.Key, x => x.ToArray() as IReadOnlyList<IShipLoadout>);
     }
 
 
@@ -63,5 +65,12 @@ WHERE
         return (_shipLoadouts.TryGetValue(id, out var loadouts) ? loadouts : _emptyLoadouts)
                 .GroupBy(x => x.LoadoutID)
                 .ToDictionary(x => x.Key, x => x.ToArray() as IReadOnlyList<IShipLoadout>);
+    }
+
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        _shipLoadouts.Dispose();
     }
 }

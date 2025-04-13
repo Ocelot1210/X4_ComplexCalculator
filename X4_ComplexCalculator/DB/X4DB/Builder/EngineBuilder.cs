@@ -1,22 +1,23 @@
-﻿using Dapper;
-using System.Collections.Generic;
+﻿using Collections.Pooled;
+using Dapper;
+using System;
 using System.Data;
-using System.Linq;
 using X4_ComplexCalculator.DB.X4DB.Entity;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.DB.X4DB.Builder;
 
+
 /// <summary>
 /// <see cref="Engine"/> クラスのインスタンスを作成するBuilderクラス
 /// </summary>
-class EngineBuilder
+sealed class EngineBuilder : IDisposable
 {
     #region メンバ
     /// <summary>
     /// エンジン情報一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, X4_DataExporterWPF.Entities.Engine> _engines;
+    private readonly PooledDictionary<string, X4_DataExporterWPF.Entities.Engine> _engines;
     #endregion
 
 
@@ -27,7 +28,7 @@ class EngineBuilder
     public EngineBuilder(IDbConnection conn)
     {
         _engines = conn.Query<X4_DataExporterWPF.Entities.Engine>("SELECT * FROM Engine")
-            .ToDictionary(x => x.EquipmentID);
+            .ToPooledDictionary(x => x.EquipmentID);
     }
 
 
@@ -50,5 +51,12 @@ class EngineBuilder
         }
 
         return equipment;
+    }
+
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        _engines.Dispose();
     }
 }

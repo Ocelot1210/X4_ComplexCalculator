@@ -1,23 +1,18 @@
-﻿using Dapper;
+﻿using Collections.Pooled;
+using Dapper;
+using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 
 namespace X4_ComplexCalculator.DB.X4DB.Manager;
 
-sealed class WareTagsManager
+sealed class WareTagsManager : IDisposable
 {
     #region メンバ
     /// <summary>
-    /// Tagのユニークな組み合わせ一覧
-    /// </summary>
-    private readonly IReadOnlyDictionary<string, HashSet<string>> _tags;
-
-
-    /// <summary>
     /// ウェアIDとタグ文字列のペア
     /// </summary>
-    private readonly IReadOnlyDictionary<string, string> _wareTagsPair;
+    private readonly PooledDictionary<string, HashSet<string>> _wareTagsPair;
 
 
     /// <summary>
@@ -27,51 +22,36 @@ sealed class WareTagsManager
     #endregion
 
 
-
     /// <summary>
     /// コンストラクタ
     /// </summary>
     /// <param name="conn">DB接続情報</param>
     public WareTagsManager(IDbConnection conn)
     {
-        // Tagのユニークな組み合わせ一覧を作成する
+        // ウェアIDとタグ一覧を作成する
+        const string SQL = @"
+WITH
+	TmpTags AS (
+		SELECT	 DISTINCT W.WareID, W.Tag
+		FROM 	 WareTags W
+		ORDER BY W.WareID, W.Tag
+	)
+
+SELECT   W.WareID, group_concat(T.Tag, '彁') AS Tags
+FROM     Ware W, TmpTags T
+WHERE    W.WareID = T.WareID AND W.TransportTypeID <> 'inventory'
+GROUP BY W.WareID
+";
+        int capacity = conn.QuerySingle<int>("SELECT count(*) FROM Ware WHERE TransportTypeID <> 'inventory'");
+        _wareTagsPair = new(capacity);
+
+        using var tagsMgr = new TagsManager<HashSet<string>>(capacity, static x => [.. x.Split('彁')]);
+
+        foreach (var (wareID, tags) in conn.Query<(string, string)>(SQL))
         {
-            const string SQL = @"
-SELECT
-	DISTINCT group_concat(TmpTagsTable.Tag, '彁') As Tags
-	
-FROM
-	(SELECT WareTags.WareID, WareTags.Tag FROM WareTags ORDER BY WareTags.WareID, WareTags.Tag) TmpTagsTable
-
-GROUP BY
-	TmpTagsTable.WareID";
-
-            _tags = conn.Query<string>(SQL)
-                .ToDictionary(x => x, x => new HashSet<string>(x.Split('彁')));
-        }
-
-        // ウェアIDとタグ文字列のペアを作成する
-        {
-            const string SQL = @"
-SELECT
-	Ware.WareID,
-	group_concat(Sorted_WareTags.Tag, '彁') AS Tags
-FROM
-	Ware,
-	(SELECT WareTags.WareID, WareTags.Tag FROM WareTags ORDER BY WareTags.WareID, WareTags.Tag) Sorted_WareTags
-	
-WHERE
-	Ware.WareID = Sorted_WareTags.WareID AND
-	Ware.TransportTypeID <> 'inventory'
-
-GROUP BY
-	Ware.WareID";
-
-            _wareTagsPair = conn.Query<(string WareID, string Tags)>(SQL)
-                .ToDictionary(x => x.WareID, x => x.Tags);
-        }
+            _wareTagsPair.Add(wareID, tagsMgr[tags]);
+        }        
     }
-
 
 
     /// <summary>
@@ -79,16 +59,12 @@ GROUP BY
     /// </summary>
     /// <param name="wareID">ウェアID</param>
     /// <returns>タグ一覧</returns>
-    public HashSet<string> Get(string wareID)
-    {
-        if (_wareTagsPair.TryGetValue(wareID, out var tagsText))
-        {
-            if (_tags.TryGetValue(tagsText, out var tags))
-            {
-                return tags;
-            }
-        }
+    public HashSet<string> Get(string wareID) => _wareTagsPair.TryGetValue(wareID, out var tags) ? tags : _emptyTags;
 
-        return _emptyTags;
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        _wareTagsPair.Dispose();
     }
 }

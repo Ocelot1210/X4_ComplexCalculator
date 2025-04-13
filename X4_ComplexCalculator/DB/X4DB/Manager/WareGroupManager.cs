@@ -1,7 +1,7 @@
-﻿using Dapper;
-using System.Collections.Generic;
+﻿using Collections.Pooled;
+using Dapper;
+using System;
 using System.Data;
-using System.Linq;
 using X4_ComplexCalculator.DB.X4DB.Entity;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
@@ -10,13 +10,13 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager;
 /// <summary>
 /// <see cref="IWareGroup"/> の一覧を管理するクラス
 /// </summary>
-sealed class WareGroupManager
+sealed class WareGroupManager : IDisposable
 {
     #region メンバ
     /// <summary>
     /// ウェア種別IDをキーにした <see cref="IWareGroup"/> の一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IWareGroup> _wareGroups;
+    private readonly PooledDictionary<string, IWareGroup> _wareGroups;
 
 
     /// <summary>
@@ -34,7 +34,7 @@ sealed class WareGroupManager
     {
         const string SQL = "SELECT WareGroupID, Name, Tier FROM WareGroup";
         _wareGroups = conn.Query<WareGroup>(SQL)
-            .ToDictionary(x => x.WareGroupID, x => x as IWareGroup);
+            .ToPooledDictionary(x => x.WareGroupID, x => x as IWareGroup);
     }
 
 
@@ -48,4 +48,11 @@ sealed class WareGroupManager
     /// </returns>
     public IWareGroup TryGet(string wareGroupID) =>
         _wareGroups.TryGetValue(wareGroupID, out var ret) ? ret : _dummyWareGroup;
+
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        _wareGroups.Dispose();
+    }
 }

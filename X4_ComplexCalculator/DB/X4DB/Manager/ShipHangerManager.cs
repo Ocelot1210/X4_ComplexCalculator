@@ -1,4 +1,6 @@
-﻿using Dapper;
+﻿using Collections.Pooled;
+using Dapper;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -10,13 +12,13 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager;
 /// <summary>
 /// <see cref="IShip"/> に対応する <see cref="IShipHanger"/> の一覧を管理するクラス
 /// </summary>
-sealed class ShipHangerManager
+sealed class ShipHangerManager : IDisposable
 {
     #region メンバ
     /// <summary>
     /// 艦船のハンガー一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, IShipHanger>> _shipHangers;
+    private readonly PooledDictionary<string, IReadOnlyDictionary<string, IShipHanger>> _shipHangers;
 
 
     /// <summary>
@@ -35,7 +37,7 @@ sealed class ShipHangerManager
         const string SQL = @"SELECT ShipID, SizeID, Count, Capacity FROM ShipHanger";
         _shipHangers = conn.Query<ShipHanger>(SQL)
             .GroupBy(x => x.ShipID)
-            .ToDictionary(
+            .ToPooledDictionary(
                 x => x.Key,
                 x => x.ToDictionary(y => y.Size.SizeID, y => y as IShipHanger) as IReadOnlyDictionary<string, IShipHanger>);
     }
@@ -51,4 +53,11 @@ sealed class ShipHangerManager
     /// </returns>
     public IReadOnlyDictionary<string, IShipHanger> Get(string id) =>
         _shipHangers.TryGetValue(id, out var hanger) ? hanger : _emptyHanger;
+
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        _shipHangers.Dispose();
+    }
 }

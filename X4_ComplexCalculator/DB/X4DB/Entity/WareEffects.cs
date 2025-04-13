@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
+using ZLinq;
 
 namespace X4_ComplexCalculator.DB.X4DB.Entity;
 
@@ -17,13 +18,14 @@ public sealed class WareEffects(IEnumerable<IWareEffect> effects) : IWareEffects
     /// <summary>
     /// ウェア生産時の追加効果情報一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, IWareEffect>> _effects = 
+    private readonly Dictionary<string, IReadOnlyDictionary<string, IWareEffect>> _effects = 
         effects
-            .GroupBy(x => x.Method)
-            .ToDictionary(
-                x => x.Key,
-                x => x.ToDictionary(y => y.EffectID) as IReadOnlyDictionary<string, IWareEffect>
-            );
+        .AsValueEnumerable()
+        .GroupBy(x => x.Method)
+        .ToDictionary(
+            x => x.Key,
+            x => x.ToDictionary(y => y.EffectID) as IReadOnlyDictionary<string, IWareEffect>
+        );
     #endregion
 
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
+using ZLinq;
 
 namespace X4_ComplexCalculator.DB.X4DB.Entity;
 
@@ -45,8 +46,8 @@ public sealed class WareEquipment(string wareID, string connectionName, string e
     {
         return equipment switch
         {
-            IThruster => !equipment.EquipmentTags.Where(x => x != "component" && x != "thruster").Except(Tags).Any(),
-            _ => !equipment.EquipmentTags.Where(x => x != "component").Except(Tags).Any(),
+            IThruster => !equipment.EquipmentTags.AsValueEnumerable().Where(x => x != "component" && x != "thruster").Except(Tags).Any(),
+            _ => !equipment.EquipmentTags.AsValueEnumerable().Where(x => x != "component").Except(Tags).Any(),
         };
     }
 

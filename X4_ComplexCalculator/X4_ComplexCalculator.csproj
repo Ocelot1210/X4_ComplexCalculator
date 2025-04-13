@@ -36,6 +36,7 @@
     <PackageReference Include="Onova" Version="2.6.13" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
     <PackageReference Include="WPFLocalizeExtension" Version="3.10.0" />
+    <PackageReference Include="ZLinq" Version="1.1.0" />
   </ItemGroup>
 
   <ItemGroup>

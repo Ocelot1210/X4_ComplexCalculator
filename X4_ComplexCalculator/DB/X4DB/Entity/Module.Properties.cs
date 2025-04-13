@@ -3,7 +3,7 @@ using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
 namespace X4_ComplexCalculator.DB.X4DB.Entity;
 
-public partial class Module
+public sealed partial class Module
 {
     #region IWare
     /// <inheritdoc/>

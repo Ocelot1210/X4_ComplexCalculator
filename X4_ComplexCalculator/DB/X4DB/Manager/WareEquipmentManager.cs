@@ -6,25 +6,26 @@ using System.Data;
 using System.Linq;
 using X4_ComplexCalculator.DB.X4DB.Entity;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
+using ZLinq;
 
 namespace X4_ComplexCalculator.DB.X4DB.Manager;
 
 /// <summary>
 /// <see cref="IWareEquipment"/> の一覧を管理するクラス
 /// </summary>
-sealed class WareEquipmentManager
+sealed class WareEquipmentManager : IDisposable
 {
     #region メンバ
     /// <summary>
     /// 空のウェアの装備情報一覧(ダミー用)
     /// </summary>
-    private readonly IReadOnlyList<IWareEquipment> _emptyEquipments = Array.Empty<IWareEquipment>();
+    private readonly IReadOnlyDictionary<string, IWareEquipment> _emptyEquipments = new Dictionary<string, IWareEquipment>();
 
 
     /// <summary>
     /// ウェアの装備情報一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IReadOnlyList<IWareEquipment>> _wareEquipments;
+    private readonly PooledDictionary<string, IReadOnlyDictionary<string, IWareEquipment>> _wareEquipments;
     #endregion
 
 
@@ -34,86 +35,48 @@ sealed class WareEquipmentManager
     /// <param name="conn">DB接続情報</param>
     public WareEquipmentManager(IDbConnection conn)
     {
-        // Tagのユニークな組み合わせ一覧を作成する
-        const string SQL_1 = @"
-SELECT
-	DISTINCT group_concat(TmpTagsTable.Tag, '彁') As Tags
-	
-FROM
-	(
-		SELECT
-			WareEquipmentTag.WareID,
-			WareEquipmentTag.ConnectionName,
-			WareEquipmentTag.Tag
-		FROM
-			WareEquipmentTag
-		ORDER BY
-			WareEquipmentTag.WareID,
-			WareEquipmentTag.ConnectionName,
-			WareEquipmentTag.Tag
-	) TmpTagsTable
-
-GROUP BY
-	TmpTagsTable.WareID,
-	TmpTagsTable.ConnectionName";
-
-        using var tagsDict = conn.Query<string>(SQL_1)
-            .ToPooledDictionary(x => x, x => new HashSet<string>(x.Split('彁')));
-        
-
-
         // 装備一覧を作成する
-        const string SQL_2 = @"
-SELECT
-	WareEquipment.WareID,
-	WareEquipment.ConnectionName,
-	WareEquipment.EquipmentTypeID,
-	WareEquipment.GroupName,
-	group_concat(Sorted_WareEquipmentTag.Tag, '彁') AS Tags
-	
-FROM
-	WareEquipment,
-	(SELECT * FROM WareEquipmentTag ORDER BY WareEquipmentTag.WareID, WareEquipmentTag.ConnectionName, WareEquipmentTag.Tag) Sorted_WareEquipmentTag
-	
-WHERE
-	WareEquipment.WareID = Sorted_WareEquipmentTag.WareID AND
-	WareEquipment.ConnectionName = Sorted_WareEquipmentTag.ConnectionName
-	
-GROUP BY
-	WareEquipment.WareID,
-	WareEquipment.ConnectionName";
+        const string SQL = @"
+WITH
+	TmpTags AS (
+		SELECT   WareID, ConnectionName, Tag
+		FROM     WareEquipmentTag
+		ORDER BY WareID, ConnectionName, Tag
+	)
 
-        _wareEquipments = conn.Query<TempWareEquipment>(SQL_2)
-            .Select(x => new WareEquipment(x.WareID, x.ConnectionName, x.EquipmentTypeID, x.GroupName, tagsDict[x.Tags]))
-            .GroupBy(x => x.ID)
-            .ToDictionary(x => x.Key, x => x.ToArray() as IReadOnlyList<IWareEquipment>);
-        
+SELECT   W.WareID, W.ConnectionName, W.EquipmentTypeID, W.GroupName, group_concat(T.Tag, '彁') AS Tags
+FROM     WareEquipment W, TmpTags T
+WHERE    W.WareID = T.WareID AND W.ConnectionName = T.ConnectionName
+GROUP BY W.WareID, W.ConnectionName
+";
+
+        int capacity = conn.QuerySingle<int>("SELECT count(*) FROM (SELECT DISTINCT WareID, ConnectionName FROM WareEquipmentTag)");
+        using var tagsMgr = new TagsManager<HashSet<string>>(capacity, static x => [.. x.Split('彁')]);
+
+        var groups = conn.Query<(string WareID, string ConnectionName, string EquipmentTypeID, string GroupName, string Tags)>(SQL)
+            .AsValueEnumerable()
+            .Select(x => new WareEquipment(x.WareID, x.ConnectionName, x.EquipmentTypeID, x.GroupName, tagsMgr[x.Tags]) as IWareEquipment)
+            .GroupBy(x => x.ID);
+
+        _wareEquipments = new(capacity);
+        foreach (var group in groups)
+        {
+            _wareEquipments.Add(group.Key, group.ToDictionary(x => x.ConnectionName));
+        }
     }
 
 
     /// <summary>
-    /// ウェアの装備情報を取得する
+    /// ウェアIDをキーに、ウェアIDに対応する接続名をキーにした装備情報一覧を取得する
     /// </summary>
     /// <param name="id">ウェアID</param>
-    /// <returns>ウェアIDに対応するウェアの装備情報一覧</returns>
-    public IReadOnlyList<IWareEquipment> Get(string id) => _wareEquipments.TryGetValue(id, out var value) ? value : _emptyEquipments;
+    /// <returns>ウェアIDに対応する接続名をキーにした装備情報一覧</returns>
+    public IReadOnlyDictionary<string, IWareEquipment> Get(string id) => _wareEquipments.TryGetValue(id, out var value) ? value : _emptyEquipments;
 
 
-    /// <summary>
-    /// 装備一覧作成時の一時情報用クラス
-    /// </summary>
-    private sealed class TempWareEquipment(
-        string wareID,
-        string connectionName,
-        string equipmentTypeID,
-        string groupName,
-        string tags
-        )
+    /// <inheritdoc/>
+    public void Dispose()
     {
-        public string WareID { get; } = wareID;
-        public string ConnectionName { get; } = connectionName;
-        public string EquipmentTypeID { get; } = equipmentTypeID;
-        public string GroupName { get; } = groupName;
-        public string Tags { get; } = tags;
+        _wareEquipments.Dispose();
     }
 }

@@ -6,28 +6,21 @@ namespace X4_ComplexCalculator.DB.X4DB.Entity;
 /// <summary>
 /// カーゴタイプ(輸送種別)情報用クラス
 /// </summary>
-public sealed class TransportType : ITransportType
+/// <remarks>
+/// コンストラクタ
+/// </remarks>
+/// <param name="transportTypeID">カーゴ種別ID</param>
+/// <param name="name">カーゴ種別名</param>
+public sealed class TransportType(string transportTypeID, string name) : ITransportType
 {
     #region ITransportType
     /// <inheritdoc/>
-    public string TransportTypeID { get; }
+    public string TransportTypeID { get; } = transportTypeID;
 
 
     /// <inheritdoc/>
-    public string Name { get; }
+    public string Name { get; } = name;
     #endregion
-
-
-    /// <summary>
-    /// コンストラクタ
-    /// </summary>
-    /// <param name="transportTypeID">カーゴ種別ID</param>
-    /// <param name="name">カーゴ種別名</param>
-    public TransportType(string transportTypeID, string name)
-    {
-        TransportTypeID = transportTypeID;
-        Name = name;
-    }
 
 
     /// <summary>

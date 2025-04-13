@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using Collections.Pooled;
+using Dapper;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -6,24 +7,25 @@ using System.Linq;
 using X4_ComplexCalculator.DB.X4DB.Entity;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 
+
 namespace X4_ComplexCalculator.DB.X4DB.Manager;
 
 /// <summary>
 /// <see cref="IX4Module"/> に対応する <see cref="IModuleProduct"/> の一覧を管理するクラス
 /// </summary>
-sealed class ModuleProductManager
+sealed class ModuleProductManager : IDisposable
 {
     #region メンバ
     /// <summary>
     /// モジュールの製品情報一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IReadOnlyList<IModuleProduct>> _moduleProducts;
+    private readonly PooledDictionary<string, IReadOnlyList<IModuleProduct>> _moduleProducts;
 
 
     /// <summary>
     /// ダミーの製品情報一覧
     /// </summary>
-    private readonly IReadOnlyList<IModuleProduct> _dummyProduct = Array.Empty<IModuleProduct>();
+    private readonly IReadOnlyList<IModuleProduct> _dummyProduct = [];
     #endregion
 
 
@@ -39,7 +41,7 @@ sealed class ModuleProductManager
         _moduleProducts = conn.Query<X4_DataExporterWPF.Entities.ModuleProduct>(SQL)
             .Select(x => new ModuleProduct(x.ModuleID, x.WareID, x.Method, x.Amount, wareProductionManager.Get(x.WareID, x.Method)))
             .GroupBy(x => x.ModuleID)
-            .ToDictionary(x => x.Key, x => x.ToArray() as IReadOnlyList<IModuleProduct>);
+            .ToPooledDictionary(x => x.Key, x => x.ToArray() as IReadOnlyList<IModuleProduct>);
     }
 
 
@@ -50,4 +52,11 @@ sealed class ModuleProductManager
     /// <returns>モジュールIDに対応するモジュールの製品情報一覧</returns>
     public IReadOnlyList<IModuleProduct> Get(string id) =>
         _moduleProducts.TryGetValue(id, out var product) ? product : _dummyProduct;
+
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        _moduleProducts.Dispose();
+    }
 }

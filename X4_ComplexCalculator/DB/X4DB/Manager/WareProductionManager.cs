@@ -1,4 +1,6 @@
-﻿using Dapper;
+﻿using Collections.Pooled;
+using Dapper;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -10,13 +12,13 @@ namespace X4_ComplexCalculator.DB.X4DB.Manager;
 /// <summary>
 /// <see cref="IWare"/> に対応する <see cref="IWareProduction"/> の一覧を管理するクラス
 /// </summary>
-sealed class WareProductionManager
+sealed class WareProductionManager : IDisposable
 {
     #region メンバ
     /// <summary>
     /// ウェアの生産量と生産時間情報の一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, IWareProduction>> _wareProductions;
+    private readonly PooledDictionary<string, IReadOnlyDictionary<string, IWareProduction>> _wareProductions;
 
 
     /// <summary>
@@ -24,7 +26,6 @@ sealed class WareProductionManager
     /// </summary>
     private readonly IReadOnlyDictionary<string, IWareProduction> _dummyWareProduction = new Dictionary<string, IWareProduction>();
     #endregion
-
 
 
     /// <summary>
@@ -37,7 +38,7 @@ sealed class WareProductionManager
 
         _wareProductions = conn.Query<WareProduction>(SQL)
             .GroupBy(x => x.WareID)
-            .ToDictionary(
+            .ToPooledDictionary(
                 x => x.Key,
                 x => x.ToDictionary(y => y.Method, y => y as IWareProduction) as IReadOnlyDictionary<string, IWareProduction>
             );
@@ -71,5 +72,12 @@ sealed class WareProductionManager
         }
 
         return productions["default"];
+    }
+
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        _wareProductions.Dispose();
     }
 }

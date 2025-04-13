@@ -1,6 +1,6 @@
-﻿using Dapper;
+﻿using Collections.Pooled;
+using Dapper;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using X4_ComplexCalculator.DB.X4DB.Entity;
@@ -17,23 +17,23 @@ namespace X4_ComplexCalculator.DB.X4DB.Builder;
 /// </remarks>
 /// <param name="conn">DB接続情報</param>
 /// <param name="wareEquipmentManager">ウェアの装備情報一覧</param>
-class ShipBuilder(IDbConnection conn, WareEquipmentManager wareEquipmentManager)
+sealed class ShipBuilder(IDbConnection conn, WareEquipmentManager wareEquipmentManager) : IDisposable
 {
     #region メンバ
     /// <summary>
     /// 艦船種別一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IShipType> _shipTypes = 
+    private readonly PooledDictionary<string, IShipType> _shipTypes = 
         conn.Query<ShipType>("SELECT ShipTypeID, Name, Description FROM ShipType")
-                .ToDictionary(x => x.ShipTypeID, x => x as IShipType);
+            .ToPooledDictionary(x => x.ShipTypeID, x => x as IShipType);
 
 
     /// <summary>
     /// 艦船一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, X4_DataExporterWPF.Entities.Ship> _ships = 
+    private readonly PooledDictionary<string, X4_DataExporterWPF.Entities.Ship> _ships = 
         conn.Query<X4_DataExporterWPF.Entities.Ship>("SELECT * FROM Ship")
-                .ToDictionary(x => x.ShipID);
+            .ToPooledDictionary(x => x.ShipID);
 
 
     /// <summary>
@@ -81,7 +81,17 @@ class ShipBuilder(IDbConnection conn, WareEquipmentManager wareEquipmentManager)
             item.CargoSize,
             _shipHangerManager.Get(ware.ID),
             _shipLoadoutManager.Get(ware.ID),
-            wareEquipmentManager.Get(ware.ID).ToDictionary(x => x.ConnectionName)
+            wareEquipmentManager.Get(ware.ID)
         );
+    }
+
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        _shipTypes.Dispose();
+        _ships.Dispose();
+        _shipHangerManager.Dispose();
+        _shipLoadoutManager.Dispose();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using X4_ComplexCalculator.DB.X4DB.Entity;
@@ -10,7 +11,7 @@ namespace X4_ComplexCalculator.DB.X4DB.Builder;
 /// <summary>
 /// <see cref="Ware"/> クラスのインスタンスを作成するBuilderクラス
 /// </summary>
-class WareBuilder
+sealed class WareBuilder : IDisposable
 {
     #region メンバ
     /// <summary>
@@ -62,6 +63,12 @@ class WareBuilder
 
 
     /// <summary>
+    /// 装備品一覧
+    /// </summary>
+    private readonly WareEquipmentManager _wareEquipmentManager;
+
+
+    /// <summary>
     /// 艦船情報ビルダ
     /// </summary>
     private readonly ShipBuilder _shipBuilder;
@@ -87,24 +94,19 @@ class WareBuilder
     /// <param name="conn">DB接続情報</param>
     public WareBuilder(IDbConnection conn, TransportTypeManager transportTypeManager)
     {
-        _conn = conn;
-
-        _transportTypeManager = transportTypeManager;
-        _wareTagsManager = new(conn);
-        _wareOwnerManager = new(conn);
-        _wareResourceManager = new(conn);
-        _wareProductionManager = new(conn);
-        _wareGroupManager = new(conn);
-        _wareEffectManager = new(conn);
-
-
-        var wareEquipmentManager = new WareEquipmentManager(conn);
-
-        _shipBuilder = new(conn, wareEquipmentManager);
-        _moduleBuilder = new(conn, _wareProductionManager, transportTypeManager, wareEquipmentManager);
-        _equipmentBuilder = new(conn);
+        _conn                   = conn;
+        _transportTypeManager   = transportTypeManager;
+        _wareTagsManager        = new(conn);
+        _wareOwnerManager       = new(conn);
+        _wareResourceManager    = new(conn);
+        _wareProductionManager  = new(conn);
+        _wareGroupManager       = new(conn);
+        _wareEffectManager      = new(conn);
+        _wareEquipmentManager   = new(conn);
+        _shipBuilder            = new(conn, _wareEquipmentManager);
+        _moduleBuilder          = new(conn, _wareProductionManager, transportTypeManager, _wareEquipmentManager);
+        _equipmentBuilder       = new(conn);
     }
-
 
 
     /// <summary>
@@ -164,5 +166,21 @@ WHERE  TransportTypeID IS NOT NULL AND TransportTypeID <> 'inventory'";
         }
 
         yield break;
+    }
+
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        _wareTagsManager.Dispose();
+        _wareOwnerManager.Dispose();
+        _wareResourceManager.Dispose();
+        _wareProductionManager.Dispose();
+        _wareGroupManager.Dispose();
+        _wareEffectManager.Dispose();
+        _wareEquipmentManager.Dispose();
+        _shipBuilder.Dispose();
+        _moduleBuilder.Dispose();
+        _equipmentBuilder.Dispose();
     }
 }

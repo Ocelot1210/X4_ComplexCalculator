@@ -1,8 +1,7 @@
-﻿using Dapper;
+﻿using Collections.Pooled;
+using Dapper;
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using X4_ComplexCalculator.DB.X4DB.Entity;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.DB.X4DB.Manager;
@@ -21,28 +20,28 @@ namespace X4_ComplexCalculator.DB.X4DB.Builder;
 /// <param name="wareEquipmentManager">
 /// ウェアの装備情報一覧
 /// </param>
-class ModuleBuilder(
+sealed class ModuleBuilder(
     IDbConnection conn,
     WareProductionManager wareProductionManager,
     TransportTypeManager transportTypeManager,
     WareEquipmentManager wareEquipmentManager
-    )
+    ) : IDisposable
 {
     #region メンバ
     /// <summary>
     /// モジュール種別一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, IModuleType> _moduleTypes = 
+    private readonly PooledDictionary<string, IModuleType> _moduleTypes =
         conn.Query<ModuleType>("SELECT ModuleTypeID, Name FROM ModuleType")
-            .ToDictionary(x => x.ModuleTypeID, x => x as IModuleType);
+            .ToPooledDictionary(x => x.ModuleTypeID, x => x as IModuleType);
 
 
     /// <summary>
     /// モジュール情報一覧
     /// </summary>
-    private readonly IReadOnlyDictionary<string, X4_DataExporterWPF.Entities.Module> _modules = 
+    private readonly PooledDictionary<string, X4_DataExporterWPF.Entities.Module> _modules =
         conn.Query<X4_DataExporterWPF.Entities.Module>("SELECT * FROM Module")
-            .ToDictionary(x => x.ModuleID);
+            .ToPooledDictionary(x => x.ModuleID);
 
 
     /// <summary>
@@ -84,7 +83,17 @@ class ModuleBuilder(
             item.NoBlueprint,
             _moduleProductManager.Get(ware.ID),
             _storageManager.Get(ware.ID),
-            wareEquipmentManager.Get(ware.ID).ToDictionary(x => x.ConnectionName)
+            wareEquipmentManager.Get(ware.ID)
         );
+    }
+
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        _moduleTypes.Dispose();
+        _modules.Dispose();
+        _moduleProductManager.Dispose();
+        _storageManager.Dispose();
     }
 }
