@@ -153,7 +153,8 @@ public sealed partial class ModulesGridItem : ObservableRecipientEx, IEditable, 
     /// 装備を追加
     /// </summary>
     /// <param name="equipment">追加したい装備</param>
-    public void AddEquipment(IEquipment equipment) => Equipments.Add(equipment);
+    /// <param name="count">追加数</param>
+    public void AddEquipment(IEquipment equipment, long count = 1) => Equipments.Add(equipment, count);
 
 
     /// <summary>
