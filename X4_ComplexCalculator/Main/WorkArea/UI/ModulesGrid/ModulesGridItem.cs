@@ -12,6 +12,7 @@ using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.EditEquipment;
+using ZLinq;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
@@ -91,16 +92,17 @@ public sealed partial class ModulesGridItem : ObservableRecipientEx, IEditable, 
     /// <param name="module">モジュール</param>
     /// <param name="selectedMethod">選択中の建造方式</param>
     /// <param name="moduleCount">モジュール数</param>
-    public ModulesGridItem(IMessenger messenger, IX4Module module, IWareProduction? selectedMethod = null, long moduleCount = 1) : base(messenger, false, nameof(ModulesGridItem))
+    public ModulesGridItem(IMessenger messenger, IX4Module module, IWareProduction? selectedMethod = null, long moduleCount = 1, IEnumerable<IEquipment>? equipments = null, EditStatus editStatus = EditStatus.Unedited) : base(messenger, false, nameof(ModulesGridItem))
     {
         Module = module;
         ModuleCount = moduleCount;
-        Equipments = new EquippableWareEquipmentManager(module);
+        Equipments = new EquippableWareEquipmentManager(module, equipments ?? []);
         
         Turrets = new EquipmentsInfo(Equipments, "turrets");
         Shields = new EquipmentsInfo(Equipments, "shields");
 
         SelectedMethod = selectedMethod ?? Module.Productions.First().Value;
+        EditStatus = editStatus;
 
         IsActive = true;
     }
@@ -181,16 +183,12 @@ public sealed partial class ModulesGridItem : ObservableRecipientEx, IEditable, 
     [RelayCommand]
     private void EditEquipment()
     {
-        // 変更前
-        using var turretsOld = Equipments.AllEquipments
-            .Where(x => x.EquipmentType.EquipmentTypeID == "turrets")
-            .OrderBy(x => x.ID)
-            .ToPooledList();
+        var turretsType = X4Database.Instance.EquipmentType.Get("turrets");
+        var shieldsType = X4Database.Instance.EquipmentType.Get("shields");
 
-        using var shieldsOld = Equipments.AllEquipments
-            .Where(x => x.EquipmentType.EquipmentTypeID == "shields")
-            .OrderBy(x => x.ID)
-            .ToPooledList();
+        // 変更前
+        using var turretsOld = Equipments.AllEquipments.Where(x => x.EquipmentType.Equals(turretsType)).ToPooledList();
+        using var shieldsOld = Equipments.AllEquipments.Where(x => x.EquipmentType.Equals(shieldsType)).ToPooledList();
 
 
         var window = new EditEquipmentWindow(Messenger, Equipments)
@@ -201,22 +199,26 @@ public sealed partial class ModulesGridItem : ObservableRecipientEx, IEditable, 
 
 
         {
-            (IList<IEquipment> OldEquipement, string EquipmentTypeID)[] equipemtns = 
+            (IList<IEquipment> OldEquipement, IEquipmentType EquipmentType, EquipmentsInfo Info)[] equipemtns = 
             [
-                (turretsOld, "turrets"),
-                (shieldsOld, "shields")
+                (turretsOld, turretsType, Turrets),
+                (shieldsOld, shieldsType, Shields)
             ];
 
-            // 変更があったか？
-            var equipmentChanged = equipemtns.Any(x => x.OldEquipement.SequenceEqual(Equipments.AllEquipments.Where(y => y.EquipmentType.EquipmentTypeID == x.EquipmentTypeID).OrderBy(x => x.ID)));
-
-            if (equipmentChanged)
+            // 装備の内容に変更があったか？(建造コスト計算用。順番の変更は変更と見なさない)
+            if (equipemtns.Any(x => !x.OldEquipement.AsValueEnumerable().OrderBy(x => x.ID).SequenceEqual(Equipments.AllEquipments.AsValueEnumerable().Where(y => y.EquipmentType.Equals(x.EquipmentType)).OrderBy(x => x.ID))))
             {
                 using var newItems = Equipments.AllEquipments
-                    .Where(x => x.EquipmentType.EquipmentTypeID == "shields" || x.EquipmentType.EquipmentTypeID == "turrets")
+                    .Where(x => x.EquipmentType.Equals(turretsType) || x.EquipmentType.Equals(shieldsType))
                     .ToPooledList();
 
                 Broadcast(turretsOld.Concat(shieldsOld), newItems, nameof(Equipments));
+            }
+
+            // 装備の内容に変更があったものについては個数を更新(モジュール一覧表示用のため、順番の変更も変更と見なす)
+            foreach (var (_, _, info) in equipemtns.AsValueEnumerable().Where(x => !x.OldEquipement.AsValueEnumerable().SequenceEqual(Equipments.AllEquipments.AsValueEnumerable().Where(y => y.EquipmentType.Equals(x.EquipmentType)))))
+            {
+                info.UpdateCount();
                 EditStatus = EditStatus.Edited;
             }
         }

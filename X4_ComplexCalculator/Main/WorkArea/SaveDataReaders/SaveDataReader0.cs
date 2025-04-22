@@ -2,10 +2,12 @@
 using CommunityToolkit.Mvvm.Messaging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using X4_ComplexCalculator.Common.EditStatus;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.DB.X4DB.Interfaces;
 using X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
+using ZLinq;
 
 namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReaders;
 
@@ -90,36 +92,43 @@ class SaveDataReader0(IMessenger messenger, IWorkArea WorkArea) : ISaveDataReade
     {
         // レコード数取得
         var moduleCnt = conn.QuerySingle<int>("SELECT count(*) AS Count from Modules");
-        var equipmentCnt = conn.QuerySingle<int>("SELECT count(*) AS Count from Equipments");
-        var records = moduleCnt + equipmentCnt;
+        var records = moduleCnt + conn.QuerySingle<int>("SELECT count(*) AS Count from Equipments");
 
-
-        using var modules = new PooledList<ModulesGridItem>(moduleCnt);
         var progressCnt = 1;
 
         // モジュールを復元
+        using var tmpModules = new PooledList<(IX4Module Module, long Count)>(moduleCnt);
         const string SQL_1 = "SELECT ModuleID, Count FROM Modules ORDER BY Row ASC";
         foreach (var (moduleID, count) in conn.Query<(string, long)>(SQL_1))
         {
             var module = X4Database.Instance.Ware.TryGet<IX4Module>(moduleID);
             if (module is not null)
             {
-                var mod = new ModulesGridItem(_messenger, module, null, count) { EditStatus = EditStatus.Unedited };
-                modules.Add(mod);
+                tmpModules.Add((module, count));
             }
             progress.Report((double)progressCnt++ / (records * maxProgress));
         }
-        
+
+        using var modules = new PooledList<ModulesGridItem>(moduleCnt);
+
         // モジュールの装備を復元
+        int lastIdx = 0;
         const string SQL_2 = "SELECT Row, EquipmentID FROM Equipments";
-        foreach (var (row, equipmentID) in conn.Query<(int, string)>(SQL_2))
+        foreach (var group in conn.Query<(int, string)>(SQL_2).AsValueEnumerable().GroupBy(x => x.Item1))
         {
-            var eqp = X4Database.Instance.Ware.TryGet<IEquipment>(equipmentID);
-            if (eqp is not null)
+            lastIdx = group.Key;
+
+            while (modules.Count < lastIdx)
             {
-                modules[row].AddEquipment(eqp);
+                modules.Add(new ModulesGridItem(_messenger, tmpModules[modules.Count].Module, null, tmpModules[modules.Count].Count));
             }
-            progress.Report((double)progressCnt++ / (records * maxProgress));
+
+            modules.Add(new ModulesGridItem(_messenger, tmpModules[lastIdx].Module, null, tmpModules[lastIdx].Count, group.Select(x => X4Database.Instance.Ware.Get<IEquipment>(x.Item2)), EditStatus.Unedited));
+        }
+
+        for (var i = lastIdx; i < tmpModules.Count; i++)
+        {
+            modules.Add(new ModulesGridItem(_messenger, tmpModules[i].Module, null, tmpModules[i].Count));
         }
 
         _workArea.StationData.ModulesInfo.Modules.Reset(modules);

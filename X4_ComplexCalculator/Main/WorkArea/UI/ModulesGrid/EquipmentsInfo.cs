@@ -1,8 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using X4_ComplexCalculator.DB.X4DB.Interfaces;
+using ZLinq;
 
 namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 
@@ -22,12 +21,6 @@ public sealed partial class EquipmentsInfo : ObservableObject
     /// 表示対象の装備ID
     /// </summary>
     private readonly string _equipmentTypeID;
-
-
-    /// <summary>
-    /// 詳細表示文字列
-    /// </summary>
-    private string _detailsText = "";
     #endregion
 
 
@@ -35,27 +28,7 @@ public sealed partial class EquipmentsInfo : ObservableObject
     /// <summary>
     /// 詳細表示文字列
     /// </summary>
-    public string DetailsText
-    {
-        get
-        {
-            Update();
-            return _detailsText;
-        }
-        set
-        {
-            SetProperty(ref _detailsText, value);
-        }
-    }
-
-
-    public IEnumerable<IWareEquipment> Equipments
-    {
-        get
-        {
-            yield break; 
-        }
-    }
+    public string DetailsText => GetDetailText();
 
 
     /// <summary>
@@ -75,7 +48,15 @@ public sealed partial class EquipmentsInfo : ObservableObject
     {
         _manager = manager;
         _equipmentTypeID = equipmentTypeID;
+        UpdateCount();
+    }
 
+
+    /// <summary>
+    /// 個数を更新
+    /// </summary>
+    public void UpdateCount()
+    {
         Count = _manager.AllEquipments.Where(x => x.EquipmentType.EquipmentTypeID == _equipmentTypeID).Count();
     }
 
@@ -84,21 +65,19 @@ public sealed partial class EquipmentsInfo : ObservableObject
     /// 表示内容を更新
     /// </summary>
     /// <returns></returns>
-    private void Update()
+    private string GetDetailText()
     {
         var equipments = _manager.AllEquipments
+            .AsValueEnumerable()
             .Where(x => x.EquipmentType.EquipmentTypeID == _equipmentTypeID);
 
-        // 装備が無い場合は
+        // 装備が無い場合は専用のテキストを表示
         if (!equipments.Any())
         {
-            Count = 0;
-            DetailsText = (string)WPFLocalizeExtension.Engine.LocalizeDictionary.Instance.GetLocalizedObject("Lang:Common_NotEquippedToolTipText", null, null);
-            return;
+            return (string)WPFLocalizeExtension.Engine.LocalizeDictionary.Instance.GetLocalizedObject("Lang:Common_NotEquippedToolTipText", null, null);
         }
 
-        var sb = new StringBuilder();
-        var total = 0;
+        var sb = new StringBuilder(256);
 
         var groups = equipments.GroupBy(x => x.Size)
             .OrderByDescending(x => x.Key is not null)
@@ -112,6 +91,7 @@ public sealed partial class EquipmentsInfo : ObservableObject
             {
                 if (cnt == 1)
                 {
+                    // サイズが切り替わった直後なら改行する
                     if (sb.Length != 0)
                     {
                         sb.AppendLine();
@@ -119,15 +99,13 @@ public sealed partial class EquipmentsInfo : ObservableObject
                     sb.AppendLine($"【{group.Key?.Name ?? ""}】");
                 }
                 sb.AppendLine($"{cnt++:D2} : {ware.Name}");
-                total++;
             }
         }
 
         // 最後の改行を消す
         sb.Length -= 2;
 
-        DetailsText = sb.ToString();
-        Count = total;
+        return sb.ToString();
     }
 
 

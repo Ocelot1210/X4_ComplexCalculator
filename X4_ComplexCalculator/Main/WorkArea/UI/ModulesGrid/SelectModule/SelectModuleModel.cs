@@ -122,7 +122,7 @@ sealed class SelectModuleModel : ObservableRecipient
         var items = Modules.Where(x => x.IsChecked)
             .Select(x => X4Database.Instance.Ware.TryGet<IX4Module>(x.ID))
             .Where(x => x is not null)
-            .Select(x => new ModulesGridItem(Messenger, x!) { EditStatus = EditStatus.Edited });
+            .Select(x => new ModulesGridItem(Messenger, x!, null, 1, [], EditStatus.Edited));
 
         _itemCollection.AddRange(items);
     }

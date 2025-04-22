@@ -163,7 +163,7 @@ class ModulesGridModel(IMessenger messenger, ModulesInfo modulesInfo, ILocalized
                 {
                     // モジュール自動追加作業用に実際に追加するモジュールが存在しない場合、
                     // 実際に追加するモジュールと見なす
-                    var mgi = new ModulesGridItem(Messenger, module, null, count) { EditStatus = EditStatus.Edited };
+                    var mgi = new ModulesGridItem(Messenger, module, null, count, [], EditStatus.Edited);
                     addTarget.Add(mgi);
                     autoAddedModules.Add(module.ID, mgi);
 

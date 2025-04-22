@@ -60,6 +60,25 @@ public sealed class EquippableWareEquipmentManager : INotifyCollectionChanged
 
 
     /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    /// <param name="ware">ウェア</param>
+    public EquippableWareEquipmentManager(IEquippableWare ware, IEnumerable<IEquipment> equipments)
+    {
+        Ware = ware;
+
+        //if (!CanEquipped) throw new InvalidOperationException();
+
+        _equipped = [];
+
+        foreach (var equipment in equipments)
+        {
+            AddEquipmentInternal(equipment);
+        }
+    }
+
+
+    /// <summary>
     /// コピーコンストラクタ
     /// </summary>
     /// <param name="manager">コピー元インスタンス</param>

@@ -112,7 +112,7 @@ partial class StationCalculatorImporter : ObservableObject, IImporter
                 .Select(x => (Module: X4Database.Instance.Ware.TryGet<IX4Module>(x.Groups[1].Value), Count: long.Parse(x.Groups[2].Value)))
                 .Where(x => x.Module is not null)
                 .Select(x => (Module: x.Module!, x.Count))
-                .Select(x => new ModulesGridItem(messenger, x.Module, null, x.Count) { EditStatus = EditStatus.Unedited });
+                .Select(x => new ModulesGridItem(messenger, x.Module, null, x.Count, [], EditStatus.Unedited));
 
 
             workArea.StationData.ModulesInfo.Modules.AddRange(modules);
