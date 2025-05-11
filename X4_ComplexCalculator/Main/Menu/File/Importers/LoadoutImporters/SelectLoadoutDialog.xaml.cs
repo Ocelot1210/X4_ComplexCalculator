@@ -7,7 +7,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Importers.LoadoutImporters;
 /// <summary>
 /// SelectLoadoutDialog.xaml の相互作用ロジック
 /// </summary>
-public partial class SelectLoadoutDialog : Window
+public sealed partial class SelectLoadoutDialog : Window
 {
     /// <summary>
     /// コンストラクタ

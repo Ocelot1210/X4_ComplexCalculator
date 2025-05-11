@@ -21,7 +21,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Importers.StationPlanImporters;
 /// <summary>
 /// 既存の計画ファイルからインポートする
 /// </summary>
-partial class StationPlanImporter : ObservableObject, IImporter
+sealed partial class StationPlanImporter : ObservableObject, IImporter
 {
     #region メンバ
     /// <summary>

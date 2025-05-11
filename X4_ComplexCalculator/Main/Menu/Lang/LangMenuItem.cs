@@ -16,7 +16,7 @@ namespace X4_ComplexCalculator.Main.Menu.Lang;
 /// コンストラクタ
 /// </remarks>
 /// <param name="cultureInfo">言語情報</param>
-public partial class LangMenuItem(IMessenger messenger, CultureInfo cultureInfo, bool isChecked) : ObservableRecipient(messenger), IRecipient<LangChangedMessage>
+public sealed partial class LangMenuItem(IMessenger messenger, CultureInfo cultureInfo, bool isChecked) : ObservableRecipient(messenger), IRecipient<LangChangedMessage>
 {
     #region メンバ
     /// <summary>

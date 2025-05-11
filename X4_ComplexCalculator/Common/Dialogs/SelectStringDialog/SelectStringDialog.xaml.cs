@@ -8,7 +8,7 @@ namespace X4_ComplexCalculator.Common.Dialogs.SelectStringDialog;
 /// <summary>
 /// EditStringDialog.xaml の相互作用ロジック
 /// </summary>
-public partial class SelectStringDialog : Window
+public sealed partial class SelectStringDialog : Window
 {
     /// <summary>
     /// コンストラクタ

@@ -12,7 +12,7 @@ namespace X4_ComplexCalculator.Common;
 /// <summary>
 /// 設定ファイル読み込み用
 /// </summary>
-public class Configuration
+public sealed class Configuration
 {
     #region スタティックプロパティ
     /// <summary>

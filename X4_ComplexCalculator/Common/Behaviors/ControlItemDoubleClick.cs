@@ -9,7 +9,7 @@ namespace X4_ComplexCalculator.Common.Behaviors;
 /// <summary>
 /// ItemsControlにダブルクリックを処理させるかを設定する添付プロパティ
 /// </summary>
-public class ControlItemDoubleClick : DependencyObject
+public sealed class ControlItemDoubleClick : DependencyObject
 {
     /// <summary>
     /// ItemsControlにダブルクリックを処理させるか
@@ -49,7 +49,6 @@ public class ControlItemDoubleClick : DependencyObject
     }
 
 
-
     /// <summary>
     /// マウスダブルクリック時
     /// </summary>
@@ -63,9 +62,9 @@ public class ControlItemDoubleClick : DependencyObject
         }
 
         var mouseBindings = control.InputBindings.OfType<MouseBinding>()
-                                                 .Where(x => x.Gesture is not null &&
-                                                             ((MouseGesture)x.Gesture).MouseAction == MouseAction.LeftDoubleClick &&
-                                                             x.Command.CanExecute(null));
+            .Where(x => x.Gesture is not null &&
+                        ((MouseGesture)x.Gesture).MouseAction == MouseAction.LeftDoubleClick &&
+                        x.Command.CanExecute(null));
 
         foreach (var b in mouseBindings)
         {

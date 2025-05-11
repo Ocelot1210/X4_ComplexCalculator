@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
+using System.Windows.Threading;
 using X4_ComplexCalculator.Common;
 
 namespace X4_ComplexCalculator.Main.WorkArea.SaveDataReaders;
@@ -66,17 +67,10 @@ internal sealed partial class SaveDataReaderProgress : ObservableObject
 
 
     /// <summary>
-    /// 読み込み予定のファイル数
+    /// ファイル読み込み開始時のビジーインジゲータ更新開始
     /// </summary>
-    public void Init(int filesCount)
-    {
-        _loaded = 0;
-        Value = 0;
-        Maximum  = filesCount * 100;
-    }
-
-
-
+    /// <param name="filesCount">読み込む対象のファイル数</param>
+    /// <returns>自動で後始末する処理を呼ぶための簡易IDisposable</returns>
     public IDisposable Start(int filesCount)
     {
         _loaded = 0;

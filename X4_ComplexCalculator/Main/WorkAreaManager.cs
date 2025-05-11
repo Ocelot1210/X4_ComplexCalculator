@@ -23,7 +23,7 @@ namespace X4_ComplexCalculator.Main;
 /// <summary>
 /// 作業エリア管理用
 /// </summary>
-partial class WorkAreaManager : ObservableRecipientEx
+sealed partial class WorkAreaManager : ObservableRecipientEx
 {
     #region メンバ
     /// <summary>

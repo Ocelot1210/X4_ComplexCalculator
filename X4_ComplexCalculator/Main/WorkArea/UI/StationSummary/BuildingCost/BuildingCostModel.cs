@@ -12,7 +12,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.StationSummary.BuildingCost;
 /// <summary>
 /// 建造コスト用
 /// </summary>
-partial class BuildingCostModel : ObservableRecipientEx
+sealed partial class BuildingCostModel : ObservableRecipientEx
 {
     #region メンバ
     /// <summary>

@@ -8,7 +8,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Importers.SaveDataImporters;
 /// </summary>
 /// <param name="sectorName">セクター名</param>
 /// <param name="xElement">xml内容</param>
-public partial class SaveDataStationItem(string sectorName, XElement xElement) : ObservableObject
+public sealed partial class SaveDataStationItem(string sectorName, XElement xElement) : ObservableObject
 {
     #region プロパティ
     /// <summary>

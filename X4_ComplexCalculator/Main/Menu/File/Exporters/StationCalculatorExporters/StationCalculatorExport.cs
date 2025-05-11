@@ -14,7 +14,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Exporters.StationCalculatorExporte
 /// コンストラクタ
 /// </remarks>
 /// <param name="workAreaManager">作業エリア管理</param>
-partial class StationCalculatorExporter(WorkAreaManager workAreaManager) : ObservableObject, IExporter
+sealed partial class StationCalculatorExporter(WorkAreaManager workAreaManager) : ObservableObject, IExporter
 {
     /// <summary>
     /// 作業エリア管理

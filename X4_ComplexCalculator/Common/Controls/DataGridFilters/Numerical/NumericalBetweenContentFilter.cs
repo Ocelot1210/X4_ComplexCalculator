@@ -7,7 +7,7 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilters.Numerical;
 /// <summary>
 /// 数値フィルタ用クラス(指定の範囲内用)
 /// </summary>
-class NumericalBetweenContentFilter : IDataGridFilter
+sealed class NumericalBetweenContentFilter : IDataGridFilter
 {
     #region メンバ
     /// <summary>

@@ -8,7 +8,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Importers.StationPlanImporters;
 /// <summary>
 /// SelectPlanWindow.xaml の相互作用ロジック
 /// </summary>
-public partial class SelectPlanDialog : Window
+public sealed partial class SelectPlanDialog : Window
 {
     /// <summary>
     /// コンストラクタ

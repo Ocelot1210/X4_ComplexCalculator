@@ -3,7 +3,7 @@ using System.Windows.Controls;
 
 namespace X4_ComplexCalculator.Common.Behaviors;
 
-public class HorizontalScrollSyncBehavior
+public sealed class HorizontalScrollSyncBehavior
 {
     public static readonly DependencyProperty SyncElementProperty =
         DependencyProperty.RegisterAttached("SyncElement", typeof(ScrollViewer), typeof(HorizontalScrollSyncBehavior), new PropertyMetadata(PropertyCallback));

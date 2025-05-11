@@ -11,7 +11,7 @@ namespace X4_ComplexCalculator.Common.Dialogs.MessageBoxes;
 /// <summary>
 /// メッセージボックスの表示を行うクラス
 /// </summary>
-public class LocalizedMessageBoxEx : ILocalizedMessageBox
+public sealed class LocalizedMessageBoxEx : ILocalizedMessageBox
 {
     /// <summary>
     /// 親ウィンドウ

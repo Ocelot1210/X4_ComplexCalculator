@@ -7,7 +7,7 @@ namespace X4_ComplexCalculator.Common.Behaviors;
 /// <summary>
 /// 参考：https://dotnetmemo.hatenadiary.org/entry/20120212/1329061121
 /// </summary>
-public class DataGridHeaderThumbBehavior
+public sealed class DataGridHeaderThumbBehavior
 {
     public static readonly DependencyProperty SyncColumnProperty =
         DependencyProperty.RegisterAttached("SyncColumn", typeof(DataGridColumn), typeof(DataGridHeaderThumbBehavior), new PropertyMetadata(PropertyCallback));
@@ -42,6 +42,4 @@ public class DataGridHeaderThumbBehavior
             source.DragDelta += eventHandler;
         }
     }
-
-
 }

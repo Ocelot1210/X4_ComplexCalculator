@@ -14,7 +14,7 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilters.MultiList;
 /// <summary>
 /// MultiListFilter.xaml の相互作用ロジック
 /// </summary>
-public partial class MultiListFilter
+public sealed partial class MultiListFilter
 {
     #region メンバ
     /// <summary>

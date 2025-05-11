@@ -7,7 +7,7 @@ namespace X4_ComplexCalculator.Main.Menu.Lang
     /// 言語が変わった事を表すメッセージ
     /// </summary>
     /// <param name="cultureInfo">変更後の言語</param>
-    public class LangChangedMessage(CultureInfo cultureInfo) : ValueChangedMessage<CultureInfo>(cultureInfo)
+    public sealed class LangChangedMessage(CultureInfo cultureInfo) : ValueChangedMessage<CultureInfo>(cultureInfo)
     {
     }
 }

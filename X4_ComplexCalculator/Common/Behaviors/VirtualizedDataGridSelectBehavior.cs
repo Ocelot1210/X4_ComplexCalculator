@@ -10,7 +10,7 @@ namespace X4_ComplexCalculator.Common.Behaviors;
 /// <summary>
 /// 仮想化を行ったDataGridも正しく選択できるようにするビヘイビア
 /// </summary>
-public class VirtualizedDataGridSelectBehavior
+public sealed class VirtualizedDataGridSelectBehavior
 {
     /// <summary>
     /// 添付ビヘイビアの有効/無効を設定するメンバ名

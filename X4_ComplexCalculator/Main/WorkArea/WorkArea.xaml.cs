@@ -5,7 +5,7 @@ namespace X4_ComplexCalculator.Main.WorkArea;
 /// <summary>
 /// WorkArea.xaml の相互作用ロジック
 /// </summary>
-public partial class WorkArea : UserControl
+public sealed partial class WorkArea : UserControl
 {
     /// <summary>
     /// コンストラクタ

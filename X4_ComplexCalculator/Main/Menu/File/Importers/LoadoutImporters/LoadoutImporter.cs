@@ -6,7 +6,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Importers.LoadoutImporters;
 /// <summary>
 /// 装備をインポート
 /// </summary>
-partial class LoadoutImporter : ObservableObject, IImporter
+sealed partial class LoadoutImporter : ObservableObject, IImporter
 {
     /// <summary>
     /// メニュー表示用タイトル

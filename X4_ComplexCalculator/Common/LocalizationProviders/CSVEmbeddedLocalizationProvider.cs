@@ -29,7 +29,7 @@ using XAMLMarkupExtensions.Base;
 /// <summary>
 /// A singleton CSV provider that uses attached properties and the Parent property to iterate through the visual tree.
 /// </summary>
-public class CSVEmbeddedLocalizationProvider : CSVLocalizationProviderBase
+public sealed class CSVEmbeddedLocalizationProvider : CSVLocalizationProviderBase
 {
     #region Dependency Properties
     /// <summary>

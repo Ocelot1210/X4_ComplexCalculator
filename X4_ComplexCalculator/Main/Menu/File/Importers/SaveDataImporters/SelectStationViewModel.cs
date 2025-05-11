@@ -7,7 +7,7 @@ using X4_ComplexCalculator.Common.Dialogs.MessageBoxes;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Importers.SaveDataImporters;
 
-partial class SelectStationViewModel : ObservableObject
+sealed partial class SelectStationViewModel : ObservableObject
 {
     #region メンバ
     /// <summary>

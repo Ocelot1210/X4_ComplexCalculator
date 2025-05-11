@@ -15,7 +15,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Importers.LoadoutImporters;
 /// <summary>
 /// モジュール装備インポート画面のModel
 /// </summary>
-partial class LoadoutImporterModel : ObservableObject
+sealed partial class LoadoutImporterModel : ObservableObject
 {
     #region メンバ
     /// <summary>

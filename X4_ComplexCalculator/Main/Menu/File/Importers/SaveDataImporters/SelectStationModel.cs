@@ -18,7 +18,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Importers.SaveDataImporters;
 /// コンストラクタ
 /// </summary>
 /// <param name="messageBox">メッセージボックス表示用</param>
-partial class SelectStationModel(List<SaveDataStationItem> stationItems, ILocalizedMessageBox messageBox) : ObservableObject
+sealed partial class SelectStationModel(List<SaveDataStationItem> stationItems, ILocalizedMessageBox messageBox) : ObservableObject
 {
     #region メンバ
     /// <summary>

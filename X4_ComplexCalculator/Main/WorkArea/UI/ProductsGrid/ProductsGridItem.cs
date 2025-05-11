@@ -15,7 +15,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ProductsGrid;
 /// <summary>
 /// 製品一覧を表示するDataGridViewの1レコード分用クラス
 /// </summary>
-public partial class ProductsGridItem : ObservableRecipientEx, IEditable, ISelectable
+public sealed partial class ProductsGridItem : ObservableRecipientEx, IEditable, ISelectable
 {
     #region プロパティ
     /// <summary>

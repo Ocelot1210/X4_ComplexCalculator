@@ -5,7 +5,7 @@ namespace X4_ComplexCalculator.Common;
 /// <summary>
 /// データ中継用クラス
 /// </summary>
-public class BindingProxy : Freezable
+public sealed class BindingProxy : Freezable
 {
     protected override Freezable CreateInstanceCore()
     {

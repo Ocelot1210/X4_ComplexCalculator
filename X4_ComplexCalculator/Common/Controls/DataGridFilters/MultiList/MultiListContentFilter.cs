@@ -9,7 +9,7 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilters.MultiList;
 /// <summary>
 /// マルチリストフィルタ用クラス
 /// </summary>
-public class MultiListContentFilter : IDataGridFilter
+public sealed class MultiListContentFilter : IDataGridFilter
 {
     #region プロパティ
     /// <summary>

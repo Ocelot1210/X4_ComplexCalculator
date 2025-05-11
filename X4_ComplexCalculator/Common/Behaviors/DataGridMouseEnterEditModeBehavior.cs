@@ -8,7 +8,7 @@ namespace X4_ComplexCalculator.Common.Behaviors;
 /// <summary>
 /// マウスカーソルがセルに乗った時に編集モードにするビヘイビア
 /// </summary>
-public class DataGridMouseEnterEditModeBehavior : Behavior<DataGridCell>
+public sealed class DataGridMouseEnterEditModeBehavior : Behavior<DataGridCell>
 {
     /// <summary>
     /// マウスカーソル座標

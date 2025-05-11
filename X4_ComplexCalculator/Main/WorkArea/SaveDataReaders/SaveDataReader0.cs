@@ -106,7 +106,7 @@ class SaveDataReader0(IMessenger messenger, IWorkArea WorkArea) : ISaveDataReade
             {
                 tmpModules.Add((module, count));
             }
-            progress.Report((double)progressCnt++ / (records * maxProgress));
+            progress.Report(((double)progressCnt++ / records) * maxProgress);
         }
 
         using var modules = new PooledList<ModulesGridItem>(moduleCnt);

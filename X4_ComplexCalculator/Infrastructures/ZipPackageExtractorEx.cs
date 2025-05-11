@@ -12,7 +12,7 @@ namespace X4_ComplexCalculator.Infrastructures;
 /// <see cref="ZipPackageExtractor">ZipPackageExtractor</see>
 /// をベースに特定のフォルダ内のみを解凍する PackageExtractor
 /// </summary>
-internal class ZipExcerptPackageExtractor : IPackageExtractor
+internal sealed class ZipExcerptPackageExtractor : IPackageExtractor
 {
     #region スタティックメンバ
     /// <summary>

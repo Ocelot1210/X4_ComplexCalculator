@@ -11,7 +11,7 @@ using X4_ComplexCalculator.Common.Dialogs.MessageBoxes;
 
 namespace X4_ComplexCalculator.Main.Menu.File.Importers.StationPlanImporters;
 
-partial class SelectPlanModel : ObservableObject
+sealed partial class SelectPlanModel : ObservableObject
 {
     #region メンバ
     /// <summary>

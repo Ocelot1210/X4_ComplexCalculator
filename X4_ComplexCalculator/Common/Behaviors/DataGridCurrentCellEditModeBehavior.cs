@@ -8,7 +8,7 @@ namespace X4_ComplexCalculator.Common.Behaviors;
 /// <summary>
 /// カレントセルを自動的に編集モードにするBehavior
 /// </summary>
-public class DataGridCurrentCellEditModeBehavior : Behavior<DataGrid>
+public sealed class DataGridCurrentCellEditModeBehavior : Behavior<DataGrid>
 {
     /// <summary>
     /// カレントセルを編集モードにするかのプロパティ

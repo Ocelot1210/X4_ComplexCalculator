@@ -7,7 +7,7 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilters.Text;
 /// <summary>
 /// TextFilter.xaml の相互作用ロジック
 /// </summary>
-public partial class TextFilter
+public sealed partial class TextFilter
 {
     #region メンバ
     /// <summary>

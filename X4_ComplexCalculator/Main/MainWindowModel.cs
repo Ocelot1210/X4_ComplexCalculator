@@ -13,7 +13,7 @@ namespace X4_ComplexCalculator.Main;
 /// </summary>
 /// <param name="workAreaManager">作業エリア管理用</param>
 /// <param name="localizedMessageBox">メッセージボックス表示用</param>
-class MainWindowModel(WorkAreaManager workAreaManager, ILocalizedMessageBox localizedMessageBox)
+sealed class MainWindowModel(WorkAreaManager workAreaManager, ILocalizedMessageBox localizedMessageBox)
 {
     #region メンバ
     /// <summary>

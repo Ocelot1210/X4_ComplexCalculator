@@ -20,7 +20,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 /// <param name="messanger">メッセージ交換用</param>
 /// <param name="modulesInfo">モジュール一覧</param>
 /// <param name="localizedMessageBox">メッセージボックス表示用</param>
-class ModulesGridModel(IMessenger messenger, ModulesInfo modulesInfo, ILocalizedMessageBox localizedMessageBox) : ObservableRecipient(messenger), IDisposable
+sealed class ModulesGridModel(IMessenger messenger, ModulesInfo modulesInfo, ILocalizedMessageBox localizedMessageBox) : ObservableRecipient(messenger), IDisposable
 {
     #region メンバ
     /// <summary>

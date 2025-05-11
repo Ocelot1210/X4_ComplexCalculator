@@ -134,11 +134,11 @@ partial class MainWindowViewModel : ObservableRecipient, IDropTarget
     /// <param name="messageBox">メッセージボックス表示用</param>
     public MainWindowViewModel(IMessenger messenger, ILocalizedMessageBox messageBox) : base(messenger)
     {
-        _localizedMessageBox             = messageBox;
-        _workAreaManager                 = new(Messenger, _localizedMessageBox, SaveDataReaderProgress);
-        _model                           = new(_workAreaManager, _localizedMessageBox);
-        _helpMenu                        = new HelpMenu(_localizedMessageBox);
-        CheckUpdateAtLaunch              = Configuration.Instance.CheckUpdateAtLaunch;
+        _localizedMessageBox = messageBox;
+        _workAreaManager     = new(Messenger, _localizedMessageBox, SaveDataReaderProgress);
+        _model               = new(_workAreaManager, _localizedMessageBox);
+        _helpMenu            = new HelpMenu(_localizedMessageBox);
+        CheckUpdateAtLaunch  = Configuration.Instance.CheckUpdateAtLaunch;
 
         Importers =
         [

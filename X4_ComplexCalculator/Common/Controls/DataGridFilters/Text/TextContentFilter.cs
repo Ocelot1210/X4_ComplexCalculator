@@ -7,7 +7,7 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilters.Text;
 /// <summary>
 /// 文字列フィルタ用クラス
 /// </summary>
-class TextContentFilter : IDataGridFilter
+sealed class TextContentFilter : IDataGridFilter
 {
     /// <summary>
     /// フィルタ文字列

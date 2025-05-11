@@ -8,7 +8,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Importers.SaveDataImporters;
 /// <summary>
 /// SelectStationDialog.xaml の相互作用ロジック
 /// </summary>
-public partial class SelectStationDialog : Window
+public sealed partial class SelectStationDialog : Window
 {
     /// <summary>
     /// コンストラクタ

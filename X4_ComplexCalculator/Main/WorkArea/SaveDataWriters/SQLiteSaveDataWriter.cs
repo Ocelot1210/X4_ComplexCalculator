@@ -185,7 +185,7 @@ sealed class SQLiteSaveDataWriter(ILocalizedMessageBox messageBox) : ISaveDataWr
     /// <summary>
     /// Dappar が IWare を WareID に変換するためのクラス
     /// </summary>
-    private class WareTypeHandler : SqlMapper.TypeHandler<IWare>
+    private sealed class WareTypeHandler : SqlMapper.TypeHandler<IWare>
     {
         /// <inheritdoc />
         public override IWare Parse(object value) => throw new NotImplementedException();

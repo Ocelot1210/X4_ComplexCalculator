@@ -14,7 +14,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Importers.LoadoutImporters;
 /// <summary>
 /// 装備一覧アイテム1レコード分
 /// </summary>
-public class LoadoutItem : ObservableObject
+public sealed class LoadoutItem : ObservableObject
 {
     #region メンバ
     /// <summary>

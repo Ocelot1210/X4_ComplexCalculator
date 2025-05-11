@@ -10,7 +10,7 @@ namespace X4_ComplexCalculator.Main;
 /// <summary>
 /// AvalonDock のドッキング/ドッキング解除時の親ウィンドウを子に設定するクラス
 /// </summary>
-internal class OwnerWindowSetter : Behavior<ContentControl>
+internal sealed class OwnerWindowSetter : Behavior<ContentControl>
 {
     private DockingManager? _dockingManager;
 

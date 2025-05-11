@@ -8,7 +8,7 @@ namespace X4_ComplexCalculator.Common.Controls.DataGridFilters.Numerical;
 /// <summary>
 /// NumericalFilter.xaml の相互作用ロジック
 /// </summary>
-public partial class NumericalFilter
+public sealed partial class NumericalFilter
 {
     #region メンバ
     /// <summary>

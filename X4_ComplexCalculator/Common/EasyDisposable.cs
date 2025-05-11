@@ -1,36 +1,36 @@
 ﻿using System;
 
-namespace X4_ComplexCalculator.Common
+namespace X4_ComplexCalculator.Common;
+
+
+/// <summary>
+/// 簡易 <see cref="IDisposable"/> 実装
+/// </summary>
+public sealed class EasyDisposable : IDisposable
 {
-    /// <summary>
-    /// 簡易 <see cref="IDisposable"/> 実装
-    /// </summary>
-    public class EasyDisposable : IDisposable
+    public Action? DisposeAction { init; private get; }
+
+
+    #region IDisposable
+    private bool _disposedValue;
+
+    void Dispose(bool disposing)
     {
-        public Action? DisposeAction { init; private get; }
-
-
-        #region IDisposable
-        private bool _disposedValue;
-
-        protected virtual void Dispose(bool disposing)
+        if (!_disposedValue)
         {
-            if (!_disposedValue)
+            if (disposing)
             {
-                if (disposing)
-                {
-                    DisposeAction?.Invoke();
-                }
-
-                _disposedValue = true;
+                DisposeAction?.Invoke();
             }
-        }
 
-        public void Dispose()
-        {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
+            _disposedValue = true;
         }
-        #endregion
     }
+
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+    #endregion
 }

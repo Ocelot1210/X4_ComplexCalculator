@@ -8,7 +8,7 @@ namespace X4_ComplexCalculator.Common;
 /// <summary>
 /// マウスホバー時に編集モードになるセル
 /// </summary>
-public class MouseHoverEditCellColumn : DataGridTemplateColumn
+public sealed class MouseHoverEditCellColumn : DataGridTemplateColumn
 {
     /// <summary>
     /// セル作成

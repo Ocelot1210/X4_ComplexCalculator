@@ -12,7 +12,7 @@ namespace X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid;
 /// <summary>
 /// モジュール一覧の入れ替えを行うクラス
 /// </summary>
-public partial class ModulesReorder : ObservableObject
+public sealed partial class ModulesReorder : ObservableObject
 {
     #region メンバ
     /// <summary>

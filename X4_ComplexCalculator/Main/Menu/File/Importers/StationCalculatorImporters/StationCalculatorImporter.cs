@@ -19,7 +19,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Importers.StationCalculatorImporte
 /// <summary>
 /// Station Calculatorからインポートする
 /// </summary>
-partial class StationCalculatorImporter : ObservableObject, IImporter
+sealed partial class StationCalculatorImporter : ObservableObject, IImporter
 {
     #region メンバ
     /// <summary>

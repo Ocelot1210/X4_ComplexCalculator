@@ -10,7 +10,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Importers.LoadoutImporters;
 /// モジュール装備インポート画面のViewModel
 /// </summary>
 /// <param name="localizedMessageBox">メッセージボックス表示用</param>
-partial class LoadoutImporterViewModel(ILocalizedMessageBox localizedMessageBox) : ObservableObject
+sealed partial class LoadoutImporterViewModel(ILocalizedMessageBox localizedMessageBox) : ObservableObject
 {
     #region メンバ
     /// <summary>

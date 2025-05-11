@@ -19,7 +19,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Importers.SaveDataImporters;
 /// </summary>
 /// <param name="workAreaManager">作業エリア管理用</param>
 /// <param name="localizedMessageBox">メッセージボックス表示用</param>
-partial class SaveDataImporter(WorkAreaManager workAreaManager, ILocalizedMessageBox localizedMessageBox) : ObservableObject, IImporter
+sealed partial class SaveDataImporter(WorkAreaManager workAreaManager, ILocalizedMessageBox localizedMessageBox) : ObservableObject, IImporter
 {
     #region メンバ
     /// <summary>
