@@ -20,7 +20,7 @@ public static class XAttributeExtension
         try
         {
             var value = attr?.Value ?? throw XmlFormatException.CreateFrom(attr);
-            return double.Parse(value, CultureInfo.InvariantCulture);
+            return double.Parse(value, NumberStyles.Any, CultureInfo.InvariantCulture);
         }
         catch (SystemException exception)
         {
@@ -39,7 +39,7 @@ public static class XAttributeExtension
         try
         {
             var value = attr?.Value ?? throw XmlFormatException.CreateFrom(attr);
-            return double.Parse(value, CultureInfo.InvariantCulture);
+            return double.Parse(value, NumberStyles.Any, CultureInfo.InvariantCulture);
         }
         catch
         {
@@ -59,7 +59,14 @@ public static class XAttributeExtension
         try
         {
             var value = attr?.Value ?? throw XmlFormatException.CreateFrom(attr);
-            return int.Parse(value, CultureInfo.InvariantCulture);
+
+            if (int.TryParse(value, CultureInfo.InvariantCulture, out var ret))
+            {
+                return ret;
+            }
+
+            // int で Parse 出来なかったら double で Parse を試みる
+            return (int)double.Parse(value, NumberStyles.Any, CultureInfo.InvariantCulture);
         }
         catch (SystemException exception)
         {

@@ -23,4 +23,16 @@ public class XAttributeExtensionTest
         var time = new XAttribute("time", "1.5");
         Assert.Equal(1.5, time.GetDouble());
     }
+
+
+    /// <summary>
+    /// 整数を期待する属性に実数が混じるとデータ抽出に失敗する
+    /// 参照: <a href="https://github.com/Ocelot1210/X4_ComplexCalculator/issues/190>#190</a>
+    /// </summary>
+    [Fact]
+    public void ParseDecimalInt()
+    {
+        var price = new XAttribute("min", "87682.6");
+        Assert.Equal(87682, price.GetInt());
+    }
 }
