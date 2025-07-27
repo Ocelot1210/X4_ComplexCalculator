@@ -260,14 +260,15 @@ sealed class ProductCalculator
                     addModuleProducts.Add((X4Database.Instance.Ware.Get(addProduct.WareID), addProduct.WareAmount * modCount));
                 }
 
-                // 追加予定モジュールにモジュールを追加
-                if (addModules.ContainsKey(module))
+                // モジュール数が 0 を超える場合のみ追加する。
+                // ※ 日光が 0% のセクターではエネルギーーセルを製造できず、追加モジュール数が 0 になる事を考慮
+                if (0 < modCount)
                 {
-                    addModules[module] += modCount;
-                }
-                else
-                {
-                    addModules.Add(module, modCount);
+                    // 追加予定モジュールにモジュールを追加
+                    if (!addModules.TryAdd(module, modCount))
+                    {
+                        addModules[module] += modCount;
+                    }
                 }
             }
         }
