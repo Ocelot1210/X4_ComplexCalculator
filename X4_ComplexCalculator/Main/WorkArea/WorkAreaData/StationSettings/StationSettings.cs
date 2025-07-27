@@ -35,6 +35,6 @@ public sealed partial class StationSettingInfo(IMessenger messenger) : Observabl
     /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedRecipients]
-    public partial double Sunlight { get; set; }
+    public partial double Sunlight { get; set; } = 100;
     #endregion
 }
