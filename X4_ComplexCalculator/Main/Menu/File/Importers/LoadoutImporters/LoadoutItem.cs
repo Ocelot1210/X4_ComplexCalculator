@@ -1,5 +1,4 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -14,7 +13,7 @@ namespace X4_ComplexCalculator.Main.Menu.File.Importers.LoadoutImporters;
 /// <summary>
 /// 装備一覧アイテム1レコード分
 /// </summary>
-public sealed class LoadoutItem : ObservableObject
+public sealed partial class LoadoutItem : ObservableObject
 {
     #region メンバ
     /// <summary>
@@ -46,7 +45,7 @@ public sealed class LoadoutItem : ObservableObject
     /// <summary>
     /// 装備
     /// </summary>
-    public EquippableWareEquipmentManager Equipment { get; }
+    public EquippableWareEquipmentManager Equipments { get; }
 
 
     /// <summary>
@@ -83,15 +82,17 @@ public sealed class LoadoutItem : ObservableObject
 
 
     /// <summary>
-    /// タレット情報
+    /// タレット数
     /// </summary>
-    public EquipmentsInfo TurretInfo { get; }
+    [ObservableProperty]
+    public partial long TurretsCount { get; private set; }
 
 
     /// <summary>
-    /// シールド情報
+    /// シールド数
     /// </summary>
-    public EquipmentsInfo ShieldInfo { get; }
+    [ObservableProperty]
+    public partial long ShieldsCount { get; private set; }
     #endregion
 
 
@@ -119,8 +120,6 @@ public sealed class LoadoutItem : ObservableObject
     }
 
 
-
-
     /// <summary>
     /// コンストラクタ
     /// </summary>
@@ -131,7 +130,7 @@ public sealed class LoadoutItem : ObservableObject
         Name = elm.Attribute("name")?.Value ?? "";
 
         Module = module;
-        Equipment = new EquippableWareEquipmentManager(module);
+        Equipments = new EquippableWareEquipmentManager(module);
 
         AddEquipment(elm.XPathSelectElements("groups/shields"));
         AddEquipment(elm.XPathSelectElements("groups/turrets"));
@@ -139,7 +138,7 @@ public sealed class LoadoutItem : ObservableObject
 
         // 同一の内容がプリセット一覧に無ければインポート可能にする
         {
-            var currentEquipmentIds = Equipment.AllEquipments.Select(x => x.ID).OrderBy(x => x).ToArray();
+            var currentEquipmentIds = Equipments.AllEquipments.Select(x => x.ID).OrderBy(x => x).ToArray();
 
             // 同一モジュールの同一名称のプリセットを取得する
             var presets = SettingDatabase.Instance.GetModulePreset(module.ID)
@@ -163,8 +162,8 @@ public sealed class LoadoutItem : ObservableObject
             }
         }
 
-        TurretInfo = new EquipmentsInfo(Equipment, "turrets");
-        ShieldInfo = new EquipmentsInfo(Equipment, "shields");
+        TurretsCount = Equipments.AllEquipments.Count(x => x.EquipmentType.EquipmentTypeID == "turrets");
+        ShieldsCount = Equipments.AllEquipments.Count(x => x.EquipmentType.EquipmentTypeID == "shields");
     }
 
 
@@ -188,7 +187,7 @@ public sealed class LoadoutItem : ObservableObject
             var max = int.Parse(elm.Attribute("exact")?.Value ?? "1");
             if (equipment is not null)
             {
-                Equipment.Add(equipment, max);
+                Equipments.Add(equipment, max);
             }
         }
     }
@@ -204,7 +203,7 @@ public sealed class LoadoutItem : ObservableObject
 
         try
         {
-            SettingDatabase.Instance.AddModulePreset(Module.ID, presetID, Name, Equipment.AllEquipments);
+            SettingDatabase.Instance.AddModulePreset(Module.ID, presetID, Name, Equipments.AllEquipments);
             Imported = true;
         }
         catch

@@ -13,6 +13,7 @@
     Height="400"
     x4bhv:CloseWindowBehavior.Close="{Binding CloseDialogProperty, Mode=OneWay}"
     x4bhv:CloseWindowBehavior.Result="{Binding DialogResult, Mode=OneWay}"
+    xmlns:x4modgridcvt="clr-namespace:X4_ComplexCalculator.Main.WorkArea.UI.ModulesGrid.Converters"
     Style="{StaticResource DefaultWindowBackgroundStyle}"
     WindowStartupLocation="CenterOwner"
     WindowStyle="ToolWindow"
@@ -21,6 +22,10 @@
     <Window.Resources>
         <!--  データ中継用  -->
         <x4cmn:BindingProxy x:Key="ProxyIsCheckedAll" Data="{Binding IsCheckedAll, Mode=TwoWay}" />
+
+        <!--  ツールチップ作成用  -->
+        <x4modgridcvt:EquipmentToTooltipTextConverter x:Key="EquipmentToTooltipTextConverter"/>
+        
     </Window.Resources>
 
     <Grid Margin="5">
@@ -130,28 +135,22 @@
                         CanUserResize="False"
                         ClipboardContentBinding="{Binding TurretsCount, Mode=OneTime}"
                         Header="{lex:Loc Lang:Common_Turrets}"
-                        SortMemberPath="TurretInfo.Count">
+                        SortMemberPath="TurretsCount">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock
                                     VerticalAlignment="Center"
-                                    Text="{Binding TurretInfo.Count, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat='{}{0:N0}'}"
+                                    Text="{Binding TurretsCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat='{}{0:N0}'}"
                                     TextAlignment="Right"
                                     ToolTipService.ShowDuration="1000000">
-                                    <TextBlock.Style>
-                                        <Style TargetType="{x:Type TextBlock}">
-                                            <Setter Property="ToolTip">
-                                                <Setter.Value>
-                                                    <ToolTip HorizontalContentAlignment="Left">
-                                                        <TextBlock
-                                                            HorizontalAlignment="Left"
-                                                            Text="{Binding TurretInfo.DetailsText, Mode=OneTime}"
-                                                            TextAlignment="Left" />
-                                                    </ToolTip>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Style>
-                                    </TextBlock.Style>
+                                    <TextBlock.ToolTip>
+                                        <ToolTip HorizontalContentAlignment="Left">
+                                            <TextBlock
+                                            HorizontalAlignment="Left"
+                                            Text="{Binding Equipments, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EquipmentToTooltipTextConverter}, ConverterParameter=turrets}"
+                                            TextAlignment="Left" />
+                                        </ToolTip>
+                                    </TextBlock.ToolTip>
                                 </TextBlock>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
@@ -163,28 +162,22 @@
                         CanUserResize="False"
                         ClipboardContentBinding="{Binding ShieldsCount, Mode=OneTime}"
                         Header="{lex:Loc Lang:Common_Shields}"
-                        SortMemberPath="ShieldInfo.Count">
+                        SortMemberPath="ShieldsCount">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock
                                     VerticalAlignment="Center"
-                                    Text="{Binding ShieldInfo.Count, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat='{}{0:N0}'}"
+                                    Text="{Binding ShieldsCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat='{}{0:N0}'}"
                                     TextAlignment="Right"
                                     ToolTipService.ShowDuration="1000000">
-                                    <TextBlock.Style>
-                                        <Style TargetType="{x:Type TextBlock}">
-                                            <Setter Property="ToolTip">
-                                                <Setter.Value>
-                                                    <ToolTip HorizontalContentAlignment="Left">
-                                                        <TextBlock
-                                                            HorizontalAlignment="Left"
-                                                            Text="{Binding ShieldInfo.DetailsText, Mode=OneTime}"
-                                                            TextAlignment="Left" />
-                                                    </ToolTip>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Style>
-                                    </TextBlock.Style>
+                                    <TextBlock.ToolTip>
+                                        <ToolTip HorizontalContentAlignment="Left">
+                                            <TextBlock
+                                            HorizontalAlignment="Left"
+                                            Text="{Binding Equipments, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EquipmentToTooltipTextConverter}, ConverterParameter=shields}"
+                                            TextAlignment="Left" />
+                                        </ToolTip>
+                                    </TextBlock.ToolTip>
                                 </TextBlock>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>

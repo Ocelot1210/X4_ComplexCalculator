@@ -50,15 +50,17 @@ public sealed partial class ModulesGridItem : ObservableRecipientEx, IEditable, 
 
 
     /// <summary>
-    /// タレット情報
+    /// タレット数
     /// </summary>
-    public EquipmentsInfo Turrets { get; }
+    [ObservableProperty]
+    public partial long TurretsCount { get; private set; }
 
 
     /// <summary>
-    /// シールド情報
+    /// シールド数
     /// </summary>
-    public EquipmentsInfo Shields { get; }
+    [ObservableProperty]
+    public partial long ShieldsCount { get; private set; }
 
 
     /// <summary>
@@ -97,9 +99,7 @@ public sealed partial class ModulesGridItem : ObservableRecipientEx, IEditable, 
         Module = module;
         ModuleCount = moduleCount;
         Equipments = new EquippableWareEquipmentManager(module, equipments ?? []);
-        
-        Turrets = new EquipmentsInfo(Equipments, "turrets");
-        Shields = new EquipmentsInfo(Equipments, "shields");
+        UpdateEquipmentsCount();
 
         SelectedMethod = selectedMethod ?? Module.Productions.First().Value;
         EditStatus = editStatus;
@@ -117,14 +117,12 @@ public sealed partial class ModulesGridItem : ObservableRecipientEx, IEditable, 
     {
         Module = X4Database.Instance.Ware.TryGet<IX4Module>(element.Attribute("id")!.Value) ?? throw new ArgumentException("Invalid XElement.", nameof(element));
         Equipments = new EquippableWareEquipmentManager(Module, element.Element("equipments"));
+        UpdateEquipmentsCount();
 
         ModuleCount = long.Parse(element.Attribute("count")?.Value ?? "1");
 
         SelectedMethod = 
             Module.Productions.TryGetValue(element.Attribute("method")?.Value ?? "default", out var method) ? method : Module.Productions.Values.First();
-
-        Turrets = new EquipmentsInfo(Equipments, "turrets");
-        Shields = new EquipmentsInfo(Equipments, "shields");
 
         EditStatus = editStatus;
 
@@ -199,10 +197,10 @@ public sealed partial class ModulesGridItem : ObservableRecipientEx, IEditable, 
 
 
         {
-            (IList<IEquipment> OldEquipement, IEquipmentType EquipmentType, EquipmentsInfo Info)[] equipemtns = 
+            (IList<IEquipment> OldEquipement, IEquipmentType EquipmentType)[] equipemtns = 
             [
-                (turretsOld, turretsType, Turrets),
-                (shieldsOld, shieldsType, Shields)
+                (turretsOld, turretsType),
+                (shieldsOld, shieldsType)
             ];
 
             // 装備の内容に変更があったか？(建造コスト計算用。順番の変更は変更と見なさない)
@@ -214,14 +212,26 @@ public sealed partial class ModulesGridItem : ObservableRecipientEx, IEditable, 
 
                 Broadcast(turretsOld.Concat(shieldsOld), newItems, nameof(Equipments));
             }
+            
 
             // 装備の内容に変更があったものについては個数を更新(モジュール一覧表示用のため、順番の変更も変更と見なす)
-            foreach (var (_, _, info) in equipemtns.AsValueEnumerable().Where(x => !x.OldEquipement.AsValueEnumerable().SequenceEqual(Equipments.AllEquipments.AsValueEnumerable().Where(y => y.EquipmentType.Equals(x.EquipmentType)))))
+            if (equipemtns.AsValueEnumerable().Any(x => !x.OldEquipement.AsValueEnumerable().SequenceEqual(Equipments.AllEquipments.AsValueEnumerable().Where(y => y.EquipmentType.Equals(x.EquipmentType)))))
             {
-                info.UpdateCount();
+                UpdateEquipmentsCount();
+                OnPropertyChanged(nameof(Equipments));
                 EditStatus = EditStatus.Edited;
             }
         }
+    }
+
+
+    /// <summary>
+    /// タレット数とシールド数を更新
+    /// </summary>
+    private void UpdateEquipmentsCount()
+    {
+        TurretsCount = Equipments.AllEquipments.Count(x => x.EquipmentType.EquipmentTypeID == "turrets");
+        ShieldsCount = Equipments.AllEquipments.Count(x => x.EquipmentType.EquipmentTypeID == "shields");
     }
 
 

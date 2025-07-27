@@ -76,6 +76,8 @@
 
         <localcvt:ModuleNameConverter x:Key="ModuleNameConverter"/>
 
+        <localcvt:EquipmentToTooltipTextConverter x:Key="EquipmentToTooltipTextConverter"/>
+
     </UserControl.Resources>
 
     <DockPanel>
@@ -226,31 +228,25 @@
                 <!--  タレット数  -->
                 <DataGridTemplateColumn
                     CanUserResize="False"
-                    ClipboardContentBinding="{Binding Turrets.Count, Mode=OneTime}"
+                    ClipboardContentBinding="{Binding TurretsCount, Mode=OneTime}"
                     Header="{lex:Loc Lang:Common_Turrets}"
-                    SortMemberPath="Turrets.Count">
+                    SortMemberPath="TurretsCount">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock
                                 VerticalAlignment="Center"
-                                Text="{Binding Turrets.Count, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat='{}{0:N0}'}"
+                                Text="{Binding TurretsCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat='{}{0:N0}'}"
                                 TextAlignment="Right"
                                 ToolTipService.ShowDuration="1000000"
                                 Visibility="{Binding Equipments, Mode=OneTime, Converter={StaticResource EditEquipmentButtonVisiblityConverter}}">
-                                <TextBlock.Style>
-                                    <Style TargetType="{x:Type TextBlock}">
-                                        <Setter Property="ToolTip">
-                                            <Setter.Value>
-                                                <ToolTip HorizontalContentAlignment="Left">
-                                                    <TextBlock
-                                                        HorizontalAlignment="Left"
-                                                        Text="{Binding Turrets.DetailsText, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-                                                        TextAlignment="Left" />
-                                                </ToolTip>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </TextBlock.Style>
+                                <TextBlock.ToolTip>
+                                    <ToolTip HorizontalContentAlignment="Left">
+                                        <TextBlock
+                                            HorizontalAlignment="Left"
+                                            Text="{Binding Equipments, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EquipmentToTooltipTextConverter}, ConverterParameter=turrets}"
+                                            TextAlignment="Left" />
+                                    </ToolTip>
+                                </TextBlock.ToolTip>
                             </TextBlock>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -260,31 +256,25 @@
                 <!--  シールド数  -->
                 <DataGridTemplateColumn
                     CanUserResize="False"
-                    ClipboardContentBinding="{Binding Shields.Count, Mode=OneTime}"
+                    ClipboardContentBinding="{Binding ShieldsCount, Mode=OneTime}"
                     Header="{lex:Loc Lang:Common_Shields}"
-                    SortMemberPath="Shields.Count">
+                    SortMemberPath="ShieldsCount">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock
                                 VerticalAlignment="Center"
-                                Text="{Binding Shields.Count, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat='{}{0:N0}'}"
+                                Text="{Binding ShieldsCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, StringFormat='{}{0:N0}'}"
                                 TextAlignment="Right"
                                 ToolTipService.ShowDuration="1000000"
                                 Visibility="{Binding Equipments, Mode=OneTime, Converter={StaticResource EditEquipmentButtonVisiblityConverter}}">
-                                <TextBlock.Style>
-                                    <Style TargetType="{x:Type TextBlock}">
-                                        <Setter Property="ToolTip">
-                                            <Setter.Value>
-                                                <ToolTip HorizontalContentAlignment="Left">
-                                                    <TextBlock
-                                                        HorizontalAlignment="Left"
-                                                        Text="{Binding Shields.DetailsText, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-                                                        TextAlignment="Left" />
-                                                </ToolTip>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </TextBlock.Style>
+                                <TextBlock.ToolTip>
+                                    <ToolTip HorizontalContentAlignment="Left">
+                                        <TextBlock
+                                            HorizontalAlignment="Left"
+                                            Text="{Binding Equipments, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EquipmentToTooltipTextConverter}, ConverterParameter=shields}"
+                                            TextAlignment="Left" />
+                                    </ToolTip>
+                                </TextBlock.ToolTip>
                             </TextBlock>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
