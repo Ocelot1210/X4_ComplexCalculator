@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using X4_ComplexCalculator.DB;
 using X4_ComplexCalculator.Main.WorkArea.WorkAreaData.StationSettings;
@@ -83,7 +84,7 @@ class SaveDataReader2 : SaveDataReader1
         // 日光
         const string SQL_2 = "SELECT Value FROM StationSettings WHERE Key = 'Sunlight' UNION ALL SELECT '100' LIMIT 1";
         var sunLightString = conn.QuerySingle<string>(SQL_2);
-        if (double.TryParse(sunLightString, out var sunLight))
+        if (double.TryParse(sunLightString, CultureInfo.InvariantCulture, out var sunLight))
         {
             settings.Sunlight = sunLight;
         }
